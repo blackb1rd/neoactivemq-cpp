@@ -20,7 +20,7 @@
 
 // Turn off warning message for ignored exception specification
 #ifdef _MSC_VER
-#pragma warning( disable : 4290 )
+#pragma warning(disable : 4290)
 #endif
 
 #include <activemq/commands/ActiveMQDestination.h>
@@ -32,8 +32,10 @@
 #include <string>
 #include <vector>
 
-namespace activemq {
-namespace commands {
+namespace activemq
+{
+namespace commands
+{
 
     using decaf::lang::Pointer;
 
@@ -46,25 +48,23 @@ namespace commands {
      *         in the activemq-cpp-openwire-generator module
      *
      */
-    class AMQCPP_API MessageDispatchNotification : public BaseCommand {
+    class AMQCPP_API MessageDispatchNotification : public BaseCommand
+    {
     protected:
-
-        Pointer<ConsumerId> consumerId;
+        Pointer<ConsumerId>          consumerId;
         Pointer<ActiveMQDestination> destination;
-        long long deliverySequenceId;
-        Pointer<MessageId> messageId;
+        long long                    deliverySequenceId;
+        Pointer<MessageId>           messageId;
 
     public:
-
         const static unsigned char ID_MESSAGEDISPATCHNOTIFICATION = 90;
 
     private:
-
         MessageDispatchNotification(const MessageDispatchNotification&);
-        MessageDispatchNotification& operator= (const MessageDispatchNotification&);
+        MessageDispatchNotification& operator=(
+            const MessageDispatchNotification&);
 
     public:
-
         MessageDispatchNotification();
 
         virtual ~MessageDispatchNotification();
@@ -80,31 +80,34 @@ namespace commands {
         virtual bool equals(const DataStructure* value) const;
 
         virtual const Pointer<ConsumerId>& getConsumerId() const;
-        virtual Pointer<ConsumerId>& getConsumerId();
+        virtual Pointer<ConsumerId>&       getConsumerId();
         virtual void setConsumerId(const Pointer<ConsumerId>& consumerId);
 
         virtual const Pointer<ActiveMQDestination>& getDestination() const;
-        virtual Pointer<ActiveMQDestination>& getDestination();
-        virtual void setDestination(const Pointer<ActiveMQDestination>& destination);
+        virtual Pointer<ActiveMQDestination>&       getDestination();
+        virtual void                                setDestination(
+                                           const Pointer<ActiveMQDestination>& destination);
 
         virtual long long getDeliverySequenceId() const;
-        virtual void setDeliverySequenceId(long long deliverySequenceId);
+        virtual void      setDeliverySequenceId(long long deliverySequenceId);
 
         virtual const Pointer<MessageId>& getMessageId() const;
-        virtual Pointer<MessageId>& getMessageId();
+        virtual Pointer<MessageId>&       getMessageId();
         virtual void setMessageId(const Pointer<MessageId>& messageId);
 
         /**
-         * @return an answer of true to the isMessageDispatchNotification() query.
+         * @return an answer of true to the isMessageDispatchNotification()
+         * query.
          */
-        virtual bool isMessageDispatchNotification() const {
+        virtual bool isMessageDispatchNotification() const
+        {
             return true;
         }
 
         virtual Pointer<Command> visit(activemq::state::CommandVisitor* visitor);
-
     };
 
-}}
+}  // namespace commands
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_COMMANDS_MESSAGEDISPATCHNOTIFICATION_H_*/

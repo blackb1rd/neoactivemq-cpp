@@ -15,13 +15,13 @@
  * limitations under the License.
  */
 
-#include <decaf/lang/Thread.h>
-#include <decaf/lang/Runnable.h>
 #include <activemq/library/ActiveMQCPP.h>
-#include <cms/ConnectionFactory.h>
 #include <cms/Connection.h>
-#include <cms/Session.h>
+#include <cms/ConnectionFactory.h>
 #include <cms/Destination.h>
+#include <cms/Session.h>
+#include <decaf/lang/Runnable.h>
+#include <decaf/lang/Thread.h>
 #include <stdlib.h>
 #include <iostream>
 #include <memory>
@@ -32,8 +32,8 @@ using namespace cms;
 using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
-int main( int argc AMQCPP_UNUSED, char* argv[] AMQCPP_UNUSED ) {
-
+int main(int argc AMQCPP_UNUSED, char* argv[] AMQCPP_UNUSED)
+{
     // We must always init the library first before using any methods in it.
     activemq::library::ActiveMQCPP::initializeLibrary();
 
@@ -52,30 +52,35 @@ int main( int argc AMQCPP_UNUSED, char* argv[] AMQCPP_UNUSED ) {
 
     // Create the Connection
     std::unique_ptr<cms::ConnectionFactory> connectionFactory(
-        cms::ConnectionFactory::createCMSConnectionFactory( brokerURI ) );
+        cms::ConnectionFactory::createCMSConnectionFactory(brokerURI));
 
     std::unique_ptr<cms::Connection> connection;
 
     // Create a Connection
-    try{
-        connection.reset( connectionFactory->createConnection() );
-    } catch( CMSException& e ) {
+    try
+    {
+        connection.reset(connectionFactory->createConnection());
+    }
+    catch (CMSException& e)
+    {
         e.printStackTrace();
         return 1;
     }
 
     // Create the Session
-    std::unique_ptr<cms::Session> session( connection->createSession() );
+    std::unique_ptr<cms::Session> session(connection->createSession());
 
     // Start the Connection now.
     connection->start();
 
     // Create a Temporary Topic and Queue.
-    std::unique_ptr<cms::Destination> tempTopic( session->createTemporaryTopic() );
-    std::unique_ptr<cms::Destination> tempQueue( session->createTemporaryQueue() );
+    std::unique_ptr<cms::Destination> tempTopic(
+        session->createTemporaryTopic());
+    std::unique_ptr<cms::Destination> tempQueue(
+        session->createTemporaryQueue());
 
     // Give the Broker some time
-    Thread::sleep( 2000 );
+    Thread::sleep(2000);
 
     // Shutdown now
     connection->stop();

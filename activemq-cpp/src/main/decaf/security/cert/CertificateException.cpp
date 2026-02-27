@@ -22,22 +22,33 @@ using namespace decaf::security;
 using namespace decaf::security::cert;
 
 ////////////////////////////////////////////////////////////////////////////////
-CertificateException::CertificateException() : GeneralSecurityException() {
+CertificateException::CertificateException()
+    : GeneralSecurityException()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-CertificateException::CertificateException(const Exception& ex) : GeneralSecurityException() {
-    *(Exception*) this = ex;
+CertificateException::CertificateException(const Exception& ex)
+    : GeneralSecurityException()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-CertificateException::CertificateException(const CertificateException& ex) : GeneralSecurityException() {
-    *(Exception*) this = ex;
+CertificateException::CertificateException(const CertificateException& ex)
+    : GeneralSecurityException()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-CertificateException::CertificateException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...) : GeneralSecurityException(cause) {
-
+CertificateException::CertificateException(const char*           file,
+                                           const int             lineNumber,
+                                           const std::exception* cause,
+                                           const char*           msg,
+                                           ...)
+    : GeneralSecurityException(cause)
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -47,12 +58,18 @@ CertificateException::CertificateException(const char* file, const int lineNumbe
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-CertificateException::CertificateException(const std::exception* cause) : GeneralSecurityException(cause) {
+CertificateException::CertificateException(const std::exception* cause)
+    : GeneralSecurityException(cause)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-CertificateException::CertificateException(const char* file, const int lineNumber, const char* msg, ...) : GeneralSecurityException() {
-
+CertificateException::CertificateException(const char* file,
+                                           const int   lineNumber,
+                                           const char* msg,
+                                           ...)
+    : GeneralSecurityException()
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -62,5 +79,6 @@ CertificateException::CertificateException(const char* file, const int lineNumbe
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-CertificateException::~CertificateException() throw () {
+CertificateException::~CertificateException() throw()
+{
 }

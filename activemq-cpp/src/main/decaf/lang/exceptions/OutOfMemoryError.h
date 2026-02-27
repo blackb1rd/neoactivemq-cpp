@@ -19,84 +19,98 @@
 
 #include <decaf/lang/Exception.h>
 
-namespace decaf {
-namespace lang {
-namespace exceptions {
+namespace decaf
+{
+namespace lang
+{
+    namespace exceptions
+    {
 
-    /*
-     * Thrown when an allocation operation fails indicating not enough memory.
-     *
-     * @since 1.0
-     */
-    class DECAF_API OutOfMemoryError : public Exception {
-    public:
-
-        /**
-         * Default Constructor
-         */
-        OutOfMemoryError();
-
-        /**
-         * Conversion Constructor from some other Exception
+        /*
+         * Thrown when an allocation operation fails indicating not enough
+         * memory.
          *
-         * @param ex
-         *      The Exception whose data is to be copied into this one.
+         * @since 1.0
          */
-        OutOfMemoryError(const Exception& ex);
+        class DECAF_API OutOfMemoryError : public Exception
+        {
+        public:
+            /**
+             * Default Constructor
+             */
+            OutOfMemoryError();
 
-        /**
-         * Copy Constructor
-         *
-         * @param ex
-         *      The Exception whose data is to be copied into this one.
-         */
-        OutOfMemoryError(const OutOfMemoryError& ex);
+            /**
+             * Conversion Constructor from some other Exception
+             *
+             * @param ex
+             *      The Exception whose data is to be copied into this one.
+             */
+            OutOfMemoryError(const Exception& ex);
 
-        /**
-         * Constructor
-         * @param cause Pointer to the exception that caused this one to
-         * be thrown, the object is cloned caller retains ownership.
-         */
-        OutOfMemoryError(const std::exception* cause);
+            /**
+             * Copy Constructor
+             *
+             * @param ex
+             *      The Exception whose data is to be copied into this one.
+             */
+            OutOfMemoryError(const OutOfMemoryError& ex);
 
-        /**
-         * Constructor - Initializes the file name and line number where
-         * this message occurred.  Sets the message to report, using an
-         * optional list of arguments to parse into the message
-         * @param file The file name where exception occurs
-         * @param lineNumber The line number where the exception occurred.
-         * @param msg The message to report
-         * @param ... list of primitives that are formatted into the message
-         */
-        OutOfMemoryError(const char* file, const int lineNumber, const char* msg, ...);
+            /**
+             * Constructor
+             * @param cause Pointer to the exception that caused this one to
+             * be thrown, the object is cloned caller retains ownership.
+             */
+            OutOfMemoryError(const std::exception* cause);
 
-        /**
-         * Constructor - Initializes the file name and line number where
-         * this message occurred.  Sets the message to report, using an
-         * optional list of arguments to parse into the message
-         * @param file The file name where exception occurs
-         * @param lineNumber The line number where the exception occurred.
-         * @param cause The exception that was the cause for this one to be thrown.
-         * @param msg The message to report
-         * @param ... list of primitives that are formatted into the message
-         */
-        OutOfMemoryError(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...);
+            /**
+             * Constructor - Initializes the file name and line number where
+             * this message occurred.  Sets the message to report, using an
+             * optional list of arguments to parse into the message
+             * @param file The file name where exception occurs
+             * @param lineNumber The line number where the exception occurred.
+             * @param msg The message to report
+             * @param ... list of primitives that are formatted into the message
+             */
+            OutOfMemoryError(const char* file,
+                             const int   lineNumber,
+                             const char* msg,
+                             ...);
 
-        /**
-         * Clones this exception.  This is useful for cases where you need
-         * to preserve the type of the original exception as well as the message.
-         * All subclasses should override.
-         *
-         * @return an new Exception instance that is a copy of this one.
-         */
-        virtual OutOfMemoryError* clone() const {
-            return new OutOfMemoryError(*this);
-        }
+            /**
+             * Constructor - Initializes the file name and line number where
+             * this message occurred.  Sets the message to report, using an
+             * optional list of arguments to parse into the message
+             * @param file The file name where exception occurs
+             * @param lineNumber The line number where the exception occurred.
+             * @param cause The exception that was the cause for this one to be
+             * thrown.
+             * @param msg The message to report
+             * @param ... list of primitives that are formatted into the message
+             */
+            OutOfMemoryError(const char*           file,
+                             const int             lineNumber,
+                             const std::exception* cause,
+                             const char*           msg,
+                             ...);
 
-        virtual ~OutOfMemoryError() throw();
+            /**
+             * Clones this exception.  This is useful for cases where you need
+             * to preserve the type of the original exception as well as the
+             * message. All subclasses should override.
+             *
+             * @return an new Exception instance that is a copy of this one.
+             */
+            virtual OutOfMemoryError* clone() const
+            {
+                return new OutOfMemoryError(*this);
+            }
 
-    };
+            virtual ~OutOfMemoryError() throw();
+        };
 
-}}}
+    }  // namespace exceptions
+}  // namespace lang
+}  // namespace decaf
 
 #endif /*_DECAF_LANG_EXCEPTIONS_OUTOFMEMORYERROR_H_*/

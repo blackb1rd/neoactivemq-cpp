@@ -26,24 +26,33 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-InputStreamReader::InputStreamReader(InputStream* stream, bool own) :
-    Reader(), stream(stream), own(own), closed(false) {
-
-    if (stream == NULL) {
-        throw NullPointerException(__FILE__, __LINE__, "The passed InputStream cannot be NULL.");
+InputStreamReader::InputStreamReader(InputStream* stream, bool own)
+    : Reader(),
+      stream(stream),
+      own(own),
+      closed(false)
+{
+    if (stream == NULL)
+    {
+        throw NullPointerException(__FILE__,
+                                   __LINE__,
+                                   "The passed InputStream cannot be NULL.");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-InputStreamReader::~InputStreamReader() {
-
-    try {
+InputStreamReader::~InputStreamReader()
+{
+    try
+    {
         this->close();
     }
     DECAF_CATCHALL_NOTHROW()
 
-    try {
-        if (this->own) {
+    try
+    {
+        if (this->own)
+        {
             delete this->stream;
         }
 
@@ -53,10 +62,12 @@ InputStreamReader::~InputStreamReader() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InputStreamReader::close() {
-
-    try {
-        if (!closed) {
+void InputStreamReader::close()
+{
+    try
+    {
+        if (!closed)
+        {
             this->stream->close();
             this->closed = true;
         }
@@ -66,13 +77,17 @@ void InputStreamReader::close() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool InputStreamReader::ready() const {
-
-    try {
+bool InputStreamReader::ready() const
+{
+    try
+    {
         checkClosed();
-        try {
+        try
+        {
             return this->stream->available() != 0;
-        } catch (IOException& ex) {
+        }
+        catch (IOException& ex)
+        {
             return false;
         }
     }
@@ -81,16 +96,21 @@ bool InputStreamReader::ready() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int InputStreamReader::doReadArrayBounded(char* buffer, int size, int offset, int length) {
-
-    try {
+int InputStreamReader::doReadArrayBounded(char* buffer,
+                                          int   size,
+                                          int   offset,
+                                          int   length)
+{
+    try
+    {
         checkClosed();
 
-        if (length == 0) {
+        if (length == 0)
+        {
             return 0;
         }
 
-        return this->stream->read((unsigned char*) buffer, size, offset, length);
+        return this->stream->read((unsigned char*)buffer, size, offset, length);
     }
     DECAF_CATCH_RETHROW(IOException)
     DECAF_CATCH_RETHROW(NullPointerException)
@@ -99,8 +119,10 @@ int InputStreamReader::doReadArrayBounded(char* buffer, int size, int offset, in
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InputStreamReader::checkClosed() const {
-    if (closed) {
+void InputStreamReader::checkClosed() const
+{
+    if (closed)
+    {
         throw IOException(__FILE__, __LINE__, "This Reader is Closed");
     }
 }

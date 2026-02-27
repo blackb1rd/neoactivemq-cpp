@@ -23,26 +23,38 @@ using namespace decaf::util;
 using namespace decaf::util::zip;
 
 ////////////////////////////////////////////////////////////////////////////////
-DataFormatException::DataFormatException() : lang::Exception() {
+DataFormatException::DataFormatException()
+    : lang::Exception()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DataFormatException::~DataFormatException() throw () {
+DataFormatException::~DataFormatException() throw()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DataFormatException::DataFormatException(const lang::Exception& ex) : lang::Exception() {
-    *(lang::Exception*) this = ex;
+DataFormatException::DataFormatException(const lang::Exception& ex)
+    : lang::Exception()
+{
+    *(lang::Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DataFormatException::DataFormatException(const DataFormatException& ex) : lang::Exception() {
-    *(lang::Exception*) this = ex;
+DataFormatException::DataFormatException(const DataFormatException& ex)
+    : lang::Exception()
+{
+    *(lang::Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DataFormatException::DataFormatException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...) : lang::Exception(cause) {
-
+DataFormatException::DataFormatException(const char*           file,
+                                         const int             lineNumber,
+                                         const std::exception* cause,
+                                         const char*           msg,
+                                         ...)
+    : lang::Exception(cause)
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -52,12 +64,18 @@ DataFormatException::DataFormatException(const char* file, const int lineNumber,
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DataFormatException::DataFormatException(const std::exception* cause) : lang::Exception(cause) {
+DataFormatException::DataFormatException(const std::exception* cause)
+    : lang::Exception(cause)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DataFormatException::DataFormatException(const char* file, const int lineNumber, const char* msg, ...) : lang::Exception() {
-
+DataFormatException::DataFormatException(const char* file,
+                                         const int   lineNumber,
+                                         const char* msg,
+                                         ...)
+    : lang::Exception()
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -67,6 +85,7 @@ DataFormatException::DataFormatException(const char* file, const int lineNumber,
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DataFormatException* DataFormatException::clone() const {
+DataFormatException* DataFormatException::clone() const
+{
     return new DataFormatException(*this);
 }

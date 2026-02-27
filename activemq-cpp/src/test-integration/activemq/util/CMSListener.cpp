@@ -17,8 +17,8 @@
 
 #include "CMSListener.h"
 
-#include <gtest/gtest.h>
 #include <activemq/exceptions/ActiveMQException.h>
+#include <gtest/gtest.h>
 using namespace std;
 using namespace cms;
 using namespace activemq;
@@ -28,31 +28,40 @@ using namespace decaf::util;
 using namespace decaf::util::concurrent;
 
 ////////////////////////////////////////////////////////////////////////////////
-CMSListener::CMSListener(cms::Session* session) : numReceived(), mutex(), session(session) {
+CMSListener::CMSListener(cms::Session* session)
+    : numReceived(),
+      mutex(),
+      session(session)
+{
     this->reset();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-CMSListener::~CMSListener() {
+CMSListener::~CMSListener()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CMSListener::reset() {
+void CMSListener::reset()
+{
     this->numReceived = 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CMSListener::asyncWaitForMessages(unsigned int count) {
-
-    try {
-
-        synchronized( &mutex ) {
+void CMSListener::asyncWaitForMessages(unsigned int count)
+{
+    try
+    {
+        synchronized(&mutex)
+        {
             int stopAtZero = count + 5;
 
-            while (numReceived < count) {
+            while (numReceived < count)
+            {
                 mutex.wait(500);
 
-                if (--stopAtZero == 0) {
+                if (--stopAtZero == 0)
+                {
                     break;
                 }
             }
@@ -63,24 +72,31 @@ void CMSListener::asyncWaitForMessages(unsigned int count) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CMSListener::onMessage(const cms::Message* message) {
-
-    if (session->getAcknowledgeMode() == cms::Session::CLIENT_ACKNOWLEDGE) {
-        try {
+void CMSListener::onMessage(const cms::Message* message)
+{
+    if (session->getAcknowledgeMode() == cms::Session::CLIENT_ACKNOWLEDGE)
+    {
+        try
+        {
             message->acknowledge();
-        } catch (CMSException& ex) {
+        }
+        catch (CMSException& ex)
+        {
             ASSERT_TRUE(false) << (ex.getStackTraceString());
         }
     }
 
     // Got a text message.
-    const cms::TextMessage* txtMsg = dynamic_cast<const cms::TextMessage*>(message);
+    const cms::TextMessage* txtMsg =
+        dynamic_cast<const cms::TextMessage*>(message);
 
-    if (txtMsg != NULL) {
+    if (txtMsg != NULL)
+    {
         numReceived++;
 
         // Signal that we got one
-        synchronized( &mutex ) {
+        synchronized(&mutex)
+        {
             mutex.notifyAll();
         }
 
@@ -88,14 +104,16 @@ void CMSListener::onMessage(const cms::Message* message) {
     }
 
     // Got a bytes msg.
-    const cms::BytesMessage* bytesMsg = dynamic_cast<const cms::BytesMessage*>(message);
+    const cms::BytesMessage* bytesMsg =
+        dynamic_cast<const cms::BytesMessage*>(message);
 
-    if (bytesMsg != NULL) {
-
+    if (bytesMsg != NULL)
+    {
         numReceived++;
 
         // Signal that we got one
-        synchronized( &mutex ) {
+        synchronized(&mutex)
+        {
             mutex.notifyAll();
         }
 
@@ -104,6 +122,7 @@ void CMSListener::onMessage(const cms::Message* message) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CMSListener::onException(const cms::CMSException& error) {
+void CMSListener::onException(const cms::CMSException& error)
+{
     ASSERT_TRUE(false) << (error.getStackTraceString());
 }

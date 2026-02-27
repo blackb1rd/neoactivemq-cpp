@@ -19,39 +19,42 @@
 #define _DECAF_LANG_THROWABLE_H_
 
 // Includes
+#include <exception>
+#include <iostream>
 #include <string>
 #include <vector>
-#include <iostream>
-#include <exception>
 
 #include <decaf/util/Config.h>
 
-namespace decaf{
-namespace lang{
+namespace decaf
+{
+namespace lang
+{
 
     /**
-     * This class represents an error that has occurred.  All Exceptions in the Decaf
-     * library should extend from this or from the Exception class in order to ensure
-     * that all Decaf Exceptions are interchangeable with the std::exception class.
+     * This class represents an error that has occurred.  All Exceptions in the
+     * Decaf library should extend from this or from the Exception class in
+     * order to ensure that all Decaf Exceptions are interchangeable with the
+     * std::exception class.
      *
-     * Throwable can wrap another Throwable as the cause if the error being thrown.
-     * The user can inspect the cause by calling <code>getCause</code>, the pointer
-     * returned is the property of the Throwable instance and will be deleted when it
-     * is deleted or goes out of scope.
+     * Throwable can wrap another Throwable as the cause if the error being
+     * thrown. The user can inspect the cause by calling <code>getCause</code>,
+     * the pointer returned is the property of the Throwable instance and will
+     * be deleted when it is deleted or goes out of scope.
      *
      * @since 1.0
      */
-    class DECAF_API Throwable : public std::exception {
+    class DECAF_API Throwable : public std::exception
+    {
     public:
-
         Throwable();
 
         virtual ~Throwable() throw();
 
         /**
-         * Gets the cause of the error, if no message was provided to the instance
-         * of this interface but a cause was then the value cause.getMessage is
-         * then returned.
+         * Gets the cause of the error, if no message was provided to the
+         * instance of this interface but a cause was then the value
+         * cause.getMessage is then returned.
          * @return string errors message
          */
         virtual std::string getMessage() const = 0;
@@ -72,19 +75,19 @@ namespace lang{
          * is made to avoid ownership issues.
          * @param cause The exception that was the cause of this one.
          */
-        virtual void initCause( const std::exception* cause ) = 0;
+        virtual void initCause(const std::exception* cause) = 0;
 
         /**
          * Adds a file/line number to the stack trace.
          * @param file The name of the file calling this method (use __FILE__).
          * @param lineNumber The line number in the calling file (use __LINE__).
          */
-        virtual void setMark( const char* file, const int lineNumber ) = 0;
+        virtual void setMark(const char* file, const int lineNumber) = 0;
 
         /**
          * Clones this exception.  This is useful for cases where you need
-         * to preserve the type of the original exception as well as the message.
-         * All subclasses should override.
+         * to preserve the type of the original exception as well as the
+         * message. All subclasses should override.
          * @return Copy of this Exception object
          */
         virtual Throwable* clone() const = 0;
@@ -94,7 +97,8 @@ namespace lang{
          * this exception was caught, marked, and rethrown.
          * @return vector containing stack trace strings
          */
-        virtual std::vector< std::pair< std::string, int> > getStackTrace() const = 0;
+        virtual std::vector<std::pair<std::string, int>> getStackTrace()
+            const = 0;
 
         /**
          * Prints the stack trace to std::err
@@ -105,16 +109,16 @@ namespace lang{
          * Prints the stack trace to the given output stream.
          * @param stream the target output stream.
          */
-        virtual void printStackTrace( std::ostream& stream ) const = 0;
+        virtual void printStackTrace(std::ostream& stream) const = 0;
 
         /**
          * Gets the stack trace as one contiguous string.
          * @return string with formatted stack trace data
          */
         virtual std::string getStackTraceString() const = 0;
-
     };
 
-}}
+}  // namespace lang
+}  // namespace decaf
 
 #endif /*_DECAF_LANG_THROWABLE_H_*/

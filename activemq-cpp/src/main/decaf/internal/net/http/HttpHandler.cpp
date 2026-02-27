@@ -27,26 +27,34 @@ using namespace decaf::internal::net;
 using namespace decaf::internal::net::http;
 
 ////////////////////////////////////////////////////////////////////////////////
-HttpHandler::~HttpHandler() {
+HttpHandler::~HttpHandler()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::net::URLConnection* HttpHandler::openConnection(const decaf::net::URL& url DECAF_UNUSED) {
+decaf::net::URLConnection* HttpHandler::openConnection(
+    const decaf::net::URL& url DECAF_UNUSED)
+{
     return NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::net::URLConnection* HttpHandler::openConnection(const decaf::net::URL& url DECAF_UNUSED,
-                                                       const decaf::net::Proxy* proxy) {
-
-    if (proxy == NULL) {
-        throw IllegalArgumentException(__FILE__, __LINE__, "proxy object cannot be NULL");
+decaf::net::URLConnection* HttpHandler::openConnection(
+    const decaf::net::URL& url DECAF_UNUSED,
+    const decaf::net::Proxy*   proxy)
+{
+    if (proxy == NULL)
+    {
+        throw IllegalArgumentException(__FILE__,
+                                       __LINE__,
+                                       "proxy object cannot be NULL");
     }
 
     return NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int HttpHandler::getDefaultPort() const {
+int HttpHandler::getDefaultPort() const
+{
     return 80;
 }

@@ -17,13 +17,13 @@
 
 #include <gtest/gtest.h>
 
-#include <activemq/core/ConnectionAudit.h>
-#include <activemq/core/Dispatcher.h>
-#include <activemq/core/ActiveMQMessageAudit.h>
-#include <activemq/util/IdGenerator.h>
-#include <activemq/commands/Message.h>
 #include <activemq/commands/ActiveMQDestination.h>
 #include <activemq/commands/ActiveMQQueue.h>
+#include <activemq/commands/Message.h>
+#include <activemq/core/ActiveMQMessageAudit.h>
+#include <activemq/core/ConnectionAudit.h>
+#include <activemq/core/Dispatcher.h>
+#include <activemq/util/IdGenerator.h>
 
 #include <decaf/util/ArrayList.h>
 
@@ -36,40 +36,46 @@ using namespace decaf;
 using namespace decaf::lang;
 using namespace decaf::util;
 
-    class ConnectionAuditTest : public ::testing::Test {
-    };
+class ConnectionAuditTest : public ::testing::Test
+{
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class MyDispatcher : public Dispatcher {
-    public:
+class MyDispatcher : public Dispatcher
+{
+public:
+    virtual ~MyDispatcher()
+    {
+    }
 
-        virtual ~MyDispatcher() {}
+    virtual void dispatch(const Pointer<commands::MessageDispatch>& message)
+    {
+    }
 
-        virtual void dispatch(const Pointer<commands::MessageDispatch>& message) {
-
-        }
-
-        virtual int getHashCode() const {
-            return 1;
-        }
-
-    };
-}
+    virtual int getHashCode() const
+    {
+        return 1;
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ConnectionAuditTest, testConstructor1) {
-
+TEST_F(ConnectionAuditTest, testConstructor1)
+{
     ConnectionAudit audit;
     ASSERT_TRUE(audit.isCheckForDuplicates());
-    ASSERT_TRUE(audit.getAuditDepth() == ActiveMQMessageAudit::DEFAULT_WINDOW_SIZE);
-    ASSERT_TRUE(audit.getAuditMaximumProducerNumber() == ActiveMQMessageAudit::MAXIMUM_PRODUCER_COUNT);
+    ASSERT_TRUE(audit.getAuditDepth() ==
+                ActiveMQMessageAudit::DEFAULT_WINDOW_SIZE);
+    ASSERT_TRUE(audit.getAuditMaximumProducerNumber() ==
+                ActiveMQMessageAudit::MAXIMUM_PRODUCER_COUNT);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ConnectionAuditTest, testConstructor2) {
-
+TEST_F(ConnectionAuditTest, testConstructor2)
+{
     ConnectionAudit audit(100, 200);
     ASSERT_TRUE(audit.isCheckForDuplicates());
     ASSERT_TRUE(audit.getAuditDepth() == 100);
@@ -77,12 +83,12 @@ TEST_F(ConnectionAuditTest, testConstructor2) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ConnectionAuditTest, testIsDuplicate) {
-
-    int count = 10000;
-    ConnectionAudit audit;
-    ArrayList<Pointer<MessageId> > list;
-    Pointer<MyDispatcher> dispatcher(new MyDispatcher);
+TEST_F(ConnectionAuditTest, testIsDuplicate)
+{
+    int                           count = 10000;
+    ConnectionAudit               audit;
+    ArrayList<Pointer<MessageId>> list;
+    Pointer<MyDispatcher>         dispatcher(new MyDispatcher);
 
     Pointer<ProducerId> pid(new ProducerId);
     pid->setConnectionId("test");
@@ -91,8 +97,10 @@ TEST_F(ConnectionAuditTest, testIsDuplicate) {
 
     Pointer<Message> message(new Message());
 
-    for (int i = 0; i < count; i++) {
-        Pointer<ActiveMQDestination> destination(new ActiveMQQueue("TEST.QUEUE"));
+    for (int i = 0; i < count; i++)
+    {
+        Pointer<ActiveMQDestination> destination(
+            new ActiveMQQueue("TEST.QUEUE"));
         message->setDestination(destination);
 
         Pointer<MessageId> id(new MessageId);
@@ -104,21 +112,23 @@ TEST_F(ConnectionAuditTest, testIsDuplicate) {
         ASSERT_TRUE(!audit.isDuplicate(dispatcher.get(), message));
     }
 
-    int index = list.size() -1 -audit.getAuditDepth();
-    for (; index < list.size(); index++) {
+    int index = list.size() - 1 - audit.getAuditDepth();
+    for (; index < list.size(); index++)
+    {
         Pointer<MessageId> id = list.get(index);
         message->setMessageId(id);
-        ASSERT_TRUE(audit.isDuplicate(dispatcher.get(), message)) << (std::string() + "duplicate msg:" + id->toString());
+        ASSERT_TRUE(audit.isDuplicate(dispatcher.get(), message))
+            << (std::string() + "duplicate msg:" + id->toString());
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ConnectionAuditTest, testRollbackDuplicate) {
-
-    int count = 10000;
-    ConnectionAudit audit;
-    ArrayList<Pointer<MessageId> > list;
-    Pointer<MyDispatcher> dispatcher(new MyDispatcher);
+TEST_F(ConnectionAuditTest, testRollbackDuplicate)
+{
+    int                           count = 10000;
+    ConnectionAudit               audit;
+    ArrayList<Pointer<MessageId>> list;
+    Pointer<MyDispatcher>         dispatcher(new MyDispatcher);
 
     Pointer<ProducerId> pid(new ProducerId);
     pid->setConnectionId("test");
@@ -126,10 +136,11 @@ TEST_F(ConnectionAuditTest, testRollbackDuplicate) {
     pid->setValue(1);
 
     Pointer<ActiveMQDestination> destination(new ActiveMQQueue("TEST.QUEUE"));
-    Pointer<Message> message(new Message());
+    Pointer<Message>             message(new Message());
     message->setDestination(destination);
 
-    for (int i = 0; i < count; i++) {
+    for (int i = 0; i < count; i++)
+    {
         Pointer<MessageId> id(new MessageId);
         id->setProducerId(pid);
         id->setProducerSequenceId(i);
@@ -139,12 +150,15 @@ TEST_F(ConnectionAuditTest, testRollbackDuplicate) {
         ASSERT_TRUE(!audit.isDuplicate(dispatcher.get(), message));
     }
 
-    int index = list.size() -1 -audit.getAuditDepth();
-    for (; index < list.size(); index++) {
+    int index = list.size() - 1 - audit.getAuditDepth();
+    for (; index < list.size(); index++)
+    {
         Pointer<MessageId> id = list.get(index);
         message->setMessageId(id);
-        ASSERT_TRUE(audit.isDuplicate(dispatcher.get(), message)) << (std::string() + "duplicate msg:" + id->toString());
+        ASSERT_TRUE(audit.isDuplicate(dispatcher.get(), message))
+            << (std::string() + "duplicate msg:" + id->toString());
         audit.rollbackDuplicate(dispatcher.get(), message);
-        ASSERT_TRUE(!audit.isDuplicate(dispatcher.get(), message)) << (std::string() + "duplicate msg:" + id->toString());
+        ASSERT_TRUE(!audit.isDuplicate(dispatcher.get(), message))
+            << (std::string() + "duplicate msg:" + id->toString());
     }
 }

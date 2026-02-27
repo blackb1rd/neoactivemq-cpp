@@ -20,7 +20,7 @@
 
 // Turn off warning message for ignored exception specification
 #ifdef _MSC_VER
-#pragma warning( disable : 4290 )
+#pragma warning(disable : 4290)
 #endif
 
 #include <activemq/commands/BaseDataStructure.h>
@@ -30,8 +30,10 @@
 #include <string>
 #include <vector>
 
-namespace activemq {
-namespace commands {
+namespace activemq
+{
+namespace commands
+{
 
     using decaf::lang::Pointer;
 
@@ -44,19 +46,18 @@ namespace commands {
      *         in the activemq-cpp-openwire-generator module
      *
      */
-    class AMQCPP_API BrokerId : public BaseDataStructure, public decaf::lang::Comparable<BrokerId> {
+    class AMQCPP_API BrokerId : public BaseDataStructure,
+                                public decaf::lang::Comparable<BrokerId>
+    {
     protected:
-
         std::string value;
 
     public:
-
         const static unsigned char ID_BROKERID = 124;
 
         typedef decaf::lang::PointerComparator<BrokerId> COMPARATOR;
 
     public:
-
         BrokerId();
 
         BrokerId(const BrokerId& other);
@@ -74,8 +75,8 @@ namespace commands {
         virtual bool equals(const DataStructure* value) const;
 
         virtual const std::string& getValue() const;
-        virtual std::string& getValue();
-        virtual void setValue(const std::string& value);
+        virtual std::string&       getValue();
+        virtual void               setValue(const std::string& value);
 
         virtual int compareTo(const BrokerId& value) const;
 
@@ -85,12 +86,12 @@ namespace commands {
 
         virtual bool operator<(const BrokerId& value) const;
 
-        BrokerId& operator= (const BrokerId& other);
+        BrokerId& operator=(const BrokerId& other);
 
         int getHashCode() const;
-
     };
 
-}}
+}  // namespace commands
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_COMMANDS_BROKERID_H_*/

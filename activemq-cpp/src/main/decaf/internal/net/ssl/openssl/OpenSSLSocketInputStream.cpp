@@ -29,100 +29,114 @@ using namespace decaf::internal::net::ssl;
 using namespace decaf::internal::net::ssl::openssl;
 
 ////////////////////////////////////////////////////////////////////////////////
-OpenSSLSocketInputStream::OpenSSLSocketInputStream( OpenSSLSocket* socket ) :
-    InputStream(), socket( socket ), closed( false ) {
-
-    if( socket == NULL ) {
-        throw NullPointerException(
-            __FILE__, __LINE__, "Socket instance passed was NULL." );
+OpenSSLSocketInputStream::OpenSSLSocketInputStream(OpenSSLSocket* socket)
+    : InputStream(),
+      socket(socket),
+      closed(false)
+{
+    if (socket == NULL)
+    {
+        throw NullPointerException(__FILE__,
+                                   __LINE__,
+                                   "Socket instance passed was NULL.");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-OpenSSLSocketInputStream::~OpenSSLSocketInputStream() {
+OpenSSLSocketInputStream::~OpenSSLSocketInputStream()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenSSLSocketInputStream::close() {
-
-    if( this->closed ) {
+void OpenSSLSocketInputStream::close()
+{
+    if (this->closed)
+    {
         return;
     }
 
-    try{
+    try
+    {
         this->closed = true;
         this->socket->close();
     }
-    DECAF_CATCH_RETHROW( IOException )
-    DECAF_CATCHALL_THROW( IOException )
+    DECAF_CATCH_RETHROW(IOException)
+    DECAF_CATCHALL_THROW(IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int OpenSSLSocketInputStream::available() const {
-
-    if( this->closed ){
-        throw IOException(
-            __FILE__, __LINE__, "The stream is closed" );
+int OpenSSLSocketInputStream::available() const
+{
+    if (this->closed)
+    {
+        throw IOException(__FILE__, __LINE__, "The stream is closed");
     }
 
     return this->socket->available();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int OpenSSLSocketInputStream::doReadByte() {
-
-    if( this->closed ){
-        throw IOException(
-            __FILE__, __LINE__, "The stream is closed" );
+int OpenSSLSocketInputStream::doReadByte()
+{
+    if (this->closed)
+    {
+        throw IOException(__FILE__, __LINE__, "The stream is closed");
     }
 
-    try{
-
+    try
+    {
         unsigned char buffer[1];
-        int result = this->socket->read( buffer, 1, 0, 1 );
+        int           result = this->socket->read(buffer, 1, 0, 1);
         return result == -1 ? result : buffer[0];
     }
-    DECAF_CATCH_RETHROW( IOException )
-    DECAF_CATCH_EXCEPTION_CONVERT( Exception, IOException )
-    DECAF_CATCHALL_THROW( IOException )
+    DECAF_CATCH_RETHROW(IOException)
+    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IOException)
+    DECAF_CATCHALL_THROW(IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int OpenSSLSocketInputStream::doReadArrayBounded( unsigned char* buffer, int size, int offset, int length ) {
-
-    if( closed ){
-        throw IOException(
-            __FILE__, __LINE__, "The stream is closed" );
+int OpenSSLSocketInputStream::doReadArrayBounded(unsigned char* buffer,
+                                                 int            size,
+                                                 int            offset,
+                                                 int            length)
+{
+    if (closed)
+    {
+        throw IOException(__FILE__, __LINE__, "The stream is closed");
     }
 
-    if( buffer == NULL ) {
-        throw NullPointerException(
-            __FILE__, __LINE__, "Buffer passed was NULL." );
+    if (buffer == NULL)
+    {
+        throw NullPointerException(__FILE__,
+                                   __LINE__,
+                                   "Buffer passed was NULL.");
     }
 
-    try{
-        return this->socket->read( buffer, size, offset, length );
+    try
+    {
+        return this->socket->read(buffer, size, offset, length);
     }
-    DECAF_CATCH_RETHROW( IOException )
-    DECAF_CATCH_RETHROW( IndexOutOfBoundsException )
-    DECAF_CATCH_RETHROW( NullPointerException )
-    DECAF_CATCH_EXCEPTION_CONVERT( Exception, IOException )
-    DECAF_CATCHALL_THROW( IOException )
+    DECAF_CATCH_RETHROW(IOException)
+    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
+    DECAF_CATCH_RETHROW(NullPointerException)
+    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IOException)
+    DECAF_CATCHALL_THROW(IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-long long OpenSSLSocketInputStream::skip( long long num ) {
-
-    try{
-
-        if( num == 0 ) {
+long long OpenSSLSocketInputStream::skip(long long num)
+{
+    try
+    {
+        if (num == 0)
+        {
             return 0;
         }
 
-        return InputStream::skip( num );
+        return InputStream::skip(num);
     }
-    DECAF_CATCH_RETHROW( IOException )
-    DECAF_CATCH_RETHROW( UnsupportedOperationException )
-    DECAF_CATCH_EXCEPTION_CONVERT( Exception, IOException )
-    DECAF_CATCHALL_THROW( IOException )
+    DECAF_CATCH_RETHROW(IOException)
+    DECAF_CATCH_RETHROW(UnsupportedOperationException)
+    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IOException)
+    DECAF_CATCHALL_THROW(IOException)
 }

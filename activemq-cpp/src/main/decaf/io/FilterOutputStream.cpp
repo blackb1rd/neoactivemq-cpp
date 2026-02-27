@@ -28,19 +28,27 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-FilterOutputStream::FilterOutputStream(OutputStream* outputStream, bool own) :
-    OutputStream(), outputStream(outputStream), own(own), closed(outputStream == NULL ? true : false) {
+FilterOutputStream::FilterOutputStream(OutputStream* outputStream, bool own)
+    : OutputStream(),
+      outputStream(outputStream),
+      own(own),
+      closed(outputStream == NULL ? true : false)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-FilterOutputStream::~FilterOutputStream() {
-    try {
+FilterOutputStream::~FilterOutputStream()
+{
+    try
+    {
         this->close();
     }
     DECAF_CATCHALL_NOTHROW()
 
-    try {
-        if (own) {
+    try
+    {
+        if (own)
+        {
             delete outputStream;
         }
         outputStream = NULL;
@@ -49,11 +57,15 @@ FilterOutputStream::~FilterOutputStream() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FilterOutputStream::doWriteByte(unsigned char c) {
-    try {
-
-        if (isClosed()) {
-            throw IOException(__FILE__, __LINE__, "FilterOutputStream::write - Stream is closed");
+void FilterOutputStream::doWriteByte(unsigned char c)
+{
+    try
+    {
+        if (isClosed())
+        {
+            throw IOException(__FILE__,
+                              __LINE__,
+                              "FilterOutputStream::write - Stream is closed");
         }
 
         this->outputStream->write(c);
@@ -63,12 +75,15 @@ void FilterOutputStream::doWriteByte(unsigned char c) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FilterOutputStream::doWriteArray(const unsigned char* buffer, int size) {
-
-    try {
-
-        if (isClosed()) {
-            throw IOException(__FILE__, __LINE__, "FilterOutputStream::write - Stream is closed");
+void FilterOutputStream::doWriteArray(const unsigned char* buffer, int size)
+{
+    try
+    {
+        if (isClosed())
+        {
+            throw IOException(__FILE__,
+                              __LINE__,
+                              "FilterOutputStream::write - Stream is closed");
         }
 
         this->doWriteArrayBounded(buffer, size, 0, size);
@@ -80,32 +95,58 @@ void FilterOutputStream::doWriteArray(const unsigned char* buffer, int size) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FilterOutputStream::doWriteArrayBounded(const unsigned char* buffer, int size, int offset, int length) {
-
-    try {
-
-        if (isClosed()) {
-            throw IOException(__FILE__, __LINE__, "FilterOutputStream::write - Stream is closed");
+void FilterOutputStream::doWriteArrayBounded(const unsigned char* buffer,
+                                             int                  size,
+                                             int                  offset,
+                                             int                  length)
+{
+    try
+    {
+        if (isClosed())
+        {
+            throw IOException(__FILE__,
+                              __LINE__,
+                              "FilterOutputStream::write - Stream is closed");
         }
 
-        if (buffer == NULL) {
-            throw decaf::lang::exceptions::NullPointerException(__FILE__, __LINE__, "FilterOutputStream::write - Buffer passed is Null.");
+        if (buffer == NULL)
+        {
+            throw decaf::lang::exceptions::NullPointerException(
+                __FILE__,
+                __LINE__,
+                "FilterOutputStream::write - Buffer passed is Null.");
         }
 
-        if (size < 0) {
-            throw IndexOutOfBoundsException(__FILE__, __LINE__, "size parameter out of Bounds: %d.", size);
+        if (size < 0)
+        {
+            throw IndexOutOfBoundsException(__FILE__,
+                                            __LINE__,
+                                            "size parameter out of Bounds: %d.",
+                                            size);
         }
 
-        if (offset > size || offset < 0) {
-            throw IndexOutOfBoundsException(__FILE__, __LINE__, "offset parameter out of Bounds: %d.", offset);
+        if (offset > size || offset < 0)
+        {
+            throw IndexOutOfBoundsException(
+                __FILE__,
+                __LINE__,
+                "offset parameter out of Bounds: %d.",
+                offset);
         }
 
-        if (length < 0 || length > size - offset) {
-            throw IndexOutOfBoundsException(__FILE__, __LINE__, "length parameter out of Bounds: %d.", length);
+        if (length < 0 || length > size - offset)
+        {
+            throw IndexOutOfBoundsException(
+                __FILE__,
+                __LINE__,
+                "length parameter out of Bounds: %d.",
+                length);
         }
 
-        // Calls the doWriteByte method since subclasses may over override that method.
-        for (int ix = offset; ix < offset + length; ++ix) {
+        // Calls the doWriteByte method since subclasses may over override that
+        // method.
+        for (int ix = offset; ix < offset + length; ++ix)
+        {
             this->doWriteByte(buffer[ix]);
         }
     }
@@ -116,11 +157,15 @@ void FilterOutputStream::doWriteArrayBounded(const unsigned char* buffer, int si
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FilterOutputStream::flush() {
-    try {
-
-        if (isClosed()) {
-            throw IOException(__FILE__, __LINE__, "FilterOutputStream::flush - Stream is closed");
+void FilterOutputStream::flush()
+{
+    try
+    {
+        if (isClosed())
+        {
+            throw IOException(__FILE__,
+                              __LINE__,
+                              "FilterOutputStream::flush - Stream is closed");
         }
 
         this->outputStream->flush();
@@ -130,9 +175,12 @@ void FilterOutputStream::flush() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FilterOutputStream::close() {
-    try {
-        if (!this->closed && this->outputStream != NULL) {
+void FilterOutputStream::close()
+{
+    try
+    {
+        if (!this->closed && this->outputStream != NULL)
+        {
             this->outputStream->flush();
             this->outputStream->close();
         }
@@ -143,9 +191,10 @@ void FilterOutputStream::close() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string FilterOutputStream::toString() const {
-
-    if (this->outputStream != NULL) {
+std::string FilterOutputStream::toString() const
+{
+    if (this->outputStream != NULL)
+    {
         return this->outputStream->toString();
     }
 
@@ -153,6 +202,7 @@ std::string FilterOutputStream::toString() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool FilterOutputStream::isClosed() const {
+bool FilterOutputStream::isClosed() const
+{
     return this->closed || this->outputStream == NULL;
 }

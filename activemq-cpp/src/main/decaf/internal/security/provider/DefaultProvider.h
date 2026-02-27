@@ -22,36 +22,40 @@
 
 #include <decaf/security/Provider.h>
 
-namespace decaf {
-namespace internal {
-namespace security {
-    class SecurityRuntime;
-namespace provider {
+namespace decaf
+{
+namespace internal
+{
+    namespace security
+    {
+        class SecurityRuntime;
 
-    /**
-     * Implements the Security Provider interface for the Decaf library.
-     *
-     * @since 1.0
-     */
-    class DECAF_API DefaultProvider : public decaf::security::Provider {
-    private:
+        namespace provider
+        {
 
-        friend class decaf::internal::security::SecurityRuntime;
+            /**
+             * Implements the Security Provider interface for the Decaf library.
+             *
+             * @since 1.0
+             */
+            class DECAF_API DefaultProvider : public decaf::security::Provider
+            {
+            private:
+                friend class decaf::internal::security::SecurityRuntime;
 
-    protected:
+            protected:
+                DefaultProvider();
 
-        DefaultProvider();
+            public:
+                virtual ~DefaultProvider();
 
-    public:
+            protected:
+                virtual void initialize();
+            };
 
-        virtual ~DefaultProvider();
-
-    protected:
-
-        virtual void initialize();
-
-    };
-
-}}}}
+        }  // namespace provider
+    }  // namespace security
+}  // namespace internal
+}  // namespace decaf
 
 #endif /* _DECAF_INTERNAL_SECURITY_PROVIDER_DEFAULTPROVIDER_H_ */

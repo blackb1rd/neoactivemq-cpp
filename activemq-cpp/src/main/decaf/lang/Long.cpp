@@ -23,86 +23,123 @@ using namespace decaf;
 using namespace decaf::lang;
 
 ////////////////////////////////////////////////////////////////////////////////
-DECAF_API const int Long::SIZE = 64;
-DECAF_API const long long Long::MAX_VALUE = (long long) 0x7FFFFFFFFFFFFFFFLL;
-DECAF_API const long long Long::MIN_VALUE = (long long) 0x8000000000000000LL;
+DECAF_API const int       Long::SIZE      = 64;
+DECAF_API const long long Long::MAX_VALUE = (long long)0x7FFFFFFFFFFFFFFFLL;
+DECAF_API const long long Long::MIN_VALUE = (long long)0x8000000000000000LL;
 
 ////////////////////////////////////////////////////////////////////////////////
-Long::Long(long long value) : value(value) {
+Long::Long(long long value)
+    : value(value)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Long::Long(const String& value) : value(0) {
+Long::Long(const String& value)
+    : value(0)
+{
     this->value = parseLong(value);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Long::~Long() {
+Long::~Long()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int Long::compareTo(const Long& l) const {
+int Long::compareTo(const Long& l) const
+{
     return this->value < l.value ? -1 : this->value == l.value ? 0 : 1;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int Long::compareTo(const long long& l) const {
+int Long::compareTo(const long long& l) const
+{
     return this->value < l ? -1 : this->value == l ? 0 : 1;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int Long::bitCount(long long value) {
-
-    if (value == 0) {
+int Long::bitCount(long long value)
+{
+    if (value == 0)
+    {
         return 0;
     }
 
-    unsigned long long uvalue = (unsigned long long) value;
+    unsigned long long uvalue = (unsigned long long)value;
 
-    uvalue = (uvalue & 0x5555555555555555LL) + ((uvalue >> 1) & 0x5555555555555555LL);
-    uvalue = (uvalue & 0x3333333333333333LL) + ((uvalue >> 2) & 0x3333333333333333LL);
+    uvalue = (uvalue & 0x5555555555555555LL) +
+             ((uvalue >> 1) & 0x5555555555555555LL);
+    uvalue = (uvalue & 0x3333333333333333LL) +
+             ((uvalue >> 2) & 0x3333333333333333LL);
     // adjust for 64-bit integer
-    unsigned int i = (unsigned int) ((uvalue >> 32) + uvalue);
-    i = (i & 0x0F0F0F0F) + ((i >> 4) & 0x0F0F0F0F);
-    i = (i & 0x00FF00FF) + ((i >> 8) & 0x00FF00FF);
-    i = (i & 0x0000FFFF) + ((i >> 16) & 0x0000FFFF);
+    unsigned int i = (unsigned int)((uvalue >> 32) + uvalue);
+    i              = (i & 0x0F0F0F0F) + ((i >> 4) & 0x0F0F0F0F);
+    i              = (i & 0x00FF00FF) + ((i >> 8) & 0x00FF00FF);
+    i              = (i & 0x0000FFFF) + ((i >> 16) & 0x0000FFFF);
     return i;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Long Long::decode(const String& value) {
-
-    int length = (int) value.length(), i = 0;
-    if (length == 0) {
-        throw exceptions::NumberFormatException(__FILE__, __LINE__, "Long::decode - Zero length string given.");
+Long Long::decode(const String& value)
+{
+    int length = (int)value.length(), i = 0;
+    if (length == 0)
+    {
+        throw exceptions::NumberFormatException(
+            __FILE__,
+            __LINE__,
+            "Long::decode - Zero length string given.");
     }
 
     char firstDigit = value.charAt(i);
-    bool negative = firstDigit == '-';
-    if (negative) {
-        if (length == 1) {
-            throw exceptions::NumberFormatException(__FILE__, __LINE__, "Long::decode - Invalid length string given.", value.c_str());
+    bool negative   = firstDigit == '-';
+    if (negative)
+    {
+        if (length == 1)
+        {
+            throw exceptions::NumberFormatException(
+                __FILE__,
+                __LINE__,
+                "Long::decode - Invalid length string given.",
+                value.c_str());
         }
         firstDigit = value.charAt(++i);
     }
 
     int base = 10;
-    if (firstDigit == '0') {
-        if (++i == length) {
+    if (firstDigit == '0')
+    {
+        if (++i == length)
+        {
             return valueOf(0LL);
         }
-        if ((firstDigit = value.charAt(i)) == 'x' || firstDigit == 'X') {
-            if (i == length) {
-                throw exceptions::NumberFormatException(__FILE__, __LINE__, "Long::decode - Invalid length string given.", value.c_str());
+        if ((firstDigit = value.charAt(i)) == 'x' || firstDigit == 'X')
+        {
+            if (i == length)
+            {
+                throw exceptions::NumberFormatException(
+                    __FILE__,
+                    __LINE__,
+                    "Long::decode - Invalid length string given.",
+                    value.c_str());
             }
             i++;
             base = 16;
-        } else {
+        }
+        else
+        {
             base = 8;
         }
-    } else if (firstDigit == '#') {
-        if (i == length) {
-            throw exceptions::NumberFormatException(__FILE__, __LINE__, "Long::decode - Invalid length string given.", value.c_str());
+    }
+    else if (firstDigit == '#')
+    {
+        if (i == length)
+        {
+            throw exceptions::NumberFormatException(
+                __FILE__,
+                __LINE__,
+                "Long::decode - Invalid length string given.",
+                value.c_str());
         }
         i++;
         base = 16;
@@ -113,13 +150,14 @@ Long Long::decode(const String& value) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-long long Long::highestOneBit(long long value) {
-
-    if (value == 0) {
+long long Long::highestOneBit(long long value)
+{
+    if (value == 0)
+    {
         return 0;
     }
 
-    unsigned long long uvalue = (unsigned long long) value;
+    unsigned long long uvalue = (unsigned long long)value;
 
     uvalue |= (uvalue >> 1);
     uvalue |= (uvalue >> 2);
@@ -131,23 +169,26 @@ long long Long::highestOneBit(long long value) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-long long Long::lowestOneBit(long long value) {
-    if (value == 0) {
+long long Long::lowestOneBit(long long value)
+{
+    if (value == 0)
+    {
         return 0;
     }
 
-    unsigned long long uvalue = (unsigned long long) value;
+    unsigned long long uvalue = (unsigned long long)value;
     return (uvalue & (-1 * uvalue));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int Long::numberOfLeadingZeros(long long value) {
-
-    if (value == 0) {
+int Long::numberOfLeadingZeros(long long value)
+{
+    if (value == 0)
+    {
         return 0;
     }
 
-    unsigned long long uvalue = (unsigned long long) value;
+    unsigned long long uvalue = (unsigned long long)value;
 
     value |= value >> 1;
     value |= value >> 2;
@@ -159,75 +200,104 @@ int Long::numberOfLeadingZeros(long long value) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int Long::numberOfTrailingZeros(long long value) {
-    if (value == 0) {
+int Long::numberOfTrailingZeros(long long value)
+{
+    if (value == 0)
+    {
         return 0;
     }
 
-    unsigned long long uvalue = (unsigned long long) value;
+    unsigned long long uvalue = (unsigned long long)value;
     return Long::bitCount((uvalue & (-1 * uvalue)) - 1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-long long Long::parseLong(const String& value) {
+long long Long::parseLong(const String& value)
+{
     return Long::parseLong(value, 10);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-long long Long::parseLong(const String& value, int radix) {
-
-    if (radix < Character::MIN_RADIX || radix > Character::MAX_RADIX) {
-        throw exceptions::NumberFormatException(__FILE__, __LINE__, "Long::parseLong - Given Radix is out of range.");
+long long Long::parseLong(const String& value, int radix)
+{
+    if (radix < Character::MIN_RADIX || radix > Character::MAX_RADIX)
+    {
+        throw exceptions::NumberFormatException(
+            __FILE__,
+            __LINE__,
+            "Long::parseLong - Given Radix is out of range.");
     }
 
-    int length = (int) value.length();
-    int i = 0;
+    int length = (int)value.length();
+    int i      = 0;
 
-    if (length == 0) {
-        throw exceptions::NumberFormatException(__FILE__, __LINE__, "Long::parseLong - Zero length string is illegal.");
+    if (length == 0)
+    {
+        throw exceptions::NumberFormatException(
+            __FILE__,
+            __LINE__,
+            "Long::parseLong - Zero length string is illegal.");
     }
 
     bool negative = value.charAt(i) == '-';
-    if (negative && ++i == length) {
-        throw exceptions::NumberFormatException(__FILE__, __LINE__, "Long::parseLong - Only a minus given, string is invalid.");
+    if (negative && ++i == length)
+    {
+        throw exceptions::NumberFormatException(
+            __FILE__,
+            __LINE__,
+            "Long::parseLong - Only a minus given, string is invalid.");
     }
 
     return Long::parse(value, i, radix, negative);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-long long Long::parse(const String& value, int offset, int radix, bool negative) {
-
-    long long max = Long::MIN_VALUE / radix;
+long long Long::parse(const String& value, int offset, int radix, bool negative)
+{
+    long long max    = Long::MIN_VALUE / radix;
     long long result = 0;
     long long length = value.length();
 
-    while (offset < length) {
+    while (offset < length)
+    {
         int digit = Character::digit(value.charAt(offset++), radix);
 
-        if (digit == -1) {
-            throw exceptions::NumberFormatException(__FILE__, __LINE__,
+        if (digit == -1)
+        {
+            throw exceptions::NumberFormatException(
+                __FILE__,
+                __LINE__,
                 "Long::parseLong - String contains no digit characters.");
         }
 
-        if (max > result) {
-            throw exceptions::NumberFormatException(__FILE__, __LINE__,
+        if (max > result)
+        {
+            throw exceptions::NumberFormatException(
+                __FILE__,
+                __LINE__,
                 "Long::parseLong - Parsed value greater than max for radix.");
         }
 
         long long next = result * radix - digit;
 
-        if (next > result) {
-            throw exceptions::NumberFormatException(__FILE__, __LINE__,
+        if (next > result)
+        {
+            throw exceptions::NumberFormatException(
+                __FILE__,
+                __LINE__,
                 "Long::parseLong - Only a minus given, string is invalid.");
         }
 
         result = next;
     }
 
-    if (!negative) {
-        if (result == Long::MIN_VALUE) {
-            throw exceptions::NumberFormatException(__FILE__, __LINE__,
+    if (!negative)
+    {
+        if (result == Long::MIN_VALUE)
+        {
+            throw exceptions::NumberFormatException(
+                __FILE__,
+                __LINE__,
                 "Long::parseLong - Value less than zero, but no minus sign.");
         }
         result = -result;
@@ -237,13 +307,14 @@ long long Long::parse(const String& value, int offset, int radix, bool negative)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-long long Long::reverseBytes(long long value) {
-
-    if (value == 0) {
+long long Long::reverseBytes(long long value)
+{
+    if (value == 0)
+    {
         return 0;
     }
 
-    unsigned long long uvalue = (unsigned long long) value;
+    unsigned long long uvalue = (unsigned long long)value;
 
     long long b7 = (uvalue >> 56);
     long long b6 = (uvalue >> 40) & 0xFF00ULL;
@@ -257,91 +328,109 @@ long long Long::reverseBytes(long long value) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-long long Long::reverse(long long value) {
-
-    if (value == 0) {
+long long Long::reverse(long long value)
+{
+    if (value == 0)
+    {
         return 0;
     }
 
-    unsigned long long uvalue = (unsigned long long) value;
+    unsigned long long uvalue = (unsigned long long)value;
 
     // From Hacker's Delight, 7-1, Figure 7-1
-    uvalue = ((uvalue & 0x5555555555555555ULL) << 1) | ((uvalue >> 1) & 0x5555555555555555ULL);
-    uvalue = ((uvalue & 0x3333333333333333ULL) << 2) | ((uvalue >> 2) & 0x3333333333333333ULL);
-    uvalue = ((uvalue & 0x0F0F0F0F0F0F0F0FULL) << 4) | ((uvalue >> 4) & 0x0F0F0F0F0F0F0F0FULL);
+    uvalue = ((uvalue & 0x5555555555555555ULL) << 1) |
+             ((uvalue >> 1) & 0x5555555555555555ULL);
+    uvalue = ((uvalue & 0x3333333333333333ULL) << 2) |
+             ((uvalue >> 2) & 0x3333333333333333ULL);
+    uvalue = ((uvalue & 0x0F0F0F0F0F0F0F0FULL) << 4) |
+             ((uvalue >> 4) & 0x0F0F0F0F0F0F0F0FULL);
 
     return reverseBytes(uvalue);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-long long Long::rotateLeft(long long value, int distance) {
-    unsigned long long i = (unsigned long long) value;
-    int j = distance & 0x1F;
+long long Long::rotateLeft(long long value, int distance)
+{
+    unsigned long long i = (unsigned long long)value;
+    int                j = distance & 0x1F;
     return (i << j) | (i >> (-j & 0x1F));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-long long Long::rotateRight(long long value, int distance) {
-    unsigned long long i = (unsigned long long) value;
-    int j = distance & 0x1F;
+long long Long::rotateRight(long long value, int distance)
+{
+    unsigned long long i = (unsigned long long)value;
+    int                j = distance & 0x1F;
     return (i >> j) | (i << (-j & 0x1F));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int Long::signum(long long value) {
+int Long::signum(long long value)
+{
     return (value == 0 ? 0 : (value < 0 ? -1 : 1));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string Long::toString() const {
+std::string Long::toString() const
+{
     return Long::toString(this->value, 10);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string Long::toString(long long value) {
+std::string Long::toString(long long value)
+{
     return Long::toString(value, 10);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string Long::toString(long long value, int radix) {
-
-    if (radix < Character::MIN_RADIX || radix > Character::MAX_RADIX) {
+std::string Long::toString(long long value, int radix)
+{
+    if (radix < Character::MIN_RADIX || radix > Character::MAX_RADIX)
+    {
         radix = 10;
     }
 
-    if (value == 0) {
+    if (value == 0)
+    {
         return "0";
     }
 
-    int count = 2;
-    long long j = value;
-    bool negative = value < 0;
+    int       count    = 2;
+    long long j        = value;
+    bool      negative = value < 0;
 
-    if (!negative) {
+    if (!negative)
+    {
         count = 1;
-        j = -value;
+        j     = -value;
     }
 
-    while ((value /= radix) != 0) {
+    while ((value /= radix) != 0)
+    {
         count++;
     }
 
     // Save length and allocate a new buffer for the string, add one
     // more for the null character.
-    int length = count;
+    int   length = count;
     char* buffer = new char[length + 1];
 
-    do {
-        int ch = (int) (0 - (j % radix));
-        if (ch > 9) {
+    do
+    {
+        int ch = (int)(0 - (j % radix));
+        if (ch > 9)
+        {
             ch = ch - 10 + 'a';
-        } else {
+        }
+        else
+        {
             ch += '0';
         }
-        buffer[--count] = (char) ch;
+        buffer[--count] = (char)ch;
     } while ((j /= radix) != 0);
 
-    if (negative) {
+    if (negative)
+    {
         buffer[0] = '-';
     }
 
@@ -354,26 +443,31 @@ std::string Long::toString(long long value, int radix) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string Long::toBinaryString(long long value) {
+std::string Long::toBinaryString(long long value)
+{
+    int       count = 1;
+    long long j     = value;
 
-    int count = 1;
-    long long j = value;
-
-    if (value < 0) {
-        count = 64; // 8 * sizeof(long long);
-    } else {
-        while ((j >>= 1) != 0) {
+    if (value < 0)
+    {
+        count = 64;  // 8 * sizeof(long long);
+    }
+    else
+    {
+        while ((j >>= 1) != 0)
+        {
             count++;
         }
     }
 
     // Save length and allocate a new buffer for the string, add one
     // more for the null character.
-    int length = count;
+    int   length = count;
     char* buffer = new char[length + 1];
 
-    do {
-        buffer[--count] = (char) ((value & 1) + '0');
+    do
+    {
+        buffer[--count] = (char)((value & 1) + '0');
         value >>= 1;
     } while (count > 0);
 
@@ -386,27 +480,32 @@ std::string Long::toBinaryString(long long value) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string Long::toOctalString(long long value) {
+std::string Long::toOctalString(long long value)
+{
+    int                count  = 1;
+    long long          j      = value;
+    unsigned long long uvalue = (unsigned long long)value;
 
-    int count = 1;
-    long long j = value;
-    unsigned long long uvalue = (unsigned long long) value;
-
-    if (value < 0) {
-        count = 22; // (8 * sizeof(long long) + 2) / 3;
-    } else {
-        while ((j >>= 3) != 0) {
+    if (value < 0)
+    {
+        count = 22;  // (8 * sizeof(long long) + 2) / 3;
+    }
+    else
+    {
+        while ((j >>= 3) != 0)
+        {
             count++;
         }
     }
 
     // Save length and allocate a new buffer for the string, add one
     // more for the null character.
-    int length = count;
+    int   length = count;
     char* buffer = new char[length + 1];
 
-    do {
-        buffer[--count] = (char) ((uvalue & 7) + '0');
+    do
+    {
+        buffer[--count] = (char)((uvalue & 7) + '0');
         uvalue >>= 3;
     } while (count > 0);
 
@@ -419,32 +518,40 @@ std::string Long::toOctalString(long long value) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string Long::toHexString(long long value) {
+std::string Long::toHexString(long long value)
+{
+    int       count = 1;
+    long long j     = value;
 
-    int count = 1;
-    long long j = value;
-
-    if (value < 0) {
-        count = 16; // 8 * sizeof(long long) / 4
-    } else {
-        while ((j >>= 4) != 0) {
+    if (value < 0)
+    {
+        count = 16;  // 8 * sizeof(long long) / 4
+    }
+    else
+    {
+        while ((j >>= 4) != 0)
+        {
             count++;
         }
     }
 
     // Save length and allocate a new buffer for the string, add one
     // more for the null character.
-    int length = count;
+    int   length = count;
     char* buffer = new char[length + 1];
 
-    do {
-        int t = (int) (value & 15);
-        if (t > 9) {
+    do
+    {
+        int t = (int)(value & 15);
+        if (t > 9)
+        {
             t = t - 10 + 'a';
-        } else {
+        }
+        else
+        {
             t += '0';
         }
-        buffer[--count] = (char) t;
+        buffer[--count] = (char)t;
         value >>= 4;
     } while (count > 0);
 
@@ -457,11 +564,13 @@ std::string Long::toHexString(long long value) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Long Long::valueOf(const String& value) {
+Long Long::valueOf(const String& value)
+{
     return Long(Long::parseLong(value));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Long Long::valueOf(const String& value, int radix) {
+Long Long::valueOf(const String& value, int radix)
+{
     return Long(Long::parseLong(value, radix));
 }

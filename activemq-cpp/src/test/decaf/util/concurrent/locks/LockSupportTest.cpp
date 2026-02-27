@@ -17,13 +17,13 @@
 
 #include <gtest/gtest.h>
 
+#include <decaf/lang/Runnable.h>
 #include <decaf/lang/System.h>
 #include <decaf/lang/Thread.h>
-#include <decaf/lang/Runnable.h>
 #include <decaf/util/Date.h>
+#include <decaf/util/concurrent/ExecutorsTestSupport.h>
 #include <decaf/util/concurrent/TimeUnit.h>
 #include <decaf/util/concurrent/locks/LockSupport.h>
-#include <decaf/util/concurrent/ExecutorsTestSupport.h>
 
 using namespace std;
 using namespace decaf;
@@ -32,245 +32,302 @@ using namespace decaf::util;
 using namespace decaf::util::concurrent;
 using namespace decaf::util::concurrent::locks;
 
-    class LockSupportTest : public ExecutorsTestSupport {
+class LockSupportTest : public ExecutorsTestSupport
+{
 public:
+    LockSupportTest();
 
-        LockSupportTest();
-
-        virtual ~LockSupportTest();
-
-    };
+    virtual ~LockSupportTest();
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-LockSupportTest::LockSupportTest() {
+LockSupportTest::LockSupportTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-LockSupportTest::~LockSupportTest() {
+LockSupportTest::~LockSupportTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class ParkTestThread : public Thread {
-    private:
+class ParkTestThread : public Thread
+{
+private:
+    LockSupportTest* parent;
 
-        LockSupportTest* parent;
+private:
+    ParkTestThread(const ParkTestThread&);
+    ParkTestThread operator=(const ParkTestThread&);
 
-    private:
+public:
+    ParkTestThread(LockSupportTest* parent)
+        : Thread(),
+          parent(parent)
+    {
+    }
 
-        ParkTestThread(const ParkTestThread&);
-        ParkTestThread operator= (const ParkTestThread&);
+    virtual ~ParkTestThread()
+    {
+    }
 
-    public:
-
-        ParkTestThread(LockSupportTest* parent) : Thread(), parent(parent) {}
-        virtual ~ParkTestThread() {}
-
-        virtual void run() {
-            try{
-                LockSupport::park();
-            } catch(...) {
-                parent->threadUnexpectedException();
-            }
+    virtual void run()
+    {
+        try
+        {
+            LockSupport::park();
         }
-    };
-}
+        catch (...)
+        {
+            parent->threadUnexpectedException();
+        }
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LockSupportTest, testPark1) {
-
+TEST_F(LockSupportTest, testPark1)
+{
     ParkTestThread t(this);
 
-    try {
-
+    try
+    {
         t.start();
-        Thread::sleep( 1000 );
-        LockSupport::unpark( &t );
+        Thread::sleep(1000);
+        LockSupport::unpark(&t);
         t.join();
-
-    } catch(...) {
+    }
+    catch (...)
+    {
         FAIL() << ("Caught an unexpected exception");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class ParkTest2Thread : public Thread {
-    private:
+class ParkTest2Thread : public Thread
+{
+private:
+    LockSupportTest* parent;
 
-        LockSupportTest* parent;
+private:
+    ParkTest2Thread(const ParkTest2Thread&);
+    ParkTest2Thread operator=(const ParkTest2Thread&);
 
-    private:
+public:
+    ParkTest2Thread(LockSupportTest* parent)
+        : Thread(),
+          parent(parent)
+    {
+    }
 
-        ParkTest2Thread(const ParkTest2Thread&);
-        ParkTest2Thread operator= (const ParkTest2Thread&);
+    virtual ~ParkTest2Thread()
+    {
+    }
 
-    public:
-
-        ParkTest2Thread(LockSupportTest* parent) : Thread(), parent(parent) {}
-        virtual ~ParkTest2Thread() {}
-
-        virtual void run() {
-            try{
-                Thread::sleep( 1000 );
-                LockSupport::park();
-            } catch(...) {
-                parent->threadUnexpectedException();
-            }
+    virtual void run()
+    {
+        try
+        {
+            Thread::sleep(1000);
+            LockSupport::park();
         }
-
-    };
-}
+        catch (...)
+        {
+            parent->threadUnexpectedException();
+        }
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LockSupportTest, testPark2) {
-
+TEST_F(LockSupportTest, testPark2)
+{
     ParkTest2Thread t(this);
 
-    try {
-
+    try
+    {
         long long before = System::currentTimeMillis();
         t.start();
-        LockSupport::unpark( &t );
+        LockSupport::unpark(&t);
         t.join();
         long long after = System::currentTimeMillis();
 
         long long delta = after - before;
 
         ASSERT_TRUE(delta > 800 && delta < 1500);
-
-    } catch(...) {
+    }
+    catch (...)
+    {
         FAIL() << ("Caught an unexpected exception");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class Park3TestThread : public Thread {
-    private:
+class Park3TestThread : public Thread
+{
+private:
+    LockSupportTest* parent;
 
-        LockSupportTest* parent;
+private:
+    Park3TestThread(const Park3TestThread&);
+    Park3TestThread operator=(const Park3TestThread&);
 
-    private:
+public:
+    Park3TestThread(LockSupportTest* parent)
+        : Thread(),
+          parent(parent)
+    {
+    }
 
-        Park3TestThread(const Park3TestThread&);
-        Park3TestThread operator= (const Park3TestThread&);
+    virtual ~Park3TestThread()
+    {
+    }
 
-    public:
-
-        Park3TestThread(LockSupportTest* parent) : Thread(), parent(parent) {}
-        virtual ~Park3TestThread() {}
-
-        virtual void run() {
-            try{
-                LockSupport::park();
-            } catch(...) {
-                parent->threadUnexpectedException();
-            }
+    virtual void run()
+    {
+        try
+        {
+            LockSupport::park();
         }
-    };
-}
+        catch (...)
+        {
+            parent->threadUnexpectedException();
+        }
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LockSupportTest, testPark3) {
-
+TEST_F(LockSupportTest, testPark3)
+{
     Park3TestThread t(this);
 
-    try {
+    try
+    {
         t.start();
         Thread::sleep(SHORT_DELAY_MS);
         t.interrupt();
         t.join();
     }
-    catch(Exception& e) {
+    catch (Exception& e)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class Park4TestThread : public Thread {
-    private:
+class Park4TestThread : public Thread
+{
+private:
+    LockSupportTest* parent;
+    Mutex*           lock;
 
-        LockSupportTest* parent;
-        Mutex* lock;
+private:
+    Park4TestThread(const Park4TestThread&);
+    Park4TestThread operator=(const Park4TestThread&);
 
-    private:
+public:
+    Park4TestThread(LockSupportTest* parent, Mutex* lock)
+        : Thread(),
+          parent(parent),
+          lock(lock)
+    {
+    }
 
-        Park4TestThread(const Park4TestThread&);
-        Park4TestThread operator= (const Park4TestThread&);
+    virtual ~Park4TestThread()
+    {
+    }
 
-    public:
-
-        Park4TestThread(LockSupportTest* parent, Mutex* lock) : Thread(), parent(parent), lock(lock) {}
-        virtual ~Park4TestThread() {}
-
-        virtual void run() {
-            try{
-                lock->lock();
-                LockSupport::park();
-                lock->unlock();
-                parent->threadAssertTrue(Thread::currentThread()->isInterrupted());
-            } catch(...) {
-                parent->threadUnexpectedException();
-            }
+    virtual void run()
+    {
+        try
+        {
+            lock->lock();
+            LockSupport::park();
+            lock->unlock();
+            parent->threadAssertTrue(Thread::currentThread()->isInterrupted());
         }
-    };
-}
+        catch (...)
+        {
+            parent->threadUnexpectedException();
+        }
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LockSupportTest, testPark4) {
-
-    Mutex lock;
+TEST_F(LockSupportTest, testPark4)
+{
+    Mutex           lock;
     Park4TestThread t(this, &lock);
     lock.lock();
 
-    try {
+    try
+    {
         t.start();
         t.interrupt();
         lock.unlock();
         t.join();
     }
-    catch(Exception e) {
+    catch (Exception e)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class ParkNanosTestThread : public Thread {
-    private:
+class ParkNanosTestThread : public Thread
+{
+private:
+    LockSupportTest* parent;
 
-        LockSupportTest* parent;
+private:
+    ParkNanosTestThread(const ParkNanosTestThread&);
+    ParkNanosTestThread operator=(const ParkNanosTestThread&);
 
-    private:
+public:
+    ParkNanosTestThread(LockSupportTest* parent)
+        : Thread(),
+          parent(parent)
+    {
+    }
 
-        ParkNanosTestThread(const ParkNanosTestThread&);
-        ParkNanosTestThread operator= (const ParkNanosTestThread&);
+    virtual ~ParkNanosTestThread()
+    {
+    }
 
-    public:
-
-        ParkNanosTestThread(LockSupportTest* parent) : Thread(), parent(parent) {}
-        virtual ~ParkNanosTestThread() {}
-
-        virtual void run() {
-            try{
-                LockSupport::parkNanos( TimeUnit::SECONDS.toNanos( 2 ) );
-            } catch(...) {
-                parent->threadUnexpectedException();
-            }
+    virtual void run()
+    {
+        try
+        {
+            LockSupport::parkNanos(TimeUnit::SECONDS.toNanos(2));
         }
-    };
-}
+        catch (...)
+        {
+            parent->threadUnexpectedException();
+        }
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LockSupportTest, testParkNanos) {
-
+TEST_F(LockSupportTest, testParkNanos)
+{
     ParkNanosTestThread t(this);
 
     long long before = System::currentTimeMillis();
@@ -283,43 +340,56 @@ TEST_F(LockSupportTest, testParkNanos) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class ParkUntilTestThread : public Thread {
-    private:
+class ParkUntilTestThread : public Thread
+{
+private:
+    LockSupportTest* parent;
 
-        LockSupportTest* parent;
+private:
+    ParkUntilTestThread(const ParkUntilTestThread&);
+    ParkUntilTestThread operator=(const ParkUntilTestThread&);
 
-    private:
+public:
+    ParkUntilTestThread(LockSupportTest* parent)
+        : Thread(),
+          parent(parent)
+    {
+    }
 
-        ParkUntilTestThread(const ParkUntilTestThread&);
-        ParkUntilTestThread operator= (const ParkUntilTestThread&);
+    virtual ~ParkUntilTestThread()
+    {
+    }
 
-    public:
-
-        ParkUntilTestThread(LockSupportTest* parent) : Thread(), parent(parent) {}
-        virtual ~ParkUntilTestThread() {}
-
-        virtual void run() {
-            try{
-                long long deadline = Date().getTime() + 100;
-                LockSupport::parkUntil( deadline );
-            } catch(...) {
-                parent->threadUnexpectedException();
-            }
+    virtual void run()
+    {
+        try
+        {
+            long long deadline = Date().getTime() + 100;
+            LockSupport::parkUntil(deadline);
         }
-    };
-}
+        catch (...)
+        {
+            parent->threadUnexpectedException();
+        }
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LockSupportTest, testParkUntil) {
-
+TEST_F(LockSupportTest, testParkUntil)
+{
     ParkUntilTestThread t(this);
 
-    try {
+    try
+    {
         t.start();
         t.join();
-    } catch(...) {
+    }
+    catch (...)
+    {
         FAIL() << ("Caught an unexpected exception");
     }
 }

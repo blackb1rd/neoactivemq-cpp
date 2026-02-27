@@ -17,79 +17,81 @@
 #ifndef _DECAF_UTIL_LOGGING_SIMPLELOGGER_H_
 #define _DECAF_UTIL_LOGGING_SIMPLELOGGER_H_
 
-#include <string>
 #include <decaf/util/Config.h>
+#include <string>
 
-namespace decaf{
-namespace util{
-namespace logging{
+namespace decaf
+{
+namespace util
+{
+    namespace logging
+    {
 
-   class DECAF_API SimpleLogger
-   {
-   public:
+        class DECAF_API SimpleLogger
+        {
+        public:
+            /**
+             * Constructor
+             */
+            SimpleLogger(const std::string& name);
 
-      /**
-       * Constructor
-       */
-      SimpleLogger( const std::string& name );
+            /**
+             * Destructor
+             */
+            virtual ~SimpleLogger();
 
-      /**
-       * Destructor
-       */
-      virtual ~SimpleLogger();
+            /**
+             * Log a Mark Block Level Log
+             */
+            virtual void mark(const std::string& message);
 
-      /**
-       * Log a Mark Block Level Log
-       */
-      virtual void mark(const std::string& message);
+            /**
+             * Log a Debug Level Log
+             */
+            virtual void debug(const std::string& file,
+                               const int          line,
+                               const std::string& message);
 
-      /**
-       * Log a Debug Level Log
-       */
-      virtual void debug(const std::string& file,
-                         const int          line,
-                         const std::string& message);
+            /**
+             * Log a Informational Level Log
+             */
+            virtual void info(const std::string& file,
+                              const int          line,
+                              const std::string& message);
 
-      /**
-       * Log a Informational Level Log
-       */
-      virtual void info(const std::string& file,
-                        const int          line,
-                        const std::string& message);
+            /**
+             * Log a Warning Level Log
+             */
+            virtual void warn(const std::string& file,
+                              const int          line,
+                              const std::string& message);
 
-      /**
-       * Log a Warning Level Log
-       */
-      virtual void warn(const std::string& file,
-                        const int          line,
-                        const std::string& message);
+            /**
+             * Log a Error Level Log
+             */
+            virtual void error(const std::string& file,
+                               const int          line,
+                               const std::string& message);
 
-      /**
-       * Log a Error Level Log
-       */
-      virtual void error(const std::string& file,
-                         const int          line,
-                         const std::string& message);
+            /**
+             * Log a Fatal Level Log
+             */
+            virtual void fatal(const std::string& file,
+                               const int          line,
+                               const std::string& message);
 
-      /**
-       * Log a Fatal Level Log
-       */
-      virtual void fatal(const std::string& file,
-                         const int          line,
-                         const std::string& message);
+            /**
+             * No-frills log.
+             */
+            virtual void log(const std::string& message);
 
-      /**
-       * No-frills log.
-       */
-      virtual void log(const std::string& message);
+        private:
+            // Name of this Logger
+            std::string name;
+        };
 
-   private:
-
-      // Name of this Logger
-      std::string name;
-
-   };
-
-}}}
+    }  // namespace logging
+}  // namespace util
+}  // namespace decaf
 
 #endif /*_DECAF_UTIL_LOGGING_SIMPLELOGGER_H_*/

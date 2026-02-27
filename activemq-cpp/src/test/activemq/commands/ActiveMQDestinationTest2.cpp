@@ -17,8 +17,8 @@
 
 #include <gtest/gtest.h>
 
-#include <decaf/util/UUID.h>
 #include <activemq/commands/ActiveMQDestination.h>
+#include <decaf/util/UUID.h>
 
 using namespace std;
 using namespace decaf;
@@ -27,87 +27,92 @@ using namespace activemq;
 using namespace activemq::util;
 using namespace activemq::commands;
 
-    class ActiveMQDestinationTest : public ::testing::Test {
-    };
+class ActiveMQDestinationTest : public ::testing::Test
+{
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class MyDestination : public ActiveMQDestination {
-    public:
+class MyDestination : public ActiveMQDestination
+{
+public:
+    /**
+     * Returns the Type of Destination that this object represents
+     * @returns int type qualifier.
+     */
+    virtual cms::Destination::DestinationType getDestinationType() const
+    {
+        return cms::Destination::TOPIC;
+    }
 
-        /**
-         * Returns the Type of Destination that this object represents
-         * @returns int type qualifier.
-         */
-        virtual cms::Destination::DestinationType getDestinationType() const {
-            return cms::Destination::TOPIC;
-        }
+    /**
+     * Clone this object and return a new instance that the
+     * caller now owns, this will be an exact copy of this one
+     * @returns new copy of this object.
+     */
+    virtual MyDestination* cloneDataStructure() const
+    {
+        MyDestination* message = new MyDestination();
+        message->copyDataStructure(this);
+        return message;
+    }
 
-        /**
-         * Clone this object and return a new instance that the
-         * caller now owns, this will be an exact copy of this one
-         * @returns new copy of this object.
-         */
-        virtual MyDestination* cloneDataStructure() const {
-            MyDestination* message = new MyDestination();
-            message->copyDataStructure( this );
-            return message;
-        }
+    /**
+     * Copy the contents of the passed object into this objects
+     * members, overwriting any existing data.
+     * @return src - Source Object
+     */
+    virtual void copyDataStructure(const DataStructure* src)
+    {
+        ActiveMQDestination::copyDataStructure(src);
+    }
+};
 
-        /**
-         * Copy the contents of the passed object into this objects
-         * members, overwriting any existing data.
-         * @return src - Source Object
-         */
-        virtual void copyDataStructure( const DataStructure* src ) {
-            ActiveMQDestination::copyDataStructure( src );
-        }
-    };
+class MyTempDestination : public MyDestination
+{
+public:
+    /**
+     * Returns the Type of Destination that this object represents
+     * @returns int type qualifier.
+     */
+    virtual cms::Destination::DestinationType getDestinationType() const
+    {
+        return cms::Destination::TEMPORARY_TOPIC;
+    }
+};
 
-    class MyTempDestination : public MyDestination {
-    public:
-
-        /**
-         * Returns the Type of Destination that this object represents
-         * @returns int type qualifier.
-         */
-        virtual cms::Destination::DestinationType getDestinationType() const {
-            return cms::Destination::TEMPORARY_TOPIC;
-        }
-
-    };
-
-}
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(ActiveMQDestinationTest, test)
 {
     MyDestination dest;
 
-    dest.setPhysicalName( "test" );
-    dest.setAdvisory( true );
-    dest.setExclusive( true );
-    dest.setOrdered( true );
+    dest.setPhysicalName("test");
+    dest.setAdvisory(true);
+    dest.setExclusive(true);
+    dest.setOrdered(true);
 
-    ASSERT_TRUE(dest.getPhysicalName().find( "test" ) != string::npos);
+    ASSERT_TRUE(dest.getPhysicalName().find("test") != string::npos);
     ASSERT_TRUE(dest.isAdvisory() == true);
     ASSERT_TRUE(dest.isExclusive() == true);
     ASSERT_TRUE(dest.isAdvisory() == true);
 
     MyDestination dest2;
-    dest2.copyDataStructure( &dest );
+    dest2.copyDataStructure(&dest);
 
-    ASSERT_TRUE(dest2.getPhysicalName().find( "test" ) != string::npos);
+    ASSERT_TRUE(dest2.getPhysicalName().find("test") != string::npos);
     ASSERT_TRUE(dest2.isAdvisory() == true);
     ASSERT_TRUE(dest2.isExclusive() == true);
     ASSERT_TRUE(dest2.isAdvisory() == true);
 
     MyDestination* dest3 = NULL;
-    dest3 = dynamic_cast<MyDestination*>( dest.cloneDataStructure() );
+    dest3 = dynamic_cast<MyDestination*>(dest.cloneDataStructure());
 
     ASSERT_TRUE(dest3 != NULL);
-    ASSERT_TRUE(dest3->getPhysicalName().find( "test" ) != string::npos);
+    ASSERT_TRUE(dest3->getPhysicalName().find("test") != string::npos);
     ASSERT_TRUE(dest3->isAdvisory() == true);
     ASSERT_TRUE(dest3->isExclusive() == true);
     ASSERT_TRUE(dest3->isAdvisory() == true);
@@ -115,28 +120,27 @@ TEST_F(ActiveMQDestinationTest, test)
     delete dest3;
 
     std::string clientId = UUID::randomUUID().toString();
-    std::string result = dest.createTemporaryName( clientId );
-    ASSERT_TRUE(result.find( clientId ) != string::npos);
-    dest.setPhysicalName( result );
-    ASSERT_TRUE(clientId != dest.getClientId( &dest ));
+    std::string result   = dest.createTemporaryName(clientId);
+    ASSERT_TRUE(result.find(clientId) != string::npos);
+    dest.setPhysicalName(result);
+    ASSERT_TRUE(clientId != dest.getClientId(&dest));
     MyTempDestination tmpDest;
-    tmpDest.setPhysicalName( result );
-    ASSERT_TRUE(clientId == ActiveMQDestination::getClientId( &tmpDest ));
-
+    tmpDest.setPhysicalName(result);
+    ASSERT_TRUE(clientId == ActiveMQDestination::getClientId(&tmpDest));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ActiveMQDestinationTest, testOptions){
-
+TEST_F(ActiveMQDestinationTest, testOptions)
+{
     MyDestination dest;
 
-    dest.setPhysicalName( "test?option1=test1&option2=test2" );
+    dest.setPhysicalName("test?option1=test1&option2=test2");
 
     const activemq::util::ActiveMQProperties& properties = dest.getOptions();
 
-    ASSERT_TRUE(properties.hasProperty( "option1" ) == true);
-    ASSERT_TRUE(properties.hasProperty( "option2" ) == true);
+    ASSERT_TRUE(properties.hasProperty("option1") == true);
+    ASSERT_TRUE(properties.hasProperty("option2") == true);
 
-    ASSERT_TRUE(std::string( properties.getProperty( "option1" ) ) == "test1");
-    ASSERT_TRUE(std::string( properties.getProperty( "option2" ) ) == "test2");
+    ASSERT_TRUE(std::string(properties.getProperty("option1")) == "test1");
+    ASSERT_TRUE(std::string(properties.getProperty("option2")) == "test2");
 }

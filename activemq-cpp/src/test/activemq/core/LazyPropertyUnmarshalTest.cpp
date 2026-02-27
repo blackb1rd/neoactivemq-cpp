@@ -17,15 +17,15 @@
 
 #include <gtest/gtest.h>
 
-#include <activemq/commands/Message.h>
+#include <activemq/commands/ActiveMQQueue.h>
 #include <activemq/commands/ActiveMQTextMessage.h>
+#include <activemq/commands/ConsumerId.h>
+#include <activemq/commands/Message.h>
 #include <activemq/commands/MessageDispatch.h>
 #include <activemq/commands/MessageId.h>
-#include <activemq/commands/ConsumerId.h>
-#include <activemq/commands/ActiveMQQueue.h>
-#include <activemq/wireformat/openwire/marshal/PrimitiveTypesMarshaller.h>
 #include <activemq/core/kernels/ActiveMQConsumerKernel.h>
 #include <activemq/core/policies/DefaultRedeliveryPolicy.h>
+#include <activemq/wireformat/openwire/marshal/PrimitiveTypesMarshaller.h>
 #include <decaf/io/IOException.h>
 
 using namespace activemq;
@@ -37,70 +37,71 @@ using namespace activemq::wireformat::openwire::marshal;
 using namespace decaf::io;
 using namespace decaf::lang;
 
-    /**
-     * Unit tests for lazy property unmarshaling behavior.
-     *
-     * Tests verify:
-     * - Properties are lazily unmarshaled (not during wire reading)
-     * - Corrupted properties throw IOException during access
-     * - Redelivery limit is configurable
-     * - POISON_ACK is sent after maximum redeliveries
-     * - Connection stays alive when property corruption occurs
-     */
-    class LazyPropertyUnmarshalTest : public ::testing::Test {
+/**
+ * Unit tests for lazy property unmarshaling behavior.
+ *
+ * Tests verify:
+ * - Properties are lazily unmarshaled (not during wire reading)
+ * - Corrupted properties throw IOException during access
+ * - Redelivery limit is configurable
+ * - POISON_ACK is sent after maximum redeliveries
+ * - Connection stays alive when property corruption occurs
+ */
+class LazyPropertyUnmarshalTest : public ::testing::Test
+{
 public:
+    LazyPropertyUnmarshalTest();
+    virtual ~LazyPropertyUnmarshalTest();
 
-        LazyPropertyUnmarshalTest();
-        virtual ~LazyPropertyUnmarshalTest();
+    /**
+     * Test that properties are lazily unmarshaled when first accessed.
+     */
+    void testPropertiesLazilyUnmarshaled();
 
-        /**
-         * Test that properties are lazily unmarshaled when first accessed.
-         */
-        void testPropertiesLazilyUnmarshaled();
+    /**
+     * Test that corrupted properties throw IOException when accessed.
+     */
+    void testCorruptedPropertiesThrowIOException();
 
-        /**
-         * Test that corrupted properties throw IOException when accessed.
-         */
-        void testCorruptedPropertiesThrowIOException();
+    /**
+     * Test that redelivery limit can be configured via API and properties.
+     */
+    void testRedeliveryLimitConfiguration();
 
-        /**
-         * Test that redelivery limit can be configured via API and properties.
-         */
-        void testRedeliveryLimitConfiguration();
+    /**
+     * Test that redelivery exceeded check works correctly after max attempts.
+     */
+    void testRedeliveryExceededAfterMaxAttempts();
 
-        /**
-         * Test that redelivery exceeded check works correctly after max attempts.
-         */
-        void testRedeliveryExceededAfterMaxAttempts();
+    /**
+     * Test that corrupted messages trigger redelivery without closing
+     * connection. Verifies:
+     * - IOException thrown during property access
+     * - Broker redelivers message
+     * - POISON_ACK sent after 6 redeliveries
+     * - Connection stays alive
+     */
+    void testCorruptedMessageDoesNotCloseConnection();
 
-        /**
-         * Test that corrupted messages trigger redelivery without closing connection.
-         * Verifies:
-         * - IOException thrown during property access
-         * - Broker redelivers message
-         * - POISON_ACK sent after 6 redeliveries
-         * - Connection stays alive
-         */
-        void testCorruptedMessageDoesNotCloseConnection();
-
-        /**
-         * Test that redelivery policy can be configured via wireformat properties.
-         */
-        void testWireFormatRedeliveryConfiguration();
-    };
-
+    /**
+     * Test that redelivery policy can be configured via wireformat properties.
+     */
+    void testWireFormatRedeliveryConfiguration();
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-LazyPropertyUnmarshalTest::LazyPropertyUnmarshalTest() {
+LazyPropertyUnmarshalTest::LazyPropertyUnmarshalTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-LazyPropertyUnmarshalTest::~LazyPropertyUnmarshalTest() {
+LazyPropertyUnmarshalTest::~LazyPropertyUnmarshalTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LazyPropertyUnmarshalTest::testPropertiesLazilyUnmarshaled() {
-
+void LazyPropertyUnmarshalTest::testPropertiesLazilyUnmarshaled()
+{
     // Create a message with valid marshalled properties
     Pointer<ActiveMQTextMessage> message(new ActiveMQTextMessage());
     message->setText("Test Message");
@@ -125,8 +126,8 @@ void LazyPropertyUnmarshalTest::testPropertiesLazilyUnmarshaled() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LazyPropertyUnmarshalTest::testCorruptedPropertiesThrowIOException() {
-
+void LazyPropertyUnmarshalTest::testCorruptedPropertiesThrowIOException()
+{
     // Create a message with corrupted marshalled properties
     Pointer<ActiveMQTextMessage> message(new ActiveMQTextMessage());
     message->setText("Test Message");
@@ -142,20 +143,24 @@ void LazyPropertyUnmarshalTest::testCorruptedPropertiesThrowIOException() {
 
     // Accessing properties should throw IOException
     bool exceptionThrown = false;
-    try {
+    try
+    {
         message->getMessageProperties();
         FAIL() << ("Expected IOException for corrupted properties");
-    } catch (IOException& e) {
+    }
+    catch (IOException& e)
+    {
         exceptionThrown = true;
         // Expected - corrupted properties should throw IOException
     }
 
-    ASSERT_TRUE(exceptionThrown) << ("IOException should be thrown for corrupted properties");
+    ASSERT_TRUE(exceptionThrown)
+        << ("IOException should be thrown for corrupted properties");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LazyPropertyUnmarshalTest::testRedeliveryLimitConfiguration() {
-
+void LazyPropertyUnmarshalTest::testRedeliveryLimitConfiguration()
+{
     // Test default redelivery limit
     DefaultRedeliveryPolicy defaultPolicy;
     ASSERT_EQ(6, defaultPolicy.getMaximumRedeliveries());
@@ -174,14 +179,14 @@ void LazyPropertyUnmarshalTest::testRedeliveryLimitConfiguration() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LazyPropertyUnmarshalTest::testRedeliveryExceededAfterMaxAttempts() {
-
+void LazyPropertyUnmarshalTest::testRedeliveryExceededAfterMaxAttempts()
+{
     // Create a redelivery policy with 6 max redeliveries
     DefaultRedeliveryPolicy policy;
     policy.setMaximumRedeliveries(6);
 
     // Simulate message dispatch with redelivery counter
-    Pointer<MessageDispatch> dispatch(new MessageDispatch());
+    Pointer<MessageDispatch>     dispatch(new MessageDispatch());
     Pointer<ActiveMQTextMessage> message(new ActiveMQTextMessage());
     message->setText("Test");
     dispatch->setMessage(message);
@@ -190,23 +195,29 @@ void LazyPropertyUnmarshalTest::testRedeliveryExceededAfterMaxAttempts() {
     // Counter starts at 0, so after 6 redeliveries, counter = 6
     // redeliveryExceeded should be true when counter > maximumRedeliveries
 
-    for (int counter = 0; counter <= 7; counter++) {
+    for (int counter = 0; counter <= 7; counter++)
+    {
         dispatch->setRedeliveryCounter(counter);
         bool exceeded = (counter > policy.getMaximumRedeliveries());
 
-        if (counter <= 6) {
-            ASSERT_TRUE(!exceeded) << ("Redelivery should not exceed before limit");
-        } else {
+        if (counter <= 6)
+        {
+            ASSERT_TRUE(!exceeded)
+                << ("Redelivery should not exceed before limit");
+        }
+        else
+        {
             ASSERT_TRUE(exceeded) << ("Redelivery should exceed after limit");
         }
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LazyPropertyUnmarshalTest::testCorruptedMessageDoesNotCloseConnection() {
-
+void LazyPropertyUnmarshalTest::testCorruptedMessageDoesNotCloseConnection()
+{
     // This test verifies the conceptual behavior:
-    // 1. Corrupted properties detected during consumer processing (not wire unmarshal)
+    // 1. Corrupted properties detected during consumer processing (not wire
+    // unmarshal)
     // 2. IOException thrown during property access triggers rollback
     // 3. Broker redelivers message (counter increments)
     // 4. After 6 redeliveries, POISON_ACK is sent
@@ -233,31 +244,39 @@ void LazyPropertyUnmarshalTest::testCorruptedMessageDoesNotCloseConnection() {
 
     Pointer<MessageDispatch> dispatch(new MessageDispatch());
     dispatch->setMessage(message);
-    dispatch->setDestination(Pointer<ActiveMQQueue>(new ActiveMQQueue("TEST.QUEUE")));
+    dispatch->setDestination(
+        Pointer<ActiveMQQueue>(new ActiveMQQueue("TEST.QUEUE")));
 
     Pointer<MessageId> msgId(new MessageId());
     msgId->setProducerSequenceId(1);
     message->setMessageId(msgId);
 
     // Simulate redelivery attempts
-    for (int attempt = 0; attempt <= 7; attempt++) {
+    for (int attempt = 0; attempt <= 7; attempt++)
+    {
         dispatch->setRedeliveryCounter(attempt);
 
         // Try to access properties (simulates consumer processing)
         bool ioExceptionThrown = false;
-        try {
+        try
+        {
             message->getMessageProperties();
-        } catch (IOException& e) {
+        }
+        catch (IOException& e)
+        {
             ioExceptionThrown = true;
         }
 
-        ASSERT_TRUE(ioExceptionThrown) << ("IOException should be thrown for corrupted properties");
+        ASSERT_TRUE(ioExceptionThrown)
+            << ("IOException should be thrown for corrupted properties");
 
         // Check if redelivery exceeded
-        if (attempt > policy.getMaximumRedeliveries()) {
+        if (attempt > policy.getMaximumRedeliveries())
+        {
             // After 6 redeliveries (attempt 7), POISON_ACK should be sent
             // Connection remains alive
-            ASSERT_TRUE(true) << ("Redelivery exceeded, POISON_ACK should be sent");
+            ASSERT_TRUE(true)
+                << ("Redelivery exceeded, POISON_ACK should be sent");
         }
     }
 
@@ -267,8 +286,8 @@ void LazyPropertyUnmarshalTest::testCorruptedMessageDoesNotCloseConnection() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LazyPropertyUnmarshalTest::testWireFormatRedeliveryConfiguration() {
-
+void LazyPropertyUnmarshalTest::testWireFormatRedeliveryConfiguration()
+{
     // Test that redelivery policy can be configured via properties
     // This simulates URL parameters like:
     // tcp://localhost:61616?cms.redeliveryPolicy.maximumRedeliveries=10

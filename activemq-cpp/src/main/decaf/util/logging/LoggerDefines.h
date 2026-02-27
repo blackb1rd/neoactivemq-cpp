@@ -20,36 +20,34 @@
 #include <decaf/util/logging/SimpleLogger.h>
 #include <sstream>
 
-#define LOGDECAF_DECLARE(loggerName)                                  \
-   static decaf::util::logging::SimpleLogger loggerName;
+#define LOGDECAF_DECLARE(loggerName) \
+    static decaf::util::logging::SimpleLogger loggerName;
 
-#define LOGDECAF_INITIALIZE(loggerName, className, loggerFamily)      \
-   decaf::util::logging::SimpleLogger className::loggerName(loggerFamily);
+#define LOGDECAF_INITIALIZE(loggerName, className, loggerFamily) \
+    decaf::util::logging::SimpleLogger className::loggerName(loggerFamily);
 
-#define LOGDECAF_DECLARE_LOCAL(loggerName)                            \
-   decaf::util::logging::Logger loggerName;
+#define LOGDECAF_DECLARE_LOCAL(loggerName) \
+    decaf::util::logging::Logger loggerName;
 
-#define LOGDECAF_DEBUG(logger, message)                               \
-   logger.debug(__FILE__, __LINE__, message);
+#define LOGDECAF_DEBUG(logger, message) \
+    logger.debug(__FILE__, __LINE__, message);
 
-#define LOGDECAF_DEBUG_1(logger, message, value);                     \
-   {                                                                  \
-      std::ostringstream ostream;                                     \
-      ostream << message << value;                                    \
-      logger.debug(__FILE__, __LINE__, ostream.str());                \
-   }
+#define LOGDECAF_DEBUG_1(logger, message, value)         \
+    ;                                                    \
+    {                                                    \
+        std::ostringstream ostream;                      \
+        ostream << message << value;                     \
+        logger.debug(__FILE__, __LINE__, ostream.str()); \
+    }
 
-#define LOGDECAF_INFO(logger, message)                                \
-   logger.info(__FILE__, __LINE__, message);
+#define LOGDECAF_INFO(logger, message) logger.info(__FILE__, __LINE__, message);
 
-#define LOGDECAF_ERROR(logger, message)                               \
-   logger.error(__FILE__, __LINE__, message);
+#define LOGDECAF_ERROR(logger, message) \
+    logger.error(__FILE__, __LINE__, message);
 
-#define LOGDECAF_WARN(logger, message)                                \
-   logger.warn(__FILE__, __LINE__, message);
+#define LOGDECAF_WARN(logger, message) logger.warn(__FILE__, __LINE__, message);
 
-#define LOGDECAF_FATAL(logger, message)                               \
-   logger.fatal(__FILE__, __LINE__, message);
-
+#define LOGDECAF_FATAL(logger, message) \
+    logger.fatal(__FILE__, __LINE__, message);
 
 #endif

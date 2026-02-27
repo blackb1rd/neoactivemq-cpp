@@ -30,57 +30,68 @@ using namespace decaf::internal;
 using namespace decaf::internal::net;
 
 ////////////////////////////////////////////////////////////////////////////////
-DefaultServerSocketFactory::DefaultServerSocketFactory() {
+DefaultServerSocketFactory::DefaultServerSocketFactory()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DefaultServerSocketFactory::~DefaultServerSocketFactory() {
+DefaultServerSocketFactory::~DefaultServerSocketFactory()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ServerSocket* DefaultServerSocketFactory::createServerSocket() {
-
-    try{
-        std::unique_ptr<ServerSocket> socket( new ServerSocket() );
+ServerSocket* DefaultServerSocketFactory::createServerSocket()
+{
+    try
+    {
+        std::unique_ptr<ServerSocket> socket(new ServerSocket());
         return socket.release();
     }
-    DECAF_CATCH_RETHROW( IOException )
-    DECAF_CATCH_EXCEPTION_CONVERT( Exception, IOException )
-    DECAF_CATCHALL_THROW( IOException )
+    DECAF_CATCH_RETHROW(IOException)
+    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IOException)
+    DECAF_CATCHALL_THROW(IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ServerSocket* DefaultServerSocketFactory::createServerSocket( int port ) {
-
-    try{
-        std::unique_ptr<ServerSocket> socket( new ServerSocket( port ) );
+ServerSocket* DefaultServerSocketFactory::createServerSocket(int port)
+{
+    try
+    {
+        std::unique_ptr<ServerSocket> socket(new ServerSocket(port));
         return socket.release();
     }
-    DECAF_CATCH_RETHROW( IOException )
-    DECAF_CATCH_EXCEPTION_CONVERT( Exception, IOException )
-    DECAF_CATCHALL_THROW( IOException )
+    DECAF_CATCH_RETHROW(IOException)
+    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IOException)
+    DECAF_CATCHALL_THROW(IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ServerSocket* DefaultServerSocketFactory::createServerSocket( int port, int backlog ) {
-
-    try{
-        std::unique_ptr<ServerSocket> socket( new ServerSocket( port, backlog ) );
+ServerSocket* DefaultServerSocketFactory::createServerSocket(int port,
+                                                             int backlog)
+{
+    try
+    {
+        std::unique_ptr<ServerSocket> socket(new ServerSocket(port, backlog));
         return socket.release();
     }
-    DECAF_CATCH_RETHROW( IOException )
-    DECAF_CATCH_EXCEPTION_CONVERT( Exception, IOException )
-    DECAF_CATCHALL_THROW( IOException )
+    DECAF_CATCH_RETHROW(IOException)
+    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IOException)
+    DECAF_CATCHALL_THROW(IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ServerSocket* DefaultServerSocketFactory::createServerSocket( int port, int backlog, const InetAddress* address ) {
-
-    try{
-        std::unique_ptr<ServerSocket> socket( new ServerSocket( port, backlog, address ) );
+ServerSocket* DefaultServerSocketFactory::createServerSocket(
+    int                port,
+    int                backlog,
+    const InetAddress* address)
+{
+    try
+    {
+        std::unique_ptr<ServerSocket> socket(
+            new ServerSocket(port, backlog, address));
         return socket.release();
     }
-    DECAF_CATCH_RETHROW( IOException )
-    DECAF_CATCH_EXCEPTION_CONVERT( Exception, IOException )
-    DECAF_CATCHALL_THROW( IOException )
+    DECAF_CATCH_RETHROW(IOException)
+    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IOException)
+    DECAF_CATCHALL_THROW(IOException)
 }

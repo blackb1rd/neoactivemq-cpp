@@ -20,21 +20,23 @@
 
 #include <decaf/util/Config.h>
 
-namespace decaf {
-namespace lang {
+namespace decaf
+{
+namespace lang
+{
 
     /**
      *
      * @since 1.0
      */
-    class DECAF_API ThreadGroup {
+    class DECAF_API ThreadGroup
+    {
     public:
-
         ThreadGroup();
         virtual ~ThreadGroup();
-
     };
 
-}}
+}  // namespace lang
+}  // namespace decaf
 
 #endif /* _DECAF_LANG_THREADGROUP_H_ */

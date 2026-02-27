@@ -17,19 +17,19 @@
 
 #include <gtest/gtest.h>
 
+#include <activemq/commands/ActiveMQMessage.h>
+#include <activemq/commands/WireFormatInfo.h>
+#include <activemq/transport/TransportListener.h>
 #include <activemq/transport/inactivity/InactivityMonitor.h>
 #include <activemq/transport/mock/MockTransport.h>
 #include <activemq/transport/mock/MockTransportFactory.h>
-#include <activemq/transport/TransportListener.h>
-#include <activemq/commands/WireFormatInfo.h>
-#include <activemq/commands/ActiveMQMessage.h>
 
-#include <decaf/net/URI.h>
 #include <decaf/lang/Thread.h>
+#include <decaf/net/URI.h>
 
-#include <typeinfo>
 #include <activemq/util/Config.h>
 #include <decaf/lang/Pointer.h>
+#include <typeinfo>
 
 using namespace activemq;
 using namespace activemq::commands;
@@ -43,75 +43,85 @@ using namespace decaf::io;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
-    class InactivityMonitorTest : public ::testing::Test {
-    protected:
+class InactivityMonitorTest : public ::testing::Test
+{
+protected:
+    decaf::lang::Pointer<mock::MockTransport> transport;
 
-        decaf::lang::Pointer<mock::MockTransport> transport;
+    Pointer<activemq::commands::WireFormatInfo> localWireFormatInfo;
 
-        Pointer<activemq::commands::WireFormatInfo> localWireFormatInfo;
+    void SetUp() override;
+    void TearDown() override;
+};
 
-        void SetUp() override;
-        void TearDown() override;
-
-    };
-
-
-namespace {
-
-    ////////////////////////////////////////////////////////////////////////////////
-    class MyTransportListener : public TransportListener {
-    public:
-
-        bool exceptionFired;
-        int commandsReceived;
-
-    public:
-
-        MyTransportListener() : exceptionFired(false), commandsReceived(0) {}
-
-        virtual ~MyTransportListener() {}
-
-        virtual void onCommand(const Pointer<Command> command) {
-            this->commandsReceived++;
-        }
-
-        virtual void onException(const decaf::lang::Exception& ex) {
-            this->exceptionFired = true;
-        }
-
-        virtual void transportInterrupted() {
-        }
-
-        virtual void transportResumed() {
-        }
-    };
-
-}
+namespace
+{
 
 ////////////////////////////////////////////////////////////////////////////////
-void InactivityMonitorTest::SetUp() {
+class MyTransportListener : public TransportListener
+{
+public:
+    bool exceptionFired;
+    int  commandsReceived;
 
-    URI uri( "mock://mock?wireformat=openwire" );
+public:
+    MyTransportListener()
+        : exceptionFired(false),
+          commandsReceived(0)
+    {
+    }
+
+    virtual ~MyTransportListener()
+    {
+    }
+
+    virtual void onCommand(const Pointer<Command> command)
+    {
+        this->commandsReceived++;
+    }
+
+    virtual void onException(const decaf::lang::Exception& ex)
+    {
+        this->exceptionFired = true;
+    }
+
+    virtual void transportInterrupted()
+    {
+    }
+
+    virtual void transportResumed()
+    {
+    }
+};
+
+}  // namespace
+
+////////////////////////////////////////////////////////////////////////////////
+void InactivityMonitorTest::SetUp()
+{
+    URI                  uri("mock://mock?wireformat=openwire");
     MockTransportFactory factory;
 
-    this->transport = factory.createComposite( uri ).dynamicCast<MockTransport>();
+    this->transport = factory.createComposite(uri).dynamicCast<MockTransport>();
 
-    this->localWireFormatInfo.reset( new WireFormatInfo() );
+    this->localWireFormatInfo.reset(new WireFormatInfo());
 
-    this->localWireFormatInfo->setVersion( 5 );
-    this->localWireFormatInfo->setMaxInactivityDuration( 3000 );
-    this->localWireFormatInfo->setTightEncodingEnabled( false );
+    this->localWireFormatInfo->setVersion(5);
+    this->localWireFormatInfo->setMaxInactivityDuration(3000);
+    this->localWireFormatInfo->setTightEncodingEnabled(false);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InactivityMonitorTest::TearDown() {
-    this->transport.reset( NULL );
+void InactivityMonitorTest::TearDown()
+{
+    this->transport.reset(NULL);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(InactivityMonitorTest, testCreate) {
-
-    InactivityMonitor monitor( this->transport, this->transport->getWireFormat() );
+TEST_F(InactivityMonitorTest, testCreate)
+{
+    InactivityMonitor monitor(this->transport,
+                              this->transport->getWireFormat());
 
     ASSERT_TRUE(monitor.getInitialDelayTime() == 0);
     ASSERT_TRUE(monitor.getReadCheckTime() == 0);
@@ -121,72 +131,76 @@ TEST_F(InactivityMonitorTest, testCreate) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(InactivityMonitorTest, testReadTimeout) {
-
+TEST_F(InactivityMonitorTest, testReadTimeout)
+{
     MyTransportListener listener;
-    InactivityMonitor monitor( this->transport, this->transport->getWireFormat() );
-    monitor.setTransportListener( &listener );
+    InactivityMonitor   monitor(this->transport,
+                              this->transport->getWireFormat());
+    monitor.setTransportListener(&listener);
     monitor.start();
 
     // Send the local one for the monitor to record.
-    monitor.oneway( this->localWireFormatInfo );
+    monitor.oneway(this->localWireFormatInfo);
 
-    Thread::sleep( 2000 );
+    Thread::sleep(2000);
 
     // Should not have timed out on Read yet.
     ASSERT_TRUE(listener.exceptionFired == false);
 
-    Thread::sleep( 5000 );
+    Thread::sleep(5000);
 
     // Channel should have been inactive for to long.
     ASSERT_TRUE(listener.exceptionFired == true);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(InactivityMonitorTest, testWriteMessageFail) {
-
-    this->transport->setFailOnKeepAliveSends( true );
-    this->transport->setNumSentKeepAlivesBeforeFail( 4 );
+TEST_F(InactivityMonitorTest, testWriteMessageFail)
+{
+    this->transport->setFailOnKeepAliveSends(true);
+    this->transport->setNumSentKeepAlivesBeforeFail(4);
 
     MyTransportListener listener;
-    InactivityMonitor monitor( this->transport, this->transport->getWireFormat() );
-    monitor.setTransportListener( &listener );
+    InactivityMonitor   monitor(this->transport,
+                              this->transport->getWireFormat());
+    monitor.setTransportListener(&listener);
     monitor.start();
 
     // Send the local one for the monitor to record.
-    monitor.oneway( this->localWireFormatInfo );
+    monitor.oneway(this->localWireFormatInfo);
 
-    Thread::sleep( 2000 );
+    Thread::sleep(2000);
 
-    Pointer<ActiveMQMessage> message( new ActiveMQMessage() );
-    this->transport->fireCommand( message );
+    Pointer<ActiveMQMessage> message(new ActiveMQMessage());
+    this->transport->fireCommand(message);
 
     // Should not have timed out on Read yet.
     ASSERT_TRUE(listener.exceptionFired == false);
 
-    Thread::sleep( 5000 );
+    Thread::sleep(5000);
 
     // Channel should have been inactive for to long.
     ASSERT_TRUE(listener.exceptionFired == true);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(InactivityMonitorTest, testNonFailureSendCase) {
-
+TEST_F(InactivityMonitorTest, testNonFailureSendCase)
+{
     MyTransportListener listener;
-    InactivityMonitor monitor( this->transport, this->transport->getWireFormat() );
-    monitor.setTransportListener( &listener );
+    InactivityMonitor   monitor(this->transport,
+                              this->transport->getWireFormat());
+    monitor.setTransportListener(&listener);
     monitor.start();
 
     // Send the local one for the monitor to record.
-    monitor.oneway( this->localWireFormatInfo );
+    monitor.oneway(this->localWireFormatInfo);
 
-    Pointer<ActiveMQMessage> message( new ActiveMQMessage() );
-    for( int ix = 0; ix < 20; ++ix ) {
-        monitor.oneway( message );
-        Thread::sleep( 500 );
-        this->transport->fireCommand( message );
-        Thread::sleep( 500 );
+    Pointer<ActiveMQMessage> message(new ActiveMQMessage());
+    for (int ix = 0; ix < 20; ++ix)
+    {
+        monitor.oneway(message);
+        Thread::sleep(500);
+        this->transport->fireCommand(message);
+        Thread::sleep(500);
     }
 
     // Channel should have been inactive for to long.

@@ -20,16 +20,18 @@
 
 #include <decaf/security/GeneralSecurityException.h>
 
-namespace decaf {
-namespace security {
+namespace decaf
+{
+namespace security
+{
 
     /*
      * This exception is thrown when a particular cryptographic algorithm is
      * requested but is not available in the environment.
      */
-    class DECAF_API DigestException : public GeneralSecurityException {
+    class DECAF_API DigestException : public GeneralSecurityException
+    {
     public:
-
         /**
          * Default Constructor
          */
@@ -66,7 +68,11 @@ namespace security {
          * @param ...
          *      list of primitives that are formatted into the message
          */
-        DigestException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...);
+        DigestException(const char*           file,
+                        const int             lineNumber,
+                        const std::exception* cause,
+                        const char*           msg,
+                        ...);
 
         /**
          * Constructor
@@ -91,23 +97,27 @@ namespace security {
          * @param ...
          *      list of primitives that are formatted into the message
          */
-        DigestException(const char* file, const int lineNumber, const char* msg, ...);
+        DigestException(const char* file,
+                        const int   lineNumber,
+                        const char* msg,
+                        ...);
 
         /**
          * Clones this exception.  This is useful for cases where you need
-         * to preserve the type of the original exception as well as the message.
-         * All subclasses should override.
+         * to preserve the type of the original exception as well as the
+         * message. All subclasses should override.
          *
          * @return A deep copy of this exception.
          */
-        virtual DigestException* clone() const {
+        virtual DigestException* clone() const
+        {
             return new DigestException(*this);
         }
 
         virtual ~DigestException() throw();
-
     };
 
-}}
+}  // namespace security
+}  // namespace decaf
 
 #endif /*_DECAF_SECURITY_DIGESTEXCEPTION_H_*/

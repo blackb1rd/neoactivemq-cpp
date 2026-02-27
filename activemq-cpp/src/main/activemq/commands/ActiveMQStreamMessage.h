@@ -18,47 +18,47 @@
 #ifndef _ACTIVEMQ_COMMANDS_ACTIVEMQSTREAMMESSAGE_H_
 #define _ACTIVEMQ_COMMANDS_ACTIVEMQSTREAMMESSAGE_H_
 
-#include <activemq/util/Config.h>
 #include <activemq/commands/ActiveMQMessage.h>
 #include <activemq/commands/ActiveMQMessageTemplate.h>
-#include <cms/StreamMessage.h>
-#include <cms/MessageNotWriteableException.h>
-#include <cms/MessageNotReadableException.h>
-#include <cms/MessageFormatException.h>
+#include <activemq/util/Config.h>
 #include <cms/MessageEOFException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
+#include <cms/MessageFormatException.h>
+#include <cms/MessageNotReadableException.h>
+#include <cms/MessageNotWriteableException.h>
+#include <cms/StreamMessage.h>
 #include <decaf/io/DataInputStream.h>
 #include <decaf/io/DataOutputStream.h>
-#include <string>
+#include <decaf/lang/exceptions/NullPointerException.h>
 #include <memory>
+#include <string>
 
-namespace activemq {
-namespace commands {
+namespace activemq
+{
+namespace commands
+{
 
     class ActiveMQStreamMessageImpl;
 
-    class AMQCPP_API ActiveMQStreamMessage: public ActiveMQMessageTemplate<cms::StreamMessage> {
+    class AMQCPP_API ActiveMQStreamMessage
+        : public ActiveMQMessageTemplate<cms::StreamMessage>
+    {
     private:
-
         ActiveMQStreamMessageImpl* impl;
 
-        mutable std::unique_ptr<decaf::io::DataInputStream> dataIn;
+        mutable std::unique_ptr<decaf::io::DataInputStream>  dataIn;
         mutable std::unique_ptr<decaf::io::DataOutputStream> dataOut;
 
     public:
-
         const static unsigned char ID_ACTIVEMQSTREAMMESSAGE;
 
     private:
-
         ActiveMQStreamMessage(const ActiveMQStreamMessage&);
         ActiveMQStreamMessage& operator=(const ActiveMQStreamMessage&);
 
     public:
-
         ActiveMQStreamMessage();
 
-        virtual ~ActiveMQStreamMessage() throw ();
+        virtual ~ActiveMQStreamMessage() throw();
 
         virtual unsigned char getDataStructureType() const;
 
@@ -72,14 +72,12 @@ namespace commands {
 
         virtual void onSend();
 
-    public: // CMS Message
-
+    public:  // CMS Message
         virtual cms::StreamMessage* clone() const;
 
         virtual void clearBody();
 
-    public: // CMS Stream Message
-
+    public:  // CMS Stream Message
         virtual ValueType getNextValueType() const;
 
         virtual void reset();
@@ -98,7 +96,9 @@ namespace commands {
 
         virtual int readBytes(unsigned char* buffer, int length) const;
 
-        virtual void writeBytes(const unsigned char* value, int offset, int length);
+        virtual void writeBytes(const unsigned char* value,
+                                int                  offset,
+                                int                  length);
 
         virtual char readChar() const;
 
@@ -133,15 +133,14 @@ namespace commands {
         virtual void writeString(const std::string& value);
 
     private:
-
         void storeContent();
 
         void initializeReading() const;
 
         void initializeWriting();
-
     };
 
-}}
+}  // namespace commands
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_COMMANDS_ACTIVEMQSTREAMMESSAGE_H_*/

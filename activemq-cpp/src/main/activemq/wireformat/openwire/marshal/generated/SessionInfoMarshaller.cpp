@@ -41,94 +41,123 @@ using namespace decaf::io;
 using namespace decaf::lang;
 
 ///////////////////////////////////////////////////////////////////////////////
-DataStructure* SessionInfoMarshaller::createObject() const {
+DataStructure* SessionInfoMarshaller::createObject() const
+{
     return new SessionInfo();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-unsigned char SessionInfoMarshaller::getDataStructureType() const {
+unsigned char SessionInfoMarshaller::getDataStructureType() const
+{
     return SessionInfo::ID_SESSIONINFO;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void SessionInfoMarshaller::tightUnmarshal(OpenWireFormat* wireFormat, DataStructure* dataStructure, DataInputStream* dataIn, BooleanStream* bs) {
+void SessionInfoMarshaller::tightUnmarshal(OpenWireFormat*  wireFormat,
+                                           DataStructure*   dataStructure,
+                                           DataInputStream* dataIn,
+                                           BooleanStream*   bs)
+{
+    try
+    {
+        BaseCommandMarshaller::tightUnmarshal(wireFormat,
+                                              dataStructure,
+                                              dataIn,
+                                              bs);
 
-    try {
-
-        BaseCommandMarshaller::tightUnmarshal(wireFormat, dataStructure, dataIn, bs);
-
-        SessionInfo* info =
-            dynamic_cast<SessionInfo*>(dataStructure);
-        info->setSessionId(Pointer<SessionId>(dynamic_cast<SessionId* >(
+        SessionInfo* info = dynamic_cast<SessionInfo*>(dataStructure);
+        info->setSessionId(Pointer<SessionId>(dynamic_cast<SessionId*>(
             tightUnmarshalCachedObject(wireFormat, dataIn, bs))));
     }
     AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException, decaf::io::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
+                                decaf::io::IOException)
     AMQ_CATCHALL_THROW(decaf::io::IOException)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int SessionInfoMarshaller::tightMarshal1(OpenWireFormat* wireFormat, DataStructure* dataStructure, BooleanStream* bs) {
+int SessionInfoMarshaller::tightMarshal1(OpenWireFormat* wireFormat,
+                                         DataStructure*  dataStructure,
+                                         BooleanStream*  bs)
+{
+    try
+    {
+        SessionInfo* info = dynamic_cast<SessionInfo*>(dataStructure);
 
-    try {
-
-        SessionInfo* info =
-            dynamic_cast<SessionInfo*>(dataStructure);
-
-        int rc = BaseCommandMarshaller::tightMarshal1(wireFormat, dataStructure, bs);
-        rc += tightMarshalCachedObject1(wireFormat, info->getSessionId().get(), bs);
+        int rc =
+            BaseCommandMarshaller::tightMarshal1(wireFormat, dataStructure, bs);
+        rc += tightMarshalCachedObject1(wireFormat,
+                                        info->getSessionId().get(),
+                                        bs);
 
         return rc + 0;
     }
     AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException, decaf::io::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
+                                decaf::io::IOException)
     AMQ_CATCHALL_THROW(decaf::io::IOException)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void SessionInfoMarshaller::tightMarshal2(OpenWireFormat* wireFormat, DataStructure* dataStructure, DataOutputStream* dataOut, BooleanStream* bs) {
+void SessionInfoMarshaller::tightMarshal2(OpenWireFormat*   wireFormat,
+                                          DataStructure*    dataStructure,
+                                          DataOutputStream* dataOut,
+                                          BooleanStream*    bs)
+{
+    try
+    {
+        BaseCommandMarshaller::tightMarshal2(wireFormat,
+                                             dataStructure,
+                                             dataOut,
+                                             bs);
 
-    try {
-
-        BaseCommandMarshaller::tightMarshal2(wireFormat, dataStructure, dataOut, bs );
-
-        SessionInfo* info =
-            dynamic_cast<SessionInfo*>(dataStructure);
-        tightMarshalCachedObject2(wireFormat, info->getSessionId().get(), dataOut, bs);
+        SessionInfo* info = dynamic_cast<SessionInfo*>(dataStructure);
+        tightMarshalCachedObject2(wireFormat,
+                                  info->getSessionId().get(),
+                                  dataOut,
+                                  bs);
     }
     AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT( exceptions::ActiveMQException, decaf::io::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
+                                decaf::io::IOException)
     AMQ_CATCHALL_THROW(decaf::io::IOException)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void SessionInfoMarshaller::looseUnmarshal(OpenWireFormat* wireFormat, DataStructure* dataStructure, DataInputStream* dataIn) {
-
-    try {
-
-        BaseCommandMarshaller::looseUnmarshal(wireFormat, dataStructure, dataIn);
-        SessionInfo* info =
-            dynamic_cast<SessionInfo*>(dataStructure);
+void SessionInfoMarshaller::looseUnmarshal(OpenWireFormat*  wireFormat,
+                                           DataStructure*   dataStructure,
+                                           DataInputStream* dataIn)
+{
+    try
+    {
+        BaseCommandMarshaller::looseUnmarshal(wireFormat,
+                                              dataStructure,
+                                              dataIn);
+        SessionInfo* info = dynamic_cast<SessionInfo*>(dataStructure);
         info->setSessionId(Pointer<SessionId>(dynamic_cast<SessionId*>(
             looseUnmarshalCachedObject(wireFormat, dataIn))));
     }
     AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException, decaf::io::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
+                                decaf::io::IOException)
     AMQ_CATCHALL_THROW(decaf::io::IOException)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void SessionInfoMarshaller::looseMarshal(OpenWireFormat* wireFormat, DataStructure* dataStructure, DataOutputStream* dataOut) {
-
-    try {
-
-        SessionInfo* info =
-            dynamic_cast<SessionInfo*>(dataStructure);
+void SessionInfoMarshaller::looseMarshal(OpenWireFormat*   wireFormat,
+                                         DataStructure*    dataStructure,
+                                         DataOutputStream* dataOut)
+{
+    try
+    {
+        SessionInfo* info = dynamic_cast<SessionInfo*>(dataStructure);
         BaseCommandMarshaller::looseMarshal(wireFormat, dataStructure, dataOut);
-        looseMarshalCachedObject(wireFormat, info->getSessionId().get(), dataOut);
+        looseMarshalCachedObject(wireFormat,
+                                 info->getSessionId().get(),
+                                 dataOut);
     }
     AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException, decaf::io::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
+                                decaf::io::IOException)
     AMQ_CATCHALL_THROW(decaf::io::IOException)
 }
-

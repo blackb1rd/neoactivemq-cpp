@@ -23,21 +23,20 @@
 
 #include <activemq/cmsutil/MessageCreator.h>
 
-namespace cmstemplate {
+namespace cmstemplate
+{
 
-    class CmsMessageCreator : public activemq::cmsutil::MessageCreator {
-    private:
+class CmsMessageCreator : public activemq::cmsutil::MessageCreator
+{
+private:
+    std::string text;
 
-        std::string text;
+public:
+    CmsMessageCreator(const std::string& text);
 
-    public:
-
-        CmsMessageCreator(const std::string& text);
-
-        virtual ~CmsMessageCreator();
-        virtual cms::Message* createMessage(cms::Session* session);
-
-    };
-}
+    virtual ~CmsMessageCreator();
+    virtual cms::Message* createMessage(cms::Session* session);
+};
+}  // namespace cmstemplate
 
 #endif /** _CMSTEMPLATE_CMSMESSAGECREATOR_H_ */

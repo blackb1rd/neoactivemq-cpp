@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <activemq/wireformat/openwire/marshal/generated/MarshallerFactory.h>
 #include <activemq/wireformat/openwire/marshal/generated/ActiveMQBlobMessageMarshaller.h>
 #include <activemq/wireformat/openwire/marshal/generated/ActiveMQBytesMessageMarshaller.h>
 #include <activemq/wireformat/openwire/marshal/generated/ActiveMQMapMessageMarshaller.h>
@@ -50,6 +49,7 @@
 #include <activemq/wireformat/openwire/marshal/generated/KeepAliveInfoMarshaller.h>
 #include <activemq/wireformat/openwire/marshal/generated/LastPartialCommandMarshaller.h>
 #include <activemq/wireformat/openwire/marshal/generated/LocalTransactionIdMarshaller.h>
+#include <activemq/wireformat/openwire/marshal/generated/MarshallerFactory.h>
 #include <activemq/wireformat/openwire/marshal/generated/MessageAckMarshaller.h>
 #include <activemq/wireformat/openwire/marshal/generated/MessageDispatchMarshaller.h>
 #include <activemq/wireformat/openwire/marshal/generated/MessageDispatchNotificationMarshaller.h>
@@ -90,8 +90,8 @@ using namespace activemq::wireformat::openwire::marshal;
 using namespace activemq::wireformat::openwire::marshal::generated;
 
 ///////////////////////////////////////////////////////////////////////////////
-void MarshallerFactory::configure(OpenWireFormat* format) {
-
+void MarshallerFactory::configure(OpenWireFormat* format)
+{
     format->addMarshaller(new ActiveMQBlobMessageMarshaller());
     format->addMarshaller(new ActiveMQBytesMessageMarshaller());
     format->addMarshaller(new ActiveMQMapMessageMarshaller());
@@ -149,4 +149,3 @@ void MarshallerFactory::configure(OpenWireFormat* format) {
     format->addMarshaller(new WireFormatInfoMarshaller());
     format->addMarshaller(new XATransactionIdMarshaller());
 }
-

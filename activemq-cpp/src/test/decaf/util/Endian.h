@@ -17,27 +17,30 @@
 #ifndef _DECAF_UTIL_ENDIAN_H
 #define _DECAF_UTIL_ENDIAN_H
 
-namespace decaf{
-namespace util{
+namespace decaf
+{
+namespace util
+{
 
-    class Endian{
+    class Endian
+    {
     public:
-
         static void byteSwap(unsigned char* data, int dataLength);
 
-        static unsigned char byteSwap( unsigned char value );
+        static unsigned char byteSwap(unsigned char value);
 
-        static unsigned short byteSwap( unsigned short value );
+        static unsigned short byteSwap(unsigned short value);
 
-        static unsigned int byteSwap( unsigned int value );
+        static unsigned int byteSwap(unsigned int value);
 
-        static unsigned long long byteSwap( unsigned long long value );
+        static unsigned long long byteSwap(unsigned long long value);
 
-        static float byteSwap( float value );
+        static float byteSwap(float value);
 
-        static double byteSwap( double value );
+        static double byteSwap(double value);
     };
 
-}}
+}  // namespace util
+}  // namespace decaf
 
 #endif /*_DECAF_UTIL_ENDIAN_H*/

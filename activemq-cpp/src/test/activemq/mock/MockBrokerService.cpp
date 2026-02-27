@@ -17,29 +17,29 @@
 
 #include "MockBrokerService.h"
 
-#include <activemq/wireformat/openwire/OpenWireFormatFactory.h>
-#include <activemq/wireformat/openwire/OpenWireFormat.h>
-#include <activemq/wireformat/openwire/OpenWireResponseBuilder.h>
 #include <activemq/commands/Command.h>
 #include <activemq/commands/Response.h>
 #include <activemq/commands/WireFormatInfo.h>
 #include <activemq/transport/mock/MockTransport.h>
+#include <activemq/wireformat/openwire/OpenWireFormat.h>
+#include <activemq/wireformat/openwire/OpenWireFormatFactory.h>
+#include <activemq/wireformat/openwire/OpenWireResponseBuilder.h>
 
+#include <decaf/io/EOFException.h>
+#include <decaf/io/InputStream.h>
+#include <decaf/io/OutputStream.h>
+#include <decaf/lang/Integer.h>
+#include <decaf/lang/Pointer.h>
 #include <decaf/net/ServerSocket.h>
 #include <decaf/net/Socket.h>
 #include <decaf/net/SocketTimeoutException.h>
-#include <decaf/lang/Integer.h>
-#include <decaf/lang/Pointer.h>
-#include <decaf/util/Random.h>
 #include <decaf/util/Properties.h>
+#include <decaf/util/Random.h>
 #include <decaf/util/concurrent/CountDownLatch.h>
-#include <decaf/io/InputStream.h>
-#include <decaf/io/OutputStream.h>
-#include <decaf/io/EOFException.h>
 
-#include <mutex>
-#include <condition_variable>
 #include <atomic>
+#include <condition_variable>
+#include <mutex>
 
 using namespace activemq;
 using namespace activemq::mock;
@@ -55,132 +55,195 @@ using namespace decaf::util::concurrent;
 using namespace decaf::net;
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace activemq {
-namespace mock {
+namespace activemq
+{
+namespace mock
+{
 
-    class TcpServer : public lang::Thread {
+    class TcpServer : public lang::Thread
+    {
     private:
-
-        std::atomic<bool> done;
-        std::atomic<bool> error;
-        const int configuredPort;
-        Pointer<ServerSocket> server;
-        Pointer<Socket> clientSocket;
-        std::mutex socketMutex;
-        std::mutex startedMutex;
-        std::condition_variable startedCondition;
-        bool serverStarted;
-        Pointer<OpenWireFormat> wireFormat;
+        std::atomic<bool>                done;
+        std::atomic<bool>                error;
+        const int                        configuredPort;
+        Pointer<ServerSocket>            server;
+        Pointer<Socket>                  clientSocket;
+        std::mutex                       socketMutex;
+        std::mutex                       startedMutex;
+        std::condition_variable          startedCondition;
+        bool                             serverStarted;
+        Pointer<OpenWireFormat>          wireFormat;
         Pointer<OpenWireResponseBuilder> responeBuilder;
-        Random rand;
+        Random                           rand;
 
     public:
-
-        TcpServer() : Thread(), done(false), error(false), configuredPort(0), server(), clientSocket(), wireFormat(),
-                      responeBuilder(), rand(), serverStarted(false) {
-
+        TcpServer()
+            : Thread(),
+              done(false),
+              error(false),
+              configuredPort(0),
+              server(),
+              clientSocket(),
+              wireFormat(),
+              responeBuilder(),
+              rand(),
+              serverStarted(false)
+        {
             Properties properties;
 
-            this->wireFormat = OpenWireFormatFactory().createWireFormat(properties).dynamicCast<OpenWireFormat>();
+            this->wireFormat = OpenWireFormatFactory()
+                                   .createWireFormat(properties)
+                                   .dynamicCast<OpenWireFormat>();
             this->responeBuilder.reset(new OpenWireResponseBuilder());
 
             this->rand.setSeed(System::currentTimeMillis());
         }
 
-        TcpServer(int port) : Thread(), done(false), error(false), configuredPort(port), server(), clientSocket(), wireFormat(),
-                              responeBuilder(), rand(), serverStarted(false) {
-
+        TcpServer(int port)
+            : Thread(),
+              done(false),
+              error(false),
+              configuredPort(port),
+              server(),
+              clientSocket(),
+              wireFormat(),
+              responeBuilder(),
+              rand(),
+              serverStarted(false)
+        {
             Properties properties;
-            this->wireFormat = OpenWireFormatFactory().createWireFormat(properties).dynamicCast<OpenWireFormat>();
+            this->wireFormat = OpenWireFormatFactory()
+                                   .createWireFormat(properties)
+                                   .dynamicCast<OpenWireFormat>();
             this->responeBuilder.reset(new OpenWireResponseBuilder());
 
             this->rand.setSeed(System::currentTimeMillis());
         }
 
-        virtual ~TcpServer() {
+        virtual ~TcpServer()
+        {
             stop();
             waitUntilStopped();
         }
 
-        int getLocalPort() {
-            if (this->server.get() != NULL) {
+        int getLocalPort()
+        {
+            if (this->server.get() != NULL)
+            {
                 return server->getLocalPort();
             }
 
             return 0;
         }
 
-        void waitUntilStarted() {
+        void waitUntilStarted()
+        {
             std::unique_lock<std::mutex> lock(startedMutex);
-            startedCondition.wait(lock, [this]{ return serverStarted || error; });
-            if (error && !serverStarted) {
-                throw IOException(__FILE__, __LINE__, "Mock broker failed to start");
+            startedCondition.wait(lock,
+                                  [this]
+                                  {
+                                      return serverStarted || error;
+                                  });
+            if (error && !serverStarted)
+            {
+                throw IOException(__FILE__,
+                                  __LINE__,
+                                  "Mock broker failed to start");
             }
         }
 
-        void waitUntilStopped() {
-            // Thread should exit cleanly now that done is set and sockets are closed
+        void waitUntilStopped()
+        {
+            // Thread should exit cleanly now that done is set and sockets are
+            // closed
             this->join();
 
             // Thread has exited, ensure sockets are cleaned up
             std::lock_guard<std::mutex> lock(socketMutex);
-            if (server.get() != NULL) {
+            if (server.get() != NULL)
+            {
                 server.reset(NULL);
             }
-            if (clientSocket.get() != NULL) {
+            if (clientSocket.get() != NULL)
+            {
                 clientSocket.reset(NULL);
             }
         }
 
-        void stop() {
-            try {
+        void stop()
+        {
+            try
+            {
                 done.store(true, std::memory_order_release);
 
                 // Close the server socket to stop accepting new connections
-                // DO NOT close clientSocket here - let the run() thread clean it up
-                // after its DataInputStream/DataOutputStream are destroyed
+                // DO NOT close clientSocket here - let the run() thread clean
+                // it up after its DataInputStream/DataOutputStream are
+                // destroyed
                 std::lock_guard<std::mutex> lock(socketMutex);
 
-                if (server.get() != NULL) {
-                    try {
+                if (server.get() != NULL)
+                {
+                    try
+                    {
                         server->close();
-                    } catch (...) {}
+                    }
+                    catch (...)
+                    {
+                    }
                     server.reset(NULL);
                 }
-            } catch (...) {}
+            }
+            catch (...)
+            {
+            }
         }
 
-        virtual void run() {
-            try {
+        virtual void run()
+        {
+            try
+            {
                 MockTransport mock(this->wireFormat, this->responeBuilder);
 
-                // Create and bind the server socket with retry logic for port conflicts
-                const int maxRetries = 5;
-                const int retryDelayMs = 200;
-                bool bindSucceeded = false;
+                // Create and bind the server socket with retry logic for port
+                // conflicts
+                const int maxRetries    = 5;
+                const int retryDelayMs  = 200;
+                bool      bindSucceeded = false;
 
-                for (int attempt = 0; attempt < maxRetries && !bindSucceeded; attempt++) {
-                    try {
+                for (int attempt = 0; attempt < maxRetries && !bindSucceeded;
+                     attempt++)
+                {
+                    try
+                    {
                         // Create socket without binding first
                         server.reset(new ServerSocket());
-                        // Set SO_REUSEADDR BEFORE binding to allow immediate port reuse
+                        // Set SO_REUSEADDR BEFORE binding to allow immediate
+                        // port reuse
                         server->setReuseAddress(true);
-                        server->setSoTimeout(100); // 100ms timeout for quick shutdown response
-                        // Bind to all interfaces (0.0.0.0) to accept both IPv4 and IPv6 connections
-                        // This ensures compatibility when clients resolve "localhost" to either 127.0.0.1 or ::1
+                        server->setSoTimeout(
+                            100);  // 100ms timeout for quick shutdown response
+                        // Bind to all interfaces (0.0.0.0) to accept both IPv4
+                        // and IPv6 connections This ensures compatibility when
+                        // clients resolve "localhost" to either 127.0.0.1 or
+                        // ::1
                         server->bind("0.0.0.0", configuredPort);
                         bindSucceeded = true;
-                    } catch (IOException& e) {
+                    }
+                    catch (IOException& e)
+                    {
                         // Bind failed - could be TIME_WAIT or port in use
                         server.reset(NULL);
-                        if (attempt < maxRetries - 1) {
+                        if (attempt < maxRetries - 1)
+                        {
                             // Wait before retry (increasing delay)
                             Thread::sleep(retryDelayMs * (attempt + 1));
                         }
                     }
                 }
 
-                if (!bindSucceeded) {
+                if (!bindSucceeded)
+                {
                     // Failed to bind after all retries - notify and exit
                     error.store(true, std::memory_order_release);
                     {
@@ -198,230 +261,313 @@ namespace mock {
                 }
                 startedCondition.notify_all();
 
-                while (!done.load(std::memory_order_acquire)) {
+                while (!done.load(std::memory_order_acquire))
+                {
                     Socket* socketPtr = NULL;
-                    try {
+                    try
+                    {
                         // Check done flag before blocking accept call
-                        if (done.load(std::memory_order_acquire)) {
+                        if (done.load(std::memory_order_acquire))
+                        {
                             break;
                         }
 
-                        // Check if server socket is still valid before calling accept
-                        // Copy to local variable to prevent race condition with stop()
+                        // Check if server socket is still valid before calling
+                        // accept Copy to local variable to prevent race
+                        // condition with stop()
                         Pointer<ServerSocket> localServer;
                         {
                             std::lock_guard<std::mutex> lock(socketMutex);
-                            if (server.get() == NULL || done.load(std::memory_order_acquire)) {
+                            if (server.get() == NULL ||
+                                done.load(std::memory_order_acquire))
+                            {
                                 break;
                             }
-                            localServer = server;  // Keep server alive during accept
+                            localServer =
+                                server;  // Keep server alive during accept
                         }
 
                         socketPtr = localServer->accept();
 
-                        // Check done again after accept to avoid processing during shutdown
-                        if (done.load(std::memory_order_acquire)) {
-                            if (socketPtr != NULL) {
-                                try {
+                        // Check done again after accept to avoid processing
+                        // during shutdown
+                        if (done.load(std::memory_order_acquire))
+                        {
+                            if (socketPtr != NULL)
+                            {
+                                try
+                                {
                                     delete socketPtr;
-                                } catch (...) {}
+                                }
+                                catch (...)
+                                {
+                                }
                             }
                             break;
                         }
 
                         std::lock_guard<std::mutex> lock(socketMutex);
                         clientSocket.reset(socketPtr);
-                    } catch (SocketTimeoutException& ste) {
+                    }
+                    catch (SocketTimeoutException& ste)
+                    {
                         // Timeout on accept - check done flag and continue
-                        // This is expected and allows periodic checking of done flag
+                        // This is expected and allows periodic checking of done
+                        // flag
                         continue;
-                    } catch (...) {
+                    }
+                    catch (...)
+                    {
                         // Accept failed or server closed
                         // Clean up socketPtr if allocated
-                        if (socketPtr != NULL) {
-                            try {
+                        if (socketPtr != NULL)
+                        {
+                            try
+                            {
                                 delete socketPtr;
-                            } catch (...) {}
+                            }
+                            catch (...)
+                            {
+                            }
                         }
-                        if (done.load(std::memory_order_acquire)) {
+                        if (done.load(std::memory_order_acquire))
+                        {
                             break;
                         }
                         continue;
                     }
 
                     // Don't set SO_LINGER to avoid RST on close
-                    clientSocket->setTcpNoDelay(true);  // Disable Nagle's algorithm for immediate sends
-                    // Set socket timeout to allow thread to check done flag periodically
-                    clientSocket->setSoTimeout(1000); // 1 second timeout
+                    clientSocket->setTcpNoDelay(
+                        true);  // Disable Nagle's algorithm for immediate sends
+                    // Set socket timeout to allow thread to check done flag
+                    // periodically
+                    clientSocket->setSoTimeout(1000);  // 1 second timeout
 
-                    Pointer<WireFormatInfo> preferred = wireFormat->getPreferedWireFormatInfo();
+                    Pointer<WireFormatInfo> preferred =
+                        wireFormat->getPreferedWireFormatInfo();
 
-                    try {
+                    try
+                    {
                         {
                             OutputStream* os = clientSocket->getOutputStream();
                             DataOutputStream dataOut(os);
 
-                            InputStream* is = clientSocket->getInputStream();
+                            InputStream*    is = clientSocket->getInputStream();
                             DataInputStream dataIn(is);
 
-                            Pointer<WireFormatInfo> preferred = wireFormat->getPreferedWireFormatInfo();
+                            Pointer<WireFormatInfo> preferred =
+                                wireFormat->getPreferedWireFormatInfo();
 
                             // Send our WireFormatInfo first
                             wireFormat->marshal(preferred, &mock, &dataOut);
                             dataOut.flush();
 
                             // Then receive the client's WireFormatInfo
-                            Pointer<Command> clientWireFormat = wireFormat->unmarshal(&mock, &dataIn);
+                            Pointer<Command> clientWireFormat =
+                                wireFormat->unmarshal(&mock, &dataIn);
 
-                            // Small delay to let client process the WireFormatInfo before we start reading commands
+                            // Small delay to let client process the
+                            // WireFormatInfo before we start reading commands
                             Thread::sleep(50);
 
-                            while (!done.load(std::memory_order_acquire)) {
-                                try {
-                                    Pointer<Command> command = wireFormat->unmarshal(&mock, &dataIn);
-                                    Pointer<Response> response = responeBuilder->buildResponse(command);
+                            while (!done.load(std::memory_order_acquire))
+                            {
+                                try
+                                {
+                                    Pointer<Command> command =
+                                        wireFormat->unmarshal(&mock, &dataIn);
+                                    Pointer<Response> response =
+                                        responeBuilder->buildResponse(command);
 
-                                    if (response != NULL) {
-                                        wireFormat->marshal(response, &mock, &dataOut);
+                                    if (response != NULL)
+                                    {
+                                        wireFormat->marshal(response,
+                                                            &mock,
+                                                            &dataOut);
                                         dataOut.flush();
                                     }
-                                } catch (SocketTimeoutException& ste) {
+                                }
+                                catch (SocketTimeoutException& ste)
+                                {
                                     // Timeout allows us to check done flag
                                     continue;
-                                } catch (IOException& ioe) {
+                                }
+                                catch (IOException& ioe)
+                                {
                                     // Socket closed or connection error
                                     break;
                                 }
                             }
-                            // DataInputStream and DataOutputStream will be destroyed here,
-                            // before the socket is closed
+                            // DataInputStream and DataOutputStream will be
+                            // destroyed here, before the socket is closed
                         }
-                    } catch (IOException& ioe) {
+                    }
+                    catch (IOException& ioe)
+                    {
                         // Failed during handshake or stream operations
                         // Clean up and wait for next connection
-                    } catch (...) {
+                    }
+                    catch (...)
+                    {
                         // Unexpected error
                     }
 
                     // Clean up the client socket
                     {
                         std::lock_guard<std::mutex> lock(socketMutex);
-                        if (clientSocket.get() != NULL) {
-                            try {
+                        if (clientSocket.get() != NULL)
+                        {
+                            try
+                            {
                                 clientSocket->close();
-                            } catch (...) {}
+                            }
+                            catch (...)
+                            {
+                            }
                             clientSocket.reset(NULL);
                         }
                     }
                 }
-            } catch (IOException& ex) {
+            }
+            catch (IOException& ex)
+            {
                 error.store(true, std::memory_order_release);
-            } catch (Exception& ex) {
+            }
+            catch (Exception& ex)
+            {
                 error.store(true, std::memory_order_release);
-            } catch (...) {
+            }
+            catch (...)
+            {
                 error.store(true, std::memory_order_release);
             }
         }
     };
 
-    class MockBrokerServiceImpl {
+    class MockBrokerServiceImpl
+    {
     private:
-
         MockBrokerServiceImpl(const MockBrokerServiceImpl&);
-        MockBrokerServiceImpl& operator= (const MockBrokerServiceImpl&);
+        MockBrokerServiceImpl& operator=(const MockBrokerServiceImpl&);
 
     public:
-
         Pointer<TcpServer> server;
-        int configuredPort;
+        int                configuredPort;
 
     public:
-
-        MockBrokerServiceImpl() : server(), configuredPort(0) {
+        MockBrokerServiceImpl()
+            : server(),
+              configuredPort(0)
+        {
         }
 
-        MockBrokerServiceImpl(int port) : server(), configuredPort(port) {
+        MockBrokerServiceImpl(int port)
+            : server(),
+              configuredPort(port)
+        {
         }
-
     };
 
-}}
+}  // namespace mock
+}  // namespace activemq
 
 ////////////////////////////////////////////////////////////////////////////////
-MockBrokerService::MockBrokerService() : impl(new MockBrokerServiceImpl()) {
-
+MockBrokerService::MockBrokerService()
+    : impl(new MockBrokerServiceImpl())
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-MockBrokerService::MockBrokerService(int port) : impl(new MockBrokerServiceImpl(port)) {
-
+MockBrokerService::MockBrokerService(int port)
+    : impl(new MockBrokerServiceImpl(port))
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-MockBrokerService::~MockBrokerService() {
-    try {
+MockBrokerService::~MockBrokerService()
+{
+    try
+    {
         stop();
     }
     AMQ_CATCHALL_NOTHROW()
 
-    try {
+    try
+    {
         delete impl;
     }
     AMQ_CATCHALL_NOTHROW()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MockBrokerService::start() {
+void MockBrokerService::start()
+{
     // Create a new server thread each time to support restart
-    if (impl->server.get() != NULL) {
+    if (impl->server.get() != NULL)
+    {
         // Make sure previous server is stopped
         impl->server->stop();
         impl->server->waitUntilStopped();
     }
 
-    if (impl->configuredPort != 0) {
+    if (impl->configuredPort != 0)
+    {
         impl->server.reset(new TcpServer(impl->configuredPort));
-    } else {
+    }
+    else
+    {
         impl->server.reset(new TcpServer());
     }
     impl->server->start();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MockBrokerService::stop() {
-    if (impl->server.get() != NULL) {
+void MockBrokerService::stop()
+{
+    if (impl->server.get() != NULL)
+    {
         impl->server->stop();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MockBrokerService::waitUntilStarted() {
-    if (impl->server.get() != NULL) {
+void MockBrokerService::waitUntilStarted()
+{
+    if (impl->server.get() != NULL)
+    {
         impl->server->waitUntilStarted();
-        // Save the actual port for restart support when using dynamic ports (port 0)
-        if (impl->configuredPort == 0) {
+        // Save the actual port for restart support when using dynamic ports
+        // (port 0)
+        if (impl->configuredPort == 0)
+        {
             impl->configuredPort = impl->server->getLocalPort();
         }
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MockBrokerService::waitUntilStopped() {
-    if (impl->server.get() != NULL) {
+void MockBrokerService::waitUntilStopped()
+{
+    if (impl->server.get() != NULL)
+    {
         impl->server->waitUntilStopped();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int MockBrokerService::getPort() const {
-    if (impl->server.get() != NULL) {
+int MockBrokerService::getPort() const
+{
+    if (impl->server.get() != NULL)
+    {
         return impl->server->getLocalPort();
     }
     return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string MockBrokerService::getConnectString() const {
+std::string MockBrokerService::getConnectString() const
+{
     int port = getPort();
     return std::string("tcp://localhost:") + Integer::toString(port);
 }

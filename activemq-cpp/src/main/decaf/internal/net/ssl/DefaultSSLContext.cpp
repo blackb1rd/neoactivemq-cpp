@@ -20,9 +20,9 @@
 #include <decaf/io/IOException.h>
 #include <decaf/lang/Runnable.h>
 
-#include <decaf/security/SecureRandom.h>
 #include <decaf/internal/net/Network.h>
 #include <decaf/internal/net/ssl/openssl/OpenSSLContextSpi.h>
+#include <decaf/security/SecureRandom.h>
 
 #include <memory>
 
@@ -37,58 +37,67 @@ using namespace decaf::internal::net::ssl;
 using namespace decaf::internal::net::ssl::openssl;
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class ShutdownTask : public decaf::lang::Runnable {
-    private:
+class ShutdownTask : public decaf::lang::Runnable
+{
+private:
+    SSLContext** defaultRef;
 
-        SSLContext** defaultRef;
+private:
+    ShutdownTask(const ShutdownTask&);
+    ShutdownTask& operator=(const ShutdownTask&);
 
-    private:
+public:
+    ShutdownTask(SSLContext** defaultRef)
+        : defaultRef(defaultRef)
+    {
+    }
 
-        ShutdownTask( const ShutdownTask& );
-        ShutdownTask& operator= ( const ShutdownTask& );
+    virtual ~ShutdownTask()
+    {
+    }
 
-    public:
-
-        ShutdownTask( SSLContext** defaultRef ) : defaultRef( defaultRef ) {}
-        virtual ~ShutdownTask() {}
-
-        virtual void run() {
-            *defaultRef = NULL;
-        }
-    };
-}
+    virtual void run()
+    {
+        *defaultRef = NULL;
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
 SSLContext* DefaultSSLContext::defaultSSLContext = NULL;
 
 ////////////////////////////////////////////////////////////////////////////////
-DefaultSSLContext::DefaultSSLContext() {
+DefaultSSLContext::DefaultSSLContext()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DefaultSSLContext::~DefaultSSLContext() {
+DefaultSSLContext::~DefaultSSLContext()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SSLContext* DefaultSSLContext::getContext() {
-
-    if( defaultSSLContext == NULL ) {
-
-        std::unique_ptr<SecureRandom> random( new SecureRandom() );
-        std::unique_ptr<SSLContextSpi> contextSpi( new OpenSSLContextSpi() );
+SSLContext* DefaultSSLContext::getContext()
+{
+    if (defaultSSLContext == NULL)
+    {
+        std::unique_ptr<SecureRandom>  random(new SecureRandom());
+        std::unique_ptr<SSLContextSpi> contextSpi(new OpenSSLContextSpi());
 
         // TODO - This should eventually move to a call to SSLContext::init();
-        contextSpi->providerInit( random.release() );
+        contextSpi->providerInit(random.release());
 
         // Update the default, this is the Application default from now on.
-        defaultSSLContext = new SSLContext( contextSpi.release() );
+        defaultSSLContext = new SSLContext(contextSpi.release());
 
-        // Store the default in the Network Runtime, it will be destroyed when the
-        // Application calls the Decaf shutdownLibrary method.
-        Network::getNetworkRuntime()->addAsResource( defaultSSLContext );
-        Network::getNetworkRuntime()->addShutdownTask( new ShutdownTask( &defaultSSLContext ) );
+        // Store the default in the Network Runtime, it will be destroyed when
+        // the Application calls the Decaf shutdownLibrary method.
+        Network::getNetworkRuntime()->addAsResource(defaultSSLContext);
+        Network::getNetworkRuntime()->addShutdownTask(
+            new ShutdownTask(&defaultSSLContext));
     }
 
     return defaultSSLContext;

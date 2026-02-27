@@ -22,25 +22,29 @@
 
 #include <activemq/transport/tcp/TcpTransportFactory.h>
 
-namespace activemq {
-namespace transport {
-namespace tcp {
+namespace activemq
+{
+namespace transport
+{
+    namespace tcp
+    {
 
-    using decaf::lang::Pointer;
+        using decaf::lang::Pointer;
 
-    class SslTransportFactory : public TcpTransportFactory {
-    public:
+        class SslTransportFactory : public TcpTransportFactory
+        {
+        public:
+            virtual ~SslTransportFactory();
 
-        virtual ~SslTransportFactory();
+        protected:
+            virtual Pointer<Transport> doCreateComposite(
+                const decaf::net::URI&                location,
+                const Pointer<wireformat::WireFormat> wireFormat,
+                const decaf::util::Properties&        properties);
+        };
 
-    protected:
-
-        virtual Pointer<Transport> doCreateComposite(const decaf::net::URI& location,
-                                                     const Pointer<wireformat::WireFormat> wireFormat,
-                                                     const decaf::util::Properties& properties );
-
-    };
-
-}}}
+    }  // namespace tcp
+}  // namespace transport
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_TRANSPORT_TCP_SSLTRANSPORTFACTORY_H_ */

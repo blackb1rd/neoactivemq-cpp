@@ -19,13 +19,15 @@
 #define _ACTIVEMQ_CMSUTIL_SESSIONPOOL_H_
 
 #include <activemq/cmsutil/PooledSession.h>
-#include <decaf/util/concurrent/Mutex.h>
-#include <cms/Connection.h>
-#include <list>
 #include <activemq/util/Config.h>
+#include <cms/Connection.h>
+#include <decaf/util/concurrent/Mutex.h>
+#include <list>
 
-namespace activemq {
-namespace cmsutil {
+namespace activemq
+{
+namespace cmsutil
+{
 
     // Forward declarations.
     class ResourceLifecycleManager;
@@ -36,9 +38,9 @@ namespace cmsutil {
      * provided <code>ResourceLifecycleManager</code>, not by this pool.  This
      * class is thread-safe.
      */
-    class AMQCPP_API SessionPool {
+    class AMQCPP_API SessionPool
+    {
     private:
-
         cms::Connection* connection;
 
         ResourceLifecycleManager* resourceLifecycleManager;
@@ -52,12 +54,10 @@ namespace cmsutil {
         cms::Session::AcknowledgeMode acknowledgeMode;
 
     private:
-
         SessionPool(const SessionPool&);
         SessionPool& operator=(const SessionPool&);
 
     public:
-
         /**
          * Constructs a session pool.
          * @param connection
@@ -68,9 +68,9 @@ namespace cmsutil {
          *          the object responsible for managing the lifecycle of
          *          any allocated cms::Session resources.
          */
-        SessionPool(cms::Connection* connection,
+        SessionPool(cms::Connection*              connection,
                     cms::Session::AcknowledgeMode ackMode,
-                    ResourceLifecycleManager* resourceLifecycleManager);
+                    ResourceLifecycleManager*     resourceLifecycleManager);
 
         /**
          * Destroys the pooled session objects, but not the underlying session
@@ -95,12 +95,13 @@ namespace cmsutil {
          */
         virtual void returnSession(PooledSession* session);
 
-        ResourceLifecycleManager* getResourceLifecycleManager() {
+        ResourceLifecycleManager* getResourceLifecycleManager()
+        {
             return resourceLifecycleManager;
         }
-
     };
 
-}}
+}  // namespace cmsutil
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_CMSUTIL_SESSIONPOOL_H_*/

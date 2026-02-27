@@ -20,12 +20,16 @@
 #include <activemq/util/Config.h>
 #include <string>
 
-namespace cms {
-    class Session;
-    class Destination;
-}
-namespace activemq {
-namespace cmsutil {
+namespace cms
+{
+class Session;
+class Destination;
+}  // namespace cms
+
+namespace activemq
+{
+namespace cmsutil
+{
 
     // Forward declarations.
     class ResourceLifecycleManager;
@@ -33,9 +37,9 @@ namespace cmsutil {
     /**
      * Resolves a CMS destination name to a <code>Destination</code>.
      */
-    class AMQCPP_API DestinationResolver {
+    class AMQCPP_API DestinationResolver
+    {
     public:
-
         virtual ~DestinationResolver();
 
         /**
@@ -71,12 +75,13 @@ namespace cmsutil {
          *
          * @throws cms::CMSException if resolution failed.
          */
-        virtual cms::Destination* resolveDestinationName(cms::Session* session,
-                                                         const std::string& destName,
-                                                         bool pubSubDomain) = 0;
-
+        virtual cms::Destination* resolveDestinationName(
+            cms::Session*      session,
+            const std::string& destName,
+            bool               pubSubDomain) = 0;
     };
 
-}}
+}  // namespace cmsutil
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_CMSUTIL_DESTINATIONRESOLVER_H_ */

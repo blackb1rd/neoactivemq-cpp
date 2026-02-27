@@ -18,48 +18,50 @@
 #ifndef _ACTIVEMQ_STATE_TRANSACTIONSTATE_H_
 #define _ACTIVEMQ_STATE_TRANSACTIONSTATE_H_
 
-#include <activemq/util/Config.h>
 #include <activemq/commands/Command.h>
 #include <activemq/commands/ProducerId.h>
 #include <activemq/commands/TransactionId.h>
+#include <activemq/util/Config.h>
 
 #include <decaf/lang/Pointer.h>
 #include <decaf/util/LinkedList.h>
-#include <decaf/util/concurrent/atomic/AtomicBoolean.h>
 #include <decaf/util/concurrent/ConcurrentStlMap.h>
+#include <decaf/util/concurrent/atomic/AtomicBoolean.h>
 
-#include <string>
 #include <memory>
+#include <string>
 
-namespace activemq {
-namespace state {
+namespace activemq
+{
+namespace state
+{
 
     using decaf::lang::Pointer;
     using decaf::util::LinkedList;
-    using decaf::util::concurrent::atomic::AtomicBoolean;
     using decaf::util::concurrent::ConcurrentStlMap;
+    using decaf::util::concurrent::atomic::AtomicBoolean;
     using namespace activemq::commands;
 
     class ProducerState;
 
-    class AMQCPP_API TransactionState {
+    class AMQCPP_API TransactionState
+    {
     private:
-
-        LinkedList< Pointer<Command> > commands;
-        Pointer<TransactionId> id;
-        AtomicBoolean disposed;
-        bool prepared;
-        int preparedResult;
-        ConcurrentStlMap<Pointer<ProducerId>, Pointer<ProducerState>,
-                         ProducerId::COMPARATOR> producers;
+        LinkedList<Pointer<Command>> commands;
+        Pointer<TransactionId>       id;
+        AtomicBoolean                disposed;
+        bool                         prepared;
+        int                          preparedResult;
+        ConcurrentStlMap<Pointer<ProducerId>,
+                         Pointer<ProducerState>,
+                         ProducerId::COMPARATOR>
+            producers;
 
     private:
-
         TransactionState(const TransactionState&);
         TransactionState& operator=(const TransactionState&);
 
     public:
-
         TransactionState(Pointer<TransactionId> id);
 
         virtual ~TransactionState();
@@ -74,36 +76,43 @@ namespace state {
 
         void clear();
 
-        const LinkedList<Pointer<Command> >& getCommands() const {
+        const LinkedList<Pointer<Command>>& getCommands() const
+        {
             return commands;
         }
 
-        const Pointer<TransactionId> getId() const {
+        const Pointer<TransactionId> getId() const
+        {
             return id;
         }
 
-        void setPrepared(bool prepared) {
+        void setPrepared(bool prepared)
+        {
             this->prepared = prepared;
         }
 
-        bool isPrepared() const {
+        bool isPrepared() const
+        {
             return this->prepared;
         }
 
-        void setPreparedResult(int preparedResult) {
+        void setPreparedResult(int preparedResult)
+        {
             this->preparedResult = preparedResult;
         }
 
-        int getPreparedResult() const {
+        int getPreparedResult() const
+        {
             return this->preparedResult;
         }
 
         void addProducerState(Pointer<ProducerState> producerState);
 
-        const decaf::util::Collection<Pointer<ProducerState> >& getProducerStates();
-
+        const decaf::util::Collection<Pointer<ProducerState>>&
+        getProducerStates();
     };
 
-}}
+}  // namespace state
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_STATE_TRANSACTIONSTATE_H_*/

@@ -18,75 +18,86 @@
 #ifndef _DECAF_UTIL_ZIP_CHECKEDINPUTSTREAM_H_
 #define _DECAF_UTIL_ZIP_CHECKEDINPUTSTREAM_H_
 
+#include <decaf/io/FilterInputStream.h>
 #include <decaf/util/Config.h>
 #include <decaf/util/zip/Checksum.h>
-#include <decaf/io/FilterInputStream.h>
 
-namespace decaf {
-namespace util {
-namespace zip {
-
-    /**
-     * An implementation of a FilterInputStream that will maintain a Checksum of the
-     * bytes read, the Checksum can then be used to verify the integrity of the
-     * input stream.
-     *
-     * @since 1.0
-     */
-    class DECAF_API CheckedInputStream : public decaf::io::FilterInputStream {
-    private:
-
-        // Pointer to the Checksum instance to use in this stream, ownership
-        // of the Checksum pointer is not taken by this class.
-        Checksum* sum;
-
-    private:
-
-        CheckedInputStream(const CheckedInputStream&);
-        CheckedInputStream& operator=(const CheckedInputStream&);
-
-    public:
+namespace decaf
+{
+namespace util
+{
+    namespace zip
+    {
 
         /**
-         * Create a new instance of a CheckedInputStream
+         * An implementation of a FilterInputStream that will maintain a
+         * Checksum of the bytes read, the Checksum can then be used to verify
+         * the integrity of the input stream.
          *
-         * @param inputStream
-         *      The InputStream instance to Wrap.
-         * @param sum
-         *      The Checksum instance to use (does not take ownership of the Pointer).
-         * @param own
-         *      Indicates if this filer should take ownership of the InputStream.
-         *
-         * @throws NullPointerException if the Checksum pointer is NULL.
+         * @since 1.0
          */
-        CheckedInputStream(InputStream* inputStream, Checksum* sum, bool own = false);
+        class DECAF_API CheckedInputStream : public decaf::io::FilterInputStream
+        {
+        private:
+            // Pointer to the Checksum instance to use in this stream, ownership
+            // of the Checksum pointer is not taken by this class.
+            Checksum* sum;
 
-        virtual ~CheckedInputStream();
+        private:
+            CheckedInputStream(const CheckedInputStream&);
+            CheckedInputStream& operator=(const CheckedInputStream&);
 
-        /**
-         * Returns a Pointer to the Checksum that is in use by this CheckedInputStream.
-         *
-         * @return the pointer to the Checksum instance that is in use by this object.
-         */
-        Checksum* getChecksum() const {
-            return this->sum;
-        }
+        public:
+            /**
+             * Create a new instance of a CheckedInputStream
+             *
+             * @param inputStream
+             *      The InputStream instance to Wrap.
+             * @param sum
+             *      The Checksum instance to use (does not take ownership of the
+             * Pointer).
+             * @param own
+             *      Indicates if this filer should take ownership of the
+             * InputStream.
+             *
+             * @throws NullPointerException if the Checksum pointer is NULL.
+             */
+            CheckedInputStream(InputStream* inputStream,
+                               Checksum*    sum,
+                               bool         own = false);
 
-        /**
-         * {@inheritDoc}
-         *
-         * Adds the skipped bytes into the Checksum.
-         */
-        virtual long long skip(long long num);
+            virtual ~CheckedInputStream();
 
-    protected:
+            /**
+             * Returns a Pointer to the Checksum that is in use by this
+             * CheckedInputStream.
+             *
+             * @return the pointer to the Checksum instance that is in use by
+             * this object.
+             */
+            Checksum* getChecksum() const
+            {
+                return this->sum;
+            }
 
-        virtual int doReadByte();
+            /**
+             * {@inheritDoc}
+             *
+             * Adds the skipped bytes into the Checksum.
+             */
+            virtual long long skip(long long num);
 
-        virtual int doReadArrayBounded(unsigned char* buffer, int size, int offset, int length);
+        protected:
+            virtual int doReadByte();
 
-    };
+            virtual int doReadArrayBounded(unsigned char* buffer,
+                                           int            size,
+                                           int            offset,
+                                           int            length);
+        };
 
-}}}
+    }  // namespace zip
+}  // namespace util
+}  // namespace decaf
 
 #endif /* _DECAF_UTIL_ZIP_CHECKEDINPUTSTREAM_H_ */

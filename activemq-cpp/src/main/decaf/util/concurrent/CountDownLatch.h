@@ -18,150 +18,173 @@
 #ifndef _DECAF_CONCURRENT_COUNTDOWNLATCH_H_
 #define _DECAF_CONCURRENT_COUNTDOWNLATCH_H_
 
+#include <decaf/lang/Exception.h>
+#include <decaf/lang/exceptions/InterruptedException.h>
+#include <decaf/util/Config.h>
 #include <decaf/util/concurrent/Mutex.h>
 #include <decaf/util/concurrent/TimeUnit.h>
-#include <decaf/util/Config.h>
-#include <decaf/lang/exceptions/InterruptedException.h>
-#include <decaf/lang/Exception.h>
 
-namespace decaf{
-namespace util{
-namespace concurrent{
+namespace decaf
+{
+namespace util
+{
+    namespace concurrent
+    {
 
-    class LatchSync;
+        class LatchSync;
 
-    class DECAF_API CountDownLatch {
-    private:
+        class DECAF_API CountDownLatch
+        {
+        private:
+            LatchSync* sync;
 
-        LatchSync* sync;
+        private:
+            CountDownLatch(const CountDownLatch&);
+            CountDownLatch& operator=(const CountDownLatch&);
 
-    private:
+        public:
+            /**
+             * Constructor
+             * @param count - number to count down from.
+             */
+            CountDownLatch(int count);
 
-        CountDownLatch(const CountDownLatch&);
-        CountDownLatch& operator= (const CountDownLatch&);
+            virtual ~CountDownLatch();
 
-    public:
+            /**
+             * Causes the current thread to wait until the latch has counted
+             * down to zero, unless the thread is interrupted.
+             *
+             * If the current count is zero then this method returns
+             * immediately.
+             *
+             * If the current count is greater than zero then the current thread
+             * becomes disabled for thread scheduling purposes and lies dormant
+             * until one of two things happen:
+             *
+             *   * The count reaches zero due to invocations of the countDown()
+             * method; or
+             *   * Some other thread interrupts the current thread.
+             *
+             * If the current thread:
+             *
+             *   * has its interrupted status set on entry to this method; or
+             *   * is interrupted while waiting,
+             *
+             * then InterruptedException is thrown and the current thread's
+             * interrupted status is cleared.
+             *
+             * @throws InterruptedException - if the current thread is
+             * interrupted while waiting.
+             * @throws Exception - if any other error occurs.
+             */
+            virtual void await();
 
-        /**
-         * Constructor
-         * @param count - number to count down from.
-         */
-        CountDownLatch(int count);
+            /**
+             * Causes the current thread to wait until the latch has counted
+             * down to zero, unless the thread is interrupted, or the specified
+             * waiting time elapses.
+             *
+             * If the current count is zero then this method returns immediately
+             * with the value true.
+             *
+             * If the current count is greater than zero then the current thread
+             * becomes disabled for thread scheduling purposes and lies dormant
+             * until one of three things happen:
+             *
+             *   * The count reaches zero due to invocations of the countDown()
+             * method; or
+             *   * Some other thread interrupts the current thread; or
+             *   * The specified waiting time elapses.
+             *
+             * If the count reaches zero then the method returns with the value
+             * true.
+             *
+             * If the current thread:
+             *
+             *   * has its interrupted status set on entry to this method; or
+             *   * is interrupted while waiting,
+             *
+             * then InterruptedException is thrown and the current thread's
+             * interrupted status is cleared.
+             *
+             * If the specified waiting time elapses then the value false is
+             * returned. If the time is less than or equal to zero, the method
+             * will not wait at all.
+             *
+             * @param timeout - Time in milliseconds to wait for the count to
+             * reach zero.
+             *
+             * @throws InterruptedException - if the current thread is
+             * interrupted while waiting.
+             * @throws Exception - if any other error occurs.
+             */
+            virtual bool await(long long timeOut);
 
-        virtual ~CountDownLatch();
+            /**
+             * Causes the current thread to wait until the latch has counted
+             * down to zero, unless the thread is interrupted, or the specified
+             * waiting time elapses.
+             *
+             * If the current count is zero then this method returns immediately
+             * with the value true.
+             *
+             * If the current count is greater than zero then the current thread
+             * becomes disabled for thread scheduling purposes and lies dormant
+             * until one of three things happen:
+             *
+             *   * The count reaches zero due to invocations of the countDown()
+             * method; or
+             *   * Some other thread interrupts the current thread; or
+             *   * The specified waiting time elapses.
+             *
+             * If the count reaches zero then the method returns with the value
+             * true.
+             *
+             * If the current thread:
+             *
+             *   * has its interrupted status set on entry to this method; or
+             *   * is interrupted while waiting,
+             *
+             * then InterruptedException is thrown and the current thread's
+             * interrupted status is cleared.
+             *
+             * If the specified waiting time elapses then the value false is
+             * returned. If the time is less than or equal to zero, the method
+             * will not wait at all.
+             *
+             * @param timeout - Time to wait for the count to reach zero.
+             * @param unit - The units that the timeout specifies.
+             *
+             * @throws InterruptedException - if the current thread is
+             * interrupted while waiting.
+             * @throws Exception - if any other error occurs.
+             */
+            virtual bool await(long long timeout, const TimeUnit& unit);
 
-        /**
-         * Causes the current thread to wait until the latch has counted down to zero, unless
-         * the thread is interrupted.
-         *
-         * If the current count is zero then this method returns immediately.
-         *
-         * If the current count is greater than zero then the current thread becomes disabled
-         * for thread scheduling purposes and lies dormant until one of two things happen:
-         *
-         *   * The count reaches zero due to invocations of the countDown() method; or
-         *   * Some other thread interrupts the current thread.
-         *
-         * If the current thread:
-         *
-         *   * has its interrupted status set on entry to this method; or
-         *   * is interrupted while waiting,
-         *
-         * then InterruptedException is thrown and the current thread's interrupted status
-         * is cleared.
-         *
-         * @throws InterruptedException - if the current thread is interrupted while waiting.
-         * @throws Exception - if any other error occurs.
-         */
-        virtual void await();
+            /**
+             * Counts down the latch, releasing all waiting threads when
+             * the count hits zero.
+             */
+            virtual void countDown();
 
-        /**
-         * Causes the current thread to wait until the latch has counted down to zero, unless the
-         * thread is interrupted, or the specified waiting time elapses.
-         *
-         * If the current count is zero then this method returns immediately with the value true.
-         *
-         * If the current count is greater than zero then the current thread becomes disabled for
-         * thread scheduling purposes and lies dormant until one of three things happen:
-         *
-         *   * The count reaches zero due to invocations of the countDown() method; or
-         *   * Some other thread interrupts the current thread; or
-         *   * The specified waiting time elapses.
-         *
-         * If the count reaches zero then the method returns with the value true.
-         *
-         * If the current thread:
-         *
-         *   * has its interrupted status set on entry to this method; or
-         *   * is interrupted while waiting,
-         *
-         * then InterruptedException is thrown and the current thread's interrupted status is cleared.
-         *
-         * If the specified waiting time elapses then the value false is returned. If the time is
-         * less than or equal to zero, the method will not wait at all.
-         *
-         * @param timeout - Time in milliseconds to wait for the count to reach zero.
-         *
-         * @throws InterruptedException - if the current thread is interrupted while waiting.
-         * @throws Exception - if any other error occurs.
-         */
-        virtual bool await(long long timeOut);
+            /**
+             * Gets the current count
+             * @return int count value
+             */
+            virtual int getCount() const;
 
-        /**
-         * Causes the current thread to wait until the latch has counted down to zero, unless the
-         * thread is interrupted, or the specified waiting time elapses.
-         *
-         * If the current count is zero then this method returns immediately with the value true.
-         *
-         * If the current count is greater than zero then the current thread becomes disabled for
-         * thread scheduling purposes and lies dormant until one of three things happen:
-         *
-         *   * The count reaches zero due to invocations of the countDown() method; or
-         *   * Some other thread interrupts the current thread; or
-         *   * The specified waiting time elapses.
-         *
-         * If the count reaches zero then the method returns with the value true.
-         *
-         * If the current thread:
-         *
-         *   * has its interrupted status set on entry to this method; or
-         *   * is interrupted while waiting,
-         *
-         * then InterruptedException is thrown and the current thread's interrupted status is cleared.
-         *
-         * If the specified waiting time elapses then the value false is returned. If the time is
-         * less than or equal to zero, the method will not wait at all.
-         *
-         * @param timeout - Time to wait for the count to reach zero.
-         * @param unit - The units that the timeout specifies.
-         *
-         * @throws InterruptedException - if the current thread is interrupted while waiting.
-         * @throws Exception - if any other error occurs.
-         */
-        virtual bool await(long long timeout, const TimeUnit& unit);
+            /**
+             * Returns the string representation of this latch, includes the
+             * current count value at the time of calling.
+             *
+             * @return string describing this CountDownLatch instance.
+             */
+            virtual std::string toString() const;
+        };
 
-        /**
-         * Counts down the latch, releasing all waiting threads when
-         * the count hits zero.
-         */
-        virtual void countDown();
-
-        /**
-         * Gets the current count
-         * @return int count value
-         */
-        virtual int getCount() const;
-
-        /**
-         * Returns the string representation of this latch, includes the current
-         * count value at the time of calling.
-         *
-         * @return string describing this CountDownLatch instance.
-         */
-        virtual std::string toString() const;
-
-    };
-
-}}}
+    }  // namespace concurrent
+}  // namespace util
+}  // namespace decaf
 
 #endif /*_DECAF_CONCURRENT_COUNTDOWNLATCH_H_*/

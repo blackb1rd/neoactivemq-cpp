@@ -17,10 +17,10 @@
 
 #include "FutureResponse.h"
 
-#include <decaf/util/concurrent/Concurrent.h>
-#include <decaf/lang/exceptions/UnsupportedOperationException.h>
 #include <activemq/exceptions/ActiveMQException.h>
 #include <activemq/util/Config.h>
+#include <decaf/lang/exceptions/UnsupportedOperationException.h>
+#include <decaf/util/concurrent/Concurrent.h>
 #include <typeinfo>
 
 using namespace activemq;
@@ -34,62 +34,103 @@ using namespace decaf::lang::exceptions;
 using namespace decaf::util::concurrent;
 
 ////////////////////////////////////////////////////////////////////////////////
-FutureResponse::FutureResponse() : responseLatch(1), response(), responseCallback() {}
+FutureResponse::FutureResponse()
+    : responseLatch(1),
+      response(),
+      responseCallback()
+{
+}
 
 ////////////////////////////////////////////////////////////////////////////////
-FutureResponse::FutureResponse(const Pointer<ResponseCallback> responseCallback) :
-    responseLatch(1), response(), responseCallback(responseCallback) {}
+FutureResponse::FutureResponse(const Pointer<ResponseCallback> responseCallback)
+    : responseLatch(1),
+      response(),
+      responseCallback(responseCallback)
+{
+}
 
 ////////////////////////////////////////////////////////////////////////////////
-FutureResponse::~FutureResponse() {}
+FutureResponse::~FutureResponse()
+{
+}
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Response> FutureResponse::getResponse() const {
-    try {
+Pointer<Response> FutureResponse::getResponse() const
+{
+    try
+    {
         this->responseLatch.await();
         return response;
-    } catch (decaf::lang::exceptions::InterruptedException& ex) {
+    }
+    catch (decaf::lang::exceptions::InterruptedException& ex)
+    {
         decaf::lang::Thread::currentThread()->interrupt();
-        throw decaf::io::InterruptedIOException(__FILE__, __LINE__, "Interrupted while awaiting a response");
+        throw decaf::io::InterruptedIOException(
+            __FILE__,
+            __LINE__,
+            "Interrupted while awaiting a response");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Response> FutureResponse::getResponse() {
-    try {
+Pointer<Response> FutureResponse::getResponse()
+{
+    try
+    {
         this->responseLatch.await();
         return response;
-    } catch (decaf::lang::exceptions::InterruptedException& ex) {
+    }
+    catch (decaf::lang::exceptions::InterruptedException& ex)
+    {
         decaf::lang::Thread::currentThread()->interrupt();
-        throw decaf::io::InterruptedIOException(__FILE__, __LINE__, "Interrupted while awaiting a response");
+        throw decaf::io::InterruptedIOException(
+            __FILE__,
+            __LINE__,
+            "Interrupted while awaiting a response");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Response> FutureResponse::getResponse(unsigned int timeout) const {
-    try {
+Pointer<Response> FutureResponse::getResponse(unsigned int timeout) const
+{
+    try
+    {
         this->responseLatch.await(timeout);
         return response;
-    } catch (decaf::lang::exceptions::InterruptedException& ex) {
-        throw decaf::io::InterruptedIOException(__FILE__, __LINE__, "Interrupted while awaiting a response");
+    }
+    catch (decaf::lang::exceptions::InterruptedException& ex)
+    {
+        throw decaf::io::InterruptedIOException(
+            __FILE__,
+            __LINE__,
+            "Interrupted while awaiting a response");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Response> FutureResponse::getResponse(unsigned int timeout) {
-    try {
+Pointer<Response> FutureResponse::getResponse(unsigned int timeout)
+{
+    try
+    {
         this->responseLatch.await(timeout);
         return response;
-    } catch (decaf::lang::exceptions::InterruptedException& ex) {
-        throw decaf::io::InterruptedIOException(__FILE__, __LINE__, "Interrupted while awaiting a response");
+    }
+    catch (decaf::lang::exceptions::InterruptedException& ex)
+    {
+        throw decaf::io::InterruptedIOException(
+            __FILE__,
+            __LINE__,
+            "Interrupted while awaiting a response");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FutureResponse::setResponse(Pointer<Response> response) {
+void FutureResponse::setResponse(Pointer<Response> response)
+{
     this->response = response;
     this->responseLatch.countDown();
-    if (responseCallback != NULL) {
+    if (responseCallback != NULL)
+    {
         responseCallback->onComplete(this->response);
     }
 }

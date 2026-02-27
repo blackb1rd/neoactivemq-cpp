@@ -38,18 +38,22 @@ using namespace decaf::lang::exceptions;
  */
 
 ////////////////////////////////////////////////////////////////////////////////
-ExceptionResponse::ExceptionResponse() :
-    Response(), exception(NULL) {
-
+ExceptionResponse::ExceptionResponse()
+    : Response(),
+      exception(NULL)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ExceptionResponse::~ExceptionResponse() {
+ExceptionResponse::~ExceptionResponse()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ExceptionResponse* ExceptionResponse::cloneDataStructure() const {
-    std::unique_ptr<ExceptionResponse> exceptionResponse(new ExceptionResponse());
+ExceptionResponse* ExceptionResponse::cloneDataStructure() const
+{
+    std::unique_ptr<ExceptionResponse> exceptionResponse(
+        new ExceptionResponse());
 
     // Copy the data from the base class or classes
     exceptionResponse->copyDataStructure(this);
@@ -58,18 +62,22 @@ ExceptionResponse* ExceptionResponse::cloneDataStructure() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ExceptionResponse::copyDataStructure(const DataStructure* src) {
-
+void ExceptionResponse::copyDataStructure(const DataStructure* src)
+{
     // Protect against invalid self assignment.
-    if (this == src) {
+    if (this == src)
+    {
         return;
     }
 
-    const ExceptionResponse* srcPtr = dynamic_cast<const ExceptionResponse*>(src);
+    const ExceptionResponse* srcPtr =
+        dynamic_cast<const ExceptionResponse*>(src);
 
-    if (srcPtr == NULL || src == NULL) {
+    if (srcPtr == NULL || src == NULL)
+    {
         throw decaf::lang::exceptions::NullPointerException(
-            __FILE__, __LINE__,
+            __FILE__,
+            __LINE__,
             "ExceptionResponse::copyDataStructure - src is NULL or invalid");
     }
 
@@ -80,20 +88,24 @@ void ExceptionResponse::copyDataStructure(const DataStructure* src) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-unsigned char ExceptionResponse::getDataStructureType() const {
+unsigned char ExceptionResponse::getDataStructureType() const
+{
     return ExceptionResponse::ID_EXCEPTIONRESPONSE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string ExceptionResponse::toString() const {
-
+std::string ExceptionResponse::toString() const
+{
     ostringstream stream;
 
     stream << "ExceptionResponse { ";
     stream << "Exception = ";
-    if (this->getException() != NULL) {
+    if (this->getException() != NULL)
+    {
         stream << this->getException()->toString();
-    } else {
+    }
+    else
+    {
         stream << "NULL";
     }
     stream << " }";
@@ -102,43 +114,54 @@ std::string ExceptionResponse::toString() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool ExceptionResponse::equals(const DataStructure* value) const {
-
-    if (this == value) {
+bool ExceptionResponse::equals(const DataStructure* value) const
+{
+    if (this == value)
+    {
         return true;
     }
 
-    const ExceptionResponse* valuePtr = dynamic_cast<const ExceptionResponse*>(value);
+    const ExceptionResponse* valuePtr =
+        dynamic_cast<const ExceptionResponse*>(value);
 
-    if (valuePtr == NULL || value == NULL) {
+    if (valuePtr == NULL || value == NULL)
+    {
         return false;
     }
 
-    if (this->getException() != NULL) {
-        if (!this->getException()->equals(valuePtr->getException().get())) {
+    if (this->getException() != NULL)
+    {
+        if (!this->getException()->equals(valuePtr->getException().get()))
+        {
             return false;
         }
-    } else if (valuePtr->getException() != NULL) {
+    }
+    else if (valuePtr->getException() != NULL)
+    {
         return false;
     }
-    if (!Response::equals(value)) {
+    if (!Response::equals(value))
+    {
         return false;
     }
     return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const decaf::lang::Pointer<BrokerError>& ExceptionResponse::getException() const {
+const decaf::lang::Pointer<BrokerError>& ExceptionResponse::getException() const
+{
     return exception;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<BrokerError>& ExceptionResponse::getException() {
+decaf::lang::Pointer<BrokerError>& ExceptionResponse::getException()
+{
     return exception;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ExceptionResponse::setException(const decaf::lang::Pointer<BrokerError>& exception) {
+void ExceptionResponse::setException(
+    const decaf::lang::Pointer<BrokerError>& exception)
+{
     this->exception = exception;
 }
-

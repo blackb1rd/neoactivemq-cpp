@@ -20,84 +20,95 @@
 
 #include <decaf/util/Config.h>
 
-#include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/lang/exceptions/IndexOutOfBoundsException.h>
+#include <decaf/lang/exceptions/NullPointerException.h>
 
 #include <vector>
 
-namespace decaf {
-namespace util {
-namespace zip {
-
-    /**
-     * An interface used to represent Checksum values in the Zip package.
-     *
-     * @since 1.0
-     */
-    class DECAF_API Checksum {
-    public:
-
-        virtual ~Checksum();
+namespace decaf
+{
+namespace util
+{
+    namespace zip
+    {
 
         /**
-         * @return the current checksum value.
-         */
-        virtual long long getValue() const = 0;
-
-        /**
-         * Reset the checksum to its initial value.
-         */
-        virtual void reset() = 0;
-
-        /**
-         * Updates the current checksum with the specified vector of bytes.
+         * An interface used to represent Checksum values in the Zip package.
          *
-         * @param buffer
-         *      The buffer to read the updated bytes from.
+         * @since 1.0
          */
-        virtual void update(const std::vector<unsigned char>& buffer) = 0;
+        class DECAF_API Checksum
+        {
+        public:
+            virtual ~Checksum();
 
-        /**
-         * Updates the current checksum with the specified array of bytes.
-         *
-         * @param buffer
-         *      The buffer to read the updated bytes from.
-         * @param offset
-         *      The position in the buffer to start reading.
-         * @param length
-         *      The amount of data to read from the byte buffer.
-         *
-         * @throw IndexOutOfBoundsException if offset + length > size of the buffer.
-         */
-        virtual void update(const std::vector<unsigned char>& buffer, int offset, int length) = 0;
+            /**
+             * @return the current checksum value.
+             */
+            virtual long long getValue() const = 0;
 
-        /**
-         * Updates the current checksum with the specified array of bytes.
-         *
-         * @param buffer
-         *      The buffer to read the updated bytes from.
-         * @param size
-         *      The size of the passed buffer.
-         * @param offset
-         *      The position in the buffer to start reading.
-         * @param length
-         *      The amount of data to read from the byte buffer.
-         *
-         * @throw NullPointerException if the passed buffer is NULL.
-         * @throw IndexOutOfBoundsException if offset + length > size of the buffer.
-         */
-        virtual void update(const unsigned char* buffer, int size, int offset, int length) = 0;
+            /**
+             * Reset the checksum to its initial value.
+             */
+            virtual void reset() = 0;
 
-        /**
-         * Updates the current checksum with the specified byte value.
-         *
-         * @param byte
-         *      The byte value to update the current Checksum with (0..255).
-         */
-        virtual void update(int byte) = 0;
+            /**
+             * Updates the current checksum with the specified vector of bytes.
+             *
+             * @param buffer
+             *      The buffer to read the updated bytes from.
+             */
+            virtual void update(const std::vector<unsigned char>& buffer) = 0;
 
-    };
+            /**
+             * Updates the current checksum with the specified array of bytes.
+             *
+             * @param buffer
+             *      The buffer to read the updated bytes from.
+             * @param offset
+             *      The position in the buffer to start reading.
+             * @param length
+             *      The amount of data to read from the byte buffer.
+             *
+             * @throw IndexOutOfBoundsException if offset + length > size of the
+             * buffer.
+             */
+            virtual void update(const std::vector<unsigned char>& buffer,
+                                int                               offset,
+                                int                               length) = 0;
 
-}}}
+            /**
+             * Updates the current checksum with the specified array of bytes.
+             *
+             * @param buffer
+             *      The buffer to read the updated bytes from.
+             * @param size
+             *      The size of the passed buffer.
+             * @param offset
+             *      The position in the buffer to start reading.
+             * @param length
+             *      The amount of data to read from the byte buffer.
+             *
+             * @throw NullPointerException if the passed buffer is NULL.
+             * @throw IndexOutOfBoundsException if offset + length > size of the
+             * buffer.
+             */
+            virtual void update(const unsigned char* buffer,
+                                int                  size,
+                                int                  offset,
+                                int                  length) = 0;
+
+            /**
+             * Updates the current checksum with the specified byte value.
+             *
+             * @param byte
+             *      The byte value to update the current Checksum with (0..255).
+             */
+            virtual void update(int byte) = 0;
+        };
+
+    }  // namespace zip
+}  // namespace util
+}  // namespace decaf
 
 #endif /* _DECAF_UTIL_ZIP_CHECKSUM_H_ */

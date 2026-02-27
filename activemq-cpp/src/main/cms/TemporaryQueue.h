@@ -18,38 +18,39 @@
 #ifndef _CMS_TEMPORARYQUEUE_H_
 #define _CMS_TEMPORARYQUEUE_H_
 
+#include <cms/CMSException.h>
 #include <cms/Config.h>
 #include <cms/Queue.h>
-#include <cms/CMSException.h>
 
-namespace cms {
+namespace cms
+{
+
+/**
+ * Defines a Temporary Queue based Destination.
+ *
+ * A TemporaryQueue is a special type of Queue Destination that can only be
+ * consumed from the Connection which created it.  TemporaryQueues are most
+ * commonly used as the reply to address for Message's that implement the
+ * request response pattern.
+ *
+ * A TemporaryQueue is guaranteed to exist at the Provider only for the lifetime
+ * of the Connection that created it.
+ *
+ * @since 1.0
+ */
+class CMS_API TemporaryQueue : public Queue
+{
+public:
+    virtual ~TemporaryQueue();
 
     /**
-     * Defines a Temporary Queue based Destination.
+     * Destroy's the Temporary Destination at the Provider.
      *
-     * A TemporaryQueue is a special type of Queue Destination that can only be consumed
-     * from the Connection which created it.  TemporaryQueues are most commonly used as the
-     * reply to address for Message's that implement the request response pattern.
-     *
-     * A TemporaryQueue is guaranteed to exist at the Provider only for the lifetime of the
-     * Connection that created it.
-     *
-     * @since 1.0
+     * @throws CMSException - if an internal error occurs.
      */
-    class CMS_API TemporaryQueue : public Queue {
-    public:
+    virtual void destroy() = 0;
+};
 
-        virtual ~TemporaryQueue();
-
-        /**
-         * Destroy's the Temporary Destination at the Provider.
-         *
-         * @throws CMSException - if an internal error occurs.
-         */
-        virtual void destroy() = 0;
-
-   };
-
-}
+}  // namespace cms
 
 #endif /*_CMS_TEMPORARYQUEUE_H_*/

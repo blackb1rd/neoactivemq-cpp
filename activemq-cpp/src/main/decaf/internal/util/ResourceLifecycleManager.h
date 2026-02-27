@@ -20,36 +20,38 @@
 
 #include <decaf/util/Config.h>
 
-#include <decaf/util/StlSet.h>
 #include <decaf/internal/util/Resource.h>
+#include <decaf/util/StlSet.h>
 
-namespace decaf {
-namespace internal {
-namespace util {
+namespace decaf
+{
+namespace internal
+{
+    namespace util
+    {
 
-    /**
-     *
-     * @since 1.0
-     */
-    class DECAF_API ResourceLifecycleManager {
-    private:
+        /**
+         *
+         * @since 1.0
+         */
+        class DECAF_API ResourceLifecycleManager
+        {
+        private:
+            decaf::util::StlSet<Resource*> resources;
 
-        decaf::util::StlSet<Resource*> resources;
+        public:
+            ResourceLifecycleManager();
 
-    public:
+            virtual ~ResourceLifecycleManager();
 
-        ResourceLifecycleManager();
+            virtual void addResource(Resource* value);
 
-        virtual ~ResourceLifecycleManager();
+        protected:
+            virtual void destroyResources();
+        };
 
-        virtual void addResource(Resource* value);
-
-    protected:
-
-        virtual void destroyResources();
-
-    };
-
-}}}
+    }  // namespace util
+}  // namespace internal
+}  // namespace decaf
 
 #endif /* _DECAF_INTERNAL_UTIL_RESOURCELIFECYCLEMANAGER_H_ */

@@ -24,25 +24,28 @@ using namespace std;
 using namespace decaf;
 using namespace decaf::net;
 
-    class URLEncoderTest : public ::testing::Test {
+class URLEncoderTest : public ::testing::Test
+{
 public:
-
-        URLEncoderTest();
-
-    };
+    URLEncoderTest();
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-URLEncoderTest::URLEncoderTest() {}
+URLEncoderTest::URLEncoderTest()
+{
+}
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(URLEncoderTest, testEncode) {
-
-    const std::string URL = "http://127.0.0.1:80/%24%25";
+TEST_F(URLEncoderTest, testEncode)
+{
+    const std::string URL  = "http://127.0.0.1:80/%24%25";
     const std::string URL2 = "telnet://justWantToHaveFun.com:400";
     const std::string URL3 = "file://myServer.org/a file with spaces.jpg";
 
-    ASSERT_TRUE(URLDecoder::decode( URLEncoder::encode( URL ) ) == URL) << ("1. Incorrect encoding/decoding");
-    ASSERT_TRUE(URLDecoder::decode( URLEncoder::encode( URL2 ) ) == URL2) << ("2. Incorrect encoding/decoding");
-    ASSERT_TRUE(URLDecoder::decode( URLEncoder::encode( URL3 ) ) == URL3) << ("3. Incorrect encoding/decoding");
-
+    ASSERT_TRUE(URLDecoder::decode(URLEncoder::encode(URL)) == URL)
+        << ("1. Incorrect encoding/decoding");
+    ASSERT_TRUE(URLDecoder::decode(URLEncoder::encode(URL2)) == URL2)
+        << ("2. Incorrect encoding/decoding");
+    ASSERT_TRUE(URLDecoder::decode(URLEncoder::encode(URL3)) == URL3)
+        << ("3. Incorrect encoding/decoding");
 }

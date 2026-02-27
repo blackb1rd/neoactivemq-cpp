@@ -18,34 +18,34 @@
 #ifndef _CMS_STARTABLE_H
 #define _CMS_STARTABLE_H
 
-#include <cms/Config.h>
 #include <cms/CMSException.h>
+#include <cms/Config.h>
 
-namespace cms {
+namespace cms
+{
+
+/**
+ * Interface for a class that implements the start method.
+ *
+ * An object that implements the Startable interface implies that until its
+ * start method is called it will be considered to be in a closed or stopped
+ * state and will throw an Exception to indicate that it is not in an started
+ * state if one of its methods is called.
+ *
+ * @since 1.0
+ */
+class CMS_API Startable
+{
+public:
+    virtual ~Startable();
 
     /**
-     * Interface for a class that implements the start method.
+     * Starts the service.
      *
-     * An object that implements the Startable interface implies that until its start
-     * method is called it will be considered to be in a closed or stopped state and will
-     * throw an Exception to indicate that it is not in an started state if one of its
-     * methods is called.
-     *
-     * @since 1.0
+     * @throws CMSException if an internal error occurs while starting.
      */
-    class CMS_API Startable {
-    public:
-
-        virtual ~Startable();
-
-        /**
-         * Starts the service.
-         *
-         * @throws CMSException if an internal error occurs while starting.
-         */
-        virtual void start() = 0;
-
-    };
-}
+    virtual void start() = 0;
+};
+}  // namespace cms
 
 #endif /*_CMS_STARTABLE_H*/

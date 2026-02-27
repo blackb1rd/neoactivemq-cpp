@@ -17,10 +17,10 @@
 
 #include <gtest/gtest.h>
 
-#include <activemq/transport/discovery/DiscoveryListener.h>
 #include <activemq/transport/discovery/AbstractDiscoveryAgent.h>
 #include <activemq/transport/discovery/DiscoveryAgentFactory.h>
 #include <activemq/transport/discovery/DiscoveryAgentRegistry.h>
+#include <activemq/transport/discovery/DiscoveryListener.h>
 
 #include <decaf/net/URI.h>
 #include <decaf/util/concurrent/CountDownLatch.h>
@@ -35,101 +35,127 @@ using namespace decaf::net;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
-    class AbstractDiscoveryAgentTest : public ::testing::Test {
+class AbstractDiscoveryAgentTest : public ::testing::Test
+{
 public:
+    AbstractDiscoveryAgentTest();
+    virtual ~AbstractDiscoveryAgentTest();
 
-        AbstractDiscoveryAgentTest();
-        virtual ~AbstractDiscoveryAgentTest();
-
-        void test();
-
-    };
-
+    void test();
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class MockDiscoveryAgent : public AbstractDiscoveryAgent {
-    private:
+class MockDiscoveryAgent : public AbstractDiscoveryAgent
+{
+private:
+    bool reported;
 
-        bool reported;
+public:
+    virtual ~MockDiscoveryAgent()
+    {
+    }
 
-    public:
+    virtual std::string toString() const
+    {
+        return "MockDiscoveryAgent";
+    }
 
-        virtual ~MockDiscoveryAgent() {}
+protected:
+    virtual void doStart()
+    {
+        reported = false;
+    }
 
-        virtual std::string toString() const { return "MockDiscoveryAgent"; }
+    virtual void doStop()
+    {
+    }
 
-    protected:
+    virtual void doAdvertizeSelf()
+    {
+    }
 
-        virtual void doStart() {
-            reported = false;
-        }
-
-        virtual void doStop() {}
-
-        virtual void doAdvertizeSelf() {}
-
-        virtual void doDiscovery() {
-            try {
-                if (!reported) {
-                    Thread::sleep(1000);
-                    processLiveService("dummy", "mock://localhost");
-                    reported = true;
-                } else {
-                    Thread::sleep(500);
-                }
-            } catch (InterruptedException& ex) {
+    virtual void doDiscovery()
+    {
+        try
+        {
+            if (!reported)
+            {
+                Thread::sleep(1000);
+                processLiveService("dummy", "mock://localhost");
+                reported = true;
+            }
+            else
+            {
+                Thread::sleep(500);
             }
         }
-
-    };
-
-    class MockDiscoveryAgentFactory : public DiscoveryAgentFactory {
-    public:
-
-        virtual ~MockDiscoveryAgentFactory() {}
-
-        virtual decaf::lang::Pointer<DiscoveryAgent> createAgent(const decaf::net::URI& agentURI) {
-            return Pointer<DiscoveryAgent>(new MockDiscoveryAgent);
+        catch (InterruptedException& ex)
+        {
         }
+    }
+};
 
-    };
+class MockDiscoveryAgentFactory : public DiscoveryAgentFactory
+{
+public:
+    virtual ~MockDiscoveryAgentFactory()
+    {
+    }
 
-    class MockDiscoveryListener : public DiscoveryListener {
-    public:
+    virtual decaf::lang::Pointer<DiscoveryAgent> createAgent(
+        const decaf::net::URI& agentURI)
+    {
+        return Pointer<DiscoveryAgent>(new MockDiscoveryAgent);
+    }
+};
 
-        CountDownLatch* added;
-        CountDownLatch* removed;
+class MockDiscoveryListener : public DiscoveryListener
+{
+public:
+    CountDownLatch* added;
+    CountDownLatch* removed;
 
-    public:
+public:
+    MockDiscoveryListener(CountDownLatch* added, CountDownLatch* removed)
+        : DiscoveryListener(),
+          added(added),
+          removed(removed)
+    {
+    }
 
-        MockDiscoveryListener(CountDownLatch* added, CountDownLatch* removed) :
-            DiscoveryListener(), added(added), removed(removed) {}
-        virtual ~MockDiscoveryListener() {}
+    virtual ~MockDiscoveryListener()
+    {
+    }
 
-        virtual void onServiceAdd(const activemq::commands::DiscoveryEvent* event) {
-            added->countDown();
-        }
+    virtual void onServiceAdd(const activemq::commands::DiscoveryEvent* event)
+    {
+        added->countDown();
+    }
 
-        virtual void onServiceRemove(const activemq::commands::DiscoveryEvent* event) {
-            removed->countDown();
-        }
-    };
+    virtual void onServiceRemove(const activemq::commands::DiscoveryEvent* event)
+    {
+        removed->countDown();
+    }
+};
 
+}  // namespace
+
+////////////////////////////////////////////////////////////////////////////////
+AbstractDiscoveryAgentTest::AbstractDiscoveryAgentTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-AbstractDiscoveryAgentTest::AbstractDiscoveryAgentTest() {
+AbstractDiscoveryAgentTest::~AbstractDiscoveryAgentTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-AbstractDiscoveryAgentTest::~AbstractDiscoveryAgentTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void AbstractDiscoveryAgentTest::test() {
-
+void AbstractDiscoveryAgentTest::test()
+{
     CountDownLatch added(1);
     CountDownLatch removed(1);
 
@@ -138,7 +164,7 @@ void AbstractDiscoveryAgentTest::test() {
     DiscoveryAgentRegistry& registry = DiscoveryAgentRegistry::getInstance();
     registry.registerFactory("mock", new MockDiscoveryAgentFactory);
 
-    ASSERT_EQ(1, (int) registry.getAgentNames().size());
+    ASSERT_EQ(1, (int)registry.getAgentNames().size());
 
     DiscoveryAgentFactory* factory = registry.findFactory("mock");
     ASSERT_TRUE(factory != NULL);

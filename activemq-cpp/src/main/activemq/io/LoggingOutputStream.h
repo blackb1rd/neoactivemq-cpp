@@ -22,20 +22,21 @@
 #include <decaf/io/FilterOutputStream.h>
 #include <decaf/util/logging/LoggerDefines.h>
 
-namespace activemq{
-namespace io{
+namespace activemq
+{
+namespace io
+{
 
     /**
      * OutputStream filter that just logs the data being
      * written.
      */
-    class AMQCPP_API LoggingOutputStream : public decaf::io::FilterOutputStream {
+    class AMQCPP_API LoggingOutputStream : public decaf::io::FilterOutputStream
+    {
     private:
-
         LOGDECAF_DECLARE(logger)
 
     public:
-
         /**
          * Constructor.
          *
@@ -50,20 +51,21 @@ namespace io{
         virtual ~LoggingOutputStream();
 
     protected:
-
         virtual void doWriteByte(unsigned char c);
 
-        virtual void doWriteArrayBounded(const unsigned char* buffer, int size, int offset, int length);
+        virtual void doWriteArrayBounded(const unsigned char* buffer,
+                                         int                  size,
+                                         int                  offset,
+                                         int                  length);
 
     private:
-
         /**
          * Logs the data in the buffer.
          */
         void log(const unsigned char* buffer, int len);
-
     };
 
-}}
+}  // namespace io
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_IO_LOGGINGOUTPUTSTREAM_H_*/

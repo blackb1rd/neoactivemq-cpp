@@ -17,16 +17,16 @@
 
 #include <decaf/internal/net/URLStreamHandlerManager.h>
 
+#include <decaf/internal/net/Network.h>
+#include <decaf/lang/Exception.h>
 #include <decaf/lang/Runnable.h>
 #include <decaf/lang/exceptions/RuntimeException.h>
-#include <decaf/lang/Exception.h>
 #include <decaf/net/URLStreamHandler.h>
 #include <decaf/net/URLStreamHandlerFactory.h>
-#include <decaf/internal/net/Network.h>
 
+#include <decaf/internal/net/file/FileHandler.h>
 #include <decaf/internal/net/http/HttpHandler.h>
 #include <decaf/internal/net/https/HttpsHandler.h>
-#include <decaf/internal/net/file/FileHandler.h>
 
 using namespace decaf;
 using namespace decaf::internal;
@@ -42,83 +42,105 @@ using namespace decaf::lang::exceptions;
 URLStreamHandlerManager* URLStreamHandlerManager::instance;
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class ShutdownTask : public decaf::lang::Runnable {
-    private:
+class ShutdownTask : public decaf::lang::Runnable
+{
+private:
+    URLStreamHandlerManager** defaultRef;
 
-        URLStreamHandlerManager** defaultRef;
+private:
+    ShutdownTask(const ShutdownTask&);
+    ShutdownTask& operator=(const ShutdownTask&);
 
-    private:
+public:
+    ShutdownTask(URLStreamHandlerManager** defaultRef)
+        : defaultRef(defaultRef)
+    {
+    }
 
-        ShutdownTask( const ShutdownTask& );
-        ShutdownTask& operator= ( const ShutdownTask& );
+    virtual ~ShutdownTask()
+    {
+    }
 
-    public:
+    virtual void run()
+    {
+        *defaultRef = NULL;
+    }
+};
+}  // namespace
 
-        ShutdownTask( URLStreamHandlerManager** defaultRef ) : defaultRef( defaultRef ) {}
-        virtual ~ShutdownTask() {}
+////////////////////////////////////////////////////////////////////////////////
+namespace decaf
+{
+namespace internal
+{
+    namespace net
+    {
 
-        virtual void run() {
-            *defaultRef = NULL;
-        }
-    };
+        class URLStreamHandlerManagerImpl
+        {
+        public:
+            URLStreamHandlerFactory* factory;
+
+        public:
+            URLStreamHandlerManagerImpl()
+                : factory(NULL)
+            {
+            }
+
+            virtual ~URLStreamHandlerManagerImpl()
+            {
+                try
+                {
+                    delete factory;
+                }
+                catch (...)
+                {
+                }
+            }
+        };
+
+    }  // namespace net
+}  // namespace internal
+}  // namespace decaf
+
+////////////////////////////////////////////////////////////////////////////////
+URLStreamHandlerManager::URLStreamHandlerManager()
+    : impl(new URLStreamHandlerManagerImpl)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace decaf {
-namespace internal {
-namespace net {
-
-    class URLStreamHandlerManagerImpl {
-    public:
-
-        URLStreamHandlerFactory* factory;
-
-    public:
-
-        URLStreamHandlerManagerImpl() : factory(NULL) {
-        }
-
-        virtual ~URLStreamHandlerManagerImpl() {
-            try {
-                delete factory;
-            } catch(...) {}
-        }
-
-    };
-
-}}}
-
-////////////////////////////////////////////////////////////////////////////////
-URLStreamHandlerManager::URLStreamHandlerManager() : impl(new URLStreamHandlerManagerImpl) {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-URLStreamHandlerManager::~URLStreamHandlerManager() {
-    try {
+URLStreamHandlerManager::~URLStreamHandlerManager()
+{
+    try
+    {
         delete impl;
     }
     DECAF_CATCHALL_NOTHROW()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-URLStreamHandlerManager* URLStreamHandlerManager::getInstance() {
-
-    if (instance == NULL) {
-
-        synchronized(Network::getNetworkRuntime()->getRuntimeLock()) {
-
-            if (instance != NULL) {
+URLStreamHandlerManager* URLStreamHandlerManager::getInstance()
+{
+    if (instance == NULL)
+    {
+        synchronized(Network::getNetworkRuntime()->getRuntimeLock())
+        {
+            if (instance != NULL)
+            {
                 return instance;
             }
 
             instance = new URLStreamHandlerManager;
 
-            // Store the default in the Network Runtime, it will be destroyed when the
-            // Application calls the Decaf shutdownLibrary method.
+            // Store the default in the Network Runtime, it will be destroyed
+            // when the Application calls the Decaf shutdownLibrary method.
             Network::getNetworkRuntime()->addAsResource(instance);
-            Network::getNetworkRuntime()->addShutdownTask(new ShutdownTask(&instance));
+            Network::getNetworkRuntime()->addShutdownTask(
+                new ShutdownTask(&instance));
         }
     }
 
@@ -126,13 +148,17 @@ URLStreamHandlerManager* URLStreamHandlerManager::getInstance() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLStreamHandlerManager::setURLStreamHandlerFactory(URLStreamHandlerFactory* factory) {
-
-    synchronized(Network::getNetworkRuntime()->getRuntimeLock()) {
-
-        if (impl->factory != NULL) {
+void URLStreamHandlerManager::setURLStreamHandlerFactory(
+    URLStreamHandlerFactory* factory)
+{
+    synchronized(Network::getNetworkRuntime()->getRuntimeLock())
+    {
+        if (impl->factory != NULL)
+        {
             throw RuntimeException(
-                __FILE__, __LINE__, "Application already set a URLStreamHandlerFactory");
+                __FILE__,
+                __LINE__,
+                "Application already set a URLStreamHandlerFactory");
         }
 
         impl->factory = factory;
@@ -140,34 +166,44 @@ void URLStreamHandlerManager::setURLStreamHandlerFactory(URLStreamHandlerFactory
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-URLStreamHandler* URLStreamHandlerManager::getURLStreamHandler(const decaf::lang::String& protocol) {
-
+URLStreamHandler* URLStreamHandlerManager::getURLStreamHandler(
+    const decaf::lang::String& protocol)
+{
     URLStreamHandler* streamHandler = NULL;
 
-    synchronized(Network::getNetworkRuntime()->getRuntimeLock()) {
-
+    synchronized(Network::getNetworkRuntime()->getRuntimeLock())
+    {
         // If there is a stream handler factory, then attempt to
         // use it to create the handler.
-        if (impl->factory != NULL) {
-            streamHandler = impl->factory->createURLStreamHandler(protocol.toString());
-            if (streamHandler != NULL) {
+        if (impl->factory != NULL)
+        {
+            streamHandler =
+                impl->factory->createURLStreamHandler(protocol.toString());
+            if (streamHandler != NULL)
+            {
                 return streamHandler;
             }
         }
 
         // No one else has provided a handler, so try our internal one.
-        if (protocol.equalsIgnoreCase("http")) {
+        if (protocol.equalsIgnoreCase("http"))
+        {
             return new HttpHandler;
-        } else if (protocol.equalsIgnoreCase("https")) {
+        }
+        else if (protocol.equalsIgnoreCase("https"))
+        {
             return new HttpsHandler;
-        } else if (protocol.equalsIgnoreCase("file")) {
+        }
+        else if (protocol.equalsIgnoreCase("file"))
+        {
             return new FileHandler;
         }
 
-        // TODO we should cache the stream handlers and return the cached version
-        //      we just need to ensure we manage the lifetime from within this object.
+        // TODO we should cache the stream handlers and return the cached
+        // version
+        //      we just need to ensure we manage the lifetime from within this
+        //      object.
     }
 
     return streamHandler;
 }
-

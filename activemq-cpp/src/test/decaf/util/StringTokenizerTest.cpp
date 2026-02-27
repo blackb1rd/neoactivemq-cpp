@@ -15,14 +15,16 @@
  * limitations under the License.
  */
 
-#include <gtest/gtest.h>
 #include <decaf/util/StringTokenizer.h>
+#include <gtest/gtest.h>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::util;
 
-   class StringTokenizerTest : public ::testing::Test {};
+class StringTokenizerTest : public ::testing::Test
+{
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(StringTokenizerTest, test)
@@ -52,12 +54,12 @@ TEST_F(StringTokenizerTest, test)
 
     try
     {
-       tokenizer3.nextToken();
-       ASSERT_TRUE(false);
+        tokenizer3.nextToken();
+        ASSERT_TRUE(false);
     }
-    catch(decaf::util::NoSuchElementException ex)
+    catch (decaf::util::NoSuchElementException ex)
     {
-       ASSERT_TRUE(true);
+        ASSERT_TRUE(true);
     }
 
     StringTokenizer tokenizer4("the quick brown fox");
@@ -84,7 +86,7 @@ TEST_F(StringTokenizerTest, test)
     ASSERT_TRUE(tokenizer5.hasMoreTokens() == false);
 
     std::vector<std::string> myArray;
-    StringTokenizer tokenizer6("the:quick:brown:fox", ":");
+    StringTokenizer          tokenizer6("the:quick:brown:fox", ":");
     ASSERT_TRUE(tokenizer6.countTokens() == 4);
     ASSERT_TRUE(tokenizer6.toArray(myArray) == 4);
     ASSERT_TRUE(tokenizer6.countTokens() == 0);
@@ -95,5 +97,5 @@ TEST_F(StringTokenizerTest, test)
     tokenizer6.reset("this$is$a$test");
     ASSERT_TRUE(tokenizer6.countTokens() == 4);
     tokenizer6.reset("this$is$a$test", "$", true);
-        ASSERT_TRUE(tokenizer6.countTokens() == 7);
+    ASSERT_TRUE(tokenizer6.countTokens() == 7);
 }

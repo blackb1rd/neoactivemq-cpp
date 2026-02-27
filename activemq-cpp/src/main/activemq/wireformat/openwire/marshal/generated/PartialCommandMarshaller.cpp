@@ -41,104 +41,137 @@ using namespace decaf::io;
 using namespace decaf::lang;
 
 ///////////////////////////////////////////////////////////////////////////////
-DataStructure* PartialCommandMarshaller::createObject() const {
+DataStructure* PartialCommandMarshaller::createObject() const
+{
     return new PartialCommand();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-unsigned char PartialCommandMarshaller::getDataStructureType() const {
+unsigned char PartialCommandMarshaller::getDataStructureType() const
+{
     return PartialCommand::ID_PARTIALCOMMAND;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void PartialCommandMarshaller::tightUnmarshal(OpenWireFormat* wireFormat, DataStructure* dataStructure, DataInputStream* dataIn, BooleanStream* bs) {
+void PartialCommandMarshaller::tightUnmarshal(OpenWireFormat*  wireFormat,
+                                              DataStructure*   dataStructure,
+                                              DataInputStream* dataIn,
+                                              BooleanStream*   bs)
+{
+    try
+    {
+        BaseDataStreamMarshaller::tightUnmarshal(wireFormat,
+                                                 dataStructure,
+                                                 dataIn,
+                                                 bs);
 
-    try {
-
-        BaseDataStreamMarshaller::tightUnmarshal(wireFormat, dataStructure, dataIn, bs);
-
-        PartialCommand* info =
-            dynamic_cast<PartialCommand*>(dataStructure);
+        PartialCommand* info = dynamic_cast<PartialCommand*>(dataStructure);
         info->setCommandId(dataIn->readInt());
         info->setData(tightUnmarshalByteArray(dataIn, bs));
     }
     AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException, decaf::io::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
+                                decaf::io::IOException)
     AMQ_CATCHALL_THROW(decaf::io::IOException)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int PartialCommandMarshaller::tightMarshal1(OpenWireFormat* wireFormat, DataStructure* dataStructure, BooleanStream* bs) {
+int PartialCommandMarshaller::tightMarshal1(OpenWireFormat* wireFormat,
+                                            DataStructure*  dataStructure,
+                                            BooleanStream*  bs)
+{
+    try
+    {
+        PartialCommand* info = dynamic_cast<PartialCommand*>(dataStructure);
 
-    try {
-
-        PartialCommand* info =
-            dynamic_cast<PartialCommand*>(dataStructure);
-
-        int rc = BaseDataStreamMarshaller::tightMarshal1(wireFormat, dataStructure, bs);
+        int rc = BaseDataStreamMarshaller::tightMarshal1(wireFormat,
+                                                         dataStructure,
+                                                         bs);
         bs->writeBoolean(info->getData().size() != 0);
         rc += info->getData().size() == 0 ? 0 : (int)info->getData().size() + 4;
 
         return rc + 4;
     }
     AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException, decaf::io::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
+                                decaf::io::IOException)
     AMQ_CATCHALL_THROW(decaf::io::IOException)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void PartialCommandMarshaller::tightMarshal2(OpenWireFormat* wireFormat, DataStructure* dataStructure, DataOutputStream* dataOut, BooleanStream* bs) {
+void PartialCommandMarshaller::tightMarshal2(OpenWireFormat*   wireFormat,
+                                             DataStructure*    dataStructure,
+                                             DataOutputStream* dataOut,
+                                             BooleanStream*    bs)
+{
+    try
+    {
+        BaseDataStreamMarshaller::tightMarshal2(wireFormat,
+                                                dataStructure,
+                                                dataOut,
+                                                bs);
 
-    try {
-
-        BaseDataStreamMarshaller::tightMarshal2(wireFormat, dataStructure, dataOut, bs );
-
-        PartialCommand* info =
-            dynamic_cast<PartialCommand*>(dataStructure);
+        PartialCommand* info = dynamic_cast<PartialCommand*>(dataStructure);
         dataOut->writeInt(info->getCommandId());
-        if (bs->readBoolean()) {
-            dataOut->writeInt((int)info->getData().size() );
-            dataOut->write((const unsigned char*)(&info->getData()[0]), (int)info->getData().size(), 0, (int)info->getData().size());
+        if (bs->readBoolean())
+        {
+            dataOut->writeInt((int)info->getData().size());
+            dataOut->write((const unsigned char*)(&info->getData()[0]),
+                           (int)info->getData().size(),
+                           0,
+                           (int)info->getData().size());
         }
     }
     AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT( exceptions::ActiveMQException, decaf::io::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
+                                decaf::io::IOException)
     AMQ_CATCHALL_THROW(decaf::io::IOException)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void PartialCommandMarshaller::looseUnmarshal(OpenWireFormat* wireFormat, DataStructure* dataStructure, DataInputStream* dataIn) {
-
-    try {
-
-        BaseDataStreamMarshaller::looseUnmarshal(wireFormat, dataStructure, dataIn);
-        PartialCommand* info =
-            dynamic_cast<PartialCommand*>(dataStructure);
+void PartialCommandMarshaller::looseUnmarshal(OpenWireFormat*  wireFormat,
+                                              DataStructure*   dataStructure,
+                                              DataInputStream* dataIn)
+{
+    try
+    {
+        BaseDataStreamMarshaller::looseUnmarshal(wireFormat,
+                                                 dataStructure,
+                                                 dataIn);
+        PartialCommand* info = dynamic_cast<PartialCommand*>(dataStructure);
         info->setCommandId(dataIn->readInt());
         info->setData(looseUnmarshalByteArray(dataIn));
     }
     AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException, decaf::io::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
+                                decaf::io::IOException)
     AMQ_CATCHALL_THROW(decaf::io::IOException)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void PartialCommandMarshaller::looseMarshal(OpenWireFormat* wireFormat, DataStructure* dataStructure, DataOutputStream* dataOut) {
-
-    try {
-
-        PartialCommand* info =
-            dynamic_cast<PartialCommand*>(dataStructure);
-        BaseDataStreamMarshaller::looseMarshal(wireFormat, dataStructure, dataOut);
+void PartialCommandMarshaller::looseMarshal(OpenWireFormat*   wireFormat,
+                                            DataStructure*    dataStructure,
+                                            DataOutputStream* dataOut)
+{
+    try
+    {
+        PartialCommand* info = dynamic_cast<PartialCommand*>(dataStructure);
+        BaseDataStreamMarshaller::looseMarshal(wireFormat,
+                                               dataStructure,
+                                               dataOut);
         dataOut->writeInt(info->getCommandId());
-        dataOut->write( info->getData().size() != 0 );
-        if( info->getData().size() != 0 ) {
-            dataOut->writeInt( (int)info->getData().size() );
-            dataOut->write((const unsigned char*)(&info->getData()[0]), (int)info->getData().size(), 0, (int)info->getData().size());
+        dataOut->write(info->getData().size() != 0);
+        if (info->getData().size() != 0)
+        {
+            dataOut->writeInt((int)info->getData().size());
+            dataOut->write((const unsigned char*)(&info->getData()[0]),
+                           (int)info->getData().size(),
+                           0,
+                           (int)info->getData().size());
         }
     }
     AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException, decaf::io::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
+                                decaf::io::IOException)
     AMQ_CATCHALL_THROW(decaf::io::IOException)
 }
-

@@ -21,46 +21,58 @@ using namespace activemq;
 using namespace activemq::commands;
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQQueue::ActiveMQQueue() : ActiveMQDestination()
-{}
-
-////////////////////////////////////////////////////////////////////////////////
-ActiveMQQueue::ActiveMQQueue( const std::string& name ) : ActiveMQDestination( name )
-{}
-
-////////////////////////////////////////////////////////////////////////////////
-ActiveMQQueue::~ActiveMQQueue() throw() {
+ActiveMQQueue::ActiveMQQueue()
+    : ActiveMQDestination()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-unsigned char ActiveMQQueue::getDataStructureType() const {
+ActiveMQQueue::ActiveMQQueue(const std::string& name)
+    : ActiveMQDestination(name)
+{
+}
+
+////////////////////////////////////////////////////////////////////////////////
+ActiveMQQueue::~ActiveMQQueue() throw()
+{
+}
+
+////////////////////////////////////////////////////////////////////////////////
+unsigned char ActiveMQQueue::getDataStructureType() const
+{
     return ActiveMQQueue::ID_ACTIVEMQQUEUE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQQueue* ActiveMQQueue::cloneDataStructure() const {
-    std::unique_ptr<ActiveMQQueue> message( new ActiveMQQueue() );
-    message->copyDataStructure( this );
+ActiveMQQueue* ActiveMQQueue::cloneDataStructure() const
+{
+    std::unique_ptr<ActiveMQQueue> message(new ActiveMQQueue());
+    message->copyDataStructure(this);
     return message.release();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQQueue::copyDataStructure( const DataStructure* src ) {
-    ActiveMQDestination::copyDataStructure( src );
+void ActiveMQQueue::copyDataStructure(const DataStructure* src)
+{
+    ActiveMQDestination::copyDataStructure(src);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string ActiveMQQueue::toString() const {
+std::string ActiveMQQueue::toString() const
+{
     return ActiveMQDestination::toString();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool ActiveMQQueue::equals( const DataStructure* value ) const {
-    return ActiveMQDestination::equals( value );
+bool ActiveMQQueue::equals(const DataStructure* value) const
+{
+    return ActiveMQDestination::equals(value);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool ActiveMQQueue::equals( const cms::Destination& value ) const {
-    const ActiveMQDestination* dest = dynamic_cast<const ActiveMQDestination*>( &value );
-    return ActiveMQDestination::equals( dest );
+bool ActiveMQQueue::equals(const cms::Destination& value) const
+{
+    const ActiveMQDestination* dest =
+        dynamic_cast<const ActiveMQDestination*>(&value);
+    return ActiveMQDestination::equals(dest);
 }

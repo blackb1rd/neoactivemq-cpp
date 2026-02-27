@@ -20,7 +20,7 @@
 
 // Turn off warning message for ignored exception specification
 #ifdef _MSC_VER
-#pragma warning( disable : 4290 )
+#pragma warning(disable : 4290)
 #endif
 
 #include <activemq/commands/ConnectionId.h>
@@ -31,8 +31,10 @@
 #include <string>
 #include <vector>
 
-namespace activemq {
-namespace commands {
+namespace activemq
+{
+namespace commands
+{
 
     using decaf::lang::Pointer;
 
@@ -45,27 +47,26 @@ namespace commands {
      *         in the activemq-cpp-openwire-generator module
      *
      */
-    class AMQCPP_API LocalTransactionId : public TransactionId, public decaf::lang::Comparable<LocalTransactionId> {
+    class AMQCPP_API LocalTransactionId
+        : public TransactionId,
+          public decaf::lang::Comparable<LocalTransactionId>
+    {
     protected:
-
         using TransactionId::compareTo;
         using TransactionId::equals;
-        using TransactionId::operator <;
+        using TransactionId::operator<;
         using TransactionId::operator==;
 
     protected:
-
-        long long value;
+        long long             value;
         Pointer<ConnectionId> connectionId;
 
     public:
-
         const static unsigned char ID_LOCALTRANSACTIONID = 111;
 
         typedef decaf::lang::PointerComparator<LocalTransactionId> COMPARATOR;
 
     public:
-
         LocalTransactionId();
 
         LocalTransactionId(const LocalTransactionId& other);
@@ -82,15 +83,16 @@ namespace commands {
 
         virtual bool equals(const DataStructure* value) const;
 
-        virtual bool isLocalTransactionId() const {
+        virtual bool isLocalTransactionId() const
+        {
             return true;
         }
 
         virtual long long getValue() const;
-        virtual void setValue(long long value);
+        virtual void      setValue(long long value);
 
         virtual const Pointer<ConnectionId>& getConnectionId() const;
-        virtual Pointer<ConnectionId>& getConnectionId();
+        virtual Pointer<ConnectionId>&       getConnectionId();
         virtual void setConnectionId(const Pointer<ConnectionId>& connectionId);
 
         virtual int compareTo(const LocalTransactionId& value) const;
@@ -101,12 +103,12 @@ namespace commands {
 
         virtual bool operator<(const LocalTransactionId& value) const;
 
-        LocalTransactionId& operator= (const LocalTransactionId& other);
+        LocalTransactionId& operator=(const LocalTransactionId& other);
 
         int getHashCode() const;
-
     };
 
-}}
+}  // namespace commands
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_COMMANDS_LOCALTRANSACTIONID_H_*/

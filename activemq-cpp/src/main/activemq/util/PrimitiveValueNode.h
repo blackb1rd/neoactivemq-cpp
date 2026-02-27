@@ -19,12 +19,14 @@
 #define _ACTIVEMQ_UTIL_PRIMITIVEVALUENODE_H_
 
 #include <activemq/util/Config.h>
-#include <decaf/util/NoSuchElementException.h>
-#include <decaf/util/Map.h>
 #include <decaf/util/List.h>
+#include <decaf/util/Map.h>
+#include <decaf/util/NoSuchElementException.h>
 
-namespace activemq {
-namespace util {
+namespace activemq
+{
+namespace util
+{
 
     /**
      * Class that wraps around a single value of one of the
@@ -35,56 +37,54 @@ namespace util {
      * we'll never extend this class, not having a virtual
      * destructor isn't a concern.
      */
-    class AMQCPP_API PrimitiveValueNode {
+    class AMQCPP_API PrimitiveValueNode
+    {
     public:
-
         /**
          * Enumeration for the various primitive types.
          */
-        enum PrimitiveType{
-            NULL_TYPE          = 0,
-            BOOLEAN_TYPE       = 1,
-            BYTE_TYPE          = 2,
-            CHAR_TYPE          = 3,
-            SHORT_TYPE         = 4,
-            INTEGER_TYPE       = 5,
-            LONG_TYPE          = 6,
-            DOUBLE_TYPE        = 7,
-            FLOAT_TYPE         = 8,
-            STRING_TYPE        = 9,
-            BYTE_ARRAY_TYPE    = 10,
-            MAP_TYPE           = 11,
-            LIST_TYPE          = 12,
-            BIG_STRING_TYPE    = 13
+        enum PrimitiveType
+        {
+            NULL_TYPE       = 0,
+            BOOLEAN_TYPE    = 1,
+            BYTE_TYPE       = 2,
+            CHAR_TYPE       = 3,
+            SHORT_TYPE      = 4,
+            INTEGER_TYPE    = 5,
+            LONG_TYPE       = 6,
+            DOUBLE_TYPE     = 7,
+            FLOAT_TYPE      = 8,
+            STRING_TYPE     = 9,
+            BYTE_ARRAY_TYPE = 10,
+            MAP_TYPE        = 11,
+            LIST_TYPE       = 12,
+            BIG_STRING_TYPE = 13
         };
 
         /**
          * Define a union type comprised of the various types.
          */
-        union PrimitiveValue {
-
-            bool boolValue;
-            unsigned char byteValue;
-            char charValue;
-            short shortValue;
-            int intValue;
-            long long longValue;
-            double doubleValue;
-            float floatValue;
-            std::string* stringValue;
-            std::vector<unsigned char>* byteArrayValue;
-            decaf::util::List<PrimitiveValueNode>* listValue;
+        union PrimitiveValue
+        {
+            bool                                               boolValue;
+            unsigned char                                      byteValue;
+            char                                               charValue;
+            short                                              shortValue;
+            int                                                intValue;
+            long long                                          longValue;
+            double                                             doubleValue;
+            float                                              floatValue;
+            std::string*                                       stringValue;
+            std::vector<unsigned char>*                        byteArrayValue;
+            decaf::util::List<PrimitiveValueNode>*             listValue;
             decaf::util::Map<std::string, PrimitiveValueNode>* mapValue;
-
         };
 
     private:
-
-        PrimitiveType valueType;
+        PrimitiveType  valueType;
         PrimitiveValue value;
 
     public:
-
         /**
          * Default Constructor, creates a value of the NULL_TYPE.
          */
@@ -166,7 +166,8 @@ namespace util {
          * Primtive Map Value Constructor
          * @param value - the new value to store.
          */
-        PrimitiveValueNode(const decaf::util::Map<std::string, PrimitiveValueNode>& value);
+        PrimitiveValueNode(
+            const decaf::util::Map<std::string, PrimitiveValueNode>& value);
 
         /**
          * Copy constructor
@@ -175,7 +176,8 @@ namespace util {
          */
         PrimitiveValueNode(const PrimitiveValueNode& node);
 
-        ~PrimitiveValueNode() {
+        ~PrimitiveValueNode()
+        {
             clear();
         }
 
@@ -185,7 +187,7 @@ namespace util {
          * @param node
          *      The instance of another node to copy to this one.
          */
-        PrimitiveValueNode& operator =(const PrimitiveValueNode& node);
+        PrimitiveValueNode& operator=(const PrimitiveValueNode& node);
 
         /**
          * Comparison Operator, compares this node to the other node.
@@ -197,7 +199,8 @@ namespace util {
          * Gets the Value Type of this type wrapper.
          * @return the PrimitiveType value for this wrapper.
          */
-        PrimitiveType getType() const {
+        PrimitiveType getType() const
+        {
             return valueType;
         }
 
@@ -205,7 +208,8 @@ namespace util {
          * Gets the internal Primitive Value object from this wrapper.
          * @return a copy of the contained PrimitiveValue
          */
-        PrimitiveValue getValue() const {
+        PrimitiveValue getValue() const
+        {
             return this->value;
         }
 
@@ -408,7 +412,8 @@ namespace util {
          * given.
          * @param value - the new value to assign to the element at index
          */
-        void setMap(const decaf::util::Map<std::string, PrimitiveValueNode>& value);
+        void setMap(
+            const decaf::util::Map<std::string, PrimitiveValueNode>& value);
 
         /**
          * Gets the Primitive Map value of this Node.
@@ -423,9 +428,9 @@ namespace util {
          * @return string value of this type wrapper.
          */
         std::string toString() const;
-
     };
 
-}}
+}  // namespace util
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_UTIL_PRIMITIVEVALUENODE_H_*/

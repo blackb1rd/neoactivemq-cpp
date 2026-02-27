@@ -21,19 +21,21 @@
 #include <activemq/test/CMSTestFixture.h>
 #include <activemq/util/IntegrationCommon.h>
 
-namespace activemq {
-namespace test {
+namespace activemq
+{
+namespace test
+{
 
-    class MessagePriorityTest : public CMSTestFixture {
+    class MessagePriorityTest : public CMSTestFixture
+    {
     public:
-
         MessagePriorityTest();
         virtual ~MessagePriorityTest();
 
         void testMessagePrioritySendReceive();
-
     };
 
-}}
+}  // namespace test
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_TEST_MESSAGEPRIORITYTEST_H_ */

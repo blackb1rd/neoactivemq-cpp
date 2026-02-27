@@ -18,28 +18,31 @@
 #ifndef _ACTIVEMQ_COMMANDS_ACTIVEMQMESSAGE_H_
 #define _ACTIVEMQ_COMMANDS_ACTIVEMQMESSAGE_H_
 
-#include <cms/Message.h>
-#include <activemq/util/Config.h>
 #include <activemq/commands/ActiveMQMessageTemplate.h>
+#include <activemq/util/Config.h>
+#include <cms/Message.h>
 
-namespace activemq {
-namespace commands {
+namespace activemq
+{
+namespace commands
+{
 
-    class AMQCPP_API ActiveMQMessage : public ActiveMQMessageTemplate<cms::Message> {
+    class AMQCPP_API ActiveMQMessage
+        : public ActiveMQMessageTemplate<cms::Message>
+    {
     public:
-
         static const unsigned char ID_ACTIVEMQMESSAGE;
 
     private:
-
         ActiveMQMessage(const ActiveMQMessage&);
         ActiveMQMessage& operator=(const ActiveMQMessage&);
 
     public:
-
         ActiveMQMessage();
 
-        virtual ~ActiveMQMessage() throw () {}
+        virtual ~ActiveMQMessage() throw()
+        {
+        }
 
         virtual unsigned char getDataStructureType() const;
 
@@ -52,11 +55,10 @@ namespace commands {
         virtual bool equals(const DataStructure* value) const;
 
     public:  // CMS Message
-
         virtual cms::Message* clone() const;
-
     };
 
-}}
+}  // namespace commands
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_COMMANDS_ACTIVEMQMESSAGE_H_*/

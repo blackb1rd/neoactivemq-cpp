@@ -22,26 +22,38 @@ using namespace decaf::net;
 using namespace decaf::lang;
 
 ////////////////////////////////////////////////////////////////////////////////
-MalformedURLException::MalformedURLException() : io::IOException() {
+MalformedURLException::MalformedURLException()
+    : io::IOException()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-MalformedURLException::~MalformedURLException() throw() {
+MalformedURLException::~MalformedURLException() throw()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-MalformedURLException::MalformedURLException(const Exception& ex) : io::IOException() {
-    *(Exception*) this = ex;
+MalformedURLException::MalformedURLException(const Exception& ex)
+    : io::IOException()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-MalformedURLException::MalformedURLException(const MalformedURLException& ex) : io::IOException() {
-    *(Exception*) this = ex;
+MalformedURLException::MalformedURLException(const MalformedURLException& ex)
+    : io::IOException()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-MalformedURLException::MalformedURLException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...) : io::IOException(cause) {
-
+MalformedURLException::MalformedURLException(const char*           file,
+                                             const int             lineNumber,
+                                             const std::exception* cause,
+                                             const char*           msg,
+                                             ...)
+    : io::IOException(cause)
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -51,12 +63,18 @@ MalformedURLException::MalformedURLException(const char* file, const int lineNum
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-MalformedURLException::MalformedURLException(const std::exception* cause) : io::IOException(cause) {
+MalformedURLException::MalformedURLException(const std::exception* cause)
+    : io::IOException(cause)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-MalformedURLException::MalformedURLException(const char* file, const int lineNumber, const char* msg, ...) : io::IOException() {
-
+MalformedURLException::MalformedURLException(const char* file,
+                                             const int   lineNumber,
+                                             const char* msg,
+                                             ...)
+    : io::IOException()
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);

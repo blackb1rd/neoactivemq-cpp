@@ -18,24 +18,25 @@
 #ifndef _DECAF_LANG_CHARACTER_H_
 #define _DECAF_LANG_CHARACTER_H_
 
-#include <decaf/util/Config.h>
-#include <decaf/lang/Number.h>
 #include <decaf/lang/Comparable.h>
+#include <decaf/lang/Number.h>
+#include <decaf/util/Config.h>
 #include <string>
 
-namespace decaf{
-namespace lang{
+namespace decaf
+{
+namespace lang
+{
 
     class DECAF_API Character : public Number,
                                 public Comparable<Character>,
-                                public Comparable<char> {
+                                public Comparable<char>
+    {
     private:
-
         // The primitive Char value
         char value;
 
     public:
-
         /** The minimum radix available for conversion to and from strings. */
         static const int MIN_RADIX;
 
@@ -52,7 +53,6 @@ namespace lang{
         static const int SIZE;
 
     public:
-
         /**
          * @param value - char to wrap.
          */
@@ -65,11 +65,12 @@ namespace lang{
          *      the Character instance to be compared
          *
          * @return zero if this object represents the same char value as the
-         *         argument; a positive value if this object represents a value greater
-         *         than the passed in value, and -1 if this object represents a value
-         *         less than the passed in value.
+         *         argument; a positive value if this object represents a value
+         * greater than the passed in value, and -1 if this object represents a
+         * value less than the passed in value.
          */
-        virtual int compareTo(const Character& c) const {
+        virtual int compareTo(const Character& c) const
+        {
             return this->value < c.value ? -1 : (this->value > c.value) ? 1 : 0;
         }
 
@@ -81,7 +82,8 @@ namespace lang{
          *
          * @return true if this object is equal to the one passed.
          */
-        virtual bool operator==(const Character& c) const {
+        virtual bool operator==(const Character& c) const
+        {
             return this->value == c.value;
         }
 
@@ -94,7 +96,8 @@ namespace lang{
          *
          * @return true if this object is equal to the one passed.
          */
-        virtual bool operator<(const Character& c) const {
+        virtual bool operator<(const Character& c) const
+        {
             return this->value < c.value;
         }
 
@@ -105,11 +108,12 @@ namespace lang{
          *      the char instance to be compared
          *
          * @return zero if this object represents the same char value as the
-         *         argument; a positive value if this object represents a value greater
-         *         than the passed in value, and -1 if this object represents a value
-         *         less than the passed in value.
+         *         argument; a positive value if this object represents a value
+         * greater than the passed in value, and -1 if this object represents a
+         * value less than the passed in value.
          */
-        virtual int compareTo(const char& c) const {
+        virtual int compareTo(const char& c) const
+        {
             return this->value < c ? -1 : (this->value > c) ? 1 : 0;
         }
 
@@ -121,7 +125,8 @@ namespace lang{
          *
          * @return true if this object is equal to the one passed.
          */
-        virtual bool operator==(const char& c) const {
+        virtual bool operator==(const char& c) const
+        {
             return this->value == c;
         }
 
@@ -134,21 +139,24 @@ namespace lang{
          *
          * @return true if this object is equal to the one passed.
          */
-        virtual bool operator<(const char& c) const {
+        virtual bool operator<(const char& c) const
+        {
             return this->value < c;
         }
 
         /**
          * @return true if the two Character Objects have the same value.
          */
-        bool equals(const Character& c) const {
+        bool equals(const Character& c) const
+        {
             return this->value == c.value;
         }
 
         /**
          * @return true if the two Characters have the same value.
          */
-        bool equals(const char& c) const {
+        bool equals(const char& c) const
+        {
             return this->value == c;
         }
 
@@ -162,8 +170,9 @@ namespace lang{
          *
          * @return double the value of the receiver.
          */
-        virtual double doubleValue() const {
-            return (double) this->value;
+        virtual double doubleValue() const
+        {
+            return (double)this->value;
         }
 
         /**
@@ -171,8 +180,9 @@ namespace lang{
          *
          * @return float the value of the receiver.
          */
-        virtual float floatValue() const {
-            return (float) this->value;
+        virtual float floatValue() const
+        {
+            return (float)this->value;
         }
 
         /**
@@ -180,8 +190,9 @@ namespace lang{
          *
          * @return int the value of the receiver.
          */
-        virtual unsigned char byteValue() const {
-            return (unsigned char) this->value;
+        virtual unsigned char byteValue() const
+        {
+            return (unsigned char)this->value;
         }
 
         /**
@@ -189,8 +200,9 @@ namespace lang{
          *
          * @return int the value of the receiver.
          */
-        virtual short shortValue() const {
-            return (short) this->value;
+        virtual short shortValue() const
+        {
+            return (short)this->value;
         }
 
         /**
@@ -198,8 +210,9 @@ namespace lang{
          *
          * @return int the value of the receiver.
          */
-        virtual int intValue() const {
-            return (int) this->value;
+        virtual int intValue() const
+        {
+            return (int)this->value;
         }
 
         /**
@@ -207,12 +220,12 @@ namespace lang{
          *
          * @return long the value of the receiver.
          */
-        virtual long long longValue() const {
-            return (long long) this->value;
+        virtual long long longValue() const
+        {
+            return (long long)this->value;
         }
 
     public:
-
         /**
          * Returns a Character instance representing the specified char value.
          *
@@ -221,7 +234,8 @@ namespace lang{
          *
          * @return a new Character instance that wraps this value.
          */
-        static Character valueOf(char value) {
+        static Character valueOf(char value)
+        {
             return Character(value);
         }
 
@@ -234,8 +248,10 @@ namespace lang{
          *
          * @return true if the character is a whitespace value.
          */
-        static bool isWhitespace(char c) {
-            switch (c) {
+        static bool isWhitespace(char c)
+        {
+            switch (c)
+            {
                 case '\n':
                 case '\t':
                 case '\r':
@@ -255,19 +271,22 @@ namespace lang{
          *
          * @return true if the character is a digit value.
          */
-        static bool isDigit(char c) {
+        static bool isDigit(char c)
+        {
             return c >= '0' && c <= '9';
         }
 
         /**
-         * Indicates whether or not the given character is a lower case character.
+         * Indicates whether or not the given character is a lower case
+         * character.
          *
          * @param c
          *      The character whose value is being checked.
          *
          * @return true if the character is a lower case ASCII value.
          */
-        static bool isLowerCase(char c) {
+        static bool isLowerCase(char c)
+        {
             return c >= 'a' && c <= 'z';
         }
 
@@ -280,7 +299,8 @@ namespace lang{
          *
          * @return true if the character is a upper case ASCII value.
          */
-        static bool isUpperCase(char c) {
+        static bool isUpperCase(char c)
+        {
             return c >= 'A' && c <= 'Z';
         }
 
@@ -292,7 +312,8 @@ namespace lang{
          *
          * @return true if the character is an ASCII letter value.
          */
-        static bool isLetter(char c) {
+        static bool isLetter(char c)
+        {
             return isUpperCase(c) || isLowerCase(c);
         }
 
@@ -305,7 +326,8 @@ namespace lang{
          *
          * @return true if the character is an ASCII letter or numeric value.
          */
-        static bool isLetterOrDigit(char c) {
+        static bool isLetterOrDigit(char c)
+        {
             return isLetter(c) || isDigit(c);
         }
 
@@ -317,41 +339,44 @@ namespace lang{
          *
          * @return true if the char is an ISO control character
          */
-        static bool isISOControl(char c) {
-            return (c >= 0 && c <= 0x1f) || ((unsigned char) c >= 0x7f && (unsigned char) c <= 0x9f);
+        static bool isISOControl(char c)
+        {
+            return (c >= 0 && c <= 0x1f) ||
+                   ((unsigned char)c >= 0x7f && (unsigned char)c <= 0x9f);
         }
 
         /**
          * Returns the numeric value of the character ch in the specified radix.
          *
-         * If the radix is not in the range MIN_RADIX <= radix <= MAX_RADIX or if
-         * the value of ch is not a valid digit in the specified radix, -1 is
-         * returned. A character is a valid digit if at least one of the following
-         * is true:
+         * If the radix is not in the range MIN_RADIX <= radix <= MAX_RADIX or
+         * if the value of ch is not a valid digit in the specified radix, -1 is
+         * returned. A character is a valid digit if at least one of the
+         * following is true:
          *
-         *    * The method isDigit is true of the character and the single-character
-         *      decomposition is less than the specified radix. In this case the
-         *      decimal digit value is returned.
-         *    * The character is one of the uppercase Latin letters 'A' through 'Z'
-         *      and its code is less than radix + 'A' - 10. In this case,
-         *      ch - 'A' + 10 is returned.
-         *    * The character is one of the lowercase Latin letters 'a' through 'z'
-         *      and its code is less than radix + 'a' - 10. In this case,
-         *      ch - 'a' + 10 is returned.
+         *    * The method isDigit is true of the character and the
+         * single-character decomposition is less than the specified radix. In
+         * this case the decimal digit value is returned.
+         *    * The character is one of the uppercase Latin letters 'A' through
+         * 'Z' and its code is less than radix + 'A' - 10. In this case, ch -
+         * 'A' + 10 is returned.
+         *    * The character is one of the lowercase Latin letters 'a' through
+         * 'z' and its code is less than radix + 'a' - 10. In this case, ch -
+         * 'a' + 10 is returned.
          *
          * @param c
          *      the char to be converted
          * @param radix
          *      the radix of the number
          *
-         * @return the numeric value of the number represented in the given radix
+         * @return the numeric value of the number represented in the given
+         * radix
          */
         static int digit(char c, int radix);
 
         /**
          * Returns the lower case equivalent for the specified character if the
-         * character is an upper case letter. Otherwise, the specified character is
-         * returned unchanged.
+         * character is an upper case letter. Otherwise, the specified character
+         * is returned unchanged.
          *
          * @param value
          *      the character to convert if needed.
@@ -359,9 +384,11 @@ namespace lang{
          * @return if value is an upper case character then its lower case
          *         counterpart, otherwise just returns value unchanged.
          */
-        static char toLowerCase(char value) {
-            if ('A' <= value && value <= 'Z') {
-                return (char) (value + ('a' - 'A'));
+        static char toLowerCase(char value)
+        {
+            if ('A' <= value && value <= 'Z')
+            {
+                return (char)(value + ('a' - 'A'));
             }
 
             return value;
@@ -369,8 +396,8 @@ namespace lang{
 
         /**
          * Returns the upper case equivalent for the specified character if the
-         * character is a lower case letter. Otherwise, the specified character is
-         * returned unchanged.
+         * character is a lower case letter. Otherwise, the specified character
+         * is returned unchanged.
          *
          * @param value
          *      the character to convert to upper case if needed.
@@ -378,15 +405,18 @@ namespace lang{
          * @return if value is a lower case character then its upper case
          *         counterpart, otherwise just returns value unchanged.
          */
-        static char toUpperCase(char value) {
-            if ('a' <= value && value <= 'z') {
-                return (char) (value - ('a' - 'A'));
+        static char toUpperCase(char value)
+        {
+            if ('a' <= value && value <= 'z')
+            {
+                return (char)(value - ('a' - 'A'));
             }
 
             return value;
         }
     };
 
-}}
+}  // namespace lang
+}  // namespace decaf
 
 #endif /*_DECAF_LANG_CHARACTER_H_*/

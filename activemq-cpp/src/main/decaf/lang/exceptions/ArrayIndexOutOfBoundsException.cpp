@@ -24,35 +24,54 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-ArrayIndexOutOfBoundsException::ArrayIndexOutOfBoundsException() : IndexOutOfBoundsException() {
+ArrayIndexOutOfBoundsException::ArrayIndexOutOfBoundsException()
+    : IndexOutOfBoundsException()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ArrayIndexOutOfBoundsException::ArrayIndexOutOfBoundsException(int index) : IndexOutOfBoundsException() {
+ArrayIndexOutOfBoundsException::ArrayIndexOutOfBoundsException(int index)
+    : IndexOutOfBoundsException()
+{
     this->setMessage("Array index out of range: %d", index);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ArrayIndexOutOfBoundsException::~ArrayIndexOutOfBoundsException() throw () {
+ArrayIndexOutOfBoundsException::~ArrayIndexOutOfBoundsException() throw()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ArrayIndexOutOfBoundsException::ArrayIndexOutOfBoundsException(const Exception& ex) : IndexOutOfBoundsException() {
-    *(Exception*) this = ex;
+ArrayIndexOutOfBoundsException::ArrayIndexOutOfBoundsException(
+    const Exception& ex)
+    : IndexOutOfBoundsException()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ArrayIndexOutOfBoundsException::ArrayIndexOutOfBoundsException(const ArrayIndexOutOfBoundsException& ex) : IndexOutOfBoundsException() {
-    *(Exception*) this = ex;
+ArrayIndexOutOfBoundsException::ArrayIndexOutOfBoundsException(
+    const ArrayIndexOutOfBoundsException& ex)
+    : IndexOutOfBoundsException()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ArrayIndexOutOfBoundsException::ArrayIndexOutOfBoundsException(const std::exception* cause) : IndexOutOfBoundsException(cause) {
+ArrayIndexOutOfBoundsException::ArrayIndexOutOfBoundsException(
+    const std::exception* cause)
+    : IndexOutOfBoundsException(cause)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ArrayIndexOutOfBoundsException::ArrayIndexOutOfBoundsException(const char* file, const int lineNumber, const char* msg, ...) : IndexOutOfBoundsException() {
-
+ArrayIndexOutOfBoundsException::ArrayIndexOutOfBoundsException(
+    const char* file,
+    const int   lineNumber,
+    const char* msg,
+    ...)
+    : IndexOutOfBoundsException()
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -62,14 +81,25 @@ ArrayIndexOutOfBoundsException::ArrayIndexOutOfBoundsException(const char* file,
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ArrayIndexOutOfBoundsException::ArrayIndexOutOfBoundsException(const char* file, const int lineNumber, int index) : IndexOutOfBoundsException() {
+ArrayIndexOutOfBoundsException::ArrayIndexOutOfBoundsException(
+    const char* file,
+    const int   lineNumber,
+    int         index)
+    : IndexOutOfBoundsException()
+{
     setMark(file, lineNumber);
     this->setMessage("Array index out of range: %d", index);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ArrayIndexOutOfBoundsException::ArrayIndexOutOfBoundsException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...) : IndexOutOfBoundsException(cause) {
-
+ArrayIndexOutOfBoundsException::ArrayIndexOutOfBoundsException(
+    const char*           file,
+    const int             lineNumber,
+    const std::exception* cause,
+    const char*           msg,
+    ...)
+    : IndexOutOfBoundsException(cause)
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);

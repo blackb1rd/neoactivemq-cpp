@@ -21,5 +21,6 @@ using namespace decaf;
 using namespace decaf::net;
 
 ////////////////////////////////////////////////////////////////////////////////
-FileNameMap::~FileNameMap() {
+FileNameMap::~FileNameMap()
+{
 }

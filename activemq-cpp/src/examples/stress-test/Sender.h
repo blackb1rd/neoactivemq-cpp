@@ -23,36 +23,38 @@
 #include <activemq/cmsutil/CmsTemplate.h>
 #include <activemq/cmsutil/MessageCreator.h>
 
-#include <decaf/util/concurrent/CountDownLatch.h>
 #include <decaf/lang/Runnable.h>
+#include <decaf/util/concurrent/CountDownLatch.h>
 
 #include "CmsMessageHandlerDefinitions.h"
 
-namespace cms {
-namespace stress {
+namespace cms
+{
+namespace stress
+{
 
-    class Sender {
+    class Sender
+    {
     private:
-
-        decaf::util::concurrent::Mutex cmsTemplateMutex;
+        decaf::util::concurrent::Mutex  cmsTemplateMutex;
         activemq::cmsutil::CmsTemplate* cmsTemplate;
 
     public:
-
         Sender(const std::string& url,
                const std::string& queueOrTopicName,
-               bool isTopic, bool isDeliveryPersistent,
-               int timeToLive);
+               bool               isTopic,
+               bool               isDeliveryPersistent,
+               int                timeToLive);
 
         virtual ~Sender();
 
         void SendMessage(const std::string& msg,
-                         ErrorCode& errorCode,
+                         ErrorCode&         errorCode,
                          const std::string& header,
                          const std::string& value);
-
     };
 
-}}
+}  // namespace stress
+}  // namespace cms
 
 #endif /** _CMS_STRESS_SENDER_H_ */

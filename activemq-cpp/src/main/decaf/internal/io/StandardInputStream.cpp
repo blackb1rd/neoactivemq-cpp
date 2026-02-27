@@ -27,25 +27,29 @@ using namespace decaf::internal;
 using namespace decaf::internal::io;
 
 ////////////////////////////////////////////////////////////////////////////////
-StandardInputStream::StandardInputStream() {
+StandardInputStream::StandardInputStream()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-StandardInputStream::~StandardInputStream() {
+StandardInputStream::~StandardInputStream()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int StandardInputStream::available() const {
+int StandardInputStream::available() const
+{
     return 1;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int StandardInputStream::doReadByte() {
-
-    if( !std::cin.good() ) {
-        throw decaf::io::IOException(
-            __FILE__, __LINE__,
-            "Standard Input Stream in Error State." );
+int StandardInputStream::doReadByte()
+{
+    if (!std::cin.good())
+    {
+        throw decaf::io::IOException(__FILE__,
+                                     __LINE__,
+                                     "Standard Input Stream in Error State.");
     }
 
     return std::cin.get();

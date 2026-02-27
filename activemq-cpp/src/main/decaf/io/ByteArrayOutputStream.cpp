@@ -28,35 +28,49 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-ByteArrayOutputStream::ByteArrayOutputStream() :
-    OutputStream(), buffer(new unsigned char[32]), bufferSize(32), count(0) {
+ByteArrayOutputStream::ByteArrayOutputStream()
+    : OutputStream(),
+      buffer(new unsigned char[32]),
+      bufferSize(32),
+      count(0)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ByteArrayOutputStream::ByteArrayOutputStream(int bufferSize) :
-    OutputStream(), buffer(NULL), bufferSize(bufferSize), count(0) {
-
-    if (bufferSize <= 0) {
-        throw IllegalArgumentException(__FILE__, __LINE__, "Buffer size given was invalid: %d", bufferSize);
+ByteArrayOutputStream::ByteArrayOutputStream(int bufferSize)
+    : OutputStream(),
+      buffer(NULL),
+      bufferSize(bufferSize),
+      count(0)
+{
+    if (bufferSize <= 0)
+    {
+        throw IllegalArgumentException(__FILE__,
+                                       __LINE__,
+                                       "Buffer size given was invalid: %d",
+                                       bufferSize);
     }
 
     this->buffer = new unsigned char[bufferSize];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ByteArrayOutputStream::~ByteArrayOutputStream() {
-    try {
+ByteArrayOutputStream::~ByteArrayOutputStream()
+{
+    try
+    {
         delete[] buffer;
     }
     DECAF_CATCHALL_NOTHROW()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::pair<unsigned char*, int> ByteArrayOutputStream::toByteArray() const {
-
+std::pair<unsigned char*, int> ByteArrayOutputStream::toByteArray() const
+{
     unsigned char* temp = NULL;
 
-    if (this->count == 0) {
+    if (this->count == 0)
+    {
         return std::pair<unsigned char*, int>(temp, 0);
     }
 
@@ -67,55 +81,75 @@ std::pair<unsigned char*, int> ByteArrayOutputStream::toByteArray() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-long long ByteArrayOutputStream::size() const {
+long long ByteArrayOutputStream::size() const
+{
     return this->count;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayOutputStream::reset() {
+void ByteArrayOutputStream::reset()
+{
     this->count = 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayOutputStream::doWriteByte(unsigned char c) {
-
-    try {
-
-        if (this->count == this->bufferSize) {
+void ByteArrayOutputStream::doWriteByte(unsigned char c)
+{
+    try
+    {
+        if (this->count == this->bufferSize)
+        {
             checkExpandSize(1);
         }
 
         this->buffer[this->count++] = c;
     }
-    DECAF_CATCH_RETHROW( IOException)
-    DECAF_CATCHALL_THROW( IOException)
+    DECAF_CATCH_RETHROW(IOException)
+    DECAF_CATCHALL_THROW(IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayOutputStream::doWriteArrayBounded(const unsigned char* buffer, int size, int offset, int length) {
-
-    if (length == 0) {
+void ByteArrayOutputStream::doWriteArrayBounded(const unsigned char* buffer,
+                                                int                  size,
+                                                int                  offset,
+                                                int                  length)
+{
+    if (length == 0)
+    {
         return;
     }
 
-    if (buffer == NULL) {
+    if (buffer == NULL)
+    {
         throw NullPointerException(__FILE__, __LINE__, "passed buffer is null");
     }
 
-    if (size < 0) {
-        throw IndexOutOfBoundsException(__FILE__, __LINE__, "size parameter out of Bounds: %d.", size);
+    if (size < 0)
+    {
+        throw IndexOutOfBoundsException(__FILE__,
+                                        __LINE__,
+                                        "size parameter out of Bounds: %d.",
+                                        size);
     }
 
-    if (offset > size || offset < 0) {
-        throw IndexOutOfBoundsException(__FILE__, __LINE__, "offset parameter out of Bounds: %d.", offset);
+    if (offset > size || offset < 0)
+    {
+        throw IndexOutOfBoundsException(__FILE__,
+                                        __LINE__,
+                                        "offset parameter out of Bounds: %d.",
+                                        offset);
     }
 
-    if (length < 0 || length > size - offset) {
-        throw IndexOutOfBoundsException(__FILE__, __LINE__, "length parameter out of Bounds: %d.", length);
+    if (length < 0 || length > size - offset)
+    {
+        throw IndexOutOfBoundsException(__FILE__,
+                                        __LINE__,
+                                        "length parameter out of Bounds: %d.",
+                                        length);
     }
 
-    try {
-
+    try
+    {
         checkExpandSize(length);
 
         System::arraycopy(buffer, offset, this->buffer, this->count, length);
@@ -128,26 +162,31 @@ void ByteArrayOutputStream::doWriteArrayBounded(const unsigned char* buffer, int
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string ByteArrayOutputStream::toString() const {
-
-    if (this->count == 0) {
+std::string ByteArrayOutputStream::toString() const
+{
+    if (this->count == 0)
+    {
         return "";
     }
 
-    return string((const char*) this->buffer, this->count);
+    return string((const char*)this->buffer, this->count);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayOutputStream::writeTo(OutputStream* out) const {
-
-    try {
-
-        if (this->count == 0) {
+void ByteArrayOutputStream::writeTo(OutputStream* out) const
+{
+    try
+    {
+        if (this->count == 0)
+        {
             return;
         }
 
-        if (out == NULL) {
-            throw NullPointerException(__FILE__, __LINE__, "Passed stream pointer is null");
+        if (out == NULL)
+        {
+            throw NullPointerException(__FILE__,
+                                       __LINE__,
+                                       "Passed stream pointer is null");
         }
 
         out->write(this->buffer, this->count);
@@ -158,16 +197,17 @@ void ByteArrayOutputStream::writeTo(OutputStream* out) const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ByteArrayOutputStream::checkExpandSize(int needed) {
-
-    try {
-
-        if (this->count + needed <= this->bufferSize) {
+void ByteArrayOutputStream::checkExpandSize(int needed)
+{
+    try
+    {
+        if (this->count + needed <= this->bufferSize)
+        {
             return;
         }
 
-        int newSize = (this->count + needed) * 2;
-        unsigned char* temp = new unsigned char[newSize];
+        int            newSize = (this->count + needed) * 2;
+        unsigned char* temp    = new unsigned char[newSize];
         System::arraycopy(this->buffer, 0, temp, 0, this->count);
 
         std::swap(temp, this->buffer);

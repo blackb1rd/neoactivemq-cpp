@@ -22,5 +22,6 @@ using namespace decaf::util;
 using namespace decaf::util::zip;
 
 ////////////////////////////////////////////////////////////////////////////////
-Checksum::~Checksum() {
+Checksum::~Checksum()
+{
 }

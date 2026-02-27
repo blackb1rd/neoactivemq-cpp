@@ -29,162 +29,217 @@ using namespace decaf::util::concurrent;
 using namespace decaf::util::concurrent::locks;
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace decaf {
-namespace util {
-namespace concurrent {
+namespace decaf
+{
+namespace util
+{
+    namespace concurrent
+    {
 
-    class SemSync : public AbstractQueuedSynchronizer{
-    public:
+        class SemSync : public AbstractQueuedSynchronizer
+        {
+        public:
+            SemSync(int permits)
+                : AbstractQueuedSynchronizer()
+            {
+                this->setState(permits);
+            }
 
-        SemSync(int permits) : AbstractQueuedSynchronizer() {
-            this->setState(permits);
-        }
-        virtual ~SemSync() {}
+            virtual ~SemSync()
+            {
+            }
 
-        virtual bool isFair() const = 0;
+            virtual bool isFair() const = 0;
 
-        int getPermits() {
-            return getState();
-        }
+            int getPermits()
+            {
+                return getState();
+            }
 
-        int nonfairTryAcquireShared(int acquires) {
-            for (;;) {
-                int available = getState();
-                int remaining = available - acquires;
-                if (remaining < 0 || compareAndSetState(available, remaining)) {
-                    return remaining;
+            int nonfairTryAcquireShared(int acquires)
+            {
+                for (;;)
+                {
+                    int available = getState();
+                    int remaining = available - acquires;
+                    if (remaining < 0 ||
+                        compareAndSetState(available, remaining))
+                    {
+                        return remaining;
+                    }
                 }
             }
-        }
 
-        void reducePermits(int reductions) {
-            for (;;) {
-                int current = getState();
-                int next = current - reductions;
-                if (compareAndSetState(current, next)) {
-                    return;
+            void reducePermits(int reductions)
+            {
+                for (;;)
+                {
+                    int current = getState();
+                    int next    = current - reductions;
+                    if (compareAndSetState(current, next))
+                    {
+                        return;
+                    }
                 }
             }
-        }
 
-        int drainPermits() {
-            for (;;) {
-                int current = getState();
-                if (current == 0 || compareAndSetState(current, 0)) {
-                    return current;
+            int drainPermits()
+            {
+                for (;;)
+                {
+                    int current = getState();
+                    if (current == 0 || compareAndSetState(current, 0))
+                    {
+                        return current;
+                    }
                 }
             }
-        }
 
-    protected:
-
-        virtual bool tryReleaseShared(int releases) {
-            for (;;) {
-                int p = getState();
-                if (compareAndSetState(p, p + releases)) {
-                    return true;
+        protected:
+            virtual bool tryReleaseShared(int releases)
+            {
+                for (;;)
+                {
+                    int p = getState();
+                    if (compareAndSetState(p, p + releases))
+                    {
+                        return true;
+                    }
                 }
             }
-        }
+        };
 
-    };
+        class NonFairSemSync : public SemSync
+        {
+        public:
+            NonFairSemSync(int permits)
+                : SemSync(permits)
+            {
+            }
 
-    class NonFairSemSync : public SemSync {
-    public:
+            virtual ~NonFairSemSync()
+            {
+            }
 
-        NonFairSemSync(int permits) : SemSync(permits) {}
-        virtual ~NonFairSemSync() {}
+            virtual bool isFair() const
+            {
+                return false;
+            }
 
-        virtual bool isFair() const {
-            return false;
-        }
+        protected:
+            virtual int tryAcquireShared(int acquires)
+            {
+                return nonfairTryAcquireShared(acquires);
+            }
+        };
 
-    protected:
+        class FairSemSync : public SemSync
+        {
+        public:
+            FairSemSync(int permits)
+                : SemSync(permits)
+            {
+            }
 
-        virtual int tryAcquireShared(int acquires) {
-            return nonfairTryAcquireShared(acquires);
-        }
-    };
+            virtual ~FairSemSync()
+            {
+            }
 
-    class FairSemSync : public SemSync {
-    public:
+            virtual bool isFair() const
+            {
+                return true;
+            }
 
-        FairSemSync(int permits) : SemSync(permits) {}
-        virtual ~FairSemSync() {}
+        protected:
+            virtual int tryAcquireShared(int acquires)
+            {
+                Thread* current = Thread::currentThread();
+                for (;;)
+                {
+                    Thread* first = this->getFirstQueuedThread();
 
-        virtual bool isFair() const {
-            return true;
-        }
+                    if (first != NULL && first != current)
+                    {
+                        return -1;
+                    }
 
-    protected:
-
-        virtual int tryAcquireShared(int acquires) {
-            Thread* current = Thread::currentThread();
-            for(;;) {
-                Thread* first = this->getFirstQueuedThread();
-
-                if (first != NULL && first != current) {
-                    return -1;
-                }
-
-                int available = getState();
-                int remaining = available - acquires;
-                if (remaining < 0 || compareAndSetState(available, remaining)) {
-                    return remaining;
+                    int available = getState();
+                    int remaining = available - acquires;
+                    if (remaining < 0 ||
+                        compareAndSetState(available, remaining))
+                    {
+                        return remaining;
+                    }
                 }
             }
-        }
-    };
+        };
 
-}}}
+    }  // namespace concurrent
+}  // namespace util
+}  // namespace decaf
 
 ////////////////////////////////////////////////////////////////////////////////
-Semaphore::Semaphore(int permits) : sync(new NonFairSemSync(permits)) {
+Semaphore::Semaphore(int permits)
+    : sync(new NonFairSemSync(permits))
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Semaphore::Semaphore(int permits, bool fair) : sync(NULL) {
-    fair == true ? sync = new FairSemSync(permits) : sync = new NonFairSemSync(permits);
+Semaphore::Semaphore(int permits, bool fair)
+    : sync(NULL)
+{
+    fair == true ? sync = new FairSemSync(permits)
+                 : sync = new NonFairSemSync(permits);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Semaphore::~Semaphore() {
-    try{
+Semaphore::~Semaphore()
+{
+    try
+    {
         delete sync;
     }
     DECAF_CATCHALL_NOTHROW()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Semaphore::acquire() {
+void Semaphore::acquire()
+{
     this->sync->acquireSharedInterruptibly(1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Semaphore::acquireUninterruptibly() {
+void Semaphore::acquireUninterruptibly()
+{
     this->sync->acquireShared(1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool Semaphore::tryAcquire() {
+bool Semaphore::tryAcquire()
+{
     return this->sync->nonfairTryAcquireShared(1) >= 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool Semaphore::tryAcquire(long long timeout, const TimeUnit& unit) {
+bool Semaphore::tryAcquire(long long timeout, const TimeUnit& unit)
+{
     return this->sync->tryAcquireSharedNanos(1, unit.toNanos(timeout));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Semaphore::release() {
+void Semaphore::release()
+{
     this->sync->releaseShared(1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Semaphore::acquire(int permits) {
-
-    if (permits < 0) {
-        throw new IllegalArgumentException(__FILE__, __LINE__,
+void Semaphore::acquire(int permits)
+{
+    if (permits < 0)
+    {
+        throw new IllegalArgumentException(
+            __FILE__,
+            __LINE__,
             "Value of acquired permits must be greater than zero.");
     }
 
@@ -192,10 +247,13 @@ void Semaphore::acquire(int permits) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Semaphore::acquireUninterruptibly( int permits DECAF_UNUSED ) {
-
-    if (permits < 0) {
-        throw new IllegalArgumentException(__FILE__, __LINE__,
+void Semaphore::acquireUninterruptibly(int permits DECAF_UNUSED)
+{
+    if (permits < 0)
+    {
+        throw new IllegalArgumentException(
+            __FILE__,
+            __LINE__,
             "Value of acquired permits must be greater than zero.");
     }
 
@@ -203,10 +261,13 @@ void Semaphore::acquireUninterruptibly( int permits DECAF_UNUSED ) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool Semaphore::tryAcquire(int permits) {
-
-    if (permits < 0) {
-        throw new IllegalArgumentException(__FILE__, __LINE__,
+bool Semaphore::tryAcquire(int permits)
+{
+    if (permits < 0)
+    {
+        throw new IllegalArgumentException(
+            __FILE__,
+            __LINE__,
             "Value of acquired permits must be greater than zero.");
     }
 
@@ -214,10 +275,13 @@ bool Semaphore::tryAcquire(int permits) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool Semaphore::tryAcquire(int permits, long long timeout, const TimeUnit& unit) {
-
-    if (permits < 0) {
-        throw new IllegalArgumentException(__FILE__, __LINE__,
+bool Semaphore::tryAcquire(int permits, long long timeout, const TimeUnit& unit)
+{
+    if (permits < 0)
+    {
+        throw new IllegalArgumentException(
+            __FILE__,
+            __LINE__,
             "Value of acquired permits must be greater than zero.");
     }
 
@@ -225,10 +289,13 @@ bool Semaphore::tryAcquire(int permits, long long timeout, const TimeUnit& unit)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Semaphore::release(int permits) {
-
-    if (permits < 0) {
-        throw new IllegalArgumentException(__FILE__, __LINE__,
+void Semaphore::release(int permits)
+{
+    if (permits < 0)
+    {
+        throw new IllegalArgumentException(
+            __FILE__,
+            __LINE__,
             "Value of acquired permits must be greater than zero.");
     }
 
@@ -236,41 +303,50 @@ void Semaphore::release(int permits) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int Semaphore::availablePermits() const {
+int Semaphore::availablePermits() const
+{
     return this->sync->getPermits();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int Semaphore::drainPermits() {
+int Semaphore::drainPermits()
+{
     return this->sync->drainPermits();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Semaphore::reducePermits(int reduceBy) {
+void Semaphore::reducePermits(int reduceBy)
+{
     return this->sync->reducePermits(reduceBy);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool Semaphore::isFair() const {
+bool Semaphore::isFair() const
+{
     return this->sync->isFair();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string Semaphore::toString() const {
-    return std::string("Semaphore[Permits = ") + Integer::toString(this->sync->getPermits()) + "]";
+std::string Semaphore::toString() const
+{
+    return std::string("Semaphore[Permits = ") +
+           Integer::toString(this->sync->getPermits()) + "]";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int Semaphore::getQueueLength() const {
+int Semaphore::getQueueLength() const
+{
     return this->sync->getQueueLength();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool Semaphore::hasQueuedThreads() const {
+bool Semaphore::hasQueuedThreads() const
+{
     return this->sync->hasQueuedThreads();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Collection<decaf::lang::Thread*>* Semaphore::getQueuedThreads() const {
+Collection<decaf::lang::Thread*>* Semaphore::getQueuedThreads() const
+{
     return this->sync->getQueuedThreads();
 }

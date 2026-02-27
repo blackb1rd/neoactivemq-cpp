@@ -22,30 +22,32 @@
 
 #include <string>
 
-namespace activemq {
-namespace library {
+namespace activemq
+{
+namespace library
+{
     class ActiveMQCPP;
-}
-namespace util {
+}  // namespace library
+
+namespace util
+{
 
     class IdGeneratorKernel;
 
-    class AMQCPP_API IdGenerator {
+    class AMQCPP_API IdGenerator
+    {
     private:
-
-        std::string prefix;
+        std::string         prefix;
         mutable std::string seed;
-        mutable long long sequence;
+        mutable long long   sequence;
 
         static IdGeneratorKernel* kernel;
 
     private:
-
         IdGenerator(const IdGenerator&);
         IdGenerator& operator=(const IdGenerator&);
 
     public:
-
         IdGenerator();
 
         IdGenerator(const std::string& prefix);
@@ -53,31 +55,31 @@ namespace util {
         virtual ~IdGenerator();
 
     public:
-
         /**
          * @return a newly generated unique id.
          */
         std::string generateId() const;
 
     public:
-
         /**
-         * Since the initialization of this object results in the retrieval of the
-         * machine's host name we can quickly return it here.
+         * Since the initialization of this object results in the retrieval of
+         * the machine's host name we can quickly return it here.
          *
          * @return the previously retrieved host name.
          */
         static std::string getHostname();
 
         /**
-         * Gets the seed value from a Generated Id, the count portion is removed.
+         * Gets the seed value from a Generated Id, the count portion is
+         * removed.
          *
          * @return the seed portion of the Id, minus the count value.
          */
         static std::string getSeedFromId(const std::string& id);
 
         /**
-         * Gets the count value from a Generated Id, the seed portion is removed.
+         * Gets the count value from a Generated Id, the seed portion is
+         * removed.
          *
          * @return the sequence count portion of the id, minus the seed value.
          */
@@ -96,13 +98,13 @@ namespace util {
         static int compare(const std::string& id1, const std::string& id2);
 
     private:
-
         static void initialize();
         static void shutdown();
 
         friend class activemq::library::ActiveMQCPP;
     };
 
-}}
+}  // namespace util
+}  // namespace activemq
 
 #endif /* _ATIVEMQ_UTIL_IDGENERATOR_H_ */

@@ -23,6 +23,6 @@ using namespace decaf::util;
 using namespace decaf::util::concurrent;
 
 ////////////////////////////////////////////////////////////////////////////////
-BrokenBarrierException::~BrokenBarrierException() throw() {
-
+BrokenBarrierException::~BrokenBarrierException() throw()
+{
 }

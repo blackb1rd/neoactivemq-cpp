@@ -17,8 +17,8 @@
 
 #include "ActiveMQDestinationEvent.h"
 
-#include <activemq/core/ActiveMQConstants.h>
 #include <activemq/commands/ActiveMQDestination.h>
+#include <activemq/core/ActiveMQConstants.h>
 
 #include <decaf/lang/exceptions/NullPointerException.h>
 
@@ -31,22 +31,30 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQDestinationEvent::ActiveMQDestinationEvent(Pointer<DestinationInfo> destination) :
-    DestinationEvent(), destination(destination) {
-
-    if (destination == NULL) {
-        throw NullPointerException(__FILE__, __LINE__, "Events cannot have null destinations");
+ActiveMQDestinationEvent::ActiveMQDestinationEvent(
+    Pointer<DestinationInfo> destination)
+    : DestinationEvent(),
+      destination(destination)
+{
+    if (destination == NULL)
+    {
+        throw NullPointerException(__FILE__,
+                                   __LINE__,
+                                   "Events cannot have null destinations");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQDestinationEvent::~ActiveMQDestinationEvent() {
+ActiveMQDestinationEvent::~ActiveMQDestinationEvent()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const cms::Destination* ActiveMQDestinationEvent::getDestination() const {
+const cms::Destination* ActiveMQDestinationEvent::getDestination() const
+{
     Pointer<ActiveMQDestination> dest = this->destination->getDestination();
-    if (dest != NULL) {
+    if (dest != NULL)
+    {
         return dest->getCMSDestination();
     }
 
@@ -54,11 +62,15 @@ const cms::Destination* ActiveMQDestinationEvent::getDestination() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool ActiveMQDestinationEvent::isAddOperation() const {
-    return this->destination->getOperationType() == ActiveMQConstants::DESTINATION_ADD_OPERATION;
+bool ActiveMQDestinationEvent::isAddOperation() const
+{
+    return this->destination->getOperationType() ==
+           ActiveMQConstants::DESTINATION_ADD_OPERATION;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool ActiveMQDestinationEvent::isRemoveOperation() const {
-    return this->destination->getOperationType() == ActiveMQConstants::DESTINATION_REMOVE_OPERATION;
+bool ActiveMQDestinationEvent::isRemoveOperation() const
+{
+    return this->destination->getOperationType() ==
+           ActiveMQConstants::DESTINATION_REMOVE_OPERATION;
 }

@@ -18,16 +18,18 @@
 #ifndef _ACTIVEMQ_TRANSPORT_ABSTRACTTRANSPORTFACTORY_H_
 #define _ACTIVEMQ_TRANSPORT_ABSTRACTTRANSPORTFACTORY_H_
 
-#include <activemq/util/Config.h>
 #include <activemq/transport/Transport.h>
 #include <activemq/transport/TransportFactory.h>
+#include <activemq/util/Config.h>
 #include <activemq/wireformat/WireFormat.h>
-#include <decaf/util/NoSuchElementException.h>
 #include <decaf/lang/Pointer.h>
+#include <decaf/util/NoSuchElementException.h>
 #include <decaf/util/Properties.h>
 
-namespace activemq {
-namespace transport {
+namespace activemq
+{
+namespace transport
+{
 
     using decaf::lang::Pointer;
 
@@ -38,29 +40,29 @@ namespace transport {
      *
      * @since 3.0
      */
-    class AMQCPP_API AbstractTransportFactory : public TransportFactory {
+    class AMQCPP_API AbstractTransportFactory : public TransportFactory
+    {
     public:
-
         virtual ~AbstractTransportFactory();
 
     protected:
-
         /**
-         * Creates the WireFormat that is configured for this Transport and returns it.
-         * The default WireFormat is Openwire.
+         * Creates the WireFormat that is configured for this Transport and
+         * returns it. The default WireFormat is Openwire.
          *
          * @param properties
          *        The properties that were configured on the URI.
          *
          * @return a pointer to a WireFormat instance that the caller then owns.
          *
-         * @throws NoSuchElementException if the configured WireFormat is not found.
+         * @throws NoSuchElementException if the configured WireFormat is not
+         * found.
          */
         virtual Pointer<wireformat::WireFormat> createWireFormat(
             const decaf::util::Properties& properties);
-
     };
 
-}}
+}  // namespace transport
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_TRANSPORT_ABSTRACTTRANSPORTFACTORY_H_ */

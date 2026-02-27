@@ -18,141 +18,154 @@
 #ifndef _ACTIVEMQ_TRANSPORT_FAILOVER_BACKUPTRANSPORTPOOL_H_
 #define _ACTIVEMQ_TRANSPORT_FAILOVER_BACKUPTRANSPORTPOOL_H_
 
-#include <activemq/util/Config.h>
 #include <activemq/threads/CompositeTask.h>
 #include <activemq/threads/CompositeTaskRunner.h>
-#include <activemq/transport/failover/CloseTransportsTask.h>
 #include <activemq/transport/failover/BackupTransport.h>
+#include <activemq/transport/failover/CloseTransportsTask.h>
 #include <activemq/transport/failover/URIPool.h>
+#include <activemq/util/Config.h>
 
-#include <decaf/lang/Pointer.h>
 #include <decaf/io/IOException.h>
+#include <decaf/lang/Pointer.h>
 #include <decaf/util/LinkedList.h>
 
-namespace activemq {
-namespace transport {
-namespace failover {
+namespace activemq
+{
+namespace transport
+{
+    namespace failover
+    {
 
-    using decaf::lang::Pointer;
-    using decaf::util::LinkedList;
-    using activemq::threads::CompositeTaskRunner;
+        using activemq::threads::CompositeTaskRunner;
+        using decaf::lang::Pointer;
+        using decaf::util::LinkedList;
 
-    class BackupTransportPoolImpl;
-    class FailoverTransport;
+        class BackupTransportPoolImpl;
+        class FailoverTransport;
 
-    class AMQCPP_API BackupTransportPool : public activemq::threads::CompositeTask {
-    private:
+        class AMQCPP_API BackupTransportPool
+            : public activemq::threads::CompositeTask
+        {
+        private:
+            friend class BackupTransport;
 
-        friend class BackupTransport;
+            BackupTransportPoolImpl* impl;
 
-        BackupTransportPoolImpl* impl;
+            FailoverTransport*           parent;
+            Pointer<CompositeTaskRunner> taskRunner;
+            Pointer<CloseTransportsTask> closeTask;
+            Pointer<URIPool>             uriPool;
+            Pointer<URIPool>             updates;
+            Pointer<URIPool>             priorityUriPool;
+            volatile int                 backupPoolSize;
+            volatile bool                enabled;
+            volatile int                 maxReconnectDelay;
 
-        FailoverTransport* parent;
-        Pointer<CompositeTaskRunner> taskRunner;
-        Pointer<CloseTransportsTask> closeTask;
-        Pointer<URIPool> uriPool;
-        Pointer<URIPool> updates;
-        Pointer<URIPool> priorityUriPool;
-        volatile int backupPoolSize;
-        volatile bool enabled;
-        volatile int maxReconnectDelay;
+        public:
+            BackupTransportPool(FailoverTransport*                 parent,
+                                const Pointer<CompositeTaskRunner> taskRunner,
+                                const Pointer<CloseTransportsTask> closeTask,
+                                const Pointer<URIPool>             uriPool,
+                                const Pointer<URIPool>             updates,
+                                const Pointer<URIPool> priorityUriPool);
 
-    public:
+            BackupTransportPool(FailoverTransport* parent,
+                                int                backupPoolSize,
+                                const Pointer<CompositeTaskRunner> taskRunner,
+                                const Pointer<CloseTransportsTask> closeTask,
+                                const Pointer<URIPool>             uriPool,
+                                const Pointer<URIPool>             updates,
+                                const Pointer<URIPool> priorityUriPool);
 
-        BackupTransportPool(FailoverTransport* parent,
-                            const Pointer<CompositeTaskRunner> taskRunner,
-                            const Pointer<CloseTransportsTask> closeTask,
-                            const Pointer<URIPool> uriPool,
-                            const Pointer<URIPool> updates,
-                            const Pointer<URIPool> priorityUriPool);
+            virtual ~BackupTransportPool();
 
-        BackupTransportPool(FailoverTransport* parent,
-                            int backupPoolSize,
-                            const Pointer<CompositeTaskRunner> taskRunner,
-                            const Pointer<CloseTransportsTask> closeTask,
-                            const Pointer<URIPool> uriPool,
-                            const Pointer<URIPool> updates,
-                            const Pointer<URIPool> priorityUriPool);
+            /**
+             * Closes down the pool and destroys any Backups contained in the
+             * pool.
+             */
+            void close();
 
-        virtual ~BackupTransportPool();
+            /**
+             * Return true if we don't currently have enough Connected
+             * Transports
+             */
+            virtual bool isPending() const;
 
-        /**
-         * Closes down the pool and destroys any Backups contained in the pool.
-         */
-        void close();
+            /**
+             * Get a Connected Transport from the pool of Backups if any are
+             * present, otherwise it return a NULL Pointer.
+             *
+             * @return Pointer to a Connected Transport or NULL
+             */
+            Pointer<BackupTransport> getBackup();
 
-        /**
-         * Return true if we don't currently have enough Connected Transports
-         */
-        virtual bool isPending() const;
+            /**
+             * Connect to a Backup Broker if we haven't already connected to the
+             * max number of Backups.
+             */
+            virtual bool iterate();
 
-        /**
-         * Get a Connected Transport from the pool of Backups if any are present,
-         * otherwise it return a NULL Pointer.
-         *
-         * @return Pointer to a Connected Transport or NULL
-         */
-        Pointer<BackupTransport> getBackup();
+            /**
+             * Gets the Max number of Backups this Task will create.
+             * @return the max number of active BackupTransports that will be
+             * created.
+             */
+            int getBackupPoolSize() const
+            {
+                return this->backupPoolSize;
+            }
 
-        /**
-         * Connect to a Backup Broker if we haven't already connected to the max
-         * number of Backups.
-         */
-        virtual bool iterate();
+            /**
+             * Sets the Max number of Backups this Task will create.
+             * @param size - the max number of active BackupTransports that will
+             * be created.
+             */
+            void setBackupPoolSize(int size)
+            {
+                this->backupPoolSize = size;
+            }
 
-        /**
-         * Gets the Max number of Backups this Task will create.
-         * @return the max number of active BackupTransports that will be created.
-         */
-        int getBackupPoolSize() const {
-            return this->backupPoolSize;
-        }
+            /**
+             * Gets if the backup Transport Pool has been enabled or not, when
+             * not enabled no backups are created and any that were are
+             * destroyed.
+             *
+             * @return true if enable.
+             */
+            bool isEnabled() const
+            {
+                return this->enabled;
+            }
 
-        /**
-         * Sets the Max number of Backups this Task will create.
-         * @param size - the max number of active BackupTransports that will be created.
-         */
-        void setBackupPoolSize(int size) {
-            this->backupPoolSize = size;
-        }
+            /**
+             * Sets if this Backup Transport Pool is enabled.  When not enabled
+             * no Backups are created and any that were are destroyed.
+             *
+             * @param value - true to enable backup creation, false to disable.
+             */
+            void setEnabled(bool value);
 
-        /**
-         * Gets if the backup Transport Pool has been enabled or not, when not enabled
-         * no backups are created and any that were are destroyed.
-         *
-         * @return true if enable.
-         */
-        bool isEnabled() const {
-            return this->enabled;
-        }
+            /**
+             * Returns true if there is a Backup in the pool that's on the
+             * priority backups list.
+             *
+             * @return true if there is a priority backup available.
+             */
+            bool isPriorityBackupAvailable() const;
 
-        /**
-         * Sets if this Backup Transport Pool is enabled.  When not enabled no Backups
-         * are created and any that were are destroyed.
-         *
-         * @param value - true to enable backup creation, false to disable.
-         */
-        void setEnabled(bool value);
+        private:
+            // The backups report their failure to the pool, the pool removes
+            // them from the list and returns their URIs to the URIPool, and
+            // then adds the internal transport to the close transport's task
+            // for cleanup.
+            void onBackupTransportFailure(BackupTransport* failedTransport);
 
-        /**
-         * Returns true if there is a Backup in the pool that's on the priority
-         * backups list.
-         *
-         * @return true if there is a priority backup available.
-         */
-        bool isPriorityBackupAvailable() const;
+            Pointer<Transport> createTransport(
+                const decaf::net::URI& location) const;
+        };
 
-    private:
-
-        // The backups report their failure to the pool, the pool removes them
-        // from the list and returns their URIs to the URIPool, and then adds
-        // the internal transport to the close transport's task for cleanup.
-        void onBackupTransportFailure(BackupTransport* failedTransport);
-
-        Pointer<Transport> createTransport(const decaf::net::URI& location) const;
-
-    };
-
-}}}
+    }  // namespace failover
+}  // namespace transport
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_TRANSPORT_FAILOVER_BACKUPTRANSPORTPOOL_H_*/

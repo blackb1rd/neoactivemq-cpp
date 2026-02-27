@@ -18,18 +18,20 @@
 #ifndef _DECAF_SECURITY_SIGNATUREEXCEPTION_H_
 #define _DECAF_SECURITY_SIGNATUREEXCEPTION_H_
 
-#include <decaf/util/Config.h>
 #include <decaf/security/GeneralSecurityException.h>
+#include <decaf/util/Config.h>
 
-namespace decaf {
-namespace security {
+namespace decaf
+{
+namespace security
+{
 
     /*
      * Generic signature exception.
      */
-    class DECAF_API SignatureException: public GeneralSecurityException {
+    class DECAF_API SignatureException : public GeneralSecurityException
+    {
     public:
-
         /**
          * Default Constructor
          */
@@ -67,7 +69,11 @@ namespace security {
          * @param ...
          *      list of primitives that are formatted into the message
          */
-        SignatureException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...);
+        SignatureException(const char*           file,
+                           const int             lineNumber,
+                           const std::exception* cause,
+                           const char*           msg,
+                           ...);
 
         /**
          * Convenience Constructor
@@ -92,23 +98,27 @@ namespace security {
          * @param ...
          *      list of primitives that are formatted into the message
          */
-        SignatureException(const char* file, const int lineNumber, const char* msg, ...);
+        SignatureException(const char* file,
+                           const int   lineNumber,
+                           const char* msg,
+                           ...);
 
         /**
          * Clones this exception.  This is useful for cases where you need
-         * to preserve the type of the original exception as well as the message.
-         * All subclasses should override.
+         * to preserve the type of the original exception as well as the
+         * message. All subclasses should override.
          *
          * @return A deep copy of this exception.
          */
-        virtual SignatureException* clone() const {
+        virtual SignatureException* clone() const
+        {
             return new SignatureException(*this);
         }
 
         virtual ~SignatureException() throw();
-
     };
 
-}}
+}  // namespace security
+}  // namespace decaf
 
 #endif /*_DECAF_SECURITY_SIGNATUREEXCEPTION_H_*/

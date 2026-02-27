@@ -20,19 +20,21 @@
 
 #include <activemq/test/CMSTestFixture.h>
 
-namespace activemq {
-namespace test {
+namespace activemq
+{
+namespace test
+{
 
-    class AdvisoryTest : public CMSTestFixture {
+    class AdvisoryTest : public CMSTestFixture
+    {
     public:
-
         AdvisoryTest();
         virtual ~AdvisoryTest();
 
         void testTempDestinationCompositeAdvisoryTopic();
-
     };
 
-}}
+}  // namespace test
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_TEST_ADVISORYTEST_H_*/

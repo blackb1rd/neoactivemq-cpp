@@ -22,37 +22,41 @@
 
 #include <decaf/security/SecureRandomSpi.h>
 
-namespace decaf {
-namespace internal {
-namespace security {
+namespace decaf
+{
+namespace internal
+{
+    namespace security
+    {
 
-    /**
-     * Secure Random Number Generator for Windows based platforms that uses
-     * BCryptGenRandom to obtain cryptographically secure random bytes from the
-     * OS-preferred algorithm provider.
-     *
-     * @since 1.0
-     */
-    class DECAF_API SecureRandomImpl : public decaf::security::SecureRandomSpi {
-    private:
+        /**
+         * Secure Random Number Generator for Windows based platforms that uses
+         * BCryptGenRandom to obtain cryptographically secure random bytes from
+         * the OS-preferred algorithm provider.
+         *
+         * @since 1.0
+         */
+        class DECAF_API SecureRandomImpl
+            : public decaf::security::SecureRandomSpi
+        {
+        private:
+            SecureRandomImpl(const SecureRandomImpl&);
+            SecureRandomImpl& operator=(const SecureRandomImpl&);
 
-        SecureRandomImpl( const SecureRandomImpl& );
-        SecureRandomImpl& operator= ( const SecureRandomImpl& );
+        public:
+            SecureRandomImpl();
 
-    public:
+            virtual ~SecureRandomImpl();
 
-        SecureRandomImpl();
+            virtual void providerSetSeed(const unsigned char* seed, int size);
 
-        virtual ~SecureRandomImpl();
+            virtual void providerNextBytes(unsigned char* bytes, int numBytes);
 
-        virtual void providerSetSeed( const unsigned char* seed, int size );
+            virtual unsigned char* providerGenerateSeed(int numBytes);
+        };
 
-        virtual void providerNextBytes( unsigned char* bytes, int numBytes );
-
-        virtual unsigned char* providerGenerateSeed( int numBytes );
-
-    };
-
-}}}
+    }  // namespace security
+}  // namespace internal
+}  // namespace decaf
 
 #endif /* _DECAF_INTERNAL_SECURITY_SECURERANDOMIMPL_H_ */

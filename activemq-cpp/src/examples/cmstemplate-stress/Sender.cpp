@@ -30,10 +30,16 @@ using namespace activemq::cmsutil;
 using namespace cmstemplate;
 
 ////////////////////////////////////////////////////////////////////////////////
-Sender::Sender(const string& url, const string& queueOrTopicName, bool isTopic, bool isDeliveryPersistent, int timeToLive) :
-    cmsTemplateMutex(), cmsTemplate(NULL) {
-
-    ConnectionFactory* connectionFactory = ConnectionFactoryMgr::getConnectionFactory(url);
+Sender::Sender(const string& url,
+               const string& queueOrTopicName,
+               bool          isTopic,
+               bool          isDeliveryPersistent,
+               int           timeToLive)
+    : cmsTemplateMutex(),
+      cmsTemplate(NULL)
+{
+    ConnectionFactory* connectionFactory =
+        ConnectionFactoryMgr::getConnectionFactory(url);
 
     cmsTemplate.reset(new CmsTemplate(connectionFactory));
     cmsTemplate->setExplicitQosEnabled(true);
@@ -44,28 +50,35 @@ Sender::Sender(const string& url, const string& queueOrTopicName, bool isTopic, 
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Sender::~Sender() {
-    try {
+Sender::~Sender()
+{
+    try
+    {
         cmsTemplateMutex.lock();
         cmsTemplate.reset(NULL);
         cmsTemplateMutex.unlock();
-    } catch (...) {
+    }
+    catch (...)
+    {
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Sender::SendMessage(string& message, ErrorCode& errorCode) {
-
+void Sender::SendMessage(string& message, ErrorCode& errorCode)
+{
     // create a MessageCreator
     CmsMessageCreator messageCreator(message);
 
     // send message through a CmsTemplate
-    try {
+    try
+    {
         cmsTemplateMutex.lock();
         cmsTemplate->send(&messageCreator);
         cmsTemplateMutex.unlock();
         errorCode = CMS_SUCCESS;
-    } catch (cms::CMSException& ex) {
+    }
+    catch (cms::CMSException& ex)
+    {
         cmsTemplateMutex.unlock();
         errorCode = CMS_ERROR_CAUGHT_CMS_EXCEPTION;
     }

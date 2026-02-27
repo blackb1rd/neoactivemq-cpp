@@ -17,14 +17,14 @@
 
 #include "StompHelper.h"
 
-#include <activemq/wireformat/stomp/StompWireFormat.h>
-#include <activemq/wireformat/stomp/StompCommandConstants.h>
 #include <activemq/commands/LocalTransactionId.h>
+#include <activemq/wireformat/stomp/StompCommandConstants.h>
+#include <activemq/wireformat/stomp/StompWireFormat.h>
 
-#include <decaf/util/StringTokenizer.h>
-#include <decaf/lang/Integer.h>
 #include <decaf/lang/Boolean.h>
+#include <decaf/lang/Integer.h>
 #include <decaf/lang/Long.h>
+#include <decaf/util/StringTokenizer.h>
 
 using namespace std;
 using namespace activemq;
@@ -36,177 +36,241 @@ using namespace decaf::lang;
 using namespace decaf::util;
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    std::string doConvertDestination(StompWireFormat* wireFormat, Pointer<ActiveMQDestination> destination) {
-        switch (destination->getDestinationType()) {
-
+std::string doConvertDestination(StompWireFormat*             wireFormat,
+                                 Pointer<ActiveMQDestination> destination)
+{
+    switch (destination->getDestinationType())
+    {
         case cms::Destination::TOPIC:
-            return std::string(wireFormat->getTopicPrefix()) + destination->getPhysicalName();
+            return std::string(wireFormat->getTopicPrefix()) +
+                   destination->getPhysicalName();
         case cms::Destination::TEMPORARY_TOPIC:
 
-            if (destination->getPhysicalName().find("/remote-temp-topic/") == 0) {
+            if (destination->getPhysicalName().find("/remote-temp-topic/") == 0)
+            {
                 return destination->getPhysicalName();
-            } else {
-                return std::string(wireFormat->getTempTopicPrefix()) + destination->getPhysicalName();
+            }
+            else
+            {
+                return std::string(wireFormat->getTempTopicPrefix()) +
+                       destination->getPhysicalName();
             }
 
         case cms::Destination::TEMPORARY_QUEUE:
 
-            if (destination->getPhysicalName().find("/remote-temp-queue/") == 0) {
+            if (destination->getPhysicalName().find("/remote-temp-queue/") == 0)
+            {
                 return destination->getPhysicalName();
-            } else {
-                return std::string(wireFormat->getTempQueuePrefix()) + destination->getPhysicalName();
+            }
+            else
+            {
+                return std::string(wireFormat->getTempQueuePrefix()) +
+                       destination->getPhysicalName();
             }
 
         default:
-            return std::string(wireFormat->getQueuePrefix()) + destination->getPhysicalName();
-        }
+            return std::string(wireFormat->getQueuePrefix()) +
+                   destination->getPhysicalName();
     }
 }
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-StompHelper::StompHelper(StompWireFormat* wireformat) : messageIdGenerator(), wireFormat(wireformat) {
+StompHelper::StompHelper(StompWireFormat* wireformat)
+    : messageIdGenerator(),
+      wireFormat(wireformat)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-StompHelper::~StompHelper() {
+StompHelper::~StompHelper()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StompHelper::convertProperties(const Pointer<StompFrame>& frame, const Pointer<Message>& message) {
-
-    const std::string destination = frame->removeProperty(StompCommandConstants::HEADER_DESTINATION);
+void StompHelper::convertProperties(const Pointer<StompFrame>& frame,
+                                    const Pointer<Message>&    message)
+{
+    const std::string destination =
+        frame->removeProperty(StompCommandConstants::HEADER_DESTINATION);
     message->setDestination(convertDestination(destination));
 
-    const std::string messageId = frame->removeProperty(StompCommandConstants::HEADER_MESSAGEID);
+    const std::string messageId =
+        frame->removeProperty(StompCommandConstants::HEADER_MESSAGEID);
     message->setMessageId(convertMessageId(messageId));
 
     // the standard JMS headers
-    if (frame->hasProperty(StompCommandConstants::HEADER_CORRELATIONID)) {
+    if (frame->hasProperty(StompCommandConstants::HEADER_CORRELATIONID))
+    {
         message->setCorrelationId(
             frame->removeProperty(StompCommandConstants::HEADER_CORRELATIONID));
     }
 
-    if (frame->hasProperty(StompCommandConstants::HEADER_EXPIRES)) {
+    if (frame->hasProperty(StompCommandConstants::HEADER_EXPIRES))
+    {
         message->setExpiration(Long::parseLong(
             frame->removeProperty(StompCommandConstants::HEADER_EXPIRES)));
     }
 
-    if (frame->hasProperty(StompCommandConstants::HEADER_JMSPRIORITY)) {
-        message->setPriority((unsigned char) Integer::parseInt(
+    if (frame->hasProperty(StompCommandConstants::HEADER_JMSPRIORITY))
+    {
+        message->setPriority((unsigned char)Integer::parseInt(
             frame->removeProperty(StompCommandConstants::HEADER_JMSPRIORITY)));
     }
 
-    if (frame->hasProperty(StompCommandConstants::HEADER_TYPE)) {
+    if (frame->hasProperty(StompCommandConstants::HEADER_TYPE))
+    {
         message->setType(
             frame->removeProperty(StompCommandConstants::HEADER_TYPE));
     }
 
-    if (frame->hasProperty(StompCommandConstants::HEADER_REPLYTO)) {
+    if (frame->hasProperty(StompCommandConstants::HEADER_REPLYTO))
+    {
         message->setReplyTo(convertDestination(
             frame->removeProperty(StompCommandConstants::HEADER_REPLYTO)));
     }
 
-    if (frame->hasProperty(StompCommandConstants::HEADER_PERSISTENT)) {
+    if (frame->hasProperty(StompCommandConstants::HEADER_PERSISTENT))
+    {
         message->setPersistent(Boolean::parseBoolean(
             frame->removeProperty(StompCommandConstants::HEADER_PERSISTENT)));
     }
 
-    if (frame->hasProperty(StompCommandConstants::HEADER_TRANSACTIONID)) {
-        std::string transactionId = frame->removeProperty(StompCommandConstants::HEADER_TRANSACTIONID);
+    if (frame->hasProperty(StompCommandConstants::HEADER_TRANSACTIONID))
+    {
+        std::string transactionId =
+            frame->removeProperty(StompCommandConstants::HEADER_TRANSACTIONID);
         message->setTransactionId(convertTransactionId(transactionId));
     }
 
     // Handle JMSX Properties.
-    if (frame->hasProperty("JMSXDeliveryCount")) {
-        message->setRedeliveryCounter(Integer::parseInt(frame->removeProperty("JMSXDeliveryCount")));
+    if (frame->hasProperty("JMSXDeliveryCount"))
+    {
+        message->setRedeliveryCounter(
+            Integer::parseInt(frame->removeProperty("JMSXDeliveryCount")));
     }
-    if (frame->hasProperty("JMSXGroupID")) {
+    if (frame->hasProperty("JMSXGroupID"))
+    {
         message->setGroupID(frame->removeProperty("JMSXGroupID"));
     }
-    if (frame->hasProperty("JMSXGroupSeq")) {
-        message->setGroupSequence(Integer::parseInt(frame->removeProperty("JMSXGroupSeq")));
+    if (frame->hasProperty("JMSXGroupSeq"))
+    {
+        message->setGroupSequence(
+            Integer::parseInt(frame->removeProperty("JMSXGroupSeq")));
     }
 
     // Copy the general headers over to the Message.
-    std::vector<std::pair<std::string, std::string> > properties = frame->getProperties().toArray();
-    std::vector<std::pair<std::string, std::string> >::const_iterator iter = properties.begin();
+    std::vector<std::pair<std::string, std::string>> properties =
+        frame->getProperties().toArray();
+    std::vector<std::pair<std::string, std::string>>::const_iterator iter =
+        properties.begin();
 
-    for (; iter != properties.end(); ++iter) {
+    for (; iter != properties.end(); ++iter)
+    {
         message->getMessageProperties().setString(iter->first, iter->second);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StompHelper::convertProperties(const Pointer<Message>& message, const Pointer<StompFrame>& frame) {
+void StompHelper::convertProperties(const Pointer<Message>&    message,
+                                    const Pointer<StompFrame>& frame)
+{
+    frame->setProperty(StompCommandConstants::HEADER_DESTINATION,
+                       convertDestination(message->getDestination()));
 
-    frame->setProperty(StompCommandConstants::HEADER_DESTINATION, convertDestination(message->getDestination()));
-
-    if (message->getCorrelationId() != "") {
-        frame->setProperty(StompCommandConstants::HEADER_CORRELATIONID, message->getCorrelationId());
+    if (message->getCorrelationId() != "")
+    {
+        frame->setProperty(StompCommandConstants::HEADER_CORRELATIONID,
+                           message->getCorrelationId());
     }
 
-    frame->setProperty(StompCommandConstants::HEADER_EXPIRES, Long::toString(message->getExpiration()));
+    frame->setProperty(StompCommandConstants::HEADER_EXPIRES,
+                       Long::toString(message->getExpiration()));
 
-    frame->setProperty(StompCommandConstants::HEADER_PERSISTENT, Boolean::toString(message->isPersistent()));
+    frame->setProperty(StompCommandConstants::HEADER_PERSISTENT,
+                       Boolean::toString(message->isPersistent()));
 
-    if (message->getRedeliveryCounter() != 0) {
+    if (message->getRedeliveryCounter() != 0)
+    {
         frame->setProperty(StompCommandConstants::HEADER_REDELIVERED, "true");
     }
 
-    frame->setProperty(StompCommandConstants::HEADER_JMSPRIORITY, Integer::toString(message->getPriority()));
+    frame->setProperty(StompCommandConstants::HEADER_JMSPRIORITY,
+                       Integer::toString(message->getPriority()));
 
-    if (message->getReplyTo() != NULL) {
-        frame->setProperty(StompCommandConstants::HEADER_REPLYTO, convertDestination(message->getReplyTo()));
+    if (message->getReplyTo() != NULL)
+    {
+        frame->setProperty(StompCommandConstants::HEADER_REPLYTO,
+                           convertDestination(message->getReplyTo()));
     }
 
-    frame->setProperty(StompCommandConstants::HEADER_TIMESTAMP, Long::toString(message->getTimestamp()));
+    frame->setProperty(StompCommandConstants::HEADER_TIMESTAMP,
+                       Long::toString(message->getTimestamp()));
 
-    if (message->getType() != "") {
-        frame->setProperty(StompCommandConstants::HEADER_TYPE, message->getType());
+    if (message->getType() != "")
+    {
+        frame->setProperty(StompCommandConstants::HEADER_TYPE,
+                           message->getType());
     }
 
-    if (message->getTransactionId() != NULL) {
-        frame->setProperty(StompCommandConstants::HEADER_TRANSACTIONID, convertTransactionId(message->getTransactionId()));
+    if (message->getTransactionId() != NULL)
+    {
+        frame->setProperty(StompCommandConstants::HEADER_TRANSACTIONID,
+                           convertTransactionId(message->getTransactionId()));
     }
 
     // Handle JMSX Properties.
-    frame->setProperty("JMSXDeliveryCount", Integer::toString(message->getRedeliveryCounter()));
-    frame->setProperty("JMSXGroupSeq", Integer::toString(message->getGroupSequence()));
+    frame->setProperty("JMSXDeliveryCount",
+                       Integer::toString(message->getRedeliveryCounter()));
+    frame->setProperty("JMSXGroupSeq",
+                       Integer::toString(message->getGroupSequence()));
 
-    if (message->getGroupID() != "") {
+    if (message->getGroupID() != "")
+    {
         frame->setProperty("JMSXGroupID", message->getGroupID());
     }
 
-    Pointer<Iterator<std::string> > keys(message->getMessageProperties().keySet().iterator());
-    while (keys->hasNext()) {
+    Pointer<Iterator<std::string>> keys(
+        message->getMessageProperties().keySet().iterator());
+    while (keys->hasNext())
+    {
         std::string key = keys->next();
         frame->setProperty(key, message->getMessageProperties().getString(key));
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string StompHelper::convertDestination(const Pointer<ActiveMQDestination>& destination) {
-
+std::string StompHelper::convertDestination(
+    const Pointer<ActiveMQDestination>& destination)
+{
     std::string result = "";
 
-    if (destination != NULL) {
+    if (destination != NULL)
+    {
+        if (destination->isComposite())
+        {
+            ArrayList<Pointer<ActiveMQDestination>> destinations =
+                destination->getCompositeDestinations();
 
-        if (destination->isComposite()) {
-            ArrayList< Pointer<ActiveMQDestination> > destinations = destination->getCompositeDestinations();
-
-            Pointer<Iterator< Pointer<ActiveMQDestination> > > destIter(destinations.iterator());
-            while (destIter->hasNext()) {
+            Pointer<Iterator<Pointer<ActiveMQDestination>>> destIter(
+                destinations.iterator());
+            while (destIter->hasNext())
+            {
                 Pointer<ActiveMQDestination> composite = destIter->next();
 
-                if (!result.empty()) {
+                if (!result.empty())
+                {
                     result.append(",");
                 }
 
                 result += doConvertDestination(wireFormat, composite);
             }
-        } else {
+        }
+        else
+        {
             result += doConvertDestination(wireFormat, destination);
         }
     }
@@ -215,30 +279,43 @@ std::string StompHelper::convertDestination(const Pointer<ActiveMQDestination>& 
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<ActiveMQDestination> StompHelper::convertDestination(const std::string& destination) {
-
-    if (destination == "") {
+Pointer<ActiveMQDestination> StompHelper::convertDestination(
+    const std::string& destination)
+{
+    if (destination == "")
+    {
         return Pointer<ActiveMQDestination>();
     }
 
-    int type = 0;
+    int         type = 0;
     std::string dest = "";
 
-    if (destination.find(wireFormat->getQueuePrefix()) == 0) {
+    if (destination.find(wireFormat->getQueuePrefix()) == 0)
+    {
         dest = destination.substr(wireFormat->getQueuePrefix().length());
         type = cms::Destination::QUEUE;
-    } else if (destination.find(wireFormat->getTopicPrefix()) == 0) {
+    }
+    else if (destination.find(wireFormat->getTopicPrefix()) == 0)
+    {
         dest = destination.substr(wireFormat->getTopicPrefix().length());
         type = cms::Destination::TOPIC;
-    } else if (destination.find(wireFormat->getTempTopicPrefix()) == 0) {
+    }
+    else if (destination.find(wireFormat->getTempTopicPrefix()) == 0)
+    {
         dest = destination.substr(wireFormat->getTempTopicPrefix().length());
         type = cms::Destination::TEMPORARY_TOPIC;
-    } else if (destination.find(wireFormat->getTempQueuePrefix()) == 0) {
+    }
+    else if (destination.find(wireFormat->getTempQueuePrefix()) == 0)
+    {
         dest = destination.substr(wireFormat->getTempQueuePrefix().length());
         type = cms::Destination::TEMPORARY_QUEUE;
-    } else if (destination.find("/remote-temp-topic/") == 0) {
+    }
+    else if (destination.find("/remote-temp-topic/") == 0)
+    {
         type = cms::Destination::TEMPORARY_TOPIC;
-    } else if (destination.find("/remote-temp-queue/") == 0) {
+    }
+    else if (destination.find("/remote-temp-queue/") == 0)
+    {
         type = cms::Destination::TEMPORARY_QUEUE;
     }
 
@@ -246,8 +323,8 @@ Pointer<ActiveMQDestination> StompHelper::convertDestination(const std::string& 
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string StompHelper::convertMessageId(const Pointer<MessageId>& messageId) {
-
+std::string StompHelper::convertMessageId(const Pointer<MessageId>& messageId)
+{
     // The Stomp MessageId is always hidden solely in the Producer Id.
     std::string result = convertProducerId(messageId->getProducerId());
 
@@ -255,9 +332,10 @@ std::string StompHelper::convertMessageId(const Pointer<MessageId>& messageId) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<MessageId> StompHelper::convertMessageId(const std::string& messageId) {
-
-    if (messageId == "") {
+Pointer<MessageId> StompHelper::convertMessageId(const std::string& messageId)
+{
+    if (messageId == "")
+    {
         return Pointer<MessageId>();
     }
 
@@ -270,15 +348,18 @@ Pointer<MessageId> StompHelper::convertMessageId(const std::string& messageId) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string StompHelper::convertConsumerId(const Pointer<ConsumerId>& consumerId) {
-
-    return consumerId->getConnectionId() + ":" + Long::toString(consumerId->getSessionId()) + ":" + Long::toString(consumerId->getValue());
+std::string StompHelper::convertConsumerId(const Pointer<ConsumerId>& consumerId)
+{
+    return consumerId->getConnectionId() + ":" +
+           Long::toString(consumerId->getSessionId()) + ":" +
+           Long::toString(consumerId->getValue());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<ConsumerId> StompHelper::convertConsumerId(const std::string& consumerId) {
-
-    if (consumerId == "") {
+Pointer<ConsumerId> StompHelper::convertConsumerId(const std::string& consumerId)
+{
+    if (consumerId == "")
+    {
         return Pointer<ConsumerId>();
     }
 
@@ -296,12 +377,16 @@ Pointer<ConsumerId> StompHelper::convertConsumerId(const std::string& consumerId
 
     id->setConnectionId(connectionId);
 
-    while (tokenizer.hasMoreTokens()) {
+    while (tokenizer.hasMoreTokens())
+    {
         string text = tokenizer.nextToken();
 
-        if (tokenizer.hasMoreTokens()) {
+        if (tokenizer.hasMoreTokens())
+        {
             id->setSessionId(Long::parseLong(text));
-        } else {
+        }
+        else
+        {
             id->setValue(Long::parseLong(text));
         }
     }
@@ -310,15 +395,16 @@ Pointer<ConsumerId> StompHelper::convertConsumerId(const std::string& consumerId
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string StompHelper::convertProducerId(const Pointer<ProducerId>& producerId) {
-
+std::string StompHelper::convertProducerId(const Pointer<ProducerId>& producerId)
+{
     return producerId->getConnectionId();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<ProducerId> StompHelper::convertProducerId(const std::string& producerId) {
-
-    if (producerId == "") {
+Pointer<ProducerId> StompHelper::convertProducerId(const std::string& producerId)
+{
+    if (producerId == "")
+    {
         return Pointer<ProducerId>();
     }
 
@@ -332,22 +418,27 @@ Pointer<ProducerId> StompHelper::convertProducerId(const std::string& producerId
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string StompHelper::convertTransactionId(const Pointer<TransactionId>& transactionId) {
-
-    Pointer<LocalTransactionId> id = transactionId.dynamicCast<LocalTransactionId>();
-    std::string result = id->getConnectionId()->getValue() + ":" + Long::toString(id->getValue());
+std::string StompHelper::convertTransactionId(
+    const Pointer<TransactionId>& transactionId)
+{
+    Pointer<LocalTransactionId> id =
+        transactionId.dynamicCast<LocalTransactionId>();
+    std::string result = id->getConnectionId()->getValue() + ":" +
+                         Long::toString(id->getValue());
     return result;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<TransactionId> StompHelper::convertTransactionId(const std::string& transactionId) {
-
-    if (transactionId == "") {
+Pointer<TransactionId> StompHelper::convertTransactionId(
+    const std::string& transactionId)
+{
+    if (transactionId == "")
+    {
         return Pointer<TransactionId>();
     }
 
     Pointer<LocalTransactionId> id(new LocalTransactionId());
-    StringTokenizer tokenizer(transactionId, ":");
+    StringTokenizer             tokenizer(transactionId, ":");
 
     string connectionIdStr;
     connectionIdStr += tokenizer.nextToken();
@@ -358,7 +449,8 @@ Pointer<TransactionId> StompHelper::convertTransactionId(const std::string& tran
     connectionId->setValue(connectionIdStr);
     id->setConnectionId(connectionId);
 
-    while (tokenizer.hasMoreTokens()) {
+    while (tokenizer.hasMoreTokens())
+    {
         string text = tokenizer.nextToken();
         id->setValue(Long::parseLong(text));
     }

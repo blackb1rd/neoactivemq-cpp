@@ -17,185 +17,205 @@
 #ifndef _DECAF_INTERNAL_NET_TCP_TCPSOCKET_H_
 #define _DECAF_INTERNAL_NET_TCP_TCPSOCKET_H_
 
-#include <decaf/net/SocketException.h>
-#include <decaf/net/SocketImpl.h>
+#include <decaf/io/IOException.h>
 #include <decaf/io/InputStream.h>
 #include <decaf/io/OutputStream.h>
-#include <decaf/util/Config.h>
-#include <decaf/io/IOException.h>
-#include <decaf/net/SocketTimeoutException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/lang/exceptions/IndexOutOfBoundsException.h>
+#include <decaf/lang/exceptions/NullPointerException.h>
+#include <decaf/net/SocketException.h>
+#include <decaf/net/SocketImpl.h>
+#include <decaf/net/SocketTimeoutException.h>
+#include <decaf/util/Config.h>
 
-namespace decaf {
-namespace internal {
-namespace net {
-namespace tcp {
+namespace decaf
+{
+namespace internal
+{
+    namespace net
+    {
+        namespace tcp
+        {
 
-    class TcpSocketInputStream;
-    class TcpSocketOutputStream;
-    class TcpSocketImpl;
+            class TcpSocketInputStream;
+            class TcpSocketOutputStream;
+            class TcpSocketImpl;
 
-    /**
-     * Platform-independent implementation of the socket interface.
-     */
-    class DECAF_API TcpSocket: public decaf::net::SocketImpl {
-    private:
+            /**
+             * Platform-independent implementation of the socket interface.
+             */
+            class DECAF_API TcpSocket : public decaf::net::SocketImpl
+            {
+            private:
+                TcpSocketImpl* impl;
 
-        TcpSocketImpl* impl;
+            private:
+                TcpSocket(const TcpSocket&);
+                TcpSocket& operator=(const TcpSocket&);
 
-    private:
+            public:
+                /**
+                 * Construct a non-connected socket.
+                 *
+                 * @throws SocketException thrown if an error occurs while
+                 * creating the Socket.
+                 */
+                TcpSocket();
 
-        TcpSocket(const TcpSocket&);
-        TcpSocket& operator=(const TcpSocket&);
+                /**
+                 * Releases the socket handle but not gracefully shut down the
+                 * connection.
+                 */
+                virtual ~TcpSocket();
 
-    public:
+                /**
+                 * @return true if the socketHandle is not in a disconnected
+                 * state.
+                 */
+                bool isConnected() const;
 
-        /**
-         * Construct a non-connected socket.
-         *
-         * @throws SocketException thrown if an error occurs while creating the Socket.
-         */
-        TcpSocket();
+                /**
+                 * @return true if the close method has been called on this
+                 * Socket.
+                 */
+                bool isClosed() const;
 
-        /**
-         * Releases the socket handle but not gracefully shut down the connection.
-         */
-        virtual ~TcpSocket();
+                /**
+                 * {@inheritDoc}
+                 */
+                virtual std::string getLocalAddress() const;
 
-        /**
-         * @return true if the socketHandle is not in a disconnected state.
-         */
-        bool isConnected() const;
+                /**
+                 * {@inheritDoc}
+                 */
+                virtual void create();
 
-        /**
-         * @return true if the close method has been called on this Socket.
-         */
-        bool isClosed() const;
+                /**
+                 * {@inheritDoc}
+                 */
+                virtual void accept(SocketImpl* socket);
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual std::string getLocalAddress() const;
+                /**
+                 * {@inheritDoc}
+                 */
+                virtual void bind(const std::string& ipaddress, int port);
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual void create();
+                /**
+                 * {@inheritDoc}
+                 */
+                virtual void connect(const std::string& hostname,
+                                     int                port,
+                                     int                timeout);
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual void accept(SocketImpl* socket);
+                /**
+                 * {@inheritDoc}
+                 */
+                virtual void listen(int backlog);
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual void bind(const std::string& ipaddress, int port);
+                /**
+                 * {@inheritDoc}
+                 */
+                virtual decaf::io::InputStream* getInputStream();
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual void connect(const std::string& hostname, int port, int timeout);
+                /**
+                 * {@inheritDoc}
+                 */
+                virtual decaf::io::OutputStream* getOutputStream();
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual void listen(int backlog);
+                /**
+                 * {@inheritDoc}
+                 */
+                virtual int available();
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual decaf::io::InputStream* getInputStream();
+                /**
+                 * {@inheritDoc}
+                 */
+                virtual void close();
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual decaf::io::OutputStream* getOutputStream();
+                /**
+                 * {@inheritDoc}
+                 */
+                virtual void shutdownInput();
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual int available();
+                /**
+                 * {@inheritDoc}
+                 */
+                virtual void shutdownOutput();
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual void close();
+                /**
+                 * {@inheritDoc}
+                 */
+                virtual int getOption(int option) const;
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual void shutdownInput();
+                /**
+                 * {@inheritDoc}
+                 */
+                virtual void setOption(int option, int value);
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual void shutdownOutput();
+            public:
+                /**
+                 * Reads the requested data from the Socket and write it into
+                 * the passed in buffer.
+                 *
+                 * @param buffer
+                 *      The buffer to read into
+                 * @param size
+                 *      The size of the specified buffer
+                 * @param offset
+                 *      The offset into the buffer where reading should start
+                 * filling.
+                 * @param length
+                 *      The number of bytes past offset to fill with data.
+                 *
+                 * @return the actual number of bytes read or -1 if at EOF.
+                 *
+                 * @throw IOException if an I/O error occurs during the read.
+                 * @throw NullPointerException if buffer is Null.
+                 * @throw IndexOutOfBoundsException if offset + length is
+                 * greater than buffer size.
+                 */
+                int read(unsigned char* buffer,
+                         int            size,
+                         int            offset,
+                         int            length);
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual int getOption(int option) const;
+                /**
+                 * Writes the specified data in the passed in buffer to the
+                 * Socket.
+                 *
+                 * @param buffer
+                 *      The buffer to write to the socket.
+                 * @param size
+                 *      The size of the specified buffer.
+                 * @param offset
+                 *      The offset into the buffer where the data to write
+                 * starts at.
+                 * @param length
+                 *      The number of bytes past offset to write.
+                 *
+                 * @throw IOException if an I/O error occurs during the write.
+                 * @throw NullPointerException if buffer is Null.
+                 * @throw IndexOutOfBoundsException if offset + length is
+                 * greater than buffer size.
+                 */
+                void write(const unsigned char* buffer,
+                           int                  size,
+                           int                  offset,
+                           int                  length);
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual void setOption(int option, int value);
+                /**
+                 * Get access to the underlying TcpSocketImpl for advanced
+                 * operations. This is primarily used by SSL socket
+                 * implementations that need direct access to the ASIO socket.
+                 *
+                 * @return pointer to the TcpSocketImpl, or NULL if not
+                 * available
+                 */
+                TcpSocketImpl* getSocketImpl();
+            };
 
-    public:
-
-        /**
-         * Reads the requested data from the Socket and write it into the passed in buffer.
-         *
-         * @param buffer
-         *      The buffer to read into
-         * @param size
-         *      The size of the specified buffer
-         * @param offset
-         *      The offset into the buffer where reading should start filling.
-         * @param length
-         *      The number of bytes past offset to fill with data.
-         *
-         * @return the actual number of bytes read or -1 if at EOF.
-         *
-         * @throw IOException if an I/O error occurs during the read.
-         * @throw NullPointerException if buffer is Null.
-         * @throw IndexOutOfBoundsException if offset + length is greater than buffer size.
-         */
-        int read(unsigned char* buffer, int size, int offset, int length);
-
-        /**
-         * Writes the specified data in the passed in buffer to the Socket.
-         *
-         * @param buffer
-         *      The buffer to write to the socket.
-         * @param size
-         *      The size of the specified buffer.
-         * @param offset
-         *      The offset into the buffer where the data to write starts at.
-         * @param length
-         *      The number of bytes past offset to write.
-         *
-         * @throw IOException if an I/O error occurs during the write.
-         * @throw NullPointerException if buffer is Null.
-         * @throw IndexOutOfBoundsException if offset + length is greater than buffer size.
-         */
-        void write(const unsigned char* buffer, int size, int offset, int length);
-
-        /**
-         * Get access to the underlying TcpSocketImpl for advanced operations.
-         * This is primarily used by SSL socket implementations that need direct
-         * access to the ASIO socket.
-         *
-         * @return pointer to the TcpSocketImpl, or NULL if not available
-         */
-        TcpSocketImpl* getSocketImpl();
-
-    };
-
-}}}}
+        }  // namespace tcp
+    }  // namespace net
+}  // namespace internal
+}  // namespace decaf
 
 #endif /*_DECAF_INTERNAL_NET_TCP_TCPSOCKET_H_*/
-
-

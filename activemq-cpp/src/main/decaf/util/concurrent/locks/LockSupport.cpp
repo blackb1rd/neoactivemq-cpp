@@ -18,8 +18,8 @@
 #include "LockSupport.h"
 
 #include <decaf/lang/Exception.h>
-#include <decaf/lang/Thread.h>
 #include <decaf/lang/System.h>
+#include <decaf/lang/Thread.h>
 
 #include <decaf/internal/util/concurrent/Threading.h>
 
@@ -31,38 +31,44 @@ using namespace decaf::util::concurrent::locks;
 using namespace decaf::internal::util::concurrent;
 
 ////////////////////////////////////////////////////////////////////////////////
-LockSupport::LockSupport() {
+LockSupport::LockSupport()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-LockSupport::~LockSupport() {
+LockSupport::~LockSupport()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LockSupport::unpark( decaf::lang::Thread* thread ) {
-
-    try {
-		Threading::unpark(thread);
-	}
+void LockSupport::unpark(decaf::lang::Thread* thread)
+{
+    try
+    {
+        Threading::unpark(thread);
+    }
     DECAF_CATCHALL_NOTHROW()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LockSupport::park() {
-
-    try {
-		Threading::park(Thread::currentThread());
-	}
+void LockSupport::park()
+{
+    try
+    {
+        Threading::park(Thread::currentThread());
+    }
     DECAF_CATCHALL_NOTHROW()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LockSupport::parkNanos( long long nanos ) {
-
-    try {
+void LockSupport::parkNanos(long long nanos)
+{
+    try
+    {
         long long mills = 0;
 
-        if( nanos >= 1000000 ) {
+        if (nanos >= 1000000)
+        {
             mills = nanos / 1000000;
             nanos = nanos % 1000000;
         }
@@ -73,17 +79,18 @@ void LockSupport::parkNanos( long long nanos ) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LockSupport::parkUntil( long long deadline ) {
-
-    try{
-
+void LockSupport::parkUntil(long long deadline)
+{
+    try
+    {
         long long now = System::currentTimeMillis();
 
-        if( deadline <= now ) {
+        if (deadline <= now)
+        {
             return;
         }
 
-        Threading::park(Thread::currentThread(), ( deadline - now ), 0);
+        Threading::park(Thread::currentThread(), (deadline - now), 0);
     }
     DECAF_CATCHALL_NOTHROW()
 }

@@ -18,7 +18,6 @@
 #ifndef _ACTIVEMQ_STATE_CONNECTIONSTATETRACKER_H_
 #define _ACTIVEMQ_STATE_CONNECTIONSTATETRACKER_H_
 
-#include <activemq/util/Config.h>
 #include <activemq/commands/ConnectionId.h>
 #include <activemq/exceptions/ActiveMQException.h>
 #include <activemq/state/CommandVisitorAdapter.h>
@@ -26,21 +25,24 @@
 #include <activemq/state/ConsumerState.h>
 #include <activemq/state/ProducerState.h>
 #include <activemq/state/SessionState.h>
-#include <activemq/state/TransactionState.h>
 #include <activemq/state/Tracked.h>
+#include <activemq/state/TransactionState.h>
 #include <activemq/transport/Transport.h>
+#include <activemq/util/Config.h>
 
 #include <decaf/lang/Pointer.h>
 
-namespace activemq {
-namespace state {
+namespace activemq
+{
+namespace state
+{
 
     class RemoveTransactionAction;
     class StateTrackerImpl;
 
-    class AMQCPP_API ConnectionStateTracker: public CommandVisitorAdapter {
+    class AMQCPP_API ConnectionStateTracker : public CommandVisitorAdapter
+    {
     private:
-
         StateTrackerImpl* impl;
 
         bool trackTransactions;
@@ -50,13 +52,12 @@ namespace state {
         bool restoreTransaction;
         bool trackMessages;
         bool trackTransactionProducers;
-        int maxMessageCacheSize;
-        int maxMessagePullCacheSize;
+        int  maxMessageCacheSize;
+        int  maxMessagePullCacheSize;
 
         friend class RemoveTransactionAction;
 
     public:
-
         ConnectionStateTracker();
 
         virtual ~ConnectionStateTracker();
@@ -68,137 +69,177 @@ namespace state {
         void restore(decaf::lang::Pointer<transport::Transport> transport);
 
         void connectionInterruptProcessingComplete(
-            transport::Transport* transport, decaf::lang::Pointer<ConnectionId> connectionId);
+            transport::Transport*              transport,
+            decaf::lang::Pointer<ConnectionId> connectionId);
 
         void transportInterrupted();
 
-        virtual decaf::lang::Pointer<Command> processDestinationInfo(DestinationInfo* info);
+        virtual decaf::lang::Pointer<Command> processDestinationInfo(
+            DestinationInfo* info);
 
-        virtual decaf::lang::Pointer<Command> processRemoveDestination(DestinationInfo* info);
+        virtual decaf::lang::Pointer<Command> processRemoveDestination(
+            DestinationInfo* info);
 
-        virtual decaf::lang::Pointer<Command> processProducerInfo(ProducerInfo* info);
+        virtual decaf::lang::Pointer<Command> processProducerInfo(
+            ProducerInfo* info);
 
-        virtual decaf::lang::Pointer<Command> processRemoveProducer(ProducerId* id);
+        virtual decaf::lang::Pointer<Command> processRemoveProducer(
+            ProducerId* id);
 
-        virtual decaf::lang::Pointer<Command> processConsumerInfo(ConsumerInfo* info);
+        virtual decaf::lang::Pointer<Command> processConsumerInfo(
+            ConsumerInfo* info);
 
-        virtual decaf::lang::Pointer<Command> processRemoveConsumer(ConsumerId* id);
+        virtual decaf::lang::Pointer<Command> processRemoveConsumer(
+            ConsumerId* id);
 
-        virtual decaf::lang::Pointer<Command> processSessionInfo(SessionInfo* info);
+        virtual decaf::lang::Pointer<Command> processSessionInfo(
+            SessionInfo* info);
 
-        virtual decaf::lang::Pointer<Command> processRemoveSession(SessionId* id);
+        virtual decaf::lang::Pointer<Command> processRemoveSession(
+            SessionId* id);
 
-        virtual decaf::lang::Pointer<Command> processConnectionInfo(ConnectionInfo* info);
+        virtual decaf::lang::Pointer<Command> processConnectionInfo(
+            ConnectionInfo* info);
 
-        virtual decaf::lang::Pointer<Command> processRemoveConnection(ConnectionId* id);
+        virtual decaf::lang::Pointer<Command> processRemoveConnection(
+            ConnectionId* id);
 
         virtual decaf::lang::Pointer<Command> processMessage(Message* message);
 
-        virtual decaf::lang::Pointer<Command> processBeginTransaction(TransactionInfo* info);
+        virtual decaf::lang::Pointer<Command> processBeginTransaction(
+            TransactionInfo* info);
 
-        virtual decaf::lang::Pointer<Command> processPrepareTransaction(TransactionInfo* info);
+        virtual decaf::lang::Pointer<Command> processPrepareTransaction(
+            TransactionInfo* info);
 
-        virtual decaf::lang::Pointer<Command> processCommitTransactionOnePhase(TransactionInfo* info);
+        virtual decaf::lang::Pointer<Command> processCommitTransactionOnePhase(
+            TransactionInfo* info);
 
-        virtual decaf::lang::Pointer<Command> processCommitTransactionTwoPhase(TransactionInfo* info);
+        virtual decaf::lang::Pointer<Command> processCommitTransactionTwoPhase(
+            TransactionInfo* info);
 
-        virtual decaf::lang::Pointer<Command> processRollbackTransaction(TransactionInfo* info);
+        virtual decaf::lang::Pointer<Command> processRollbackTransaction(
+            TransactionInfo* info);
 
-        virtual decaf::lang::Pointer<Command> processEndTransaction(TransactionInfo* info);
+        virtual decaf::lang::Pointer<Command> processEndTransaction(
+            TransactionInfo* info);
 
-        virtual decaf::lang::Pointer<Command> processMessagePull(MessagePull* pull);
+        virtual decaf::lang::Pointer<Command> processMessagePull(
+            MessagePull* pull);
 
-        bool isRestoreConsumers() const {
+        bool isRestoreConsumers() const
+        {
             return this->restoreConsumers;
         }
 
-        void setRestoreConsumers(bool restoreConsumers) {
+        void setRestoreConsumers(bool restoreConsumers)
+        {
             this->restoreConsumers = restoreConsumers;
         }
 
-        bool isRestoreProducers() const {
+        bool isRestoreProducers() const
+        {
             return this->restoreProducers;
         }
 
-        void setRestoreProducers(bool restoreProducers) {
+        void setRestoreProducers(bool restoreProducers)
+        {
             this->restoreProducers = restoreProducers;
         }
 
-        bool isRestoreSessions() const {
+        bool isRestoreSessions() const
+        {
             return this->restoreSessions;
         }
 
-        void setRestoreSessions(bool restoreSessions) {
+        void setRestoreSessions(bool restoreSessions)
+        {
             this->restoreSessions = restoreSessions;
         }
 
-        bool isTrackTransactions() const {
+        bool isTrackTransactions() const
+        {
             return this->trackTransactions;
         }
 
-        void setTrackTransactions(bool trackTransactions) {
+        void setTrackTransactions(bool trackTransactions)
+        {
             this->trackTransactions = trackTransactions;
         }
 
-        bool isRestoreTransaction() const {
+        bool isRestoreTransaction() const
+        {
             return this->restoreTransaction;
         }
 
-        void setRestoreTransaction(bool restoreTransaction) {
+        void setRestoreTransaction(bool restoreTransaction)
+        {
             this->restoreTransaction = restoreTransaction;
         }
 
-        bool isTrackMessages() const {
+        bool isTrackMessages() const
+        {
             return this->trackMessages;
         }
 
-        void setTrackMessages(bool trackMessages) {
+        void setTrackMessages(bool trackMessages)
+        {
             this->trackMessages = trackMessages;
         }
 
-        int getMaxMessageCacheSize() const {
+        int getMaxMessageCacheSize() const
+        {
             return this->maxMessageCacheSize;
         }
 
-        void setMaxMessageCacheSize(int maxMessageCacheSize) {
+        void setMaxMessageCacheSize(int maxMessageCacheSize)
+        {
             this->maxMessageCacheSize = maxMessageCacheSize;
         }
 
-        int getMaxMessagePullCacheSize() const {
+        int getMaxMessagePullCacheSize() const
+        {
             return this->maxMessagePullCacheSize;
         }
 
-        void setMaxMessagePullCacheSize(int maxMessagePullCacheSize) {
+        void setMaxMessagePullCacheSize(int maxMessagePullCacheSize)
+        {
             this->maxMessagePullCacheSize = maxMessagePullCacheSize;
         }
 
-        bool isTrackTransactionProducers() const {
+        bool isTrackTransactionProducers() const
+        {
             return this->trackTransactionProducers;
         }
 
-        void setTrackTransactionProducers(bool trackTransactionProducers) {
+        void setTrackTransactionProducers(bool trackTransactionProducers)
+        {
             this->trackTransactionProducers = trackTransactionProducers;
         }
 
     private:
+        void doRestoreTransactions(
+            decaf::lang::Pointer<transport::Transport> transport,
+            decaf::lang::Pointer<ConnectionState>      connectionState);
 
-        void doRestoreTransactions(decaf::lang::Pointer<transport::Transport> transport,
-                                   decaf::lang::Pointer<ConnectionState> connectionState);
+        void doRestoreSessions(
+            decaf::lang::Pointer<transport::Transport> transport,
+            decaf::lang::Pointer<ConnectionState>      connectionState);
 
-        void doRestoreSessions(decaf::lang::Pointer<transport::Transport> transport,
-                               decaf::lang::Pointer<ConnectionState> connectionState);
+        void doRestoreConsumers(
+            decaf::lang::Pointer<transport::Transport> transport,
+            decaf::lang::Pointer<SessionState>         sessionState);
 
-        void doRestoreConsumers(decaf::lang::Pointer<transport::Transport> transport,
-                                decaf::lang::Pointer<SessionState> sessionState);
+        void doRestoreProducers(
+            decaf::lang::Pointer<transport::Transport> transport,
+            decaf::lang::Pointer<SessionState>         sessionState);
 
-        void doRestoreProducers(decaf::lang::Pointer<transport::Transport> transport,
-                                decaf::lang::Pointer<SessionState> sessionState);
-
-        void doRestoreTempDestinations(decaf::lang::Pointer<transport::Transport> transport,
-                                       decaf::lang::Pointer<ConnectionState> connectionState);
-
+        void doRestoreTempDestinations(
+            decaf::lang::Pointer<transport::Transport> transport,
+            decaf::lang::Pointer<ConnectionState>      connectionState);
     };
 
-}}
+}  // namespace state
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_STATE_CONNECTIONSTATETRACKER_H_*/

@@ -21,20 +21,21 @@
 #include <activemq/test/CMSTestFixture.h>
 #include <activemq/util/IntegrationCommon.h>
 
-#include <decaf/lang/Pointer.h>
 #include <cms/Connection.h>
+#include <decaf/lang/Pointer.h>
 
-namespace activemq{
-namespace test{
+namespace activemq
+{
+namespace test
+{
 
-    class CmsConnectionStartStopTest : public CMSTestFixture {
+    class CmsConnectionStartStopTest : public CMSTestFixture
+    {
     protected:
-
         decaf::lang::Pointer<cms::Connection> startedConnection;
         decaf::lang::Pointer<cms::Connection> stoppedConnection;
 
     public:
-
         CmsConnectionStartStopTest();
         virtual ~CmsConnectionStartStopTest();
 
@@ -44,9 +45,9 @@ namespace test{
         void testStoppedConsumerHoldsMessagesTillStarted();
         void testMultipleConnectionStops();
         void testConcurrentSessionCreateWithStart();
-
     };
 
-}}
+}  // namespace test
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_TEST_CMSCONNECTIONSTARTSTOPTEST_H_ */

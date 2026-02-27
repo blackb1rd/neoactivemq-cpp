@@ -17,8 +17,8 @@
 
 #include <gtest/gtest.h>
 
-#include <activemq/transport/mock/MockTransportFactory.h>
 #include <activemq/transport/mock/MockTransport.h>
+#include <activemq/transport/mock/MockTransportFactory.h>
 #include <decaf/net/URI.h>
 #include <memory>
 
@@ -31,23 +31,24 @@ using namespace decaf::net;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
-class MockTransportFactoryTest : public ::testing::Test {};
+class MockTransportFactoryTest : public ::testing::Test
+{
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(MockTransportFactoryTest, test) {
-
-    URI uri( "mock://mock?wireformat=openwire" );
+TEST_F(MockTransportFactoryTest, test)
+{
+    URI uri("mock://mock?wireformat=openwire");
 
     MockTransportFactory factory;
 
-    Pointer<Transport> transport( factory.create( uri ) );
+    Pointer<Transport> transport(factory.create(uri));
 
     ASSERT_TRUE(transport.get() != NULL);
 
-    transport = factory.createComposite( uri );
+    transport = factory.createComposite(uri);
 
     ASSERT_TRUE(transport.get() != NULL);
 
-    transport.reset( NULL );
-
+    transport.reset(NULL);
 }

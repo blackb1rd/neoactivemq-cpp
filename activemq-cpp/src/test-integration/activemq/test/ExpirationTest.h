@@ -21,28 +21,39 @@
 #include <activemq/test/CMSTestFixture.h>
 #include <activemq/util/IntegrationCommon.h>
 
-namespace activemq{
-namespace test{
+namespace activemq
+{
+namespace test
+{
 
-    class ExpirationTest : public CMSTestFixture {
+    class ExpirationTest : public CMSTestFixture
+    {
     public:
-
         static std::string messageTag;
 
     public:
+        ExpirationTest()
+        {
+        }
 
-        ExpirationTest(){}
-        virtual ~ExpirationTest(){}
+        virtual ~ExpirationTest()
+        {
+        }
 
-        void SetUp() override {}
-        void TearDown() override {}
+        void SetUp() override
+        {
+        }
+
+        void TearDown() override
+        {
+        }
 
         virtual void testExpired();
         virtual void testExpiredWithChecksDisabled();
         virtual void testNotExpired();
-
     };
 
-}}
+}  // namespace test
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_TEST_EXPIRATIONTEST_H_*/

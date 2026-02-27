@@ -27,28 +27,33 @@ using namespace decaf::net;
 const std::string URLEncoder::digits = "0123456789ABCDEF";
 
 ////////////////////////////////////////////////////////////////////////////////
-URLEncoder::URLEncoder() {
+URLEncoder::URLEncoder()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string URLEncoder::encode( const std::string& src ) {
-
-    string encoded = "";
+std::string URLEncoder::encode(const std::string& src)
+{
+    string encoded    = "";
     string allowables = ".-*_";
 
-    for( std::size_t i = 0; i < src.length(); i++ ) {
-
+    for (std::size_t i = 0; i < src.length(); i++)
+    {
         char ch = src.at(i);
-        if( Character::isLetterOrDigit( ch ) ||
-            allowables.find_first_of( ch, 0 ) != std::string::npos ) {
-
+        if (Character::isLetterOrDigit(ch) ||
+            allowables.find_first_of(ch, 0) != std::string::npos)
+        {
             encoded += ch;
-        } else if (ch == ' ') {
+        }
+        else if (ch == ' ')
+        {
             encoded += '+';
-        } else {
+        }
+        else
+        {
             encoded += '%';
-            encoded += digits.at( (ch & 0xf0) >> 4 );
-            encoded += digits.at( ch & 0xf );
+            encoded += digits.at((ch & 0xf0) >> 4);
+            encoded += digits.at(ch & 0xf);
         }
     }
 

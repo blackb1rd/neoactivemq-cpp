@@ -15,12 +15,10 @@
  * limitations under the License.
  */
 
-#include <gtest/gtest.h>
-
 #include <activemq/util/AMQLog.h>
-
 #include <decaf/lang/Thread.h>
 #include <decaf/util/concurrent/CountDownLatch.h>
+#include <gtest/gtest.h>
 
 #include <mutex>
 #include <sstream>
@@ -43,15 +41,16 @@ using namespace decaf::util::concurrent;
 
 // Use aliases to avoid Windows macro conflicts with enum values
 static const AMQLogLevel LOG_LEVEL_NONE  = AMQLogLevel::NONE;
-static const AMQLogLevel LOG_LEVEL_ERROR = AMQLogLevel::ERROR;
+static const AMQLogLevel LOG_LEVEL_ERROR = AMQLogLevel::ERR;
 static const AMQLogLevel LOG_LEVEL_WARN  = AMQLogLevel::WARN;
 static const AMQLogLevel LOG_LEVEL_INFO  = AMQLogLevel::INFO;
-static const AMQLogLevel LOG_LEVEL_DEBUG = AMQLogLevel::DEBUG;
+static const AMQLogLevel LOG_LEVEL_DEBUG = AMQLogLevel::DBG;
 
-class AMQLogTest : public ::testing::Test {
+class AMQLogTest : public ::testing::Test
+{
 public:
-
-    void SetUp() override {
+    void SetUp() override
+    {
         // Reset logger state before each test
         AMQLogger::setLevel(LOG_LEVEL_NONE);
         AMQLogger::clearLogContext();
@@ -69,7 +68,8 @@ public:
         AMQLogger::shutdownFlightRecorder();
     }
 
-    void TearDown() override {
+    void TearDown() override
+    {
         // Clean up after each test
         AMQLogger::setLevel(LOG_LEVEL_NONE);
         AMQLogger::clearLogContext();
@@ -84,7 +84,8 @@ public:
 // Global Logging Tests
 ////////////////////////////////////////////////////////////////////////////////
 
-TEST_F(AMQLogTest, testGlobalLogLevel) {
+TEST_F(AMQLogTest, testGlobalLogLevel)
+{
     // Default should be NONE
     ASSERT_EQ(LOG_LEVEL_NONE, AMQLogger::getLevel());
 
@@ -107,7 +108,8 @@ TEST_F(AMQLogTest, testGlobalLogLevel) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(AMQLogTest, testGlobalLogLevelParsing) {
+TEST_F(AMQLogTest, testGlobalLogLevelParsing)
+{
     // Test case-insensitive parsing
     ASSERT_EQ(LOG_LEVEL_DEBUG, AMQLogger::parseLevel("debug"));
     ASSERT_EQ(LOG_LEVEL_DEBUG, AMQLogger::parseLevel("DEBUG"));
@@ -128,7 +130,8 @@ TEST_F(AMQLogTest, testGlobalLogLevelParsing) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(AMQLogTest, testGlobalLogIsEnabled) {
+TEST_F(AMQLogTest, testGlobalLogIsEnabled)
+{
     // With NONE level, nothing should be enabled
     AMQLogger::setLevel(LOG_LEVEL_NONE);
     ASSERT_TRUE(!AMQLogger::isEnabled(LOG_LEVEL_ERROR));
@@ -169,7 +172,8 @@ TEST_F(AMQLogTest, testGlobalLogIsEnabled) {
 // Context-Specific Logging Tests
 ////////////////////////////////////////////////////////////////////////////////
 
-TEST_F(AMQLogTest, testContextLogLevel) {
+TEST_F(AMQLogTest, testContextLogLevel)
+{
     const std::string context1 = "failover://server1,server2";
     const std::string context2 = "tcp://server3:61616";
 
@@ -200,7 +204,8 @@ TEST_F(AMQLogTest, testContextLogLevel) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(AMQLogTest, testMultiConnectionLogging) {
+TEST_F(AMQLogTest, testMultiConnectionLogging)
+{
     // Simulates two connections:
     // Connection 1: failover(server1, server2) - DEBUG level
     // Connection 2: server3 - ERROR level only
@@ -246,24 +251,31 @@ TEST_F(AMQLogTest, testMultiConnectionLogging) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(AMQLogTest, testContextOutputHandler) {
+TEST_F(AMQLogTest, testContextOutputHandler)
+{
     const std::string connection1 = "failover://server1,server2";
     const std::string connection2 = "tcp://server3:61616";
 
     // Capture logs for each connection
     std::vector<std::string> connection1Logs;
     std::vector<std::string> connection2Logs;
-    std::mutex logMutex;
+    std::mutex               logMutex;
 
     // Set up handlers for each connection
-    AMQLogger::setContextOutputHandler(connection1,
-        [&connection1Logs, &logMutex](AMQLogLevel level, const std::string& message) {
+    AMQLogger::setContextOutputHandler(
+        connection1,
+        [&connection1Logs, &logMutex](AMQLogLevel        level,
+                                      const std::string& message)
+        {
             std::lock_guard<std::mutex> lock(logMutex);
             connection1Logs.push_back(message);
         });
 
-    AMQLogger::setContextOutputHandler(connection2,
-        [&connection2Logs, &logMutex](AMQLogLevel level, const std::string& message) {
+    AMQLogger::setContextOutputHandler(
+        connection2,
+        [&connection2Logs, &logMutex](AMQLogLevel        level,
+                                      const std::string& message)
+        {
             std::lock_guard<std::mutex> lock(logMutex);
             connection2Logs.push_back(message);
         });
@@ -284,8 +296,10 @@ TEST_F(AMQLogTest, testContextOutputHandler) {
     ASSERT_EQ(static_cast<std::size_t>(1), connection1Logs.size());
     ASSERT_EQ(static_cast<std::size_t>(1), connection2Logs.size());
 
-    ASSERT_TRUE(connection1Logs[0].find("Connection 1 message") != std::string::npos);
-    ASSERT_TRUE(connection2Logs[0].find("Connection 2 message") != std::string::npos);
+    ASSERT_TRUE(connection1Logs[0].find("Connection 1 message") !=
+                std::string::npos);
+    ASSERT_TRUE(connection2Logs[0].find("Connection 2 message") !=
+                std::string::npos);
 
     // Clear handler and verify
     AMQLogger::clearContextOutputHandler(connection1);
@@ -299,7 +313,8 @@ TEST_F(AMQLogTest, testContextOutputHandler) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(AMQLogTest, testHandlerWithRecordOnlyMode) {
+TEST_F(AMQLogTest, testHandlerWithRecordOnlyMode)
+{
     // Test that handlers are ALWAYS called even when recordOnlyMode is enabled
     // This is important for users who want to capture logs to their own system
 
@@ -307,11 +322,14 @@ TEST_F(AMQLogTest, testHandlerWithRecordOnlyMode) {
 
     // Capture logs
     std::vector<std::string> capturedLogs;
-    std::mutex logMutex;
+    std::mutex               logMutex;
 
     // Set up handler
-    AMQLogger::setContextOutputHandler(connection1,
-        [&capturedLogs, &logMutex](AMQLogLevel level, const std::string& message) {
+    AMQLogger::setContextOutputHandler(
+        connection1,
+        [&capturedLogs, &logMutex](AMQLogLevel        level,
+                                   const std::string& message)
+        {
             std::lock_guard<std::mutex> lock(logMutex);
             capturedLogs.push_back(message);
         });
@@ -324,17 +342,21 @@ TEST_F(AMQLogTest, testHandlerWithRecordOnlyMode) {
 
     // Log with context set
     AMQLogger::setLogContext(connection1);
-    AMQLogger::log(LOG_LEVEL_INFO, "TestComponent", "Message with recordOnlyMode enabled");
+    AMQLogger::log(LOG_LEVEL_INFO,
+                   "TestComponent",
+                   "Message with recordOnlyMode enabled");
 
     // Handler should still have been called despite recordOnlyMode
     ASSERT_EQ(static_cast<std::size_t>(1), capturedLogs.size());
-    ASSERT_TRUE(capturedLogs[0].find("Message with recordOnlyMode enabled") != std::string::npos);
+    ASSERT_TRUE(capturedLogs[0].find("Message with recordOnlyMode enabled") !=
+                std::string::npos);
 
     // Log another message
     AMQLogger::log(LOG_LEVEL_ERROR, "TestComponent", "Error message");
     ASSERT_EQ(static_cast<std::size_t>(2), capturedLogs.size());
 
-    // Clear context - now logs should NOT appear (recordOnlyMode blocks console)
+    // Clear context - now logs should NOT appear (recordOnlyMode blocks
+    // console)
     AMQLogger::clearLogContext();
 
     // This should not throw or cause issues, but won't go to handler
@@ -345,68 +367,86 @@ TEST_F(AMQLogTest, testHandlerWithRecordOnlyMode) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
-    class ContextTestThread : public Thread {
-    private:
-        std::string context;
-        AMQLogLevel expectedLevel;
-        bool& failed;
-        CountDownLatch& startLatch;
-        CountDownLatch& doneLatch;
+namespace
+{
+class ContextTestThread : public Thread
+{
+private:
+    std::string     context;
+    AMQLogLevel     expectedLevel;
+    bool&           failed;
+    CountDownLatch& startLatch;
+    CountDownLatch& doneLatch;
 
-    public:
-        ContextTestThread(const std::string& ctx, AMQLogLevel level,
-                          bool& failFlag, CountDownLatch& start, CountDownLatch& done)
-            : context(ctx), expectedLevel(level), failed(failFlag),
-              startLatch(start), doneLatch(done) {}
+public:
+    ContextTestThread(const std::string& ctx,
+                      AMQLogLevel        level,
+                      bool&              failFlag,
+                      CountDownLatch&    start,
+                      CountDownLatch&    done)
+        : context(ctx),
+          expectedLevel(level),
+          failed(failFlag),
+          startLatch(start),
+          doneLatch(done)
+    {
+    }
 
-        virtual void run() {
-            try {
-                // Wait for all threads to be ready
-                startLatch.countDown();
-                startLatch.await();
+    virtual void run()
+    {
+        try
+        {
+            // Wait for all threads to be ready
+            startLatch.countDown();
+            startLatch.await();
 
-                // Set this thread's context
-                AMQLogger::setLogContext(context);
+            // Set this thread's context
+            AMQLogger::setLogContext(context);
 
-                // Verify effective level matches expected
-                AMQLogLevel effective = AMQLogger::getEffectiveLevel();
-                if (effective != expectedLevel) {
-                    failed = true;
-                }
-
-                // Verify context is correct
-                std::string currentContext = AMQLogger::getLogContext();
-                if (currentContext != context) {
-                    failed = true;
-                }
-
-                // Sleep a bit to ensure threads overlap
-                Thread::sleep(10);
-
-                // Verify context is still correct after sleep
-                currentContext = AMQLogger::getLogContext();
-                if (currentContext != context) {
-                    failed = true;
-                }
-
-                effective = AMQLogger::getEffectiveLevel();
-                if (effective != expectedLevel) {
-                    failed = true;
-                }
-
-                AMQLogger::clearLogContext();
-
-            } catch (...) {
+            // Verify effective level matches expected
+            AMQLogLevel effective = AMQLogger::getEffectiveLevel();
+            if (effective != expectedLevel)
+            {
                 failed = true;
             }
 
-            doneLatch.countDown();
-        }
-    };
-}
+            // Verify context is correct
+            std::string currentContext = AMQLogger::getLogContext();
+            if (currentContext != context)
+            {
+                failed = true;
+            }
 
-TEST_F(AMQLogTest, testMultiThreadContextIsolation) {
+            // Sleep a bit to ensure threads overlap
+            Thread::sleep(10);
+
+            // Verify context is still correct after sleep
+            currentContext = AMQLogger::getLogContext();
+            if (currentContext != context)
+            {
+                failed = true;
+            }
+
+            effective = AMQLogger::getEffectiveLevel();
+            if (effective != expectedLevel)
+            {
+                failed = true;
+            }
+
+            AMQLogger::clearLogContext();
+        }
+        catch (...)
+        {
+            failed = true;
+        }
+
+        doneLatch.countDown();
+    }
+};
+}  // namespace
+
+TEST_F(AMQLogTest, testMultiThreadContextIsolation)
+{
     const std::string connection1 = "failover://server1,server2";
     const std::string connection2 = "tcp://server3:61616";
 
@@ -415,7 +455,7 @@ TEST_F(AMQLogTest, testMultiThreadContextIsolation) {
     AMQLogger::setLevel(connection2, LOG_LEVEL_ERROR);
 
     static const int THREAD_COUNT = 10;
-    bool failed = false;
+    bool             failed       = false;
 
     CountDownLatch startLatch(THREAD_COUNT);
     CountDownLatch doneLatch(THREAD_COUNT);
@@ -423,18 +463,29 @@ TEST_F(AMQLogTest, testMultiThreadContextIsolation) {
     std::vector<ContextTestThread*> threads;
 
     // Create alternating threads for each connection
-    for (int i = 0; i < THREAD_COUNT; i++) {
-        if (i % 2 == 0) {
-            threads.push_back(new ContextTestThread(
-                connection1, LOG_LEVEL_DEBUG, failed, startLatch, doneLatch));
-        } else {
-            threads.push_back(new ContextTestThread(
-                connection2, LOG_LEVEL_ERROR, failed, startLatch, doneLatch));
+    for (int i = 0; i < THREAD_COUNT; i++)
+    {
+        if (i % 2 == 0)
+        {
+            threads.push_back(new ContextTestThread(connection1,
+                                                    LOG_LEVEL_DEBUG,
+                                                    failed,
+                                                    startLatch,
+                                                    doneLatch));
+        }
+        else
+        {
+            threads.push_back(new ContextTestThread(connection2,
+                                                    LOG_LEVEL_ERROR,
+                                                    failed,
+                                                    startLatch,
+                                                    doneLatch));
         }
     }
 
     // Start all threads
-    for (auto* thread : threads) {
+    for (auto* thread : threads)
+    {
         thread->start();
     }
 
@@ -442,7 +493,8 @@ TEST_F(AMQLogTest, testMultiThreadContextIsolation) {
     doneLatch.await();
 
     // Join and cleanup
-    for (auto* thread : threads) {
+    for (auto* thread : threads)
+    {
         thread->join();
         delete thread;
     }
@@ -454,7 +506,8 @@ TEST_F(AMQLogTest, testMultiThreadContextIsolation) {
 // Flight Recorder Tests
 ////////////////////////////////////////////////////////////////////////////////
 
-TEST_F(AMQLogTest, testFlightRecorder) {
+TEST_F(AMQLogTest, testFlightRecorder)
+{
     // Initialize flight recorder with small buffer for testing
     AMQLogger::initializeFlightRecorder(0.001, 100, 1000);
 
@@ -466,7 +519,8 @@ TEST_F(AMQLogTest, testFlightRecorder) {
     AMQLogger::setRecordOnlyMode(true);
 
     // Record some entries
-    for (int i = 0; i < 50; i++) {
+    for (int i = 0; i < 50; i++)
+    {
         std::ostringstream msg;
         msg << "Test message " << i;
         AMQLogger::log(LOG_LEVEL_INFO, "FlightRecorderTest", msg.str());

@@ -29,26 +29,33 @@ using namespace decaf::util::concurrent::atomic;
 using namespace decaf::internal::util::concurrent;
 
 ////////////////////////////////////////////////////////////////////////////////
-AtomicBoolean::AtomicBoolean() : value(0) {
+AtomicBoolean::AtomicBoolean()
+    : value(0)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-AtomicBoolean::AtomicBoolean( bool initialValue ) : value(initialValue ? 1 : 0) {
+AtomicBoolean::AtomicBoolean(bool initialValue)
+    : value(initialValue ? 1 : 0)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool AtomicBoolean::compareAndSet( bool expect, bool update ) {
+bool AtomicBoolean::compareAndSet(bool expect, bool update)
+{
     int upd = update ? 1 : 0;
     int exp = expect ? 1 : 0;
     return Atomics::compareAndSet32(&this->value, exp, upd);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool AtomicBoolean::getAndSet( bool newValue ) {
+bool AtomicBoolean::getAndSet(bool newValue)
+{
     return Atomics::getAndSet(&this->value, newValue) > 0 ? true : false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string AtomicBoolean::toString() const {
-    return Boolean::toString( this->value ? true : false );
+std::string AtomicBoolean::toString() const
+{
+    return Boolean::toString(this->value ? true : false);
 }

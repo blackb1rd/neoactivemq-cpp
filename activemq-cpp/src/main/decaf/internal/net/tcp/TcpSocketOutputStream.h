@@ -22,51 +22,58 @@
 
 #include <decaf/io/OutputStream.h>
 
-namespace decaf {
-namespace internal {
-namespace net {
-namespace tcp {
+namespace decaf
+{
+namespace internal
+{
+    namespace net
+    {
+        namespace tcp
+        {
 
-    class TcpSocket;
+            class TcpSocket;
 
-    /**
-     * Output stream for performing write operations on a socket.
-     *
-     * @since 1.0
-     */
-    class DECAF_API TcpSocketOutputStream: public decaf::io::OutputStream {
-    private:
+            /**
+             * Output stream for performing write operations on a socket.
+             *
+             * @since 1.0
+             */
+            class DECAF_API TcpSocketOutputStream
+                : public decaf::io::OutputStream
+            {
+            private:
+                TcpSocket*    socket;
+                volatile bool closed;
 
-        TcpSocket* socket;
-        volatile bool closed;
+            private:
+                TcpSocketOutputStream(const TcpSocketOutputStream&);
+                TcpSocketOutputStream& operator=(const TcpSocketOutputStream&);
 
-    private:
+            public:
+                /**
+                 * Create a new instance of a Socket OutputStream class.
+                 *
+                 * @param socket
+                 *      The socket to use to write out the data.
+                 */
+                TcpSocketOutputStream(TcpSocket* socket);
 
-        TcpSocketOutputStream(const TcpSocketOutputStream&);
-        TcpSocketOutputStream& operator=(const TcpSocketOutputStream&);
+                virtual ~TcpSocketOutputStream();
 
-    public:
+                virtual void close();
 
-        /**
-         * Create a new instance of a Socket OutputStream class.
-         *
-         * @param socket
-         *      The socket to use to write out the data.
-         */
-        TcpSocketOutputStream(TcpSocket* socket);
+            protected:
+                virtual void doWriteByte(unsigned char c);
 
-        virtual ~TcpSocketOutputStream();
+                virtual void doWriteArrayBounded(const unsigned char* buffer,
+                                                 int                  size,
+                                                 int                  offset,
+                                                 int                  length);
+            };
 
-        virtual void close();
-
-    protected:
-
-        virtual void doWriteByte(unsigned char c);
-
-        virtual void doWriteArrayBounded(const unsigned char* buffer, int size, int offset, int length);
-
-    };
-
-}}}}
+        }  // namespace tcp
+    }  // namespace net
+}  // namespace internal
+}  // namespace decaf
 
 #endif /*_DECAF_INTERNAL_NET_TCP_TCPSOCKETOUTPUTSTREAM_H_*/

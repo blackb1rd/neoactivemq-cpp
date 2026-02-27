@@ -24,14 +24,16 @@
 #include <decaf/lang/exceptions/UnsupportedOperationException.h>
 #include <string>
 
-namespace activemq {
-namespace util {
+namespace activemq
+{
+namespace util
+{
 
     /**
      * Class controls the conversion of data contained in a PrimitiveValueNode
      * from one type to another.  If the conversion is supported then calling
-     * the convert method will throw an UnsupportedOperationException to indicate
-     * that its not possible to perform the conversion.
+     * the convert method will throw an UnsupportedOperationException to
+     * indicate that its not possible to perform the conversion.
      *
      * This class is used to implement the rules of conversion on CMS Message
      * properties, the following conversion table must be implemented.  A value
@@ -51,41 +53,60 @@ namespace util {
      *
      * @since 3.0
      */
-    class AMQCPP_API PrimitiveValueConverter {
+    class AMQCPP_API PrimitiveValueConverter
+    {
     public:
+        PrimitiveValueConverter()
+        {
+        }
 
-        PrimitiveValueConverter() {}
-        virtual ~PrimitiveValueConverter() {}
+        virtual ~PrimitiveValueConverter()
+        {
+        }
 
-        template<typename TO>
-        TO convert(const PrimitiveValueNode& value DECAF_UNUSED) const {
-
+        template <typename TO>
+        TO convert(const PrimitiveValueNode& value DECAF_UNUSED) const
+        {
             throw decaf::lang::exceptions::UnsupportedOperationException(
-                __FILE__, __LINE__, "Invalid Conversion");
+                __FILE__,
+                __LINE__,
+                "Invalid Conversion");
         }
     };
 
-    template<>
-    bool PrimitiveValueConverter::convert<bool>(const PrimitiveValueNode& value) const;
-    template<>
-    unsigned char PrimitiveValueConverter::convert<unsigned char>(const PrimitiveValueNode& value) const;
-    template<>
-    char PrimitiveValueConverter::convert<char>(const PrimitiveValueNode& value) const;
-    template<>
-    short PrimitiveValueConverter::convert<short>(const PrimitiveValueNode& value) const;
-    template<>
-    int PrimitiveValueConverter::convert<int>(const PrimitiveValueNode& value) const;
-    template<>
-    long long PrimitiveValueConverter::convert<long long>(const PrimitiveValueNode& value) const;
-    template<>
-    float PrimitiveValueConverter::convert<float>(const PrimitiveValueNode& value) const;
-    template<>
-    double PrimitiveValueConverter::convert<double>(const PrimitiveValueNode& value) const;
-    template<>
-    std::string PrimitiveValueConverter::convert<std::string>(const PrimitiveValueNode& value) const;
-    template<>
-    std::vector<unsigned char> PrimitiveValueConverter::convert<std::vector<unsigned char> >(const PrimitiveValueNode& value) const;
+    template <>
+    bool PrimitiveValueConverter::convert<bool>(
+        const PrimitiveValueNode& value) const;
+    template <>
+    unsigned char PrimitiveValueConverter::convert<unsigned char>(
+        const PrimitiveValueNode& value) const;
+    template <>
+    char PrimitiveValueConverter::convert<char>(
+        const PrimitiveValueNode& value) const;
+    template <>
+    short PrimitiveValueConverter::convert<short>(
+        const PrimitiveValueNode& value) const;
+    template <>
+    int PrimitiveValueConverter::convert<int>(
+        const PrimitiveValueNode& value) const;
+    template <>
+    long long PrimitiveValueConverter::convert<long long>(
+        const PrimitiveValueNode& value) const;
+    template <>
+    float PrimitiveValueConverter::convert<float>(
+        const PrimitiveValueNode& value) const;
+    template <>
+    double PrimitiveValueConverter::convert<double>(
+        const PrimitiveValueNode& value) const;
+    template <>
+    std::string PrimitiveValueConverter::convert<std::string>(
+        const PrimitiveValueNode& value) const;
+    template <>
+    std::vector<unsigned char>
+    PrimitiveValueConverter::convert<std::vector<unsigned char>>(
+        const PrimitiveValueNode& value) const;
 
-}}
+}  // namespace util
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_UTIL_PRIMITIVEVALUECONVERTER_H_ */

@@ -20,14 +20,14 @@
 #include <activemq/core/ActiveMQConnectionFactory.h>
 #include <activemq/exceptions/ActiveMQException.h>
 
-#include <decaf/lang/Runnable.h>
-#include <decaf/lang/Pointer.h>
 #include <decaf/lang/Integer.h>
+#include <decaf/lang/Pointer.h>
+#include <decaf/lang/Runnable.h>
 #include <decaf/util/Random.h>
 #include <decaf/util/concurrent/CopyOnWriteArrayList.h>
-#include <decaf/util/concurrent/TimeUnit.h>
-#include <decaf/util/concurrent/ThreadPoolExecutor.h>
 #include <decaf/util/concurrent/LinkedBlockingQueue.h>
+#include <decaf/util/concurrent/ThreadPoolExecutor.h>
+#include <decaf/util/concurrent/TimeUnit.h>
 
 using namespace std;
 using namespace cms;
@@ -42,20 +42,25 @@ using namespace decaf::util::concurrent;
 using namespace decaf::lang;
 
 ////////////////////////////////////////////////////////////////////////////////
-CmsConnectionStartStopTest::CmsConnectionStartStopTest() :
-    CMSTestFixture(), startedConnection(), stoppedConnection() {
+CmsConnectionStartStopTest::CmsConnectionStartStopTest()
+    : CMSTestFixture(),
+      startedConnection(),
+      stoppedConnection()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-CmsConnectionStartStopTest::~CmsConnectionStartStopTest() {
+CmsConnectionStartStopTest::~CmsConnectionStartStopTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsConnectionStartStopTest::SetUp() {
-
+void CmsConnectionStartStopTest::SetUp()
+{
     CMSTestFixture::SetUp();
 
-    Pointer<ActiveMQConnectionFactory> factory(new ActiveMQConnectionFactory(cmsProvider->getBrokerURL()));
+    Pointer<ActiveMQConnectionFactory> factory(
+        new ActiveMQConnectionFactory(cmsProvider->getBrokerURL()));
 
     startedConnection.reset(factory->createConnection());
     startedConnection->start();
@@ -63,8 +68,8 @@ void CmsConnectionStartStopTest::SetUp() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsConnectionStartStopTest::TearDown() {
-
+void CmsConnectionStartStopTest::TearDown()
+{
     startedConnection->close();
     stoppedConnection->close();
 
@@ -75,18 +80,21 @@ void CmsConnectionStartStopTest::TearDown() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsConnectionStartStopTest::testStoppedConsumerHoldsMessagesTillStarted() {
-
+void CmsConnectionStartStopTest::testStoppedConsumerHoldsMessagesTillStarted()
+{
     Pointer<Session> startedSession(startedConnection->createSession());
     Pointer<Session> stoppedSession(stoppedConnection->createSession());
 
     // Setup the consumers.
-    Pointer<Topic> topic(startedSession->createTopic("test"));
-    Pointer<MessageConsumer> startedConsumer(startedSession->createConsumer(topic.get()));
-    Pointer<MessageConsumer> stoppedConsumer(stoppedSession->createConsumer(topic.get()));
+    Pointer<Topic>           topic(startedSession->createTopic("test"));
+    Pointer<MessageConsumer> startedConsumer(
+        startedSession->createConsumer(topic.get()));
+    Pointer<MessageConsumer> stoppedConsumer(
+        stoppedSession->createConsumer(topic.get()));
 
     // Send the message.
-    Pointer<MessageProducer> producer(startedSession->createProducer(topic.get()));
+    Pointer<MessageProducer> producer(
+        startedSession->createProducer(topic.get()));
     Pointer<TextMessage> message(startedSession->createTextMessage("Hello"));
     producer->send(message.get());
 
@@ -106,8 +114,8 @@ void CmsConnectionStartStopTest::testStoppedConsumerHoldsMessagesTillStarted() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsConnectionStartStopTest::testMultipleConnectionStops() {
-
+void CmsConnectionStartStopTest::testMultipleConnectionStops()
+{
     testStoppedConsumerHoldsMessagesTillStarted();
     stoppedConnection->stop();
     testStoppedConsumerHoldsMessagesTillStarted();
@@ -116,86 +124,113 @@ void CmsConnectionStartStopTest::testMultipleConnectionStops() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class CreateSessionRunnable : public Runnable {
-    private:
+class CreateSessionRunnable : public Runnable
+{
+private:
+    Connection*                        connection;
+    Random                             rand;
+    CopyOnWriteArrayList<std::string>* exceptions;
 
-        Connection* connection;
-        Random rand;
-        CopyOnWriteArrayList<std::string>* exceptions;
+private:
+    CreateSessionRunnable(const CreateSessionRunnable&);
+    CreateSessionRunnable& operator=(const CreateSessionRunnable&);
 
-    private:
+public:
+    CreateSessionRunnable(Connection*                        connection,
+                          CopyOnWriteArrayList<std::string>* exceptions)
+        : Runnable(),
+          connection(connection),
+          rand(),
+          exceptions(exceptions)
+    {
+    }
 
-        CreateSessionRunnable(const CreateSessionRunnable&);
-        CreateSessionRunnable& operator= (const CreateSessionRunnable&);
+    virtual ~CreateSessionRunnable()
+    {
+    }
 
-    public:
-
-        CreateSessionRunnable(Connection* connection, CopyOnWriteArrayList<std::string>* exceptions) :
-            Runnable(), connection(connection), rand(), exceptions(exceptions) {
+    virtual void run()
+    {
+        try
+        {
+            TimeUnit::MILLISECONDS.sleep(rand.nextInt(10));
+            Pointer<Session>(connection->createSession());
         }
-
-        virtual ~CreateSessionRunnable() {}
-
-        virtual void run() {
-            try {
-                TimeUnit::MILLISECONDS.sleep(rand.nextInt(10));
-                Pointer<Session>(connection->createSession());
-            } catch (CMSException& e) {
-                exceptions->add(e.getMessage());
-            }
+        catch (CMSException& e)
+        {
+            exceptions->add(e.getMessage());
         }
-    };
+    }
+};
 
-    class StartStopRunnable : public Runnable {
-    private:
+class StartStopRunnable : public Runnable
+{
+private:
+    Connection*                        connection;
+    Random                             rand;
+    CopyOnWriteArrayList<std::string>* exceptions;
 
-        Connection* connection;
-        Random rand;
-        CopyOnWriteArrayList<std::string>* exceptions;
+private:
+    StartStopRunnable(const StartStopRunnable&);
+    StartStopRunnable& operator=(const StartStopRunnable&);
 
-    private:
+public:
+    StartStopRunnable(Connection*                        connection,
+                      CopyOnWriteArrayList<std::string>* exceptions)
+        : Runnable(),
+          connection(connection),
+          rand(),
+          exceptions(exceptions)
+    {
+    }
 
-        StartStopRunnable(const StartStopRunnable&);
-        StartStopRunnable& operator= (const StartStopRunnable&);
+    virtual ~StartStopRunnable()
+    {
+    }
 
-    public:
-
-        StartStopRunnable(Connection* connection, CopyOnWriteArrayList<std::string>* exceptions) :
-            Runnable(), connection(connection), rand(), exceptions(exceptions) {
+    virtual void run()
+    {
+        try
+        {
+            TimeUnit::MILLISECONDS.sleep(rand.nextInt(10));
+            connection->start();
+            connection->stop();
         }
-
-        virtual ~StartStopRunnable() {}
-
-        virtual void run() {
-            try {
-                TimeUnit::MILLISECONDS.sleep(rand.nextInt(10));
-                connection->start();
-                connection->stop();
-            } catch (CMSException& e) {
-                exceptions->add(e.getMessage());
-            }
-
+        catch (CMSException& e)
+        {
+            exceptions->add(e.getMessage());
         }
-    };
+    }
+};
 
-}
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsConnectionStartStopTest::testConcurrentSessionCreateWithStart() {
-
-    ThreadPoolExecutor executor(50, Integer::MAX_VALUE, 60LL, TimeUnit::SECONDS, new LinkedBlockingQueue<Runnable*>());
+void CmsConnectionStartStopTest::testConcurrentSessionCreateWithStart()
+{
+    ThreadPoolExecutor executor(50,
+                                Integer::MAX_VALUE,
+                                60LL,
+                                TimeUnit::SECONDS,
+                                new LinkedBlockingQueue<Runnable*>());
 
     CopyOnWriteArrayList<std::string> exceptions;
-    Random rand;
+    Random                            rand;
 
-    for (int i=0; i<2000; i++) {
-        executor.execute(new CreateSessionRunnable(stoppedConnection.get(), &exceptions));
-        executor.execute(new StartStopRunnable(stoppedConnection.get(), &exceptions));
+    for (int i = 0; i < 2000; i++)
+    {
+        executor.execute(
+            new CreateSessionRunnable(stoppedConnection.get(), &exceptions));
+        executor.execute(
+            new StartStopRunnable(stoppedConnection.get(), &exceptions));
     }
 
     executor.shutdown();
-    ASSERT_TRUE(executor.awaitTermination(45, TimeUnit::SECONDS)) << ("executor terminated");
-    ASSERT_TRUE(exceptions.isEmpty()) << ("no exceptions: " + exceptions.toString());
+    ASSERT_TRUE(executor.awaitTermination(45, TimeUnit::SECONDS))
+        << ("executor terminated");
+    ASSERT_TRUE(exceptions.isEmpty())
+        << ("no exceptions: " + exceptions.toString());
 }

@@ -17,9 +17,9 @@
 
 #include "ServiceSupport.h"
 
-#include <memory>
 #include <activemq/util/ServiceListener.h>
 #include <activemq/util/ServiceStopper.h>
+#include <memory>
 
 #include <decaf/util/Iterator.h>
 
@@ -30,41 +30,60 @@ using namespace decaf::lang;
 using namespace decaf::util;
 
 ////////////////////////////////////////////////////////////////////////////////
-ServiceSupport::ServiceSupport() : Service(), started(), stopping(), stopped(true), listeners() {
+ServiceSupport::ServiceSupport()
+    : Service(),
+      started(),
+      stopping(),
+      stopped(true),
+      listeners()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ServiceSupport::~ServiceSupport() {
+ServiceSupport::~ServiceSupport()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ServiceSupport::dispose(Service* service) {
-    try {
-        if (service != NULL) {
+void ServiceSupport::dispose(Service* service)
+{
+    try
+    {
+        if (service != NULL)
+        {
             service->stop();
         }
-    } catch (Exception& e) {
+    }
+    catch (Exception& e)
+    {
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ServiceSupport::start() {
-    if (started.compareAndSet(false, true)) {
-
+void ServiceSupport::start()
+{
+    if (started.compareAndSet(false, true))
+    {
         bool success = false;
-        try {
+        try
+        {
             this->doStart();
             success = true;
-        } catch (...) {
+        }
+        catch (...)
+        {
             this->started.set(success);
         }
 
         this->stopping.set(false);
         this->stopped.set(!success);
 
-        synchronized(&this->listeners) {
-            std::unique_ptr<Iterator<ServiceListener*> > iter(this->listeners.iterator());
-            while (iter->hasNext()) {
+        synchronized(&this->listeners)
+        {
+            std::unique_ptr<Iterator<ServiceListener*>> iter(
+                this->listeners.iterator());
+            while (iter->hasNext())
+            {
                 iter->next()->started(this);
             }
         }
@@ -72,13 +91,18 @@ void ServiceSupport::start() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ServiceSupport::stop() {
-    if (this->stopped.compareAndSet(false, true)) {
+void ServiceSupport::stop()
+{
+    if (this->stopped.compareAndSet(false, true))
+    {
         this->stopping.set(true);
         ServiceStopper stopper;
-        try {
+        try
+        {
             this->doStop(&stopper);
-        } catch (Exception& e) {
+        }
+        catch (Exception& e)
+        {
             stopper.onException(this, e);
         }
 
@@ -86,9 +110,12 @@ void ServiceSupport::stop() {
         this->started.set(false);
         this->stopping.set(false);
 
-        synchronized(&this->listeners) {
-            std::unique_ptr<Iterator<ServiceListener*> > iter(this->listeners.iterator());
-            while (iter->hasNext()) {
+        synchronized(&this->listeners)
+        {
+            std::unique_ptr<Iterator<ServiceListener*>> iter(
+                this->listeners.iterator());
+            while (iter->hasNext())
+            {
                 iter->next()->stopped(this);
             }
         }
@@ -98,33 +125,42 @@ void ServiceSupport::stop() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool ServiceSupport::isStarted() const {
+bool ServiceSupport::isStarted() const
+{
     return this->started.get();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool ServiceSupport::isStopping() const {
+bool ServiceSupport::isStopping() const
+{
     return this->stopping.get();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool ServiceSupport::isStopped() const {
+bool ServiceSupport::isStopped() const
+{
     return this->stopped.get();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ServiceSupport::addServiceListener(ServiceListener* listener) {
-    if (listener != NULL) {
-        synchronized(&this->listeners) {
+void ServiceSupport::addServiceListener(ServiceListener* listener)
+{
+    if (listener != NULL)
+    {
+        synchronized(&this->listeners)
+        {
             this->listeners.add(listener);
         }
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ServiceSupport::removeServiceListener(ServiceListener* listener) {
-    if (listener != NULL) {
-        synchronized(&this->listeners) {
+void ServiceSupport::removeServiceListener(ServiceListener* listener)
+{
+    if (listener != NULL)
+    {
+        synchronized(&this->listeners)
+        {
             this->listeners.remove(listener);
         }
     }

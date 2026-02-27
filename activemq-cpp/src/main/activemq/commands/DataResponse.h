@@ -20,7 +20,7 @@
 
 // Turn off warning message for ignored exception specification
 #ifdef _MSC_VER
-#pragma warning( disable : 4290 )
+#pragma warning(disable : 4290)
 #endif
 
 #include <activemq/commands/DataStructure.h>
@@ -30,8 +30,10 @@
 #include <string>
 #include <vector>
 
-namespace activemq {
-namespace commands {
+namespace activemq
+{
+namespace commands
+{
 
     using decaf::lang::Pointer;
 
@@ -44,22 +46,19 @@ namespace commands {
      *         in the activemq-cpp-openwire-generator module
      *
      */
-    class AMQCPP_API DataResponse : public Response {
+    class AMQCPP_API DataResponse : public Response
+    {
     protected:
-
         Pointer<DataStructure> data;
 
     public:
-
         const static unsigned char ID_DATARESPONSE = 32;
 
     private:
-
         DataResponse(const DataResponse&);
-        DataResponse& operator= (const DataResponse&);
+        DataResponse& operator=(const DataResponse&);
 
     public:
-
         DataResponse();
 
         virtual ~DataResponse();
@@ -75,11 +74,11 @@ namespace commands {
         virtual bool equals(const DataStructure* value) const;
 
         virtual const Pointer<DataStructure>& getData() const;
-        virtual Pointer<DataStructure>& getData();
+        virtual Pointer<DataStructure>&       getData();
         virtual void setData(const Pointer<DataStructure>& data);
-
     };
 
-}}
+}  // namespace commands
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_COMMANDS_DATARESPONSE_H_*/

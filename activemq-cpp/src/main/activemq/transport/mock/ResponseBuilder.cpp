@@ -22,5 +22,6 @@ using namespace activemq::transport;
 using namespace activemq::transport::mock;
 
 ////////////////////////////////////////////////////////////////////////////////
-ResponseBuilder::~ResponseBuilder() {
+ResponseBuilder::~ResponseBuilder()
+{
 }

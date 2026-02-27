@@ -18,15 +18,17 @@
 #ifndef _ACTIVEMQ_TRANSPORT_TRANSPORTFACTORY_H_
 #define _ACTIVEMQ_TRANSPORT_TRANSPORTFACTORY_H_
 
-#include <activemq/util/Config.h>
 #include <activemq/exceptions/ActiveMQException.h>
 #include <activemq/transport/Transport.h>
+#include <activemq/util/Config.h>
+#include <decaf/lang/Pointer.h>
 #include <decaf/net/URI.h>
 #include <decaf/util/Properties.h>
-#include <decaf/lang/Pointer.h>
 
-namespace activemq{
-namespace transport{
+namespace activemq
+{
+namespace transport
+{
 
     /**
      * Defines the interface for Factories that create Transports or
@@ -39,29 +41,34 @@ namespace transport{
      *
      * @since 3.0
      */
-    class AMQCPP_API TransportFactory {
+    class AMQCPP_API TransportFactory
+    {
     public:
-
-        virtual ~TransportFactory() {}
+        virtual ~TransportFactory()
+        {
+        }
 
         /**
          * Creates a fully configured Transport instance which could be a chain
          * of filters and transports.
-         * @param location - URI location to connect to plus any properties to assign.
+         * @param location - URI location to connect to plus any properties to
+         * assign.
          * @throws ActiveMQexception if an error occurs
          */
         virtual Pointer<Transport> create(const decaf::net::URI& location) = 0;
 
         /**
-         * Creates a slimed down Transport instance which can be used in composite
-         * transport instances.
-         * @param location - URI location to connect to plus any properties to assign.
+         * Creates a slimed down Transport instance which can be used in
+         * composite transport instances.
+         * @param location - URI location to connect to plus any properties to
+         * assign.
          * @throws ActiveMQexception if an error occurs
          */
-        virtual Pointer<Transport> createComposite(const decaf::net::URI& location) = 0;
-
+        virtual Pointer<Transport> createComposite(
+            const decaf::net::URI& location) = 0;
     };
 
-}}
+}  // namespace transport
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_TRANSPORT_TRANSPORTFACTORY_H_*/

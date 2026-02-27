@@ -18,22 +18,25 @@
 #ifndef _ACTIVEMQ_COMMANDS_ACTIVEMQBYTESMESSAGE_H_
 #define _ACTIVEMQ_COMMANDS_ACTIVEMQBYTESMESSAGE_H_
 
-#include <activemq/util/Config.h>
 #include <activemq/commands/ActiveMQMessageTemplate.h>
+#include <activemq/util/Config.h>
+#include <cms/BytesMessage.h>
 #include <decaf/io/ByteArrayOutputStream.h>
 #include <decaf/io/DataInputStream.h>
 #include <decaf/io/DataOutputStream.h>
-#include <cms/BytesMessage.h>
-#include <vector>
-#include <string>
 #include <memory>
+#include <string>
+#include <vector>
 
-namespace activemq {
-namespace commands {
+namespace activemq
+{
+namespace commands
+{
 
-    class AMQCPP_API ActiveMQBytesMessage : public ActiveMQMessageTemplate< cms::BytesMessage > {
+    class AMQCPP_API ActiveMQBytesMessage
+        : public ActiveMQMessageTemplate<cms::BytesMessage>
+    {
     private:
-
         /**
          * OutputStream that wraps around the command's content when in
          * write-only mode.
@@ -56,19 +59,16 @@ namespace commands {
         mutable int length;
 
     public:
-
         const static unsigned char ID_ACTIVEMQBYTESMESSAGE;
 
     private:
-
         ActiveMQBytesMessage(const ActiveMQBytesMessage&);
         ActiveMQBytesMessage& operator=(const ActiveMQBytesMessage&);
 
     public:
-
         ActiveMQBytesMessage();
 
-        virtual ~ActiveMQBytesMessage() throw ();
+        virtual ~ActiveMQBytesMessage() throw();
 
         virtual unsigned char getDataStructureType() const;
 
@@ -80,16 +80,14 @@ namespace commands {
 
         virtual bool equals(const DataStructure* value) const;
 
-    public:   // CMS Message
-
+    public:  // CMS Message
         virtual cms::BytesMessage* clone() const;
 
         virtual void clearBody();
 
         virtual void onSend();
 
-    public:   // CMS BytesMessage
-
+    public:  // CMS BytesMessage
         virtual void setBodyBytes(const unsigned char* buffer, int numBytes);
 
         virtual unsigned char* getBodyBytes() const;
@@ -112,7 +110,9 @@ namespace commands {
 
         virtual int readBytes(unsigned char* buffer, int length) const;
 
-        virtual void writeBytes(const unsigned char* value, int offset, int length);
+        virtual void writeBytes(const unsigned char* value,
+                                int                  offset,
+                                int                  length);
 
         virtual char readChar() const;
 
@@ -151,15 +151,14 @@ namespace commands {
         virtual void writeUTF(const std::string& value);
 
     private:
-
         void storeContent();
 
         void initializeReading() const;
 
         void initializeWriting();
-
     };
 
-}}
+}  // namespace commands
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_COMMANDS_ACTIVEMQBYTESMESSAGE_H_*/

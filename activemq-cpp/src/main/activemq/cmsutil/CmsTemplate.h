@@ -18,17 +18,19 @@
 #ifndef _ACTIVEMQ_CMSUTIL_CMSTEMPLATE_H_
 #define _ACTIVEMQ_CMSUTIL_CMSTEMPLATE_H_
 
-#include <activemq/util/Config.h>
 #include <activemq/cmsutil/CmsDestinationAccessor.h>
-#include <activemq/cmsutil/SessionCallback.h>
 #include <activemq/cmsutil/ProducerCallback.h>
+#include <activemq/cmsutil/SessionCallback.h>
 #include <activemq/cmsutil/SessionPool.h>
+#include <activemq/util/Config.h>
 #include <cms/ConnectionFactory.h>
 #include <cms/DeliveryMode.h>
 #include <string>
 
-namespace activemq {
-namespace cmsutil {
+namespace activemq
+{
+namespace cmsutil
+{
 
     // Forward declarations.
     class MessageCreator;
@@ -57,9 +59,9 @@ namespace cmsutil {
      * @see ProducerCallback
      * @see MessageCreator
      */
-    class AMQCPP_API CmsTemplate : public CmsDestinationAccessor {
+    class AMQCPP_API CmsTemplate : public CmsDestinationAccessor
+    {
     public:
-
         /**
          * Timeout value indicating that a receive operation should
          * check if a message is immediately available without blocking.
@@ -82,65 +84,75 @@ namespace cmsutil {
         static const long long DEFAULT_TIME_TO_LIVE;
 
     public:
-
         /**
          * Session callback that executes a producer callback.
          */
         class ProducerExecutor;
         friend class ProducerExecutor;
-        class ProducerExecutor : public SessionCallback {
-        protected:
 
+        class ProducerExecutor : public SessionCallback
+        {
+        protected:
             ProducerCallback* action;
-            CmsTemplate* parent;
+            CmsTemplate*      parent;
             cms::Destination* destination;
 
         private:
-
             ProducerExecutor(const ProducerExecutor&);
             ProducerExecutor& operator=(const ProducerExecutor&);
 
         public:
-
             ProducerExecutor(ProducerCallback* action,
-                             CmsTemplate* parent,
+                             CmsTemplate*      parent,
                              cms::Destination* destination)
-                : SessionCallback(), action(action), parent(parent), destination(destination) {
+                : SessionCallback(),
+                  action(action),
+                  parent(parent),
+                  destination(destination)
+            {
             }
 
-            virtual ~ProducerExecutor() {}
+            virtual ~ProducerExecutor()
+            {
+            }
 
             virtual void doInCms(cms::Session* session);
 
-            virtual cms::Destination* getDestination(cms::Session* session AMQCPP_UNUSED) {
+            virtual cms::Destination* getDestination(
+                cms::Session* session AMQCPP_UNUSED)
+            {
                 return destination;
             }
         };
 
         /**
-         * Session callback that executes a producer callback for a named destination.
+         * Session callback that executes a producer callback for a named
+         * destination.
          */
         class ResolveProducerExecutor;
         friend class ResolveProducerExecutor;
-        class ResolveProducerExecutor : public ProducerExecutor {
-        private:
 
+        class ResolveProducerExecutor : public ProducerExecutor
+        {
+        private:
             std::string destinationName;
 
         private:
-
             ResolveProducerExecutor(const ResolveProducerExecutor&);
             ResolveProducerExecutor& operator=(const ResolveProducerExecutor&);
 
         public:
-
-            ResolveProducerExecutor(ProducerCallback* action,
-                                    CmsTemplate* parent,
+            ResolveProducerExecutor(ProducerCallback*  action,
+                                    CmsTemplate*       parent,
                                     const std::string& destinationName)
-                : ProducerExecutor(action, parent, NULL), destinationName(destinationName) {
+                : ProducerExecutor(action, parent, NULL),
+                  destinationName(destinationName)
+            {
             }
 
-            virtual ~ResolveProducerExecutor() {}
+            virtual ~ResolveProducerExecutor()
+            {
+            }
 
             virtual cms::Destination* getDestination(cms::Session* session);
         };
@@ -150,27 +162,32 @@ namespace cmsutil {
          */
         class SendExecutor;
         friend class SendExecutor;
-        class SendExecutor : public ProducerCallback {
-        private:
 
+        class SendExecutor : public ProducerCallback
+        {
+        private:
             MessageCreator* messageCreator;
-            CmsTemplate* parent;
+            CmsTemplate*    parent;
 
         private:
-
             SendExecutor(const SendExecutor&);
             SendExecutor& operator=(const SendExecutor&);
 
         public:
-
-            SendExecutor(MessageCreator* messageCreator, CmsTemplate* parent) :
-                ProducerCallback(), messageCreator(messageCreator), parent(parent) {
+            SendExecutor(MessageCreator* messageCreator, CmsTemplate* parent)
+                : ProducerCallback(),
+                  messageCreator(messageCreator),
+                  parent(parent)
+            {
             }
 
-            virtual ~SendExecutor() {
+            virtual ~SendExecutor()
+            {
             }
 
-            virtual void doInCms(cms::Session* session, cms::MessageProducer* producer) {
+            virtual void doInCms(cms::Session*         session,
+                                 cms::MessageProducer* producer)
+            {
                 parent->doSend(session, producer, messageCreator);
             }
         };
@@ -180,70 +197,88 @@ namespace cmsutil {
          */
         class ReceiveExecutor;
         friend class ReceiveExecutor;
-        class ReceiveExecutor : public SessionCallback {
-        protected:
 
+        class ReceiveExecutor : public SessionCallback
+        {
+        protected:
             cms::Destination* destination;
-            std::string selector;
-            bool noLocal;
-            cms::Message* message;
-            CmsTemplate* parent;
+            std::string       selector;
+            bool              noLocal;
+            cms::Message*     message;
+            CmsTemplate*      parent;
 
         private:
-
             ReceiveExecutor(const ReceiveExecutor&);
             ReceiveExecutor& operator=(const ReceiveExecutor&);
 
         public:
-
-            ReceiveExecutor(CmsTemplate* parent, cms::Destination* destination,
-                            const std::string& selector, bool noLocal) :
-                SessionCallback(), destination(destination), selector(selector), noLocal(noLocal), message(NULL), parent(parent) {
+            ReceiveExecutor(CmsTemplate*       parent,
+                            cms::Destination*  destination,
+                            const std::string& selector,
+                            bool               noLocal)
+                : SessionCallback(),
+                  destination(destination),
+                  selector(selector),
+                  noLocal(noLocal),
+                  message(NULL),
+                  parent(parent)
+            {
             }
 
-            virtual ~ReceiveExecutor() {}
+            virtual ~ReceiveExecutor()
+            {
+            }
 
             virtual void doInCms(cms::Session* session);
 
-            virtual cms::Destination* getDestination(cms::Session* session AMQCPP_UNUSED) {
+            virtual cms::Destination* getDestination(
+                cms::Session* session AMQCPP_UNUSED)
+            {
                 return destination;
             }
 
-            cms::Message* getMessage() {
+            cms::Message* getMessage()
+            {
                 return message;
             }
         };
 
         /**
-         * Session callback that executes a receive callback for a named destination.
+         * Session callback that executes a receive callback for a named
+         * destination.
          */
         class ResolveReceiveExecutor;
         friend class ResolveReceiveExecutor;
-        class ResolveReceiveExecutor : public ReceiveExecutor {
-        private:
 
+        class ResolveReceiveExecutor : public ReceiveExecutor
+        {
+        private:
             std::string destinationName;
 
         private:
-
             ResolveReceiveExecutor(const ResolveReceiveExecutor&);
             ResolveReceiveExecutor& operator=(const ResolveReceiveExecutor&);
 
         public:
-
-            ResolveReceiveExecutor(CmsTemplate* parent, const std::string& selector,
-                                   bool noLocal, const std::string& destinationName) :
-                ReceiveExecutor(parent, NULL, selector, noLocal), destinationName(destinationName) {
+            ResolveReceiveExecutor(CmsTemplate*       parent,
+                                   const std::string& selector,
+                                   bool               noLocal,
+                                   const std::string& destinationName)
+                : ReceiveExecutor(parent, NULL, selector, noLocal),
+                  destinationName(destinationName)
+            {
             }
 
-            virtual ~ResolveReceiveExecutor() {}
+            virtual ~ResolveReceiveExecutor()
+            {
+            }
 
             virtual cms::Destination* getDestination(cms::Session* session);
         };
 
     private:
-
-        static const int NUM_SESSION_POOLS = (int)cms::Session::SESSION_TRANSACTED + 1;
+        static const int NUM_SESSION_POOLS =
+            (int)cms::Session::SESSION_TRANSACTED + 1;
 
         cms::Connection* connection;
 
@@ -272,116 +307,136 @@ namespace cmsutil {
         bool initialized;
 
     private:
-
         CmsTemplate(const CmsTemplate&);
         CmsTemplate& operator=(const CmsTemplate&);
 
     public:
-
         CmsTemplate();
         CmsTemplate(cms::ConnectionFactory* connectionFactory);
 
         virtual ~CmsTemplate();
 
         /**
-         * Sets the destination object to be used by default for send/receive operations.
-         * If no default destination is provided, the <code>defaultDestinationName</code>
-         * property is used to resolve this default destination for send/receive
-         * operations.
+         * Sets the destination object to be used by default for send/receive
+         * operations. If no default destination is provided, the
+         * <code>defaultDestinationName</code> property is used to resolve this
+         * default destination for send/receive operations.
          *
          * @param defaultDestination
          *          the default destination
          */
-        virtual void setDefaultDestination(cms::Destination* defaultDestination) {
+        virtual void setDefaultDestination(cms::Destination* defaultDestination)
+        {
             this->defaultDestination = defaultDestination;
         }
 
         /**
-         * Retrieves the default destination to be used for send/receive operations.
+         * Retrieves the default destination to be used for send/receive
+         * operations.
          * @return the default destination. Const version of this method.
          */
-        virtual const cms::Destination* getDefaultDestination() const {
+        virtual const cms::Destination* getDefaultDestination() const
+        {
             return this->defaultDestination;
         }
 
         /**
-         * Retrieves the default destination to be used for send/receive operations.
+         * Retrieves the default destination to be used for send/receive
+         * operations.
          * @return the default destination. Non-const version of this method.
          */
-        virtual cms::Destination* getDefaultDestination() {
+        virtual cms::Destination* getDefaultDestination()
+        {
             return this->defaultDestination;
         }
 
         /**
-         * Sets the name of the default destination to be used from send/receive operations.
-         * Calling this method will set the <code>defaultDestination</code> property to NULL.
-         * The destination type (topic/queue) is determined by the
-         * <code>pubSubDomain</code> property.
+         * Sets the name of the default destination to be used from send/receive
+         * operations. Calling this method will set the
+         * <code>defaultDestination</code> property to NULL. The destination
+         * type (topic/queue) is determined by the <code>pubSubDomain</code>
+         * property.
          *
          * @param defaultDestinationName
          *          the name of the destination for send/receive to by default.
          */
-        virtual void setDefaultDestinationName(const std::string& defaultDestinationName) {
-            if (defaultDestinationName != this->defaultDestinationName) {
-                this->defaultDestination = NULL;
+        virtual void setDefaultDestinationName(
+            const std::string& defaultDestinationName)
+        {
+            if (defaultDestinationName != this->defaultDestinationName)
+            {
+                this->defaultDestination     = NULL;
                 this->defaultDestinationName = defaultDestinationName;
             }
         }
 
         /**
-         * Gets the name of the default destination to be used for send/receive operations.
-         * The destination type (topic/queue) is determined by the
+         * Gets the name of the default destination to be used for send/receive
+         * operations. The destination type (topic/queue) is determined by the
          * <code>pubSubDomain</code> property.
          *
-         * @return the default name of the destination for send/receive operations.
+         * @return the default name of the destination for send/receive
+         * operations.
          */
-        virtual const std::string getDefaultDestinationName() const {
+        virtual const std::string getDefaultDestinationName() const
+        {
             return this->defaultDestinationName;
         }
 
         /**
-         * Indicates whether the default destination is a topic (true) or a queue (false).
-         * Calling this method will set the <code>defaultDestination</code> property to NULL.
+         * Indicates whether the default destination is a topic (true) or a
+         * queue (false). Calling this method will set the
+         * <code>defaultDestination</code> property to NULL.
          *
          * @param pubSubDomain
          *          indicates whether to use pub-sub messaging (topics).
          */
-        virtual void setPubSubDomain(bool pubSubDomain) {
-            if (pubSubDomain != isPubSubDomain()) {
+        virtual void setPubSubDomain(bool pubSubDomain)
+        {
+            if (pubSubDomain != isPubSubDomain())
+            {
                 this->defaultDestination = NULL;
                 CmsDestinationAccessor::setPubSubDomain(pubSubDomain);
             }
         }
 
-        virtual void setMessageIdEnabled(bool messageIdEnabled) {
+        virtual void setMessageIdEnabled(bool messageIdEnabled)
+        {
             this->messageIdEnabled = messageIdEnabled;
         }
 
-        virtual bool isMessageIdEnabled() const {
+        virtual bool isMessageIdEnabled() const
+        {
             return this->messageIdEnabled;
         }
 
-        virtual void setMessageTimestampEnabled(bool messageTimestampEnabled) {
+        virtual void setMessageTimestampEnabled(bool messageTimestampEnabled)
+        {
             this->messageTimestampEnabled = messageTimestampEnabled;
         }
 
-        virtual bool isMessageTimestampEnabled() const {
+        virtual bool isMessageTimestampEnabled() const
+        {
             return this->messageTimestampEnabled;
         }
 
-        virtual void setNoLocal(bool noLocal) {
+        virtual void setNoLocal(bool noLocal)
+        {
             this->noLocal = noLocal;
         }
 
-        virtual bool isNoLocal() const {
+        virtual bool isNoLocal() const
+        {
             return this->noLocal;
         }
 
-        virtual void setReceiveTimeout(long long receiveTimeout) {
+        virtual void setReceiveTimeout(long long receiveTimeout)
+        {
             this->receiveTimeout = receiveTimeout;
         }
 
-        virtual long long getReceiveTimeout() const {
+        virtual long long getReceiveTimeout() const
+        {
             return this->receiveTimeout;
         }
 
@@ -393,7 +448,8 @@ namespace cmsutil {
          * @see #setPriority
          * @see #setTimeToLive
          */
-        virtual void setExplicitQosEnabled(bool explicitQosEnabled) {
+        virtual void setExplicitQosEnabled(bool explicitQosEnabled)
+        {
             this->explicitQosEnabled = explicitQosEnabled;
         }
 
@@ -409,19 +465,22 @@ namespace cmsutil {
          * @see #setPriority
          * @see #setTimeToLive
          */
-        virtual bool isExplicitQosEnabled() const {
+        virtual bool isExplicitQosEnabled() const
+        {
             return this->explicitQosEnabled;
         }
 
         /**
          * Set whether message delivery should be persistent or non-persistent,
-         * specified as boolean value ("true" or "false"). This will set the delivery
-         * mode accordingly, to either "PERSISTENT" or "NON_PERSISTENT".
-         * <p>Default it "true" aka delivery mode "PERSISTENT".
+         * specified as boolean value ("true" or "false"). This will set the
+         * delivery mode accordingly, to either "PERSISTENT" or
+         * "NON_PERSISTENT". <p>Default it "true" aka delivery mode
+         * "PERSISTENT".
          *
          * @see #setDeliveryMode(int)
          */
-        virtual void setDeliveryPersistent(bool deliveryPersistent) {
+        virtual void setDeliveryPersistent(bool deliveryPersistent)
+        {
             this->deliveryMode = (deliveryPersistent ? 0 : 1);
         }
 
@@ -433,14 +492,16 @@ namespace cmsutil {
          * @param deliveryMode the delivery mode to use
          * @see #isExplicitQosEnabled
          */
-        virtual void setDeliveryMode(int deliveryMode) {
+        virtual void setDeliveryMode(int deliveryMode)
+        {
             this->deliveryMode = deliveryMode;
         }
 
         /**
          * Return the delivery mode to use when sending a message.
          */
-        virtual int getDeliveryMode() const {
+        virtual int getDeliveryMode() const
+        {
             return this->deliveryMode;
         }
 
@@ -451,14 +512,16 @@ namespace cmsutil {
          *
          * @see #isExplicitQosEnabled
          */
-        virtual void setPriority(int priority) {
+        virtual void setPriority(int priority)
+        {
             this->priority = priority;
         }
 
         /**
          * Return the priority of a message when sending.
          */
-        virtual int getPriority() const {
+        virtual int getPriority() const
+        {
             return this->priority;
         }
 
@@ -470,14 +533,16 @@ namespace cmsutil {
          *
          * @see #isExplicitQosEnabled
          */
-        virtual void setTimeToLive(long long timeToLive) {
+        virtual void setTimeToLive(long long timeToLive)
+        {
             this->timeToLive = timeToLive;
         }
 
         /**
          * Return the time-to-live of the message when sending.
          */
-        virtual long long getTimeToLive() const {
+        virtual long long getTimeToLive() const
+        {
             return this->timeToLive;
         }
 
@@ -523,7 +588,8 @@ namespace cmsutil {
          *
          * @throws cms::CMSException thrown if an error occurs.
          */
-        virtual void execute(const std::string& destinationName, ProducerCallback* action);
+        virtual void execute(const std::string& destinationName,
+                             ProducerCallback*  action);
 
         /**
          * Convenience method for sending a message to the default destination.
@@ -535,7 +601,8 @@ namespace cmsutil {
         virtual void send(MessageCreator* messageCreator);
 
         /**
-         * Convenience method for sending a message to the specified destination.
+         * Convenience method for sending a message to the specified
+         * destination.
          *
          * @param dest
          *          The destination to send to
@@ -543,10 +610,12 @@ namespace cmsutil {
          *          Responsible for creating the message to be sent
          * @throws cms::CMSException thrown if an error occurs.
          */
-        virtual void send(cms::Destination* dest, MessageCreator* messageCreator);
+        virtual void send(cms::Destination* dest,
+                          MessageCreator*   messageCreator);
 
         /**
-         * Convenience method for sending a message to the specified destination.
+         * Convenience method for sending a message to the specified
+         * destination.
          *
          * @param destinationName
          *          The name of the destination to send to.
@@ -554,7 +623,8 @@ namespace cmsutil {
          *          Responsible for creating the message to be sent
          * @throws cms::CMSException thrown if an error occurs.
          */
-        virtual void send(const std::string& destinationName, MessageCreator* messageCreator);
+        virtual void send(const std::string& destinationName,
+                          MessageCreator*    messageCreator);
 
         /**
          * Performs a synchronous read from the default destination.
@@ -604,7 +674,8 @@ namespace cmsutil {
          * @return the message
          * @throws cms::CMSException thrown if an error occurs
          */
-        virtual cms::Message* receiveSelected(cms::Destination* destination, const std::string& selector);
+        virtual cms::Message* receiveSelected(cms::Destination*  destination,
+                                              const std::string& selector);
 
         /**
          * Performs a synchronous read from the specified destination, consuming
@@ -618,16 +689,15 @@ namespace cmsutil {
          * @return the message
          * @throws cms::CMSException thrown if an error occurs
          */
-        virtual cms::Message* receiveSelected(const std::string& destinationName, const std::string& selector);
+        virtual cms::Message* receiveSelected(const std::string& destinationName,
+                                              const std::string& selector);
 
     protected:
-
         void init();
 
         void destroy();
 
     private:
-
         /**
          * Initializes all members to their defaults.
          */
@@ -686,7 +756,8 @@ namespace cmsutil {
          * @return the producer
          * @throws cms::CMSException thrown by the CMS API
          */
-        cms::MessageProducer* createProducer(cms::Session* session, cms::Destination* dest);
+        cms::MessageProducer* createProducer(cms::Session*     session,
+                                             cms::Destination* dest);
 
         /**
          * Closes and destroys a producer resource
@@ -707,8 +778,10 @@ namespace cmsutil {
          * @return the consumer
          * @throws cms::CMSException thrown by the CMS API
          */
-        cms::MessageConsumer* createConsumer(cms::Session* session, cms::Destination* dest,
-                                             const std::string& selector, bool noLocal);
+        cms::MessageConsumer* createConsumer(cms::Session*      session,
+                                             cms::Destination*  dest,
+                                             const std::string& selector,
+                                             bool               noLocal);
 
         /**
          * Closes and destroys a consumer resource
@@ -735,7 +808,9 @@ namespace cmsutil {
          *          creates the message to be sent
          * @throws cms::CMSException thrown if the CMS API throws.
          */
-        void doSend(cms::Session* session, cms::MessageProducer* producer, MessageCreator* messageCreator);
+        void doSend(cms::Session*         session,
+                    cms::MessageProducer* producer,
+                    MessageCreator*       messageCreator);
 
         /**
          * Receives a message from a destination.
@@ -754,9 +829,9 @@ namespace cmsutil {
          * @throws cms::CMSException if an error occurs
          */
         cms::Destination* resolveDefaultDestination(cms::Session* session);
-
     };
 
-}}
+}  // namespace cmsutil
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_CMSUTIL_CMSTEMPLATE_H_*/

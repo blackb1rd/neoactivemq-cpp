@@ -15,73 +15,79 @@
  * limitations under the License.
  */
 
-#include <gtest/gtest.h>
-#include <activemq/cmsutil/DynamicDestinationResolver.h>
-#include <activemq/cmsutil/ResourceLifecycleManager.h>
 #include "DummyConnectionFactory.h"
 #include <activemq/cmsutil/CmsAccessor.h>
+#include <activemq/cmsutil/DynamicDestinationResolver.h>
+#include <activemq/cmsutil/ResourceLifecycleManager.h>
+#include <gtest/gtest.h>
 
 using namespace activemq;
 using namespace activemq::cmsutil;
 
-    class CmsAccessorTest : public ::testing::Test
+class CmsAccessorTest : public ::testing::Test
+{
+protected:
+    class MyAccessor : public CmsAccessor
     {
-    protected:
+    public:
+        virtual ~MyAccessor()
+        {
+        }
 
-        class MyAccessor : public CmsAccessor {
-        public:
+        virtual cms::Connection* createConnection()
+        {
+            return CmsAccessor::createConnection();
+        }
 
-            virtual ~MyAccessor() {}
-
-            virtual cms::Connection* createConnection() {
-                return CmsAccessor::createConnection();
-            }
-
-            virtual cms::Session* createSession(cms::Connection* con) {
-                return CmsAccessor::createSession(con);
-            }
-        };
-
-        MyAccessor* accessor;
-        DummyConnectionFactory* cf;
-
-        void SetUp() override;
-        void TearDown() override;
+        virtual cms::Session* createSession(cms::Connection* con)
+        {
+            return CmsAccessor::createSession(con);
+        }
     };
 
+    MyAccessor*             accessor;
+    DummyConnectionFactory* cf;
+
+    void SetUp() override;
+    void TearDown() override;
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsAccessorTest::SetUp() {
-    cf = new DummyConnectionFactory();
+void CmsAccessorTest::SetUp()
+{
+    cf       = new DummyConnectionFactory();
     accessor = new MyAccessor();
     accessor->setConnectionFactory(cf);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsAccessorTest::TearDown() {
+void CmsAccessorTest::TearDown()
+{
     delete accessor;
     delete cf;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(CmsAccessorTest, testConnectionFactory) {
-
+TEST_F(CmsAccessorTest, testConnectionFactory)
+{
     ASSERT_TRUE(accessor->getConnectionFactory() == cf);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(CmsAccessorTest, testAckMode) {
-
-    ASSERT_TRUE(accessor->getSessionAcknowledgeMode() == cms::Session::AUTO_ACKNOWLEDGE);
+TEST_F(CmsAccessorTest, testAckMode)
+{
+    ASSERT_TRUE(accessor->getSessionAcknowledgeMode() ==
+                cms::Session::AUTO_ACKNOWLEDGE);
 
     accessor->setSessionAcknowledgeMode(cms::Session::CLIENT_ACKNOWLEDGE);
 
-    ASSERT_TRUE(accessor->getSessionAcknowledgeMode() == cms::Session::CLIENT_ACKNOWLEDGE) ;
+    ASSERT_TRUE(accessor->getSessionAcknowledgeMode() ==
+                cms::Session::CLIENT_ACKNOWLEDGE);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(CmsAccessorTest, testCreateResources) {
-
+TEST_F(CmsAccessorTest, testCreateResources)
+{
     cms::Connection* c = accessor->createConnection();
     ASSERT_TRUE(c != NULL);
 

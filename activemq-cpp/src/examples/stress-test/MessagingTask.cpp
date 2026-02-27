@@ -26,48 +26,71 @@ using namespace cms::stress;
 ThreadPoolExecutor* MessagingTask::threadPoolExecutor = NULL;
 
 ////////////////////////////////////////////////////////////////////////////////
-MessagingTask::MessagingTask(Receiver* receiver, const std::string& message) :
-    receiver(receiver), message(message) {
+MessagingTask::MessagingTask(Receiver* receiver, const std::string& message)
+    : receiver(receiver),
+      message(message)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-MessagingTask::~MessagingTask() {
+MessagingTask::~MessagingTask()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MessagingTask::queue() {
-    if (threadPoolExecutor != NULL) {
+void MessagingTask::queue()
+{
+    if (threadPoolExecutor != NULL)
+    {
         threadPoolExecutor->execute(this);
-    } else {
+    }
+    else
+    {
         run();
         delete this;
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MessagingTask::run() {
-    try {
-        if (receiver != NULL) {
+void MessagingTask::run()
+{
+    try
+    {
+        if (receiver != NULL)
+        {
             receiver->executeMessagingTask(message);
         }
-    } catch (...) {
+    }
+    catch (...)
+    {
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MessagingTask::initializeThreads(int min, int max) {
-    if (min > 0) {
-        threadPoolExecutor = new ThreadPoolExecutor(min, max, 5, TimeUnit::SECONDS, new LinkedBlockingQueue<Runnable*>());
-    } else {
+void MessagingTask::initializeThreads(int min, int max)
+{
+    if (min > 0)
+    {
+        threadPoolExecutor =
+            new ThreadPoolExecutor(min,
+                                   max,
+                                   5,
+                                   TimeUnit::SECONDS,
+                                   new LinkedBlockingQueue<Runnable*>());
+    }
+    else
+    {
         threadPoolExecutor = NULL;
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MessagingTask::terminateThreads() {
-    if (threadPoolExecutor != NULL) {
+void MessagingTask::terminateThreads()
+{
+    if (threadPoolExecutor != NULL)
+    {
         threadPoolExecutor->shutdown();
-        //threadPoolExecutor->awaitTermination(10000, TimeUnit::MILLISECONDS);
+        // threadPoolExecutor->awaitTermination(10000, TimeUnit::MILLISECONDS);
         threadPoolExecutor->awaitTermination(-1, TimeUnit::SECONDS);
         delete threadPoolExecutor;
         threadPoolExecutor = NULL;

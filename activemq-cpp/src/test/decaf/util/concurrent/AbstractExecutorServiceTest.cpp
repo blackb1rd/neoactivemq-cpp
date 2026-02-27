@@ -19,16 +19,16 @@
 
 #include <string>
 
-#include <decaf/lang/Runnable.h>
 #include <decaf/lang/Pointer.h>
+#include <decaf/lang/Runnable.h>
 #include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/util/ArrayList.h>
-#include <decaf/util/concurrent/LinkedBlockingQueue.h>
-#include <decaf/util/concurrent/TimeUnit.h>
-#include <decaf/util/concurrent/Future.h>
 #include <decaf/util/concurrent/AbstractExecutorService.h>
-#include <decaf/util/concurrent/ThreadPoolExecutor.h>
 #include <decaf/util/concurrent/ExecutorsTestSupport.h>
+#include <decaf/util/concurrent/Future.h>
+#include <decaf/util/concurrent/LinkedBlockingQueue.h>
+#include <decaf/util/concurrent/ThreadPoolExecutor.h>
+#include <decaf/util/concurrent/TimeUnit.h>
 
 using namespace std;
 using namespace decaf;
@@ -37,383 +37,501 @@ using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 
-    class AbstractExecutorServiceTest : public ExecutorsTestSupport
-    {
+class AbstractExecutorServiceTest : public ExecutorsTestSupport
+{
 public:
-
-        AbstractExecutorServiceTest();
-        virtual ~AbstractExecutorServiceTest();
-
-    };
+    AbstractExecutorServiceTest();
+    virtual ~AbstractExecutorServiceTest();
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    /**
-     * A no-frills implementation of AbstractExecutorService, designed
-     * to test the submit methods only.
-     */
-    class DirectExecutorService : public AbstractExecutorService {
-    private:
+/**
+ * A no-frills implementation of AbstractExecutorService, designed
+ * to test the submit methods only.
+ */
+class DirectExecutorService : public AbstractExecutorService
+{
+private:
+    volatile bool isshutdown;
 
-        volatile bool isshutdown;
+public:
+    DirectExecutorService()
+        : AbstractExecutorService(),
+          isshutdown(false)
+    {
+    }
 
-    public:
+    virtual ~DirectExecutorService()
+    {
+    }
 
-        DirectExecutorService() : AbstractExecutorService(), isshutdown(false) {
+    virtual void execute(Runnable* r)
+    {
+        this->execute(r, true);
+    }
+
+    virtual void execute(Runnable* r, bool own)
+    {
+        if (r == NULL)
+        {
+            throw NullPointerException(__FILE__, __LINE__, "Runnable was NULL");
         }
 
-        virtual ~DirectExecutorService() {}
-
-        virtual void execute(Runnable* r) {
-            this->execute(r, true);
+        try
+        {
+            r->run();
         }
-
-        virtual void execute(Runnable* r, bool own) {
-            if (r == NULL) {
-                throw NullPointerException(__FILE__, __LINE__, "Runnable was NULL");
-            }
-
-            try {
-                r->run();
-            } catch(Exception& e) {
-                if (own) {
-                    delete r;
-                }
-
-                throw;
-            }
-
-            if (own) {
+        catch (Exception& e)
+        {
+            if (own)
+            {
                 delete r;
             }
+
+            throw;
         }
 
-        virtual void shutdown() {
-            isshutdown = true;
+        if (own)
+        {
+            delete r;
         }
+    }
 
-        virtual ArrayList<Runnable*> shutdownNow() {
-            isshutdown = true;
+    virtual void shutdown()
+    {
+        isshutdown = true;
+    }
 
-            return ArrayList<Runnable*>();
-        }
+    virtual ArrayList<Runnable*> shutdownNow()
+    {
+        isshutdown = true;
 
-        virtual bool isShutdown() const {
-            return isshutdown;
-        }
+        return ArrayList<Runnable*>();
+    }
 
-        virtual bool isTerminated() const {
-            return isShutdown();
-        }
+    virtual bool isShutdown() const
+    {
+        return isshutdown;
+    }
 
-        virtual bool awaitTermination(long long timeout, const TimeUnit& unit) {
-            return isShutdown();
-        }
-    };
+    virtual bool isTerminated() const
+    {
+        return isShutdown();
+    }
+
+    virtual bool awaitTermination(long long timeout, const TimeUnit& unit)
+    {
+        return isShutdown();
+    }
+};
+}  // namespace
+
+////////////////////////////////////////////////////////////////////////////////
+AbstractExecutorServiceTest::AbstractExecutorServiceTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-AbstractExecutorServiceTest::AbstractExecutorServiceTest() {
+AbstractExecutorServiceTest::~AbstractExecutorServiceTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-AbstractExecutorServiceTest::~AbstractExecutorServiceTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-TEST_F(AbstractExecutorServiceTest, testExecuteRunnable) {
-
-    try {
-        bool done = false;
+TEST_F(AbstractExecutorServiceTest, testExecuteRunnable)
+{
+    try
+    {
+        bool                  done = false;
         DirectExecutorService e;
-        TrackedShortRunnable task(&done);
+        TrackedShortRunnable  task(&done);
 
         ASSERT_TRUE(!done);
         Future<int>* future = e.submit<int>(&task, false);
         future->get();
         ASSERT_TRUE(done);
         delete future;
-    } catch (ExecutionException& ex) {
+    }
+    catch (ExecutionException& ex)
+    {
         unexpectedException();
-    } catch (InterruptedException& ex) {
+    }
+    catch (InterruptedException& ex)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(AbstractExecutorServiceTest, testSubmitCallable) {
-
-    try {
+TEST_F(AbstractExecutorServiceTest, testSubmitCallable)
+{
+    try
+    {
         DirectExecutorService e;
-        Future<string>* future = e.submit(new StringTask());
-        string result = future->get();
+        Future<string>*       future = e.submit(new StringTask());
+        string                result = future->get();
         ASSERT_EQ(TEST_STRING, result);
         delete future;
-    } catch (ExecutionException& ex) {
+    }
+    catch (ExecutionException& ex)
+    {
         unexpectedException();
-    } catch (InterruptedException& ex) {
+    }
+    catch (InterruptedException& ex)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(AbstractExecutorServiceTest, testSubmitRunnable) {
-    try {
+TEST_F(AbstractExecutorServiceTest, testSubmitRunnable)
+{
+    try
+    {
         DirectExecutorService e;
-        Future<int>* future = e.submit<int>(new NoOpRunnable());
+        Future<int>*          future = e.submit<int>(new NoOpRunnable());
         future->get();
         ASSERT_TRUE(future->isDone());
         delete future;
-    } catch (ExecutionException& ex) {
+    }
+    catch (ExecutionException& ex)
+    {
         unexpectedException();
-    } catch (InterruptedException& ex) {
+    }
+    catch (InterruptedException& ex)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(AbstractExecutorServiceTest, testSubmitRunnable2) {
-    try {
+TEST_F(AbstractExecutorServiceTest, testSubmitRunnable2)
+{
+    try
+    {
         DirectExecutorService e;
         Future<string>* future = e.submit(new NoOpRunnable(), TEST_STRING);
-        string result = future->get();
+        string          result = future->get();
         ASSERT_EQ(TEST_STRING, result);
         delete future;
-    } catch (ExecutionException& ex) {
+    }
+    catch (ExecutionException& ex)
+    {
         unexpectedException();
-    } catch (InterruptedException& ex) {
+    }
+    catch (InterruptedException& ex)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(AbstractExecutorServiceTest, testExecuteNullRunnable) {
-    try {
+TEST_F(AbstractExecutorServiceTest, testExecuteNullRunnable)
+{
+    try
+    {
         DirectExecutorService e;
         TrackedShortRunnable* task = NULL;
         e.submit<int>(task);
         shouldThrow();
-    } catch (NullPointerException& success) {
-    } catch (Exception& ex) {
+    }
+    catch (NullPointerException& success)
+    {
+    }
+    catch (Exception& ex)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(AbstractExecutorServiceTest, testSubmitNullCallable) {
-    try {
+TEST_F(AbstractExecutorServiceTest, testSubmitNullCallable)
+{
+    try
+    {
         DirectExecutorService e;
-        StringTask* t = NULL;
+        StringTask*           t = NULL;
         e.submit(t);
         shouldThrow();
-    } catch (NullPointerException& success) {
-    } catch (Exception& ex) {
+    }
+    catch (NullPointerException& success)
+    {
+    }
+    catch (Exception& ex)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(AbstractExecutorServiceTest, testExecute1) {
-    ThreadPoolExecutor p(1, 1, 60, TimeUnit::SECONDS, new LinkedBlockingQueue<Runnable*>(1));
-    MediumRunnable task(this);
+TEST_F(AbstractExecutorServiceTest, testExecute1)
+{
+    ThreadPoolExecutor p(1,
+                         1,
+                         60,
+                         TimeUnit::SECONDS,
+                         new LinkedBlockingQueue<Runnable*>(1));
+    MediumRunnable     task(this);
 
-    try {
-        for(int i = 0; i < 5; ++i) {
-            Pointer< Future<int> > future(p.submit<int>(&task, false));
+    try
+    {
+        for (int i = 0; i < 5; ++i)
+        {
+            Pointer<Future<int>> future(p.submit<int>(&task, false));
         }
 
         shouldThrow();
-    } catch(RejectedExecutionException& success) {
+    }
+    catch (RejectedExecutionException& success)
+    {
     }
 
     joinPool(p);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(AbstractExecutorServiceTest, testExecute2) {
-    ThreadPoolExecutor p(1, 1, 60, TimeUnit::SECONDS, new LinkedBlockingQueue<Runnable*>(1));
-    try {
-
-        for(int i = 0; i < 5; ++i) {
+TEST_F(AbstractExecutorServiceTest, testExecute2)
+{
+    ThreadPoolExecutor p(1,
+                         1,
+                         60,
+                         TimeUnit::SECONDS,
+                         new LinkedBlockingQueue<Runnable*>(1));
+    try
+    {
+        for (int i = 0; i < 5; ++i)
+        {
             delete p.submit(new SmallCallable<int>(this));
         }
 
         shouldThrow();
-    } catch(RejectedExecutionException& e) {
+    }
+    catch (RejectedExecutionException& e)
+    {
     }
 
     joinPool(p);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    template<typename E>
-    class TestInterruptedSubmitCallable : public Callable<E> {
-    private:
+template <typename E>
+class TestInterruptedSubmitCallable : public Callable<E>
+{
+private:
+    AbstractExecutorServiceTest* parent;
 
-        AbstractExecutorServiceTest* parent;
+private:
+    TestInterruptedSubmitCallable(const TestInterruptedSubmitCallable&);
+    TestInterruptedSubmitCallable operator=(
+        const TestInterruptedSubmitCallable&);
 
-    private:
+public:
+    TestInterruptedSubmitCallable(AbstractExecutorServiceTest* parent)
+        : decaf::util::concurrent::Callable<E>(),
+          parent(parent)
+    {
+    }
 
-        TestInterruptedSubmitCallable(const TestInterruptedSubmitCallable&);
-        TestInterruptedSubmitCallable operator= (const TestInterruptedSubmitCallable&);
+    virtual ~TestInterruptedSubmitCallable()
+    {
+    }
 
-    public:
-
-        TestInterruptedSubmitCallable(AbstractExecutorServiceTest* parent) :
-            decaf::util::concurrent::Callable<E>(), parent(parent) {
+    virtual E call()
+    {
+        try
+        {
+            Thread::sleep(AbstractExecutorServiceTest::LONG_DELAY_MS);
+            parent->threadShouldThrow();
+        }
+        catch (InterruptedException& e)
+        {
         }
 
-        virtual ~TestInterruptedSubmitCallable() {}
+        return E();
+    }
+};
 
-        virtual E call() {
-            try {
-                Thread::sleep(AbstractExecutorServiceTest::LONG_DELAY_MS);
-                parent->threadShouldThrow();
-            } catch(InterruptedException& e){
-            }
+class TestInterruptedSubmitRunnable : public Runnable
+{
+private:
+    AbstractExecutorServiceTest* parent;
+    ThreadPoolExecutor*          executor;
 
-            return E();
+private:
+    TestInterruptedSubmitRunnable(const TestInterruptedSubmitRunnable&);
+    TestInterruptedSubmitRunnable operator=(
+        const TestInterruptedSubmitRunnable&);
+
+public:
+    TestInterruptedSubmitRunnable(AbstractExecutorServiceTest* parent,
+                                  ThreadPoolExecutor*          executor)
+        : Runnable(),
+          parent(parent),
+          executor(executor)
+    {
+    }
+
+    virtual ~TestInterruptedSubmitRunnable()
+    {
+    }
+
+    virtual void run()
+    {
+        try
+        {
+            Pointer<Future<int>> future(executor->submit(
+                new TestInterruptedSubmitCallable<int>(parent)));
+            future->get();
         }
-    };
-
-    class TestInterruptedSubmitRunnable : public Runnable {
-    private:
-
-        AbstractExecutorServiceTest* parent;
-        ThreadPoolExecutor* executor;
-
-    private:
-
-        TestInterruptedSubmitRunnable(const TestInterruptedSubmitRunnable&);
-        TestInterruptedSubmitRunnable operator= (const TestInterruptedSubmitRunnable&);
-
-    public:
-
-        TestInterruptedSubmitRunnable(AbstractExecutorServiceTest* parent, ThreadPoolExecutor* executor) :
-            Runnable(), parent(parent), executor(executor) {
+        catch (InterruptedException& success)
+        {
         }
-
-        virtual ~TestInterruptedSubmitRunnable() {}
-
-        virtual void run() {
-            try {
-                Pointer< Future<int> > future(executor->submit(new TestInterruptedSubmitCallable<int>(parent)));
-                future->get();
-            } catch(InterruptedException& success){
-            } catch(Exception& e) {
-                parent->unexpectedException();
-            }
+        catch (Exception& e)
+        {
+            parent->unexpectedException();
         }
-    };
-}
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(AbstractExecutorServiceTest, testInterruptedSubmit) {
-
+TEST_F(AbstractExecutorServiceTest, testInterruptedSubmit)
+{
     // TODO
-//    ThreadPoolExecutor p(1, 1, 60, TimeUnit::SECONDS, new LinkedBlockingQueue<Runnable*>(10));
-//    TestInterruptedSubmitRunnable runner(this, &p);
-//    Thread t(&runner);
-//
-//    try {
-//
-//        t.start();
-//        Thread::sleep(SHORT_DELAY_MS);
-//        t.interrupt();
-//
-//    } catch(Exception& e){
-//        unexpectedException();
-//    }
-//
-//    joinPool(p);
+    //    ThreadPoolExecutor p(1, 1, 60, TimeUnit::SECONDS, new
+    //    LinkedBlockingQueue<Runnable*>(10)); TestInterruptedSubmitRunnable
+    //    runner(this, &p); Thread t(&runner);
+    //
+    //    try {
+    //
+    //        t.start();
+    //        Thread::sleep(SHORT_DELAY_MS);
+    //        t.interrupt();
+    //
+    //    } catch(Exception& e){
+    //        unexpectedException();
+    //    }
+    //
+    //    joinPool(p);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    template<typename E>
-    class CallingRunnable : public decaf::lang::Runnable {
-    private:
+template <typename E>
+class CallingRunnable : public decaf::lang::Runnable
+{
+private:
+    AbstractExecutorServiceTest* parent;
+    Callable<E>*                 target;
 
-        AbstractExecutorServiceTest* parent;
-        Callable<E>* target;
+private:
+    CallingRunnable(const CallingRunnable&);
+    CallingRunnable operator=(const CallingRunnable&);
 
-    private:
+public:
+    CallingRunnable(AbstractExecutorServiceTest* parent, Callable<E>* target)
+        : Runnable(),
+          parent(parent),
+          target(target)
+    {
+    }
 
-        CallingRunnable(const CallingRunnable&);
-        CallingRunnable operator= (const CallingRunnable&);
+    virtual ~CallingRunnable()
+    {
+        delete target;
+    }
 
-    public:
+    virtual void run()
+    {
+        try
+        {
+            target->call();
+        }
+        catch (Exception& e)
+        {
+        }
+    }
+};
 
-        CallingRunnable(AbstractExecutorServiceTest* parent, Callable<E>* target) :
-            Runnable(), parent(parent), target(target) {
+template <typename E>
+class TestSubmitIECallable : public Callable<E>
+{
+private:
+    AbstractExecutorServiceTest* parent;
+    ThreadPoolExecutor*          executor;
+
+private:
+    TestSubmitIECallable(const TestSubmitIECallable&);
+    TestSubmitIECallable operator=(const TestSubmitIECallable&);
+
+public:
+    TestSubmitIECallable(AbstractExecutorServiceTest* parent,
+                         ThreadPoolExecutor*          executor)
+        : Callable<E>(),
+          parent(parent),
+          executor(executor)
+    {
+    }
+
+    virtual ~TestSubmitIECallable()
+    {
+    }
+
+    virtual E call()
+    {
+        try
+        {
+            Pointer<Future<E>>(
+                executor->submit(
+                    new AbstractExecutorServiceTest::SmallCallable<E>(parent)))
+                ->get();
+            parent->threadShouldThrow();
+        }
+        catch (InterruptedException& e)
+        {
+        }
+        catch (RejectedExecutionException& e2)
+        {
+        }
+        catch (ExecutionException& e3)
+        {
         }
 
-        virtual ~CallingRunnable() {
-            delete target;
-        }
-
-        virtual void run() {
-            try {
-                target->call();
-            } catch(Exception& e) {
-            }
-        }
-    };
-
-    template<typename E>
-    class TestSubmitIECallable : public Callable<E> {
-    private:
-
-        AbstractExecutorServiceTest* parent;
-        ThreadPoolExecutor* executor;
-
-    private:
-
-        TestSubmitIECallable(const TestSubmitIECallable&);
-        TestSubmitIECallable operator= (const TestSubmitIECallable&);
-
-    public:
-
-        TestSubmitIECallable(AbstractExecutorServiceTest* parent, ThreadPoolExecutor* executor) :
-            Callable<E>(), parent(parent), executor(executor) {
-        }
-
-        virtual ~TestSubmitIECallable() {}
-
-        virtual E call() {
-            try {
-                Pointer< Future<E> >(executor->submit(
-                    new AbstractExecutorServiceTest::SmallCallable<E>(parent)))->get();
-                parent->threadShouldThrow();
-            } catch(InterruptedException& e){
-            } catch(RejectedExecutionException& e2){
-            } catch(ExecutionException& e3){
-            }
-
-            return E();
-        }
-    };
-}
+        return E();
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(AbstractExecutorServiceTest, testSubmitIE) {
+TEST_F(AbstractExecutorServiceTest, testSubmitIE)
+{
+    ThreadPoolExecutor p(1,
+                         1,
+                         60,
+                         TimeUnit::SECONDS,
+                         new LinkedBlockingQueue<Runnable*>(10));
 
-    ThreadPoolExecutor p(1, 1, 60, TimeUnit::SECONDS, new LinkedBlockingQueue<Runnable*>(10));
-
-    TestSubmitIECallable<int>* callable = new TestSubmitIECallable<int>(this, &p);
+    TestSubmitIECallable<int>* callable =
+        new TestSubmitIECallable<int>(this, &p);
     CallingRunnable<int> runner(this, callable);
-    Thread t(&runner);
+    Thread               t(&runner);
 
-    try {
+    try
+    {
         t.start();
         Thread::sleep(SHORT_DELAY_MS);
         t.interrupt();
         t.join();
-    } catch(InterruptedException& e){
+    }
+    catch (InterruptedException& e)
+    {
         unexpectedException();
     }
 
@@ -421,35 +539,51 @@ TEST_F(AbstractExecutorServiceTest, testSubmitIE) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class testSubmitEECallable : public Callable<int> {
-    public:
+class testSubmitEECallable : public Callable<int>
+{
+public:
+    virtual ~testSubmitEECallable()
+    {
+    }
 
-        virtual ~testSubmitEECallable() {}
-
-        virtual int call() {
-            throw NumberFormatException(__FILE__, __LINE__, "Throwing a common exception");
-            return 1;
-        }
-    };
-}
+    virtual int call()
+    {
+        throw NumberFormatException(__FILE__,
+                                    __LINE__,
+                                    "Throwing a common exception");
+        return 1;
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(AbstractExecutorServiceTest, testSubmitEE) {
-    ThreadPoolExecutor p(1, 1, 60, TimeUnit::SECONDS, new LinkedBlockingQueue<Runnable*>(10));
+TEST_F(AbstractExecutorServiceTest, testSubmitEE)
+{
+    ThreadPoolExecutor p(1,
+                         1,
+                         60,
+                         TimeUnit::SECONDS,
+                         new LinkedBlockingQueue<Runnable*>(10));
 
     testSubmitEECallable c;
 
-    try {
-
-        for(int i = 0; i < 5; i++) {
-            Pointer< Future<int> >(p.submit(&c, false))->get();
+    try
+    {
+        for (int i = 0; i < 5; i++)
+        {
+            Pointer<Future<int>>(p.submit(&c, false))->get();
         }
 
         shouldThrow();
-    } catch(ExecutionException& success) {
-    } catch(Exception& e) {
+    }
+    catch (ExecutionException& success)
+    {
+    }
+    catch (Exception& e)
+    {
         unexpectedException();
     }
 

@@ -24,11 +24,13 @@ using namespace activemq::wireformat;
 using namespace activemq::wireformat::openwire;
 using namespace activemq::wireformat::openwire::utils;
 
-class HexTableTest : public ::testing::Test {};
+class HexTableTest : public ::testing::Test
+{
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(HexTableTest, test){
-
+TEST_F(HexTableTest, test)
+{
     HexTable table;
 
     ASSERT_TRUE(table[0] == "00");
@@ -41,9 +43,12 @@ TEST_F(HexTableTest, test){
 
     ASSERT_TRUE(table.size() == 256);
 
-    try{
+    try
+    {
         std::string test = table[277];
         ASSERT_TRUE(false);
     }
-    catch(...) {}
+    catch (...)
+    {
+    }
 }

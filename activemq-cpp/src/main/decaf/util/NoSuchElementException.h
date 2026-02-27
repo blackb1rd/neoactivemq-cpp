@@ -19,8 +19,10 @@
 
 #include <decaf/lang/exceptions/RuntimeException.h>
 
-namespace decaf {
-namespace util {
+namespace decaf
+{
+namespace util
+{
 
     /*
      * Thrown from an operation that attempts to access some element that does
@@ -28,9 +30,10 @@ namespace util {
      *
      * @since 1.0
      */
-    class DECAF_API NoSuchElementException : public decaf::lang::exceptions::RuntimeException {
+    class DECAF_API NoSuchElementException
+        : public decaf::lang::exceptions::RuntimeException
+    {
     public:
-
         /**
          * Default Constructor
          */
@@ -42,7 +45,8 @@ namespace util {
          * @param ex
          *      The Exception whose data is to be copied into this one.
          */
-        NoSuchElementException(const decaf::lang::exceptions::RuntimeException& ex);
+        NoSuchElementException(
+            const decaf::lang::exceptions::RuntimeException& ex);
 
         /**
          * Copy Constructor
@@ -59,11 +63,16 @@ namespace util {
          *
          * @param file The file name where exception occurs
          * @param lineNumber The line number where the exception occurred.
-         * @param cause The exception that was the cause for this one to be thrown.
+         * @param cause The exception that was the cause for this one to be
+         * thrown.
          * @param msg The message to report
          * @param ... list of primitives that are formatted into the message
          */
-        NoSuchElementException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...);
+        NoSuchElementException(const char*           file,
+                               const int             lineNumber,
+                               const std::exception* cause,
+                               const char*           msg,
+                               ...);
 
         /**
          * Constructor
@@ -83,23 +92,27 @@ namespace util {
          * @param msg The message to report
          * @param ... list of primitives that are formatted into the message
          */
-        NoSuchElementException(const char* file, const int lineNumber, const char* msg, ...);
+        NoSuchElementException(const char* file,
+                               const int   lineNumber,
+                               const char* msg,
+                               ...);
 
         /**
          * Clones this exception.  This is useful for cases where you need
-         * to preserve the type of the original exception as well as the message.
-         * All subclasses should override.
+         * to preserve the type of the original exception as well as the
+         * message. All subclasses should override.
          *
          * @return an new Exception instance that is a copy of this one.
          */
-        virtual NoSuchElementException* clone() const{
+        virtual NoSuchElementException* clone() const
+        {
             return new NoSuchElementException(*this);
         }
 
         virtual ~NoSuchElementException() throw();
-
     };
 
-}}
+}  // namespace util
+}  // namespace decaf
 
 #endif /*_DECAF_UTIL_NOSUCHELEMENTEXCEPTION_H_*/

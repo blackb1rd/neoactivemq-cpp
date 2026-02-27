@@ -27,36 +27,45 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-InputStream::InputStream() : mutex() {
+InputStream::InputStream()
+    : mutex()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-InputStream::~InputStream() {
+InputStream::~InputStream()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InputStream::close() {
-
+void InputStream::close()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InputStream::mark(int readLimit DECAF_UNUSED) {
-
+void InputStream::mark(int readLimit DECAF_UNUSED)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string InputStream::toString() const {
+std::string InputStream::toString() const
+{
     return typeid(this).name();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InputStream::reset() {
-    throw IOException(__FILE__, __LINE__, "Base InputStream class does not support Reset.");
+void InputStream::reset()
+{
+    throw IOException(__FILE__,
+                      __LINE__,
+                      "Base InputStream class does not support Reset.");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int InputStream::read() {
-    try {
+int InputStream::read()
+{
+    try
+    {
         return this->doReadByte();
     }
     DECAF_CATCH_RETHROW(IOException)
@@ -64,9 +73,10 @@ int InputStream::read() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int InputStream::read(unsigned char* buffer, int size) {
-
-    try {
+int InputStream::read(unsigned char* buffer, int size)
+{
+    try
+    {
         return this->doReadArray(buffer, size);
     }
     DECAF_CATCH_RETHROW(IOException)
@@ -75,9 +85,10 @@ int InputStream::read(unsigned char* buffer, int size) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int InputStream::read(unsigned char* buffer, int size, int offset, int length) {
-
-    try {
+int InputStream::read(unsigned char* buffer, int size, int offset, int length)
+{
+    try
+    {
         return this->doReadArrayBounded(buffer, size, offset, length);
     }
     DECAF_CATCH_RETHROW(IOException)
@@ -87,11 +98,12 @@ int InputStream::read(unsigned char* buffer, int size, int offset, int length) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-long long InputStream::skip(long long num) {
-
-    try {
-
-        if (num <= 0) {
+long long InputStream::skip(long long num)
+{
+    try
+    {
+        if (num <= 0)
+        {
             return 0;
         }
 
@@ -100,25 +112,29 @@ long long InputStream::skip(long long num) {
         // Lets not try and buffer every byte since it could be as large as
         // whatever size_t is on this platform, read the data in reasonable
         // chunks until finished.
-        int toRead = num < 4096LL ? (int) num : 4096;
+        int                        toRead = num < 4096LL ? (int)num : 4096;
         std::vector<unsigned char> buffer(toRead);
 
-        while (skipped < num) {
-
-            int read = doReadArrayBounded(&buffer[0], (int) buffer.size(), 0, toRead);
+        while (skipped < num)
+        {
+            int read =
+                doReadArrayBounded(&buffer[0], (int)buffer.size(), 0, toRead);
 
             // Is it EOF?
-            if (read == -1) {
+            if (read == -1)
+            {
                 return skipped;
             }
 
             skipped += read;
 
-            if (read < toRead) {
+            if (read < toRead)
+            {
                 return skipped;
             }
-            if (num - skipped < toRead) {
-                toRead = (int) (num - skipped);
+            if (num - skipped < toRead)
+            {
+                toRead = (int)(num - skipped);
             }
         }
         return skipped;
@@ -129,9 +145,10 @@ long long InputStream::skip(long long num) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int InputStream::doReadArray(unsigned char* buffer, int size) {
-
-    try {
+int InputStream::doReadArray(unsigned char* buffer, int size)
+{
+    try
+    {
         return this->doReadArrayBounded(buffer, size, 0, size);
     }
     DECAF_CATCH_RETHROW(IOException)
@@ -140,39 +157,55 @@ int InputStream::doReadArray(unsigned char* buffer, int size) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int InputStream::doReadArrayBounded(unsigned char* buffer, int size, int offset, int length) {
-
-    try {
-
-        if (length == 0) {
+int InputStream::doReadArrayBounded(unsigned char* buffer,
+                                    int            size,
+                                    int            offset,
+                                    int            length)
+{
+    try
+    {
+        if (length == 0)
+        {
             return 0;
         }
 
-        if (buffer == NULL) {
-            throw NullPointerException(__FILE__, __LINE__, "Buffer passed was NULL");
+        if (buffer == NULL)
+        {
+            throw NullPointerException(__FILE__,
+                                       __LINE__,
+                                       "Buffer passed was NULL");
         }
 
-        if (length > (size - offset)) {
-            throw IndexOutOfBoundsException(__FILE__, __LINE__, "Offset + Length given exceeds Buffer size.");
+        if (length > (size - offset))
+        {
+            throw IndexOutOfBoundsException(
+                __FILE__,
+                __LINE__,
+                "Offset + Length given exceeds Buffer size.");
         }
 
-        for (int i = 0; i < length; i++) {
-
+        for (int i = 0; i < length; i++)
+        {
             int c;
-            try {
-                if ((c = doReadByte()) == -1) {
-                    return i == 0 ? -1 : (int) i;
+            try
+            {
+                if ((c = doReadByte()) == -1)
+                {
+                    return i == 0 ? -1 : (int)i;
                 }
-            } catch (IOException& e) {
-                if (i != 0) {
-                    return (int) i;
+            }
+            catch (IOException& e)
+            {
+                if (i != 0)
+                {
+                    return (int)i;
                 }
                 throw e;
             }
-            buffer[offset + i] = (unsigned char) c;
+            buffer[offset + i] = (unsigned char)c;
         }
 
-        return (int) length;
+        return (int)length;
     }
     DECAF_CATCH_RETHROW(IOException)
     DECAF_CATCH_RETHROW(IndexOutOfBoundsException)

@@ -24,58 +24,78 @@ using namespace decaf::internal;
 using namespace decaf::internal::io;
 
 ////////////////////////////////////////////////////////////////////////////////
-StandardErrorOutputStream::StandardErrorOutputStream() {
+StandardErrorOutputStream::StandardErrorOutputStream()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-StandardErrorOutputStream::~StandardErrorOutputStream() {
+StandardErrorOutputStream::~StandardErrorOutputStream()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StandardErrorOutputStream::doWriteByte( unsigned char c ) {
+void StandardErrorOutputStream::doWriteByte(unsigned char c)
+{
     std::cerr << c;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StandardErrorOutputStream::doWriteArrayBounded( const unsigned char* buffer, int size,
-                                                     int offset, int length ) {
-
-    if( length == 0 ) {
+void StandardErrorOutputStream::doWriteArrayBounded(const unsigned char* buffer,
+                                                    int                  size,
+                                                    int                  offset,
+                                                    int                  length)
+{
+    if (length == 0)
+    {
         return;
     }
 
-    if( buffer == NULL ) {
+    if (buffer == NULL)
+    {
         throw lang::exceptions::NullPointerException(
-            __FILE__, __LINE__,
-            "StandardErrorOutputStream::write - Passed buffer is null." );
+            __FILE__,
+            __LINE__,
+            "StandardErrorOutputStream::write - Passed buffer is null.");
     }
 
-    if( size < 0 ) {
-        throw IndexOutOfBoundsException(
-            __FILE__, __LINE__, "size parameter out of Bounds: %d.", size );
+    if (size < 0)
+    {
+        throw IndexOutOfBoundsException(__FILE__,
+                                        __LINE__,
+                                        "size parameter out of Bounds: %d.",
+                                        size);
     }
 
-    if( offset > size || offset < 0 ) {
-        throw IndexOutOfBoundsException(
-            __FILE__, __LINE__, "offset parameter out of Bounds: %d.", offset );
+    if (offset > size || offset < 0)
+    {
+        throw IndexOutOfBoundsException(__FILE__,
+                                        __LINE__,
+                                        "offset parameter out of Bounds: %d.",
+                                        offset);
     }
 
-    if( length < 0 || length > size - offset ) {
-        throw IndexOutOfBoundsException(
-            __FILE__, __LINE__, "length parameter out of Bounds: %d.", length );
+    if (length < 0 || length > size - offset)
+    {
+        throw IndexOutOfBoundsException(__FILE__,
+                                        __LINE__,
+                                        "length parameter out of Bounds: %d.",
+                                        length);
     }
 
-    for( int i = 0; i < length; ++i ) {
-        std::cerr << buffer[i+offset];
+    for (int i = 0; i < length; ++i)
+    {
+        std::cerr << buffer[i + offset];
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StandardErrorOutputStream::flush() {
+void StandardErrorOutputStream::flush()
+{
     std::cerr.flush();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StandardErrorOutputStream::close() {
+void StandardErrorOutputStream::close()
+{
     std::cerr.flush();
 }

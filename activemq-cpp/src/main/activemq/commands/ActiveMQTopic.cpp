@@ -23,47 +23,58 @@ using namespace activemq;
 using namespace activemq::commands;
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQTopic::ActiveMQTopic() : ActiveMQDestination() {
+ActiveMQTopic::ActiveMQTopic()
+    : ActiveMQDestination()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQTopic::ActiveMQTopic( const std::string& name ) :
-    ActiveMQDestination( name )
-{}
-
-////////////////////////////////////////////////////////////////////////////////
-ActiveMQTopic::~ActiveMQTopic() throw() {
+ActiveMQTopic::ActiveMQTopic(const std::string& name)
+    : ActiveMQDestination(name)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-unsigned char ActiveMQTopic::getDataStructureType() const {
+ActiveMQTopic::~ActiveMQTopic() throw()
+{
+}
+
+////////////////////////////////////////////////////////////////////////////////
+unsigned char ActiveMQTopic::getDataStructureType() const
+{
     return ActiveMQTopic::ID_ACTIVEMQTOPIC;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQTopic* ActiveMQTopic::cloneDataStructure() const {
-    std::unique_ptr<ActiveMQTopic> message( new ActiveMQTopic() );
-    message->copyDataStructure( this );
+ActiveMQTopic* ActiveMQTopic::cloneDataStructure() const
+{
+    std::unique_ptr<ActiveMQTopic> message(new ActiveMQTopic());
+    message->copyDataStructure(this);
     return message.release();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQTopic::copyDataStructure( const DataStructure* src ) {
-    ActiveMQDestination::copyDataStructure( src );
+void ActiveMQTopic::copyDataStructure(const DataStructure* src)
+{
+    ActiveMQDestination::copyDataStructure(src);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string ActiveMQTopic::toString() const {
+std::string ActiveMQTopic::toString() const
+{
     return ActiveMQDestination::toString();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool ActiveMQTopic::equals( const DataStructure* value ) const {
-    return ActiveMQDestination::equals( value );
+bool ActiveMQTopic::equals(const DataStructure* value) const
+{
+    return ActiveMQDestination::equals(value);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool ActiveMQTopic::equals( const cms::Destination& value ) const {
-    const ActiveMQDestination* dest = dynamic_cast<const ActiveMQDestination*>( &value );
-    return ActiveMQDestination::equals( dest );
+bool ActiveMQTopic::equals(const cms::Destination& value) const
+{
+    const ActiveMQDestination* dest =
+        dynamic_cast<const ActiveMQDestination*>(&value);
+    return ActiveMQDestination::equals(dest);
 }

@@ -23,25 +23,33 @@
 #include <activemq/transport/discovery/AbstractDiscoveryAgentFactory.h>
 #include <decaf/lang/Pointer.h>
 
-namespace activemq {
-namespace transport {
-namespace discovery {
-namespace http {
+namespace activemq
+{
+namespace transport
+{
+    namespace discovery
+    {
+        namespace http
+        {
 
-    class AMQCPP_API HttpDiscoveryAgentFactory : public AbstractDiscoveryAgentFactory {
-    public:
+            class AMQCPP_API HttpDiscoveryAgentFactory
+                : public AbstractDiscoveryAgentFactory
+            {
+            public:
+                virtual ~HttpDiscoveryAgentFactory();
 
-        virtual ~HttpDiscoveryAgentFactory();
+            protected:
+                virtual decaf::lang::Pointer<AbstractDiscoveryAgent>
+                doCreateAgent();
 
-    protected:
+                virtual void doConfigureAgent(
+                    decaf::lang::Pointer<AbstractDiscoveryAgent> agent,
+                    const decaf::util::Properties&               options);
+            };
 
-        virtual decaf::lang::Pointer<AbstractDiscoveryAgent> doCreateAgent();
-
-        virtual void doConfigureAgent(decaf::lang::Pointer<AbstractDiscoveryAgent> agent,
-                                      const decaf::util::Properties& options);
-
-    };
-
-}}}}
+        }  // namespace http
+    }  // namespace discovery
+}  // namespace transport
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_TRANSPORT_DISCOVERY_HTTP_HTTPDISCOVERYAGENTFACTORY_H_ */

@@ -18,29 +18,35 @@
 #ifndef _ACTIVEMQ_EXCEPTION_CONNECTIONFAILEDEXCEPTION_H_
 #define _ACTIVEMQ_EXCEPTION_CONNECTIONFAILEDEXCEPTION_H_
 
-#include <activemq/util/Config.h>
 #include <activemq/exceptions/ActiveMQException.h>
+#include <activemq/util/Config.h>
 
-namespace activemq {
-namespace exceptions {
+namespace activemq
+{
+namespace exceptions
+{
 
-    class AMQCPP_API ConnectionFailedException : public exceptions::ActiveMQException {
+    class AMQCPP_API ConnectionFailedException
+        : public exceptions::ActiveMQException
+    {
     public:
-
         ConnectionFailedException();
 
         ConnectionFailedException(const exceptions::ActiveMQException& ex);
 
         ConnectionFailedException(const ConnectionFailedException& ex);
 
-        ConnectionFailedException(const char* file, const int lineNumber, const char* msg, ...);
+        ConnectionFailedException(const char* file,
+                                  const int   lineNumber,
+                                  const char* msg,
+                                  ...);
 
-        virtual ~ConnectionFailedException() throw ();
+        virtual ~ConnectionFailedException() throw();
 
         virtual ConnectionFailedException* clone() const;
-
     };
 
-}}
+}  // namespace exceptions
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_EXCEPTION_CONNECTIONFAILEDEXCEPTION_H_ */

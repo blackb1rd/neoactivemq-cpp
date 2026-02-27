@@ -18,65 +18,76 @@
 #ifndef _DECAF_UTIL_ZIP_CHECKEDOUTPUTSTREAM_H_
 #define _DECAF_UTIL_ZIP_CHECKEDOUTPUTSTREAM_H_
 
+#include <decaf/io/FilterOutputStream.h>
 #include <decaf/util/Config.h>
 #include <decaf/util/zip/Checksum.h>
-#include <decaf/io/FilterOutputStream.h>
 
-namespace decaf {
-namespace util {
-namespace zip {
-
-    /**
-     * An implementation of a FilterOutputStream that will maintain a Checksum of the
-     * bytes written, the Checksum can then be used to verify the integrity of the
-     * output stream.
-     *
-     * @since 1.0
-     */
-    class DECAF_API CheckedOutputStream : public decaf::io::FilterOutputStream {
-    private:
-
-        // The Checksom instance used by this stream, not owned by the stream.
-        Checksum* sum;
-
-    private:
-
-        CheckedOutputStream(const CheckedOutputStream&);
-        CheckedOutputStream& operator=(const CheckedOutputStream&);
-
-    public:
+namespace decaf
+{
+namespace util
+{
+    namespace zip
+    {
 
         /**
-         * Create a new instance of a CheckedOutputStream
+         * An implementation of a FilterOutputStream that will maintain a
+         * Checksum of the bytes written, the Checksum can then be used to
+         * verify the integrity of the output stream.
          *
-         * @param outputStream
-         *      The OutputStream instance to Wrap.
-         * @param sum
-         *      The Checksum instance to use (does not take ownership of the Pointer).
-         * @param own
-         *      Indicates if this filer should take ownership of the InputStream.
-         *
-         * @throws NullPointerException if the Checksum pointer is NULL.
+         * @since 1.0
          */
-        CheckedOutputStream(decaf::io::OutputStream* outputStream, Checksum* sum, bool own = false);
+        class DECAF_API CheckedOutputStream
+            : public decaf::io::FilterOutputStream
+        {
+        private:
+            // The Checksom instance used by this stream, not owned by the
+            // stream.
+            Checksum* sum;
 
-        virtual ~CheckedOutputStream();
+        private:
+            CheckedOutputStream(const CheckedOutputStream&);
+            CheckedOutputStream& operator=(const CheckedOutputStream&);
 
-        /**
-         * @return a pointer to the Checksum instance in use by this object.
-         */
-        Checksum* getChecksum() const {
-            return this->sum;
-        }
+        public:
+            /**
+             * Create a new instance of a CheckedOutputStream
+             *
+             * @param outputStream
+             *      The OutputStream instance to Wrap.
+             * @param sum
+             *      The Checksum instance to use (does not take ownership of the
+             * Pointer).
+             * @param own
+             *      Indicates if this filer should take ownership of the
+             * InputStream.
+             *
+             * @throws NullPointerException if the Checksum pointer is NULL.
+             */
+            CheckedOutputStream(decaf::io::OutputStream* outputStream,
+                                Checksum*                sum,
+                                bool                     own = false);
 
-    protected:
+            virtual ~CheckedOutputStream();
 
-        virtual void doWriteByte(unsigned char value);
+            /**
+             * @return a pointer to the Checksum instance in use by this object.
+             */
+            Checksum* getChecksum() const
+            {
+                return this->sum;
+            }
 
-        virtual void doWriteArrayBounded(const unsigned char* buffer, int size, int offset, int length);
+        protected:
+            virtual void doWriteByte(unsigned char value);
 
-    };
+            virtual void doWriteArrayBounded(const unsigned char* buffer,
+                                             int                  size,
+                                             int                  offset,
+                                             int                  length);
+        };
 
-}}}
+    }  // namespace zip
+}  // namespace util
+}  // namespace decaf
 
 #endif /* _DECAF_UTIL_ZIP_CHECKEDOUTPUTSTREAM_H_ */

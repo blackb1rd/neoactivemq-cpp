@@ -18,24 +18,27 @@
 #ifndef _ACTIVEMQ_TRANSPORT_DEFAULTTRANSPORTLISTENER_H_
 #define _ACTIVEMQ_TRANSPORT_DEFAULTTRANSPORTLISTENER_H_
 
-#include <activemq/util/Config.h>
-#include <activemq/transport/TransportListener.h>
 #include <activemq/commands/Command.h>
+#include <activemq/transport/TransportListener.h>
+#include <activemq/util/Config.h>
 #include <decaf/lang/Pointer.h>
 
-namespace activemq {
-namespace transport {
+namespace activemq
+{
+namespace transport
+{
 
-    using decaf::lang::Pointer;
     using activemq::commands::Command;
+    using decaf::lang::Pointer;
 
     /**
-     * A Utility class that create empty implementations for the TransportListener interface
-     * so that a subclass only needs to override the one's its interested.
+     * A Utility class that create empty implementations for the
+     * TransportListener interface so that a subclass only needs to override the
+     * one's its interested.
      */
-    class AMQCPP_API DefaultTransportListener: public TransportListener {
+    class AMQCPP_API DefaultTransportListener : public TransportListener
+    {
     public:
-
         virtual ~DefaultTransportListener();
 
         /**
@@ -46,27 +49,36 @@ namespace transport {
          *
          * @param command the received command object.
          */
-        virtual void onCommand(const Pointer<Command> command AMQCPP_UNUSED) {}
+        virtual void onCommand(const Pointer<Command> command AMQCPP_UNUSED)
+        {
+        }
 
         /**
          * Event handler for an exception from a command transport.
          *
          * @param ex The exception.
          */
-        virtual void onException(const decaf::lang::Exception& ex AMQCPP_UNUSED) {}
+        virtual void onException(const decaf::lang::Exception& ex AMQCPP_UNUSED)
+        {
+        }
 
         /**
-         * The transport has suffered an interruption from which it hopes to recover
+         * The transport has suffered an interruption from which it hopes to
+         * recover
          */
-        virtual void transportInterrupted() {}
+        virtual void transportInterrupted()
+        {
+        }
 
         /**
          * The transport has resumed after an interruption
          */
-        virtual void transportResumed() {}
-
+        virtual void transportResumed()
+        {
+        }
     };
 
-}}
+}  // namespace transport
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_TRANSPORT_DEFAULTTRANSPORTLISTENER_H_*/

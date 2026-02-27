@@ -23,21 +23,24 @@ using namespace std;
 using namespace activemq;
 using namespace activemq::commands;
 
-class BrokerInfoTest : public ::testing::Test {};
+class BrokerInfoTest : public ::testing::Test
+{
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(BrokerInfoTest, test) {
+TEST_F(BrokerInfoTest, test)
+{
     BrokerInfo myCommand;
 
     ASSERT_TRUE(myCommand.getDataStructureType() == BrokerInfo::ID_BROKERINFO);
 
-    myCommand.setBrokerName( "BrokerName" );
-    myCommand.setBrokerURL( "http://www.example.com" );
-    myCommand.setCommandId( 37 );
-    myCommand.setMasterBroker( true );
+    myCommand.setBrokerName("BrokerName");
+    myCommand.setBrokerURL("http://www.example.com");
+    myCommand.setCommandId(37);
+    myCommand.setMasterBroker(true);
 
     BrokerInfo* copy =
-        dynamic_cast<BrokerInfo*>( myCommand.cloneDataStructure() );
+        dynamic_cast<BrokerInfo*>(myCommand.cloneDataStructure());
 
     ASSERT_TRUE(copy != NULL);
     ASSERT_TRUE(copy->getBrokerName() == myCommand.getBrokerName());

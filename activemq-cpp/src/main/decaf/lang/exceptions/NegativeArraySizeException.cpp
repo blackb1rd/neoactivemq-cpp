@@ -22,30 +22,45 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-NegativeArraySizeException::NegativeArraySizeException() : RuntimeException() {
+NegativeArraySizeException::NegativeArraySizeException()
+    : RuntimeException()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-NegativeArraySizeException::~NegativeArraySizeException() throw () {
+NegativeArraySizeException::~NegativeArraySizeException() throw()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-NegativeArraySizeException::NegativeArraySizeException(const Exception& ex) : RuntimeException() {
-    *(Exception*) this = ex;
+NegativeArraySizeException::NegativeArraySizeException(const Exception& ex)
+    : RuntimeException()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-NegativeArraySizeException::NegativeArraySizeException(const NegativeArraySizeException& ex) : RuntimeException() {
-    *(Exception*) this = ex;
+NegativeArraySizeException::NegativeArraySizeException(
+    const NegativeArraySizeException& ex)
+    : RuntimeException()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-NegativeArraySizeException::NegativeArraySizeException(const std::exception* cause) : RuntimeException(cause) {
+NegativeArraySizeException::NegativeArraySizeException(
+    const std::exception* cause)
+    : RuntimeException(cause)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-NegativeArraySizeException::NegativeArraySizeException(const char* file, const int lineNumber, const char* msg, ...) : RuntimeException() {
-
+NegativeArraySizeException::NegativeArraySizeException(const char* file,
+                                                       const int   lineNumber,
+                                                       const char* msg,
+                                                       ...)
+    : RuntimeException()
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -55,8 +70,14 @@ NegativeArraySizeException::NegativeArraySizeException(const char* file, const i
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-NegativeArraySizeException::NegativeArraySizeException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...) : RuntimeException(cause) {
-
+NegativeArraySizeException::NegativeArraySizeException(
+    const char*           file,
+    const int             lineNumber,
+    const std::exception* cause,
+    const char*           msg,
+    ...)
+    : RuntimeException(cause)
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);

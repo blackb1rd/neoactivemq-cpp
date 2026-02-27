@@ -18,42 +18,43 @@
 #ifndef _ACTIVEMQ_THREADS_COMPOSITETASKRUNNER_H_
 #define _ACTIVEMQ_THREADS_COMPOSITETASKRUNNER_H_
 
-#include <activemq/util/Config.h>
-#include <activemq/threads/TaskRunner.h>
 #include <activemq/threads/CompositeTask.h>
-#include <decaf/util/StlSet.h>
-#include <decaf/util/LinkedList.h>
-#include <decaf/lang/Thread.h>
-#include <decaf/lang/Runnable.h>
-#include <decaf/util/concurrent/Mutex.h>
+#include <activemq/threads/TaskRunner.h>
+#include <activemq/util/Config.h>
 #include <decaf/lang/Pointer.h>
+#include <decaf/lang/Runnable.h>
+#include <decaf/lang/Thread.h>
+#include <decaf/util/LinkedList.h>
+#include <decaf/util/StlSet.h>
+#include <decaf/util/concurrent/Mutex.h>
 #include <memory>
 
-namespace activemq {
-namespace threads {
+namespace activemq
+{
+namespace threads
+{
 
     class CompositeTaskRunnerImpl;
 
     /**
-     * A Task Runner that can contain one or more CompositeTasks that are each checked
-     * for pending work and run if any is present in the order that the tasks were added.
+     * A Task Runner that can contain one or more CompositeTasks that are each
+     * checked for pending work and run if any is present in the order that the
+     * tasks were added.
      *
      * @since 3.0
      */
     class AMQCPP_API CompositeTaskRunner : public activemq::threads::TaskRunner,
                                            public activemq::threads::Task,
-                                           public decaf::lang::Runnable {
+                                           public decaf::lang::Runnable
+    {
     private:
-
         std::shared_ptr<CompositeTaskRunnerImpl> impl;
 
     private:
-
         CompositeTaskRunner(const CompositeTaskRunner&);
         CompositeTaskRunner& operator=(const CompositeTaskRunner&);
 
     public:
-
         CompositeTaskRunner();
 
         virtual ~CompositeTaskRunner();
@@ -83,25 +84,25 @@ namespace threads {
         virtual void shutdown(long long timeout);
 
         /**
-         * Shutdown once the task has finished and the TaskRunner's thread has exited.
+         * Shutdown once the task has finished and the TaskRunner's thread has
+         * exited.
          */
         virtual void shutdown();
 
         /**
-         * Signal the TaskRunner to wakeup and execute another iteration cycle on
-         * the task, the Task instance will be run until its iterate method has
-         * returned false indicating it is done.
+         * Signal the TaskRunner to wakeup and execute another iteration cycle
+         * on the task, the Task instance will be run until its iterate method
+         * has returned false indicating it is done.
          */
         virtual void wakeup();
 
     protected:
-
         virtual void run();
 
         virtual bool iterate();
-
     };
 
-}}
+}  // namespace threads
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_THREADS_COMPOSITETASKRUNNER_H_ */

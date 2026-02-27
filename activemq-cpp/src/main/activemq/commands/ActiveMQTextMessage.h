@@ -18,33 +18,34 @@
 #ifndef _ACTIVEMQ_COMMANDS_ACTIVEMQTEXTMESSAGE_H_
 #define _ACTIVEMQ_COMMANDS_ACTIVEMQTEXTMESSAGE_H_
 
-#include <activemq/util/Config.h>
 #include <activemq/commands/ActiveMQMessageTemplate.h>
+#include <activemq/util/Config.h>
 #include <cms/TextMessage.h>
-#include <vector>
-#include <string>
 #include <memory>
+#include <string>
+#include <vector>
 
-namespace activemq {
-namespace commands {
+namespace activemq
+{
+namespace commands
+{
 
-    class AMQCPP_API ActiveMQTextMessage : public ActiveMQMessageTemplate<cms::TextMessage> {
+    class AMQCPP_API ActiveMQTextMessage
+        : public ActiveMQMessageTemplate<cms::TextMessage>
+    {
     public:
-
         const static unsigned char ID_ACTIVEMQTEXTMESSAGE;
 
         mutable std::unique_ptr<std::string> text;
 
     private:
-
         ActiveMQTextMessage(const ActiveMQTextMessage&);
         ActiveMQTextMessage& operator=(const ActiveMQTextMessage&);
 
     public:
-
         ActiveMQTextMessage();
 
-        virtual ~ActiveMQTextMessage() throw ();
+        virtual ~ActiveMQTextMessage() throw();
 
         virtual unsigned char getDataStructureType() const;
 
@@ -62,20 +63,18 @@ namespace commands {
 
         virtual unsigned int getSize() const;
 
-    public: // CMS Message
-
+    public:  // CMS Message
         virtual cms::TextMessage* clone() const;
 
-    public: // CMS TextMessage
-
+    public:  // CMS TextMessage
         virtual std::string getText() const;
 
         virtual void setText(const char* msg);
 
         virtual void setText(const std::string& msg);
-
     };
 
-}}
+}  // namespace commands
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_COMMANDS_ACTIVEMQTEXTMESSAGE_H_*/

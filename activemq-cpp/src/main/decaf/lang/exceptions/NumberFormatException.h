@@ -20,88 +20,101 @@
 
 #include <decaf/lang/Exception.h>
 
-namespace decaf {
-namespace lang {
-namespace exceptions {
+namespace decaf
+{
+namespace lang
+{
+    namespace exceptions
+    {
 
-    /*
-     * Thrown when an error occurs that involves a conversion to a Number from
-     * a string and the string is not a valid number.
-     *
-     * @since 1.0
-     */
-    class NumberFormatException : public Exception {
-    public:
-
-        /**
-         * Default Constructor
-         */
-        NumberFormatException();
-
-        /**
-         * Conversion Constructor from some other Exception
+        /*
+         * Thrown when an error occurs that involves a conversion to a Number
+         * from a string and the string is not a valid number.
          *
-         * @param ex
-         *      The Exception whose data is to be copied into this one.
+         * @since 1.0
          */
-        NumberFormatException(const Exception& ex);
+        class NumberFormatException : public Exception
+        {
+        public:
+            /**
+             * Default Constructor
+             */
+            NumberFormatException();
 
-        /**
-         * Copy Constructor
-         *
-         * @param ex
-         *      The Exception whose data is to be copied into this one.
-         */
-        NumberFormatException(const NumberFormatException& ex);
+            /**
+             * Conversion Constructor from some other Exception
+             *
+             * @param ex
+             *      The Exception whose data is to be copied into this one.
+             */
+            NumberFormatException(const Exception& ex);
 
-        /**
-         * Constructor - Initializes the file name and line number where
-         * this message occurred.  Sets the message to report, using an
-         * optional list of arguments to parse into the message
-         *
-         * @param file The file name where exception occurs
-         * @param lineNumber The line number where the exception occurred.
-         * @param cause The exception that was the cause for this one to be thrown.
-         * @param msg The message to report
-         * @param ... list of primitives that are formatted into the message
-         */
-        NumberFormatException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...);
+            /**
+             * Copy Constructor
+             *
+             * @param ex
+             *      The Exception whose data is to be copied into this one.
+             */
+            NumberFormatException(const NumberFormatException& ex);
 
-        /**
-         * Constructor
-         *
-         * @param cause Pointer to the exception that caused this one to
-         * be thrown, the object is cloned caller retains ownership.
-         */
-        NumberFormatException(const std::exception* cause);
+            /**
+             * Constructor - Initializes the file name and line number where
+             * this message occurred.  Sets the message to report, using an
+             * optional list of arguments to parse into the message
+             *
+             * @param file The file name where exception occurs
+             * @param lineNumber The line number where the exception occurred.
+             * @param cause The exception that was the cause for this one to be
+             * thrown.
+             * @param msg The message to report
+             * @param ... list of primitives that are formatted into the message
+             */
+            NumberFormatException(const char*           file,
+                                  const int             lineNumber,
+                                  const std::exception* cause,
+                                  const char*           msg,
+                                  ...);
 
-        /**
-         * Constructor - Initializes the file name and line number where
-         * this message occured.  Sets the message to report, using an
-         * optional list of arguments to parse into the message
-         *
-         * @param file The file name where exception occurs
-         * @param lineNumber The line number where the exception occurred.
-         * @param msg The message to report
-         * @param ... list of primitives that are formatted into the message
-         */
-        NumberFormatException(const char* file, const int lineNumber, const char* msg, ...);
+            /**
+             * Constructor
+             *
+             * @param cause Pointer to the exception that caused this one to
+             * be thrown, the object is cloned caller retains ownership.
+             */
+            NumberFormatException(const std::exception* cause);
 
-        /**
-         * Clones this exception.  This is useful for cases where you need
-         * to preserve the type of the original exception as well as the message.
-         * All subclasses should override.
-         *
-         * @return an new Exception instance that is a copy of this one.
-         */
-        virtual NumberFormatException* clone() const {
-            return new NumberFormatException(*this);
-        }
+            /**
+             * Constructor - Initializes the file name and line number where
+             * this message occured.  Sets the message to report, using an
+             * optional list of arguments to parse into the message
+             *
+             * @param file The file name where exception occurs
+             * @param lineNumber The line number where the exception occurred.
+             * @param msg The message to report
+             * @param ... list of primitives that are formatted into the message
+             */
+            NumberFormatException(const char* file,
+                                  const int   lineNumber,
+                                  const char* msg,
+                                  ...);
 
-        virtual ~NumberFormatException() throw ();
+            /**
+             * Clones this exception.  This is useful for cases where you need
+             * to preserve the type of the original exception as well as the
+             * message. All subclasses should override.
+             *
+             * @return an new Exception instance that is a copy of this one.
+             */
+            virtual NumberFormatException* clone() const
+            {
+                return new NumberFormatException(*this);
+            }
 
-    };
+            virtual ~NumberFormatException() throw();
+        };
 
-}}}
+    }  // namespace exceptions
+}  // namespace lang
+}  // namespace decaf
 
 #endif /*_DECAF_LANG_EXCEPTIONS_NUMBERFORMATEXCEPTION_H_*/

@@ -30,115 +30,145 @@ using namespace decaf::util::concurrent;
 using namespace decaf::util::concurrent::locks;
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace decaf{
-namespace util{
-namespace concurrent{
+namespace decaf
+{
+namespace util
+{
+    namespace concurrent
+    {
 
-    class LatchSync : public AbstractQueuedSynchronizer {
-    private:
+        class LatchSync : public AbstractQueuedSynchronizer
+        {
+        private:
+            LatchSync(const LatchSync&);
+            LatchSync& operator=(const LatchSync&);
 
-        LatchSync(const LatchSync&);
-        LatchSync& operator= (const LatchSync&);
+        public:
+            LatchSync(int count)
+                : AbstractQueuedSynchronizer()
+            {
+                this->setState(count);
+            }
 
-    public:
+            virtual ~LatchSync()
+            {
+            }
 
-        LatchSync(int count) : AbstractQueuedSynchronizer() {
-            this->setState(count);
-        }
+            int getCount() const
+            {
+                return getState();
+            }
 
-        virtual ~LatchSync() {}
+        protected:
+            virtual int tryAcquireShared(int acquires DECAF_UNUSED)
+            {
+                return getState() == 0 ? 1 : -1;
+            }
 
-        int getCount() const {
-            return getState();
-        }
+            virtual bool tryReleaseShared(int releases DECAF_UNUSED)
+            {
+                for (;;)
+                {
+                    int current = getState();
+                    if (current == 0)
+                    {
+                        return false;
+                    }
 
-    protected:
-
-        virtual int tryAcquireShared(int acquires DECAF_UNUSED) {
-            return getState() == 0 ? 1 : -1;
-        }
-
-        virtual bool tryReleaseShared(int releases DECAF_UNUSED) {
-
-            for (;;) {
-
-                int current = getState();
-                if (current == 0) {
-                    return false;
-                }
-
-                int next = current - 1;
-                if (compareAndSetState(current, next)) {
-                    return next == 0;
+                    int next = current - 1;
+                    if (compareAndSetState(current, next))
+                    {
+                        return next == 0;
+                    }
                 }
             }
-        }
-    };
+        };
 
-}}}
+    }  // namespace concurrent
+}  // namespace util
+}  // namespace decaf
 
 ////////////////////////////////////////////////////////////////////////////////
-CountDownLatch::CountDownLatch(int count) : sync(NULL) {
-    if (count < 0) {
-        throw IllegalArgumentException(__FILE__, __LINE__, "Count must be non-negative.");
+CountDownLatch::CountDownLatch(int count)
+    : sync(NULL)
+{
+    if (count < 0)
+    {
+        throw IllegalArgumentException(__FILE__,
+                                       __LINE__,
+                                       "Count must be non-negative.");
     }
 
     this->sync = new LatchSync(count);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-CountDownLatch::~CountDownLatch() {
-    try {
+CountDownLatch::~CountDownLatch()
+{
+    try
+    {
         delete sync;
     }
     DECAF_CATCHALL_NOTHROW()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CountDownLatch::await() {
-    try {
+void CountDownLatch::await()
+{
+    try
+    {
         this->sync->acquireSharedInterruptibly(1);
     }
-    DECAF_CATCH_RETHROW( decaf::lang::exceptions::InterruptedException )
-    DECAF_CATCH_RETHROW( decaf::lang::Exception )
-    DECAF_CATCHALL_THROW( decaf::lang::Exception )
+    DECAF_CATCH_RETHROW(decaf::lang::exceptions::InterruptedException)
+    DECAF_CATCH_RETHROW(decaf::lang::Exception)
+    DECAF_CATCHALL_THROW(decaf::lang::Exception)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool CountDownLatch::await( long long timeOut ) {
-    try {
-        return this->sync->tryAcquireSharedNanos(1, TimeUnit::MILLISECONDS.toNanos(timeOut));
+bool CountDownLatch::await(long long timeOut)
+{
+    try
+    {
+        return this->sync->tryAcquireSharedNanos(
+            1,
+            TimeUnit::MILLISECONDS.toNanos(timeOut));
     }
-    DECAF_CATCH_RETHROW( decaf::lang::exceptions::InterruptedException )
-    DECAF_CATCH_RETHROW( decaf::lang::Exception )
-    DECAF_CATCHALL_THROW( decaf::lang::Exception )
+    DECAF_CATCH_RETHROW(decaf::lang::exceptions::InterruptedException)
+    DECAF_CATCH_RETHROW(decaf::lang::Exception)
+    DECAF_CATCHALL_THROW(decaf::lang::Exception)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool CountDownLatch::await( long long timeout, const TimeUnit& unit ) {
-    try{
+bool CountDownLatch::await(long long timeout, const TimeUnit& unit)
+{
+    try
+    {
         return this->sync->tryAcquireSharedNanos(1, unit.toNanos(timeout));
     }
-    DECAF_CATCH_RETHROW( decaf::lang::exceptions::InterruptedException )
-    DECAF_CATCH_RETHROW( decaf::lang::Exception )
-    DECAF_CATCHALL_THROW( decaf::lang::Exception )
+    DECAF_CATCH_RETHROW(decaf::lang::exceptions::InterruptedException)
+    DECAF_CATCH_RETHROW(decaf::lang::Exception)
+    DECAF_CATCHALL_THROW(decaf::lang::Exception)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CountDownLatch::countDown() {
-    try {
+void CountDownLatch::countDown()
+{
+    try
+    {
         this->sync->releaseShared(1);
     }
     DECAF_CATCHALL_NOTHROW()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int CountDownLatch::getCount() const {
+int CountDownLatch::getCount() const
+{
     return this->sync->getCount();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string CountDownLatch::toString() const {
+std::string CountDownLatch::toString() const
+{
     return std::string("CountDownLatch[count = ") +
            Integer::toString(this->sync->getCount()) + "]";
 }

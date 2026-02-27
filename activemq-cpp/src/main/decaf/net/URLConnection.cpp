@@ -19,10 +19,10 @@
 
 #include <decaf/io/IOException.h>
 #include <decaf/lang/Integer.h>
+#include <decaf/lang/exceptions/IllegalStateException.h>
 #include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/lang/exceptions/NumberFormatException.h>
 #include <decaf/lang/exceptions/UnsupportedOperationException.h>
-#include <decaf/lang/exceptions/IllegalStateException.h>
 
 using namespace decaf;
 using namespace decaf::net;
@@ -34,148 +34,201 @@ bool URLConnection::defaultAllowUserInteraction;
 bool URLConnection::defaultUseCaches = true;
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace decaf {
-namespace net {
+namespace decaf
+{
+namespace net
+{
 
-    class URLConnectionImpl {
+    class URLConnectionImpl
+    {
     public:
-
         std::string contentType;
 
-//        static bool defaultAllowUserInteraction;
-//        static bool defaultUseCaches = true;
-//        ContentHandler defaultHandler = new DefaultContentHandler();
+        //        static bool defaultAllowUserInteraction;
+        //        static bool defaultUseCaches = true;
+        //        ContentHandler defaultHandler = new DefaultContentHandler();
 
         long long lastModified;
-        int readTimeout;
-        int connectTimeout;
+        int       readTimeout;
+        int       connectTimeout;
 
     public:
-
-        URLConnectionImpl() : contentType(),
-                              lastModified(-1),
-                              readTimeout(0),
-                              connectTimeout(0) {}
-
+        URLConnectionImpl()
+            : contentType(),
+              lastModified(-1),
+              readTimeout(0),
+              connectTimeout(0)
+        {
+        }
     };
 
-}}
+}  // namespace net
+}  // namespace decaf
 
 ////////////////////////////////////////////////////////////////////////////////
-URLConnection::URLConnection(const URL& url) : impl(new URLConnectionImpl),
-                                               url(url),
-                                               ifModifiedSince(),
-                                               useCaches(),
-                                               connected(),
-                                               doOutput(),
-                                               doInput(true),
-                                               allowUserInteraction() {
+URLConnection::URLConnection(const URL& url)
+    : impl(new URLConnectionImpl),
+      url(url),
+      ifModifiedSince(),
+      useCaches(),
+      connected(),
+      doOutput(),
+      doInput(true),
+      allowUserInteraction()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-URLConnection::~URLConnection() {
-    try {
+URLConnection::~URLConnection()
+{
+    try
+    {
         delete this->impl;
     }
     DECAF_CATCHALL_NOTHROW()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int URLConnection::getConnectTimeout() const {
+int URLConnection::getConnectTimeout() const
+{
     return impl->connectTimeout;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int URLConnection::getReadTimeout() const {
+int URLConnection::getReadTimeout() const
+{
     return impl->readTimeout;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-long long URLConnection::getHeaderFieldDate(const std::string& field, long long defaultValue) const {
+long long URLConnection::getHeaderFieldDate(const std::string& field,
+                                            long long defaultValue) const
+{
     std::string date = getHeaderField(field);
-    if (date == "") {
+    if (date == "")
+    {
         return defaultValue;
     }
 
-    throw UnsupportedOperationException(__FILE__, __LINE__, "Not yet implemented");
+    throw UnsupportedOperationException(__FILE__,
+                                        __LINE__,
+                                        "Not yet implemented");
 
-    try {
+    try
+    {
         // TODO
-        return -1; // Date::parse(date);
-    } catch (Exception& e) {
+        return -1;  // Date::parse(date);
+    }
+    catch (Exception& e)
+    {
         return defaultValue;
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int URLConnection::getHeaderFieldInt(const std::string& field, int defaultValue) const {
-    try {
+int URLConnection::getHeaderFieldInt(const std::string& field,
+                                     int                defaultValue) const
+{
+    try
+    {
         return Integer::parseInt(getHeaderField(field));
-    } catch (NumberFormatException& e) {
+    }
+    catch (NumberFormatException& e)
+    {
         return defaultValue;
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLConnection::setAllowUserInteraction(bool newValue) {
-    if (connected) {
-        throw IllegalStateException(__FILE__, __LINE__, "Connection already established");
+void URLConnection::setAllowUserInteraction(bool newValue)
+{
+    if (connected)
+    {
+        throw IllegalStateException(__FILE__,
+                                    __LINE__,
+                                    "Connection already established");
     }
 
     allowUserInteraction = newValue;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLConnection::setDefaultUseCaches(bool newValue) {
-    if (connected) {
-        throw IllegalStateException(__FILE__, __LINE__, "Connection already established");
+void URLConnection::setDefaultUseCaches(bool newValue)
+{
+    if (connected)
+    {
+        throw IllegalStateException(__FILE__,
+                                    __LINE__,
+                                    "Connection already established");
     }
     defaultUseCaches = newValue;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLConnection::setDoInput(bool newValue) {
-    if (connected) {
-        throw IllegalStateException(__FILE__, __LINE__, "Connection already established");
+void URLConnection::setDoInput(bool newValue)
+{
+    if (connected)
+    {
+        throw IllegalStateException(__FILE__,
+                                    __LINE__,
+                                    "Connection already established");
     }
     doInput = newValue;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLConnection::setDoOutput(bool newValue) {
-    if (connected) {
-        throw IllegalStateException(__FILE__, __LINE__, "Connection already established");
+void URLConnection::setDoOutput(bool newValue)
+{
+    if (connected)
+    {
+        throw IllegalStateException(__FILE__,
+                                    __LINE__,
+                                    "Connection already established");
     }
     doOutput = newValue;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLConnection::setUseCaches(bool newValue) {
-    if (connected) {
-        throw IllegalStateException(__FILE__, __LINE__, "Connection already established");
+void URLConnection::setUseCaches(bool newValue)
+{
+    if (connected)
+    {
+        throw IllegalStateException(__FILE__,
+                                    __LINE__,
+                                    "Connection already established");
     }
     useCaches = newValue;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLConnection::setConnectTimeout(int timeout) {
-    if (0 > timeout) {
-        throw IllegalStateException(__FILE__, __LINE__, "Invalid negative timeout");
+void URLConnection::setConnectTimeout(int timeout)
+{
+    if (0 > timeout)
+    {
+        throw IllegalStateException(__FILE__,
+                                    __LINE__,
+                                    "Invalid negative timeout");
     }
     impl->connectTimeout = timeout;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLConnection::setReadTimeout(int timeout) {
-    if (0 > timeout) {
-        throw IllegalStateException(__FILE__, __LINE__, "Invalid negative timeout");
+void URLConnection::setReadTimeout(int timeout)
+{
+    if (0 > timeout)
+    {
+        throw IllegalStateException(__FILE__,
+                                    __LINE__,
+                                    "Invalid negative timeout");
     }
     impl->readTimeout = timeout;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-long long URLConnection::getLastModified() const {
-    if (impl->lastModified != -1) {
+long long URLConnection::getLastModified() const
+{
+    if (impl->lastModified != -1)
+    {
         return impl->lastModified;
     }
 
@@ -183,9 +236,13 @@ long long URLConnection::getLastModified() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void URLConnection::setIfModifiedSince(long long newValue) {
-    if (connected) {
-        throw IllegalStateException(__FILE__, __LINE__, "Connection already established");
+void URLConnection::setIfModifiedSince(long long newValue)
+{
+    if (connected)
+    {
+        throw IllegalStateException(__FILE__,
+                                    __LINE__,
+                                    "Connection already established");
     }
     ifModifiedSince = newValue;
 }

@@ -21,5 +21,6 @@ using namespace activemq;
 using namespace activemq::state;
 
 ////////////////////////////////////////////////////////////////////////////////
-CommandVisitor::~CommandVisitor() {}
-
+CommandVisitor::~CommandVisitor()
+{
+}

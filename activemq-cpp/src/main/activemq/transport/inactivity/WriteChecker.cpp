@@ -31,18 +31,27 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-WriteChecker::WriteChecker(InactivityMonitor* parent) : TimerTask(), parent(parent), lastRunTime(0) {
-
-    if (this->parent == NULL) {
-        throw NullPointerException(__FILE__, __LINE__, "WriteChecker created with NULL parent.");
+WriteChecker::WriteChecker(InactivityMonitor* parent)
+    : TimerTask(),
+      parent(parent),
+      lastRunTime(0)
+{
+    if (this->parent == NULL)
+    {
+        throw NullPointerException(__FILE__,
+                                   __LINE__,
+                                   "WriteChecker created with NULL parent.");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-WriteChecker::~WriteChecker() {}
+WriteChecker::~WriteChecker()
+{
+}
 
 ////////////////////////////////////////////////////////////////////////////////
-void WriteChecker::run() {
+void WriteChecker::run()
+{
     this->lastRunTime = System::currentTimeMillis();
     this->parent->writeCheck();
 }

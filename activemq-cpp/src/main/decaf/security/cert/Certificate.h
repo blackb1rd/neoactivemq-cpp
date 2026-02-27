@@ -29,100 +29,111 @@
 #include <decaf/security/cert/CertificateEncodingException.h>
 #include <decaf/security/cert/CertificateException.h>
 
-namespace decaf {
-namespace security {
-namespace cert {
+namespace decaf
+{
+namespace security
+{
+    namespace cert
+    {
 
-    class PublicKey;
-
-    /**
-     * Base interface for all identity certificates.
-     */
-    class DECAF_API Certificate {
-
-    public:
-
-        virtual ~Certificate() {}
+        class PublicKey;
 
         /**
-         * Compares the encoded form of the two certificates.
-         *
-         * @param cert
-         *      The certificate to be tested for equality with this certificate.
-         * @return true if the given certificate is equal to this certificate.
+         * Base interface for all identity certificates.
          */
-        virtual bool equals( const Certificate& cert ) const = 0;
+        class DECAF_API Certificate
+        {
+        public:
+            virtual ~Certificate()
+            {
+            }
 
-        /**
-         * Provides the encoded form of this certificate.
-         *
-         * @param output
-         *      Receives the encoded form of this certificate.
-         * @throws CertificateEncodingException if an encoding error occurs
-         */
-        virtual void getEncoded( std::vector<unsigned char>& output ) const = 0;
+            /**
+             * Compares the encoded form of the two certificates.
+             *
+             * @param cert
+             *      The certificate to be tested for equality with this
+             * certificate.
+             * @return true if the given certificate is equal to this
+             * certificate.
+             */
+            virtual bool equals(const Certificate& cert) const = 0;
 
-        /**
-         * Returns the type of this certificate
-         *
-         * @return the type of this certificate
-         */
-        virtual std::string getType() const = 0;
+            /**
+             * Provides the encoded form of this certificate.
+             *
+             * @param output
+             *      Receives the encoded form of this certificate.
+             * @throws CertificateEncodingException if an encoding error occurs
+             */
+            virtual void getEncoded(
+                std::vector<unsigned char>& output) const = 0;
 
-        /**
-         * Gets the public key of this certificate.
-         *
-         * @return the public key
-         */
-        virtual PublicKey* getPublicKey() = 0;
+            /**
+             * Returns the type of this certificate
+             *
+             * @return the type of this certificate
+             */
+            virtual std::string getType() const = 0;
 
-        /**
-         * Gets the public key of this certificate.
-         *
-         * @return the public key
-         */
-        virtual const PublicKey* getPublicKey() const = 0;
+            /**
+             * Gets the public key of this certificate.
+             *
+             * @return the public key
+             */
+            virtual PublicKey* getPublicKey() = 0;
 
-        /**
-         * Verifies that this certificate was signed with the private key
-         * that corresponds to the specified public key.
-         *
-         * @param publicKey
-         *      The public key used to carry out the validation.
-         * @throws NoSuchAlgorithmException - on unsupported signature algorithms.
-         * @throws InvalidKeyException - on incorrect key.
-         * @throws NoSuchProviderException - if there's no default provider.
-         * @throws SignatureException - on signature errors.
-         * @throws CertificateException - on encoding errors.
-         */
-        virtual void verify( const PublicKey& publicKey ) const = 0;
+            /**
+             * Gets the public key of this certificate.
+             *
+             * @return the public key
+             */
+            virtual const PublicKey* getPublicKey() const = 0;
 
-        /**
-         * Verifies that this certificate was signed with the private key
-         * that corresponds to the specified public key.  Uses the verification
-         * engine of the specified provider.
-         *
-         * @param publicKey
-         *      The public key used to carry out the validation.
-         * @param sigProvider
-         *      The name of the signature provider
-         * @throws NoSuchAlgorithmException - on unsupported signature algorithms.
-         * @throws InvalidKeyException - on incorrect key.
-         * @throws NoSuchProviderException - if there's no default provider.
-         * @throws SignatureException - on signature errors.
-         * @throws CertificateException - on encoding errors.
-         */
-        virtual void verify( const PublicKey& publicKey,
-                             const std::string& sigProvider ) const = 0;
+            /**
+             * Verifies that this certificate was signed with the private key
+             * that corresponds to the specified public key.
+             *
+             * @param publicKey
+             *      The public key used to carry out the validation.
+             * @throws NoSuchAlgorithmException - on unsupported signature
+             * algorithms.
+             * @throws InvalidKeyException - on incorrect key.
+             * @throws NoSuchProviderException - if there's no default provider.
+             * @throws SignatureException - on signature errors.
+             * @throws CertificateException - on encoding errors.
+             */
+            virtual void verify(const PublicKey& publicKey) const = 0;
 
-        /**
-         * Returns a string representation of this certificate.
-         *
-         * @return a string representation of this certificate
-         */
-        virtual std::string toString() const = 0;
-    };
+            /**
+             * Verifies that this certificate was signed with the private key
+             * that corresponds to the specified public key.  Uses the
+             * verification engine of the specified provider.
+             *
+             * @param publicKey
+             *      The public key used to carry out the validation.
+             * @param sigProvider
+             *      The name of the signature provider
+             * @throws NoSuchAlgorithmException - on unsupported signature
+             * algorithms.
+             * @throws InvalidKeyException - on incorrect key.
+             * @throws NoSuchProviderException - if there's no default provider.
+             * @throws SignatureException - on signature errors.
+             * @throws CertificateException - on encoding errors.
+             */
+            virtual void verify(const PublicKey&   publicKey,
+                                const std::string& sigProvider) const = 0;
 
-}}}
+            /**
+             * Returns a string representation of this certificate.
+             *
+             * @return a string representation of this certificate
+             */
+            virtual std::string toString() const = 0;
+        };
+
+    }  // namespace cert
+}  // namespace security
+}  // namespace decaf
 
 #endif /*_DECAF_SECURITY_CERT_CERTIFICATE_H_*/

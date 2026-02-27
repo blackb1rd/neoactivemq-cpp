@@ -41,73 +41,88 @@ using namespace decaf::io;
 using namespace decaf::lang;
 
 ///////////////////////////////////////////////////////////////////////////////
-DataStructure* ActiveMQBytesMessageMarshaller::createObject() const {
+DataStructure* ActiveMQBytesMessageMarshaller::createObject() const
+{
     return new ActiveMQBytesMessage();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-unsigned char ActiveMQBytesMessageMarshaller::getDataStructureType() const {
+unsigned char ActiveMQBytesMessageMarshaller::getDataStructureType() const
+{
     return ActiveMQBytesMessage::ID_ACTIVEMQBYTESMESSAGE;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ActiveMQBytesMessageMarshaller::tightUnmarshal(OpenWireFormat* wireFormat, DataStructure* dataStructure, DataInputStream* dataIn, BooleanStream* bs) {
-
-    try {
-
+void ActiveMQBytesMessageMarshaller::tightUnmarshal(OpenWireFormat* wireFormat,
+                                                    DataStructure* dataStructure,
+                                                    DataInputStream* dataIn,
+                                                    BooleanStream*   bs)
+{
+    try
+    {
         MessageMarshaller::tightUnmarshal(wireFormat, dataStructure, dataIn, bs);
 
         ActiveMQBytesMessage* info =
             dynamic_cast<ActiveMQBytesMessage*>(dataStructure);
         info->beforeUnmarshal(wireFormat);
 
-
-        info->afterUnmarshal( wireFormat );
+        info->afterUnmarshal(wireFormat);
     }
     AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException, decaf::io::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
+                                decaf::io::IOException)
     AMQ_CATCHALL_THROW(decaf::io::IOException)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-int ActiveMQBytesMessageMarshaller::tightMarshal1(OpenWireFormat* wireFormat, DataStructure* dataStructure, BooleanStream* bs) {
-
-    try {
-
+int ActiveMQBytesMessageMarshaller::tightMarshal1(OpenWireFormat* wireFormat,
+                                                  DataStructure*  dataStructure,
+                                                  BooleanStream*  bs)
+{
+    try
+    {
         ActiveMQBytesMessage* info =
             dynamic_cast<ActiveMQBytesMessage*>(dataStructure);
 
         info->beforeMarshal(wireFormat);
-        int rc = MessageMarshaller::tightMarshal1(wireFormat, dataStructure, bs);
+        int rc =
+            MessageMarshaller::tightMarshal1(wireFormat, dataStructure, bs);
 
         return rc + 0;
     }
     AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException, decaf::io::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
+                                decaf::io::IOException)
     AMQ_CATCHALL_THROW(decaf::io::IOException)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ActiveMQBytesMessageMarshaller::tightMarshal2(OpenWireFormat* wireFormat, DataStructure* dataStructure, DataOutputStream* dataOut, BooleanStream* bs) {
-
-    try {
-
-        MessageMarshaller::tightMarshal2(wireFormat, dataStructure, dataOut, bs );
+void ActiveMQBytesMessageMarshaller::tightMarshal2(OpenWireFormat* wireFormat,
+                                                   DataStructure* dataStructure,
+                                                   DataOutputStream* dataOut,
+                                                   BooleanStream*    bs)
+{
+    try
+    {
+        MessageMarshaller::tightMarshal2(wireFormat, dataStructure, dataOut, bs);
 
         ActiveMQBytesMessage* info =
             dynamic_cast<ActiveMQBytesMessage*>(dataStructure);
         info->afterMarshal(wireFormat);
     }
     AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT( exceptions::ActiveMQException, decaf::io::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
+                                decaf::io::IOException)
     AMQ_CATCHALL_THROW(decaf::io::IOException)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ActiveMQBytesMessageMarshaller::looseUnmarshal(OpenWireFormat* wireFormat, DataStructure* dataStructure, DataInputStream* dataIn) {
-
-    try {
-
+void ActiveMQBytesMessageMarshaller::looseUnmarshal(OpenWireFormat* wireFormat,
+                                                    DataStructure* dataStructure,
+                                                    DataInputStream* dataIn)
+{
+    try
+    {
         MessageMarshaller::looseUnmarshal(wireFormat, dataStructure, dataIn);
         ActiveMQBytesMessage* info =
             dynamic_cast<ActiveMQBytesMessage*>(dataStructure);
@@ -115,15 +130,18 @@ void ActiveMQBytesMessageMarshaller::looseUnmarshal(OpenWireFormat* wireFormat, 
         info->afterUnmarshal(wireFormat);
     }
     AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException, decaf::io::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
+                                decaf::io::IOException)
     AMQ_CATCHALL_THROW(decaf::io::IOException)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ActiveMQBytesMessageMarshaller::looseMarshal(OpenWireFormat* wireFormat, DataStructure* dataStructure, DataOutputStream* dataOut) {
-
-    try {
-
+void ActiveMQBytesMessageMarshaller::looseMarshal(OpenWireFormat* wireFormat,
+                                                  DataStructure*  dataStructure,
+                                                  DataOutputStream* dataOut)
+{
+    try
+    {
         ActiveMQBytesMessage* info =
             dynamic_cast<ActiveMQBytesMessage*>(dataStructure);
         info->beforeMarshal(wireFormat);
@@ -131,7 +149,7 @@ void ActiveMQBytesMessageMarshaller::looseMarshal(OpenWireFormat* wireFormat, Da
         info->afterMarshal(wireFormat);
     }
     AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException, decaf::io::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
+                                decaf::io::IOException)
     AMQ_CATCHALL_THROW(decaf::io::IOException)
 }
-

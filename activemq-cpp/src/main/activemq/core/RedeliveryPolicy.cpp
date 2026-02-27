@@ -19,9 +19,9 @@
 
 #include <decaf/lang/Boolean.h>
 #include <decaf/lang/Double.h>
-#include <decaf/lang/Short.h>
 #include <decaf/lang/Integer.h>
 #include <decaf/lang/Long.h>
+#include <decaf/lang/Short.h>
 
 using namespace activemq;
 using namespace activemq::core;
@@ -32,49 +32,70 @@ using namespace decaf::lang;
 const long long RedeliveryPolicy::NO_MAXIMUM_REDELIVERIES = -1;
 
 ////////////////////////////////////////////////////////////////////////////////
-RedeliveryPolicy::RedeliveryPolicy() {
+RedeliveryPolicy::RedeliveryPolicy()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-RedeliveryPolicy::~RedeliveryPolicy() {
+RedeliveryPolicy::~RedeliveryPolicy()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void RedeliveryPolicy::configure(const decaf::util::Properties& properties) {
-
-    try {
-
-        if (properties.hasProperty("cms.redeliveryPolicy.backOffMultiplier")) {
-            this->setBackOffMultiplier(Double::parseDouble(
-                properties.getProperty("cms.redeliveryPolicy.backOffMultiplier")));
+void RedeliveryPolicy::configure(const decaf::util::Properties& properties)
+{
+    try
+    {
+        if (properties.hasProperty("cms.redeliveryPolicy.backOffMultiplier"))
+        {
+            this->setBackOffMultiplier(
+                Double::parseDouble(properties.getProperty(
+                    "cms.redeliveryPolicy.backOffMultiplier")));
         }
-        if (properties.hasProperty("cms.redeliveryPolicy.collisionAvoidancePercent")) {
-            this->setCollisionAvoidancePercent(Short::parseShort(
-                properties.getProperty("cms.redeliveryPolicy.collisionAvoidancePercent")));
+        if (properties.hasProperty(
+                "cms.redeliveryPolicy.collisionAvoidancePercent"))
+        {
+            this->setCollisionAvoidancePercent(
+                Short::parseShort(properties.getProperty(
+                    "cms.redeliveryPolicy.collisionAvoidancePercent")));
         }
-        if (properties.hasProperty("cms.redeliveryPolicy.initialRedeliveryDelay")) {
-            this->setInitialRedeliveryDelay(Long::parseLong(
-                properties.getProperty("cms.redeliveryPolicy.initialRedeliveryDelay")));
+        if (properties.hasProperty(
+                "cms.redeliveryPolicy.initialRedeliveryDelay"))
+        {
+            this->setInitialRedeliveryDelay(
+                Long::parseLong(properties.getProperty(
+                    "cms.redeliveryPolicy.initialRedeliveryDelay")));
         }
-        if (properties.hasProperty("cms.redeliveryPolicy.redeliveryDelay")) {
-            this->setRedeliveryDelay(Long::parseLong(
-                properties.getProperty("cms.redeliveryPolicy.redeliveryDelay")));
+        if (properties.hasProperty("cms.redeliveryPolicy.redeliveryDelay"))
+        {
+            this->setRedeliveryDelay(Long::parseLong(properties.getProperty(
+                "cms.redeliveryPolicy.redeliveryDelay")));
         }
-        if (properties.hasProperty("cms.redeliveryPolicy.maximumRedeliveries")) {
-            this->setMaximumRedeliveries(Integer::parseInt(
-                properties.getProperty("cms.redeliveryPolicy.maximumRedeliveries")));
+        if (properties.hasProperty("cms.redeliveryPolicy.maximumRedeliveries"))
+        {
+            this->setMaximumRedeliveries(
+                Integer::parseInt(properties.getProperty(
+                    "cms.redeliveryPolicy.maximumRedeliveries")));
         }
-        if (properties.hasProperty("cms.redeliveryPolicy.useCollisionAvoidance")) {
-            this->setUseCollisionAvoidance(Boolean::parseBoolean(
-                properties.getProperty("cms.redeliveryPolicy.useCollisionAvoidance")));
+        if (properties.hasProperty(
+                "cms.redeliveryPolicy.useCollisionAvoidance"))
+        {
+            this->setUseCollisionAvoidance(
+                Boolean::parseBoolean(properties.getProperty(
+                    "cms.redeliveryPolicy.useCollisionAvoidance")));
         }
-        if (properties.hasProperty("cms.redeliveryPolicy.useExponentialBackOff")) {
-            this->setUseExponentialBackOff(Boolean::parseBoolean(
-                properties.getProperty("cms.redeliveryPolicy.useExponentialBackOff")));
+        if (properties.hasProperty(
+                "cms.redeliveryPolicy.useExponentialBackOff"))
+        {
+            this->setUseExponentialBackOff(
+                Boolean::parseBoolean(properties.getProperty(
+                    "cms.redeliveryPolicy.useExponentialBackOff")));
         }
-        if (properties.hasProperty("cms.redeliveryPolicy.maxRedeliveryDelay")) {
-            this->setMaximumRedeliveryDelay(Long::parseLong(
-                properties.getProperty("cms.redeliveryPolicy.maxRedeliveryDelay")));
+        if (properties.hasProperty("cms.redeliveryPolicy.maxRedeliveryDelay"))
+        {
+            this->setMaximumRedeliveryDelay(
+                Long::parseLong(properties.getProperty("cms.redeliveryPolicy."
+                                                       "maxRedeliveryDelay")));
         }
     }
     DECAF_CATCH_RETHROW(Exception)

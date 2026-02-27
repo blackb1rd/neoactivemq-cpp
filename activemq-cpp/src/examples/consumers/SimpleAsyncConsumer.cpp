@@ -15,25 +15,25 @@
  * limitations under the License.
  */
 
-#include <decaf/lang/Thread.h>
-#include <decaf/lang/Runnable.h>
-#include <decaf/util/concurrent/CountDownLatch.h>
-#include <activemq/core/ActiveMQConnectionFactory.h>
 #include <activemq/core/ActiveMQConnection.h>
-#include <activemq/transport/DefaultTransportListener.h>
+#include <activemq/core/ActiveMQConnectionFactory.h>
 #include <activemq/library/ActiveMQCPP.h>
-#include <decaf/lang/Integer.h>
+#include <activemq/transport/DefaultTransportListener.h>
 #include <activemq/util/Config.h>
-#include <decaf/util/Date.h>
+#include <cms/BytesMessage.h>
 #include <cms/Connection.h>
+#include <cms/ExceptionListener.h>
+#include <cms/MapMessage.h>
+#include <cms/MessageListener.h>
 #include <cms/Session.h>
 #include <cms/TextMessage.h>
-#include <cms/BytesMessage.h>
-#include <cms/MapMessage.h>
-#include <cms/ExceptionListener.h>
-#include <cms/MessageListener.h>
-#include <stdlib.h>
+#include <decaf/lang/Integer.h>
+#include <decaf/lang/Runnable.h>
+#include <decaf/lang/Thread.h>
+#include <decaf/util/Date.h>
+#include <decaf/util/concurrent/CountDownLatch.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <iostream>
 
 using namespace activemq;
@@ -48,60 +48,64 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////////////
 class SimpleAsyncConsumer : public ExceptionListener,
                             public MessageListener,
-                            public DefaultTransportListener {
+                            public DefaultTransportListener
+{
 private:
-
-    Connection* connection;
-    Session* session;
-    Destination* destination;
+    Connection*      connection;
+    Session*         session;
+    Destination*     destination;
     MessageConsumer* consumer;
-    bool useTopic;
-    std::string brokerURI;
-    std::string destURI;
-    bool clientAck;
+    bool             useTopic;
+    std::string      brokerURI;
+    std::string      destURI;
+    bool             clientAck;
 
 private:
-
     SimpleAsyncConsumer(const SimpleAsyncConsumer&);
     SimpleAsyncConsumer& operator=(const SimpleAsyncConsumer&);
 
 public:
-
     SimpleAsyncConsumer(const std::string& brokerURI,
                         const std::string& destURI,
-                        bool useTopic = false,
-                        bool clientAck = false) :
-        connection(NULL),
-        session(NULL),
-        destination(NULL),
-        consumer(NULL),
-        useTopic(useTopic),
-        brokerURI(brokerURI),
-        destURI(destURI),
-        clientAck(clientAck) {
+                        bool               useTopic  = false,
+                        bool               clientAck = false)
+        : connection(NULL),
+          session(NULL),
+          destination(NULL),
+          consumer(NULL),
+          useTopic(useTopic),
+          brokerURI(brokerURI),
+          destURI(destURI),
+          clientAck(clientAck)
+    {
     }
 
-    virtual ~SimpleAsyncConsumer() {
+    virtual ~SimpleAsyncConsumer()
+    {
         this->cleanup();
     }
 
-    void close() {
+    void close()
+    {
         this->cleanup();
     }
 
-    void runConsumer() {
-
-        try {
-
+    void runConsumer()
+    {
+        try
+        {
             // Create a ConnectionFactory
-            ActiveMQConnectionFactory* connectionFactory = new ActiveMQConnectionFactory(brokerURI);
+            ActiveMQConnectionFactory* connectionFactory =
+                new ActiveMQConnectionFactory(brokerURI);
 
             // Create a Connection
             connection = connectionFactory->createConnection();
             delete connectionFactory;
 
-            ActiveMQConnection* amqConnection = dynamic_cast<ActiveMQConnection*>(connection);
-            if (amqConnection != NULL) {
+            ActiveMQConnection* amqConnection =
+                dynamic_cast<ActiveMQConnection*>(connection);
+            if (amqConnection != NULL)
+            {
                 amqConnection->addTransportListener(this);
             }
 
@@ -110,115 +114,175 @@ public:
             connection->setExceptionListener(this);
 
             // Create a Session
-            if (clientAck) {
-                session = connection->createSession(Session::CLIENT_ACKNOWLEDGE);
-            } else {
+            if (clientAck)
+            {
+                session =
+                    connection->createSession(Session::CLIENT_ACKNOWLEDGE);
+            }
+            else
+            {
                 session = connection->createSession(Session::AUTO_ACKNOWLEDGE);
             }
 
             // Create the destination (Topic or Queue)
-            if (useTopic) {
+            if (useTopic)
+            {
                 destination = session->createTopic(destURI);
-            } else {
+            }
+            else
+            {
                 destination = session->createQueue(destURI);
             }
 
             // Create a MessageConsumer from the Session to the Topic or Queue
             consumer = session->createConsumer(destination);
             consumer->setMessageListener(this);
-
-        } catch (CMSException& e) {
+        }
+        catch (CMSException& e)
+        {
             e.printStackTrace();
         }
     }
 
-    // Called from the consumer since this class is a registered MessageListener.
-    virtual void onMessage(const Message* message) {
-
+    // Called from the consumer since this class is a registered
+    // MessageListener.
+    virtual void onMessage(const Message* message)
+    {
         static int count = 0;
 
-        try {
+        try
+        {
             count++;
-            const TextMessage* textMessage = dynamic_cast<const TextMessage*>(message);
+            const TextMessage* textMessage =
+                dynamic_cast<const TextMessage*>(message);
             string text = "";
 
-            if (textMessage != NULL) {
+            if (textMessage != NULL)
+            {
                 text = textMessage->getText();
-            } else {
+            }
+            else
+            {
                 text = "NOT A TEXTMESSAGE!";
             }
 
-            if (clientAck) {
+            if (clientAck)
+            {
                 message->acknowledge();
             }
 
             printf("Message #%d Received: %s\n", count, text.c_str());
-        } catch (CMSException& e) {
+        }
+        catch (CMSException& e)
+        {
             e.printStackTrace();
         }
     }
 
     // If something bad happens you see it here as this class is also been
     // registered as an ExceptionListener with the connection.
-    virtual void onException(const CMSException& ex AMQCPP_UNUSED) {
+    virtual void onException(const CMSException& ex AMQCPP_UNUSED)
+    {
         printf("CMS Exception occurred.  Shutting down client.\n");
         exit(1);
     }
 
-    virtual void onException(const decaf::lang::Exception& ex) {
+    virtual void onException(const decaf::lang::Exception& ex)
+    {
         printf("Transport Exception occurred: %s \n", ex.getMessage().c_str());
     }
 
-    virtual void transportInterrupted() {
-        std::cout << "The Connection's Transport has been Interrupted." << std::endl;
+    virtual void transportInterrupted()
+    {
+        std::cout << "The Connection's Transport has been Interrupted."
+                  << std::endl;
     }
 
-    virtual void transportResumed() {
-        std::cout << "The Connection's Transport has been Restored." << std::endl;
+    virtual void transportResumed()
+    {
+        std::cout << "The Connection's Transport has been Restored."
+                  << std::endl;
     }
 
 private:
-
-    void cleanup(){
-
+    void cleanup()
+    {
         //*************************************************
         // Always close destination, consumers and producers before
         // you destroy their sessions and connection.
         //*************************************************
 
         // Destroy resources.
-        try{
-            if( destination != NULL ) delete destination;
-        }catch (CMSException& e) {}
+        try
+        {
+            if (destination != NULL)
+            {
+                delete destination;
+            }
+        }
+        catch (CMSException& e)
+        {
+        }
         destination = NULL;
 
-        try{
-            if( consumer != NULL ) delete consumer;
-        }catch (CMSException& e) {}
+        try
+        {
+            if (consumer != NULL)
+            {
+                delete consumer;
+            }
+        }
+        catch (CMSException& e)
+        {
+        }
         consumer = NULL;
 
         // Close open resources.
-        try{
-            if( session != NULL ) session->close();
-            if( connection != NULL ) connection->close();
-        }catch (CMSException& e) {}
+        try
+        {
+            if (session != NULL)
+            {
+                session->close();
+            }
+            if (connection != NULL)
+            {
+                connection->close();
+            }
+        }
+        catch (CMSException& e)
+        {
+        }
 
         // Now Destroy them
-        try{
-            if( session != NULL ) delete session;
-        }catch (CMSException& e) {}
+        try
+        {
+            if (session != NULL)
+            {
+                delete session;
+            }
+        }
+        catch (CMSException& e)
+        {
+        }
         session = NULL;
 
-        try{
-            if( connection != NULL ) delete connection;
-        }catch (CMSException& e) {}
+        try
+        {
+            if (connection != NULL)
+            {
+                delete connection;
+            }
+        }
+        catch (CMSException& e)
+        {
+        }
         connection = NULL;
     }
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-int main(int argc AMQCPP_UNUSED, char* argv[] AMQCPP_UNUSED) {
-
+int main(int argc AMQCPP_UNUSED, char* argv[] AMQCPP_UNUSED)
+{
     activemq::library::ActiveMQCPP::initializeLibrary();
 
     std::cout << "=====================================================\n";
@@ -241,21 +305,20 @@ int main(int argc AMQCPP_UNUSED, char* argv[] AMQCPP_UNUSED) {
     //    tcp://127.0.0.1:61616?wireFormat=openwire  same as above
     //    tcp://127.0.0.1:61613?wireFormat=stomp     use stomp instead
     //
-    std::string brokerURI =
-        "failover:(tcp://127.0.0.1:61616"
-//        "?wireFormat=openwire"
-//        "&connection.useAsyncSend=true"
-//        "&transport.commandTracingEnabled=true"
-//        "&transport.tcpTracingEnabled=true"
-//        "&wireFormat.tightEncodingEnabled=true"
-        ")";
+    std::string brokerURI = "failover:(tcp://127.0.0.1:61616"
+                            //        "?wireFormat=openwire"
+                            //        "&connection.useAsyncSend=true"
+                            //        "&transport.commandTracingEnabled=true"
+                            //        "&transport.tcpTracingEnabled=true"
+                            //        "&wireFormat.tightEncodingEnabled=true"
+                            ")";
 
     //============================================================
     // This is the Destination Name and URI options.  Use this to
     // customize where the consumer listens, to have the consumer
     // use a topic or queue set the 'useTopics' flag.
     //============================================================
-    std::string destURI = "TEST.FOO"; //?consumer.prefetchSize=1";
+    std::string destURI = "TEST.FOO";  //?consumer.prefetchSize=1";
 
     //============================================================
     // set to true to use topics instead of queues
@@ -271,14 +334,16 @@ int main(int argc AMQCPP_UNUSED, char* argv[] AMQCPP_UNUSED) {
     bool clientAck = false;
 
     // Create the consumer
-    SimpleAsyncConsumer consumer( brokerURI, destURI, useTopics, clientAck );
+    SimpleAsyncConsumer consumer(brokerURI, destURI, useTopics, clientAck);
 
     // Start it up and it will listen forever.
     consumer.runConsumer();
 
     // Wait to exit.
     std::cout << "Press 'q' to quit" << std::endl;
-    while( std::cin.get() != 'q') {}
+    while (std::cin.get() != 'q')
+    {
+    }
 
     // All CMS resources should be closed before the library is shutdown.
     consumer.close();

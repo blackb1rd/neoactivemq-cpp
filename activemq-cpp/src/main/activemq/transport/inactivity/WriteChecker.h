@@ -22,42 +22,45 @@
 
 #include <decaf/util/TimerTask.h>
 
-namespace activemq {
-namespace transport {
-namespace inactivity {
+namespace activemq
+{
+namespace transport
+{
+    namespace inactivity
+    {
 
-    class InactivityMonitor;
+        class InactivityMonitor;
 
-    /**
-     * Runnable class used by the {@see InactivityMonitor} to make periodic writes to the underlying
-     * transport if no other write activity is going on in order to more quickly detect failures
-     * of the connection to the broker.
-     *
-     * @since 3.1.0
-     */
-    class AMQCPP_API WriteChecker : public decaf::util::TimerTask {
-    private:
+        /**
+         * Runnable class used by the {@see InactivityMonitor} to make periodic
+         * writes to the underlying transport if no other write activity is
+         * going on in order to more quickly detect failures of the connection
+         * to the broker.
+         *
+         * @since 3.1.0
+         */
+        class AMQCPP_API WriteChecker : public decaf::util::TimerTask
+        {
+        private:
+            WriteChecker(const WriteChecker&);
+            WriteChecker operator=(const WriteChecker&);
 
-        WriteChecker(const WriteChecker&);
-        WriteChecker operator=(const WriteChecker&);
+        private:
+            // The InactivityMonitor instance that created this object.
+            InactivityMonitor* parent;
 
-    private:
+            // State variable tracking the last execution time of this Runnable.
+            long long lastRunTime;
 
-        // The InactivityMonitor instance that created this object.
-        InactivityMonitor* parent;
+        public:
+            WriteChecker(InactivityMonitor* parent);
+            virtual ~WriteChecker();
 
-        // State variable tracking the last execution time of this Runnable.
-        long long lastRunTime;
+            virtual void run();
+        };
 
-    public:
-
-        WriteChecker(InactivityMonitor* parent);
-        virtual ~WriteChecker();
-
-        virtual void run();
-
-    };
-
-}}}
+    }  // namespace inactivity
+}  // namespace transport
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_TRANSPORT_INACTIVITY_WRITECHECKER_H_ */

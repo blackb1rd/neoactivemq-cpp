@@ -18,9 +18,9 @@
 
 #include <activemq/util/CMSExceptionSupport.h>
 
-#include <decaf/io/FilterOutputStream.h>
 #include <decaf/io/ByteArrayInputStream.h>
 #include <decaf/io/EOFException.h>
+#include <decaf/io/FilterOutputStream.h>
 #include <decaf/io/IOException.h>
 
 #include <decaf/util/zip/DeflaterOutputStream.h>
@@ -41,65 +41,76 @@ using namespace decaf::util::zip;
 const unsigned char ActiveMQBytesMessage::ID_ACTIVEMQBYTESMESSAGE = 24;
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class ByteCounterOutputStream : public FilterOutputStream {
-    private:
+class ByteCounterOutputStream : public FilterOutputStream
+{
+private:
+    int* length;
 
-        int* length;
+private:
+    ByteCounterOutputStream(const ByteCounterOutputStream&);
+    ByteCounterOutputStream operator=(const ByteCounterOutputStream&);
 
-    private:
+public:
+    ByteCounterOutputStream(int* length, OutputStream* stream, bool own = false)
+        : FilterOutputStream(stream, own),
+          length(length)
+    {
+    }
 
-        ByteCounterOutputStream( const ByteCounterOutputStream& );
-        ByteCounterOutputStream operator= ( const ByteCounterOutputStream& );
+    virtual ~ByteCounterOutputStream()
+    {
+    }
 
-    public:
-
-        ByteCounterOutputStream( int* length, OutputStream* stream, bool own = false )
-            : FilterOutputStream( stream, own ), length( length ) {
-        }
-
-        virtual ~ByteCounterOutputStream() {}
-
-    protected:
-
-        virtual void doWriteByte( unsigned char value ) {
-            (*length)++;
-            FilterOutputStream::doWriteByte( value );
-        }
-
-    };
-}
+protected:
+    virtual void doWriteByte(unsigned char value)
+    {
+        (*length)++;
+        FilterOutputStream::doWriteByte(value);
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQBytesMessage::ActiveMQBytesMessage() :
-    ActiveMQMessageTemplate<cms::BytesMessage>(), bytesOut(NULL), dataIn(), dataOut(), length(0) {
-
+ActiveMQBytesMessage::ActiveMQBytesMessage()
+    : ActiveMQMessageTemplate<cms::BytesMessage>(),
+      bytesOut(NULL),
+      dataIn(),
+      dataOut(),
+      length(0)
+{
     this->clearBody();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQBytesMessage::~ActiveMQBytesMessage() throw() {
-    try {
+ActiveMQBytesMessage::~ActiveMQBytesMessage() throw()
+{
+    try
+    {
         this->reset();
     }
     AMQ_CATCHALL_NOTHROW()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-unsigned char ActiveMQBytesMessage::getDataStructureType() const {
+unsigned char ActiveMQBytesMessage::getDataStructureType() const
+{
     return ActiveMQBytesMessage::ID_ACTIVEMQBYTESMESSAGE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQBytesMessage* ActiveMQBytesMessage::cloneDataStructure() const {
-    std::unique_ptr<ActiveMQBytesMessage> message( new ActiveMQBytesMessage() );
-    message->copyDataStructure( this );
+ActiveMQBytesMessage* ActiveMQBytesMessage::cloneDataStructure() const
+{
+    std::unique_ptr<ActiveMQBytesMessage> message(new ActiveMQBytesMessage());
+    message->copyDataStructure(this);
     return message.release();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-cms::BytesMessage* ActiveMQBytesMessage::clone() const {
+cms::BytesMessage* ActiveMQBytesMessage::clone() const
+{
     ActiveMQBytesMessage* clone = this->cloneDataStructure();
     clone->setReadOnlyBody(false);
     clone->setReadOnlyProperties(false);
@@ -107,61 +118,73 @@ cms::BytesMessage* ActiveMQBytesMessage::clone() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQBytesMessage::copyDataStructure(const DataStructure* src) {
-
+void ActiveMQBytesMessage::copyDataStructure(const DataStructure* src)
+{
     // Protect against invalid self assignment.
-    if (this == src) {
+    if (this == src)
+    {
         return;
     }
 
-    const ActiveMQBytesMessage* srcPtr = dynamic_cast<const ActiveMQBytesMessage*>(src);
+    const ActiveMQBytesMessage* srcPtr =
+        dynamic_cast<const ActiveMQBytesMessage*>(src);
 
-    if (srcPtr == NULL || src == NULL) {
+    if (srcPtr == NULL || src == NULL)
+    {
         throw decaf::lang::exceptions::NullPointerException(
-            __FILE__, __LINE__,
+            __FILE__,
+            __LINE__,
             "ActiveMQBytesMessage::copyDataStructure - src is NULL or invalid");
     }
 
-    ActiveMQBytesMessage* nonConstSrc = const_cast<ActiveMQBytesMessage*>(srcPtr);
+    ActiveMQBytesMessage* nonConstSrc =
+        const_cast<ActiveMQBytesMessage*>(srcPtr);
     nonConstSrc->storeContent();
 
     ActiveMQMessageTemplate<cms::BytesMessage>::copyDataStructure(src);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string ActiveMQBytesMessage::toString() const {
+std::string ActiveMQBytesMessage::toString() const
+{
     return ActiveMQMessageTemplate<cms::BytesMessage>::toString();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool ActiveMQBytesMessage::equals(const DataStructure* value) const {
+bool ActiveMQBytesMessage::equals(const DataStructure* value) const
+{
     return ActiveMQMessageTemplate<cms::BytesMessage>::equals(value);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQBytesMessage::setBodyBytes(const unsigned char* buffer, int numBytes) {
-
-    try {
+void ActiveMQBytesMessage::setBodyBytes(const unsigned char* buffer,
+                                        int                  numBytes)
+{
+    try
+    {
         initializeWriting();
-        dataOut->write(buffer, (int) numBytes, 0, (int) numBytes);
+        dataOut->write(buffer, (int)numBytes, 0, (int)numBytes);
     }
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-unsigned char* ActiveMQBytesMessage::getBodyBytes() const {
-
-    try {
-
+unsigned char* ActiveMQBytesMessage::getBodyBytes() const
+{
+    try
+    {
         initializeReading();
 
         int length = this->getBodyLength();
 
-        if (length != 0) {
+        if (length != 0)
+        {
             unsigned char* buffer = new unsigned char[length];
             this->readBytes(buffer, length);
             return buffer;
-        } else {
+        }
+        else
+        {
             return NULL;
         }
     }
@@ -169,9 +192,10 @@ unsigned char* ActiveMQBytesMessage::getBodyBytes() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int ActiveMQBytesMessage::getBodyLength() const {
-
-    try {
+int ActiveMQBytesMessage::getBodyLength() const
+{
+    try
+    {
         initializeReading();
         return this->length;
     }
@@ -179,8 +203,8 @@ int ActiveMQBytesMessage::getBodyLength() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQBytesMessage::clearBody() {
-
+void ActiveMQBytesMessage::clearBody()
+{
     // Invoke base class's version.
     ActiveMQMessageTemplate<cms::BytesMessage>::clearBody();
 
@@ -191,15 +215,17 @@ void ActiveMQBytesMessage::clearBody() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQBytesMessage::onSend() {
+void ActiveMQBytesMessage::onSend()
+{
     this->storeContent();
     ActiveMQMessageTemplate<cms::BytesMessage>::onSend();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQBytesMessage::reset() {
-
-    try {
+void ActiveMQBytesMessage::reset()
+{
+    try
+    {
         storeContent();
         this->bytesOut = NULL;
         this->dataIn.reset(NULL);
@@ -211,408 +237,573 @@ void ActiveMQBytesMessage::reset() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool ActiveMQBytesMessage::readBoolean() const {
-
+bool ActiveMQBytesMessage::readBoolean() const
+{
     initializeReading();
-    try {
+    try
+    {
         return this->dataIn->readBoolean();
-    } catch (EOFException& ex) {
+    }
+    catch (EOFException& ex)
+    {
         throw CMSExceptionSupport::createMessageEOFException(ex);
-    } catch (IOException& ex) {
+    }
+    catch (IOException& ex)
+    {
         throw CMSExceptionSupport::createMessageFormatException(ex);
-    } catch (Exception& ex) {
+    }
+    catch (Exception& ex)
+    {
         throw CMSExceptionSupport::create(ex);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQBytesMessage::writeBoolean(bool value) {
-
+void ActiveMQBytesMessage::writeBoolean(bool value)
+{
     initializeWriting();
-    try {
+    try
+    {
         this->dataOut->writeBoolean(value);
-    } catch (EOFException& ex) {
+    }
+    catch (EOFException& ex)
+    {
         throw CMSExceptionSupport::createMessageEOFException(ex);
-    } catch (Exception& ex) {
+    }
+    catch (Exception& ex)
+    {
         throw CMSExceptionSupport::create(ex);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-unsigned char ActiveMQBytesMessage::readByte() const {
-
+unsigned char ActiveMQBytesMessage::readByte() const
+{
     initializeReading();
-    try {
-        return (unsigned char) this->dataIn->readByte();
-    } catch (EOFException& ex) {
+    try
+    {
+        return (unsigned char)this->dataIn->readByte();
+    }
+    catch (EOFException& ex)
+    {
         throw CMSExceptionSupport::createMessageEOFException(ex);
-    } catch (IOException& ex) {
+    }
+    catch (IOException& ex)
+    {
         throw CMSExceptionSupport::createMessageFormatException(ex);
-    } catch (Exception& ex) {
+    }
+    catch (Exception& ex)
+    {
         throw CMSExceptionSupport::create(ex);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQBytesMessage::writeByte(unsigned char value) {
-
+void ActiveMQBytesMessage::writeByte(unsigned char value)
+{
     initializeWriting();
-    try{
-        this->dataOut->writeByte( value );
-    } catch( EOFException& ex ) {
-        throw CMSExceptionSupport::createMessageEOFException( ex );
-    } catch( Exception& ex ) {
-        throw CMSExceptionSupport::create( ex );
+    try
+    {
+        this->dataOut->writeByte(value);
     }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-int ActiveMQBytesMessage::readBytes(std::vector<unsigned char>& value) const {
-    return this->readBytes(&value[0], (int) value.size());
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void ActiveMQBytesMessage::writeBytes(const std::vector<unsigned char>& value) {
-
-    initializeWriting();
-    try {
-        this->dataOut->write(&value[0], (int) value.size());
-    } catch (EOFException& ex) {
+    catch (EOFException& ex)
+    {
         throw CMSExceptionSupport::createMessageEOFException(ex);
-    } catch (Exception& ex) {
+    }
+    catch (Exception& ex)
+    {
         throw CMSExceptionSupport::create(ex);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int ActiveMQBytesMessage::readBytes(unsigned char* buffer, int length) const {
+int ActiveMQBytesMessage::readBytes(std::vector<unsigned char>& value) const
+{
+    return this->readBytes(&value[0], (int)value.size());
+}
 
+////////////////////////////////////////////////////////////////////////////////
+void ActiveMQBytesMessage::writeBytes(const std::vector<unsigned char>& value)
+{
+    initializeWriting();
+    try
+    {
+        this->dataOut->write(&value[0], (int)value.size());
+    }
+    catch (EOFException& ex)
+    {
+        throw CMSExceptionSupport::createMessageEOFException(ex);
+    }
+    catch (Exception& ex)
+    {
+        throw CMSExceptionSupport::create(ex);
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+int ActiveMQBytesMessage::readBytes(unsigned char* buffer, int length) const
+{
     initializeReading();
-    try {
-
-        if (length < 0) {
-            throw IndexOutOfBoundsException(__FILE__, __LINE__, "Array length given was negative");
+    try
+    {
+        if (length < 0)
+        {
+            throw IndexOutOfBoundsException(__FILE__,
+                                            __LINE__,
+                                            "Array length given was negative");
         }
 
         int n = 0;
 
-        while (n < length) {
-            int count = this->dataIn->read(buffer, (int) length, (int) n, (int) (length - n));
-            if (count < 0) {
+        while (n < length)
+        {
+            int count = this->dataIn->read(buffer,
+                                           (int)length,
+                                           (int)n,
+                                           (int)(length - n));
+            if (count < 0)
+            {
                 break;
             }
             n += count;
         }
 
-        if (n == 0 && length > 0) {
+        if (n == 0 && length > 0)
+        {
             n = -1;
         }
 
         return n;
-
-    } catch (EOFException& ex) {
+    }
+    catch (EOFException& ex)
+    {
         throw CMSExceptionSupport::createMessageEOFException(ex);
-    } catch (IOException& ex) {
+    }
+    catch (IOException& ex)
+    {
         throw CMSExceptionSupport::createMessageFormatException(ex);
-    } catch (Exception& ex) {
+    }
+    catch (Exception& ex)
+    {
         throw CMSExceptionSupport::create(ex);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQBytesMessage::writeBytes(const unsigned char* value, int offset, int length) {
-
+void ActiveMQBytesMessage::writeBytes(const unsigned char* value,
+                                      int                  offset,
+                                      int                  length)
+{
     initializeWriting();
-    try {
+    try
+    {
         this->dataOut->write(value, length, offset, length);
-    } catch (EOFException& ex) {
+    }
+    catch (EOFException& ex)
+    {
         throw CMSExceptionSupport::createMessageEOFException(ex);
-    } catch (Exception& ex) {
+    }
+    catch (Exception& ex)
+    {
         throw CMSExceptionSupport::create(ex);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-char ActiveMQBytesMessage::readChar() const {
-
+char ActiveMQBytesMessage::readChar() const
+{
     initializeReading();
-    try {
+    try
+    {
         return this->dataIn->readChar();
-    } catch (EOFException& ex) {
+    }
+    catch (EOFException& ex)
+    {
         throw CMSExceptionSupport::createMessageEOFException(ex);
-    } catch (IOException& ex) {
+    }
+    catch (IOException& ex)
+    {
         throw CMSExceptionSupport::createMessageFormatException(ex);
-    } catch (Exception& ex) {
+    }
+    catch (Exception& ex)
+    {
         throw CMSExceptionSupport::create(ex);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQBytesMessage::writeChar(char value) {
-
+void ActiveMQBytesMessage::writeChar(char value)
+{
     initializeWriting();
-    try {
+    try
+    {
         this->dataOut->writeChar(value);
-    } catch (EOFException& ex) {
+    }
+    catch (EOFException& ex)
+    {
         throw CMSExceptionSupport::createMessageEOFException(ex);
-    } catch (Exception& ex) {
+    }
+    catch (Exception& ex)
+    {
         throw CMSExceptionSupport::create(ex);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-float ActiveMQBytesMessage::readFloat() const {
-
+float ActiveMQBytesMessage::readFloat() const
+{
     initializeReading();
-    try {
+    try
+    {
         return this->dataIn->readFloat();
-    } catch (EOFException& ex) {
+    }
+    catch (EOFException& ex)
+    {
         throw CMSExceptionSupport::createMessageEOFException(ex);
-    } catch (IOException& ex) {
+    }
+    catch (IOException& ex)
+    {
         throw CMSExceptionSupport::createMessageFormatException(ex);
-    } catch (Exception& ex) {
+    }
+    catch (Exception& ex)
+    {
         throw CMSExceptionSupport::create(ex);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQBytesMessage::writeFloat(float value) {
-
+void ActiveMQBytesMessage::writeFloat(float value)
+{
     initializeWriting();
-    try {
+    try
+    {
         this->dataOut->writeFloat(value);
-    } catch (EOFException& ex) {
+    }
+    catch (EOFException& ex)
+    {
         throw CMSExceptionSupport::createMessageEOFException(ex);
-    } catch (Exception& ex) {
+    }
+    catch (Exception& ex)
+    {
         throw CMSExceptionSupport::create(ex);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-double ActiveMQBytesMessage::readDouble() const {
-
+double ActiveMQBytesMessage::readDouble() const
+{
     initializeReading();
-    try {
+    try
+    {
         return this->dataIn->readDouble();
-    } catch (EOFException& ex) {
+    }
+    catch (EOFException& ex)
+    {
         throw CMSExceptionSupport::createMessageEOFException(ex);
-    } catch (IOException& ex) {
+    }
+    catch (IOException& ex)
+    {
         throw CMSExceptionSupport::createMessageFormatException(ex);
-    } catch (Exception& ex) {
+    }
+    catch (Exception& ex)
+    {
         throw CMSExceptionSupport::create(ex);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQBytesMessage::writeDouble(double value) {
-
+void ActiveMQBytesMessage::writeDouble(double value)
+{
     initializeWriting();
-    try {
+    try
+    {
         this->dataOut->writeDouble(value);
-    } catch (EOFException& ex) {
+    }
+    catch (EOFException& ex)
+    {
         throw CMSExceptionSupport::createMessageEOFException(ex);
-    } catch (Exception& ex) {
+    }
+    catch (Exception& ex)
+    {
         throw CMSExceptionSupport::create(ex);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-short ActiveMQBytesMessage::readShort() const {
-
+short ActiveMQBytesMessage::readShort() const
+{
     initializeReading();
-    try {
+    try
+    {
         return this->dataIn->readShort();
-    } catch (EOFException& ex) {
+    }
+    catch (EOFException& ex)
+    {
         throw CMSExceptionSupport::createMessageEOFException(ex);
-    } catch (IOException& ex) {
+    }
+    catch (IOException& ex)
+    {
         throw CMSExceptionSupport::createMessageFormatException(ex);
-    } catch (Exception& ex) {
+    }
+    catch (Exception& ex)
+    {
         throw CMSExceptionSupport::create(ex);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQBytesMessage::writeShort(short value) {
-
+void ActiveMQBytesMessage::writeShort(short value)
+{
     initializeWriting();
-    try {
+    try
+    {
         this->dataOut->writeShort(value);
-    } catch (EOFException& ex) {
+    }
+    catch (EOFException& ex)
+    {
         throw CMSExceptionSupport::createMessageEOFException(ex);
-    } catch (Exception& ex) {
+    }
+    catch (Exception& ex)
+    {
         throw CMSExceptionSupport::create(ex);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-unsigned short ActiveMQBytesMessage::readUnsignedShort() const {
-
+unsigned short ActiveMQBytesMessage::readUnsignedShort() const
+{
     initializeReading();
-    try {
+    try
+    {
         return this->dataIn->readUnsignedShort();
-    } catch (EOFException& ex) {
+    }
+    catch (EOFException& ex)
+    {
         throw CMSExceptionSupport::createMessageEOFException(ex);
-    } catch (IOException& ex) {
+    }
+    catch (IOException& ex)
+    {
         throw CMSExceptionSupport::createMessageFormatException(ex);
-    } catch (Exception& ex) {
+    }
+    catch (Exception& ex)
+    {
         throw CMSExceptionSupport::create(ex);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQBytesMessage::writeUnsignedShort(unsigned short value) {
-
+void ActiveMQBytesMessage::writeUnsignedShort(unsigned short value)
+{
     initializeWriting();
-    try {
+    try
+    {
         this->dataOut->writeUnsignedShort(value);
-    } catch (EOFException& ex) {
+    }
+    catch (EOFException& ex)
+    {
         throw CMSExceptionSupport::createMessageEOFException(ex);
-    } catch (Exception& ex) {
+    }
+    catch (Exception& ex)
+    {
         throw CMSExceptionSupport::create(ex);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int ActiveMQBytesMessage::readInt() const {
-
+int ActiveMQBytesMessage::readInt() const
+{
     initializeReading();
-    try {
+    try
+    {
         return this->dataIn->readInt();
-    } catch (EOFException& ex) {
+    }
+    catch (EOFException& ex)
+    {
         throw CMSExceptionSupport::createMessageEOFException(ex);
-    } catch (IOException& ex) {
+    }
+    catch (IOException& ex)
+    {
         throw CMSExceptionSupport::createMessageFormatException(ex);
-    } catch (Exception& ex) {
+    }
+    catch (Exception& ex)
+    {
         throw CMSExceptionSupport::create(ex);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQBytesMessage::writeInt(int value) {
-
+void ActiveMQBytesMessage::writeInt(int value)
+{
     initializeWriting();
-    try {
+    try
+    {
         this->dataOut->writeInt(value);
-    } catch (EOFException& ex) {
+    }
+    catch (EOFException& ex)
+    {
         throw CMSExceptionSupport::createMessageEOFException(ex);
-    } catch (Exception& ex) {
+    }
+    catch (Exception& ex)
+    {
         throw CMSExceptionSupport::create(ex);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-long long ActiveMQBytesMessage::readLong() const {
-
+long long ActiveMQBytesMessage::readLong() const
+{
     initializeReading();
-    try {
+    try
+    {
         return this->dataIn->readLong();
-    } catch (EOFException& ex) {
+    }
+    catch (EOFException& ex)
+    {
         throw CMSExceptionSupport::createMessageEOFException(ex);
-    } catch (IOException& ex) {
+    }
+    catch (IOException& ex)
+    {
         throw CMSExceptionSupport::createMessageFormatException(ex);
-    } catch (Exception& ex) {
+    }
+    catch (Exception& ex)
+    {
         throw CMSExceptionSupport::create(ex);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQBytesMessage::writeLong(long long value) {
-
+void ActiveMQBytesMessage::writeLong(long long value)
+{
     initializeWriting();
-    try {
+    try
+    {
         this->dataOut->writeLong(value);
-    } catch (EOFException& ex) {
+    }
+    catch (EOFException& ex)
+    {
         throw CMSExceptionSupport::createMessageEOFException(ex);
-    } catch (Exception& ex) {
+    }
+    catch (Exception& ex)
+    {
         throw CMSExceptionSupport::create(ex);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string ActiveMQBytesMessage::readString() const {
-
+std::string ActiveMQBytesMessage::readString() const
+{
     initializeReading();
-    try {
+    try
+    {
         return this->dataIn->readString();
-    } catch (EOFException& ex) {
+    }
+    catch (EOFException& ex)
+    {
         throw CMSExceptionSupport::createMessageEOFException(ex);
-    } catch (IOException& ex) {
+    }
+    catch (IOException& ex)
+    {
         throw CMSExceptionSupport::createMessageFormatException(ex);
-    } catch (Exception& ex) {
+    }
+    catch (Exception& ex)
+    {
         throw CMSExceptionSupport::create(ex);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQBytesMessage::writeString(const std::string& value) {
-
+void ActiveMQBytesMessage::writeString(const std::string& value)
+{
     initializeWriting();
-    try {
+    try
+    {
         this->dataOut->writeChars(value);
-    } catch (EOFException& ex) {
+    }
+    catch (EOFException& ex)
+    {
         throw CMSExceptionSupport::createMessageEOFException(ex);
-    } catch (Exception& ex) {
+    }
+    catch (Exception& ex)
+    {
         throw CMSExceptionSupport::create(ex);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string ActiveMQBytesMessage::readUTF() const {
-
+std::string ActiveMQBytesMessage::readUTF() const
+{
     initializeReading();
-    try {
+    try
+    {
         return this->dataIn->readUTF();
-    } catch (EOFException& ex) {
+    }
+    catch (EOFException& ex)
+    {
         throw CMSExceptionSupport::createMessageEOFException(ex);
-    } catch (IOException& ex) {
+    }
+    catch (IOException& ex)
+    {
         throw CMSExceptionSupport::createMessageFormatException(ex);
-    } catch (Exception& ex) {
+    }
+    catch (Exception& ex)
+    {
         throw CMSExceptionSupport::create(ex);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQBytesMessage::writeUTF(const std::string& value) {
-
+void ActiveMQBytesMessage::writeUTF(const std::string& value)
+{
     initializeWriting();
-    try {
+    try
+    {
         this->dataOut->writeUTF(value);
-    } catch (EOFException& ex) {
+    }
+    catch (EOFException& ex)
+    {
         throw CMSExceptionSupport::createMessageEOFException(ex);
-    } catch (Exception& ex) {
+    }
+    catch (Exception& ex)
+    {
         throw CMSExceptionSupport::create(ex);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQBytesMessage::storeContent() {
-
-    try {
-
-        if (this->dataOut.get() != NULL && this->bytesOut->size() > 0) {
-
+void ActiveMQBytesMessage::storeContent()
+{
+    try
+    {
+        if (this->dataOut.get() != NULL && this->bytesOut->size() > 0)
+        {
             this->dataOut->close();
 
-            if (!this->compressed) {
-
-                std::pair<unsigned char*, int> array = this->bytesOut->toByteArray();
-                this->setContent(std::vector<unsigned char>(array.first, array.first + array.second));
+            if (!this->compressed)
+            {
+                std::pair<unsigned char*, int> array =
+                    this->bytesOut->toByteArray();
+                this->setContent(
+                    std::vector<unsigned char>(array.first,
+                                               array.first + array.second));
                 delete[] array.first;
-
-            } else {
-
+            }
+            else
+            {
                 ByteArrayOutputStream buffer;
-                DataOutputStream doBuffer(&buffer);
+                DataOutputStream      doBuffer(&buffer);
 
-                // Start by writing the length of the written data before compression.
-                doBuffer.writeInt((int) this->length);
+                // Start by writing the length of the written data before
+                // compression.
+                doBuffer.writeInt((int)this->length);
 
                 // Now write the Compressed bytes.
                 this->bytesOut->writeTo(&doBuffer);
 
                 // Now store the annotated content.
                 std::pair<unsigned char*, int> array = buffer.toByteArray();
-                this->setContent(std::vector<unsigned char>(array.first, array.first + array.second));
+                this->setContent(
+                    std::vector<unsigned char>(array.first,
+                                               array.first + array.second));
                 delete[] array.first;
             }
 
@@ -624,27 +815,32 @@ void ActiveMQBytesMessage::storeContent() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQBytesMessage::initializeReading() const {
-
+void ActiveMQBytesMessage::initializeReading() const
+{
     this->failIfWriteOnlyBody();
-    try {
-
-        if (this->dataIn.get() == NULL) {
+    try
+    {
+        if (this->dataIn.get() == NULL)
+        {
             InputStream* is = new ByteArrayInputStream(this->getContent());
 
-            if (this->isCompressed()) {
-
-                try {
+            if (this->isCompressed())
+            {
+                try
+                {
                     DataInputStream dis(is);
                     this->length = dis.readInt();
-                } catch (IOException& ex) {
+                }
+                catch (IOException& ex)
+                {
                     throw CMSExceptionSupport::create(ex);
                 }
 
                 is = new InflaterInputStream(is, true);
-
-            } else {
-                this->length = (int) this->getContent().size();
+            }
+            else
+            {
+                this->length = (int)this->getContent().size();
             }
             this->dataIn.reset(new DataInputStream(is, true));
         }
@@ -653,20 +849,25 @@ void ActiveMQBytesMessage::initializeReading() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQBytesMessage::initializeWriting() {
-
+void ActiveMQBytesMessage::initializeWriting()
+{
     this->failIfReadOnlyBody();
-    try {
-        if (this->dataOut.get() == NULL) {
-            this->length = 0;
+    try
+    {
+        if (this->dataOut.get() == NULL)
+        {
+            this->length   = 0;
             this->bytesOut = new ByteArrayOutputStream();
 
             OutputStream* os = this->bytesOut;
 
-            if (this->connection != NULL && this->connection->isUseCompression()) {
+            if (this->connection != NULL &&
+                this->connection->isUseCompression())
+            {
                 this->compressed = true;
 
-                Deflater* deflator = new Deflater(this->connection->getCompressionLevel());
+                Deflater* deflator =
+                    new Deflater(this->connection->getCompressionLevel());
 
                 os = new DeflaterOutputStream(os, deflator, true, true);
                 os = new ByteCounterOutputStream(&length, os, true);

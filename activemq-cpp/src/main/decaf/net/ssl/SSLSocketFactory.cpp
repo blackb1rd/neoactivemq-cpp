@@ -17,10 +17,10 @@
 
 #include "SSLSocketFactory.h"
 
-#include <decaf/lang/Runnable.h>
 #include <decaf/internal/net/Network.h>
 #include <decaf/internal/net/ssl/DefaultSSLContext.h>
 #include <decaf/internal/net/ssl/DefaultSSLSocketFactory.h>
+#include <decaf/lang/Runnable.h>
 
 using namespace decaf;
 using namespace decaf::lang;
@@ -30,69 +30,81 @@ using namespace decaf::internal::net;
 using namespace decaf::internal::net::ssl;
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class ShutdownTask : public decaf::lang::Runnable {
-    private:
+class ShutdownTask : public decaf::lang::Runnable
+{
+private:
+    SocketFactory** defaultRef;
 
-        SocketFactory** defaultRef;
+private:
+    ShutdownTask(const ShutdownTask&);
+    ShutdownTask& operator=(const ShutdownTask&);
 
-    private:
+public:
+    ShutdownTask(SocketFactory** defaultRef)
+        : defaultRef(defaultRef)
+    {
+    }
 
-        ShutdownTask( const ShutdownTask& );
-        ShutdownTask& operator= ( const ShutdownTask& );
+    virtual ~ShutdownTask()
+    {
+    }
 
-    public:
-
-        ShutdownTask( SocketFactory** defaultRef ) : defaultRef( defaultRef ) {}
-        virtual ~ShutdownTask() {}
-
-        virtual void run() {
-            *defaultRef = NULL;
-        }
-    };
-}
+    virtual void run()
+    {
+        *defaultRef = NULL;
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
 SocketFactory* SSLSocketFactory::defaultSocketFactory = NULL;
 
 ////////////////////////////////////////////////////////////////////////////////
-SSLSocketFactory::SSLSocketFactory() {
+SSLSocketFactory::SSLSocketFactory()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SSLSocketFactory::~SSLSocketFactory() {
+SSLSocketFactory::~SSLSocketFactory()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SocketFactory* SSLSocketFactory::getDefault() {
-
-    if( defaultSocketFactory != NULL ) {
+SocketFactory* SSLSocketFactory::getDefault()
+{
+    if (defaultSocketFactory != NULL)
+    {
         return defaultSocketFactory;
     }
 
     Network* netRuntime = Network::getNetworkRuntime();
 
-    synchronized( netRuntime->getRuntimeLock() ) {
-
+    synchronized(netRuntime->getRuntimeLock())
+    {
         // Check the DefaultSSLContext to see if any SSL Providers are enabled
         SSLContext* context = DefaultSSLContext::getContext();
-        if( context != NULL ) {
-
-            // The SSLContext owns the Factory returned here, no need to manage it.
+        if (context != NULL)
+        {
+            // The SSLContext owns the Factory returned here, no need to manage
+            // it.
             defaultSocketFactory = context->getSocketFactory();
         }
 
         // Non found, use the non-functional default one.
-        if( defaultSocketFactory == NULL ) {
-            defaultSocketFactory = new DefaultSSLSocketFactory( "SSL Support is not enabled in this build." );
+        if (defaultSocketFactory == NULL)
+        {
+            defaultSocketFactory = new DefaultSSLSocketFactory(
+                "SSL Support is not enabled in this build.");
 
-            // Since we created this one we need to make sure it is destroyed when the Network
-            // Runtime is shutdown.
-            netRuntime->addAsResource( defaultSocketFactory );
+            // Since we created this one we need to make sure it is destroyed
+            // when the Network Runtime is shutdown.
+            netRuntime->addAsResource(defaultSocketFactory);
         }
 
-        netRuntime->addShutdownTask( new ShutdownTask( &defaultSocketFactory ) );
+        netRuntime->addShutdownTask(new ShutdownTask(&defaultSocketFactory));
     }
 
     return defaultSocketFactory;

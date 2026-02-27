@@ -15,47 +15,54 @@
  * limitations under the License.
  */
 
-#include <activemq/core/ActiveMQConnectionFactory.h>
-#include <activemq/core/ActiveMQConnection.h>
-#include <activemq/core/ActiveMQSession.h>
-#include <activemq/commands/Message.h>
 #include <activemq/commands/ConnectionInfo.h>
+#include <activemq/commands/Message.h>
+#include <activemq/core/ActiveMQConnection.h>
+#include <activemq/core/ActiveMQConnectionFactory.h>
+#include <activemq/core/ActiveMQSession.h>
 #include <activemq/exceptions/ActiveMQException.h>
 
-#include <decaf/lang/exceptions/ClassCastException.h>
 #include <decaf/lang/Pointer.h>
-#include <decaf/lang/Thread.h>
 #include <decaf/lang/Runnable.h>
-#include <decaf/util/concurrent/TimeUnit.h>
+#include <decaf/lang/Thread.h>
+#include <decaf/lang/exceptions/ClassCastException.h>
 #include <decaf/util/UUID.h>
+#include <decaf/util/concurrent/TimeUnit.h>
 
-#include <cms/ConnectionFactory.h>
 #include <cms/Connection.h>
-#include <cms/Session.h>
-#include <cms/MessageConsumer.h>
-#include <cms/MessageProducer.h>
-#include <cms/MessageListener.h>
 #include <cms/ConnectionFactory.h>
-#include <cms/Connection.h>
 #include <cms/Message.h>
+#include <cms/MessageConsumer.h>
+#include <cms/MessageListener.h>
+#include <cms/MessageProducer.h>
+#include <cms/Session.h>
 #include <cms/TextMessage.h>
 
-#include <memory>
-#include <activemq/util/IntegrationCommon.h>
 #include <activemq/test/AdvisoryTest.h>
+#include <activemq/util/IntegrationCommon.h>
+#include <memory>
 
-namespace activemq {
-namespace test {
-namespace stomp {
-    class StompAdvisoryTest : public AdvisoryTest {
-public:
-        StompAdvisoryTest();
-        virtual ~StompAdvisoryTest();
-        std::string getBrokerURL() const override {
-            return activemq::util::IntegrationCommon::getInstance().getStompURL();
-        }
-    };
-}}}
+namespace activemq
+{
+namespace test
+{
+    namespace stomp
+    {
+        class StompAdvisoryTest : public AdvisoryTest
+        {
+        public:
+            StompAdvisoryTest();
+            virtual ~StompAdvisoryTest();
+
+            std::string getBrokerURL() const override
+            {
+                return activemq::util::IntegrationCommon::getInstance()
+                    .getStompURL();
+            }
+        };
+    }  // namespace stomp
+}  // namespace test
+}  // namespace activemq
 
 using namespace cms;
 using namespace std;
@@ -72,13 +79,18 @@ using namespace activemq::test;
 using namespace activemq::test::stomp;
 
 ////////////////////////////////////////////////////////////////////////////////
-StompAdvisoryTest::StompAdvisoryTest() {
+StompAdvisoryTest::StompAdvisoryTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-StompAdvisoryTest::~StompAdvisoryTest() {
+StompAdvisoryTest::~StompAdvisoryTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Test registration
-TEST_F(StompAdvisoryTest, DISABLED_testTempDestinationCompositeAdvisoryTopic) { testTempDestinationCompositeAdvisoryTopic(); }
+TEST_F(StompAdvisoryTest, DISABLED_testTempDestinationCompositeAdvisoryTopic)
+{
+    testTempDestinationCompositeAdvisoryTopic();
+}

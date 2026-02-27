@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-#include <gtest/gtest.h>
 #include <activemq/util/MemoryUsage.h>
+#include <gtest/gtest.h>
 
 #include <decaf/lang/Runnable.h>
 #include <decaf/lang/System.h>
@@ -26,38 +26,42 @@ using namespace activemq;
 using namespace activemq::util;
 using namespace decaf::lang;
 
-    class MemoryUsageTest  : public ::testing::Test {};
-
-
-////////////////////////////////////////////////////////////////////////////////
-namespace {
-
-    class UsageRunner : public decaf::lang::Runnable {
-    private:
-
-        UsageRunner(const UsageRunner&);
-        UsageRunner& operator= (const UsageRunner&);
-
-    private:
-
-        MemoryUsage* usage;
-
-    public:
-
-        UsageRunner(MemoryUsage* usage) : usage(usage) {}
-
-        virtual void run() {
-            Thread::sleep(50);
-            this->usage->decreaseUsage(this->usage->getUsage());
-        }
-    };
-}
+class MemoryUsageTest : public ::testing::Test
+{
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(MemoryUsageTest, testCTors) {
+namespace
+{
 
+class UsageRunner : public decaf::lang::Runnable
+{
+private:
+    UsageRunner(const UsageRunner&);
+    UsageRunner& operator=(const UsageRunner&);
+
+private:
+    MemoryUsage* usage;
+
+public:
+    UsageRunner(MemoryUsage* usage)
+        : usage(usage)
+    {
+    }
+
+    virtual void run()
+    {
+        Thread::sleep(50);
+        this->usage->decreaseUsage(this->usage->getUsage());
+    }
+};
+}  // namespace
+
+////////////////////////////////////////////////////////////////////////////////
+TEST_F(MemoryUsageTest, testCTors)
+{
     MemoryUsage usage1;
-    MemoryUsage usage2( 1024 );
+    MemoryUsage usage2(1024);
 
     ASSERT_TRUE(usage1.getLimit() == 0);
     ASSERT_TRUE(usage2.getLimit() == 1024);
@@ -67,42 +71,42 @@ TEST_F(MemoryUsageTest, testCTors) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(MemoryUsageTest, testUsage) {
-
-    MemoryUsage usage1( 2048 );
+TEST_F(MemoryUsageTest, testUsage)
+{
+    MemoryUsage usage1(2048);
 
     ASSERT_TRUE(!usage1.isFull());
     ASSERT_TRUE(usage1.getUsage() == 0);
 
-    usage1.increaseUsage( 1024 );
+    usage1.increaseUsage(1024);
 
     ASSERT_TRUE(!usage1.isFull());
     ASSERT_TRUE(usage1.getUsage() == 1024);
 
-    usage1.decreaseUsage( 512 );
+    usage1.decreaseUsage(512);
 
     ASSERT_TRUE(!usage1.isFull());
     ASSERT_TRUE(usage1.getUsage() == 512);
 
-    usage1.setUsage( 2048 );
+    usage1.setUsage(2048);
 
     ASSERT_TRUE(usage1.isFull());
     ASSERT_TRUE(usage1.getUsage() == 2048);
 
-    usage1.increaseUsage( 1024 );
+    usage1.increaseUsage(1024);
     ASSERT_TRUE(usage1.isFull());
     ASSERT_TRUE(usage1.getUsage() == 3072);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(MemoryUsageTest, testTimedWait) {
-
-    MemoryUsage usage( 2048 );
-    usage.increaseUsage( 5072 );
+TEST_F(MemoryUsageTest, testTimedWait)
+{
+    MemoryUsage usage(2048);
+    usage.increaseUsage(5072);
 
     unsigned long long startTime = System::currentTimeMillis();
 
-    usage.waitForSpace( 150 );
+    usage.waitForSpace(150);
 
     unsigned long long endTime = System::currentTimeMillis();
 
@@ -110,13 +114,13 @@ TEST_F(MemoryUsageTest, testTimedWait) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(MemoryUsageTest, testWait) {
+TEST_F(MemoryUsageTest, testWait)
+{
+    MemoryUsage usage(2048);
+    usage.increaseUsage(5072);
+    UsageRunner runner(&usage);
 
-    MemoryUsage usage( 2048 );
-    usage.increaseUsage( 5072 );
-    UsageRunner runner( &usage );
-
-    Thread myThread( &runner );
+    Thread myThread(&runner);
     myThread.start();
 
     usage.waitForSpace();

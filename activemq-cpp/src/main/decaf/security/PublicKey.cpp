@@ -21,5 +21,6 @@ using namespace decaf;
 using namespace decaf::security;
 
 ////////////////////////////////////////////////////////////////////////////////
-PublicKey::~PublicKey() {
+PublicKey::~PublicKey()
+{
 }

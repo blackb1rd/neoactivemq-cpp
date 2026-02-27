@@ -35,26 +35,34 @@ using namespace decaf::lang::exceptions;
 using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
-TcpSocketOutputStream::TcpSocketOutputStream(TcpSocket* socket) :
-    OutputStream(), socket(socket), closed(false) {
-
-    if (socket == NULL) {
-        throw NullPointerException(__FILE__, __LINE__, "TcpSocket instance passed was NULL.");
+TcpSocketOutputStream::TcpSocketOutputStream(TcpSocket* socket)
+    : OutputStream(),
+      socket(socket),
+      closed(false)
+{
+    if (socket == NULL)
+    {
+        throw NullPointerException(__FILE__,
+                                   __LINE__,
+                                   "TcpSocket instance passed was NULL.");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TcpSocketOutputStream::~TcpSocketOutputStream() {
+TcpSocketOutputStream::~TcpSocketOutputStream()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TcpSocketOutputStream::close() {
-
-    if (this->closed) {
+void TcpSocketOutputStream::close()
+{
+    if (this->closed)
+    {
         return;
     }
 
-    try {
+    try
+    {
         this->closed = true;
         this->socket->close();
     }
@@ -63,10 +71,10 @@ void TcpSocketOutputStream::close() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TcpSocketOutputStream::doWriteByte(unsigned char c) {
-
-    try {
-
+void TcpSocketOutputStream::doWriteByte(unsigned char c)
+{
+    try
+    {
         // Treat the single byte case the same as an array.
         this->doWriteArrayBounded(&c, 1, 0, 1);
     }
@@ -75,21 +83,31 @@ void TcpSocketOutputStream::doWriteByte(unsigned char c) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TcpSocketOutputStream::doWriteArrayBounded(const unsigned char* buffer, int size, int offset, int length) {
-
-    try {
-
-        if (length == 0) {
+void TcpSocketOutputStream::doWriteArrayBounded(const unsigned char* buffer,
+                                                int                  size,
+                                                int                  offset,
+                                                int                  length)
+{
+    try
+    {
+        if (length == 0)
+        {
             return;
         }
 
-        if (buffer == NULL) {
-            throw NullPointerException(__FILE__, __LINE__,
+        if (buffer == NULL)
+        {
+            throw NullPointerException(
+                __FILE__,
+                __LINE__,
                 "TcpSocketOutputStream::write - passed buffer is null");
         }
 
-        if (closed) {
-            throw IOException(__FILE__, __LINE__,
+        if (closed)
+        {
+            throw IOException(
+                __FILE__,
+                __LINE__,
                 "TcpSocketOutputStream::write - This Stream has been closed.");
         }
 

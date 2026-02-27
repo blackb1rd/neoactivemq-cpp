@@ -20,7 +20,7 @@
 
 // Turn off warning message for ignored exception specification
 #ifdef _MSC_VER
-#pragma warning( disable : 4290 )
+#pragma warning(disable : 4290)
 #endif
 
 #include <activemq/commands/BaseDataStructure.h>
@@ -29,8 +29,10 @@
 #include <string>
 #include <vector>
 
-namespace activemq {
-namespace commands {
+namespace activemq
+{
+namespace commands
+{
 
     using decaf::lang::Pointer;
 
@@ -43,23 +45,20 @@ namespace commands {
      *         in the activemq-cpp-openwire-generator module
      *
      */
-    class AMQCPP_API PartialCommand : public BaseDataStructure {
+    class AMQCPP_API PartialCommand : public BaseDataStructure
+    {
     protected:
-
-        int commandId;
+        int                        commandId;
         std::vector<unsigned char> data;
 
     public:
-
         const static unsigned char ID_PARTIALCOMMAND = 60;
 
     private:
-
         PartialCommand(const PartialCommand&);
-        PartialCommand& operator= (const PartialCommand&);
+        PartialCommand& operator=(const PartialCommand&);
 
     public:
-
         PartialCommand();
 
         virtual ~PartialCommand();
@@ -74,15 +73,15 @@ namespace commands {
 
         virtual bool equals(const DataStructure* value) const;
 
-        virtual int getCommandId() const;
+        virtual int  getCommandId() const;
         virtual void setCommandId(int commandId);
 
         virtual const std::vector<unsigned char>& getData() const;
-        virtual std::vector<unsigned char>& getData();
+        virtual std::vector<unsigned char>&       getData();
         virtual void setData(const std::vector<unsigned char>& data);
-
     };
 
-}}
+}  // namespace commands
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_COMMANDS_PARTIALCOMMAND_H_*/

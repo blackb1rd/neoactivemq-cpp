@@ -21,25 +21,31 @@
 #include <activemq/test/CMSTestFixture.h>
 #include <activemq/util/IntegrationCommon.h>
 
-namespace activemq{
-namespace test{
+namespace activemq
+{
+namespace test
+{
 
-    class DurableTest : public CMSTestFixture {
+    class DurableTest : public CMSTestFixture
+    {
     protected:
-
         static const int MSG_COUNT = 10;
 
     public:
+        DurableTest()
+        {
+        }
 
-        DurableTest() {}
-        virtual ~DurableTest() {}
+        virtual ~DurableTest()
+        {
+        }
 
         virtual void testDurableConsumer();
 
         virtual std::string getSubscriptionName() const = 0;
-
     };
 
-}}
+}  // namespace test
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_TEST_DURABLETESTER_H_*/

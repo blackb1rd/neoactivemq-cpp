@@ -18,19 +18,21 @@
 #ifndef _ACTIVEMQ_COMMANDS_WIREFORMATINFO_H_
 #define _ACTIVEMQ_COMMANDS_WIREFORMATINFO_H_
 
-#include <activemq/util/Config.h>
 #include <activemq/commands/BaseCommand.h>
-#include <activemq/util/PrimitiveMap.h>
 #include <activemq/exceptions/ActiveMQException.h>
+#include <activemq/util/Config.h>
+#include <activemq/util/PrimitiveMap.h>
 
 #include <vector>
 
-namespace activemq{
-namespace commands{
+namespace activemq
+{
+namespace commands
+{
 
-    class AMQCPP_API WireFormatInfo : public BaseCommand {
+    class AMQCPP_API WireFormatInfo : public BaseCommand
+    {
     private:
-
         std::vector<unsigned char> magic;
         std::vector<unsigned char> marshalledProperties;
 
@@ -46,11 +48,9 @@ namespace commands{
         int version;
 
     public:
-
         const static unsigned char ID_WIREFORMATINFO = 1;
 
     public:
-
         WireFormatInfo();
 
         virtual ~WireFormatInfo();
@@ -59,24 +59,26 @@ namespace commands{
 
         virtual DataStructure* cloneDataStructure() const;
 
-        virtual void copyDataStructure( const DataStructure* src );
+        virtual void copyDataStructure(const DataStructure* src);
 
         virtual std::string toString() const;
 
-        virtual bool equals( const DataStructure* value ) const;
+        virtual bool equals(const DataStructure* value) const;
 
-        virtual bool isMarshalAware() const {
+        virtual bool isMarshalAware() const
+        {
             return true;
         }
 
         virtual decaf::lang::Pointer<commands::Command> visit(
-            activemq::state::CommandVisitor* visitor );
+            activemq::state::CommandVisitor* visitor);
 
         /**
          * Get the current Wireformat Version
          * @return int that identifies the version
          */
-        int getVersion() const {
+        int getVersion() const
+        {
             return version;
         }
 
@@ -84,7 +86,8 @@ namespace commands{
          * Set the current Wireformat Version
          * @param version - int that identifies the version
          */
-        void setVersion( int version ) {
+        void setVersion(int version)
+        {
             this->version = version;
         }
 
@@ -98,19 +101,22 @@ namespace commands{
          * Sets the Max inactivity duration value.
          * @param maxInactivityDuration - max time a client can be inactive.
          */
-        void setMaxInactivityDuration( long long maxInactivityDuration );
+        void setMaxInactivityDuration(long long maxInactivityDuration);
 
         /**
-         * Returns the currently configured Max Inactivity Intial Delay duration.
+         * Returns the currently configured Max Inactivity Intial Delay
+         * duration.
          * @return the set inactivity duration initial delay value.
          */
         long long getMaxInactivityDurationInitalDelay() const;
 
         /**
          * Sets the Max inactivity initial delay duration value.
-         * @param maxInactivityDurationInitalDelay - time before the inactivity delay is checked.
+         * @param maxInactivityDurationInitalDelay - time before the inactivity
+         * delay is checked.
          */
-        void setMaxInactivityDurationInitalDelay( long long maxInactivityDurationInitalDelay );
+        void setMaxInactivityDurationInitalDelay(
+            long long maxInactivityDurationInitalDelay);
 
         /**
          * Checks if the stackTraceEnabled flag is on
@@ -122,7 +128,7 @@ namespace commands{
          * Sets if the stackTraceEnabled flag is on
          * @param stackTraceEnabled - ture to turn flag is on
          */
-        void setStackTraceEnabled( bool stackTraceEnabled );
+        void setStackTraceEnabled(bool stackTraceEnabled);
 
         /**
          * Checks if the tcpNoDelayEnabled flag is on
@@ -134,7 +140,7 @@ namespace commands{
          * Sets if the tcpNoDelayEnabled flag is on
          * @param tcpNoDelayEnabled - ture to turn flag is on
          */
-        void setTcpNoDelayEnabled( bool tcpNoDelayEnabled );
+        void setTcpNoDelayEnabled(bool tcpNoDelayEnabled);
 
         /**
          * Checks if the cacheEnabled flag is on
@@ -146,7 +152,7 @@ namespace commands{
          * Sets if the cacheEnabled flag is on
          * @param cacheEnabled - true to turn flag is on
          */
-        void setCacheEnabled( bool cacheEnabled );
+        void setCacheEnabled(bool cacheEnabled);
 
         /**
          * Gets the Cache Size setting.
@@ -158,7 +164,7 @@ namespace commands{
          * Sets the Cache Size setting.
          * @param value - value to set to the cache size.
          */
-        void setCacheSize( int value );
+        void setCacheSize(int value);
 
         /**
          * Checks if the tightEncodingEnabled flag is on
@@ -170,7 +176,7 @@ namespace commands{
          * Sets if the tightEncodingEnabled flag is on
          * @param tightEncodingEnabled - true to turn flag is on
          */
-        void setTightEncodingEnabled( bool tightEncodingEnabled );
+        void setTightEncodingEnabled(bool tightEncodingEnabled);
 
         /**
          * Checks if the sizePrefixDisabled flag is on
@@ -182,13 +188,14 @@ namespace commands{
          * Sets if the sizePrefixDisabled flag is on
          * @param sizePrefixDisabled - true to turn flag is on
          */
-        void setSizePrefixDisabled( bool sizePrefixDisabled );
+        void setSizePrefixDisabled(bool sizePrefixDisabled);
 
         /**
          * Get the Magic field
          * @return const reference to a std::vector<char>
          */
-        const std::vector<unsigned char>& getMagic() const {
+        const std::vector<unsigned char>& getMagic() const
+        {
             return magic;
         }
 
@@ -196,7 +203,8 @@ namespace commands{
          * Sets the value of the magic field
          * @param magic - const std::vector<char>
          */
-        void setMagic( const std::vector<unsigned char>& magic ) {
+        void setMagic(const std::vector<unsigned char>& magic)
+        {
             this->magic = magic;
         }
 
@@ -204,17 +212,20 @@ namespace commands{
          * Get the marshalledProperties field
          * @return const reference to a std::vector<char>
          */
-        const std::vector<unsigned char>& getMarshalledProperties() const {
+        const std::vector<unsigned char>& getMarshalledProperties() const
+        {
             return marshalledProperties;
         }
 
         /**
          * Sets the value of the marshalledProperties field
          * @param marshalledProperties
-         *      The Byte Array vector that contains the marshaled form of the Message
-         *      properties, this is the data sent over the wire.
+         *      The Byte Array vector that contains the marshaled form of the
+         * Message properties, this is the data sent over the wire.
          */
-        void setMarshalledProperties( const std::vector<unsigned char>& marshalledProperties ) {
+        void setMarshalledProperties(
+            const std::vector<unsigned char>& marshalledProperties)
+        {
             this->marshalledProperties = marshalledProperties;
         }
 
@@ -222,7 +233,8 @@ namespace commands{
          * Gets the Properties for this Command
          * @return the Properties object for this Command.
          */
-        virtual const util::PrimitiveMap& getProperties() const {
+        virtual const util::PrimitiveMap& getProperties() const
+        {
             return properties;
         }
 
@@ -230,7 +242,8 @@ namespace commands{
          * Gets the Properties for this Command
          * @return the Properties object for this Command.
          */
-        virtual util::PrimitiveMap& getProperties() {
+        virtual util::PrimitiveMap& getProperties()
+        {
             return properties;
         }
 
@@ -238,8 +251,9 @@ namespace commands{
          * Sets the Properties for this Command
          * @param map - PrimtiveMap to copy
          */
-        virtual void setProperties( const util::PrimitiveMap& map ) {
-            this->properties.copy( map );
+        virtual void setProperties(const util::PrimitiveMap& map)
+        {
+            this->properties.copy(map);
         }
 
         /**
@@ -251,18 +265,20 @@ namespace commands{
         /**
          * @return answers true to the isWireFormatInfo query
          */
-        virtual bool isWireFormatInfo() const {
+        virtual bool isWireFormatInfo() const
+        {
             return true;
         }
 
     public:
+        virtual void beforeMarshal(
+            wireformat::WireFormat* wireFormat AMQCPP_UNUSED);
 
-        virtual void beforeMarshal( wireformat::WireFormat* wireFormat AMQCPP_UNUSED );
-
-        virtual void afterUnmarshal( wireformat::WireFormat* wireFormat AMQCPP_UNUSED );
-
+        virtual void afterUnmarshal(
+            wireformat::WireFormat* wireFormat AMQCPP_UNUSED);
     };
 
-}}
+}  // namespace commands
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_COMMANDS_WIREFORMATINFO_H_*/

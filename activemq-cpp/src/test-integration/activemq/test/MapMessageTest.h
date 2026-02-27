@@ -21,12 +21,14 @@
 #include <activemq/test/CMSTestFixture.h>
 #include <activemq/util/IntegrationCommon.h>
 
-namespace activemq {
-namespace test {
+namespace activemq
+{
+namespace test
+{
 
-    class MapMessageTest : public CMSTestFixture {
+    class MapMessageTest : public CMSTestFixture
+    {
     public:
-
         MapMessageTest();
         virtual ~MapMessageTest();
 
@@ -35,9 +37,9 @@ namespace test {
         void testMapSetEmptyBytesVector();
         void testMapWithSingleCharEntry();
         void testMapWithCharAndStringEntry();
-
     };
 
-}}
+}  // namespace test
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_TEST_MAPMESSAGETEST_H_ */

@@ -21,22 +21,33 @@ using namespace decaf;
 using namespace decaf::security;
 
 ////////////////////////////////////////////////////////////////////////////////
-KeyException::KeyException() : GeneralSecurityException() {
+KeyException::KeyException()
+    : GeneralSecurityException()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-KeyException::KeyException(const Exception& ex) : GeneralSecurityException() {
-    *(Exception*) this = ex;
+KeyException::KeyException(const Exception& ex)
+    : GeneralSecurityException()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-KeyException::KeyException(const KeyException& ex) : GeneralSecurityException() {
-    *(Exception*) this = ex;
+KeyException::KeyException(const KeyException& ex)
+    : GeneralSecurityException()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-KeyException::KeyException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...) : GeneralSecurityException(cause) {
-
+KeyException::KeyException(const char*           file,
+                           const int             lineNumber,
+                           const std::exception* cause,
+                           const char*           msg,
+                           ...)
+    : GeneralSecurityException(cause)
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -46,12 +57,18 @@ KeyException::KeyException(const char* file, const int lineNumber, const std::ex
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-KeyException::KeyException(const std::exception* cause) : GeneralSecurityException(cause) {
+KeyException::KeyException(const std::exception* cause)
+    : GeneralSecurityException(cause)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-KeyException::KeyException(const char* file, const int lineNumber, const char* msg, ...) : GeneralSecurityException() {
-
+KeyException::KeyException(const char* file,
+                           const int   lineNumber,
+                           const char* msg,
+                           ...)
+    : GeneralSecurityException()
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -61,5 +78,6 @@ KeyException::KeyException(const char* file, const int lineNumber, const char* m
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-KeyException::~KeyException() throw () {
+KeyException::~KeyException() throw()
+{
 }

@@ -18,28 +18,31 @@
 #ifndef _DECAF_INTERNAL_IO_STANDARDINPUTSTREAM_H_
 #define _DECAF_INTERNAL_IO_STANDARDINPUTSTREAM_H_
 
-#include <decaf/util/Config.h>
 #include <decaf/io/InputStream.h>
+#include <decaf/util/Config.h>
 
-namespace decaf {
-namespace internal {
-namespace io {
+namespace decaf
+{
+namespace internal
+{
+    namespace io
+    {
 
-    class DECAF_API StandardInputStream : public decaf::io::InputStream {
-    public:
+        class DECAF_API StandardInputStream : public decaf::io::InputStream
+        {
+        public:
+            StandardInputStream();
 
-        StandardInputStream();
+            virtual ~StandardInputStream();
 
-        virtual ~StandardInputStream();
+            virtual int available() const;
 
-        virtual int available() const;
+        protected:
+            virtual int doReadByte();
+        };
 
-    protected:
-
-        virtual int doReadByte();
-
-    };
-
-}}}
+    }  // namespace io
+}  // namespace internal
+}  // namespace decaf
 
 #endif /* _DECAF_INTERNAL_IO_STANDARDINPUTSTREAM_H_ */

@@ -28,72 +28,79 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 using namespace decaf::security;
 
-    class SecureRandomTest : public ::testing::Test {
+class SecureRandomTest : public ::testing::Test
+{
 public:
-
-        SecureRandomTest();
-        virtual ~SecureRandomTest();
-
-    };
+    SecureRandomTest();
+    virtual ~SecureRandomTest();
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-SecureRandomTest::SecureRandomTest() {
+SecureRandomTest::SecureRandomTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SecureRandomTest::~SecureRandomTest() {
+SecureRandomTest::~SecureRandomTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(SecureRandomTest, testConstructor1) {
+TEST_F(SecureRandomTest, testConstructor1)
+{
     SecureRandom srng;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(SecureRandomTest, testConstructor2) {
+TEST_F(SecureRandomTest, testConstructor2)
+{
     std::vector<unsigned char> seed;
 
-    seed.push_back( 65 );
-    seed.push_back( 120 );
-    seed.push_back( 6 );
-    seed.push_back( 15 );
-    seed.push_back( 15 );
-    seed.push_back( 24 );
-    seed.push_back( 221 );
+    seed.push_back(65);
+    seed.push_back(120);
+    seed.push_back(6);
+    seed.push_back(15);
+    seed.push_back(15);
+    seed.push_back(24);
+    seed.push_back(221);
 
-    SecureRandom srng( seed );
+    SecureRandom srng(seed);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(SecureRandomTest, testConstructor3) {
-    unsigned char seed[] = { 51, 12, 99, 18, 125, 127, 21, 99 };
+TEST_F(SecureRandomTest, testConstructor3)
+{
+    unsigned char seed[] = {51, 12, 99, 18, 125, 127, 21, 99};
 
-    SecureRandom srng( seed, 8 );
+    SecureRandom srng(seed, 8);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(SecureRandomTest, testNextBytes1) {
-
-    std::vector<unsigned char> buffer1( 255, 0 );
-    std::vector<unsigned char> buffer2( 255, 0 );
-    std::vector<unsigned char> buffer3( 255, 0 );
+TEST_F(SecureRandomTest, testNextBytes1)
+{
+    std::vector<unsigned char> buffer1(255, 0);
+    std::vector<unsigned char> buffer2(255, 0);
+    std::vector<unsigned char> buffer3(255, 0);
 
     long long buffer1Sum = 0LL;
     long long buffer2Sum = 0LL;
     long long buffer3Sum = 0LL;
 
     SecureRandom srng;
-    srng.nextBytes( buffer1 );
-    srng.nextBytes( buffer2 );
-    srng.nextBytes( buffer3 );
+    srng.nextBytes(buffer1);
+    srng.nextBytes(buffer2);
+    srng.nextBytes(buffer3);
 
-    for( std::size_t i = 0; i < buffer1.size(); ++i ) {
+    for (std::size_t i = 0; i < buffer1.size(); ++i)
+    {
         buffer1Sum += buffer1[i];
     }
-    for( std::size_t i = 0; i < buffer2.size(); ++i ) {
+    for (std::size_t i = 0; i < buffer2.size(); ++i)
+    {
         buffer2Sum += buffer2[i];
     }
-    for( std::size_t i = 0; i < buffer3.size(); ++i ) {
+    for (std::size_t i = 0; i < buffer3.size(); ++i)
+    {
         buffer3Sum += buffer3[i];
     }
 
@@ -102,12 +109,12 @@ TEST_F(SecureRandomTest, testNextBytes1) {
     ASSERT_TRUE(buffer2Sum != buffer3Sum);
 
     std::vector<unsigned char> emptyBuffer;
-    ASSERT_NO_THROW(srng.nextBytes( emptyBuffer ));
+    ASSERT_NO_THROW(srng.nextBytes(emptyBuffer));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(SecureRandomTest, testNextBytes2) {
-
+TEST_F(SecureRandomTest, testNextBytes2)
+{
     unsigned char buffer1[255] = {0};
     unsigned char buffer2[255] = {0};
     unsigned char buffer3[255] = {0};
@@ -117,17 +124,20 @@ TEST_F(SecureRandomTest, testNextBytes2) {
     long long buffer3Sum = 0LL;
 
     SecureRandom srng;
-    srng.nextBytes( buffer1, 255 );
-    srng.nextBytes( buffer2, 255 );
-    srng.nextBytes( buffer3, 255 );
+    srng.nextBytes(buffer1, 255);
+    srng.nextBytes(buffer2, 255);
+    srng.nextBytes(buffer3, 255);
 
-    for( std::size_t i = 0; i < 255; ++i ) {
+    for (std::size_t i = 0; i < 255; ++i)
+    {
         buffer1Sum += buffer1[i];
     }
-    for( std::size_t i = 0; i < 255; ++i ) {
+    for (std::size_t i = 0; i < 255; ++i)
+    {
         buffer2Sum += buffer2[i];
     }
-    for( std::size_t i = 0; i < 255; ++i ) {
+    for (std::size_t i = 0; i < 255; ++i)
+    {
         buffer3Sum += buffer3[i];
     }
 
@@ -135,47 +145,52 @@ TEST_F(SecureRandomTest, testNextBytes2) {
     ASSERT_TRUE(buffer1Sum != buffer3Sum);
     ASSERT_TRUE(buffer2Sum != buffer3Sum);
 
-    ASSERT_THROW(srng.nextBytes( NULL, 255 ), NullPointerException) << ("Should have thrown a NullPointerException");
+    ASSERT_THROW(srng.nextBytes(NULL, 255), NullPointerException)
+        << ("Should have thrown a NullPointerException");
 
-    ASSERT_THROW(srng.nextBytes( buffer1, -1 ), IllegalArgumentException) << ("Should have thrown a IllegalArgumentException");
+    ASSERT_THROW(srng.nextBytes(buffer1, -1), IllegalArgumentException)
+        << ("Should have thrown a IllegalArgumentException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(SecureRandomTest, testSetSeed1) {
-
+TEST_F(SecureRandomTest, testSetSeed1)
+{
     std::vector<unsigned char> seed;
 
-    seed.push_back( 65 );
-    seed.push_back( 120 );
-    seed.push_back( 6 );
-    seed.push_back( 15 );
-    seed.push_back( 15 );
-    seed.push_back( 24 );
-    seed.push_back( 221 );
+    seed.push_back(65);
+    seed.push_back(120);
+    seed.push_back(6);
+    seed.push_back(15);
+    seed.push_back(15);
+    seed.push_back(24);
+    seed.push_back(221);
 
     SecureRandom srng;
-    ASSERT_NO_THROW(srng.setSeed( seed ));
+    ASSERT_NO_THROW(srng.setSeed(seed));
 
     std::vector<unsigned char> emptyBuffer;
-    ASSERT_NO_THROW(srng.setSeed( emptyBuffer ));
+    ASSERT_NO_THROW(srng.setSeed(emptyBuffer));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(SecureRandomTest, testSetSeed2) {
-    unsigned char seed[] = { 51, 12, 99, 18, 125, 127, 21, 99 };
+TEST_F(SecureRandomTest, testSetSeed2)
+{
+    unsigned char seed[] = {51, 12, 99, 18, 125, 127, 21, 99};
 
     SecureRandom srng;
-    ASSERT_NO_THROW(srng.setSeed( seed, 8 ));
+    ASSERT_NO_THROW(srng.setSeed(seed, 8));
 
-    ASSERT_THROW(srng.setSeed( NULL, 255 ), NullPointerException) << ("Should have thrown a NullPointerException");
+    ASSERT_THROW(srng.setSeed(NULL, 255), NullPointerException)
+        << ("Should have thrown a NullPointerException");
 
-    ASSERT_THROW(srng.setSeed( seed, -1 ), IllegalArgumentException) << ("Should have thrown a IllegalArgumentException");
+    ASSERT_THROW(srng.setSeed(seed, -1), IllegalArgumentException)
+        << ("Should have thrown a IllegalArgumentException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(SecureRandomTest, testSetSeed3) {
-
-    long long seed = 4565143165LL;
+TEST_F(SecureRandomTest, testSetSeed3)
+{
+    long long    seed = 4565143165LL;
     SecureRandom srng;
-    ASSERT_NO_THROW(srng.setSeed( seed ));
+    ASSERT_NO_THROW(srng.setSeed(seed));
 }

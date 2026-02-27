@@ -20,75 +20,95 @@
 
 #include <cms/Config.h>
 
-namespace cms {
+namespace cms
+{
 
-    class MessageProducer;
-    class MessageConsumer;
-    class Message;
-    class Session;
+class MessageProducer;
+class MessageConsumer;
+class Message;
+class Session;
+
+/**
+ * Provides an interface for clients to transform cms::Message objects inside
+ * the CMS MessageProducer and MessageConsumer objects before the message's are
+ * sent or received.
+ *
+ * @since 3.0
+ */
+class MessageTransformer
+{
+public:
+    virtual ~MessageTransformer();
 
     /**
-     * Provides an interface for clients to transform cms::Message objects inside the
-     * CMS MessageProducer and MessageConsumer objects before the message's are sent or
-     * received.
+     * Transforms the given message inside the producer before it is sent to the
+     * CMS bus.
      *
-     * @since 3.0
+     * The contract of this method is that the resulting transformed message
+     * pointer is set if and only if the method actually creates a new
+     * cms::Message object, otherwise it must always be set to NULL.  The return
+     * value indicates whether a transformation took place and indicates that
+     * the resulting transformed cms::Message pointer will need to be deleted
+     * once the producer has sent the cms::Message on to the CMS bus.
+     *
+     * @param session
+     *      The Session used to create the target MessageProducer for this
+     * transformation.
+     * @param producer
+     *      The MessageProducer instance that is going to handle sending the
+     * transformed Message.
+     * @param message
+     *      The CMS Message object that is to be transformed by this method.
+     * @param transformed
+     *      A pointer to the location in memory where the newly transformed
+     * Message has been allocated.
+     *
+     * @return true if the MessageProducer should handle deleting the
+     * transformed Message once sent.
+     *
+     * @throws cms::CMSException if an error occurs during the transform
+     * operation.
      */
-    class MessageTransformer {
-    public:
+    virtual bool producerTransform(cms::Session*         session,
+                                   cms::MessageProducer* producer,
+                                   cms::Message*         message,
+                                   cms::Message**        transformed) = 0;
 
-        virtual ~MessageTransformer();
+    /**
+     * Transforms the given message inside the consumer before it is dispatched
+     * to the client code.
+     *
+     * The contract of this method is that the resulting transformed message
+     * pointer is set if and only if the method actually creates a new
+     * cms::Message object, otherwise it must always be set to NULL.   The
+     * return value indicates whether a transformation took place and indicates
+     * that the resulting transformed cms::Message pointer will need to be
+     * deleted once the consumer completed message dispatch.
+     *
+     * @param session
+     *      The Session used to create the target MessageConsumer for this
+     * transformation.
+     * @param consumer
+     *      The MessageConsumer instance that is going to handle dispatching the
+     * transformed Message.
+     * @param message
+     *      The CMS Message object that is to be transformed by this method.
+     * @param transformed
+     *      A pointer to the location in memory where the newly transformed
+     * Message has been allocated.
+     *
+     * @return true if the MessageConsumer should handle deleting the
+     * transformed Message once sent.
+     *
+     * @throws cms::CMSException if an error occurs during the transform
+     * operation.
+     */
+    virtual bool consumerTransform(cms::Session*         session,
+                                   cms::MessageConsumer* consumer,
+                                   cms::Message*         message,
+                                   cms::Message**        transformed) = 0;
+};
 
-        /**
-         * Transforms the given message inside the producer before it is sent to the CMS bus.
-         *
-         * The contract of this method is that the resulting transformed message pointer is set if and
-         * only if the method actually creates a new cms::Message object, otherwise it must always be
-         * set to NULL.  The return value indicates whether a transformation took place and indicates
-         * that the resulting transformed cms::Message pointer will need to be deleted once the
-         * producer has sent the cms::Message on to the CMS bus.
-         *
-         * @param session
-         *      The Session used to create the target MessageProducer for this transformation.
-         * @param producer
-         *      The MessageProducer instance that is going to handle sending the transformed Message.
-         * @param message
-         *      The CMS Message object that is to be transformed by this method.
-         * @param transformed
-         *      A pointer to the location in memory where the newly transformed Message has been allocated.
-         *
-         * @return true if the MessageProducer should handle deleting the transformed Message once sent.
-         *
-         * @throws cms::CMSException if an error occurs during the transform operation.
-         */
-        virtual bool producerTransform(cms::Session* session, cms::MessageProducer* producer, cms::Message* message, cms::Message** transformed) = 0;
-
-        /**
-         * Transforms the given message inside the consumer before it is dispatched to the client code.
-         *
-         * The contract of this method is that the resulting transformed message pointer is set if and
-         * only if the method actually creates a new cms::Message object, otherwise it must always be
-         * set to NULL.   The return value indicates whether a transformation took place and indicates
-         * that the resulting transformed cms::Message pointer will need to be deleted once the
-         * consumer completed message dispatch.
-         *
-         * @param session
-         *      The Session used to create the target MessageConsumer for this transformation.
-         * @param consumer
-         *      The MessageConsumer instance that is going to handle dispatching the transformed Message.
-         * @param message
-         *      The CMS Message object that is to be transformed by this method.
-         * @param transformed
-         *      A pointer to the location in memory where the newly transformed Message has been allocated.
-         *
-         * @return true if the MessageConsumer should handle deleting the transformed Message once sent.
-         *
-         * @throws cms::CMSException if an error occurs during the transform operation.
-         */
-        virtual bool consumerTransform(cms::Session* session, cms::MessageConsumer* consumer, cms::Message* message, cms::Message** transformed) = 0;
-
-    };
-
-}
+}  // namespace cms
 
 #endif /* _CMS_MESSAGETRANSFORMER_H_ */

@@ -38,17 +38,21 @@ using namespace decaf::lang::exceptions;
  */
 
 ////////////////////////////////////////////////////////////////////////////////
-PartialCommand::PartialCommand() :
-    BaseDataStructure(), commandId(0), data() {
-
+PartialCommand::PartialCommand()
+    : BaseDataStructure(),
+      commandId(0),
+      data()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-PartialCommand::~PartialCommand() {
+PartialCommand::~PartialCommand()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-PartialCommand* PartialCommand::cloneDataStructure() const {
+PartialCommand* PartialCommand::cloneDataStructure() const
+{
     std::unique_ptr<PartialCommand> partialCommand(new PartialCommand());
 
     // Copy the data from the base class or classes
@@ -58,18 +62,21 @@ PartialCommand* PartialCommand::cloneDataStructure() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PartialCommand::copyDataStructure(const DataStructure* src) {
-
+void PartialCommand::copyDataStructure(const DataStructure* src)
+{
     // Protect against invalid self assignment.
-    if (this == src) {
+    if (this == src)
+    {
         return;
     }
 
     const PartialCommand* srcPtr = dynamic_cast<const PartialCommand*>(src);
 
-    if (srcPtr == NULL || src == NULL) {
+    if (srcPtr == NULL || src == NULL)
+    {
         throw decaf::lang::exceptions::NullPointerException(
-            __FILE__, __LINE__,
+            __FILE__,
+            __LINE__,
             "PartialCommand::copyDataStructure - src is NULL or invalid");
     }
 
@@ -81,26 +88,31 @@ void PartialCommand::copyDataStructure(const DataStructure* src) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-unsigned char PartialCommand::getDataStructureType() const {
+unsigned char PartialCommand::getDataStructureType() const
+{
     return PartialCommand::ID_PARTIALCOMMAND;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string PartialCommand::toString() const {
-
+std::string PartialCommand::toString() const
+{
     ostringstream stream;
 
     stream << "PartialCommand { ";
     stream << "CommandId = " << this->getCommandId();
     stream << ", ";
     stream << "Data = ";
-    if (this->getData().size() > 0) {
+    if (this->getData().size() > 0)
+    {
         stream << "[";
-        for (size_t idata = 0; idata < this->getData().size(); ++idata) {
+        for (size_t idata = 0; idata < this->getData().size(); ++idata)
+        {
             stream << this->getData()[idata] << ",";
         }
         stream << "]";
-    } else {
+    }
+    else
+    {
         stream << "NULL";
     }
     stream << " }";
@@ -109,54 +121,64 @@ std::string PartialCommand::toString() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool PartialCommand::equals(const DataStructure* value) const {
-
-    if (this == value) {
+bool PartialCommand::equals(const DataStructure* value) const
+{
+    if (this == value)
+    {
         return true;
     }
 
     const PartialCommand* valuePtr = dynamic_cast<const PartialCommand*>(value);
 
-    if (valuePtr == NULL || value == NULL) {
+    if (valuePtr == NULL || value == NULL)
+    {
         return false;
     }
 
-    if (this->getCommandId() != valuePtr->getCommandId()) {
+    if (this->getCommandId() != valuePtr->getCommandId())
+    {
         return false;
     }
-    for (size_t idata = 0; idata < this->getData().size(); ++idata) {
-        if (this->getData()[idata] != valuePtr->getData()[idata]) {
+    for (size_t idata = 0; idata < this->getData().size(); ++idata)
+    {
+        if (this->getData()[idata] != valuePtr->getData()[idata])
+        {
             return false;
         }
     }
-    if (!BaseDataStructure::equals(value)) {
+    if (!BaseDataStructure::equals(value))
+    {
         return false;
     }
     return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int PartialCommand::getCommandId() const {
+int PartialCommand::getCommandId() const
+{
     return commandId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PartialCommand::setCommandId(int commandId) {
+void PartialCommand::setCommandId(int commandId)
+{
     this->commandId = commandId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::vector<unsigned char>& PartialCommand::getData() const {
+const std::vector<unsigned char>& PartialCommand::getData() const
+{
     return data;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::vector<unsigned char>& PartialCommand::getData() {
+std::vector<unsigned char>& PartialCommand::getData()
+{
     return data;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PartialCommand::setData(const std::vector<unsigned char>& data) {
+void PartialCommand::setData(const std::vector<unsigned char>& data)
+{
     this->data = data;
 }
-

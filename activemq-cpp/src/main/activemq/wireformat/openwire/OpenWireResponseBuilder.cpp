@@ -17,7 +17,6 @@
 
 #include "OpenWireResponseBuilder.h"
 
-#include <typeinfo>
 #include <activemq/commands/ActiveMQBytesMessage.h>
 #include <activemq/commands/ActiveMQMapMessage.h>
 #include <activemq/commands/ActiveMQMessage.h>
@@ -29,12 +28,13 @@
 #include <activemq/commands/ConsumerInfo.h>
 #include <activemq/commands/DestinationInfo.h>
 #include <activemq/commands/ProducerInfo.h>
-#include <activemq/commands/Response.h>
-#include <activemq/commands/RemoveSubscriptionInfo.h>
 #include <activemq/commands/RemoveInfo.h>
+#include <activemq/commands/RemoveSubscriptionInfo.h>
+#include <activemq/commands/Response.h>
 #include <activemq/commands/SessionInfo.h>
 #include <activemq/commands/ShutdownInfo.h>
 #include <activemq/commands/WireFormatInfo.h>
+#include <typeinfo>
 
 using namespace activemq;
 using namespace activemq::commands;
@@ -46,9 +46,11 @@ using namespace decaf;
 using namespace decaf::lang;
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Response> OpenWireResponseBuilder::buildResponse(const Pointer<Command> command) {
-
-    if (command->isResponseRequired()) {
+Pointer<Response> OpenWireResponseBuilder::buildResponse(
+    const Pointer<Command> command)
+{
+    if (command->isResponseRequired())
+    {
         // These Commands just require a response that matches their command IDs
         Pointer<Response> response(new commands::Response());
         response->setCorrelationId(command->getCommandId());
@@ -59,16 +61,21 @@ Pointer<Response> OpenWireResponseBuilder::buildResponse(const Pointer<Command> 
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenWireResponseBuilder::buildIncomingCommands(const Pointer<Command> command, decaf::util::LinkedList<Pointer<Command> >& queue) {
-
+void OpenWireResponseBuilder::buildIncomingCommands(
+    const Pointer<Command>                     command,
+    decaf::util::LinkedList<Pointer<Command>>& queue)
+{
     // Delegate this to buildResponse
-    if (command->isResponseRequired()) {
+    if (command->isResponseRequired())
+    {
         queue.push(buildResponse(command));
     }
 
-    if (command->isWireFormatInfo()) {
+    if (command->isWireFormatInfo())
+    {
         // Return a copy of the callers own requested WireFormatInfo
         // so they get exactly the settings they asked for.
-        queue.push(Pointer<Command>(dynamic_cast<WireFormatInfo*>(command->cloneDataStructure())));
+        queue.push(Pointer<Command>(
+            dynamic_cast<WireFormatInfo*>(command->cloneDataStructure())));
     }
 }

@@ -28,17 +28,20 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-Writer::Writer() {
+Writer::Writer()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Writer::~Writer() {
+Writer::~Writer()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Writer::write(char v) {
-
-    try {
+void Writer::write(char v)
+{
+    try
+    {
         this->doWriteChar(v);
     }
     DECAF_CATCH_RETHROW(IOException)
@@ -46,9 +49,10 @@ void Writer::write(char v) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Writer::write(const std::vector<char>& buffer) {
-
-    try {
+void Writer::write(const std::vector<char>& buffer)
+{
+    try
+    {
         this->doWriteVector(buffer);
     }
     DECAF_CATCH_RETHROW(IOException)
@@ -56,9 +60,10 @@ void Writer::write(const std::vector<char>& buffer) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Writer::write(const char* buffer, int size) {
-
-    try {
+void Writer::write(const char* buffer, int size)
+{
+    try
+    {
         this->doWriteArray(buffer, size);
     }
     DECAF_CATCH_RETHROW(IOException)
@@ -67,9 +72,10 @@ void Writer::write(const char* buffer, int size) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Writer::write(const char* buffer, int size, int offset, int length) {
-
-    try {
+void Writer::write(const char* buffer, int size, int offset, int length)
+{
+    try
+    {
         this->doWriteArrayBounded(buffer, size, offset, length);
     }
     DECAF_CATCH_RETHROW(IOException)
@@ -79,9 +85,10 @@ void Writer::write(const char* buffer, int size, int offset, int length) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Writer::write(const std::string& str) {
-
-    try {
+void Writer::write(const std::string& str)
+{
+    try
+    {
         this->doWriteString(str);
     }
     DECAF_CATCH_RETHROW(IOException)
@@ -89,12 +96,16 @@ void Writer::write(const std::string& str) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Writer::write(const std::string& str, int offset, int length) {
-
-    try {
-
-        if ((offset + length) > (int) str.length()) {
-            throw IndexOutOfBoundsException(__FILE__, __LINE__, "Given Offset + Length value greater than the String length.");
+void Writer::write(const std::string& str, int offset, int length)
+{
+    try
+    {
+        if ((offset + length) > (int)str.length())
+        {
+            throw IndexOutOfBoundsException(
+                __FILE__,
+                __LINE__,
+                "Given Offset + Length value greater than the String length.");
         }
 
         this->doWriteStringBounded(str.c_str(), offset, length);
@@ -105,9 +116,10 @@ void Writer::write(const std::string& str, int offset, int length) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Appendable& Writer::append(char value) {
-
-    try {
+Appendable& Writer::append(char value)
+{
+    try
+    {
         return this->doAppendChar(value);
     }
     DECAF_CATCH_RETHROW(IOException)
@@ -115,9 +127,10 @@ Appendable& Writer::append(char value) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Appendable& Writer::append(const decaf::lang::CharSequence* csq) {
-
-    try {
+Appendable& Writer::append(const decaf::lang::CharSequence* csq)
+{
+    try
+    {
         return this->doAppendCharSequence(csq);
     }
     DECAF_CATCH_RETHROW(IOException)
@@ -125,9 +138,12 @@ Appendable& Writer::append(const decaf::lang::CharSequence* csq) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Appendable& Writer::append(const decaf::lang::CharSequence* csq, int start, int end) {
-
-    try {
+Appendable& Writer::append(const decaf::lang::CharSequence* csq,
+                           int                              start,
+                           int                              end)
+{
+    try
+    {
         return this->doAppendCharSequenceStartEnd(csq, start, end);
     }
     DECAF_CATCH_RETHROW(IOException)
@@ -136,29 +152,35 @@ Appendable& Writer::append(const decaf::lang::CharSequence* csq, int start, int 
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Writer::doWriteChar(char v) {
-
-    try {
-        this->doWriteArrayBounded((const char*) &v, 1, 0, 1);
+void Writer::doWriteChar(char v)
+{
+    try
+    {
+        this->doWriteArrayBounded((const char*)&v, 1, 0, 1);
     }
     DECAF_CATCH_RETHROW(IOException)
     DECAF_CATCHALL_THROW(IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Writer::doWriteVector(const std::vector<char>& buffer) {
-
-    try {
-        this->doWriteArrayBounded(&buffer[0], (int) buffer.size(), 0, (int) buffer.size());
+void Writer::doWriteVector(const std::vector<char>& buffer)
+{
+    try
+    {
+        this->doWriteArrayBounded(&buffer[0],
+                                  (int)buffer.size(),
+                                  0,
+                                  (int)buffer.size());
     }
     DECAF_CATCH_RETHROW(IOException)
     DECAF_CATCHALL_THROW(IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Writer::doWriteArray(const char* buffer, int size) {
-
-    try {
+void Writer::doWriteArray(const char* buffer, int size)
+{
+    try
+    {
         this->doWriteArrayBounded(buffer, size, 0, size);
     }
     DECAF_CATCH_RETHROW(IOException)
@@ -167,20 +189,30 @@ void Writer::doWriteArray(const char* buffer, int size) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Writer::doWriteString(const std::string& str) {
-
-    try {
-        this->doWriteArrayBounded(str.c_str(), (int) str.length(), 0, (int) str.length());
+void Writer::doWriteString(const std::string& str)
+{
+    try
+    {
+        this->doWriteArrayBounded(str.c_str(),
+                                  (int)str.length(),
+                                  0,
+                                  (int)str.length());
     }
     DECAF_CATCH_RETHROW(IOException)
     DECAF_CATCHALL_THROW(IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Writer::doWriteStringBounded(const std::string& str, int offset, int length) {
-
-    try {
-        this->doWriteArrayBounded(str.c_str(), (int) str.length(), offset, length);
+void Writer::doWriteStringBounded(const std::string& str,
+                                  int                offset,
+                                  int                length)
+{
+    try
+    {
+        this->doWriteArrayBounded(str.c_str(),
+                                  (int)str.length(),
+                                  offset,
+                                  length);
     }
     DECAF_CATCH_RETHROW(IOException)
     DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
@@ -188,9 +220,10 @@ void Writer::doWriteStringBounded(const std::string& str, int offset, int length
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Appendable& Writer::doAppendChar(char value) {
-
-    try {
+decaf::lang::Appendable& Writer::doAppendChar(char value)
+{
+    try
+    {
         this->doWriteChar(value);
         return *this;
     }
@@ -199,13 +232,17 @@ decaf::lang::Appendable& Writer::doAppendChar(char value) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Appendable& Writer::doAppendCharSequence(const decaf::lang::CharSequence* csq) {
-
-    try {
-
-        if (csq == NULL) {
+decaf::lang::Appendable& Writer::doAppendCharSequence(
+    const decaf::lang::CharSequence* csq)
+{
+    try
+    {
+        if (csq == NULL)
+        {
             this->doWriteString(std::string("null"));
-        } else {
+        }
+        else
+        {
             this->doWriteString(csq->toString());
         }
 
@@ -216,13 +253,19 @@ decaf::lang::Appendable& Writer::doAppendCharSequence(const decaf::lang::CharSeq
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Appendable& Writer::doAppendCharSequenceStartEnd(const decaf::lang::CharSequence* csq, int start, int end) {
-
-    try {
-
-        if (csq == NULL) {
+decaf::lang::Appendable& Writer::doAppendCharSequenceStartEnd(
+    const decaf::lang::CharSequence* csq,
+    int                              start,
+    int                              end)
+{
+    try
+    {
+        if (csq == NULL)
+        {
             this->doWriteString(string("null").substr(start, end - start));
-        } else {
+        }
+        else
+        {
             std::unique_ptr<CharSequence> result(csq->subSequence(start, end));
             this->doWriteString(result->toString());
         }

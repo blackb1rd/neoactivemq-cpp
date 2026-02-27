@@ -17,10 +17,10 @@
 
 #include "SlowListenerTest.h"
 
-#include <decaf/lang/Thread.h>
-#include <decaf/util/concurrent/Mutex.h>
-#include <decaf/util/StlSet.h>
 #include <decaf/lang/System.h>
+#include <decaf/lang/Thread.h>
+#include <decaf/util/StlSet.h>
+#include <decaf/util/concurrent/Mutex.h>
 
 #include <activemq/exceptions/ActiveMQException.h>
 
@@ -39,22 +39,34 @@ using namespace decaf::util;
 using namespace decaf::util::concurrent;
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace activemq{
-namespace test{
+namespace activemq
+{
+namespace test
+{
 
-    class SlowListener : public cms::MessageListener {
+    class SlowListener : public cms::MessageListener
+    {
     public:
-
-        unsigned int count;
-        std::set<std::thread::id> threadIds;
+        unsigned int                   count;
+        std::set<std::thread::id>      threadIds;
         decaf::util::concurrent::Mutex mutex;
 
-        SlowListener() : MessageListener(), count(0), threadIds(), mutex() {}
-        virtual ~SlowListener() {}
+        SlowListener()
+            : MessageListener(),
+              count(0),
+              threadIds(),
+              mutex()
+        {
+        }
 
-        void onMessage(const cms::Message* message) {
+        virtual ~SlowListener()
+        {
+        }
 
-            synchronized( &mutex ) {
+        void onMessage(const cms::Message* message)
+        {
+            synchronized(&mutex)
+            {
                 count++;
                 threadIds.insert(Thread::currentThread()->getId());
             }
@@ -63,13 +75,14 @@ namespace test{
         }
     };
 
-}}
+}  // namespace test
+}  // namespace activemq
 
 ////////////////////////////////////////////////////////////////////////////////
-void SlowListenerTest::testSlowListener() {
-
-    try {
-
+void SlowListenerTest::testSlowListener()
+{
+    try
+    {
         SlowListener listener;
 
         cms::Session* session = cmsProvider->getSession();
@@ -77,53 +90,63 @@ void SlowListenerTest::testSlowListener() {
         cms::MessageProducer* producer = cmsProvider->getProducer();
         producer->setDeliveryMode(DeliveryMode::NON_PERSISTENT);
 
-        const unsigned int numConsumers = 5;
+        const unsigned int    numConsumers = 5;
         cms::MessageConsumer* consumers[numConsumers];
 
         // Create several consumers for the same destination.
-        for (unsigned int i = 0; i < numConsumers; i++) {
-            consumers[i] = session->createConsumer(cmsProvider->getDestination());
+        for (unsigned int i = 0; i < numConsumers; i++)
+        {
+            consumers[i] =
+                session->createConsumer(cmsProvider->getDestination());
             consumers[i]->setMessageListener(&listener);
         }
 
-        std::unique_ptr<cms::BytesMessage> message(session->createBytesMessage());
+        std::unique_ptr<cms::BytesMessage> message(
+            session->createBytesMessage());
 
         unsigned int msgCount = 50;
-        for (unsigned int i = 0; i < msgCount; i++) {
+        for (unsigned int i = 0; i < msgCount; i++)
+        {
             producer->send(message.get());
         }
 
         // Wait no more than 10 seconds for all the messages to come in.
         waitForMessages(msgCount * numConsumers, 10000, &listener);
 
-        synchronized(&listener.mutex) {
-            // Make sure that the listener was always accessed by the same thread
-            // and that it received all the messages from all consumers.
-            ASSERT_EQ(1, (int )listener.threadIds.size());
+        synchronized(&listener.mutex)
+        {
+            // Make sure that the listener was always accessed by the same
+            // thread and that it received all the messages from all consumers.
+            ASSERT_EQ(1, (int)listener.threadIds.size());
             ASSERT_EQ((msgCount * numConsumers), listener.count);
         }
 
-        for (unsigned int i = 0; i < numConsumers; i++) {
+        for (unsigned int i = 0; i < numConsumers; i++)
+        {
             delete consumers[i];
         }
-
-    } catch (ActiveMQException& ex) {
+    }
+    catch (ActiveMQException& ex)
+    {
         ex.printStackTrace();
         throw ex;
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SlowListenerTest::waitForMessages(unsigned int count, long long maxWaitTime, SlowListener* l) {
-
+void SlowListenerTest::waitForMessages(unsigned int  count,
+                                       long long     maxWaitTime,
+                                       SlowListener* l)
+{
     long long startTime = System::currentTimeMillis();
 
-    synchronized(&(l->mutex)) {
-
-        while (l->count < count) {
-
+    synchronized(&(l->mutex))
+    {
+        while (l->count < count)
+        {
             long long curTime = System::currentTimeMillis();
-            if ((curTime - startTime) >= maxWaitTime) {
+            if ((curTime - startTime) >= maxWaitTime)
+            {
                 return;
             }
 
@@ -131,4 +154,3 @@ void SlowListenerTest::waitForMessages(unsigned int count, long long maxWaitTime
         }
     }
 }
-

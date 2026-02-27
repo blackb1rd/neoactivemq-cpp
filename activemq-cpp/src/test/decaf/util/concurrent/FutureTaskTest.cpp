@@ -17,15 +17,15 @@
 
 #include <gtest/gtest.h>
 
-#include <decaf/util/LinkedList.h>
-#include <decaf/util/concurrent/FutureTask.h>
-#include <decaf/util/concurrent/Callable.h>
 #include <decaf/lang/Integer.h>
 #include <decaf/lang/Thread.h>
 #include <decaf/lang/exceptions/IllegalArgumentException.h>
+#include <decaf/util/LinkedList.h>
+#include <decaf/util/concurrent/Callable.h>
+#include <decaf/util/concurrent/FutureTask.h>
 
-#include <typeinfo>
 #include <decaf/util/concurrent/ExecutorsTestSupport.h>
+#include <typeinfo>
 
 using namespace std;
 using namespace decaf;
@@ -34,118 +34,144 @@ using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 
-    class FutureTaskTest : public ExecutorsTestSupport {
+class FutureTaskTest : public ExecutorsTestSupport
+{
 public:
-
-        FutureTaskTest();
-        virtual ~FutureTaskTest();
-
-    };
+    FutureTaskTest();
+    virtual ~FutureTaskTest();
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class PublicFutureTask : public FutureTask<std::string> {
-    public:
+class PublicFutureTask : public FutureTask<std::string>
+{
+public:
+    PublicFutureTask(Callable<std::string>* r)
+        : FutureTask<std::string>(r)
+    {
+    }
 
-        PublicFutureTask(Callable<std::string>* r) : FutureTask<std::string>(r) {}
+    virtual ~PublicFutureTask()
+    {
+    }
 
-        virtual ~PublicFutureTask() {}
+    virtual bool runAndReset()
+    {
+        return FutureTask<std::string>::runAndReset();
+    }
 
-        virtual bool runAndReset() {
-            return FutureTask<std::string>::runAndReset();
+    virtual void set(const std::string& x)
+    {
+        FutureTask<std::string>::set(x);
+    }
+
+    virtual void setException(const Exception& ex)
+    {
+        FutureTask<std::string>::setException(ex);
+    }
+};
+
+class FutureRunnable : public decaf::lang::Runnable
+{
+public:
+    FutureRunnable()
+    {
+    }
+
+    virtual ~FutureRunnable()
+    {
+    }
+
+    virtual void run()
+    {
+    }
+};
+
+template <typename E>
+class FutureCallable : public Callable<E>
+{
+public:
+    FutureCallable()
+    {
+    }
+
+    virtual ~FutureCallable()
+    {
+    }
+
+    virtual E call()
+    {
+        return E();
+    }
+};
+
+template <typename E>
+class MediumSleepCallable : public Callable<E>
+{
+private:
+    FutureTaskTest* parent;
+
+private:
+    MediumSleepCallable(const MediumSleepCallable&);
+    MediumSleepCallable operator=(const MediumSleepCallable&);
+
+public:
+    MediumSleepCallable(FutureTaskTest* parent)
+        : Callable<E>(),
+          parent(parent)
+    {
+    }
+
+    virtual ~MediumSleepCallable()
+    {
+    }
+
+    virtual E call()
+    {
+        try
+        {
+            Thread::sleep(FutureTaskTest::MEDIUM_DELAY_MS);
+            this->parent->threadShouldThrow();
+        }
+        catch (InterruptedException& success)
+        {
         }
 
-        virtual void set(const std::string& x) {
-            FutureTask<std::string>::set(x);
-        }
+        return E();
+    }
+};
+}  // namespace
 
-        virtual void setException(const Exception& ex) {
-            FutureTask<std::string>::setException(ex);
-        }
-    };
-
-    class FutureRunnable : public decaf::lang::Runnable {
-    public:
-
-        FutureRunnable() {
-        }
-
-        virtual ~FutureRunnable() {
-        }
-
-        virtual void run() {
-        }
-    };
-
-    template<typename E>
-    class FutureCallable : public Callable<E> {
-    public:
-
-        FutureCallable() {
-        }
-
-        virtual ~FutureCallable() {
-        }
-
-        virtual E call() {
-            return E();
-        }
-    };
-
-    template<typename E>
-    class MediumSleepCallable : public Callable<E> {
-    private:
-
-        FutureTaskTest* parent;
-
-    private:
-
-        MediumSleepCallable(const MediumSleepCallable&);
-        MediumSleepCallable operator= (const MediumSleepCallable&);
-
-    public:
-
-        MediumSleepCallable(FutureTaskTest* parent) : Callable<E>(), parent(parent) {
-        }
-
-        virtual ~MediumSleepCallable() {
-        }
-
-        virtual E call() {
-            try {
-                Thread::sleep(FutureTaskTest::MEDIUM_DELAY_MS);
-                this->parent->threadShouldThrow();
-            } catch (InterruptedException& success) {
-            }
-
-            return E();
-        }
-    };
+////////////////////////////////////////////////////////////////////////////////
+FutureTaskTest::FutureTaskTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-FutureTaskTest::FutureTaskTest() {
+FutureTaskTest::~FutureTaskTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-FutureTaskTest::~FutureTaskTest() {
+TEST_F(FutureTaskTest, testConstructor1)
+{
+    ASSERT_THROW(new FutureTask<std::string>(NULL), NullPointerException)
+        << ("Should have thrown a NullPointerException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(FutureTaskTest, testConstructor1) {
-
-    ASSERT_THROW(new FutureTask<std::string>(NULL), NullPointerException) << ("Should have thrown a NullPointerException");
+TEST_F(FutureTaskTest, testConstructor2)
+{
+    ASSERT_THROW(new FutureTask<std::string>(NULL, std::string("Test")),
+                 NullPointerException)
+        << ("Should have thrown a NullPointerException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(FutureTaskTest, testConstructor2) {
-
-    ASSERT_THROW(new FutureTask<std::string>(NULL, std::string("Test")), NullPointerException) << ("Should have thrown a NullPointerException");
-}
-
-////////////////////////////////////////////////////////////////////////////////
-TEST_F(FutureTaskTest, testConstructor3) {
+TEST_F(FutureTaskTest, testConstructor3)
+{
     FutureTask<int> task(new FutureRunnable(), 10);
     ASSERT_TRUE(!task.isCancelled());
     ASSERT_TRUE(!task.isDone());
@@ -157,8 +183,8 @@ TEST_F(FutureTaskTest, testConstructor3) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(FutureTaskTest, testConstructor4) {
-
+TEST_F(FutureTaskTest, testConstructor4)
+{
     FutureTask<std::string> task(new FutureCallable<std::string>());
     ASSERT_TRUE(!task.isCancelled());
     ASSERT_TRUE(!task.isDone());
@@ -170,8 +196,8 @@ TEST_F(FutureTaskTest, testConstructor4) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(FutureTaskTest, testIsDone) {
-
+TEST_F(FutureTaskTest, testIsDone)
+{
     FutureTask<int> task(new NoOpCallable<int>());
     task.run();
     ASSERT_TRUE(task.isDone());
@@ -179,14 +205,16 @@ TEST_F(FutureTaskTest, testIsDone) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(FutureTaskTest, testRunAndReset) {
+TEST_F(FutureTaskTest, testRunAndReset)
+{
     PublicFutureTask task(new NoOpCallable<std::string>());
     ASSERT_TRUE(task.runAndReset());
     ASSERT_TRUE(!task.isDone());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(FutureTaskTest, testResetAfterCancel) {
+TEST_F(FutureTaskTest, testResetAfterCancel)
+{
     PublicFutureTask task(new NoOpCallable<std::string>());
     ASSERT_TRUE(task.cancel(false));
     ASSERT_TRUE(!task.runAndReset());
@@ -195,35 +223,46 @@ TEST_F(FutureTaskTest, testResetAfterCancel) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(FutureTaskTest, testSet) {
+TEST_F(FutureTaskTest, testSet)
+{
     PublicFutureTask task(new NoOpCallable<std::string>());
     task.set("one");
-    try {
+    try
+    {
         ASSERT_EQ(task.get(), std::string("one"));
-    } catch(Exception& e) {
+    }
+    catch (Exception& e)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(FutureTaskTest, testSetException) {
+TEST_F(FutureTaskTest, testSetException)
+{
     NoSuchElementException nse;
-    PublicFutureTask task(new NoOpCallable<std::string>());
+    PublicFutureTask       task(new NoOpCallable<std::string>());
     task.setException(nse);
-    try {
+    try
+    {
         std::string x = task.get();
         shouldThrow();
-    } catch(ExecutionException& ee) {
+    }
+    catch (ExecutionException& ee)
+    {
         const NoSuchElementException* cause =
             dynamic_cast<const NoSuchElementException*>(ee.getCause());
         ASSERT_TRUE(cause != NULL);
-    } catch(Exception& e) {
+    }
+    catch (Exception& e)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(FutureTaskTest, testCancelBeforeRun) {
+TEST_F(FutureTaskTest, testCancelBeforeRun)
+{
     PublicFutureTask task(new NoOpCallable<std::string>());
     ASSERT_TRUE(task.cancel(false));
     task.run();
@@ -232,7 +271,8 @@ TEST_F(FutureTaskTest, testCancelBeforeRun) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(FutureTaskTest, testCancelBeforeRun2) {
+TEST_F(FutureTaskTest, testCancelBeforeRun2)
+{
     PublicFutureTask task(new NoOpCallable<std::string>());
     ASSERT_TRUE(task.cancel(true));
     task.run();
@@ -241,7 +281,8 @@ TEST_F(FutureTaskTest, testCancelBeforeRun2) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(FutureTaskTest, testCancelAfterRun) {
+TEST_F(FutureTaskTest, testCancelAfterRun)
+{
     PublicFutureTask task(new NoOpCallable<std::string>());
     task.run();
     ASSERT_TRUE(!task.cancel(false));
@@ -250,116 +291,142 @@ TEST_F(FutureTaskTest, testCancelAfterRun) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(FutureTaskTest, testCancelInterrupt) {
-
+TEST_F(FutureTaskTest, testCancelInterrupt)
+{
     FutureTask<std::string> task(new MediumSleepCallable<std::string>(this));
-    Thread t(&task);
+    Thread                  t(&task);
     t.start();
 
-    try {
+    try
+    {
         Thread::sleep(SHORT_DELAY_MS);
         ASSERT_TRUE(task.cancel(true));
         t.join();
         ASSERT_TRUE(task.isDone());
         ASSERT_TRUE(task.isCancelled());
-    } catch(InterruptedException& e) {
+    }
+    catch (InterruptedException& e)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    template<typename E>
-    class MediumNoInterruptsSleepCallable : public Callable<E> {
-    private:
+template <typename E>
+class MediumNoInterruptsSleepCallable : public Callable<E>
+{
+private:
+    FutureTaskTest* parent;
 
-        FutureTaskTest* parent;
+private:
+    MediumNoInterruptsSleepCallable(const MediumNoInterruptsSleepCallable&);
+    MediumNoInterruptsSleepCallable operator=(
+        const MediumNoInterruptsSleepCallable&);
 
-    private:
+public:
+    MediumNoInterruptsSleepCallable(FutureTaskTest* parent)
+        : Callable<E>(),
+          parent(parent)
+    {
+    }
 
-        MediumNoInterruptsSleepCallable(const MediumNoInterruptsSleepCallable&);
-        MediumNoInterruptsSleepCallable operator= (const MediumNoInterruptsSleepCallable&);
+    virtual ~MediumNoInterruptsSleepCallable()
+    {
+    }
 
-    public:
-
-        MediumNoInterruptsSleepCallable(FutureTaskTest* parent) : Callable<E>(), parent(parent) {
+    virtual E call()
+    {
+        try
+        {
+            Thread::sleep(FutureTaskTest::MEDIUM_DELAY_MS);
+        }
+        catch (InterruptedException& success)
+        {
+            this->parent->threadFail("Should not interrupt");
         }
 
-        virtual ~MediumNoInterruptsSleepCallable() {
-        }
-
-        virtual E call() {
-            try {
-                Thread::sleep(FutureTaskTest::MEDIUM_DELAY_MS);
-            } catch (InterruptedException& success) {
-                this->parent->threadFail("Should not interrupt");
-            }
-
-            return E();
-        }
-    };
-}
+        return E();
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(FutureTaskTest, testCancelNoInterrupt) {
-
-    FutureTask<std::string> task(new MediumNoInterruptsSleepCallable<std::string>(this));
+TEST_F(FutureTaskTest, testCancelNoInterrupt)
+{
+    FutureTask<std::string> task(
+        new MediumNoInterruptsSleepCallable<std::string>(this));
     Thread t(&task);
     t.start();
 
-    try {
+    try
+    {
         Thread::sleep(SHORT_DELAY_MS);
         ASSERT_TRUE(task.cancel(false));
         t.join();
         ASSERT_TRUE(task.isDone());
         ASSERT_TRUE(task.isCancelled());
-    } catch(InterruptedException& e) {
+    }
+    catch (InterruptedException& e)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class MediumNoInterruptsSleepRunnable : public Runnable {
-    private:
+class MediumNoInterruptsSleepRunnable : public Runnable
+{
+private:
+    FutureTaskTest*          parent;
+    FutureTask<std::string>* task;
 
-        FutureTaskTest* parent;
-        FutureTask<std::string>* task;
+private:
+    MediumNoInterruptsSleepRunnable(const MediumNoInterruptsSleepRunnable&);
+    MediumNoInterruptsSleepRunnable operator=(
+        const MediumNoInterruptsSleepRunnable&);
 
-    private:
+public:
+    MediumNoInterruptsSleepRunnable(FutureTaskTest*          parent,
+                                    FutureTask<std::string>* task)
+        : Runnable(),
+          parent(parent),
+          task(task)
+    {
+    }
 
-        MediumNoInterruptsSleepRunnable(const MediumNoInterruptsSleepRunnable&);
-        MediumNoInterruptsSleepRunnable operator= (const MediumNoInterruptsSleepRunnable&);
+    virtual ~MediumNoInterruptsSleepRunnable()
+    {
+    }
 
-    public:
-
-        MediumNoInterruptsSleepRunnable(FutureTaskTest* parent, FutureTask<std::string>* task) :
-            Runnable(), parent(parent), task(task) {
+    virtual void run()
+    {
+        try
+        {
+            task->get();
         }
-
-        virtual ~MediumNoInterruptsSleepRunnable() {
+        catch (Exception& e)
+        {
+            this->parent->threadUnexpectedException();
         }
-
-        virtual void run() {
-            try {
-                task->get();
-            } catch(Exception& e) {
-                this->parent->threadUnexpectedException();
-            }
-        }
-    };
-}
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(FutureTaskTest, testGet1) {
-
-    FutureTask<std::string> ft(new MediumNoInterruptsSleepCallable<std::string>(this));
+TEST_F(FutureTaskTest, testGet1)
+{
+    FutureTask<std::string> ft(
+        new MediumNoInterruptsSleepCallable<std::string>(this));
     MediumNoInterruptsSleepRunnable runner(this, &ft);
-    Thread t(&runner);
+    Thread                          t(&runner);
 
-    try {
+    try
+    {
         ASSERT_TRUE(!ft.isDone());
         ASSERT_TRUE(!ft.isCancelled());
         t.start();
@@ -368,53 +435,67 @@ TEST_F(FutureTaskTest, testGet1) {
         t.join();
         ASSERT_TRUE(ft.isDone());
         ASSERT_TRUE(!ft.isCancelled());
-    } catch(InterruptedException& e) {
+    }
+    catch (InterruptedException& e)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class GetDelayedFutureTaskRunnable : public Runnable {
-    private:
+class GetDelayedFutureTaskRunnable : public Runnable
+{
+private:
+    FutureTaskTest*          parent;
+    FutureTask<std::string>* task;
 
-        FutureTaskTest* parent;
-        FutureTask<std::string>* task;
+private:
+    GetDelayedFutureTaskRunnable(const GetDelayedFutureTaskRunnable&);
+    GetDelayedFutureTaskRunnable operator=(const GetDelayedFutureTaskRunnable&);
 
-    private:
+public:
+    GetDelayedFutureTaskRunnable(FutureTaskTest*          parent,
+                                 FutureTask<std::string>* task)
+        : Runnable(),
+          parent(parent),
+          task(task)
+    {
+    }
 
-        GetDelayedFutureTaskRunnable(const GetDelayedFutureTaskRunnable&);
-        GetDelayedFutureTaskRunnable operator= (const GetDelayedFutureTaskRunnable&);
+    virtual ~GetDelayedFutureTaskRunnable()
+    {
+    }
 
-    public:
-
-        GetDelayedFutureTaskRunnable(FutureTaskTest* parent, FutureTask<std::string>* task) :
-            Runnable(), parent(parent), task(task) {
+    virtual void run()
+    {
+        try
+        {
+            task->get(FutureTaskTest::SHORT_DELAY_MS, TimeUnit::MILLISECONDS);
         }
-
-        virtual ~GetDelayedFutureTaskRunnable() {
+        catch (TimeoutException& success)
+        {
         }
-
-        virtual void run() {
-            try {
-                task->get(FutureTaskTest::SHORT_DELAY_MS, TimeUnit::MILLISECONDS);
-            } catch(TimeoutException& success) {
-            } catch(Exception& e) {
-                this->parent->threadUnexpectedException();
-            }
+        catch (Exception& e)
+        {
+            this->parent->threadUnexpectedException();
         }
-    };
-}
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(FutureTaskTest, testTimedGet1) {
-
-    FutureTask<std::string> ft(new MediumNoInterruptsSleepCallable<std::string>(this));
+TEST_F(FutureTaskTest, testTimedGet1)
+{
+    FutureTask<std::string> ft(
+        new MediumNoInterruptsSleepCallable<std::string>(this));
     GetDelayedFutureTaskRunnable runner(this, &ft);
-    Thread t(&runner);
+    Thread                       t(&runner);
 
-    try {
+    try
+    {
         ASSERT_TRUE(!ft.isDone());
         ASSERT_TRUE(!ft.isCancelled());
         t.start();
@@ -422,83 +503,104 @@ TEST_F(FutureTaskTest, testTimedGet1) {
         t.join();
         ASSERT_TRUE(ft.isDone());
         ASSERT_TRUE(!ft.isCancelled());
-    } catch(InterruptedException& e) {
+    }
+    catch (InterruptedException& e)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    template<typename E>
-    class ShortSleepCallable : public Callable<E> {
-    private:
+template <typename E>
+class ShortSleepCallable : public Callable<E>
+{
+private:
+    FutureTaskTest* parent;
 
-        FutureTaskTest* parent;
+private:
+    ShortSleepCallable(const ShortSleepCallable&);
+    ShortSleepCallable operator=(const ShortSleepCallable&);
 
-    private:
+public:
+    ShortSleepCallable(FutureTaskTest* parent)
+        : Callable<E>(),
+          parent(parent)
+    {
+    }
 
-        ShortSleepCallable(const ShortSleepCallable&);
-        ShortSleepCallable operator= (const ShortSleepCallable&);
+    virtual ~ShortSleepCallable()
+    {
+    }
 
-    public:
-
-        ShortSleepCallable(FutureTaskTest* parent) : Callable<E>(), parent(parent) {
+    virtual E call()
+    {
+        try
+        {
+            Thread::sleep(FutureTaskTest::MEDIUM_DELAY_MS);
+            this->parent->threadShouldThrow();
+        }
+        catch (InterruptedException& success)
+        {
         }
 
-        virtual ~ShortSleepCallable() {
+        return E();
+    }
+};
+
+class InterruptedGetDelayedFutureTaskRunnable : public Runnable
+{
+private:
+    FutureTaskTest*          parent;
+    FutureTask<std::string>* task;
+
+private:
+    InterruptedGetDelayedFutureTaskRunnable(
+        const InterruptedGetDelayedFutureTaskRunnable&);
+    InterruptedGetDelayedFutureTaskRunnable operator=(
+        const InterruptedGetDelayedFutureTaskRunnable&);
+
+public:
+    InterruptedGetDelayedFutureTaskRunnable(FutureTaskTest*          parent,
+                                            FutureTask<std::string>* task)
+        : Runnable(),
+          parent(parent),
+          task(task)
+    {
+    }
+
+    virtual ~InterruptedGetDelayedFutureTaskRunnable()
+    {
+    }
+
+    virtual void run()
+    {
+        try
+        {
+            task->get(FutureTaskTest::MEDIUM_DELAY_MS, TimeUnit::MILLISECONDS);
+            this->parent->threadShouldThrow();
         }
-
-        virtual E call() {
-            try {
-                Thread::sleep(FutureTaskTest::MEDIUM_DELAY_MS);
-                this->parent->threadShouldThrow();
-            } catch (InterruptedException& success) {
-            }
-
-            return E();
+        catch (CancellationException& success)
+        {
         }
-    };
-
-    class InterruptedGetDelayedFutureTaskRunnable : public Runnable {
-    private:
-
-        FutureTaskTest* parent;
-        FutureTask<std::string>* task;
-
-    private:
-
-        InterruptedGetDelayedFutureTaskRunnable(const InterruptedGetDelayedFutureTaskRunnable&);
-        InterruptedGetDelayedFutureTaskRunnable operator= (const InterruptedGetDelayedFutureTaskRunnable&);
-
-    public:
-
-        InterruptedGetDelayedFutureTaskRunnable(FutureTaskTest* parent, FutureTask<std::string>* task) :
-            Runnable(), parent(parent), task(task) {
+        catch (Exception& e)
+        {
+            this->parent->threadUnexpectedException();
         }
-
-        virtual ~InterruptedGetDelayedFutureTaskRunnable() {
-        }
-
-        virtual void run() {
-            try {
-                task->get(FutureTaskTest::MEDIUM_DELAY_MS, TimeUnit::MILLISECONDS);
-                this->parent->threadShouldThrow();
-            } catch(CancellationException& success) {
-            } catch(Exception& e) {
-                this->parent->threadUnexpectedException();
-            }
-        }
-    };
-}
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(FutureTaskTest, testTimedGetCancellation) {
-
+TEST_F(FutureTaskTest, testTimedGetCancellation)
+{
     FutureTask<std::string> ft(new ShortSleepCallable<std::string>(this));
     InterruptedGetDelayedFutureTaskRunnable runner(this, &ft);
 
-    try {
+    try
+    {
         Thread t1(&runner);
         Thread t2(&ft);
         t1.start();
@@ -507,53 +609,67 @@ TEST_F(FutureTaskTest, testTimedGetCancellation) {
         ft.cancel(true);
         t1.join();
         t2.join();
-    } catch(InterruptedException& ie) {
+    }
+    catch (InterruptedException& ie)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class CancelledGetFutureTaskRunnable : public Runnable {
-    private:
+class CancelledGetFutureTaskRunnable : public Runnable
+{
+private:
+    FutureTaskTest*          parent;
+    FutureTask<std::string>* task;
 
-        FutureTaskTest* parent;
-        FutureTask<std::string>* task;
+private:
+    CancelledGetFutureTaskRunnable(const CancelledGetFutureTaskRunnable&);
+    CancelledGetFutureTaskRunnable operator=(
+        const CancelledGetFutureTaskRunnable&);
 
-    private:
+public:
+    CancelledGetFutureTaskRunnable(FutureTaskTest*          parent,
+                                   FutureTask<std::string>* task)
+        : Runnable(),
+          parent(parent),
+          task(task)
+    {
+    }
 
-        CancelledGetFutureTaskRunnable(const CancelledGetFutureTaskRunnable&);
-        CancelledGetFutureTaskRunnable operator= (const CancelledGetFutureTaskRunnable&);
+    virtual ~CancelledGetFutureTaskRunnable()
+    {
+    }
 
-    public:
-
-        CancelledGetFutureTaskRunnable(FutureTaskTest* parent, FutureTask<std::string>* task) :
-            Runnable(), parent(parent), task(task) {
+    virtual void run()
+    {
+        try
+        {
+            task->get();
+            this->parent->threadShouldThrow();
         }
-
-        virtual ~CancelledGetFutureTaskRunnable() {
+        catch (CancellationException& success)
+        {
         }
-
-        virtual void run() {
-            try {
-                task->get();
-                this->parent->threadShouldThrow();
-            } catch(CancellationException& success) {
-            } catch(Exception& e) {
-                this->parent->threadUnexpectedException();
-            }
+        catch (Exception& e)
+        {
+            this->parent->threadUnexpectedException();
         }
-    };
-}
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(FutureTaskTest, testGetCancellation) {
-
+TEST_F(FutureTaskTest, testGetCancellation)
+{
     FutureTask<std::string> ft(new MediumSleepCallable<std::string>(this));
     CancelledGetFutureTaskRunnable runner(this, &ft);
 
-    try {
+    try
+    {
         Thread t1(&runner);
         Thread t2(&ft);
         t1.start();
@@ -562,181 +678,236 @@ TEST_F(FutureTaskTest, testGetCancellation) {
         ft.cancel(true);
         t1.join();
         t2.join();
-    } catch(InterruptedException& success) {
+    }
+    catch (InterruptedException& success)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    template<typename E>
-    class ErrorThrowingCallable : public Callable<E> {
-    private:
+template <typename E>
+class ErrorThrowingCallable : public Callable<E>
+{
+private:
+    FutureTaskTest* parent;
 
-        FutureTaskTest* parent;
+private:
+    ErrorThrowingCallable(const ErrorThrowingCallable&);
+    ErrorThrowingCallable operator=(const ErrorThrowingCallable&);
 
-    private:
+public:
+    ErrorThrowingCallable(FutureTaskTest* parent)
+        : Callable<E>(),
+          parent(parent)
+    {
+    }
 
-        ErrorThrowingCallable(const ErrorThrowingCallable&);
-        ErrorThrowingCallable operator= (const ErrorThrowingCallable&);
+    virtual ~ErrorThrowingCallable()
+    {
+    }
 
-    public:
-
-        ErrorThrowingCallable(FutureTaskTest* parent) : Callable<E>(), parent(parent) {
-        }
-
-        virtual ~ErrorThrowingCallable() {
-        }
-
-        virtual E call() {
-            throw Exception(__FILE__, __LINE__, "Something aweful");
-            return E();
-        }
-    };
-}
+    virtual E call()
+    {
+        throw Exception(__FILE__, __LINE__, "Something aweful");
+        return E();
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(FutureTaskTest, testGetExecutionException) {
-
+TEST_F(FutureTaskTest, testGetExecutionException)
+{
     FutureTask<std::string> ft(new ErrorThrowingCallable<std::string>(this));
 
-    try {
+    try
+    {
         ft.run();
         ft.get();
         shouldThrow();
-    } catch(ExecutionException& success) {
-    } catch(Exception& e) {
+    }
+    catch (ExecutionException& success)
+    {
+    }
+    catch (Exception& e)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(FutureTaskTest, testTimedGetExecutionException2) {
-
+TEST_F(FutureTaskTest, testTimedGetExecutionException2)
+{
     FutureTask<std::string> ft(new ErrorThrowingCallable<std::string>(this));
 
-    try {
+    try
+    {
         ft.run();
         ft.get(SHORT_DELAY_MS, TimeUnit::MILLISECONDS);
         shouldThrow();
-    } catch(ExecutionException& success) {
-    } catch(TimeoutException& success) {
-    } catch(Exception& e) {
+    }
+    catch (ExecutionException& success)
+    {
+    }
+    catch (TimeoutException& success)
+    {
+    }
+    catch (Exception& e)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class InterruptableFutureTaskGetRunnable : public Runnable {
-    private:
+class InterruptableFutureTaskGetRunnable : public Runnable
+{
+private:
+    FutureTaskTest*          parent;
+    FutureTask<std::string>* task;
 
-        FutureTaskTest* parent;
-        FutureTask<std::string>* task;
+private:
+    InterruptableFutureTaskGetRunnable(
+        const InterruptableFutureTaskGetRunnable&);
+    InterruptableFutureTaskGetRunnable operator=(
+        const InterruptableFutureTaskGetRunnable&);
 
-    private:
-
-        InterruptableFutureTaskGetRunnable(const InterruptableFutureTaskGetRunnable&);
-        InterruptableFutureTaskGetRunnable operator= (const InterruptableFutureTaskGetRunnable&);
-
-    public:
-
-        InterruptableFutureTaskGetRunnable(FutureTaskTest* parent, FutureTask<std::string>* task) :
-            Runnable(), parent(parent), task(task) {
-        }
-
-        virtual ~InterruptableFutureTaskGetRunnable() {
-        }
-
-        virtual void run() {
-            try {
-                task->get();
-                this->parent->threadShouldThrow();
-            } catch(InterruptedException& success) {
-            } catch(Exception& e) {
-                this->parent->threadUnexpectedException();
-            }
-        }
-    };
-}
-
-////////////////////////////////////////////////////////////////////////////////
-TEST_F(FutureTaskTest, testGetInterruptedException) {
-
-    FutureTask<std::string> ft(new NoOpCallable<std::string>());
-    Thread t(&ft);
-
-    try {
-        t.start();
-        Thread::sleep( SHORT_DELAY_MS);
-        t.interrupt();
-        t.join();
-    } catch(Exception& e) {
-        unexpectedException();
+public:
+    InterruptableFutureTaskGetRunnable(FutureTaskTest*          parent,
+                                       FutureTask<std::string>* task)
+        : Runnable(),
+          parent(parent),
+          task(task)
+    {
     }
-}
+
+    virtual ~InterruptableFutureTaskGetRunnable()
+    {
+    }
+
+    virtual void run()
+    {
+        try
+        {
+            task->get();
+            this->parent->threadShouldThrow();
+        }
+        catch (InterruptedException& success)
+        {
+        }
+        catch (Exception& e)
+        {
+            this->parent->threadUnexpectedException();
+        }
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
-
-    class InterruptableFutureTaskLongTimeoutGetRunnable : public Runnable {
-    private:
-
-        FutureTaskTest* parent;
-        FutureTask<std::string>* task;
-
-    private:
-
-        InterruptableFutureTaskLongTimeoutGetRunnable(const InterruptableFutureTaskLongTimeoutGetRunnable&);
-        InterruptableFutureTaskLongTimeoutGetRunnable operator= (const InterruptableFutureTaskLongTimeoutGetRunnable&);
-
-    public:
-
-        InterruptableFutureTaskLongTimeoutGetRunnable(FutureTaskTest* parent, FutureTask<std::string>* task) :
-            Runnable(), parent(parent), task(task) {
-        }
-
-        virtual ~InterruptableFutureTaskLongTimeoutGetRunnable() {
-        }
-
-        virtual void run() {
-            try {
-                task->get(FutureTaskTest::LONG_DELAY_MS,TimeUnit::MILLISECONDS);
-                this->parent->threadShouldThrow();
-            } catch(InterruptedException& success) {
-            } catch(Exception& e) {
-                this->parent->threadUnexpectedException();
-            }
-        }
-    };
-}
-
-////////////////////////////////////////////////////////////////////////////////
-TEST_F(FutureTaskTest, testTimedGetInterruptedException2) {
+TEST_F(FutureTaskTest, testGetInterruptedException)
+{
     FutureTask<std::string> ft(new NoOpCallable<std::string>());
-    InterruptableFutureTaskLongTimeoutGetRunnable runner(this, &ft);
-    Thread t(&runner);
+    Thread                  t(&ft);
 
-    try {
+    try
+    {
         t.start();
         Thread::sleep(SHORT_DELAY_MS);
         t.interrupt();
         t.join();
-    } catch(Exception& e) {
+    }
+    catch (Exception& e)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(FutureTaskTest, testGetTimeoutException) {
-    try {
+namespace
+{
+
+class InterruptableFutureTaskLongTimeoutGetRunnable : public Runnable
+{
+private:
+    FutureTaskTest*          parent;
+    FutureTask<std::string>* task;
+
+private:
+    InterruptableFutureTaskLongTimeoutGetRunnable(
+        const InterruptableFutureTaskLongTimeoutGetRunnable&);
+    InterruptableFutureTaskLongTimeoutGetRunnable operator=(
+        const InterruptableFutureTaskLongTimeoutGetRunnable&);
+
+public:
+    InterruptableFutureTaskLongTimeoutGetRunnable(FutureTaskTest* parent,
+                                                  FutureTask<std::string>* task)
+        : Runnable(),
+          parent(parent),
+          task(task)
+    {
+    }
+
+    virtual ~InterruptableFutureTaskLongTimeoutGetRunnable()
+    {
+    }
+
+    virtual void run()
+    {
+        try
+        {
+            task->get(FutureTaskTest::LONG_DELAY_MS, TimeUnit::MILLISECONDS);
+            this->parent->threadShouldThrow();
+        }
+        catch (InterruptedException& success)
+        {
+        }
+        catch (Exception& e)
+        {
+            this->parent->threadUnexpectedException();
+        }
+    }
+};
+}  // namespace
+
+////////////////////////////////////////////////////////////////////////////////
+TEST_F(FutureTaskTest, testTimedGetInterruptedException2)
+{
+    FutureTask<std::string> ft(new NoOpCallable<std::string>());
+    InterruptableFutureTaskLongTimeoutGetRunnable runner(this, &ft);
+    Thread                                        t(&runner);
+
+    try
+    {
+        t.start();
+        Thread::sleep(SHORT_DELAY_MS);
+        t.interrupt();
+        t.join();
+    }
+    catch (Exception& e)
+    {
+        unexpectedException();
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+TEST_F(FutureTaskTest, testGetTimeoutException)
+{
+    try
+    {
         FutureTask<std::string> ft(new NoOpCallable<std::string>());
         ft.get(1, TimeUnit::MILLISECONDS);
         shouldThrow();
-    } catch(TimeoutException& success) {
-    } catch(Exception& success) {
+    }
+    catch (TimeoutException& success)
+    {
+    }
+    catch (Exception& success)
+    {
         unexpectedException();
     }
 }

@@ -18,15 +18,17 @@
 #ifndef _DECAF_NET_SOCKETTIMEOUTEXCEPTION_H_
 #define _DECAF_NET_SOCKETTIMEOUTEXCEPTION_H_
 
-#include <decaf/util/Config.h>
 #include <decaf/io/InterruptedIOException.h>
+#include <decaf/util/Config.h>
 
-namespace decaf {
-namespace net {
+namespace decaf
+{
+namespace net
+{
 
-    class DECAF_API SocketTimeoutException : public io::InterruptedIOException {
+    class DECAF_API SocketTimeoutException : public io::InterruptedIOException
+    {
     public:
-
         /**
          * Default Constructor
          */
@@ -53,11 +55,16 @@ namespace net {
          *
          * @param file The file name where exception occurs
          * @param lineNumber The line number where the exception occurred.
-         * @param cause The exception that was the cause for this one to be thrown.
+         * @param cause The exception that was the cause for this one to be
+         * thrown.
          * @param msg The message to report
          * @param ... list of primitives that are formatted into the message
          */
-        SocketTimeoutException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...);
+        SocketTimeoutException(const char*           file,
+                               const int             lineNumber,
+                               const std::exception* cause,
+                               const char*           msg,
+                               ...);
 
         /**
          * Constructor
@@ -77,23 +84,28 @@ namespace net {
          * @param msg The message to report
          * @param ... list of primitives that are formatted into the message
          */
-        SocketTimeoutException(const char* file, const int lineNumber, const char* msg, ...);
+        SocketTimeoutException(const char* file,
+                               const int   lineNumber,
+                               const char* msg,
+                               ...);
 
         /**
          * Clones this exception.  This is useful for cases where you need
-         * to preserve the type of the original exception as well as the message.
-         * All subclasses should override.
+         * to preserve the type of the original exception as well as the
+         * message. All subclasses should override.
          *
-         * @return a new Exception instance that is a copy of this Exception object.
+         * @return a new Exception instance that is a copy of this Exception
+         * object.
          */
-        virtual SocketTimeoutException* clone() const {
+        virtual SocketTimeoutException* clone() const
+        {
             return new SocketTimeoutException(*this);
         }
 
         virtual ~SocketTimeoutException() throw();
-
     };
 
-}}
+}  // namespace net
+}  // namespace decaf
 
 #endif /*_DECAF_NET_SOCKETTIMEOUTEXCEPTION_H_*/

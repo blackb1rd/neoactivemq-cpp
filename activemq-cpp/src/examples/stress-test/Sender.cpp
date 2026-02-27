@@ -28,10 +28,16 @@ using namespace cms::stress;
 using namespace activemq::cmsutil;
 
 ////////////////////////////////////////////////////////////////////////////////
-Sender::Sender(const std::string& url, const std::string& queueOrTopicName,
-               bool isTopic, bool isDeliveryPersistent, int timeToLive) : cmsTemplateMutex(), cmsTemplate() {
-
-    ConnectionFactory* connectionFactory = ConnectionFactoryMgr::getConnectionFactory(url);
+Sender::Sender(const std::string& url,
+               const std::string& queueOrTopicName,
+               bool               isTopic,
+               bool               isDeliveryPersistent,
+               int                timeToLive)
+    : cmsTemplateMutex(),
+      cmsTemplate()
+{
+    ConnectionFactory* connectionFactory =
+        ConnectionFactoryMgr::getConnectionFactory(url);
 
     cmsTemplate = new CmsTemplate(connectionFactory);
 
@@ -43,9 +49,11 @@ Sender::Sender(const std::string& url, const std::string& queueOrTopicName,
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Sender::~Sender() {
+Sender::~Sender()
+{
     cmsTemplateMutex.lock();
-    if (cmsTemplate) {
+    if (cmsTemplate)
+    {
         delete cmsTemplate;
         cmsTemplate = NULL;
     }
@@ -53,17 +61,22 @@ Sender::~Sender() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Sender::SendMessage(const std::string& message, ErrorCode& errorCode,
-                         const std::string& header, const std::string& value) {
-
+void Sender::SendMessage(const std::string& message,
+                         ErrorCode&         errorCode,
+                         const std::string& header,
+                         const std::string& value)
+{
     CmsMessageCreator messageCreator(message, header, value);
 
-    try {
+    try
+    {
         cmsTemplateMutex.lock();
         cmsTemplate->send(&messageCreator);
         cmsTemplateMutex.unlock();
         errorCode = CMS_SUCCESS;
-    } catch (cms::CMSException& ex) {
+    }
+    catch (cms::CMSException& ex)
+    {
         cmsTemplateMutex.unlock();
         errorCode = CMS_ERROR_CAUGHT_CMS_EXCEPTION;
     }

@@ -18,6 +18,5 @@
 #include "PriorityQueue.h"
 
 ////////////////////////////////////////////////////////////////////////////////
-DECAF_API const int decaf::util::PriorityQueueBase::DEFAULT_CAPACITY = 11;
+DECAF_API const int decaf::util::PriorityQueueBase::DEFAULT_CAPACITY       = 11;
 DECAF_API const int decaf::util::PriorityQueueBase::DEFAULT_CAPACITY_RATIO = 2;
-

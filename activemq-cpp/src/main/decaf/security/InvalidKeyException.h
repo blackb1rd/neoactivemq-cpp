@@ -18,19 +18,21 @@
 #ifndef _DECAF_SECURITY_INVALIDKEYEXCEPTION_H_
 #define _DECAF_SECURITY_INVALIDKEYEXCEPTION_H_
 
-#include <decaf/util/Config.h>
 #include <decaf/security/KeyException.h>
+#include <decaf/util/Config.h>
 
-namespace decaf {
-namespace security {
+namespace decaf
+{
+namespace security
+{
 
     /*
      * This is the exception for invalid Keys (invalid encoding, wrong length,
      * uninitialized, etc).
      */
-    class DECAF_API InvalidKeyException : public KeyException {
+    class DECAF_API InvalidKeyException : public KeyException
+    {
     public:
-
         /**
          * Default Constructor
          */
@@ -58,11 +60,16 @@ namespace security {
          * optional list of arguments to parse into the message
          * @param file The file name where exception occurs
          * @param lineNumber The line number where the exception occurred.
-         * @param cause The exception that was the cause for this one to be thrown.
+         * @param cause The exception that was the cause for this one to be
+         * thrown.
          * @param msg The message to report
          * @param ... list of primitives that are formatted into the message
          */
-        InvalidKeyException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...);
+        InvalidKeyException(const char*           file,
+                            const int             lineNumber,
+                            const std::exception* cause,
+                            const char*           msg,
+                            ...);
 
         /**
          * Constructor
@@ -87,23 +94,27 @@ namespace security {
          * @param ...
          *      list of primitives that are formatted into the message
          */
-        InvalidKeyException(const char* file, const int lineNumber, const char* msg, ...);
+        InvalidKeyException(const char* file,
+                            const int   lineNumber,
+                            const char* msg,
+                            ...);
 
         /**
          * Clones this exception.  This is useful for cases where you need
-         * to preserve the type of the original exception as well as the message.
-         * All subclasses should override.
+         * to preserve the type of the original exception as well as the
+         * message. All subclasses should override.
          *
          * @return A deep copy of this exception.
          */
-        virtual InvalidKeyException* clone() const {
+        virtual InvalidKeyException* clone() const
+        {
             return new InvalidKeyException(*this);
         }
 
         virtual ~InvalidKeyException() throw();
-
     };
 
-}}
+}  // namespace security
+}  // namespace decaf
 
 #endif /*_DECAF_SECURITY_INVALIDKEYEXCEPTION_H_*/

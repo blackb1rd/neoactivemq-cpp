@@ -28,61 +28,76 @@ using namespace decaf::internal::net;
 using namespace decaf::internal::net::ssl;
 
 ////////////////////////////////////////////////////////////////////////////////
-DefaultSSLSocketFactory::DefaultSSLSocketFactory( const std::string& errorMessage ) :
-     SSLSocketFactory(), errorMessage( errorMessage ) {
+DefaultSSLSocketFactory::DefaultSSLSocketFactory(const std::string& errorMessage)
+    : SSLSocketFactory(),
+      errorMessage(errorMessage)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DefaultSSLSocketFactory::~DefaultSSLSocketFactory() {
+DefaultSSLSocketFactory::~DefaultSSLSocketFactory()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::net::Socket* DefaultSSLSocketFactory::createSocket() {
-
-    throw IOException( __FILE__, __LINE__, errorMessage.c_str() );
+decaf::net::Socket* DefaultSSLSocketFactory::createSocket()
+{
+    throw IOException(__FILE__, __LINE__, errorMessage.c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Socket* DefaultSSLSocketFactory::createSocket( const decaf::net::InetAddress* host DECAF_UNUSED, int port DECAF_UNUSED ) {
-
-    throw IOException( __FILE__, __LINE__, errorMessage.c_str() );
+Socket* DefaultSSLSocketFactory::createSocket(
+    const decaf::net::InetAddress* host DECAF_UNUSED,
+    int port                            DECAF_UNUSED)
+{
+    throw IOException(__FILE__, __LINE__, errorMessage.c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Socket* DefaultSSLSocketFactory::createSocket( const decaf::net::InetAddress* host DECAF_UNUSED, int port DECAF_UNUSED,
-                                               const decaf::net::InetAddress* ifAddress DECAF_UNUSED, int localPort DECAF_UNUSED ) {
-
-    throw IOException( __FILE__, __LINE__, errorMessage.c_str() );
+Socket* DefaultSSLSocketFactory::createSocket(
+    const decaf::net::InetAddress* host      DECAF_UNUSED,
+    int port                                 DECAF_UNUSED,
+    const decaf::net::InetAddress* ifAddress DECAF_UNUSED,
+    int localPort                            DECAF_UNUSED)
+{
+    throw IOException(__FILE__, __LINE__, errorMessage.c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::net::Socket* DefaultSSLSocketFactory::createSocket( const std::string& name DECAF_UNUSED, int port DECAF_UNUSED ) {
-
-    throw IOException( __FILE__, __LINE__, errorMessage.c_str() );
+decaf::net::Socket* DefaultSSLSocketFactory::createSocket(
+    const std::string& name DECAF_UNUSED,
+    int port                DECAF_UNUSED)
+{
+    throw IOException(__FILE__, __LINE__, errorMessage.c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::net::Socket* DefaultSSLSocketFactory::createSocket( const std::string& name DECAF_UNUSED, int port DECAF_UNUSED,
-                                                           const InetAddress* ifAddress DECAF_UNUSED, int localPort DECAF_UNUSED ) {
-
-    throw IOException( __FILE__, __LINE__, errorMessage.c_str() );
+decaf::net::Socket* DefaultSSLSocketFactory::createSocket(
+    const std::string& name      DECAF_UNUSED,
+    int port                     DECAF_UNUSED,
+    const InetAddress* ifAddress DECAF_UNUSED,
+    int localPort                DECAF_UNUSED)
+{
+    throw IOException(__FILE__, __LINE__, errorMessage.c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::vector<std::string> DefaultSSLSocketFactory::getDefaultCipherSuites() {
-
+std::vector<std::string> DefaultSSLSocketFactory::getDefaultCipherSuites()
+{
     return std::vector<std::string>();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::vector<std::string> DefaultSSLSocketFactory::getSupportedCipherSuites() {
-
+std::vector<std::string> DefaultSSLSocketFactory::getSupportedCipherSuites()
+{
     return std::vector<std::string>();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Socket* DefaultSSLSocketFactory::createSocket( Socket* socket DECAF_UNUSED, std::string host DECAF_UNUSED,
-                                               int port DECAF_UNUSED, bool autoClose DECAF_UNUSED ) {
-
-    throw IOException( __FILE__, __LINE__, errorMessage.c_str() );
+Socket* DefaultSSLSocketFactory::createSocket(Socket* socket   DECAF_UNUSED,
+                                              std::string host DECAF_UNUSED,
+                                              int port         DECAF_UNUSED,
+                                              bool autoClose   DECAF_UNUSED)
+{
+    throw IOException(__FILE__, __LINE__, errorMessage.c_str());
 }

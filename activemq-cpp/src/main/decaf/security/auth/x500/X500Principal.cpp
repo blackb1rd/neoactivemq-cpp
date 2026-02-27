@@ -23,6 +23,6 @@ using namespace decaf::security::auth;
 using namespace decaf::security::auth::x500;
 
 ////////////////////////////////////////////////////////////////////////////////
-X500Principal::~X500Principal() {
-
+X500Principal::~X500Principal()
+{
 }

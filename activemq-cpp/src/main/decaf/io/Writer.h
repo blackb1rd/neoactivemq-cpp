@@ -17,35 +17,38 @@
 #ifndef _DECAF_IO_WRITER_H
 #define _DECAF_IO_WRITER_H
 
-#include <string>
-#include <vector>
-#include <decaf/io/IOException.h>
 #include <decaf/io/Closeable.h>
 #include <decaf/io/Flushable.h>
+#include <decaf/io/IOException.h>
 #include <decaf/lang/Appendable.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/lang/exceptions/IndexOutOfBoundsException.h>
+#include <decaf/lang/exceptions/NullPointerException.h>
+#include <string>
+#include <vector>
 
-namespace decaf{
-namespace io{
+namespace decaf
+{
+namespace io
+{
 
     /*
      * Abstract class for writing to character streams. The only methods that a
      * subclass must implement are write( char*, size_t, size_t ), flush(), and
      * close().  Most subclasses, however, will override some of the methods
-     * defined here in order to provide higher efficiency, additional functionality,
-     * or both.
+     * defined here in order to provide higher efficiency, additional
+     * functionality, or both.
      *
      * @since 1.0
      */
-    class DECAF_API Writer: public decaf::io::Closeable, public decaf::io::Flushable, public decaf::lang::Appendable {
+    class DECAF_API Writer : public decaf::io::Closeable,
+                             public decaf::io::Flushable,
+                             public decaf::lang::Appendable
+    {
     private:
-
         Writer(const Writer&);
         Writer& operator=(const Writer&);
 
     public:
-
         Writer();
 
         virtual ~Writer();
@@ -97,7 +100,8 @@ namespace io{
          *
          * @throws IOException if an I/O error occurs.
          * @throws NullPointerException if buffer is NULL.
-         * @throws IndexOutOfBoundsException if offset + length > size of the buffer.
+         * @throws IndexOutOfBoundsException if offset + length > size of the
+         * buffer.
          */
         virtual void write(const char* buffer, int size, int offset, int length);
 
@@ -122,18 +126,20 @@ namespace io{
          *      The number of bytes in the array to write.
          *
          * @throws IOException thrown if an error occurs.
-         * @throws IndexOutOfBoundsException if offset+length is greater than the string length.
+         * @throws IndexOutOfBoundsException if offset+length is greater than
+         * the string length.
          */
         virtual void write(const std::string& str, int offset, int length);
 
         virtual decaf::lang::Appendable& append(char value);
 
-        virtual decaf::lang::Appendable& append(const decaf::lang::CharSequence* csq);
+        virtual decaf::lang::Appendable& append(
+            const decaf::lang::CharSequence* csq);
 
-        virtual decaf::lang::Appendable& append(const decaf::lang::CharSequence* csq, int start, int end);
+        virtual decaf::lang::Appendable&
+        append(const decaf::lang::CharSequence* csq, int start, int end);
 
     protected:
-
         /**
          * Override this method to customize the functionality of the method
          * write( char* buffer, int size, int offset, int length ).
@@ -141,10 +147,12 @@ namespace io{
          * All subclasses must override this method to provide the basic Writer
          * functionality.
          */
-        virtual void doWriteArrayBounded(const char* buffer, int size, int offset, int length) = 0;
+        virtual void doWriteArrayBounded(const char* buffer,
+                                         int         size,
+                                         int         offset,
+                                         int         length) = 0;
 
     protected:
-
         virtual void doWriteChar(char v);
 
         virtual void doWriteVector(const std::vector<char>& buffer);
@@ -153,16 +161,22 @@ namespace io{
 
         virtual void doWriteString(const std::string& str);
 
-        virtual void doWriteStringBounded(const std::string& str, int offset, int length);
+        virtual void doWriteStringBounded(const std::string& str,
+                                          int                offset,
+                                          int                length);
 
         virtual decaf::lang::Appendable& doAppendChar(char value);
 
-        virtual decaf::lang::Appendable& doAppendCharSequence(const decaf::lang::CharSequence* csq);
+        virtual decaf::lang::Appendable& doAppendCharSequence(
+            const decaf::lang::CharSequence* csq);
 
-        virtual decaf::lang::Appendable& doAppendCharSequenceStartEnd(const decaf::lang::CharSequence* csq, int start, int end);
-
+        virtual decaf::lang::Appendable& doAppendCharSequenceStartEnd(
+            const decaf::lang::CharSequence* csq,
+            int                              start,
+            int                              end);
     };
 
-}}
+}  // namespace io
+}  // namespace decaf
 
 #endif /*_DECAF_IO_WRITER_H*/

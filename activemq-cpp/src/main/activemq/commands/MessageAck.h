@@ -20,7 +20,7 @@
 
 // Turn off warning message for ignored exception specification
 #ifdef _MSC_VER
-#pragma warning( disable : 4290 )
+#pragma warning(disable : 4290)
 #endif
 
 #include <activemq/commands/ActiveMQDestination.h>
@@ -36,8 +36,10 @@
 #include <string>
 #include <vector>
 
-namespace activemq {
-namespace commands {
+namespace activemq
+{
+namespace commands
+{
 
     using decaf::lang::Pointer;
 
@@ -50,34 +52,35 @@ namespace commands {
      *         in the activemq-cpp-openwire-generator module
      *
      */
-    class AMQCPP_API MessageAck : public BaseCommand {
+    class AMQCPP_API MessageAck : public BaseCommand
+    {
     protected:
-
         Pointer<ActiveMQDestination> destination;
-        Pointer<TransactionId> transactionId;
-        Pointer<ConsumerId> consumerId;
-        unsigned char ackType;
-        Pointer<MessageId> firstMessageId;
-        Pointer<MessageId> lastMessageId;
-        int messageCount;
-        Pointer<BrokerError> poisonCause;
+        Pointer<TransactionId>       transactionId;
+        Pointer<ConsumerId>          consumerId;
+        unsigned char                ackType;
+        Pointer<MessageId>           firstMessageId;
+        Pointer<MessageId>           lastMessageId;
+        int                          messageCount;
+        Pointer<BrokerError>         poisonCause;
 
     public:
-
         const static unsigned char ID_MESSAGEACK = 22;
 
     private:
-
         MessageAck(const MessageAck&);
-        MessageAck& operator= (const MessageAck&);
+        MessageAck& operator=(const MessageAck&);
 
     public:
-
         MessageAck();
 
-        MessageAck(const Pointer<Message>& message, int ackType, int messageCount);
+        MessageAck(const Pointer<Message>& message,
+                   int                     ackType,
+                   int                     messageCount);
 
-        MessageAck(const Pointer<MessageDispatch>& dispatch, int ackType, int messageCount);
+        MessageAck(const Pointer<MessageDispatch>& dispatch,
+                   int                             ackType,
+                   int                             messageCount);
 
         virtual ~MessageAck();
 
@@ -106,46 +109,49 @@ namespace commands {
         bool isExpiredAck();
 
         virtual const Pointer<ActiveMQDestination>& getDestination() const;
-        virtual Pointer<ActiveMQDestination>& getDestination();
-        virtual void setDestination(const Pointer<ActiveMQDestination>& destination);
+        virtual Pointer<ActiveMQDestination>&       getDestination();
+        virtual void                                setDestination(
+                                           const Pointer<ActiveMQDestination>& destination);
 
         virtual const Pointer<TransactionId>& getTransactionId() const;
-        virtual Pointer<TransactionId>& getTransactionId();
-        virtual void setTransactionId(const Pointer<TransactionId>& transactionId);
+        virtual Pointer<TransactionId>&       getTransactionId();
+        virtual void                          setTransactionId(
+                                     const Pointer<TransactionId>& transactionId);
 
         virtual const Pointer<ConsumerId>& getConsumerId() const;
-        virtual Pointer<ConsumerId>& getConsumerId();
+        virtual Pointer<ConsumerId>&       getConsumerId();
         virtual void setConsumerId(const Pointer<ConsumerId>& consumerId);
 
         virtual unsigned char getAckType() const;
-        virtual void setAckType(unsigned char ackType);
+        virtual void          setAckType(unsigned char ackType);
 
         virtual const Pointer<MessageId>& getFirstMessageId() const;
-        virtual Pointer<MessageId>& getFirstMessageId();
+        virtual Pointer<MessageId>&       getFirstMessageId();
         virtual void setFirstMessageId(const Pointer<MessageId>& firstMessageId);
 
         virtual const Pointer<MessageId>& getLastMessageId() const;
-        virtual Pointer<MessageId>& getLastMessageId();
+        virtual Pointer<MessageId>&       getLastMessageId();
         virtual void setLastMessageId(const Pointer<MessageId>& lastMessageId);
 
-        virtual int getMessageCount() const;
+        virtual int  getMessageCount() const;
         virtual void setMessageCount(int messageCount);
 
         virtual const Pointer<BrokerError>& getPoisonCause() const;
-        virtual Pointer<BrokerError>& getPoisonCause();
+        virtual Pointer<BrokerError>&       getPoisonCause();
         virtual void setPoisonCause(const Pointer<BrokerError>& poisonCause);
 
         /**
          * @return an answer of true to the isMessageAck() query.
          */
-        virtual bool isMessageAck() const {
+        virtual bool isMessageAck() const
+        {
             return true;
         }
 
         virtual Pointer<Command> visit(activemq::state::CommandVisitor* visitor);
-
     };
 
-}}
+}  // namespace commands
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_COMMANDS_MESSAGEACK_H_*/

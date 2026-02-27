@@ -21,9 +21,11 @@ using namespace activemq;
 using namespace activemq::transport;
 
 ////////////////////////////////////////////////////////////////////////////////
-ResponseCallback::ResponseCallback() {
+ResponseCallback::ResponseCallback()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ResponseCallback::~ResponseCallback() {
+ResponseCallback::~ResponseCallback()
+{
 }

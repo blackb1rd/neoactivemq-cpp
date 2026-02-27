@@ -20,7 +20,7 @@
 
 // Turn off warning message for ignored exception specification
 #ifdef _MSC_VER
-#pragma warning( disable : 4290 )
+#pragma warning(disable : 4290)
 #endif
 
 #include <activemq/commands/BaseDataStructure.h>
@@ -30,8 +30,10 @@
 #include <string>
 #include <vector>
 
-namespace activemq {
-namespace commands {
+namespace activemq
+{
+namespace commands
+{
 
     using decaf::lang::Pointer;
 
@@ -44,24 +46,21 @@ namespace commands {
      *         in the activemq-cpp-openwire-generator module
      *
      */
-    class AMQCPP_API NetworkBridgeFilter : public BaseDataStructure {
+    class AMQCPP_API NetworkBridgeFilter : public BaseDataStructure
+    {
     protected:
-
         Pointer<BrokerId> networkBrokerId;
-        int messageTTL;
-        int consumerTTL;
+        int               messageTTL;
+        int               consumerTTL;
 
     public:
-
         const static unsigned char ID_NETWORKBRIDGEFILTER = 91;
 
     private:
-
         NetworkBridgeFilter(const NetworkBridgeFilter&);
-        NetworkBridgeFilter& operator= (const NetworkBridgeFilter&);
+        NetworkBridgeFilter& operator=(const NetworkBridgeFilter&);
 
     public:
-
         NetworkBridgeFilter();
 
         virtual ~NetworkBridgeFilter();
@@ -77,17 +76,18 @@ namespace commands {
         virtual bool equals(const DataStructure* value) const;
 
         virtual const Pointer<BrokerId>& getNetworkBrokerId() const;
-        virtual Pointer<BrokerId>& getNetworkBrokerId();
-        virtual void setNetworkBrokerId(const Pointer<BrokerId>& networkBrokerId);
+        virtual Pointer<BrokerId>&       getNetworkBrokerId();
+        virtual void                     setNetworkBrokerId(
+                                const Pointer<BrokerId>& networkBrokerId);
 
-        virtual int getMessageTTL() const;
+        virtual int  getMessageTTL() const;
         virtual void setMessageTTL(int messageTTL);
 
-        virtual int getConsumerTTL() const;
+        virtual int  getConsumerTTL() const;
         virtual void setConsumerTTL(int consumerTTL);
-
     };
 
-}}
+}  // namespace commands
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_COMMANDS_NETWORKBRIDGEFILTER_H_*/

@@ -17,10 +17,10 @@
 
 #include "MapMessageTest.h"
 
-#include <activemq/util/CMSListener.h>
-#include <activemq/exceptions/ActiveMQException.h>
-#include <activemq/core/ActiveMQConnection.h>
 #include <activemq/commands/ActiveMQMapMessage.h>
+#include <activemq/core/ActiveMQConnection.h>
+#include <activemq/exceptions/ActiveMQException.h>
+#include <activemq/util/CMSListener.h>
 
 using namespace std;
 using namespace cms;
@@ -35,18 +35,20 @@ using namespace decaf::lang;
 using namespace decaf::util;
 
 ////////////////////////////////////////////////////////////////////////////////
-MapMessageTest::MapMessageTest() {
+MapMessageTest::MapMessageTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-MapMessageTest::~MapMessageTest() {
+MapMessageTest::~MapMessageTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MapMessageTest::testEmptyMapSendReceive() {
-
+void MapMessageTest::testEmptyMapSendReceive()
+{
     // Create CMS Object for Comms
-    cms::Session* session(cmsProvider->getSession());
+    cms::Session*         session(cmsProvider->getSession());
     cms::MessageConsumer* consumer = cmsProvider->getConsumer();
     cms::MessageProducer* producer = cmsProvider->getProducer();
     producer->setDeliveryMode(DeliveryMode::NON_PERSISTENT);
@@ -65,10 +67,10 @@ void MapMessageTest::testEmptyMapSendReceive() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MapMessageTest::testMapWithEmptyStringValue() {
-
+void MapMessageTest::testMapWithEmptyStringValue()
+{
     // Create CMS Object for Comms
-    cms::Session* session(cmsProvider->getSession());
+    cms::Session*         session(cmsProvider->getSession());
     cms::MessageConsumer* consumer = cmsProvider->getConsumer();
     cms::MessageProducer* producer = cmsProvider->getProducer();
     producer->setDeliveryMode(DeliveryMode::NON_PERSISTENT);
@@ -94,10 +96,10 @@ void MapMessageTest::testMapWithEmptyStringValue() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MapMessageTest::testMapWithSingleCharEntry() {
-
+void MapMessageTest::testMapWithSingleCharEntry()
+{
     // Create CMS Object for Comms
-    cms::Session* session(cmsProvider->getSession());
+    cms::Session*         session(cmsProvider->getSession());
     cms::MessageConsumer* consumer = cmsProvider->getConsumer();
     cms::MessageProducer* producer = cmsProvider->getProducer();
     producer->setDeliveryMode(DeliveryMode::NON_PERSISTENT);
@@ -120,10 +122,10 @@ void MapMessageTest::testMapWithSingleCharEntry() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MapMessageTest::testMapWithCharAndStringEntry() {
-
+void MapMessageTest::testMapWithCharAndStringEntry()
+{
     // Create CMS Object for Comms
-    cms::Session* session(cmsProvider->getSession());
+    cms::Session*         session(cmsProvider->getSession());
     cms::MessageConsumer* consumer = cmsProvider->getConsumer();
     cms::MessageProducer* producer = cmsProvider->getProducer();
     producer->setDeliveryMode(DeliveryMode::NON_PERSISTENT);
@@ -150,10 +152,10 @@ void MapMessageTest::testMapWithCharAndStringEntry() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MapMessageTest::testMapSetEmptyBytesVector() {
-
+void MapMessageTest::testMapSetEmptyBytesVector()
+{
     // Create CMS Object for Comms
-    cms::Session* session(cmsProvider->getSession());
+    cms::Session*         session(cmsProvider->getSession());
     cms::MessageConsumer* consumer = cmsProvider->getConsumer();
     cms::MessageProducer* producer = cmsProvider->getProducer();
     producer->setDeliveryMode(DeliveryMode::NON_PERSISTENT);
@@ -175,4 +177,3 @@ void MapMessageTest::testMapSetEmptyBytesVector() {
     ASSERT_TRUE(recvMapMessage->itemExists("BYTES") == true);
     ASSERT_TRUE(recvMapMessage->getBytes("BYTES").empty() == true);
 }
-

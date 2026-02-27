@@ -22,26 +22,27 @@
 
 #include <decaf/net/InetAddress.h>
 
-namespace decaf {
-namespace net {
+namespace decaf
+{
+namespace net
+{
 
-    class DECAF_API Inet4Address: public InetAddress {
+    class DECAF_API Inet4Address : public InetAddress
+    {
     private:
-
         friend class InetAddress;
 
     protected:
-
         Inet4Address();
         Inet4Address(const unsigned char* ipAddress, int numBytes);
-        Inet4Address(const std::string& hostname, const unsigned char* ipAddress, int numBytes);
+        Inet4Address(const std::string&   hostname,
+                     const unsigned char* ipAddress,
+                     int                  numBytes);
 
     public:
-
         virtual ~Inet4Address();
 
     public:
-
         virtual InetAddress* clone() const;
 
         /**
@@ -113,9 +114,9 @@ namespace net {
          * @return true if the address is Multicast and has Organization scope.
          */
         virtual bool isMCOrgLocal() const;
-
     };
 
-}}
+}  // namespace net
+}  // namespace decaf
 
 #endif /* _DECAF_NET_INET4ADDRESS_H_ */

@@ -18,10 +18,10 @@
 #include <gtest/gtest.h>
 
 #include <activemq/wireformat/openwire/utils/BooleanStream.h>
-#include <decaf/io/ByteArrayOutputStream.h>
 #include <decaf/io/ByteArrayInputStream.h>
-#include <decaf/io/DataOutputStream.h>
+#include <decaf/io/ByteArrayOutputStream.h>
 #include <decaf/io/DataInputStream.h>
+#include <decaf/io/DataOutputStream.h>
 
 using namespace decaf;
 using namespace decaf::io;
@@ -30,34 +30,35 @@ using namespace activemq::wireformat;
 using namespace activemq::wireformat::openwire;
 using namespace activemq::wireformat::openwire::utils;
 
-    class BooleanStreamTest : public ::testing::Test {};
-
+class BooleanStreamTest : public ::testing::Test
+{
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(BooleanStreamTest, test) {
-
+TEST_F(BooleanStreamTest, test)
+{
     BooleanStream b1Stream;
 
     io::ByteArrayOutputStream baoStream;
-    io::DataOutputStream daoStream( &baoStream );
+    io::DataOutputStream      daoStream(&baoStream);
 
-    b1Stream.writeBoolean( false );
-    b1Stream.writeBoolean( true );
-    b1Stream.writeBoolean( false );
-    b1Stream.writeBoolean( false );
-    b1Stream.writeBoolean( true );
-    b1Stream.writeBoolean( false );
-    b1Stream.writeBoolean( true );
-    b1Stream.writeBoolean( true );
+    b1Stream.writeBoolean(false);
+    b1Stream.writeBoolean(true);
+    b1Stream.writeBoolean(false);
+    b1Stream.writeBoolean(false);
+    b1Stream.writeBoolean(true);
+    b1Stream.writeBoolean(false);
+    b1Stream.writeBoolean(true);
+    b1Stream.writeBoolean(true);
 
-    b1Stream.marshal( &daoStream );
+    b1Stream.marshal(&daoStream);
 
-    BooleanStream b2Stream;
+    BooleanStream                        b2Stream;
     std::pair<const unsigned char*, int> array = baoStream.toByteArray();
-    decaf::io::ByteArrayInputStream baiStream( array.first, array.second );
-    decaf::io::DataInputStream daiStream( &baiStream );
+    decaf::io::ByteArrayInputStream      baiStream(array.first, array.second);
+    decaf::io::DataInputStream           daiStream(&baiStream);
 
-    b2Stream.unmarshal( &daiStream );
+    b2Stream.unmarshal(&daiStream);
 
     ASSERT_TRUE(b2Stream.readBoolean() == false);
     ASSERT_TRUE(b2Stream.readBoolean() == true);
@@ -68,37 +69,39 @@ TEST_F(BooleanStreamTest, test) {
     ASSERT_TRUE(b2Stream.readBoolean() == true);
     ASSERT_TRUE(b2Stream.readBoolean() == true);
 
-    delete [] array.first;
+    delete[] array.first;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(BooleanStreamTest, test2){
-
+TEST_F(BooleanStreamTest, test2)
+{
     BooleanStream b1Stream;
 
     io::ByteArrayOutputStream baoStream;
-    io::DataOutputStream daoStream( &baoStream );
+    io::DataOutputStream      daoStream(&baoStream);
 
     bool value = false;
-    for( int i = 0; i < 65536; i++ ) {
-        b1Stream.writeBoolean( value );
+    for (int i = 0; i < 65536; i++)
+    {
+        b1Stream.writeBoolean(value);
         value = !value;
     }
 
-    b1Stream.marshal( &daoStream );
+    b1Stream.marshal(&daoStream);
 
-    BooleanStream b2Stream;
+    BooleanStream                        b2Stream;
     std::pair<const unsigned char*, int> array = baoStream.toByteArray();
-    decaf::io::ByteArrayInputStream baiStream( array.first, array.second );
-    io::DataInputStream daiStream( &baiStream );
+    decaf::io::ByteArrayInputStream      baiStream(array.first, array.second);
+    io::DataInputStream                  daiStream(&baiStream);
 
-    b2Stream.unmarshal( &daiStream );
+    b2Stream.unmarshal(&daiStream);
 
     value = false;
-    for( int i = 0; i < 65536; i++ ) {
+    for (int i = 0; i < 65536; i++)
+    {
         ASSERT_TRUE(b2Stream.readBoolean() == value);
         value = !value;
     }
 
-    delete [] array.first;
+    delete[] array.first;
 }

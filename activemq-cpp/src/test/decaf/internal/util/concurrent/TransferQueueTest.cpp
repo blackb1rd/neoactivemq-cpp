@@ -25,27 +25,27 @@ using namespace decaf::internal;
 using namespace decaf::internal::util;
 using namespace decaf::internal::util::concurrent;
 
-    class TransferQueueTest : public ::testing::Test {
+class TransferQueueTest : public ::testing::Test
+{
 public:
+    TransferQueueTest();
+    virtual ~TransferQueueTest();
 
-        TransferQueueTest();
-        virtual ~TransferQueueTest();
-
-        void test();
-
-    };
-
+    void test();
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-TransferQueueTest::TransferQueueTest() {
+TransferQueueTest::TransferQueueTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TransferQueueTest::~TransferQueueTest() {
+TransferQueueTest::~TransferQueueTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TransferQueueTest::test() {
-
+void TransferQueueTest::test()
+{
     TransferQueue<int> queue;
 }

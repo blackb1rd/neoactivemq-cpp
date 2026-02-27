@@ -31,118 +31,139 @@ using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::zip;
 
-    class Adler32Test : public ::testing::Test {
+class Adler32Test : public ::testing::Test
+{
 public:
-
-        Adler32Test();
-        virtual ~Adler32Test();
-
-    };
+    Adler32Test();
+    virtual ~Adler32Test();
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-Adler32Test::Adler32Test() {
-
+Adler32Test::Adler32Test()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Adler32Test::~Adler32Test() {
+Adler32Test::~Adler32Test()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(Adler32Test, testConstructor) {
+TEST_F(Adler32Test, testConstructor)
+{
     Adler32 adl;
     ASSERT_EQ(1LL, adl.getValue()) << ("Constructor of adl32 failed");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(Adler32Test, testGetValue) {
-
+TEST_F(Adler32Test, testGetValue)
+{
     Adler32 adl;
-    ASSERT_EQ(1LL, adl.getValue()) << ("GetValue should return a zero as a result of construction an object of Adler32");
+    ASSERT_EQ(1LL, adl.getValue())
+        << ("GetValue should return a zero as a result of construction an "
+            "object of Adler32");
 
     adl.reset();
-    adl.update( 1 );
+    adl.update(1);
 
     // The value of the adl should be 131074
-    ASSERT_EQ(131074LL, adl.getValue()) << ("update(int) failed to update the checksum to the correct value ");
+    ASSERT_EQ(131074LL, adl.getValue())
+        << ("update(int) failed to update the checksum to the correct value ");
     adl.reset();
-    ASSERT_EQ(1LL, adl.getValue()) << ("reset failed to reset the checksum value to zero");
+    ASSERT_EQ(1LL, adl.getValue())
+        << ("reset failed to reset the checksum value to zero");
 
     adl.reset();
-    adl.update( Integer::MIN_VALUE );
+    adl.update(Integer::MIN_VALUE);
 
     // The value of the adl should be 65537
-    ASSERT_EQ(65537LL, adl.getValue()) << ("update(min) failed to update the checksum to the correct value ");
+    ASSERT_EQ(65537LL, adl.getValue())
+        << ("update(min) failed to update the checksum to the correct value ");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(Adler32Test, testReset) {
-
+TEST_F(Adler32Test, testReset)
+{
     Adler32 adl;
-    adl.update( 1 );
+    adl.update(1);
 
     // The value of the adl should be 131074
-    ASSERT_EQ(131074LL, adl.getValue()) << ("update(int) failed to update the checksum to the correct value ");
+    ASSERT_EQ(131074LL, adl.getValue())
+        << ("update(int) failed to update the checksum to the correct value ");
     adl.reset();
-    ASSERT_EQ(1LL, adl.getValue()) << ("reset failed to reset the checksum value to zero");
+    ASSERT_EQ(1LL, adl.getValue())
+        << ("reset failed to reset the checksum value to zero");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(Adler32Test, testUpdateI) {
-
+TEST_F(Adler32Test, testUpdateI)
+{
     Adler32 adl;
-    adl.update( 1 );
+    adl.update(1);
     // The value of the adl should be 131074
-    ASSERT_EQ(131074LL, adl.getValue()) << ("update(int) failed to update the checksum to the correct value ");
+    ASSERT_EQ(131074LL, adl.getValue())
+        << ("update(int) failed to update the checksum to the correct value ");
 
     adl.reset();
-    adl.update( Integer::MAX_VALUE );
+    adl.update(Integer::MAX_VALUE);
 
     // The value of the adl should be 16777472
-    ASSERT_EQ(16777472LL, adl.getValue()) << ("update(max) failed to update the checksum to the correct value ");
+    ASSERT_EQ(16777472LL, adl.getValue())
+        << ("update(max) failed to update the checksum to the correct value ");
 
     adl.reset();
-    adl.update( Integer::MIN_VALUE );
+    adl.update(Integer::MIN_VALUE);
 
     // The value of the adl should be 65537
-    ASSERT_EQ(65537LL, adl.getValue()) << ("update(min) failed to update the checksum to the correct value ");
+    ASSERT_EQ(65537LL, adl.getValue())
+        << ("update(min) failed to update the checksum to the correct value ");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(Adler32Test, testUpdateArray) {
-
-    unsigned char byteArray[] = { 1, 2 };
-    Adler32 adl;
-    adl.update( byteArray, 2, 0, 2 );
+TEST_F(Adler32Test, testUpdateArray)
+{
+    unsigned char byteArray[] = {1, 2};
+    Adler32       adl;
+    adl.update(byteArray, 2, 0, 2);
 
     // The value of the adl should be 393220
-    ASSERT_EQ(393220LL, adl.getValue()) << ("update(unsigned char[]) failed to update the checksum to the correct value ");
+    ASSERT_EQ(393220LL, adl.getValue())
+        << ("update(unsigned char[]) failed to update the checksum to the "
+            "correct value ");
 
     adl.reset();
-    std::vector<unsigned char> byteEmpty( 10000, 0 );
-    adl.update( byteEmpty );
+    std::vector<unsigned char> byteEmpty(10000, 0);
+    adl.update(byteEmpty);
 
     // The value of the adl should be 655360001
-    ASSERT_EQ(655360001LL, adl.getValue()) << ("update(unsigned char[]) failed to update the checksum to the correct value ");
+    ASSERT_EQ(655360001LL, adl.getValue())
+        << ("update(unsigned char[]) failed to update the checksum to the "
+            "correct value ");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(Adler32Test, testUpdateArrayIndexed) {
-
-    static const int SIZE = 3;
-    unsigned char byteArray[] = { 1, 2, 3 };
+TEST_F(Adler32Test, testUpdateArrayIndexed)
+{
+    static const int SIZE        = 3;
+    unsigned char    byteArray[] = {1, 2, 3};
 
     Adler32 adl;
-    int off = 2;// accessing the 2nd element of byteArray
-    int len = 1;
-    int lenError = 3;
-    int offError = 4;
-    adl.update( byteArray, SIZE, off, len );
+    int     off      = 2;  // accessing the 2nd element of byteArray
+    int     len      = 1;
+    int     lenError = 3;
+    int     offError = 4;
+    adl.update(byteArray, SIZE, off, len);
 
     // The value of the adl should be 262148
-    ASSERT_EQ(262148LL, adl.getValue()) << ("update(unsigned char[],int,int) failed to update the checksum to the correct value ");
+    ASSERT_EQ(262148LL, adl.getValue())
+        << ("update(unsigned char[],int,int) failed to update the checksum to "
+            "the correct value ");
 
-    ASSERT_THROW(adl.update( byteArray, SIZE, off, lenError ), IndexOutOfBoundsException) << ("Should have thrown an IndexOutOfBoundsException for lenError");
+    ASSERT_THROW(adl.update(byteArray, SIZE, off, lenError),
+                 IndexOutOfBoundsException)
+        << ("Should have thrown an IndexOutOfBoundsException for lenError");
 
-    ASSERT_THROW(adl.update( byteArray, SIZE, offError, len ), IndexOutOfBoundsException) << ("Should have thrown an IndexOutOfBoundsException for offError");
+    ASSERT_THROW(adl.update(byteArray, SIZE, offError, len),
+                 IndexOutOfBoundsException)
+        << ("Should have thrown an IndexOutOfBoundsException for offError");
 }

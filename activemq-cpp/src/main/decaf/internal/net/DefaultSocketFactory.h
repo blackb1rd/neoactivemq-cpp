@@ -22,56 +22,68 @@
 
 #include <decaf/net/SocketFactory.h>
 
-namespace decaf {
-namespace internal {
-namespace net {
-
-    /**
-     * SocketFactory implementation that is used to create Sockets.
-     *
-     * @since 1.0
-     */
-    class DECAF_API DefaultSocketFactory : public decaf::net::SocketFactory {
-    private:
-
-        DefaultSocketFactory( const DefaultSocketFactory& );
-        DefaultSocketFactory& operator= ( const DefaultSocketFactory& );
-
-    public:
-
-        DefaultSocketFactory();
-
-        virtual ~DefaultSocketFactory();
+namespace decaf
+{
+namespace internal
+{
+    namespace net
+    {
 
         /**
-         * {@inheritDoc}
+         * SocketFactory implementation that is used to create Sockets.
+         *
+         * @since 1.0
          */
-        virtual decaf::net::Socket* createSocket();
+        class DECAF_API DefaultSocketFactory : public decaf::net::SocketFactory
+        {
+        private:
+            DefaultSocketFactory(const DefaultSocketFactory&);
+            DefaultSocketFactory& operator=(const DefaultSocketFactory&);
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual decaf::net::Socket* createSocket( const decaf::net::InetAddress* host, int port );
+        public:
+            DefaultSocketFactory();
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual decaf::net::Socket* createSocket( const decaf::net::InetAddress* host, int port,
-                                                  const decaf::net::InetAddress* ifAddress, int localPort );
+            virtual ~DefaultSocketFactory();
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual decaf::net::Socket* createSocket( const std::string& name, int port );
+            /**
+             * {@inheritDoc}
+             */
+            virtual decaf::net::Socket* createSocket();
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual decaf::net::Socket* createSocket( const std::string& name, int port,
-                                                  const decaf::net::InetAddress* ifAddress, int localPort );
+            /**
+             * {@inheritDoc}
+             */
+            virtual decaf::net::Socket* createSocket(
+                const decaf::net::InetAddress* host,
+                int                            port);
 
-    };
+            /**
+             * {@inheritDoc}
+             */
+            virtual decaf::net::Socket* createSocket(
+                const decaf::net::InetAddress* host,
+                int                            port,
+                const decaf::net::InetAddress* ifAddress,
+                int                            localPort);
 
-}}}
+            /**
+             * {@inheritDoc}
+             */
+            virtual decaf::net::Socket* createSocket(const std::string& name,
+                                                     int                port);
+
+            /**
+             * {@inheritDoc}
+             */
+            virtual decaf::net::Socket* createSocket(
+                const std::string&             name,
+                int                            port,
+                const decaf::net::InetAddress* ifAddress,
+                int                            localPort);
+        };
+
+    }  // namespace net
+}  // namespace internal
+}  // namespace decaf
 
 #endif /* _DECAF_INTERNAL_NET_DEFAULTSOCKETFACTORY_H_ */

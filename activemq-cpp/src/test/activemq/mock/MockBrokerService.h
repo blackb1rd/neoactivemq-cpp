@@ -22,23 +22,23 @@
 
 #include <string>
 
-namespace activemq {
-namespace mock {
+namespace activemq
+{
+namespace mock
+{
 
     class MockBrokerServiceImpl;
 
-    class MockBrokerService {
+    class MockBrokerService
+    {
     private:
-
         MockBrokerService(const MockBrokerService&);
-        MockBrokerService& operator= (const MockBrokerService&);
+        MockBrokerService& operator=(const MockBrokerService&);
 
     private:
-
         MockBrokerServiceImpl* impl;
 
     public:
-
         MockBrokerService();
 
         MockBrokerService(int port);
@@ -46,7 +46,6 @@ namespace mock {
         virtual ~MockBrokerService();
 
     public:
-
         void start();
 
         void stop();
@@ -58,9 +57,9 @@ namespace mock {
         std::string getConnectString() const;
 
         int getPort() const;
-
     };
 
-}}
+}  // namespace mock
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_MOCK_MOCKBROKERSERVICE_H_ */

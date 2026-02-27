@@ -17,19 +17,19 @@
 
 #include "ActiveMQProducerKernel.h"
 
-#include <cms/Message.h>
-#include <activemq/core/kernels/ActiveMQSessionKernel.h>
-#include <activemq/core/ActiveMQConnection.h>
 #include <activemq/commands/RemoveInfo.h>
-#include <activemq/util/CMSExceptionSupport.h>
-#include <activemq/util/ActiveMQProperties.h>
-#include <activemq/util/ActiveMQMessageTransformation.h>
+#include <activemq/core/ActiveMQConnection.h>
+#include <activemq/core/kernels/ActiveMQSessionKernel.h>
 #include <activemq/util/AMQLog.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
-#include <decaf/lang/exceptions/InvalidStateException.h>
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
-#include <decaf/lang/System.h>
+#include <activemq/util/ActiveMQMessageTransformation.h>
+#include <activemq/util/ActiveMQProperties.h>
+#include <activemq/util/CMSExceptionSupport.h>
+#include <cms/Message.h>
 #include <decaf/lang/Boolean.h>
+#include <decaf/lang/System.h>
+#include <decaf/lang/exceptions/IllegalArgumentException.h>
+#include <decaf/lang/exceptions/InvalidStateException.h>
+#include <decaf/lang/exceptions/NullPointerException.h>
 
 using namespace std;
 using namespace activemq;
@@ -43,73 +43,93 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQProducerKernel::ActiveMQProducerKernel(ActiveMQSessionKernel* session,
-                                               const Pointer<commands::ProducerId>& producerId,
-                                               const Pointer<ActiveMQDestination>& destination,
-                                               long long sendTimeout) : disableTimestamps(false),
-                                                                        disableMessageId(false),
-                                                                        defaultDeliveryMode(cms::Message::DEFAULT_DELIVERY_MODE),
-                                                                        defaultPriority(cms::Message::DEFAULT_MSG_PRIORITY),
-                                                                        defaultTimeToLive(cms::Message::DEFAULT_TIME_TO_LIVE),
-                                                                        sendTimeout(sendTimeout),
-                                                                        session(session),
-                                                                        producerInfo(),
-                                                                        closed(false),
-                                                                        memoryUsage(),
-                                                                        destination(),
-                                                                        messageSequence(),
-                                                                        transformer() {
-
-    if (session == NULL || producerId == NULL) {
+ActiveMQProducerKernel::ActiveMQProducerKernel(
+    ActiveMQSessionKernel*               session,
+    const Pointer<commands::ProducerId>& producerId,
+    const Pointer<ActiveMQDestination>&  destination,
+    long long                            sendTimeout)
+    : disableTimestamps(false),
+      disableMessageId(false),
+      defaultDeliveryMode(cms::Message::DEFAULT_DELIVERY_MODE),
+      defaultPriority(cms::Message::DEFAULT_MSG_PRIORITY),
+      defaultTimeToLive(cms::Message::DEFAULT_TIME_TO_LIVE),
+      sendTimeout(sendTimeout),
+      session(session),
+      producerInfo(),
+      closed(false),
+      memoryUsage(),
+      destination(),
+      messageSequence(),
+      transformer()
+{
+    if (session == NULL || producerId == NULL)
+    {
         throw ActiveMQException(
-            __FILE__, __LINE__,
-            "ActiveMQProducerKernel::ActiveMQProducerKernel - Init with NULL Session" );
+            __FILE__,
+            __LINE__,
+            "ActiveMQProducerKernel::ActiveMQProducerKernel - Init with NULL "
+            "Session");
     }
 
     this->producerInfo.reset(new ProducerInfo());
 
     this->producerInfo->setProducerId(producerId);
     this->producerInfo->setDestination(destination);
-    this->producerInfo->setWindowSize(session->getConnection()->getProducerWindowSize());
+    this->producerInfo->setWindowSize(
+        session->getConnection()->getProducerWindowSize());
 
     // Get any options specified in the destination and apply them to the
     // ProducerInfo object.
-    if (destination != NULL) {
+    if (destination != NULL)
+    {
         const ActiveMQProperties& options = destination->getOptions();
-        this->producerInfo->setDispatchAsync(
-            Boolean::parseBoolean(options.getProperty("producer.dispatchAsync", "false")));
+        this->producerInfo->setDispatchAsync(Boolean::parseBoolean(
+            options.getProperty("producer.dispatchAsync", "false")));
 
         this->destination = destination.dynamicCast<cms::Destination>();
     }
 
     // Enable producer window flow control if protocol >= 3 and the window
     // size > 0
-    if (session->getConnection()->getProtocolVersion() >= 3 && session->getConnection()->getProducerWindowSize() > 0) {
-        this->memoryUsage.reset(new MemoryUsage(session->getConnection()->getProducerWindowSize()));
+    if (session->getConnection()->getProtocolVersion() >= 3 &&
+        session->getConnection()->getProducerWindowSize() > 0)
+    {
+        this->memoryUsage.reset(
+            new MemoryUsage(session->getConnection()->getProducerWindowSize()));
     }
 
-    AMQ_LOG_DEBUG("ActiveMQProducerKernel", "Producer created: producerId=" << producerId->toString()
-                  << ", destination=" << (destination != NULL ? destination->getPhysicalName() : "NULL"));
+    AMQ_LOG_DEBUG(
+        "ActiveMQProducerKernel",
+        "Producer created: producerId="
+            << producerId->toString() << ", destination="
+            << (destination != NULL ? destination->getPhysicalName() : "NULL"));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQProducerKernel::~ActiveMQProducerKernel() {
-    AMQ_LOG_DEBUG("ActiveMQProducerKernel", "Producer destructor called: producerId="
-                  << (producerInfo != NULL ? producerInfo->getProducerId()->toString() : "NULL"));
-    try {
+ActiveMQProducerKernel::~ActiveMQProducerKernel()
+{
+    AMQ_LOG_DEBUG("ActiveMQProducerKernel",
+                  "Producer destructor called: producerId="
+                      << (producerInfo != NULL
+                              ? producerInfo->getProducerId()->toString()
+                              : "NULL"));
+    try
+    {
         close();
     }
     AMQ_CATCHALL_NOTHROW()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQProducerKernel::close() {
-
-    try {
-
-        if (!this->isClosed()) {
-            AMQ_LOG_INFO("ActiveMQProducerKernel", "Closing producer: producerId="
-                         << producerInfo->getProducerId()->toString());
+void ActiveMQProducerKernel::close()
+{
+    try
+    {
+        if (!this->isClosed())
+        {
+            AMQ_LOG_INFO("ActiveMQProducerKernel",
+                         "Closing producer: producerId="
+                             << producerInfo->getProducerId()->toString());
 
             dispose();
 
@@ -127,13 +147,17 @@ void ActiveMQProducerKernel::close() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQProducerKernel::dispose() {
-
-    if (!this->isClosed()) {
+void ActiveMQProducerKernel::dispose()
+{
+    if (!this->isClosed())
+    {
         Pointer<ActiveMQProducerKernel> producer(this);
-        try {
+        try
+        {
             this->session->removeProducer(producer);
-        } catch(Exception& e) {
+        }
+        catch (Exception& e)
+        {
             producer.release();
             throw;
         }
@@ -143,160 +167,266 @@ void ActiveMQProducerKernel::dispose() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQProducerKernel::send(cms::Message* message) {
-
-    try {
+void ActiveMQProducerKernel::send(cms::Message* message)
+{
+    try
+    {
         this->checkClosed();
-        this->send(this->destination.get(), message, defaultDeliveryMode, defaultPriority, defaultTimeToLive, NULL);
+        this->send(this->destination.get(),
+                   message,
+                   defaultDeliveryMode,
+                   defaultPriority,
+                   defaultTimeToLive,
+                   NULL);
     }
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQProducerKernel::send(cms::Message* message, cms::AsyncCallback* callback) {
-
-    try {
+void ActiveMQProducerKernel::send(cms::Message*       message,
+                                  cms::AsyncCallback* callback)
+{
+    try
+    {
         this->checkClosed();
-        this->send(this->destination.get(), message, defaultDeliveryMode, defaultPriority, defaultTimeToLive, callback);
+        this->send(this->destination.get(),
+                   message,
+                   defaultDeliveryMode,
+                   defaultPriority,
+                   defaultTimeToLive,
+                   callback);
     }
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQProducerKernel::send(cms::Message* message, int deliveryMode, int priority, long long timeToLive) {
-
-    try {
+void ActiveMQProducerKernel::send(cms::Message* message,
+                                  int           deliveryMode,
+                                  int           priority,
+                                  long long     timeToLive)
+{
+    try
+    {
         this->checkClosed();
-        this->send(this->destination.get(), message, deliveryMode, priority, timeToLive, NULL);
+        this->send(this->destination.get(),
+                   message,
+                   deliveryMode,
+                   priority,
+                   timeToLive,
+                   NULL);
     }
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQProducerKernel::send(cms::Message* message, int deliveryMode, int priority, long long timeToLive, cms::AsyncCallback* callback) {
-
-    try {
+void ActiveMQProducerKernel::send(cms::Message*       message,
+                                  int                 deliveryMode,
+                                  int                 priority,
+                                  long long           timeToLive,
+                                  cms::AsyncCallback* callback)
+{
+    try
+    {
         this->checkClosed();
-        this->send(this->destination.get(), message, deliveryMode, priority, timeToLive, callback);
+        this->send(this->destination.get(),
+                   message,
+                   deliveryMode,
+                   priority,
+                   timeToLive,
+                   callback);
     }
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQProducerKernel::send(const cms::Destination* destination, cms::Message* message) {
-
-    try {
+void ActiveMQProducerKernel::send(const cms::Destination* destination,
+                                  cms::Message*           message)
+{
+    try
+    {
         this->checkClosed();
-        this->send(destination, message, defaultDeliveryMode, defaultPriority, defaultTimeToLive, NULL);
+        this->send(destination,
+                   message,
+                   defaultDeliveryMode,
+                   defaultPriority,
+                   defaultTimeToLive,
+                   NULL);
     }
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQProducerKernel::send(const cms::Destination* destination, cms::Message* message, cms::AsyncCallback* callback) {
-
-    try {
+void ActiveMQProducerKernel::send(const cms::Destination* destination,
+                                  cms::Message*           message,
+                                  cms::AsyncCallback*     callback)
+{
+    try
+    {
         this->checkClosed();
-        this->send(destination, message, defaultDeliveryMode, defaultPriority, defaultTimeToLive, callback);
+        this->send(destination,
+                   message,
+                   defaultDeliveryMode,
+                   defaultPriority,
+                   defaultTimeToLive,
+                   callback);
     }
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQProducerKernel::send(const cms::Destination* destination, cms::Message* message,
-                                  int deliveryMode, int priority, long long timeToLive) {
-
-    try {
+void ActiveMQProducerKernel::send(const cms::Destination* destination,
+                                  cms::Message*           message,
+                                  int                     deliveryMode,
+                                  int                     priority,
+                                  long long               timeToLive)
+{
+    try
+    {
         this->checkClosed();
-        this->send(destination, message, deliveryMode, priority, timeToLive, NULL);
+        this->send(destination,
+                   message,
+                   deliveryMode,
+                   priority,
+                   timeToLive,
+                   NULL);
     }
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQProducerKernel::send(const cms::Destination* destination, cms::Message* message,
-                                  int deliveryMode, int priority, long long timeToLive, cms::AsyncCallback* onComplete) {
-
-    try {
-
+void ActiveMQProducerKernel::send(const cms::Destination* destination,
+                                  cms::Message*           message,
+                                  int                     deliveryMode,
+                                  int                     priority,
+                                  long long               timeToLive,
+                                  cms::AsyncCallback*     onComplete)
+{
+    try
+    {
         this->checkClosed();
 
-        if (destination == NULL) {
-
-            if (this->producerInfo->getDestination() == NULL) {
-                throw cms::UnsupportedOperationException("A destination must be specified.", NULL);
+        if (destination == NULL)
+        {
+            if (this->producerInfo->getDestination() == NULL)
+            {
+                throw cms::UnsupportedOperationException(
+                    "A destination must be specified.",
+                    NULL);
             }
 
-            throw cms::InvalidDestinationException("Don't understand null destinations", NULL);
+            throw cms::InvalidDestinationException(
+                "Don't understand null destinations",
+                NULL);
         }
 
         Pointer<ActiveMQDestination> dest;
-        const ActiveMQDestination* transformed;
+        const ActiveMQDestination*   transformed;
 
-        if (destination == this->destination.get()) {
+        if (destination == this->destination.get())
+        {
             dest = this->producerInfo->getDestination();
-        } else if (this->producerInfo->getDestination() == NULL) {
-            // We always need to use a copy of the users destination since we want to control
-            // its lifetime.  If the transform results in a new destination we can use that, but
-            // if its already an ActiveMQDestination then we need to clone it.
-            if (ActiveMQMessageTransformation::transformDestination(destination, &transformed)) {
+        }
+        else if (this->producerInfo->getDestination() == NULL)
+        {
+            // We always need to use a copy of the users destination since we
+            // want to control its lifetime.  If the transform results in a new
+            // destination we can use that, but if its already an
+            // ActiveMQDestination then we need to clone it.
+            if (ActiveMQMessageTransformation::transformDestination(
+                    destination,
+                    &transformed))
+            {
                 dest.reset(const_cast<ActiveMQDestination*>(transformed));
-            } else {
+            }
+            else
+            {
                 dest.reset(transformed->cloneDataStructure());
             }
-        } else {
+        }
+        else
+        {
             throw cms::UnsupportedOperationException(
                 string("This producer can only send messages to: ") +
-                this->producerInfo->getDestination()->getPhysicalName(), NULL);
+                    this->producerInfo->getDestination()->getPhysicalName(),
+                NULL);
         }
 
-        if (dest == NULL) {
+        if (dest == NULL)
+        {
             throw cms::CMSException("No destination specified", NULL);
         }
 
-        cms::Message* outbound = message;
+        cms::Message*         outbound = message;
         Pointer<cms::Message> scopedMessage;
-        if (this->transformer != NULL) {
-            if (this->transformer->producerTransform(this->session, this, message, &outbound)) {
-                // scopedMessage ensures that when we are responsible for the lifetime of the
-                // transformed message, the message remains valid until the send operation either
-                // succeeds or throws an exception.
+        if (this->transformer != NULL)
+        {
+            if (this->transformer->producerTransform(this->session,
+                                                     this,
+                                                     message,
+                                                     &outbound))
+            {
+                // scopedMessage ensures that when we are responsible for the
+                // lifetime of the transformed message, the message remains
+                // valid until the send operation either succeeds or throws an
+                // exception.
                 scopedMessage.reset(outbound);
             }
-            if (outbound == NULL) {
-                throw NullPointerException(__FILE__, __LINE__, "MessageTransformer set transformed message to NULL");
+            if (outbound == NULL)
+            {
+                throw NullPointerException(
+                    __FILE__,
+                    __LINE__,
+                    "MessageTransformer set transformed message to NULL");
             }
         }
 
-        if (this->memoryUsage.get() != NULL) {
-            try {
+        if (this->memoryUsage.get() != NULL)
+        {
+            try
+            {
                 this->memoryUsage->waitForSpace();
-            } catch (InterruptedException& e) {
-                AMQ_LOG_ERROR("ActiveMQProducerKernel", "send(): Thread interrupted while waiting for memory space");
-                throw cms::CMSException("Send aborted due to thread interrupt.");
+            }
+            catch (InterruptedException& e)
+            {
+                AMQ_LOG_ERROR("ActiveMQProducerKernel",
+                              "send(): Thread interrupted while waiting for "
+                              "memory space");
+                throw cms::CMSException(
+                    "Send aborted due to thread interrupt.");
             }
         }
 
-        AMQ_LOG_DEBUG("ActiveMQProducerKernel", "send(): Sending message to destination="
-                      << dest->getPhysicalName()
-                      << ", deliveryMode=" << deliveryMode
-                      << ", priority=" << priority
-                      << ", timeToLive=" << timeToLive);
+        AMQ_LOG_DEBUG("ActiveMQProducerKernel",
+                      "send(): Sending message to destination="
+                          << dest->getPhysicalName() << ", deliveryMode="
+                          << deliveryMode << ", priority=" << priority
+                          << ", timeToLive=" << timeToLive);
 
-        this->session->send(this, dest, outbound, deliveryMode, priority, timeToLive,
-                            this->memoryUsage.get(), this->sendTimeout, onComplete);
+        this->session->send(this,
+                            dest,
+                            outbound,
+                            deliveryMode,
+                            priority,
+                            timeToLive,
+                            this->memoryUsage.get(),
+                            this->sendTimeout,
+                            onComplete);
     }
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQProducerKernel::onProducerAck(const commands::ProducerAck& ack) {
+void ActiveMQProducerKernel::onProducerAck(const commands::ProducerAck& ack)
+{
+    try
+    {
+        AMQ_LOG_DEBUG("ActiveMQProducerKernel",
+                      "onProducerAck(): Received ack, size="
+                          << ack.getSize() << ", producerId="
+                          << ack.getProducerId()->toString());
 
-    try{
-        AMQ_LOG_DEBUG("ActiveMQProducerKernel", "onProducerAck(): Received ack, size="
-                      << ack.getSize() << ", producerId=" << ack.getProducerId()->toString());
-
-        if (this->memoryUsage.get() != NULL) {
+        if (this->memoryUsage.get() != NULL)
+        {
             this->memoryUsage->decreaseUsage(ack.getSize());
         }
     }
@@ -306,11 +436,13 @@ void ActiveMQProducerKernel::onProducerAck(const commands::ProducerAck& ack) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQProducerKernel::checkClosed() const {
-    if (closed) {
+void ActiveMQProducerKernel::checkClosed() const
+{
+    if (closed)
+    {
         throw ActiveMQException(
-            __FILE__, __LINE__,
-            "ActiveMQProducerKernel - Producer Already Closed" );
+            __FILE__,
+            __LINE__,
+            "ActiveMQProducerKernel - Producer Already Closed");
     }
 }
-

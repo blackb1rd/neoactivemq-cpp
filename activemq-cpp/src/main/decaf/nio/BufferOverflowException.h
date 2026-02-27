@@ -18,15 +18,17 @@
 #ifndef _DECAF_NIO_BUFFEROVERFLOWEXCEPTION_H_
 #define _DECAF_NIO_BUFFEROVERFLOWEXCEPTION_H_
 
-#include <decaf/util/Config.h>
 #include <decaf/lang/Exception.h>
+#include <decaf/util/Config.h>
 
-namespace decaf {
-namespace nio {
+namespace decaf
+{
+namespace nio
+{
 
-    class DECAF_API BufferOverflowException : public lang::Exception {
+    class DECAF_API BufferOverflowException : public lang::Exception
+    {
     public:
-
         /**
          * Default Constructor
          */
@@ -53,12 +55,16 @@ namespace nio {
          *
          * @param file The file name where exception occurs
          * @param lineNumber The line number where the exception occurred.
-         * @param cause The exception that was the cause for this one to be thrown.
+         * @param cause The exception that was the cause for this one to be
+         * thrown.
          * @param msg The message to report
          * @param ... list of primitives that are formatted into the message
          */
-        BufferOverflowException(const char* file, const int lineNumber,
-                                const std::exception* cause, const char* msg, ...);
+        BufferOverflowException(const char*           file,
+                                const int             lineNumber,
+                                const std::exception* cause,
+                                const char*           msg,
+                                ...);
 
         /**
          * Constructor
@@ -74,21 +80,25 @@ namespace nio {
          * @param msg The message to report
          * @param ... list of primitives that are formatted into the message
          */
-        BufferOverflowException(const char* file, const int lineNumber, const char* msg, ...);
+        BufferOverflowException(const char* file,
+                                const int   lineNumber,
+                                const char* msg,
+                                ...);
 
         /**
          * Clones this exception.  This is useful for cases where you need
-         * to preserve the type of the original exception as well as the message.
-         * All subclasses should override.
+         * to preserve the type of the original exception as well as the
+         * message. All subclasses should override.
          */
-        virtual BufferOverflowException* clone() const {
+        virtual BufferOverflowException* clone() const
+        {
             return new BufferOverflowException(*this);
         }
 
         virtual ~BufferOverflowException() throw();
-
     };
 
-}}
+}  // namespace nio
+}  // namespace decaf
 
 #endif /*_DECAF_NIO_BUFFEROVERFLOWEXCEPTION_H_*/

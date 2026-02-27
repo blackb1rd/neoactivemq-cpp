@@ -24,34 +24,34 @@
 #include <cms/Connection.h>
 #include <cms/XASession.h>
 
-namespace cms {
+namespace cms
+{
+
+/**
+ * The XAConnection interface defines an extended Connection type that is used
+ * to create XASession objects.  This is an optional interface and CMS providers
+ * are allowed to omit an implementation and instead throw an exception from an
+ * XAConnectionFactory stub to indicate that XA is not supported.
+ *
+ * @since 2.3
+ */
+class CMS_API XAConnection : public virtual cms::Connection
+{
+public:
+    virtual ~XAConnection();
 
     /**
-     * The XAConnection interface defines an extended Connection type that is used to create
-     * XASession objects.  This is an optional interface and CMS providers are allowed to omit
-     * an implementation and instead throw an exception from an XAConnectionFactory stub to
-     * indicate that XA is not supported.
+     * Creates an XASession object.
      *
-     * @since 2.3
+     * @return a newly created XASession instance, caller owns the pointer.
+     *
+     * @throws CMSException
+     *      If the XAConnection object fails to create the XASession instance
+     * due to an internal error.
      */
-    class CMS_API XAConnection : public virtual cms::Connection {
-    public:
+    virtual XASession* createXASession() = 0;
+};
 
-        virtual ~XAConnection();
-
-        /**
-         * Creates an XASession object.
-         *
-         * @return a newly created XASession instance, caller owns the pointer.
-         *
-         * @throws CMSException
-         *      If the XAConnection object fails to create the XASession instance due to
-         *      an internal error.
-         */
-        virtual XASession* createXASession() = 0;
-
-    };
-
-}
+}  // namespace cms
 
 #endif /* _CMS_XACONNECTION_H_ */

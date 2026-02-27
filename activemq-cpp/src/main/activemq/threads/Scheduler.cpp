@@ -22,10 +22,10 @@
 #include <activemq/util/ServiceStopper.h>
 
 #include <decaf/lang/Pointer.h>
-#include <decaf/util/Timer.h>
 #include <decaf/lang/Runnable.h>
 #include <decaf/lang/exceptions/IllegalArgumentException.h>
 #include <decaf/lang/exceptions/IllegalStateException.h>
+#include <decaf/util/Timer.h>
 
 using namespace activemq;
 using namespace activemq::threads;
@@ -38,18 +38,27 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-Scheduler::Scheduler(const std::string& name) : mutex(), name(name), timer(NULL), tasks() {
-
-    if (name.empty()) {
-        throw IllegalArgumentException(__FILE__, __LINE__, "Scheduler name must not be empty.");
+Scheduler::Scheduler(const std::string& name)
+    : mutex(),
+      name(name),
+      timer(NULL),
+      tasks()
+{
+    if (name.empty())
+    {
+        throw IllegalArgumentException(__FILE__,
+                                       __LINE__,
+                                       "Scheduler name must not be empty.");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Scheduler::~Scheduler() {
-    try {
-
-        if (this->timer != NULL) {
+Scheduler::~Scheduler()
+{
+    try
+    {
+        if (this->timer != NULL)
+        {
             this->timer->cancel();
         }
 
@@ -61,13 +70,19 @@ Scheduler::~Scheduler() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Scheduler::executePeriodically(Runnable* task, long long period, bool ownsTask) {
-
-    if (!isStarted()) {
-        throw IllegalStateException(__FILE__, __LINE__, "Scheduler is not started.");
+void Scheduler::executePeriodically(Runnable* task,
+                                    long long period,
+                                    bool      ownsTask)
+{
+    if (!isStarted())
+    {
+        throw IllegalStateException(__FILE__,
+                                    __LINE__,
+                                    "Scheduler is not started.");
     }
 
-    synchronized(&mutex) {
+    synchronized(&mutex)
+    {
         TimerTask* timerTask = new SchedulerTimerTask(task, ownsTask);
         this->timer->scheduleAtFixedRate(timerTask, period, period);
         this->tasks.put(task, timerTask);
@@ -75,13 +90,19 @@ void Scheduler::executePeriodically(Runnable* task, long long period, bool ownsT
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Scheduler::schedualPeriodically(Runnable* task, long long period, bool ownsTask) {
-
-    if (!isStarted()) {
-        throw IllegalStateException(__FILE__, __LINE__, "Scheduler is not started.");
+void Scheduler::schedualPeriodically(Runnable* task,
+                                     long long period,
+                                     bool      ownsTask)
+{
+    if (!isStarted())
+    {
+        throw IllegalStateException(__FILE__,
+                                    __LINE__,
+                                    "Scheduler is not started.");
     }
 
-    synchronized(&mutex) {
+    synchronized(&mutex)
+    {
         TimerTask* timerTask = new SchedulerTimerTask(task, ownsTask);
         this->timer->schedule(timerTask, period, period);
         this->tasks.put(task, timerTask);
@@ -89,15 +110,20 @@ void Scheduler::schedualPeriodically(Runnable* task, long long period, bool owns
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Scheduler::cancel(Runnable* task) {
-
-    if (!isStarted()) {
-        throw IllegalStateException(__FILE__, __LINE__, "Scheduler is not started.");
+void Scheduler::cancel(Runnable* task)
+{
+    if (!isStarted())
+    {
+        throw IllegalStateException(__FILE__,
+                                    __LINE__,
+                                    "Scheduler is not started.");
     }
 
-    synchronized(&mutex) {
+    synchronized(&mutex)
+    {
         TimerTask* ticket = this->tasks.remove(task);
-        if (ticket != NULL) {
+        if (ticket != NULL)
+        {
             ticket->cancel();
             this->timer->purge();
         }
@@ -105,36 +131,49 @@ void Scheduler::cancel(Runnable* task) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Scheduler::executeAfterDelay(Runnable* task, long long delay, bool ownsTask) {
-
-    if (!isStarted()) {
-        throw IllegalStateException(__FILE__, __LINE__, "Scheduler is not started.");
+void Scheduler::executeAfterDelay(Runnable* task,
+                                  long long delay,
+                                  bool      ownsTask)
+{
+    if (!isStarted())
+    {
+        throw IllegalStateException(__FILE__,
+                                    __LINE__,
+                                    "Scheduler is not started.");
     }
 
-    synchronized(&mutex) {
+    synchronized(&mutex)
+    {
         TimerTask* timerTask = new SchedulerTimerTask(task, ownsTask);
         this->timer->schedule(timerTask, delay);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Scheduler::shutdown() {
-    if (this->timer != NULL) {
+void Scheduler::shutdown()
+{
+    if (this->timer != NULL)
+    {
         this->timer->cancel();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Scheduler::doStart() {
-    synchronized(&mutex) {
+void Scheduler::doStart()
+{
+    synchronized(&mutex)
+    {
         this->timer = new Timer(name);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Scheduler::doStop(ServiceStopper* stopper AMQCPP_UNUSED) {
-    synchronized(&mutex) {
-        if (this->timer != NULL) {
+void Scheduler::doStop(ServiceStopper* stopper AMQCPP_UNUSED)
+{
+    synchronized(&mutex)
+    {
+        if (this->timer != NULL)
+        {
             this->timer->cancel();
         }
     }

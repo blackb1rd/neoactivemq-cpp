@@ -20,105 +20,105 @@
 
 #include <activemq/util/Config.h>
 
-#include <activemq/transport/TransportFilter.h>
 #include <activemq/commands/Command.h>
+#include <activemq/transport/TransportFilter.h>
 #include <activemq/wireformat/WireFormat.h>
 
 #include <decaf/lang/Pointer.h>
 #include <decaf/util/Properties.h>
 
-namespace activemq {
-namespace transport {
-namespace inactivity {
+namespace activemq
+{
+namespace transport
+{
+    namespace inactivity
+    {
 
-    using decaf::lang::Pointer;
+        using decaf::lang::Pointer;
 
-    class ReadChecker;
-    class WriteChecker;
-    class AsyncSignalReadErrorkTask;
-    class AsyncWriteTask;
-    class InactivityMonitorData;
+        class ReadChecker;
+        class WriteChecker;
+        class AsyncSignalReadErrorkTask;
+        class AsyncWriteTask;
+        class InactivityMonitorData;
 
-    class AMQCPP_API InactivityMonitor : public TransportFilter {
-    private:
+        class AMQCPP_API InactivityMonitor : public TransportFilter
+        {
+        private:
+            // Internal Class used to house the data structures for this object
+            InactivityMonitorData* members;
 
-        // Internal Class used to house the data structures for this object
-        InactivityMonitorData* members;
+            friend class ReadChecker;
+            friend class AsyncSignalReadErrorkTask;
+            friend class WriteChecker;
+            friend class AsyncWriteTask;
 
-        friend class ReadChecker;
-        friend class AsyncSignalReadErrorkTask;
-        friend class WriteChecker;
-        friend class AsyncWriteTask;
+        private:
+            InactivityMonitor(const InactivityMonitor&);
+            InactivityMonitor operator=(const InactivityMonitor&);
 
-    private:
+        public:
+            InactivityMonitor(const Pointer<Transport>              next,
+                              const Pointer<wireformat::WireFormat> wireFormat);
 
-        InactivityMonitor(const InactivityMonitor&);
-        InactivityMonitor operator=(const InactivityMonitor&);
+            InactivityMonitor(const Pointer<Transport>              next,
+                              const decaf::util::Properties&        properties,
+                              const Pointer<wireformat::WireFormat> wireFormat);
 
-    public:
+            virtual ~InactivityMonitor();
 
-        InactivityMonitor(const Pointer<Transport> next,
-                          const Pointer<wireformat::WireFormat> wireFormat);
+        public:  // TransportFilter Methods
+            virtual void onException(const decaf::lang::Exception& ex);
 
-        InactivityMonitor(const Pointer<Transport> next,
-                          const decaf::util::Properties& properties,
-                          const Pointer<wireformat::WireFormat> wireFormat);
+            virtual void onCommand(const Pointer<Command> command);
 
-        virtual ~InactivityMonitor();
+            virtual void oneway(const Pointer<Command> command);
 
-    public: // TransportFilter Methods
+        public:
+            bool isKeepAliveResponseRequired() const;
 
-        virtual void onException(const decaf::lang::Exception& ex);
+            void setKeepAliveResponseRequired(bool value);
 
-        virtual void onCommand(const Pointer<Command> command);
+            long long getReadCheckTime() const;
 
-        virtual void oneway(const Pointer<Command> command);
+            void setReadCheckTime(long long value);
 
-    public:
+            long long getWriteCheckTime() const;
 
-        bool isKeepAliveResponseRequired() const;
+            void setWriteCheckTime(long long value);
 
-        void setKeepAliveResponseRequired(bool value);
+            long long getInitialDelayTime() const;
 
-        long long getReadCheckTime() const;
+            void setInitialDelayTime(long long value) const;
 
-        void setReadCheckTime(long long value);
+        protected:
+            virtual void afterNextIsStarted();
 
-        long long getWriteCheckTime() const;
+            virtual void beforeNextIsStopped();
 
-        void setWriteCheckTime(long long value);
+            virtual void doClose();
 
-        long long getInitialDelayTime() const;
+        private:
+            // Throttles read checking
+            bool allowReadCheck(long long elapsed);
 
-        void setInitialDelayTime(long long value) const;
+            // Performs a Read Check on the current connection, called from a
+            // separate Thread.
+            void readCheck();
 
-    protected:
+            // Perform a Write Check on the current connection, called from a
+            // separate Thread.
+            void writeCheck();
 
-        virtual void afterNextIsStarted();
+            // Stops all the monitoring Threads, cannot restart once called.
+            void stopMonitorThreads();
 
-        virtual void beforeNextIsStopped();
+            // Starts the monitoring Threads,
+            void startMonitorThreads();
+        };
 
-        virtual void doClose();
-
-    private:
-
-        // Throttles read checking
-        bool allowReadCheck(long long elapsed);
-
-        // Performs a Read Check on the current connection, called from a separate Thread.
-        void readCheck();
-
-        // Perform a Write Check on the current connection, called from a separate Thread.
-        void writeCheck();
-
-        // Stops all the monitoring Threads, cannot restart once called.
-        void stopMonitorThreads();
-
-        // Starts the monitoring Threads,
-        void startMonitorThreads();
-
-    };
-
-}}}
+    }  // namespace inactivity
+}  // namespace transport
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_TRANSPORT_INACTIVITY_INACTIVITYMONITOR_H_ */

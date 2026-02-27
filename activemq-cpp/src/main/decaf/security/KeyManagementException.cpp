@@ -21,22 +21,33 @@ using namespace decaf;
 using namespace decaf::security;
 
 ////////////////////////////////////////////////////////////////////////////////
-KeyManagementException::KeyManagementException() : KeyException() {
+KeyManagementException::KeyManagementException()
+    : KeyException()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-KeyManagementException::KeyManagementException(const Exception& ex) : KeyException() {
-    *(Exception*) this = ex;
+KeyManagementException::KeyManagementException(const Exception& ex)
+    : KeyException()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-KeyManagementException::KeyManagementException(const KeyManagementException& ex) : KeyException() {
-    *(Exception*) this = ex;
+KeyManagementException::KeyManagementException(const KeyManagementException& ex)
+    : KeyException()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-KeyManagementException::KeyManagementException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...) : KeyException(cause) {
-
+KeyManagementException::KeyManagementException(const char*           file,
+                                               const int             lineNumber,
+                                               const std::exception* cause,
+                                               const char*           msg,
+                                               ...)
+    : KeyException(cause)
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -46,12 +57,18 @@ KeyManagementException::KeyManagementException(const char* file, const int lineN
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-KeyManagementException::KeyManagementException(const std::exception* cause) : KeyException(cause) {
+KeyManagementException::KeyManagementException(const std::exception* cause)
+    : KeyException(cause)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-KeyManagementException::KeyManagementException(const char* file, const int lineNumber, const char* msg, ...) : KeyException() {
-
+KeyManagementException::KeyManagementException(const char* file,
+                                               const int   lineNumber,
+                                               const char* msg,
+                                               ...)
+    : KeyException()
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -61,5 +78,6 @@ KeyManagementException::KeyManagementException(const char* file, const int lineN
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-KeyManagementException::~KeyManagementException() throw () {
+KeyManagementException::~KeyManagementException() throw()
+{
 }

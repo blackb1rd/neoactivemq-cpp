@@ -17,8 +17,8 @@
 
 #include "FailoverTransportFactory.h"
 
-#include <activemq/transport/failover/FailoverTransport.h>
 #include <activemq/transport/correlator/ResponseCorrelator.h>
+#include <activemq/transport/failover/FailoverTransport.h>
 #include <activemq/util/CompositeData.h>
 #include <activemq/util/URISupport.h>
 
@@ -37,10 +37,12 @@ using namespace decaf::util;
 using namespace decaf::lang;
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Transport> FailoverTransportFactory::create(const decaf::net::URI& location) {
-
-    try {
-        Properties properties; // unused but necessary for now.
+Pointer<Transport> FailoverTransportFactory::create(
+    const decaf::net::URI& location)
+{
+    try
+    {
+        Properties properties;  // unused but necessary for now.
 
         // Create the initial Transport, then wrap it in the normal Filters
         Pointer<Transport> transport(doCreateComposite(location, properties));
@@ -50,79 +52,91 @@ Pointer<Transport> FailoverTransportFactory::create(const decaf::net::URI& locat
 
         return transport;
     }
-    AMQ_CATCH_RETHROW( ActiveMQException)
-    AMQ_CATCH_EXCEPTION_CONVERT( Exception, ActiveMQException)
-    AMQ_CATCHALL_THROW( ActiveMQException)
+    AMQ_CATCH_RETHROW(ActiveMQException)
+    AMQ_CATCH_EXCEPTION_CONVERT(Exception, ActiveMQException)
+    AMQ_CATCHALL_THROW(ActiveMQException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Transport> FailoverTransportFactory::createComposite(const decaf::net::URI& location) {
-
-    try {
-        Properties properties; // unused but necessary for now.
+Pointer<Transport> FailoverTransportFactory::createComposite(
+    const decaf::net::URI& location)
+{
+    try
+    {
+        Properties properties;  // unused but necessary for now.
 
         // Create the initial Transport, then wrap it in the normal Filters
         return doCreateComposite(location, properties);
     }
-    AMQ_CATCH_RETHROW( ActiveMQException)
-    AMQ_CATCH_EXCEPTION_CONVERT( Exception, ActiveMQException)
-    AMQ_CATCHALL_THROW( ActiveMQException)
+    AMQ_CATCH_RETHROW(ActiveMQException)
+    AMQ_CATCH_EXCEPTION_CONVERT(Exception, ActiveMQException)
+    AMQ_CATCHALL_THROW(ActiveMQException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Transport> FailoverTransportFactory::doCreateComposite(const decaf::net::URI& location, const decaf::util::Properties& properties AMQCPP_UNUSED) {
-
-    try {
-
-        CompositeData data = URISupport::parseComposite(location);
+Pointer<Transport> FailoverTransportFactory::doCreateComposite(
+    const decaf::net::URI&                    location,
+    const decaf::util::Properties& properties AMQCPP_UNUSED)
+{
+    try
+    {
+        CompositeData              data = URISupport::parseComposite(location);
         Pointer<FailoverTransport> transport(new FailoverTransport());
 
         Properties topLvlProperties = data.getParameters();
 
-        transport->setInitialReconnectDelay(
-            Long::parseLong(topLvlProperties.getProperty("initialReconnectDelay", "10")));
-        transport->setMaxReconnectDelay(
-            Long::parseLong(topLvlProperties.getProperty("maxReconnectDelay", "30000")));
-        transport->setUseExponentialBackOff(
-            Boolean::parseBoolean(topLvlProperties.getProperty("useExponentialBackOff", "true")));
-        int maxReconnectAttempts = Integer::parseInt(topLvlProperties.getProperty("maxReconnectAttempts", "20"));
+        transport->setInitialReconnectDelay(Long::parseLong(
+            topLvlProperties.getProperty("initialReconnectDelay", "10")));
+        transport->setMaxReconnectDelay(Long::parseLong(
+            topLvlProperties.getProperty("maxReconnectDelay", "30000")));
+        transport->setUseExponentialBackOff(Boolean::parseBoolean(
+            topLvlProperties.getProperty("useExponentialBackOff", "true")));
+        int maxReconnectAttempts = Integer::parseInt(
+            topLvlProperties.getProperty("maxReconnectAttempts", "20"));
         transport->setMaxReconnectAttempts(maxReconnectAttempts);
 
-        // Default startupMaxReconnectAttempts to 0 (try once on initial connect, no retry).
-        // After the first successful connection, maxReconnectAttempts governs reconnection.
-        std::string startupMaxStr = topLvlProperties.getProperty("startupMaxReconnectAttempts", "");
+        // Default startupMaxReconnectAttempts to 0 (try once on initial
+        // connect, no retry). After the first successful connection,
+        // maxReconnectAttempts governs reconnection.
+        std::string startupMaxStr =
+            topLvlProperties.getProperty("startupMaxReconnectAttempts", "");
         int startupMaxReconnectAttempts;
-        if (startupMaxStr.empty()) {
+        if (startupMaxStr.empty())
+        {
             startupMaxReconnectAttempts = 0;
-        } else {
+        }
+        else
+        {
             startupMaxReconnectAttempts = Integer::parseInt(startupMaxStr);
         }
         transport->setStartupMaxReconnectAttempts(startupMaxReconnectAttempts);
-        transport->setRandomize(
-            Boolean::parseBoolean(topLvlProperties.getProperty("randomize", "true")));
-        transport->setBackup(
-            Boolean::parseBoolean(topLvlProperties.getProperty("backup", "false")));
-        transport->setBackupPoolSize(
-            Integer::parseInt(topLvlProperties.getProperty("backupPoolSize", "1")));
-        transport->setTimeout(
-            Long::parseLong(topLvlProperties.getProperty("timeout", "30000")));  // 30 second default
-        transport->setTrackMessages(
-            Boolean::parseBoolean(topLvlProperties.getProperty("trackMessages", "false")));
-        transport->setMaxCacheSize(
-            Integer::parseInt(topLvlProperties.getProperty("maxCacheSize", "131072")));
-        transport->setMaxPullCacheSize(
-            Integer::parseInt(topLvlProperties.getProperty("maxPullCacheSize", "10")));
-        transport->setUpdateURIsSupported(
-            Boolean::parseBoolean(topLvlProperties.getProperty("updateURIsSupported", "true")));
-        transport->setPriorityBackup(
-            Boolean::parseBoolean(topLvlProperties.getProperty("priorityBackup", "false")));
-        transport->setPriorityURIs(topLvlProperties.getProperty("priorityURIs", ""));
+        transport->setRandomize(Boolean::parseBoolean(
+            topLvlProperties.getProperty("randomize", "true")));
+        transport->setBackup(Boolean::parseBoolean(
+            topLvlProperties.getProperty("backup", "false")));
+        transport->setBackupPoolSize(Integer::parseInt(
+            topLvlProperties.getProperty("backupPoolSize", "1")));
+        transport->setTimeout(Long::parseLong(
+            topLvlProperties.getProperty("timeout",
+                                         "30000")));  // 30 second default
+        transport->setTrackMessages(Boolean::parseBoolean(
+            topLvlProperties.getProperty("trackMessages", "false")));
+        transport->setMaxCacheSize(Integer::parseInt(
+            topLvlProperties.getProperty("maxCacheSize", "131072")));
+        transport->setMaxPullCacheSize(Integer::parseInt(
+            topLvlProperties.getProperty("maxPullCacheSize", "10")));
+        transport->setUpdateURIsSupported(Boolean::parseBoolean(
+            topLvlProperties.getProperty("updateURIsSupported", "true")));
+        transport->setPriorityBackup(Boolean::parseBoolean(
+            topLvlProperties.getProperty("priorityBackup", "false")));
+        transport->setPriorityURIs(
+            topLvlProperties.getProperty("priorityURIs", ""));
 
         transport->addURI(false, data.getComponents());
 
         return transport;
     }
-    AMQ_CATCH_RETHROW( ActiveMQException)
-    AMQ_CATCH_EXCEPTION_CONVERT( Exception, ActiveMQException)
-    AMQ_CATCHALL_THROW( ActiveMQException)
+    AMQ_CATCH_RETHROW(ActiveMQException)
+    AMQ_CATCH_EXCEPTION_CONVERT(Exception, ActiveMQException)
+    AMQ_CATCHALL_THROW(ActiveMQException)
 }

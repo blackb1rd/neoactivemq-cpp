@@ -15,36 +15,50 @@
  * limitations under the License.
  */
 
-#include <activemq/util/IntegrationCommon.h>
 #include <activemq/test/CMSTestFixture.h>
+#include <activemq/util/IntegrationCommon.h>
 
-namespace activemq {
-namespace test {
-namespace openwire {
-    class OpenWireRedeliveryPolicyTest : public CMSTestFixture {
-    public:
-        void SetUp() override {}
-        void TearDown() override {}
-        std::string getBrokerURL() const override {
-            return activemq::util::IntegrationCommon::getInstance().getOpenwireURL();
-        }
-    };
-}}}
+namespace activemq
+{
+namespace test
+{
+    namespace openwire
+    {
+        class OpenWireRedeliveryPolicyTest : public CMSTestFixture
+        {
+        public:
+            void SetUp() override
+            {
+            }
+
+            void TearDown() override
+            {
+            }
+
+            std::string getBrokerURL() const override
+            {
+                return activemq::util::IntegrationCommon::getInstance()
+                    .getOpenwireURL();
+            }
+        };
+    }  // namespace openwire
+}  // namespace test
+}  // namespace activemq
 
 #include <cms/Connection.h>
-#include <cms/Session.h>
-#include <cms/MessageProducer.h>
 #include <cms/MessageConsumer.h>
+#include <cms/MessageProducer.h>
+#include <cms/Session.h>
 
-#include <activemq/core/policies/DefaultRedeliveryPolicy.h>
-#include <activemq/core/ActiveMQConnectionFactory.h>
-#include <activemq/core/ActiveMQConnection.h>
-#include <activemq/core/ActiveMQConsumer.h>
 #include <activemq/commands/ActiveMQTextMessage.h>
+#include <activemq/core/ActiveMQConnection.h>
+#include <activemq/core/ActiveMQConnectionFactory.h>
+#include <activemq/core/ActiveMQConsumer.h>
+#include <activemq/core/policies/DefaultRedeliveryPolicy.h>
 
-#include <decaf/lang/Thread.h>
-#include <decaf/lang/Pointer.h>
 #include <decaf/lang/Long.h>
+#include <decaf/lang/Pointer.h>
+#include <decaf/lang/Thread.h>
 #include <decaf/util/concurrent/CountDownLatch.h>
 #include <decaf/util/concurrent/atomic/AtomicInteger.h>
 
@@ -62,20 +76,20 @@ using namespace decaf::util::concurrent;
 using namespace decaf::util::concurrent::atomic;
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(OpenWireRedeliveryPolicyTest, testGetNext) {
-
+TEST_F(OpenWireRedeliveryPolicyTest, testGetNext)
+{
     DefaultRedeliveryPolicy policy;
     policy.setInitialRedeliveryDelay(0);
     policy.setRedeliveryDelay(500);
-    policy.setBackOffMultiplier((short) 2);
+    policy.setBackOffMultiplier((short)2);
     policy.setUseExponentialBackOff(true);
 
     long long delay = policy.getNextRedeliveryDelay(0);
     ASSERT_EQ(500LL, delay) << ("Incorrect delay for cycle 1");
     delay = policy.getNextRedeliveryDelay(delay);
-    ASSERT_EQ(500L*2LL, delay) << ("Incorrect delay for cycle 2");
+    ASSERT_EQ(500L * 2LL, delay) << ("Incorrect delay for cycle 2");
     delay = policy.getNextRedeliveryDelay(delay);
-    ASSERT_EQ(500L*4LL, delay) << ("Incorrect delay for cycle 3");
+    ASSERT_EQ(500L * 4LL, delay) << ("Incorrect delay for cycle 3");
 
     policy.setUseExponentialBackOff(false);
     delay = policy.getNextRedeliveryDelay(delay);
@@ -83,8 +97,8 @@ TEST_F(OpenWireRedeliveryPolicyTest, testGetNext) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(OpenWireRedeliveryPolicyTest, testGetNextWithInitialDelay) {
-
+TEST_F(OpenWireRedeliveryPolicyTest, testGetNextWithInitialDelay)
+{
     DefaultRedeliveryPolicy policy;
     policy.setInitialRedeliveryDelay(500);
 
@@ -97,26 +111,31 @@ TEST_F(OpenWireRedeliveryPolicyTest, testGetNextWithInitialDelay) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(OpenWireRedeliveryPolicyTest, testExponentialRedeliveryPolicyDelaysDeliveryOnRollback) {
-
+TEST_F(OpenWireRedeliveryPolicyTest,
+       testExponentialRedeliveryPolicyDelaysDeliveryOnRollback)
+{
     Pointer<ActiveMQConnectionFactory> connectionFactory(
         new ActiveMQConnectionFactory(getBrokerURL()));
 
     Pointer<Connection> connection(connectionFactory->createConnection());
-    Pointer<ActiveMQConnection> amqConnection = connection.dynamicCast<ActiveMQConnection>();
+    Pointer<ActiveMQConnection> amqConnection =
+        connection.dynamicCast<ActiveMQConnection>();
 
     // Receive a message with the JMS API
     RedeliveryPolicy* policy = amqConnection->getRedeliveryPolicy();
     policy->setInitialRedeliveryDelay(0);
     policy->setRedeliveryDelay(500);
-    policy->setBackOffMultiplier((short) 2);
+    policy->setBackOffMultiplier((short)2);
     policy->setUseExponentialBackOff(true);
 
     connection->start();
-    Pointer<Session> session(connection->createSession(Session::SESSION_TRANSACTED));
-    Pointer<Queue> destination(session->createTemporaryQueue());
-    Pointer<MessageProducer> producer(session->createProducer(destination.get()));
-    Pointer<MessageConsumer> consumer(session->createConsumer(destination.get()));
+    Pointer<Session> session(
+        connection->createSession(Session::SESSION_TRANSACTED));
+    Pointer<Queue>           destination(session->createTemporaryQueue());
+    Pointer<MessageProducer> producer(
+        session->createProducer(destination.get()));
+    Pointer<MessageConsumer> consumer(
+        session->createConsumer(destination.get()));
 
     // Send the messages
     Pointer<TextMessage> message1(session->createTextMessage("1st"));
@@ -127,7 +146,7 @@ TEST_F(OpenWireRedeliveryPolicyTest, testExponentialRedeliveryPolicyDelaysDelive
     session->commit();
 
     Pointer<cms::Message> received(consumer->receive(1000));
-    Pointer<TextMessage> textMessage = received.dynamicCast<TextMessage>();
+    Pointer<TextMessage>  textMessage = received.dynamicCast<TextMessage>();
     ASSERT_TRUE(textMessage != NULL);
     ASSERT_EQ(std::string("1st"), textMessage->getText());
     session->rollback();
@@ -159,13 +178,15 @@ TEST_F(OpenWireRedeliveryPolicyTest, testExponentialRedeliveryPolicyDelaysDelive
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(OpenWireRedeliveryPolicyTest, testNornalRedeliveryPolicyDelaysDeliveryOnRollback) {
-
+TEST_F(OpenWireRedeliveryPolicyTest,
+       testNornalRedeliveryPolicyDelaysDeliveryOnRollback)
+{
     Pointer<ActiveMQConnectionFactory> connectionFactory(
         new ActiveMQConnectionFactory(getBrokerURL()));
 
     Pointer<Connection> connection(connectionFactory->createConnection());
-    Pointer<ActiveMQConnection> amqConnection = connection.dynamicCast<ActiveMQConnection>();
+    Pointer<ActiveMQConnection> amqConnection =
+        connection.dynamicCast<ActiveMQConnection>();
 
     // Receive a message with the JMS API
     RedeliveryPolicy* policy = amqConnection->getRedeliveryPolicy();
@@ -173,10 +194,13 @@ TEST_F(OpenWireRedeliveryPolicyTest, testNornalRedeliveryPolicyDelaysDeliveryOnR
     policy->setRedeliveryDelay(500);
 
     connection->start();
-    Pointer<Session> session(connection->createSession(Session::SESSION_TRANSACTED));
-    Pointer<Queue> destination(session->createTemporaryQueue());
-    Pointer<MessageProducer> producer(session->createProducer(destination.get()));
-    Pointer<MessageConsumer> consumer(session->createConsumer(destination.get()));
+    Pointer<Session> session(
+        connection->createSession(Session::SESSION_TRANSACTED));
+    Pointer<Queue>           destination(session->createTemporaryQueue());
+    Pointer<MessageProducer> producer(
+        session->createProducer(destination.get()));
+    Pointer<MessageConsumer> consumer(
+        session->createConsumer(destination.get()));
 
     // Send the messages
     Pointer<TextMessage> message1(session->createTextMessage("1st"));
@@ -187,7 +211,7 @@ TEST_F(OpenWireRedeliveryPolicyTest, testNornalRedeliveryPolicyDelaysDeliveryOnR
     session->commit();
 
     Pointer<cms::Message> received(consumer->receive(1000));
-    Pointer<TextMessage> textMessage = received.dynamicCast<TextMessage>();
+    Pointer<TextMessage>  textMessage = received.dynamicCast<TextMessage>();
     ASSERT_TRUE(textMessage != NULL);
     ASSERT_EQ(std::string("1st"), textMessage->getText());
     session->rollback();
@@ -218,13 +242,14 @@ TEST_F(OpenWireRedeliveryPolicyTest, testNornalRedeliveryPolicyDelaysDeliveryOnR
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(OpenWireRedeliveryPolicyTest, testDLQHandling) {
-
+TEST_F(OpenWireRedeliveryPolicyTest, testDLQHandling)
+{
     Pointer<ActiveMQConnectionFactory> connectionFactory(
         new ActiveMQConnectionFactory(getBrokerURL()));
 
     Pointer<Connection> connection(connectionFactory->createConnection());
-    Pointer<ActiveMQConnection> amqConnection = connection.dynamicCast<ActiveMQConnection>();
+    Pointer<ActiveMQConnection> amqConnection =
+        connection.dynamicCast<ActiveMQConnection>();
 
     // Receive a message with the JMS API
     RedeliveryPolicy* policy = amqConnection->getRedeliveryPolicy();
@@ -233,10 +258,13 @@ TEST_F(OpenWireRedeliveryPolicyTest, testDLQHandling) {
     policy->setMaximumRedeliveries(2);
 
     connection->start();
-    Pointer<Session> session(connection->createSession(Session::SESSION_TRANSACTED));
-    Pointer<Queue> destination(session->createTemporaryQueue());
-    Pointer<MessageProducer> producer(session->createProducer(destination.get()));
-    Pointer<MessageConsumer> consumer(session->createConsumer(destination.get()));
+    Pointer<Session> session(
+        connection->createSession(Session::SESSION_TRANSACTED));
+    Pointer<Queue>           destination(session->createTemporaryQueue());
+    Pointer<MessageProducer> producer(
+        session->createProducer(destination.get()));
+    Pointer<MessageConsumer> consumer(
+        session->createConsumer(destination.get()));
     Pointer<Queue> dlq(session->createQueue("ActiveMQ.DLQ"));
     amqConnection->destroyDestination(dlq.get());
     Pointer<MessageConsumer> dlqConsumer(session->createConsumer(dlq.get()));
@@ -250,7 +278,7 @@ TEST_F(OpenWireRedeliveryPolicyTest, testDLQHandling) {
     session->commit();
 
     Pointer<cms::Message> received(consumer->receive(1000));
-    Pointer<TextMessage> textMessage = received.dynamicCast<TextMessage>();
+    Pointer<TextMessage>  textMessage = received.dynamicCast<TextMessage>();
     ASSERT_TRUE(textMessage != NULL) << ("Failed to get first delivery");
     ASSERT_EQ(std::string("1st"), textMessage->getText());
     session->rollback();
@@ -281,21 +309,25 @@ TEST_F(OpenWireRedeliveryPolicyTest, testDLQHandling) {
     ASSERT_EQ(std::string("1st"), textMessage->getText());
     session->commit();
 
-    if (textMessage->propertyExists("dlqDeliveryFailureCause")) {
-        std::string cause = textMessage->getStringProperty("dlqDeliveryFailureCause");
-        ASSERT_TRUE(cause.find("RedeliveryPolicy") != std::string::npos) << ("cause exception has no policy ref");
+    if (textMessage->propertyExists("dlqDeliveryFailureCause"))
+    {
+        std::string cause =
+            textMessage->getStringProperty("dlqDeliveryFailureCause");
+        ASSERT_TRUE(cause.find("RedeliveryPolicy") != std::string::npos)
+            << ("cause exception has no policy ref");
     }
     session->commit();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(OpenWireRedeliveryPolicyTest, testInfiniteMaximumNumberOfRedeliveries) {
-
+TEST_F(OpenWireRedeliveryPolicyTest, testInfiniteMaximumNumberOfRedeliveries)
+{
     Pointer<ActiveMQConnectionFactory> connectionFactory(
         new ActiveMQConnectionFactory(getBrokerURL()));
 
     Pointer<Connection> connection(connectionFactory->createConnection());
-    Pointer<ActiveMQConnection> amqConnection = connection.dynamicCast<ActiveMQConnection>();
+    Pointer<ActiveMQConnection> amqConnection =
+        connection.dynamicCast<ActiveMQConnection>();
 
     // Receive a message with the JMS API
     RedeliveryPolicy* policy = amqConnection->getRedeliveryPolicy();
@@ -305,10 +337,13 @@ TEST_F(OpenWireRedeliveryPolicyTest, testInfiniteMaximumNumberOfRedeliveries) {
     policy->setMaximumRedeliveries(-1);
 
     connection->start();
-    Pointer<Session> session(connection->createSession(Session::SESSION_TRANSACTED));
-    Pointer<Queue> destination(session->createTemporaryQueue());
-    Pointer<MessageProducer> producer(session->createProducer(destination.get()));
-    Pointer<MessageConsumer> consumer(session->createConsumer(destination.get()));
+    Pointer<Session> session(
+        connection->createSession(Session::SESSION_TRANSACTED));
+    Pointer<Queue>           destination(session->createTemporaryQueue());
+    Pointer<MessageProducer> producer(
+        session->createProducer(destination.get()));
+    Pointer<MessageConsumer> consumer(
+        session->createConsumer(destination.get()));
 
     // Send the messages
     Pointer<TextMessage> message1(session->createTextMessage("1st"));
@@ -319,12 +354,13 @@ TEST_F(OpenWireRedeliveryPolicyTest, testInfiniteMaximumNumberOfRedeliveries) {
     session->commit();
 
     Pointer<cms::Message> received(consumer->receive(1000));
-    Pointer<TextMessage> textMessage = received.dynamicCast<TextMessage>();
+    Pointer<TextMessage>  textMessage = received.dynamicCast<TextMessage>();
     ASSERT_TRUE(textMessage != NULL) << ("Failed to get first delivery");
     ASSERT_EQ(std::string("1st"), textMessage->getText());
     session->rollback();
 
-    // we should be able to get the 1st message redelivered until a session.commit is called
+    // we should be able to get the 1st message redelivered until a
+    // session.commit is called
     received.reset(consumer->receive(1000));
     ASSERT_TRUE(received != NULL) << ("Failed to get second delivery");
     textMessage = received.dynamicCast<TextMessage>();
@@ -363,13 +399,14 @@ TEST_F(OpenWireRedeliveryPolicyTest, testInfiniteMaximumNumberOfRedeliveries) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(OpenWireRedeliveryPolicyTest, testMaximumRedeliveryDelay) {
-
+TEST_F(OpenWireRedeliveryPolicyTest, testMaximumRedeliveryDelay)
+{
     Pointer<ActiveMQConnectionFactory> connectionFactory(
         new ActiveMQConnectionFactory(getBrokerURL()));
 
     Pointer<Connection> connection(connectionFactory->createConnection());
-    Pointer<ActiveMQConnection> amqConnection = connection.dynamicCast<ActiveMQConnection>();
+    Pointer<ActiveMQConnection> amqConnection =
+        connection.dynamicCast<ActiveMQConnection>();
 
     // Receive a message with the JMS API
     RedeliveryPolicy* policy = amqConnection->getRedeliveryPolicy();
@@ -378,14 +415,17 @@ TEST_F(OpenWireRedeliveryPolicyTest, testMaximumRedeliveryDelay) {
     policy->setMaximumRedeliveries(-1);
     policy->setRedeliveryDelay(50);
     policy->setMaximumRedeliveryDelay(1000);
-    policy->setBackOffMultiplier((short) 2);
+    policy->setBackOffMultiplier((short)2);
     policy->setUseExponentialBackOff(true);
 
     connection->start();
-    Pointer<Session> session(connection->createSession(Session::SESSION_TRANSACTED));
-    Pointer<Queue> destination(session->createTemporaryQueue());
-    Pointer<MessageProducer> producer(session->createProducer(destination.get()));
-    Pointer<MessageConsumer> consumer(session->createConsumer(destination.get()));
+    Pointer<Session> session(
+        connection->createSession(Session::SESSION_TRANSACTED));
+    Pointer<Queue>           destination(session->createTemporaryQueue());
+    Pointer<MessageProducer> producer(
+        session->createProducer(destination.get()));
+    Pointer<MessageConsumer> consumer(
+        session->createConsumer(destination.get()));
 
     // Send the messages
     Pointer<TextMessage> message1(session->createTextMessage("1st"));
@@ -397,8 +437,10 @@ TEST_F(OpenWireRedeliveryPolicyTest, testMaximumRedeliveryDelay) {
 
     Pointer<cms::Message> received;
 
-    for(int i = 0; i < 10; ++i) {
-        // we should be able to get the 1st message redelivered until a session.commit is called
+    for (int i = 0; i < 10; ++i)
+    {
+        // we should be able to get the 1st message redelivered until a
+        // session.commit is called
         received.reset(consumer->receive(2000));
         Pointer<TextMessage> textMessage = received.dynamicCast<TextMessage>();
         ASSERT_TRUE(textMessage != NULL) << ("Failed to get message");
@@ -423,13 +465,14 @@ TEST_F(OpenWireRedeliveryPolicyTest, testMaximumRedeliveryDelay) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(OpenWireRedeliveryPolicyTest, testZeroMaximumNumberOfRedeliveries) {
-
+TEST_F(OpenWireRedeliveryPolicyTest, testZeroMaximumNumberOfRedeliveries)
+{
     Pointer<ActiveMQConnectionFactory> connectionFactory(
         new ActiveMQConnectionFactory(getBrokerURL()));
 
     Pointer<Connection> connection(connectionFactory->createConnection());
-    Pointer<ActiveMQConnection> amqConnection = connection.dynamicCast<ActiveMQConnection>();
+    Pointer<ActiveMQConnection> amqConnection =
+        connection.dynamicCast<ActiveMQConnection>();
 
     // Receive a message with the JMS API
     RedeliveryPolicy* policy = amqConnection->getRedeliveryPolicy();
@@ -439,10 +482,13 @@ TEST_F(OpenWireRedeliveryPolicyTest, testZeroMaximumNumberOfRedeliveries) {
     policy->setMaximumRedeliveries(0);
 
     connection->start();
-    Pointer<Session> session(connection->createSession(Session::SESSION_TRANSACTED));
-    Pointer<Queue> destination(session->createTemporaryQueue());
-    Pointer<MessageProducer> producer(session->createProducer(destination.get()));
-    Pointer<MessageConsumer> consumer(session->createConsumer(destination.get()));
+    Pointer<Session> session(
+        connection->createSession(Session::SESSION_TRANSACTED));
+    Pointer<Queue>           destination(session->createTemporaryQueue());
+    Pointer<MessageProducer> producer(
+        session->createProducer(destination.get()));
+    Pointer<MessageConsumer> consumer(
+        session->createConsumer(destination.get()));
 
     // Send the messages
     Pointer<TextMessage> message1(session->createTextMessage("1st"));
@@ -453,12 +499,13 @@ TEST_F(OpenWireRedeliveryPolicyTest, testZeroMaximumNumberOfRedeliveries) {
     session->commit();
 
     Pointer<cms::Message> received(consumer->receive(1000));
-    Pointer<TextMessage> textMessage = received.dynamicCast<TextMessage>();
+    Pointer<TextMessage>  textMessage = received.dynamicCast<TextMessage>();
     ASSERT_TRUE(textMessage != NULL) << ("Failed to get first delivery");
     ASSERT_EQ(std::string("1st"), textMessage->getText());
     session->rollback();
 
-    // the 1st  message should not be redelivered since maximumRedeliveries is set to 0
+    // the 1st  message should not be redelivered since maximumRedeliveries is
+    // set to 0
     received.reset(consumer->receive(1000));
     ASSERT_TRUE(received != NULL) << ("Failed to get message two");
     textMessage = received.dynamicCast<TextMessage>();
@@ -467,21 +514,25 @@ TEST_F(OpenWireRedeliveryPolicyTest, testZeroMaximumNumberOfRedeliveries) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(OpenWireRedeliveryPolicyTest, testRepeatedRedeliveryReceiveNoCommit) {
-
+TEST_F(OpenWireRedeliveryPolicyTest, testRepeatedRedeliveryReceiveNoCommit)
+{
     Pointer<ActiveMQConnectionFactory> connectionFactory(
         new ActiveMQConnectionFactory(getBrokerURL()));
 
     Pointer<Connection> connection(connectionFactory->createConnection());
-    Pointer<ActiveMQConnection> amqConnection = connection.dynamicCast<ActiveMQConnection>();
+    Pointer<ActiveMQConnection> amqConnection =
+        connection.dynamicCast<ActiveMQConnection>();
 
     connection->start();
-    Pointer<Session> dlqSession(connection->createSession(Session::AUTO_ACKNOWLEDGE));
-    Pointer<Queue> destination(dlqSession->createQueue("testRepeatedRedeliveryReceiveNoCommit"));
+    Pointer<Session> dlqSession(
+        connection->createSession(Session::AUTO_ACKNOWLEDGE));
+    Pointer<Queue> destination(
+        dlqSession->createQueue("testRepeatedRedeliveryReceiveNoCommit"));
     Pointer<Queue> dlq(dlqSession->createQueue("ActiveMQ.DLQ"));
     amqConnection->destroyDestination(destination.get());
     amqConnection->destroyDestination(dlq.get());
-    Pointer<MessageProducer> producer(dlqSession->createProducer(destination.get()));
+    Pointer<MessageProducer> producer(
+        dlqSession->createProducer(destination.get()));
     Pointer<MessageConsumer> consumer(dlqSession->createConsumer(dlq.get()));
 
     Pointer<TextMessage> message1(dlqSession->createTextMessage("1st"));
@@ -489,9 +540,12 @@ TEST_F(OpenWireRedeliveryPolicyTest, testRepeatedRedeliveryReceiveNoCommit) {
 
     const int MAX_REDELIVERIES = 4;
 
-    for (int i = 0; i <= MAX_REDELIVERIES + 1; i++) {
-        Pointer<Connection> loopConnection(connectionFactory->createConnection());
-        Pointer<ActiveMQConnection> amqConnection = loopConnection.dynamicCast<ActiveMQConnection>();
+    for (int i = 0; i <= MAX_REDELIVERIES + 1; i++)
+    {
+        Pointer<Connection> loopConnection(
+            connectionFactory->createConnection());
+        Pointer<ActiveMQConnection> amqConnection =
+            loopConnection.dynamicCast<ActiveMQConnection>();
 
         // Receive a message with the JMS API
         RedeliveryPolicy* policy = amqConnection->getRedeliveryPolicy();
@@ -500,18 +554,26 @@ TEST_F(OpenWireRedeliveryPolicyTest, testRepeatedRedeliveryReceiveNoCommit) {
         policy->setMaximumRedeliveries(MAX_REDELIVERIES);
 
         loopConnection->start();
-        Pointer<Session> session(loopConnection->createSession(Session::SESSION_TRANSACTED));
-        Pointer<MessageConsumer> consumer(session->createConsumer(destination.get()));
+        Pointer<Session> session(
+            loopConnection->createSession(Session::SESSION_TRANSACTED));
+        Pointer<MessageConsumer> consumer(
+            session->createConsumer(destination.get()));
 
         Pointer<cms::Message> received(consumer->receive(1000));
 
-        if (i <= MAX_REDELIVERIES) {
-            Pointer<ActiveMQTextMessage> textMessage = received.dynamicCast<ActiveMQTextMessage>();
-            ASSERT_TRUE(textMessage != NULL) << ("Failed to get first delivery");
+        if (i <= MAX_REDELIVERIES)
+        {
+            Pointer<ActiveMQTextMessage> textMessage =
+                received.dynamicCast<ActiveMQTextMessage>();
+            ASSERT_TRUE(textMessage != NULL)
+                << ("Failed to get first delivery");
             ASSERT_EQ(std::string("1st"), textMessage->getText());
             ASSERT_EQ(i, textMessage->getRedeliveryCounter());
-        } else {
-            ASSERT_TRUE(received == NULL) << ("null on exceeding redelivery count");
+        }
+        else
+        {
+            ASSERT_TRUE(received == NULL)
+                << ("null on exceeding redelivery count");
         }
 
         loopConnection->close();
@@ -523,74 +585,93 @@ TEST_F(OpenWireRedeliveryPolicyTest, testRepeatedRedeliveryReceiveNoCommit) {
     Pointer<TextMessage> textMessage = received.dynamicCast<TextMessage>();
     ASSERT_EQ(std::string("1st"), textMessage->getText());
 
-    if (textMessage->propertyExists("dlqDeliveryFailureCause")) {
-        std::string cause = textMessage->getStringProperty("dlqDeliveryFailureCause");
-        ASSERT_TRUE(cause.find("RedeliveryPolicy") != std::string::npos) << ("cause exception has no policy ref");
-    } else {
+    if (textMessage->propertyExists("dlqDeliveryFailureCause"))
+    {
+        std::string cause =
+            textMessage->getStringProperty("dlqDeliveryFailureCause");
+        ASSERT_TRUE(cause.find("RedeliveryPolicy") != std::string::npos)
+            << ("cause exception has no policy ref");
+    }
+    else
+    {
         FAIL() << ("Message did not have a rollback cause");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class AsyncListener : public cms::MessageListener {
-    private:
+class AsyncListener : public cms::MessageListener
+{
+private:
+    AtomicInteger*  receivedCount;
+    CountDownLatch* done;
 
-        AtomicInteger* receivedCount;
-        CountDownLatch* done;
+public:
+    AsyncListener(AtomicInteger* receivedCount, CountDownLatch* done)
+    {
+        this->receivedCount = receivedCount;
+        this->done          = done;
+    }
 
-    public:
-
-        AsyncListener(AtomicInteger* receivedCount, CountDownLatch* done) {
-            this->receivedCount = receivedCount;
-            this->done = done;
+    virtual void onMessage(const cms::Message* message)
+    {
+        try
+        {
+            const ActiveMQTextMessage* textMessage =
+                dynamic_cast<const ActiveMQTextMessage*>(message);
+            ASSERT_TRUE(textMessage != NULL)
+                << ("Failed to get first delivery");
+            ASSERT_EQ(std::string("1st"), textMessage->getText());
+            ASSERT_EQ(receivedCount->get(),
+                      textMessage->getRedeliveryCounter());
+            receivedCount->incrementAndGet();
+            done->countDown();
         }
-
-        virtual void onMessage(const cms::Message* message) {
-            try {
-                const ActiveMQTextMessage* textMessage = dynamic_cast<const ActiveMQTextMessage*>(message);
-                ASSERT_TRUE(textMessage != NULL) << ("Failed to get first delivery");
-                ASSERT_EQ(std::string("1st"), textMessage->getText());
-                ASSERT_EQ(receivedCount->get(), textMessage->getRedeliveryCounter());
-                receivedCount->incrementAndGet();
-                done->countDown();
-            } catch (Exception& ignored) {
-                ignored.printStackTrace();
-            }
+        catch (Exception& ignored)
+        {
+            ignored.printStackTrace();
         }
-    };
-}
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(OpenWireRedeliveryPolicyTest, testRepeatedRedeliveryOnMessageNoCommit) {
-
+TEST_F(OpenWireRedeliveryPolicyTest, testRepeatedRedeliveryOnMessageNoCommit)
+{
     Pointer<ActiveMQConnectionFactory> connectionFactory(
         new ActiveMQConnectionFactory(getBrokerURL()));
 
     Pointer<Connection> connection(connectionFactory->createConnection());
-    Pointer<ActiveMQConnection> amqConnection = connection.dynamicCast<ActiveMQConnection>();
+    Pointer<ActiveMQConnection> amqConnection =
+        connection.dynamicCast<ActiveMQConnection>();
 
     connection->start();
-    Pointer<Session> dlqSession(connection->createSession(Session::AUTO_ACKNOWLEDGE));
-    Pointer<Queue> destination(dlqSession->createQueue("testRepeatedRedeliveryOnMessageNoCommit"));
+    Pointer<Session> dlqSession(
+        connection->createSession(Session::AUTO_ACKNOWLEDGE));
+    Pointer<Queue> destination(
+        dlqSession->createQueue("testRepeatedRedeliveryOnMessageNoCommit"));
     Pointer<Queue> dlq(dlqSession->createQueue("ActiveMQ.DLQ"));
     amqConnection->destroyDestination(destination.get());
     amqConnection->destroyDestination(dlq.get());
-    Pointer<MessageProducer> producer(dlqSession->createProducer(destination.get()));
+    Pointer<MessageProducer> producer(
+        dlqSession->createProducer(destination.get()));
     Pointer<MessageConsumer> consumer(dlqSession->createConsumer(dlq.get()));
 
     // Send the messages
     Pointer<TextMessage> message1(dlqSession->createTextMessage("1st"));
     producer->send(message1.get());
 
-    const int MAX_REDELIVERIES = 4;
+    const int     MAX_REDELIVERIES = 4;
     AtomicInteger receivedCount(0);
 
-    for (int i = 0; i <= MAX_REDELIVERIES + 1; i++) {
-
-        Pointer<Connection> loopConnection(connectionFactory->createConnection());
-        Pointer<ActiveMQConnection> amqConnection = loopConnection.dynamicCast<ActiveMQConnection>();
+    for (int i = 0; i <= MAX_REDELIVERIES + 1; i++)
+    {
+        Pointer<Connection> loopConnection(
+            connectionFactory->createConnection());
+        Pointer<ActiveMQConnection> amqConnection =
+            loopConnection.dynamicCast<ActiveMQConnection>();
 
         // Receive a message with the JMS API
         RedeliveryPolicy* policy = amqConnection->getRedeliveryPolicy();
@@ -599,19 +680,26 @@ TEST_F(OpenWireRedeliveryPolicyTest, testRepeatedRedeliveryOnMessageNoCommit) {
         policy->setMaximumRedeliveries(MAX_REDELIVERIES);
 
         loopConnection->start();
-        Pointer<Session> session(loopConnection->createSession(Session::SESSION_TRANSACTED));
-        Pointer<MessageConsumer> consumer(session->createConsumer(destination.get()));
+        Pointer<Session> session(
+            loopConnection->createSession(Session::SESSION_TRANSACTED));
+        Pointer<MessageConsumer> consumer(
+            session->createConsumer(destination.get()));
 
         CountDownLatch done(1);
 
         AsyncListener listener(&receivedCount, &done);
         consumer->setMessageListener(&listener);
 
-        if (i <= MAX_REDELIVERIES) {
-            ASSERT_TRUE(done.await(5, TimeUnit::SECONDS)) << ("listener didn't get a message");
-        } else {
+        if (i <= MAX_REDELIVERIES)
+        {
+            ASSERT_TRUE(done.await(5, TimeUnit::SECONDS))
+                << ("listener didn't get a message");
+        }
+        else
+        {
             // final redlivery gets poisoned before dispatch
-            ASSERT_TRUE(!done.await(2, TimeUnit::SECONDS)) << ("listener got unexpected message");
+            ASSERT_TRUE(!done.await(2, TimeUnit::SECONDS))
+                << ("listener got unexpected message");
         }
 
         loopConnection->close();
@@ -623,22 +711,28 @@ TEST_F(OpenWireRedeliveryPolicyTest, testRepeatedRedeliveryOnMessageNoCommit) {
     Pointer<TextMessage> textMessage = received.dynamicCast<TextMessage>();
     ASSERT_EQ(std::string("1st"), textMessage->getText());
 
-    if (textMessage->propertyExists("dlqDeliveryFailureCause")) {
-        std::string cause = textMessage->getStringProperty("dlqDeliveryFailureCause");
-        ASSERT_TRUE(cause.find("RedeliveryPolicy") != std::string::npos) << ("cause exception has no policy ref");
-    } else {
+    if (textMessage->propertyExists("dlqDeliveryFailureCause"))
+    {
+        std::string cause =
+            textMessage->getStringProperty("dlqDeliveryFailureCause");
+        ASSERT_TRUE(cause.find("RedeliveryPolicy") != std::string::npos)
+            << ("cause exception has no policy ref");
+    }
+    else
+    {
         FAIL() << ("Message did not have a rollback cause");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(OpenWireRedeliveryPolicyTest, testInitialRedeliveryDelayZero) {
-
+TEST_F(OpenWireRedeliveryPolicyTest, testInitialRedeliveryDelayZero)
+{
     Pointer<ActiveMQConnectionFactory> connectionFactory(
         new ActiveMQConnectionFactory(getBrokerURL()));
 
     Pointer<Connection> connection(connectionFactory->createConnection());
-    Pointer<ActiveMQConnection> amqConnection = connection.dynamicCast<ActiveMQConnection>();
+    Pointer<ActiveMQConnection> amqConnection =
+        connection.dynamicCast<ActiveMQConnection>();
 
     // Receive a message with the JMS API
     RedeliveryPolicy* policy = amqConnection->getRedeliveryPolicy();
@@ -647,10 +741,13 @@ TEST_F(OpenWireRedeliveryPolicyTest, testInitialRedeliveryDelayZero) {
     policy->setMaximumRedeliveries(1);
 
     connection->start();
-    Pointer<Session> session(connection->createSession(Session::SESSION_TRANSACTED));
-    Pointer<Queue> destination(session->createTemporaryQueue());
-    Pointer<MessageProducer> producer(session->createProducer(destination.get()));
-    Pointer<MessageConsumer> consumer(session->createConsumer(destination.get()));
+    Pointer<Session> session(
+        connection->createSession(Session::SESSION_TRANSACTED));
+    Pointer<Queue>           destination(session->createTemporaryQueue());
+    Pointer<MessageProducer> producer(
+        session->createProducer(destination.get()));
+    Pointer<MessageConsumer> consumer(
+        session->createConsumer(destination.get()));
 
     // Send the messages
     Pointer<TextMessage> message1(session->createTextMessage("1st"));
@@ -661,7 +758,7 @@ TEST_F(OpenWireRedeliveryPolicyTest, testInitialRedeliveryDelayZero) {
     session->commit();
 
     Pointer<cms::Message> received(consumer->receive(100));
-    Pointer<TextMessage> textMessage = received.dynamicCast<TextMessage>();
+    Pointer<TextMessage>  textMessage = received.dynamicCast<TextMessage>();
     ASSERT_TRUE(textMessage != NULL) << ("Failed to get first delivery");
     ASSERT_EQ(std::string("1st"), textMessage->getText());
     session->rollback();
@@ -680,13 +777,14 @@ TEST_F(OpenWireRedeliveryPolicyTest, testInitialRedeliveryDelayZero) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(OpenWireRedeliveryPolicyTest, testInitialRedeliveryDelayOne) {
-
+TEST_F(OpenWireRedeliveryPolicyTest, testInitialRedeliveryDelayOne)
+{
     Pointer<ActiveMQConnectionFactory> connectionFactory(
         new ActiveMQConnectionFactory(getBrokerURL()));
 
     Pointer<Connection> connection(connectionFactory->createConnection());
-    Pointer<ActiveMQConnection> amqConnection = connection.dynamicCast<ActiveMQConnection>();
+    Pointer<ActiveMQConnection> amqConnection =
+        connection.dynamicCast<ActiveMQConnection>();
 
     // Receive a message with the JMS API
     RedeliveryPolicy* policy = amqConnection->getRedeliveryPolicy();
@@ -695,10 +793,13 @@ TEST_F(OpenWireRedeliveryPolicyTest, testInitialRedeliveryDelayOne) {
     policy->setMaximumRedeliveries(1);
 
     connection->start();
-    Pointer<Session> session(connection->createSession(Session::SESSION_TRANSACTED));
-    Pointer<Queue> destination(session->createTemporaryQueue());
-    Pointer<MessageProducer> producer(session->createProducer(destination.get()));
-    Pointer<MessageConsumer> consumer(session->createConsumer(destination.get()));
+    Pointer<Session> session(
+        connection->createSession(Session::SESSION_TRANSACTED));
+    Pointer<Queue>           destination(session->createTemporaryQueue());
+    Pointer<MessageProducer> producer(
+        session->createProducer(destination.get()));
+    Pointer<MessageConsumer> consumer(
+        session->createConsumer(destination.get()));
 
     // Send the messages
     Pointer<TextMessage> message1(session->createTextMessage("1st"));
@@ -709,7 +810,7 @@ TEST_F(OpenWireRedeliveryPolicyTest, testInitialRedeliveryDelayOne) {
     session->commit();
 
     Pointer<cms::Message> received(consumer->receive(100));
-    Pointer<TextMessage> textMessage = received.dynamicCast<TextMessage>();
+    Pointer<TextMessage>  textMessage = received.dynamicCast<TextMessage>();
     ASSERT_TRUE(textMessage != NULL) << ("Failed to get first delivery");
     ASSERT_EQ(std::string("1st"), textMessage->getText());
     session->rollback();
@@ -730,13 +831,14 @@ TEST_F(OpenWireRedeliveryPolicyTest, testInitialRedeliveryDelayOne) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(OpenWireRedeliveryPolicyTest, testRedeliveryDelayOne) {
-
+TEST_F(OpenWireRedeliveryPolicyTest, testRedeliveryDelayOne)
+{
     Pointer<ActiveMQConnectionFactory> connectionFactory(
         new ActiveMQConnectionFactory(getBrokerURL()));
 
     Pointer<Connection> connection(connectionFactory->createConnection());
-    Pointer<ActiveMQConnection> amqConnection = connection.dynamicCast<ActiveMQConnection>();
+    Pointer<ActiveMQConnection> amqConnection =
+        connection.dynamicCast<ActiveMQConnection>();
 
     // Receive a message with the JMS API
     RedeliveryPolicy* policy = amqConnection->getRedeliveryPolicy();
@@ -746,10 +848,13 @@ TEST_F(OpenWireRedeliveryPolicyTest, testRedeliveryDelayOne) {
     policy->setMaximumRedeliveries(2);
 
     connection->start();
-    Pointer<Session> session(connection->createSession(Session::SESSION_TRANSACTED));
-    Pointer<Queue> destination(session->createTemporaryQueue());
-    Pointer<MessageProducer> producer(session->createProducer(destination.get()));
-    Pointer<MessageConsumer> consumer(session->createConsumer(destination.get()));
+    Pointer<Session> session(
+        connection->createSession(Session::SESSION_TRANSACTED));
+    Pointer<Queue>           destination(session->createTemporaryQueue());
+    Pointer<MessageProducer> producer(
+        session->createProducer(destination.get()));
+    Pointer<MessageConsumer> consumer(
+        session->createConsumer(destination.get()));
 
     // Send the messages
     Pointer<TextMessage> message1(session->createTextMessage("1st"));
@@ -760,7 +865,7 @@ TEST_F(OpenWireRedeliveryPolicyTest, testRedeliveryDelayOne) {
     session->commit();
 
     Pointer<cms::Message> received(consumer->receive(100));
-    Pointer<TextMessage> textMessage = received.dynamicCast<TextMessage>();
+    Pointer<TextMessage>  textMessage = received.dynamicCast<TextMessage>();
     ASSERT_TRUE(textMessage != NULL) << ("Failed to get first delivery");
     ASSERT_EQ(std::string("1st"), textMessage->getText());
     session->rollback();

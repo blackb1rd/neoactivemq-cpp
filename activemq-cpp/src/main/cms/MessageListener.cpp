@@ -20,7 +20,6 @@
 using namespace cms;
 
 ////////////////////////////////////////////////////////////////////////////////
-MessageListener::~MessageListener() {
-
+MessageListener::~MessageListener()
+{
 }
-

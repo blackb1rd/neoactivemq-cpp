@@ -20,19 +20,23 @@
 
 #include <activemq/util/Config.h>
 
-namespace cms {
-    class Session;
-}
-namespace activemq {
-namespace cmsutil {
+namespace cms
+{
+class Session;
+}  // namespace cms
+
+namespace activemq
+{
+namespace cmsutil
+{
 
     /**
      * Callback for executing any number of operations on a provided
      * CMS Session.
      */
-    class AMQCPP_API SessionCallback {
+    class AMQCPP_API SessionCallback
+    {
     public:
-
         virtual ~SessionCallback();
 
         /**
@@ -45,9 +49,9 @@ namespace cmsutil {
          * @throws CMSException if thrown by CMS API methods
          */
         virtual void doInCms(cms::Session* session) = 0;
-
     };
 
-}}
+}  // namespace cmsutil
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_CMSUTIL_SESSIONCALLBACK_H_*/

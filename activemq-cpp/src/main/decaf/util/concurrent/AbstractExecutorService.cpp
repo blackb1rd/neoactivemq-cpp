@@ -26,21 +26,29 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-AbstractExecutorService::AbstractExecutorService() : ExecutorService() {
+AbstractExecutorService::AbstractExecutorService()
+    : ExecutorService()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-AbstractExecutorService::~AbstractExecutorService() {
+AbstractExecutorService::~AbstractExecutorService()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AbstractExecutorService::doSubmit(FutureType* future) {
-
-    try {
+void AbstractExecutorService::doSubmit(FutureType* future)
+{
+    try
+    {
         // Its supposed to be a RunnableFuture<?> be we should double check.
         Runnable* task = dynamic_cast<Runnable*>(future);
-        if (task == NULL) {
-            throw NullPointerException(__FILE__, __LINE__, "Could not cast FutureType to a Runnabke");
+        if (task == NULL)
+        {
+            throw NullPointerException(
+                __FILE__,
+                __LINE__,
+                "Could not cast FutureType to a Runnabke");
         }
 
         // Ensure that we tell the subclass it owns the Future.

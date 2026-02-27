@@ -19,33 +19,39 @@
 
 #include <decaf/util/logging/LogRecord.h>
 
-namespace decaf{
-namespace util{
-namespace logging{
-
-    /**
-     * A Filter can be used to provide fine grain control over what is
-     * logged, beyond the control provided by log levels.
-     *
-     * Each Logger and each Handler can have a filter associated with it.
-     * The Logger or Handler will call the isLoggable method to check if a
-     * given LogRecord should be published. If isLoggable returns false,
-     * the LogRecord will be discarded.
-     */
-    class DECAF_API Filter {
-    public:
-
-        virtual ~Filter() {}
+namespace decaf
+{
+namespace util
+{
+    namespace logging
+    {
 
         /**
-         * Check if a given log record should be published.
-         * @param record the <code>LogRecord</code> to check.
-         * @return true if the record is loggable.
+         * A Filter can be used to provide fine grain control over what is
+         * logged, beyond the control provided by log levels.
+         *
+         * Each Logger and each Handler can have a filter associated with it.
+         * The Logger or Handler will call the isLoggable method to check if a
+         * given LogRecord should be published. If isLoggable returns false,
+         * the LogRecord will be discarded.
          */
-        virtual bool isLoggable( const LogRecord& record ) const = 0;
+        class DECAF_API Filter
+        {
+        public:
+            virtual ~Filter()
+            {
+            }
 
-    };
+            /**
+             * Check if a given log record should be published.
+             * @param record the <code>LogRecord</code> to check.
+             * @return true if the record is loggable.
+             */
+            virtual bool isLoggable(const LogRecord& record) const = 0;
+        };
 
-}}}
+    }  // namespace logging
+}  // namespace util
+}  // namespace decaf
 
 #endif /*_DECAF_UTIL_LOGGING_FILTER_H_*/

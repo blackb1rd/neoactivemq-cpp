@@ -34,289 +34,432 @@ using namespace decaf::lang;
 using namespace activemq;
 using namespace activemq::util;
 
-    class MarshallingSupportTest : public ::testing::Test {
-    protected:
+class MarshallingSupportTest : public ::testing::Test
+{
+protected:
+    void readTestHelper(unsigned char* input,
+                        int            inputLength,
+                        unsigned char* expect,
+                        int            expectLength);
 
-        void readTestHelper( unsigned char* input, int inputLength,
-                             unsigned char* expect, int expectLength );
-
-        void writeTestHelper( unsigned char* input, int inputLength,
-                              unsigned char* expect, int expectLength );
-    };
-
+    void writeTestHelper(unsigned char* input,
+                         int            inputLength,
+                         unsigned char* expect,
+                         int            expectLength);
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-void MarshallingSupportTest::writeTestHelper( unsigned char* input, int inputLength,
-                                              unsigned char* expect, int expectLength ) {
+void MarshallingSupportTest::writeTestHelper(unsigned char* input,
+                                             int            inputLength,
+                                             unsigned char* expect,
+                                             int            expectLength)
+{
+    std::string testStr((char*)input, inputLength);
+    std::string result = MarshallingSupport::asciiToModifiedUtf8(testStr);
 
-    std::string testStr( (char*)input, inputLength );
-    std::string result = MarshallingSupport::asciiToModifiedUtf8( testStr );
-
-    for( int i = 0; i < expectLength; ++i ) {
+    for (int i = 0; i < expectLength; ++i)
+    {
         ASSERT_TRUE((unsigned char)result[i] == expect[i]);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MarshallingSupportTest::readTestHelper( unsigned char* input, int inputLength,
-                                             unsigned char* expect, int expectLength ) {
+void MarshallingSupportTest::readTestHelper(unsigned char* input,
+                                            int            inputLength,
+                                            unsigned char* expect,
+                                            int            expectLength)
+{
+    std::string inputString((char*)input, inputLength);
+    std::string result = MarshallingSupport::modifiedUtf8ToAscii(inputString);
 
-    std::string inputString( (char*)input, inputLength );
-    std::string result = MarshallingSupport::modifiedUtf8ToAscii( inputString );
-
-    for( std::size_t i = 0; i < result.length(); ++i ) {
+    for (std::size_t i = 0; i < result.length(); ++i)
+    {
         ASSERT_TRUE((unsigned char)result[i] == expect[i]);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(MarshallingSupportTest, testAsciiToModifiedUtf8) {
-
+TEST_F(MarshallingSupportTest, testAsciiToModifiedUtf8)
+{
     // Test data with 1-byte UTF8 encoding.
     {
-        unsigned char input[] = {0x00, 0x0B, 0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x20, 0x57, 0x6F, 0x72, 0x6C, 0x64};
-        unsigned char expect[] = {0xC0, 0x80, 0x0B, 0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x20, 0x57, 0x6F, 0x72, 0x6C, 0x64};
+        unsigned char input[]  = {0x00,
+                                  0x0B,
+                                  0x48,
+                                  0x65,
+                                  0x6C,
+                                  0x6C,
+                                  0x6F,
+                                  0x20,
+                                  0x57,
+                                  0x6F,
+                                  0x72,
+                                  0x6C,
+                                  0x64};
+        unsigned char expect[] = {0xC0,
+                                  0x80,
+                                  0x0B,
+                                  0x48,
+                                  0x65,
+                                  0x6C,
+                                  0x6C,
+                                  0x6F,
+                                  0x20,
+                                  0x57,
+                                  0x6F,
+                                  0x72,
+                                  0x6C,
+                                  0x64};
 
-        writeTestHelper( input, (int) sizeof(input) / (int) sizeof(unsigned char),
-                         expect, (int) sizeof(expect) / (int) sizeof(unsigned char) );
+        writeTestHelper(input,
+                        (int)sizeof(input) / (int)sizeof(unsigned char),
+                        expect,
+                        (int)sizeof(expect) / (int)sizeof(unsigned char));
     }
 
     // Test data with 2-byte UT8 encoding.
     {
-        unsigned char input[] = {0x00, 0xC2, 0xA9, 0xC3, 0xA6 };
-        unsigned char expect[] = {0xC0, 0x80, 0xC3, 0x82, 0xC2, 0xA9, 0xC3, 0x83, 0xC2, 0xA6 };
-        writeTestHelper( input, (int) sizeof(input) / (int) sizeof(unsigned char),
-                         expect, (int) sizeof(expect) / (int) sizeof(unsigned char)  );
+        unsigned char input[] = {0x00, 0xC2, 0xA9, 0xC3, 0xA6};
+        unsigned char expect[] =
+            {0xC0, 0x80, 0xC3, 0x82, 0xC2, 0xA9, 0xC3, 0x83, 0xC2, 0xA6};
+        writeTestHelper(input,
+                        (int)sizeof(input) / (int)sizeof(unsigned char),
+                        expect,
+                        (int)sizeof(expect) / (int)sizeof(unsigned char));
     }
 
     // Test data with 1-byte and 2-byte encoding with embedded NULL's.
     {
-        unsigned char input[] = {0x00, 0x04, 0xC2, 0xA9, 0xC3, 0x00, 0xA6 };
-        unsigned char expect[] = {0xC0, 0x80, 0x04, 0xC3, 0x82, 0xC2, 0xA9, 0xC3, 0x83, 0xC0, 0x80, 0xC2, 0xA6 };
+        unsigned char input[]  = {0x00, 0x04, 0xC2, 0xA9, 0xC3, 0x00, 0xA6};
+        unsigned char expect[] = {0xC0,
+                                  0x80,
+                                  0x04,
+                                  0xC3,
+                                  0x82,
+                                  0xC2,
+                                  0xA9,
+                                  0xC3,
+                                  0x83,
+                                  0xC0,
+                                  0x80,
+                                  0xC2,
+                                  0xA6};
 
-        writeTestHelper( input, (int) sizeof(input) / (int) sizeof(unsigned char),
-                         expect, (int) sizeof(expect) / (int) sizeof(unsigned char) );
+        writeTestHelper(input,
+                        (int)sizeof(input) / (int)sizeof(unsigned char),
+                        expect,
+                        (int)sizeof(expect) / (int)sizeof(unsigned char));
     }
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(MarshallingSupportTest, testModifiedUtf8ToAscii) {
-
+TEST_F(MarshallingSupportTest, testModifiedUtf8ToAscii)
+{
     // Test data with 1-byte UTF8 encoding.
     {
-        unsigned char expect[] = { 0x00, 0x0B, 0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x20, 0x57, 0x6F, 0x72, 0x6C, 0x64 };
-        unsigned char input[] = { 0xC0, 0x80, 0x0B, 0x48, 0x65, 0x6C, 0x6C, 0x6F, 0x20, 0x57, 0x6F, 0x72, 0x6C, 0x64 };
+        unsigned char expect[] = {0x00,
+                                  0x0B,
+                                  0x48,
+                                  0x65,
+                                  0x6C,
+                                  0x6C,
+                                  0x6F,
+                                  0x20,
+                                  0x57,
+                                  0x6F,
+                                  0x72,
+                                  0x6C,
+                                  0x64};
+        unsigned char input[]  = {0xC0,
+                                  0x80,
+                                  0x0B,
+                                  0x48,
+                                  0x65,
+                                  0x6C,
+                                  0x6C,
+                                  0x6F,
+                                  0x20,
+                                  0x57,
+                                  0x6F,
+                                  0x72,
+                                  0x6C,
+                                  0x64};
 
-        readTestHelper( input, (int) sizeof(input) / (int) sizeof(unsigned char),
-                        expect, (int) sizeof(expect)/ (int) sizeof(unsigned char) );
+        readTestHelper(input,
+                       (int)sizeof(input) / (int)sizeof(unsigned char),
+                       expect,
+                       (int)sizeof(expect) / (int)sizeof(unsigned char));
     }
 
     // Test data with 2-byte UT8 encoding.
     {
-        unsigned char expect[] = { 0x00, 0xC2, 0xA9, 0xC3, 0xA6 };
-        unsigned char input[] = { 0xC0, 0x80, 0xC3, 0x82, 0xC2, 0xA9, 0xC3, 0x83, 0xC2, 0xA6 };
-        readTestHelper( input, (int) sizeof(input) / (int) sizeof(unsigned char),
-                        expect, (int) sizeof(expect) / (int) sizeof(unsigned char)  );
+        unsigned char expect[] = {0x00, 0xC2, 0xA9, 0xC3, 0xA6};
+        unsigned char input[] =
+            {0xC0, 0x80, 0xC3, 0x82, 0xC2, 0xA9, 0xC3, 0x83, 0xC2, 0xA6};
+        readTestHelper(input,
+                       (int)sizeof(input) / (int)sizeof(unsigned char),
+                       expect,
+                       (int)sizeof(expect) / (int)sizeof(unsigned char));
     }
 
     // Test data with 1-byte and 2-byte encoding with embedded NULL's.
     {
-        unsigned char expect[] = { 0x00, 0x04, 0xC2, 0xA9, 0xC3, 0x00, 0xA6 };
-        unsigned char input[] = { 0xC0, 0x80, 0x04, 0xC3, 0x82, 0xC2, 0xA9, 0xC3, 0x83, 0xC0, 0x80, 0xC2, 0xA6 };
+        unsigned char expect[] = {0x00, 0x04, 0xC2, 0xA9, 0xC3, 0x00, 0xA6};
+        unsigned char input[]  = {0xC0,
+                                  0x80,
+                                  0x04,
+                                  0xC3,
+                                  0x82,
+                                  0xC2,
+                                  0xA9,
+                                  0xC3,
+                                  0x83,
+                                  0xC0,
+                                  0x80,
+                                  0xC2,
+                                  0xA6};
 
-        readTestHelper( input, (int) sizeof(input) / (int) sizeof(unsigned char),
-                        expect, (int) sizeof(expect) / (int) sizeof(unsigned char) );
+        readTestHelper(input,
+                       (int)sizeof(input) / (int)sizeof(unsigned char),
+                       expect,
+                       (int)sizeof(expect) / (int)sizeof(unsigned char));
     }
 
     // Test with bad UTF-8 encoding, missing 2nd byte of two byte value
     {
-        unsigned char input[] = { 0xC0, 0x80, 0x04, 0xC3, 0x82, 0xC2, 0xC2, 0xC3, 0x83, 0xC0, 0x80, 0xC2, 0xA6 };
-        std::string inputString( (char*)input, (int) sizeof(input) / (int) sizeof(unsigned char) );
+        unsigned char input[] = {0xC0,
+                                 0x80,
+                                 0x04,
+                                 0xC3,
+                                 0x82,
+                                 0xC2,
+                                 0xC2,
+                                 0xC3,
+                                 0x83,
+                                 0xC0,
+                                 0x80,
+                                 0xC2,
+                                 0xA6};
+        std::string   inputString(
+            (char*)input,
+            (int)sizeof(input) / (int)sizeof(unsigned char));
 
-        ASSERT_THROW(MarshallingSupport::modifiedUtf8ToAscii( inputString ), UTFDataFormatException) << ("Should throw a UTFDataFormatException");
+        ASSERT_THROW(MarshallingSupport::modifiedUtf8ToAscii(inputString),
+                     UTFDataFormatException)
+            << ("Should throw a UTFDataFormatException");
     }
 
     // Test with bad UTF-8 encoding, encoded value greater than 255
     {
-        unsigned char input[] = { 0xC0, 0x80, 0x04, 0xC3, 0x82, 0xC2, 0xC2, 0xC3, 0x83, 0xC0, 0x80, 0xC2, 0xA6 };
-        std::string inputString( (char*)input, (int) sizeof(input) / (int) sizeof(unsigned char) );
+        unsigned char input[] = {0xC0,
+                                 0x80,
+                                 0x04,
+                                 0xC3,
+                                 0x82,
+                                 0xC2,
+                                 0xC2,
+                                 0xC3,
+                                 0x83,
+                                 0xC0,
+                                 0x80,
+                                 0xC2,
+                                 0xA6};
+        std::string   inputString(
+            (char*)input,
+            (int)sizeof(input) / (int)sizeof(unsigned char));
 
-        ASSERT_THROW(MarshallingSupport::modifiedUtf8ToAscii( inputString ), UTFDataFormatException) << ("Should throw a UTFDataFormatException");
+        ASSERT_THROW(MarshallingSupport::modifiedUtf8ToAscii(inputString),
+                     UTFDataFormatException)
+            << ("Should throw a UTFDataFormatException");
     }
 
     // Test data with value greater than 255 in 2-byte encoding.
     {
-        unsigned char input[] = { 0xC8, 0xA9, 0xC3, 0xA6};
-        std::string inputString( (char*)input, (int) sizeof(input) / (int) sizeof(unsigned char) );
+        unsigned char input[] = {0xC8, 0xA9, 0xC3, 0xA6};
+        std::string   inputString(
+            (char*)input,
+            (int)sizeof(input) / (int)sizeof(unsigned char));
 
-        ASSERT_THROW(MarshallingSupport::modifiedUtf8ToAscii( inputString ), UTFDataFormatException) << ("Should throw a UTFDataFormatException");
+        ASSERT_THROW(MarshallingSupport::modifiedUtf8ToAscii(inputString),
+                     UTFDataFormatException)
+            << ("Should throw a UTFDataFormatException");
     }
 
     // Test data with value greater than 255 in 3-byte encoding.
     {
-        unsigned char input[] = { 0xE8, 0xA8, 0xA9, 0xC3, 0xA6};
-        std::string inputString( (char*)input, (int) sizeof(input) / (int) sizeof(unsigned char) );
+        unsigned char input[] = {0xE8, 0xA8, 0xA9, 0xC3, 0xA6};
+        std::string   inputString(
+            (char*)input,
+            (int)sizeof(input) / (int)sizeof(unsigned char));
 
-        ASSERT_THROW(MarshallingSupport::modifiedUtf8ToAscii( inputString ), UTFDataFormatException) << ("Should throw a UTFDataFormatException");
+        ASSERT_THROW(MarshallingSupport::modifiedUtf8ToAscii(inputString),
+                     UTFDataFormatException)
+            << ("Should throw a UTFDataFormatException");
     }
 
     // Test with three byte encode that's missing a last byte.
     {
-        unsigned char input[] = { 0x00, 0x00, 0x00, 0x02, 0xE8, 0xA8};
-        std::string inputString( (char*)input, (int) sizeof(input) / (int) sizeof(unsigned char) );
+        unsigned char input[] = {0x00, 0x00, 0x00, 0x02, 0xE8, 0xA8};
+        std::string   inputString(
+            (char*)input,
+            (int)sizeof(input) / (int)sizeof(unsigned char));
 
-        ASSERT_THROW(MarshallingSupport::modifiedUtf8ToAscii( inputString ), UTFDataFormatException) << ("Should throw a UTFDataFormatException");
+        ASSERT_THROW(MarshallingSupport::modifiedUtf8ToAscii(inputString),
+                     UTFDataFormatException)
+            << ("Should throw a UTFDataFormatException");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(MarshallingSupportTest, testWriteString) {
-
+TEST_F(MarshallingSupportTest, testWriteString)
+{
     {
         ByteArrayOutputStream baos;
-        ByteArrayInputStream bais;
-        DataOutputStream writer( &baos );
-        DataInputStream dataIn( &bais );
+        ByteArrayInputStream  bais;
+        DataOutputStream      writer(&baos);
+        DataInputStream       dataIn(&bais);
 
-        MarshallingSupport::writeString( writer, "" );
+        MarshallingSupport::writeString(writer, "");
 
         std::pair<const unsigned char*, int> array = baos.toByteArray();
-        bais.setByteArray( array.first, array.second );
+        bais.setByteArray(array.first, array.second);
 
         ASSERT_TRUE(dataIn.read() == PrimitiveValueNode::STRING_TYPE);
         ASSERT_TRUE(dataIn.readShort() == 0);
 
-        delete [] array.first;
+        delete[] array.first;
     }
     {
         ByteArrayOutputStream baos;
-        ByteArrayInputStream bais;
-        DataOutputStream writer( &baos );
-        DataInputStream dataIn( &bais );
+        ByteArrayInputStream  bais;
+        DataOutputStream      writer(&baos);
+        DataInputStream       dataIn(&bais);
 
-        MarshallingSupport::writeString( writer, "Hello World" );
+        MarshallingSupport::writeString(writer, "Hello World");
 
         std::pair<const unsigned char*, int> array = baos.toByteArray();
-        bais.setByteArray( array.first, array.second );
+        bais.setByteArray(array.first, array.second);
 
         ASSERT_TRUE(dataIn.read() == PrimitiveValueNode::STRING_TYPE);
         ASSERT_TRUE(dataIn.readShort() == 11);
 
-        delete [] array.first;
+        delete[] array.first;
     }
     {
         ByteArrayOutputStream baos;
-        ByteArrayInputStream bais;
-        DataOutputStream writer( &baos );
-        DataInputStream dataIn( &bais );
+        ByteArrayInputStream  bais;
+        DataOutputStream      writer(&baos);
+        DataInputStream       dataIn(&bais);
 
-        MarshallingSupport::writeString( writer, std::string( Short::MAX_VALUE, 'A' ) );
+        MarshallingSupport::writeString(writer,
+                                        std::string(Short::MAX_VALUE, 'A'));
 
         std::pair<const unsigned char*, int> array = baos.toByteArray();
-        bais.setByteArray( array.first, array.second );
+        bais.setByteArray(array.first, array.second);
 
         ASSERT_TRUE(dataIn.read() == PrimitiveValueNode::BIG_STRING_TYPE);
         ASSERT_TRUE(dataIn.readInt() == Short::MAX_VALUE);
 
-        delete [] array.first;
+        delete[] array.first;
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(MarshallingSupportTest, testWriteString16) {
-
+TEST_F(MarshallingSupportTest, testWriteString16)
+{
     {
         ByteArrayOutputStream baos;
-        ByteArrayInputStream bais;
-        DataOutputStream writer( &baos );
-        DataInputStream dataIn( &bais );
+        ByteArrayInputStream  bais;
+        DataOutputStream      writer(&baos);
+        DataInputStream       dataIn(&bais);
 
-        MarshallingSupport::writeString16( writer, "Hello World" );
+        MarshallingSupport::writeString16(writer, "Hello World");
 
         std::pair<const unsigned char*, int> array = baos.toByteArray();
-        bais.setByteArray( array.first, array.second );
+        bais.setByteArray(array.first, array.second);
 
         ASSERT_TRUE(dataIn.readShort() == 11);
 
-        delete [] array.first;
+        delete[] array.first;
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(MarshallingSupportTest, testWriteString32) {
-
+TEST_F(MarshallingSupportTest, testWriteString32)
+{
     {
         ByteArrayOutputStream baos;
-        ByteArrayInputStream bais;
-        DataOutputStream writer( &baos );
-        DataInputStream dataIn( &bais );
+        ByteArrayInputStream  bais;
+        DataOutputStream      writer(&baos);
+        DataInputStream       dataIn(&bais);
 
-        MarshallingSupport::writeString32( writer, "Hello World" );
+        MarshallingSupport::writeString32(writer, "Hello World");
 
         std::pair<const unsigned char*, int> array = baos.toByteArray();
-        bais.setByteArray( array.first, array.second );
+        bais.setByteArray(array.first, array.second);
 
         ASSERT_TRUE(dataIn.readInt() == 11);
 
-        delete [] array.first;
+        delete[] array.first;
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(MarshallingSupportTest, testReadString16) {
-
-    ByteArrayInputStream bytesIn;
+TEST_F(MarshallingSupportTest, testReadString16)
+{
+    ByteArrayInputStream  bytesIn;
     ByteArrayOutputStream bytesOut;
 
-    DataInputStream dataIn( &bytesIn );
-    DataOutputStream dataOut( &bytesOut );
+    DataInputStream  dataIn(&bytesIn);
+    DataOutputStream dataOut(&bytesOut);
 
     string testStr = "This is a test string for Openwire";
 
-    MarshallingSupport::writeString( dataOut, testStr );
+    MarshallingSupport::writeString(dataOut, testStr);
 
     // Move the output back to the input.
     std::pair<const unsigned char*, int> array = bytesOut.toByteArray();
-    bytesIn.setByteArray( array.first, array.second );
+    bytesIn.setByteArray(array.first, array.second);
 
     string resultStr = "";
-    int type = dataIn.read();
+    int    type      = dataIn.read();
 
     ASSERT_TRUE(type == PrimitiveValueNode::STRING_TYPE);
 
-    ASSERT_NO_THROW(resultStr = MarshallingSupport::readString16( dataIn )) << ("Should not have thrown a message for valid String type");
+    ASSERT_NO_THROW(resultStr = MarshallingSupport::readString16(dataIn))
+        << ("Should not have thrown a message for valid String type");
 
     ASSERT_TRUE(testStr == resultStr);
 
-    delete [] array.first;
+    delete[] array.first;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(MarshallingSupportTest, testReadString32) {
-
-    ByteArrayInputStream bytesIn;
+TEST_F(MarshallingSupportTest, testReadString32)
+{
+    ByteArrayInputStream  bytesIn;
     ByteArrayOutputStream bytesOut;
 
-    DataInputStream dataIn( &bytesIn );
-    DataOutputStream dataOut( &bytesOut );
+    DataInputStream  dataIn(&bytesIn);
+    DataOutputStream dataOut(&bytesOut);
 
-    string testStr( (std::size_t)Short::MAX_VALUE, 'a' );
+    string testStr((std::size_t)Short::MAX_VALUE, 'a');
 
-    MarshallingSupport::writeString( dataOut, testStr );
+    MarshallingSupport::writeString(dataOut, testStr);
 
     // Move the output back to the input.
     std::pair<const unsigned char*, int> array = bytesOut.toByteArray();
-    bytesIn.setByteArray( array.first, array.second );
+    bytesIn.setByteArray(array.first, array.second);
 
     string resultStr = "";
-    int type = dataIn.read();
+    int    type      = dataIn.read();
 
     ASSERT_TRUE(type == PrimitiveValueNode::BIG_STRING_TYPE);
 
-    ASSERT_NO_THROW(resultStr = MarshallingSupport::readString32( dataIn )) << ("Should not have thrown a message for valid Big String type");
+    ASSERT_NO_THROW(resultStr = MarshallingSupport::readString32(dataIn))
+        << ("Should not have thrown a message for valid Big String type");
 
     ASSERT_TRUE(testStr == resultStr);
 
-    delete [] array.first;
+    delete[] array.first;
 }

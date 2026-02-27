@@ -17,8 +17,8 @@
 
 #include <gtest/gtest.h>
 
-#include <activemq/state/ProducerState.h>
 #include <activemq/commands/ProducerInfo.h>
+#include <activemq/state/ProducerState.h>
 #include <decaf/lang/Pointer.h>
 
 using namespace std;
@@ -27,18 +27,21 @@ using namespace activemq::state;
 using namespace activemq::commands;
 using namespace decaf::lang;
 
-class ProducerStateTest : public ::testing::Test {};
+class ProducerStateTest : public ::testing::Test
+{
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ProducerStateTest, test) {
-    Pointer<ProducerId> id( new ProducerId );
-    id->setConnectionId( "CONNECTION" );
-    id->setSessionId( 42 );
-    id->setValue( 4096 );
+TEST_F(ProducerStateTest, test)
+{
+    Pointer<ProducerId> id(new ProducerId);
+    id->setConnectionId("CONNECTION");
+    id->setSessionId(42);
+    id->setValue(4096);
 
-    Pointer<ProducerInfo> info( new ProducerInfo() );
-    info->setProducerId( id );
-    ProducerState state( info );
+    Pointer<ProducerInfo> info(new ProducerInfo());
+    info->setProducerId(id);
+    ProducerState state(info);
 
     ASSERT_TRUE(state.toString() != "NULL");
     ASSERT_TRUE(info == state.getInfo());

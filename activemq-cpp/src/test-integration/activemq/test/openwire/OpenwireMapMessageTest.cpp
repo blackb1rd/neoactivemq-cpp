@@ -17,10 +17,10 @@
 
 #include <activemq/test/MapMessageTest.h>
 
-#include <activemq/util/CMSListener.h>
-#include <activemq/exceptions/ActiveMQException.h>
-#include <activemq/core/ActiveMQConnection.h>
 #include <activemq/commands/ActiveMQMapMessage.h>
+#include <activemq/core/ActiveMQConnection.h>
+#include <activemq/exceptions/ActiveMQException.h>
+#include <activemq/util/CMSListener.h>
 
 using namespace std;
 using namespace cms;
@@ -34,26 +34,34 @@ using namespace decaf;
 using namespace decaf::lang;
 using namespace decaf::util;
 
-namespace activemq {
-namespace test {
-namespace openwire {
+namespace activemq
+{
+namespace test
+{
+    namespace openwire
+    {
 
-    class OpenwireMapMessageTest : public MapMessageTest {
-    public:
-        std::string getBrokerURL() const override {
-            return activemq::util::IntegrationCommon::getInstance().getOpenwireURL();
-        }
-    };
+        class OpenwireMapMessageTest : public MapMessageTest
+        {
+        public:
+            std::string getBrokerURL() const override
+            {
+                return activemq::util::IntegrationCommon::getInstance()
+                    .getOpenwireURL();
+            }
+        };
 
-}}}
+    }  // namespace openwire
+}  // namespace test
+}  // namespace activemq
 
 using activemq::test::openwire::OpenwireMapMessageTest;
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(OpenwireMapMessageTest, testEmptyMapSendReceive) {
-
+TEST_F(OpenwireMapMessageTest, testEmptyMapSendReceive)
+{
     // Create CMS Object for Comms
-    cms::Session* session(cmsProvider->getSession());
+    cms::Session*         session(cmsProvider->getSession());
     cms::MessageConsumer* consumer = cmsProvider->getConsumer();
     cms::MessageProducer* producer = cmsProvider->getProducer();
     producer->setDeliveryMode(DeliveryMode::NON_PERSISTENT);
@@ -72,10 +80,10 @@ TEST_F(OpenwireMapMessageTest, testEmptyMapSendReceive) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(OpenwireMapMessageTest, testMapWithEmptyStringValue) {
-
+TEST_F(OpenwireMapMessageTest, testMapWithEmptyStringValue)
+{
     // Create CMS Object for Comms
-    cms::Session* session(cmsProvider->getSession());
+    cms::Session*         session(cmsProvider->getSession());
     cms::MessageConsumer* consumer = cmsProvider->getConsumer();
     cms::MessageProducer* producer = cmsProvider->getProducer();
     producer->setDeliveryMode(DeliveryMode::NON_PERSISTENT);
@@ -101,10 +109,10 @@ TEST_F(OpenwireMapMessageTest, testMapWithEmptyStringValue) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(OpenwireMapMessageTest, testMapSetEmptyBytesVector) {
-
+TEST_F(OpenwireMapMessageTest, testMapSetEmptyBytesVector)
+{
     // Create CMS Object for Comms
-    cms::Session* session(cmsProvider->getSession());
+    cms::Session*         session(cmsProvider->getSession());
     cms::MessageConsumer* consumer = cmsProvider->getConsumer();
     cms::MessageProducer* producer = cmsProvider->getProducer();
     producer->setDeliveryMode(DeliveryMode::NON_PERSISTENT);
@@ -128,10 +136,10 @@ TEST_F(OpenwireMapMessageTest, testMapSetEmptyBytesVector) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(OpenwireMapMessageTest, testMapWithSingleCharEntry) {
-
+TEST_F(OpenwireMapMessageTest, testMapWithSingleCharEntry)
+{
     // Create CMS Object for Comms
-    cms::Session* session(cmsProvider->getSession());
+    cms::Session*         session(cmsProvider->getSession());
     cms::MessageConsumer* consumer = cmsProvider->getConsumer();
     cms::MessageProducer* producer = cmsProvider->getProducer();
     producer->setDeliveryMode(DeliveryMode::NON_PERSISTENT);
@@ -154,10 +162,10 @@ TEST_F(OpenwireMapMessageTest, testMapWithSingleCharEntry) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(OpenwireMapMessageTest, testMapWithCharAndStringEntry) {
-
+TEST_F(OpenwireMapMessageTest, testMapWithCharAndStringEntry)
+{
     // Create CMS Object for Comms
-    cms::Session* session(cmsProvider->getSession());
+    cms::Session*         session(cmsProvider->getSession());
     cms::MessageConsumer* consumer = cmsProvider->getConsumer();
     cms::MessageProducer* producer = cmsProvider->getProducer();
     producer->setDeliveryMode(DeliveryMode::NON_PERSISTENT);

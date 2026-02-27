@@ -18,37 +18,44 @@
 #ifndef _DECAF_UTIL_SET_H_
 #define _DECAF_UTIL_SET_H_
 
-#include <decaf/util/NoSuchElementException.h>
-#include <decaf/util/concurrent/Synchronizable.h>
-#include <decaf/util/concurrent/Mutex.h>
-#include <decaf/util/Iterator.h>
 #include <decaf/util/AbstractCollection.h>
+#include <decaf/util/Iterator.h>
+#include <decaf/util/NoSuchElementException.h>
+#include <decaf/util/concurrent/Mutex.h>
+#include <decaf/util/concurrent/Synchronizable.h>
 
-namespace decaf {
-namespace util {
+namespace decaf
+{
+namespace util
+{
 
     /**
-     * A collection that contains no duplicate elements. More formally, sets contain no
-     * pair of elements e1 and e2 such that e1 == e2, and at most one null element.
-     * As implied by its name, this interface models the mathematical set abstraction.
+     * A collection that contains no duplicate elements. More formally, sets
+     * contain no pair of elements e1 and e2 such that e1 == e2, and at most one
+     * null element. As implied by its name, this interface models the
+     * mathematical set abstraction.
      *
-     * The additional stipulation on constructors is, not surprisingly, that all constructors
-     * must create a set that contains no duplicate elements (as defined above).
+     * The additional stipulation on constructors is, not surprisingly, that all
+     * constructors must create a set that contains no duplicate elements (as
+     * defined above).
      *
-     * Note: Great care must be exercised if mutable objects are used as set elements.
-     * The behavior of a set is not specified if the value of an object is changed in a
-     * manner that affects equals comparisons while the object is an element in the set.
+     * Note: Great care must be exercised if mutable objects are used as set
+     * elements. The behavior of a set is not specified if the value of an
+     * object is changed in a manner that affects equals comparisons while the
+     * object is an element in the set.
      *
      * @since 1.0
      */
     template <typename E>
-    class Set : public virtual decaf::util::Collection<E> {
+    class Set : public virtual decaf::util::Collection<E>
+    {
     public:
-
-        virtual ~Set() {}
-
+        virtual ~Set()
+        {
+        }
     };
 
-}}
+}  // namespace util
+}  // namespace decaf
 
 #endif /*_DECAF_UTIL_SET_H_*/

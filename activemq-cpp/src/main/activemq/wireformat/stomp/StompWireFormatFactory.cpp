@@ -26,10 +26,11 @@ using namespace activemq::wireformat::stomp;
 using namespace activemq::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<WireFormat> StompWireFormatFactory::createWireFormat(const decaf::util::Properties& properties AMQCPP_UNUSED) {
-
-    try {
-
+Pointer<WireFormat> StompWireFormatFactory::createWireFormat(
+    const decaf::util::Properties& properties AMQCPP_UNUSED)
+{
+    try
+    {
         Pointer<StompWireFormat> wireFormat(new StompWireFormat());
 
         wireFormat->setTopicPrefix(
@@ -37,9 +38,11 @@ Pointer<WireFormat> StompWireFormatFactory::createWireFormat(const decaf::util::
         wireFormat->setQueuePrefix(
             properties.getProperty("wireFormat.queuePrefix", "/queue/"));
         wireFormat->setTempTopicPrefix(
-            properties.getProperty("wireFormat.tempTopicPrefix", "/temp-topic/"));
+            properties.getProperty("wireFormat.tempTopicPrefix",
+                                   "/temp-topic/"));
         wireFormat->setTempQueuePrefix(
-            properties.getProperty("wireFormat.tempQueuePrefix", "/temp-queue/"));
+            properties.getProperty("wireFormat.tempQueuePrefix",
+                                   "/temp-queue/"));
 
         return wireFormat;
     }

@@ -23,57 +23,71 @@ using namespace activemq;
 using namespace activemq::commands;
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQTempTopic::ActiveMQTempTopic() : ActiveMQTempDestination() {
+ActiveMQTempTopic::ActiveMQTempTopic()
+    : ActiveMQTempDestination()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQTempTopic::ActiveMQTempTopic(const std::string& name) : ActiveMQTempDestination(name) {
+ActiveMQTempTopic::ActiveMQTempTopic(const std::string& name)
+    : ActiveMQTempDestination(name)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQTempTopic::~ActiveMQTempTopic() throw () {
+ActiveMQTempTopic::~ActiveMQTempTopic() throw()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-unsigned char ActiveMQTempTopic::getDataStructureType() const {
+unsigned char ActiveMQTempTopic::getDataStructureType() const
+{
     return ActiveMQTempTopic::ID_ACTIVEMQTEMPTOPIC;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQTempTopic* ActiveMQTempTopic::cloneDataStructure() const {
+ActiveMQTempTopic* ActiveMQTempTopic::cloneDataStructure() const
+{
     std::unique_ptr<ActiveMQTempTopic> copy(new ActiveMQTempTopic());
     copy->copyDataStructure(this);
-    copy->connection = this->connection;
+    copy->connection   = this->connection;
     copy->connectionId = this->connectionId;
-    copy->sequenceId = this->sequenceId;
+    copy->sequenceId   = this->sequenceId;
 
     return copy.release();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQTempTopic::copyDataStructure(const DataStructure* src) {
+void ActiveMQTempTopic::copyDataStructure(const DataStructure* src)
+{
     ActiveMQTempDestination::copyDataStructure(src);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string ActiveMQTempTopic::toString() const {
+std::string ActiveMQTempTopic::toString() const
+{
     return ActiveMQDestination::toString();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool ActiveMQTempTopic::equals(const DataStructure* value) const {
+bool ActiveMQTempTopic::equals(const DataStructure* value) const
+{
     return ActiveMQDestination::equals(value);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool ActiveMQTempTopic::equals(const cms::Destination& value) const {
-    const ActiveMQDestination* dest = dynamic_cast<const ActiveMQDestination*> (&value);
+bool ActiveMQTempTopic::equals(const cms::Destination& value) const
+{
+    const ActiveMQDestination* dest =
+        dynamic_cast<const ActiveMQDestination*>(&value);
     return ActiveMQDestination::equals(dest);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQTempTopic::destroy() {
-    try {
+void ActiveMQTempTopic::destroy()
+{
+    try
+    {
         close();
     }
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()

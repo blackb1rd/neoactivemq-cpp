@@ -23,22 +23,33 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-ProviderException::ProviderException() : RuntimeException() {
+ProviderException::ProviderException()
+    : RuntimeException()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ProviderException::ProviderException(const Exception& ex) : RuntimeException() {
-    *(Exception*) this = ex;
+ProviderException::ProviderException(const Exception& ex)
+    : RuntimeException()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ProviderException::ProviderException(const ProviderException& ex) : RuntimeException() {
-    *(Exception*) this = ex;
+ProviderException::ProviderException(const ProviderException& ex)
+    : RuntimeException()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ProviderException::ProviderException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...) : RuntimeException(cause) {
-
+ProviderException::ProviderException(const char*           file,
+                                     const int             lineNumber,
+                                     const std::exception* cause,
+                                     const char*           msg,
+                                     ...)
+    : RuntimeException(cause)
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -48,12 +59,18 @@ ProviderException::ProviderException(const char* file, const int lineNumber, con
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ProviderException::ProviderException(const std::exception* cause) : RuntimeException(cause) {
+ProviderException::ProviderException(const std::exception* cause)
+    : RuntimeException(cause)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ProviderException::ProviderException(const char* file, const int lineNumber, const char* msg, ...) : RuntimeException() {
-
+ProviderException::ProviderException(const char* file,
+                                     const int   lineNumber,
+                                     const char* msg,
+                                     ...)
+    : RuntimeException()
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -63,5 +80,6 @@ ProviderException::ProviderException(const char* file, const int lineNumber, con
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ProviderException::~ProviderException() throw () {
+ProviderException::~ProviderException() throw()
+{
 }

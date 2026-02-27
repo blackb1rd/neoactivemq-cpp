@@ -15,22 +15,31 @@
  * limitations under the License.
  */
 
-#include <activemq/util/IntegrationCommon.h>
 #include <activemq/test/AsyncSenderTest.h>
+#include <activemq/util/IntegrationCommon.h>
 
-namespace activemq{
-namespace test{
-namespace stomp{
-    class StompAsyncSenderTest : public AsyncSenderTest {
-public:
-        StompAsyncSenderTest();
-        virtual ~StompAsyncSenderTest();
-        std::string getBrokerURL() const override {
-            return activemq::util::IntegrationCommon::getInstance().getStompURL() +
-                   "&connection.useAsyncSend=true";
-        }
-    };
-}}}
+namespace activemq
+{
+namespace test
+{
+    namespace stomp
+    {
+        class StompAsyncSenderTest : public AsyncSenderTest
+        {
+        public:
+            StompAsyncSenderTest();
+            virtual ~StompAsyncSenderTest();
+
+            std::string getBrokerURL() const override
+            {
+                return activemq::util::IntegrationCommon::getInstance()
+                           .getStompURL() +
+                       "&connection.useAsyncSend=true";
+            }
+        };
+    }  // namespace stomp
+}  // namespace test
+}  // namespace activemq
 
 using namespace activemq::test::stomp;
 using namespace activemq::test;
@@ -39,13 +48,18 @@ using namespace std;
 using namespace cms;
 
 ////////////////////////////////////////////////////////////////////////////////
-StompAsyncSenderTest::StompAsyncSenderTest() {
+StompAsyncSenderTest::StompAsyncSenderTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-StompAsyncSenderTest::~StompAsyncSenderTest() {
+StompAsyncSenderTest::~StompAsyncSenderTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Test registration
-TEST_F(StompAsyncSenderTest, DISABLED_testAsyncSends) { testAsyncSends(); }
+TEST_F(StompAsyncSenderTest, DISABLED_testAsyncSends)
+{
+    testAsyncSends();
+}

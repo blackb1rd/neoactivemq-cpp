@@ -22,68 +22,83 @@
 
 #include <decaf/net/ssl/SSLServerSocketFactory.h>
 
-namespace decaf {
-namespace internal {
-namespace net {
-namespace ssl {
-namespace openssl {
+namespace decaf
+{
+namespace internal
+{
+    namespace net
+    {
+        namespace ssl
+        {
+            namespace openssl
+            {
 
-    class OpenSSLContextSpi;
+                class OpenSSLContextSpi;
 
-    /**
-     * SSLServerSocketFactory that creates Server Sockets that use OpenSSL.
-     *
-     * @since 1.0
-     */
-    class DECAF_API OpenSSLServerSocketFactory : public decaf::net::ssl::SSLServerSocketFactory {
-    private:
+                /**
+                 * SSLServerSocketFactory that creates Server Sockets that use
+                 * OpenSSL.
+                 *
+                 * @since 1.0
+                 */
+                class DECAF_API OpenSSLServerSocketFactory
+                    : public decaf::net::ssl::SSLServerSocketFactory
+                {
+                private:
+                    OpenSSLContextSpi* parent;
 
-        OpenSSLContextSpi* parent;
+                private:
+                    OpenSSLServerSocketFactory(
+                        const OpenSSLServerSocketFactory&);
+                    OpenSSLServerSocketFactory& operator=(
+                        const OpenSSLServerSocketFactory&);
 
-    private:
+                public:
+                    OpenSSLServerSocketFactory(OpenSSLContextSpi* parent);
 
-        OpenSSLServerSocketFactory( const OpenSSLServerSocketFactory& );
-        OpenSSLServerSocketFactory& operator= ( const OpenSSLServerSocketFactory& );
+                    virtual ~OpenSSLServerSocketFactory();
 
-    public:
+                    /**
+                     * {@inheritDoc}
+                     */
+                    virtual decaf::net::ServerSocket* createServerSocket();
 
-        OpenSSLServerSocketFactory( OpenSSLContextSpi* parent );
+                    /**
+                     * {@inheritDoc}
+                     */
+                    virtual decaf::net::ServerSocket* createServerSocket(
+                        int port);
 
-        virtual ~OpenSSLServerSocketFactory();
+                    /**
+                     * {@inheritDoc}
+                     */
+                    virtual decaf::net::ServerSocket* createServerSocket(
+                        int port,
+                        int backlog);
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual decaf::net::ServerSocket* createServerSocket();
+                    /**
+                     * {@inheritDoc}
+                     */
+                    virtual decaf::net::ServerSocket* createServerSocket(
+                        int                            port,
+                        int                            backlog,
+                        const decaf::net::InetAddress* address);
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual decaf::net::ServerSocket* createServerSocket( int port );
+                    /**
+                     * {@inheritDoc}
+                     */
+                    virtual std::vector<std::string> getDefaultCipherSuites();
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual decaf::net::ServerSocket* createServerSocket( int port, int backlog );
+                    /**
+                     * {@inheritDoc}
+                     */
+                    virtual std::vector<std::string> getSupportedCipherSuites();
+                };
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual decaf::net::ServerSocket* createServerSocket( int port, int backlog,
-                                                              const decaf::net::InetAddress* address );
-
-        /**
-         * {@inheritDoc}
-         */
-        virtual std::vector<std::string> getDefaultCipherSuites();
-
-        /**
-         * {@inheritDoc}
-         */
-        virtual std::vector<std::string> getSupportedCipherSuites();
-
-    };
-
-}}}}}
+            }  // namespace openssl
+        }  // namespace ssl
+    }  // namespace net
+}  // namespace internal
+}  // namespace decaf
 
 #endif /* _DECAF_INTERNAL_NET_SSL_OPENSSL_OPENSSLSERVERSOCKETFACTORY_H_ */

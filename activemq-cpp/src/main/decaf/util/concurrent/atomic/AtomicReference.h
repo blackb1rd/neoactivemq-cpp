@@ -18,89 +18,114 @@
 #ifndef _DECAF_UTIL_CONCURRENT_ATOMIC_ATOMICREFERENCE_H_
 #define _DECAF_UTIL_CONCURRENT_ATOMIC_ATOMICREFERENCE_H_
 
-#include <decaf/util/Config.h>
-#include <decaf/lang/Long.h>
 #include <decaf/internal/util/concurrent/Atomics.h>
+#include <decaf/lang/Long.h>
+#include <decaf/util/Config.h>
 
-namespace decaf {
-namespace util {
-namespace concurrent {
-namespace atomic {
+namespace decaf
+{
+namespace util
+{
+    namespace concurrent
+    {
+        namespace atomic
+        {
 
-    /**
-     * An Pointer reference that may be updated atomically.
-     */
-    template< typename T >
-    class AtomicReference {
-    private:
+            /**
+             * An Pointer reference that may be updated atomically.
+             */
+            template <typename T>
+            class AtomicReference
+            {
+            private:
+                volatile void* value;
 
-        volatile void* value;
+            private:
+                AtomicReference(const AtomicReference&);
+                AtomicReference& operator=(const AtomicReference&);
 
-    private:
+            public:
+                AtomicReference()
+                    : value(NULL)
+                {
+                }
 
-        AtomicReference(const AtomicReference&);
-        AtomicReference& operator= (const AtomicReference&);
+                AtomicReference(T* value)
+                    : value((void*)value)
+                {
+                }
 
-    public:
+                virtual ~AtomicReference()
+                {
+                }
 
-        AtomicReference() : value( NULL ) {}
-        AtomicReference(T* value) : value((void*)value) {}
+                /**
+                 * Gets the Current Value.
+                 * @return the current value of this Reference.
+                 */
+                T* get() const
+                {
+                    return (T*)value;
+                }
 
-        virtual ~AtomicReference() {}
+                /**
+                 * Sets the Current value of this Reference.
+                 *
+                 * @param newValue
+                 *        The new Value of this Reference.
+                 */
+                void set(T* newValue)
+                {
+                    internal::util::concurrent::Atomics::getAndSet(
+                        &this->value,
+                        (void*)newValue);
+                }
 
-        /**
-         * Gets the Current Value.
-         * @return the current value of this Reference.
-         */
-        T* get() const {
-            return (T*)value;
-        }
+                /**
+                 * Atomically sets the value to the given updated value if the
+                 * current value == the expected value.
+                 *
+                 * @param expect - the expected value
+                 * @param update - the new value
+                 *
+                 * @return true if successful. False return indicates that the
+                 * actual value was not equal to the expected value.
+                 */
+                bool compareAndSet(T* expect, T* update)
+                {
+                    return internal::util::concurrent::Atomics::compareAndSet(
+                        &this->value,
+                        (void*)expect,
+                        (void*)update);
+                }
 
-        /**
-         * Sets the Current value of this Reference.
-         *
-         * @param newValue
-         *        The new Value of this Reference.
-         */
-        void set( T* newValue ) {
-            internal::util::concurrent::Atomics::getAndSet(&this->value, (void*)newValue);
-        }
+                /**
+                 * Atomically sets to the given value and returns the old value.
+                 *
+                 * @param newValue- the new value
+                 *
+                 * @return the previous value.
+                 */
+                T* getAndSet(T* newValue)
+                {
+                    return (T*)internal::util::concurrent::Atomics::getAndSet(
+                        &this->value,
+                        (void*)newValue);
+                }
 
-        /**
-         * Atomically sets the value to the given updated value if the current value ==
-         * the expected value.
-         *
-         * @param expect - the expected value
-         * @param update - the new value
-         *
-         * @return true if successful. False return indicates that the actual value was
-         *         not equal to the expected value.
-         */
-        bool compareAndSet( T* expect, T* update ) {
-            return internal::util::concurrent::Atomics::compareAndSet(&this->value, (void*)expect, (void*)update);
-        }
+                /**
+                 * Returns the String representation of the current value.
+                 * @return string representation of the current value.
+                 */
+                std::string toString() const
+                {
+                    return decaf::lang::Long::toString((long long)this->value);
+                }
+            };
 
-        /**
-         * Atomically sets to the given value and returns the old value.
-         *
-         * @param newValue- the new value
-         *
-         * @return the previous value.
-         */
-        T* getAndSet( T* newValue ) {
-            return (T*)internal::util::concurrent::Atomics::getAndSet(&this->value, (void*)newValue);
-        }
-
-        /**
-         * Returns the String representation of the current value.
-         * @return string representation of the current value.
-         */
-        std::string toString() const {
-            return decaf::lang::Long::toString( (long long)this->value );
-        }
-
-    };
-
-}}}}
+        }  // namespace atomic
+    }  // namespace concurrent
+}  // namespace util
+}  // namespace decaf
 
 #endif /*_DECAF_UTIL_CONCURRENT_ATOMIC_ATOMICREFERENCE_H_*/

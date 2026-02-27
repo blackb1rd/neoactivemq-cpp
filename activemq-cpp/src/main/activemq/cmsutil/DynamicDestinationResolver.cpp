@@ -25,16 +25,17 @@ using namespace cms;
 using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
-cms::Topic* DynamicDestinationResolver::SessionResolver::getTopic(const std::string& topicName) {
-
+cms::Topic* DynamicDestinationResolver::SessionResolver::getTopic(
+    const std::string& topicName)
+{
     cms::Topic* topic = NULL;
-    try {
-
+    try
+    {
         // See if we already have a topic with this name.
         topic = topicMap.get(topicName);
-
-    } catch (decaf::util::NoSuchElementException& ex) {
-
+    }
+    catch (decaf::util::NoSuchElementException& ex)
+    {
         // Create a new topic.
         topic = session->createTopic(topicName);
 
@@ -48,16 +49,17 @@ cms::Topic* DynamicDestinationResolver::SessionResolver::getTopic(const std::str
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-cms::Queue* DynamicDestinationResolver::SessionResolver::getQueue(const std::string& queueName) {
-
+cms::Queue* DynamicDestinationResolver::SessionResolver::getQueue(
+    const std::string& queueName)
+{
     cms::Queue* queue = NULL;
-    try {
-
+    try
+    {
         // See if we already have a queue with this name.
         queue = queueMap.get(queueName);
-
-    } catch (decaf::util::NoSuchElementException& ex) {
-
+    }
+    catch (decaf::util::NoSuchElementException& ex)
+    {
         // Create a new queue.
         queue = session->createQueue(queueName);
 
@@ -71,21 +73,27 @@ cms::Queue* DynamicDestinationResolver::SessionResolver::getQueue(const std::str
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DynamicDestinationResolver::DynamicDestinationResolver() :
-    DestinationResolver(), sessionResolverMap(), resourceLifecycleManager(NULL) {
+DynamicDestinationResolver::DynamicDestinationResolver()
+    : DestinationResolver(),
+      sessionResolverMap(),
+      resourceLifecycleManager(NULL)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DynamicDestinationResolver::~DynamicDestinationResolver() {
+DynamicDestinationResolver::~DynamicDestinationResolver()
+{
     destroy();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DynamicDestinationResolver::destroy() {
-
+void DynamicDestinationResolver::destroy()
+{
     // Destroy the session resolvers.
-    std::unique_ptr<Iterator<SessionResolver*> > sessionResolvers(sessionResolverMap.values().iterator());
-    while (sessionResolvers->hasNext()) {
+    std::unique_ptr<Iterator<SessionResolver*>> sessionResolvers(
+        sessionResolverMap.values().iterator());
+    while (sessionResolvers->hasNext())
+    {
         delete sessionResolvers->next();
     }
 
@@ -93,25 +101,35 @@ void DynamicDestinationResolver::destroy() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-cms::Destination* DynamicDestinationResolver::resolveDestinationName(cms::Session* session, const std::string& destName, bool pubSubDomain) {
-
-    if (destName == "") {
+cms::Destination* DynamicDestinationResolver::resolveDestinationName(
+    cms::Session*      session,
+    const std::string& destName,
+    bool               pubSubDomain)
+{
+    if (destName == "")
+    {
         throw CMSException("destination name is invalid", NULL);
     }
 
     // Get the resolver for this session.
     SessionResolver* resolver = NULL;
-    try {
+    try
+    {
         resolver = sessionResolverMap.get(session);
-    } catch (decaf::util::NoSuchElementException& ex) {
+    }
+    catch (decaf::util::NoSuchElementException& ex)
+    {
         resolver = new SessionResolver(session, resourceLifecycleManager);
         sessionResolverMap.put(session, resolver);
     }
 
     // Return the appropriate destination.
-    if (pubSubDomain) {
+    if (pubSubDomain)
+    {
         return resolver->getTopic(destName);
-    } else {
+    }
+    else
+    {
         return resolver->getQueue(destName);
     }
 }

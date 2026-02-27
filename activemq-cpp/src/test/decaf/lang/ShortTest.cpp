@@ -15,29 +15,28 @@
  * limitations under the License.
  */
 
-#include <gtest/gtest.h>
 #include <decaf/lang/Short.h>
+#include <gtest/gtest.h>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::lang;
 
-    class ShortTest : public ::testing::Test
-    {
+class ShortTest : public ::testing::Test
+{
 public:
-
-        ShortTest();
-
-    };
+    ShortTest();
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-ShortTest::ShortTest() {
+ShortTest::ShortTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ShortTest, test) {
-
-    Short short1( 65 );
+TEST_F(ShortTest, test)
+{
+    Short short1(65);
 
     ASSERT_TRUE(short1.byteValue() == 65);
     ASSERT_TRUE(short1.shortValue() == 65);
@@ -47,42 +46,41 @@ TEST_F(ShortTest, test) {
     ASSERT_TRUE(short1.doubleValue() == 65.0);
 
     ASSERT_TRUE(short1.toString() == "65");
-    ASSERT_TRUE(short1.toString( 99 ) == "99");
+    ASSERT_TRUE(short1.toString(99) == "99");
 
-    ASSERT_TRUE(Short::reverseBytes( (short)0xFF00 ) == (short)0x00FF);
-    ASSERT_TRUE(Short::reverseBytes( (short)0x0F00 ) == (short)0x000F);
-    ASSERT_TRUE(Short::reverseBytes( (short)0xDE00 ) == (short)0x00DE);
-    ASSERT_TRUE(Short::reverseBytes( (short)0x00AB ) == (short)0xAB00);
+    ASSERT_TRUE(Short::reverseBytes((short)0xFF00) == (short)0x00FF);
+    ASSERT_TRUE(Short::reverseBytes((short)0x0F00) == (short)0x000F);
+    ASSERT_TRUE(Short::reverseBytes((short)0xDE00) == (short)0x00DE);
+    ASSERT_TRUE(Short::reverseBytes((short)0x00AB) == (short)0xAB00);
 
-    Short short2( 255 );
+    Short short2(255);
 
     // Comparison functions
-    ASSERT_TRUE(short2.compareTo( 256 ) == -1);
-    ASSERT_TRUE(short2.compareTo( 255 ) == 0);
-    ASSERT_TRUE(short2.compareTo( 254 ) == 1);
-    ASSERT_TRUE(short2.equals( Short( 255 ) ) == true);
-    ASSERT_TRUE(short2.compareTo( Short( 255 ) ) == 0);
-    ASSERT_TRUE(short2 == Short( 255 ));
+    ASSERT_TRUE(short2.compareTo(256) == -1);
+    ASSERT_TRUE(short2.compareTo(255) == 0);
+    ASSERT_TRUE(short2.compareTo(254) == 1);
+    ASSERT_TRUE(short2.equals(Short(255)) == true);
+    ASSERT_TRUE(short2.compareTo(Short(255)) == 0);
+    ASSERT_TRUE(short2 == Short(255));
 
     // decode
-    ASSERT_TRUE(short2 == Short::decode( "255" ));
-    ASSERT_TRUE(short2 == Short::decode( "0xFF" ));
-    ASSERT_TRUE(short2 == Short::decode( "255" ));
-    ASSERT_TRUE(Short::decode( "-255" ) == -255);
+    ASSERT_TRUE(short2 == Short::decode("255"));
+    ASSERT_TRUE(short2 == Short::decode("0xFF"));
+    ASSERT_TRUE(short2 == Short::decode("255"));
+    ASSERT_TRUE(Short::decode("-255") == -255);
 
     // parseInt
-    ASSERT_TRUE(Short::parseShort( "255") == 255);
-    ASSERT_TRUE(Short::parseShort( "255", 10 ) == 255);
-    ASSERT_TRUE(Short::parseShort( "255", 11 ) != 255);
-    ASSERT_TRUE(Short::parseShort( "FF", 16 ) == 255);
+    ASSERT_TRUE(Short::parseShort("255") == 255);
+    ASSERT_TRUE(Short::parseShort("255", 10) == 255);
+    ASSERT_TRUE(Short::parseShort("255", 11) != 255);
+    ASSERT_TRUE(Short::parseShort("FF", 16) == 255);
 
     // valueOf
-    ASSERT_TRUE(Short::valueOf( 255 ) == 255);
-    ASSERT_TRUE(Short::valueOf( "255" ) == 255);
-    ASSERT_TRUE(Short::valueOf( "255", 10 ) == 255);
-    ASSERT_TRUE((Short::valueOf( "255", 11 )).shortValue() != 255);
-    ASSERT_TRUE(Short::valueOf( "FF", 16 ) == 255);
+    ASSERT_TRUE(Short::valueOf(255) == 255);
+    ASSERT_TRUE(Short::valueOf("255") == 255);
+    ASSERT_TRUE(Short::valueOf("255", 10) == 255);
+    ASSERT_TRUE((Short::valueOf("255", 11)).shortValue() != 255);
+    ASSERT_TRUE(Short::valueOf("FF", 16) == 255);
 
-    ASSERT_TRUE(Short::toString( 255 ) == "255");
-
+    ASSERT_TRUE(Short::toString(255) == "255");
 }

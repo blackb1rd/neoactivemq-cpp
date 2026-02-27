@@ -23,17 +23,19 @@
 #include <decaf/io/UTFDataFormatException.h>
 #include <string>
 
-namespace decaf{
-namespace io{
+namespace decaf
+{
+namespace io
+{
 
     /**
      * A data output stream lets an application write primitive Java data
      * types to an output stream in a portable way. An application can then
      * use a data input stream to read the data back in.
      */
-    class DECAF_API DataOutputStream: public FilterOutputStream {
+    class DECAF_API DataOutputStream : public FilterOutputStream
+    {
     protected:
-
         // The number of bytes written to the data output stream so far.
         long long written;
 
@@ -41,12 +43,10 @@ namespace io{
         unsigned char buffer[8];
 
     private:
-
         DataOutputStream(const DataOutputStream&);
         DataOutputStream& operator=(const DataOutputStream&);
 
     public:
-
         /**
          * Creates a new data output stream to write data to the specified
          * underlying output stream.
@@ -64,7 +64,8 @@ namespace io{
          *
          * @return the value of the written field.
          */
-        virtual long long size() const {
+        virtual long long size() const
+        {
             return written;
         }
 
@@ -129,18 +130,20 @@ namespace io{
         virtual void writeUTF(const std::string& value);
 
     protected:
-
         virtual void doWriteByte(unsigned char value);
 
-        virtual void doWriteArrayBounded(const unsigned char* buffer, int size, int offset, int length);
+        virtual void doWriteArrayBounded(const unsigned char* buffer,
+                                         int                  size,
+                                         int                  offset,
+                                         int                  length);
 
     private:
-
-        // Determine the encoded length of a string when written as modified UTF-8
+        // Determine the encoded length of a string when written as modified
+        // UTF-8
         unsigned int countUTFLength(const std::string& value);
-
     };
 
-}}
+}  // namespace io
+}  // namespace decaf
 
 #endif /*_DECAF_IO_DATAOUTPUTSTREAM_H_*/

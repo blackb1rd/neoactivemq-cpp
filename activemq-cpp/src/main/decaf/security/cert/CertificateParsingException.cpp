@@ -22,22 +22,35 @@ using namespace decaf::security;
 using namespace decaf::security::cert;
 
 ////////////////////////////////////////////////////////////////////////////////
-CertificateParsingException::CertificateParsingException() : CertificateException() {
+CertificateParsingException::CertificateParsingException()
+    : CertificateException()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-CertificateParsingException::CertificateParsingException(const Exception& ex) : CertificateException() {
-    *(Exception*) this = ex;
+CertificateParsingException::CertificateParsingException(const Exception& ex)
+    : CertificateException()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-CertificateParsingException::CertificateParsingException(const CertificateParsingException& ex) : CertificateException() {
-    *(Exception*) this = ex;
+CertificateParsingException::CertificateParsingException(
+    const CertificateParsingException& ex)
+    : CertificateException()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-CertificateParsingException::CertificateParsingException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...) : CertificateException(cause) {
-
+CertificateParsingException::CertificateParsingException(
+    const char*           file,
+    const int             lineNumber,
+    const std::exception* cause,
+    const char*           msg,
+    ...)
+    : CertificateException(cause)
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -47,12 +60,19 @@ CertificateParsingException::CertificateParsingException(const char* file, const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-CertificateParsingException::CertificateParsingException(const std::exception* cause) : CertificateException(cause) {
+CertificateParsingException::CertificateParsingException(
+    const std::exception* cause)
+    : CertificateException(cause)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-CertificateParsingException::CertificateParsingException(const char* file, const int lineNumber, const char* msg, ...) : CertificateException() {
-
+CertificateParsingException::CertificateParsingException(const char* file,
+                                                         const int   lineNumber,
+                                                         const char* msg,
+                                                         ...)
+    : CertificateException()
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -62,5 +82,6 @@ CertificateParsingException::CertificateParsingException(const char* file, const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-CertificateParsingException::~CertificateParsingException() throw () {
+CertificateParsingException::~CertificateParsingException() throw()
+{
 }

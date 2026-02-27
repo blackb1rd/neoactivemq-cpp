@@ -30,20 +30,26 @@ using namespace decaf::internal::security;
 using namespace decaf::internal::security::provider;
 
 ////////////////////////////////////////////////////////////////////////////////
-DefaultProvider::DefaultProvider() : Provider("Decaf", 1.0, "Default Decaf Security Provider") {
+DefaultProvider::DefaultProvider()
+    : Provider("Decaf", 1.0, "Default Decaf Security Provider")
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DefaultProvider::~DefaultProvider() {
+DefaultProvider::~DefaultProvider()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DefaultProvider::initialize() {
-    try {
+void DefaultProvider::initialize()
+{
+    try
+    {
         this->addService(new DefaultMessageDigestProviderService(this, "MD4"));
         this->addService(new DefaultMessageDigestProviderService(this, "MD5"));
         this->addService(new DefaultMessageDigestProviderService(this, "SHA1"));
-        this->addService(new DefaultSecureRandomProviderService(this, "Default"));
+        this->addService(
+            new DefaultSecureRandomProviderService(this, "Default"));
     }
     DECAF_CATCHALL_THROW(Exception)
 }

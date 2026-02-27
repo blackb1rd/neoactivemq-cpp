@@ -20,27 +20,28 @@
 
 #include <decaf/util/Config.h>
 
+#include <decaf/lang/Pointer.h>
 #include <decaf/util/Collection.h>
 #include <decaf/util/Iterator.h>
-#include <decaf/util/ListIterator.h>
 #include <decaf/util/List.h>
-#include <decaf/lang/Pointer.h>
+#include <decaf/util/ListIterator.h>
 
-#include <vector>
 #include <memory>
+#include <vector>
 
-namespace decaf {
-namespace util {
+namespace decaf
+{
+namespace util
+{
 
-    class DECAF_API Collections {
+    class DECAF_API Collections
+    {
     private:
-
         Collections();
         Collections(const Collections&);
-        Collections& operator= (const Collections&);
+        Collections& operator=(const Collections&);
 
     public:
-
         /**
          * Modifies the specified List by reversing the order of the elements.
          *
@@ -49,22 +50,24 @@ namespace util {
          * @throws UnsupportedOperationException
          *      when replacing an element in the List is not supported.
          */
-        template<typename E>
-        static void reverse(List<E>& list) {
-            int size = list.size();
-            decaf::lang::Pointer<ListIterator<E> > front(list.listIterator());
-            decaf::lang::Pointer<ListIterator<E> > back(list.listIterator(size));
+        template <typename E>
+        static void reverse(List<E>& list)
+        {
+            int                                   size = list.size();
+            decaf::lang::Pointer<ListIterator<E>> front(list.listIterator());
+            decaf::lang::Pointer<ListIterator<E>> back(list.listIterator(size));
 
-            for (int i = 0; i < size / 2; i++) {
+            for (int i = 0; i < size / 2; i++)
+            {
                 E frontNext = front->next();
-                E backPrev = back->previous();
+                E backPrev  = back->previous();
                 front->set(backPrev);
                 back->set(frontNext);
             }
         }
-
     };
 
-}}
+}  // namespace util
+}  // namespace decaf
 
 #endif /* _DECAF_UTIL_COLLECTIONS_H_ */

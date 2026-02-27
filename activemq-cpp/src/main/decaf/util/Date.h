@@ -18,12 +18,14 @@
 #ifndef _DECAF_UTIL_DATE_H_
 #define _DECAF_UTIL_DATE_H_
 
-#include <decaf/util/Config.h>
 #include <decaf/lang/Comparable.h>
+#include <decaf/util/Config.h>
 #include <string>
 
-namespace decaf {
-namespace util {
+namespace decaf
+{
+namespace util
+{
 
     /**
      * Wrapper class around a time value in milliseconds.  This
@@ -31,9 +33,9 @@ namespace util {
      *
      * @since 1.0
      */
-    class DECAF_API Date : public lang::Comparable<Date> {
+    class DECAF_API Date : public lang::Comparable<Date>
+    {
     private:
-
         /**
          * The underlying time value in milliseconds
          */
@@ -44,13 +46,13 @@ namespace util {
          * @param ianaTimezone The IANA timezone name (e.g., "America/New_York")
          * @return Windows timezone format string (e.g., "EST5EDT")
          */
-        std::string convertToWindowsTimezone(const std::string& ianaTimezone) const;
+        std::string convertToWindowsTimezone(
+            const std::string& ianaTimezone) const;
 
     public:
-
         /**
-         * Default constructor - sets time to the current System time, rounded to the
-         * nearest millisecond.
+         * Default constructor - sets time to the current System time, rounded
+         * to the nearest millisecond.
          */
         Date();
 
@@ -115,15 +117,19 @@ namespace util {
          * where:
          *
          *   - dow is the day of the week (Sun, Mon, Tue, Wed, Thu, Fri, Sat).
-         *   - mon is the month (Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec).
-         *   - dd is the day of the month (01 through 31), as two decimal digits.
+         *   - mon is the month (Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep,
+         * Oct, Nov, Dec).
+         *   - dd is the day of the month (01 through 31), as two decimal
+         * digits.
          *   - hh is the hour of the day (00 through 23), as two decimal digits.
-         *   - mm is the minute within the hour (00 through 59), as two decimal digits.
-         *   - ss is the second within the minute (00 through 61, as two decimal digits.
-         *   - zzz is the time zone (and may reflect daylight saving time). Standard time
-         *     zone abbreviations include those recognized by the method parse. If time
-         *     zone information is not available, then zzz is empty - that is, it consists
-         *     of no characters at all.
+         *   - mm is the minute within the hour (00 through 59), as two decimal
+         * digits.
+         *   - ss is the second within the minute (00 through 61, as two decimal
+         * digits.
+         *   - zzz is the time zone (and may reflect daylight saving time).
+         * Standard time zone abbreviations include those recognized by the
+         * method parse. If time zone information is not available, then zzz is
+         * empty - that is, it consists of no characters at all.
          *   - yyyy is the year, as four decimal digits.
          *
          * @return the String representation of the Date object.
@@ -131,7 +137,6 @@ namespace util {
         std::string toString() const;
 
     public:  // Comparable
-
         virtual int compareTo(const Date& value) const;
 
         virtual bool equals(const Date& value) const;
@@ -139,9 +144,9 @@ namespace util {
         virtual bool operator==(const Date& value) const;
 
         virtual bool operator<(const Date& value) const;
-
     };
 
-}}
+}  // namespace util
+}  // namespace decaf
 
 #endif /*_DECAF_UTIL_DATE_H_*/

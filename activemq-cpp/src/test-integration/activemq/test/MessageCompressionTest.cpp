@@ -17,10 +17,10 @@
 
 #include "MessageCompressionTest.h"
 
-#include <activemq/util/CMSListener.h>
-#include <activemq/exceptions/ActiveMQException.h>
-#include <activemq/core/ActiveMQConnection.h>
 #include <activemq/commands/Message.h>
+#include <activemq/core/ActiveMQConnection.h>
+#include <activemq/exceptions/ActiveMQException.h>
+#include <activemq/util/CMSListener.h>
 
 #include <decaf/lang/Thread.h>
 #include <decaf/util/UUID.h>
@@ -38,119 +38,133 @@ using namespace decaf::lang;
 using namespace decaf::util;
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace{
+namespace
+{
 
-    string TEST_CLIENT_ID = "MessageCompressionTestClientId";
-    string DESTINATION_NAME = "MessageCompressionTestDest";
+string TEST_CLIENT_ID   = "MessageCompressionTestClientId";
+string DESTINATION_NAME = "MessageCompressionTestDest";
 
-    // The following text should compress well
-    const string TEXT = std::string()
-                      + "The quick red fox jumped over the lazy brown dog. " + "The quick red fox jumped over the lazy brown dog. "
-                      + "The quick red fox jumped over the lazy brown dog. " + "The quick red fox jumped over the lazy brown dog. "
-                      + "The quick red fox jumped over the lazy brown dog. " + "The quick red fox jumped over the lazy brown dog. "
-                      + "The quick red fox jumped over the lazy brown dog. " + "The quick red fox jumped over the lazy brown dog. "
-                      + "The quick red fox jumped over the lazy brown dog. " + "The quick red fox jumped over the lazy brown dog. "
-                      + "The quick red fox jumped over the lazy brown dog. " + "The quick red fox jumped over the lazy brown dog. "
-                      + "The quick red fox jumped over the lazy brown dog. " + "The quick red fox jumped over the lazy brown dog. "
-                      + "The quick red fox jumped over the lazy brown dog. " + "The quick red fox jumped over the lazy brown dog. "
-                      + "The quick red fox jumped over the lazy brown dog. ";
+// The following text should compress well
+const string TEXT = std::string() +
+                    "The quick red fox jumped over the lazy brown dog. " +
+                    "The quick red fox jumped over the lazy brown dog. " +
+                    "The quick red fox jumped over the lazy brown dog. " +
+                    "The quick red fox jumped over the lazy brown dog. " +
+                    "The quick red fox jumped over the lazy brown dog. " +
+                    "The quick red fox jumped over the lazy brown dog. " +
+                    "The quick red fox jumped over the lazy brown dog. " +
+                    "The quick red fox jumped over the lazy brown dog. " +
+                    "The quick red fox jumped over the lazy brown dog. " +
+                    "The quick red fox jumped over the lazy brown dog. " +
+                    "The quick red fox jumped over the lazy brown dog. " +
+                    "The quick red fox jumped over the lazy brown dog. " +
+                    "The quick red fox jumped over the lazy brown dog. " +
+                    "The quick red fox jumped over the lazy brown dog. " +
+                    "The quick red fox jumped over the lazy brown dog. " +
+                    "The quick red fox jumped over the lazy brown dog. " +
+                    "The quick red fox jumped over the lazy brown dog. ";
 
-    bool a = true;
-    unsigned char b = 123;
-    char c = 'c';
-    short d = 0x1234;
-    int e = 0x12345678;
-    long long f = 0x1234567812345678LL;
-    string g = "Hello World!";
-    bool h = false;
-    unsigned char i = 0xFF;
-    short j = -0x1234;
-    int k = -0x12345678;
-    long long l = -0x1234567812345678LL;
-    float m = 2.1F;
-    double n = 2.3;
+bool          a = true;
+unsigned char b = 123;
+char          c = 'c';
+short         d = 0x1234;
+int           e = 0x12345678;
+long long     f = 0x1234567812345678LL;
+string        g = "Hello World!";
+bool          h = false;
+unsigned char i = 0xFF;
+short         j = -0x1234;
+int           k = -0x12345678;
+long long     l = -0x1234567812345678LL;
+float         m = 2.1F;
+double        n = 2.3;
+}  // namespace
+
+////////////////////////////////////////////////////////////////////////////////
+MessageCompressionTest::MessageCompressionTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-MessageCompressionTest::MessageCompressionTest() {
+MessageCompressionTest::~MessageCompressionTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-MessageCompressionTest::~MessageCompressionTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void MessageCompressionTest::testTextMessageCompression() {
-
+void MessageCompressionTest::testTextMessageCompression()
+{
     ActiveMQConnection* connection =
-        dynamic_cast<ActiveMQConnection*>( this->cmsProvider->getConnection() );
+        dynamic_cast<ActiveMQConnection*>(this->cmsProvider->getConnection());
 
     ASSERT_TRUE(connection != NULL);
     ASSERT_TRUE(connection->isUseCompression()) << ("Compression not enabled.");
 
     Session* session = this->cmsProvider->getSession();
 
-    std::unique_ptr<TextMessage> sent( session->createTextMessage( TEXT ) );
+    std::unique_ptr<TextMessage> sent(session->createTextMessage(TEXT));
 
     cms::MessageConsumer* consumer = cmsProvider->getConsumer();
     cms::MessageProducer* producer = cmsProvider->getProducer();
-    producer->setDeliveryMode( DeliveryMode::NON_PERSISTENT );
+    producer->setDeliveryMode(DeliveryMode::NON_PERSISTENT);
 
     // Send some text messages
-    producer->send( sent.get() );
+    producer->send(sent.get());
 
-    std::unique_ptr<cms::Message> message( consumer->receive( 2000 ) );
+    std::unique_ptr<cms::Message> message(consumer->receive(2000));
     ASSERT_TRUE(message.get() != NULL);
 
-    TextMessage* recvd = dynamic_cast<TextMessage*>( message.get() );
+    TextMessage* recvd = dynamic_cast<TextMessage*>(message.get());
     ASSERT_TRUE(recvd != NULL) << ("Received message was not a TextMessage");
 
-    ASSERT_EQ(sent->getText(), recvd->getText()) << ("Received text differs from sent text.");
+    ASSERT_EQ(sent->getText(), recvd->getText())
+        << ("Received text differs from sent text.");
 
-    commands::Message* amqMsg = dynamic_cast<commands::Message*>( message.get() );
-    ASSERT_TRUE(amqMsg != NULL) << ("Received message was not an AMQ message type");
-    ASSERT_TRUE(amqMsg->isCompressed()) << ("Received message was not compressed.");
+    commands::Message* amqMsg = dynamic_cast<commands::Message*>(message.get());
+    ASSERT_TRUE(amqMsg != NULL)
+        << ("Received message was not an AMQ message type");
+    ASSERT_TRUE(amqMsg->isCompressed())
+        << ("Received message was not compressed.");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MessageCompressionTest::testBytesMessageCompression() {
-
+void MessageCompressionTest::testBytesMessageCompression()
+{
     ActiveMQConnection* connection =
-        dynamic_cast<ActiveMQConnection*>( this->cmsProvider->getConnection() );
+        dynamic_cast<ActiveMQConnection*>(this->cmsProvider->getConnection());
 
     ASSERT_TRUE(connection != NULL);
     ASSERT_TRUE(connection->isUseCompression()) << ("Compression not enabled.");
 
     Session* session = this->cmsProvider->getSession();
 
-    std::unique_ptr<BytesMessage> sent( session->createBytesMessage() );
+    std::unique_ptr<BytesMessage> sent(session->createBytesMessage());
 
     cms::MessageConsumer* consumer = cmsProvider->getConsumer();
     cms::MessageProducer* producer = cmsProvider->getProducer();
-    producer->setDeliveryMode( DeliveryMode::NON_PERSISTENT );
+    producer->setDeliveryMode(DeliveryMode::NON_PERSISTENT);
 
-    sent->writeBoolean( a );
-    sent->writeByte( b );
-    sent->writeChar( c );
-    sent->writeShort( d );
-    sent->writeInt( e );
-    sent->writeLong( f );
-    sent->writeString( g );
-    sent->writeBoolean( h );
-    sent->writeByte( i );
-    sent->writeShort( j );
-    sent->writeInt( k );
-    sent->writeLong( l );
-    sent->writeFloat( m );
-    sent->writeDouble( n );
+    sent->writeBoolean(a);
+    sent->writeByte(b);
+    sent->writeChar(c);
+    sent->writeShort(d);
+    sent->writeInt(e);
+    sent->writeLong(f);
+    sent->writeString(g);
+    sent->writeBoolean(h);
+    sent->writeByte(i);
+    sent->writeShort(j);
+    sent->writeInt(k);
+    sent->writeLong(l);
+    sent->writeFloat(m);
+    sent->writeDouble(n);
 
     // Send some text messages
-    producer->send( sent.get() );
+    producer->send(sent.get());
 
-    std::unique_ptr<cms::Message> message( consumer->receive( 2000 ) );
+    std::unique_ptr<cms::Message> message(consumer->receive(2000));
     ASSERT_TRUE(message.get() != NULL);
 
-    BytesMessage* recvd = dynamic_cast<BytesMessage*>( message.get() );
+    BytesMessage* recvd = dynamic_cast<BytesMessage*>(message.get());
     ASSERT_TRUE(recvd != NULL) << ("Received message was not a BytesMessage");
 
     ASSERT_EQ(a, recvd->readBoolean());
@@ -168,50 +182,52 @@ void MessageCompressionTest::testBytesMessageCompression() {
     ASSERT_EQ(m, recvd->readFloat());
     ASSERT_EQ(n, recvd->readDouble());
 
-    commands::Message* amqMsg = dynamic_cast<commands::Message*>( message.get() );
-    ASSERT_TRUE(amqMsg != NULL) << ("Received message was not an AMQ message type");
-    ASSERT_TRUE(amqMsg->isCompressed()) << ("Received message was not compressed.");
+    commands::Message* amqMsg = dynamic_cast<commands::Message*>(message.get());
+    ASSERT_TRUE(amqMsg != NULL)
+        << ("Received message was not an AMQ message type");
+    ASSERT_TRUE(amqMsg->isCompressed())
+        << ("Received message was not compressed.");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MessageCompressionTest::testStreamMessageCompression() {
-
+void MessageCompressionTest::testStreamMessageCompression()
+{
     ActiveMQConnection* connection =
-        dynamic_cast<ActiveMQConnection*>( this->cmsProvider->getConnection() );
+        dynamic_cast<ActiveMQConnection*>(this->cmsProvider->getConnection());
 
     ASSERT_TRUE(connection != NULL);
     ASSERT_TRUE(connection->isUseCompression()) << ("Compression not enabled.");
 
     Session* session = this->cmsProvider->getSession();
 
-    std::unique_ptr<StreamMessage> sent( session->createStreamMessage() );
+    std::unique_ptr<StreamMessage> sent(session->createStreamMessage());
 
     cms::MessageConsumer* consumer = cmsProvider->getConsumer();
     cms::MessageProducer* producer = cmsProvider->getProducer();
-    producer->setDeliveryMode( DeliveryMode::NON_PERSISTENT );
+    producer->setDeliveryMode(DeliveryMode::NON_PERSISTENT);
 
-    sent->writeBoolean( a );
-    sent->writeByte( b );
-    sent->writeChar( c );
-    sent->writeShort( d );
-    sent->writeInt( e );
-    sent->writeLong( f );
-    sent->writeString( g );
-    sent->writeBoolean( h );
-    sent->writeByte( i );
-    sent->writeShort( j );
-    sent->writeInt( k );
-    sent->writeLong( l );
-    sent->writeFloat( m );
-    sent->writeDouble( n );
+    sent->writeBoolean(a);
+    sent->writeByte(b);
+    sent->writeChar(c);
+    sent->writeShort(d);
+    sent->writeInt(e);
+    sent->writeLong(f);
+    sent->writeString(g);
+    sent->writeBoolean(h);
+    sent->writeByte(i);
+    sent->writeShort(j);
+    sent->writeInt(k);
+    sent->writeLong(l);
+    sent->writeFloat(m);
+    sent->writeDouble(n);
 
     // Send some text messages
-    producer->send( sent.get() );
+    producer->send(sent.get());
 
-    std::unique_ptr<cms::Message> message( consumer->receive( 2000 ) );
+    std::unique_ptr<cms::Message> message(consumer->receive(2000));
     ASSERT_TRUE(message.get() != NULL);
 
-    StreamMessage* recvd = dynamic_cast<StreamMessage*>( message.get() );
+    StreamMessage* recvd = dynamic_cast<StreamMessage*>(message.get());
     ASSERT_TRUE(recvd != NULL) << ("Received message was not a StreamMessage");
 
     ASSERT_EQ(a, recvd->readBoolean());
@@ -229,69 +245,72 @@ void MessageCompressionTest::testStreamMessageCompression() {
     ASSERT_EQ(m, recvd->readFloat());
     ASSERT_EQ(n, recvd->readDouble());
 
-    commands::Message* amqMsg = dynamic_cast<commands::Message*>( message.get() );
-    ASSERT_TRUE(amqMsg != NULL) << ("Received message was not an AMQ message type");
-    ASSERT_TRUE(amqMsg->isCompressed()) << ("Received message was not compressed.");
+    commands::Message* amqMsg = dynamic_cast<commands::Message*>(message.get());
+    ASSERT_TRUE(amqMsg != NULL)
+        << ("Received message was not an AMQ message type");
+    ASSERT_TRUE(amqMsg->isCompressed())
+        << ("Received message was not compressed.");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MessageCompressionTest::testMapMessageCompression() {
-
+void MessageCompressionTest::testMapMessageCompression()
+{
     ActiveMQConnection* connection =
-        dynamic_cast<ActiveMQConnection*>( this->cmsProvider->getConnection() );
+        dynamic_cast<ActiveMQConnection*>(this->cmsProvider->getConnection());
 
     ASSERT_TRUE(connection != NULL);
     ASSERT_TRUE(connection->isUseCompression()) << ("Compression not enabled.");
 
     Session* session = this->cmsProvider->getSession();
 
-    std::unique_ptr<MapMessage> sent( session->createMapMessage() );
+    std::unique_ptr<MapMessage> sent(session->createMapMessage());
 
     cms::MessageConsumer* consumer = cmsProvider->getConsumer();
     cms::MessageProducer* producer = cmsProvider->getProducer();
-    producer->setDeliveryMode( DeliveryMode::NON_PERSISTENT );
+    producer->setDeliveryMode(DeliveryMode::NON_PERSISTENT);
 
-    sent->setBoolean( "a", a );
-    sent->setByte( "b", b );
-    sent->setChar( "c", c );
-    sent->setShort( "d", d );
-    sent->setInt( "e", e );
-    sent->setLong( "f", f );
-    sent->setString( "g", g );
-    sent->setBoolean( "h", h );
-    sent->setByte( "i", i );
-    sent->setShort( "j", j );
-    sent->setInt( "k", k );
-    sent->setLong( "l", l );
-    sent->setFloat( "m", m );
-    sent->setDouble( "n", n );
+    sent->setBoolean("a", a);
+    sent->setByte("b", b);
+    sent->setChar("c", c);
+    sent->setShort("d", d);
+    sent->setInt("e", e);
+    sent->setLong("f", f);
+    sent->setString("g", g);
+    sent->setBoolean("h", h);
+    sent->setByte("i", i);
+    sent->setShort("j", j);
+    sent->setInt("k", k);
+    sent->setLong("l", l);
+    sent->setFloat("m", m);
+    sent->setDouble("n", n);
 
     // Send some text messages
-    producer->send( sent.get() );
+    producer->send(sent.get());
 
-    std::unique_ptr<cms::Message> message( consumer->receive( 2000 ) );
+    std::unique_ptr<cms::Message> message(consumer->receive(2000));
     ASSERT_TRUE(message.get() != NULL);
 
-    MapMessage* recvd = dynamic_cast<MapMessage*>( message.get() );
+    MapMessage* recvd = dynamic_cast<MapMessage*>(message.get());
     ASSERT_TRUE(recvd != NULL) << ("Received message was not a MapMessage");
 
-    ASSERT_EQ(a, recvd->getBoolean( "a" ));
-    ASSERT_EQ(b, recvd->getByte( "b" ));
-    ASSERT_EQ(c, recvd->getChar( "c" ));
-    ASSERT_EQ(d, recvd->getShort( "d" ));
-    ASSERT_EQ(e, recvd->getInt( "e" ));
-    ASSERT_EQ(f, recvd->getLong( "f" ));
-    ASSERT_EQ(g, recvd->getString( "g" ));
-    ASSERT_EQ(h, recvd->getBoolean( "h" ));
-    ASSERT_EQ(i, recvd->getByte( "i" ));
-    ASSERT_EQ(j, recvd->getShort( "j" ));
-    ASSERT_EQ(k, recvd->getInt( "k" ));
-    ASSERT_EQ(l, recvd->getLong( "l" ));
-    ASSERT_EQ(m, recvd->getFloat( "m" ));
-    ASSERT_EQ(n, recvd->getDouble( "n" ));
+    ASSERT_EQ(a, recvd->getBoolean("a"));
+    ASSERT_EQ(b, recvd->getByte("b"));
+    ASSERT_EQ(c, recvd->getChar("c"));
+    ASSERT_EQ(d, recvd->getShort("d"));
+    ASSERT_EQ(e, recvd->getInt("e"));
+    ASSERT_EQ(f, recvd->getLong("f"));
+    ASSERT_EQ(g, recvd->getString("g"));
+    ASSERT_EQ(h, recvd->getBoolean("h"));
+    ASSERT_EQ(i, recvd->getByte("i"));
+    ASSERT_EQ(j, recvd->getShort("j"));
+    ASSERT_EQ(k, recvd->getInt("k"));
+    ASSERT_EQ(l, recvd->getLong("l"));
+    ASSERT_EQ(m, recvd->getFloat("m"));
+    ASSERT_EQ(n, recvd->getDouble("n"));
 
-    commands::Message* amqMsg = dynamic_cast<commands::Message*>( message.get() );
-    ASSERT_TRUE(amqMsg != NULL) << ("Received message was not an AMQ message type");
-    ASSERT_TRUE(amqMsg->isCompressed()) << ("Received message was not compressed.");
+    commands::Message* amqMsg = dynamic_cast<commands::Message*>(message.get());
+    ASSERT_TRUE(amqMsg != NULL)
+        << ("Received message was not an AMQ message type");
+    ASSERT_TRUE(amqMsg->isCompressed())
+        << ("Received message was not compressed.");
 }
-

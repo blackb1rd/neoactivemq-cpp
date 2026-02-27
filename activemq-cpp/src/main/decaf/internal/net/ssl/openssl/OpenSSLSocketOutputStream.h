@@ -22,46 +22,57 @@
 
 #include <decaf/io/OutputStream.h>
 
-namespace decaf {
-namespace internal {
-namespace net {
-namespace ssl {
-namespace openssl {
+namespace decaf
+{
+namespace internal
+{
+    namespace net
+    {
+        namespace ssl
+        {
+            namespace openssl
+            {
 
-    class OpenSSLSocket;
+                class OpenSSLSocket;
 
-    /**
-     * OutputStream implementation used to write data to an OpenSSLSocket instance.
-     *
-     * @since 1.0
-     */
-    class DECAF_API OpenSSLSocketOutputStream : public decaf::io::OutputStream {
-    private:
+                /**
+                 * OutputStream implementation used to write data to an
+                 * OpenSSLSocket instance.
+                 *
+                 * @since 1.0
+                 */
+                class DECAF_API OpenSSLSocketOutputStream
+                    : public decaf::io::OutputStream
+                {
+                private:
+                    OpenSSLSocket* socket;
+                    volatile bool  closed;
 
-        OpenSSLSocket* socket;
-        volatile bool closed;
+                private:
+                    OpenSSLSocketOutputStream(const OpenSSLSocketOutputStream&);
+                    OpenSSLSocketOutputStream& operator=(
+                        const OpenSSLSocketOutputStream&);
 
-    private:
+                public:
+                    OpenSSLSocketOutputStream(OpenSSLSocket* socket);
 
-        OpenSSLSocketOutputStream( const OpenSSLSocketOutputStream& );
-        OpenSSLSocketOutputStream& operator= ( const OpenSSLSocketOutputStream& );
+                    virtual ~OpenSSLSocketOutputStream();
 
-    public:
+                    virtual void close();
 
-        OpenSSLSocketOutputStream( OpenSSLSocket* socket );
+                protected:
+                    virtual void doWriteByte(unsigned char c);
 
-        virtual ~OpenSSLSocketOutputStream();
+                    virtual void doWriteArrayBounded(const unsigned char* buffer,
+                                                     int size,
+                                                     int offset,
+                                                     int length);
+                };
 
-        virtual void close();
-
-    protected:
-
-        virtual void doWriteByte( unsigned char c );
-
-        virtual void doWriteArrayBounded( const unsigned char* buffer, int size, int offset, int length );
-
-    };
-
-}}}}}
+            }  // namespace openssl
+        }  // namespace ssl
+    }  // namespace net
+}  // namespace internal
+}  // namespace decaf
 
 #endif /* _DECAF_INTERNAL_NET_SSL_OPENSSL_OPENSSLSOCKETOUTPUTSTREAM_H_ */

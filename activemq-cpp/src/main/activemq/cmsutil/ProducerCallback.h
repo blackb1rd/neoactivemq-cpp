@@ -20,19 +20,23 @@
 
 #include <activemq/util/Config.h>
 
-namespace cms {
-    class Session;
-    class MessageProducer;
-}
-namespace activemq {
-namespace cmsutil {
+namespace cms
+{
+class Session;
+class MessageProducer;
+}  // namespace cms
+
+namespace activemq
+{
+namespace cmsutil
+{
 
     /**
      * Callback for sending a message to a CMS destination.
      */
-    class AMQCPP_API ProducerCallback {
+    class AMQCPP_API ProducerCallback
+    {
     public:
-
         virtual ~ProducerCallback();
 
         /**
@@ -45,10 +49,11 @@ namespace cmsutil {
          *
          * @throws cms::CMSException if thrown by CMS API methods
          */
-        virtual void doInCms(cms::Session* session, cms::MessageProducer* producer) = 0;
-
+        virtual void doInCms(cms::Session*         session,
+                             cms::MessageProducer* producer) = 0;
     };
 
-}}
+}  // namespace cmsutil
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_CMSUTIL_PRODUCERCALLBACK_H_*/

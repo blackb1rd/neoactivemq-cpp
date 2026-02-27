@@ -22,99 +22,109 @@
 
 #include <decaf/net/ssl/SSLServerSocket.h>
 
-namespace decaf {
-namespace internal {
-namespace net {
-namespace ssl {
-namespace openssl {
+namespace decaf
+{
+namespace internal
+{
+    namespace net
+    {
+        namespace ssl
+        {
+            namespace openssl
+            {
 
-    class OpenSSLParameters;
-    class ServerSocketData;
+                class OpenSSLParameters;
+                class ServerSocketData;
 
-    /**
-     * SSLServerSocket based on OpenSSL library code.
-     *
-     * @since 1.0
-     */
-    class DECAF_API OpenSSLServerSocket : public decaf::net::ssl::SSLServerSocket {
-    private:
+                /**
+                 * SSLServerSocket based on OpenSSL library code.
+                 *
+                 * @since 1.0
+                 */
+                class DECAF_API OpenSSLServerSocket
+                    : public decaf::net::ssl::SSLServerSocket
+                {
+                private:
+                    ServerSocketData* data;
 
-        ServerSocketData* data;
+                    OpenSSLParameters* parameters;
 
-        OpenSSLParameters* parameters;
+                private:
+                    OpenSSLServerSocket(const OpenSSLServerSocket&);
+                    OpenSSLServerSocket& operator=(const OpenSSLServerSocket&);
 
-    private:
+                public:
+                    OpenSSLServerSocket(OpenSSLParameters* parameters);
 
-        OpenSSLServerSocket( const OpenSSLServerSocket& );
-        OpenSSLServerSocket& operator= ( const OpenSSLServerSocket& );
+                    virtual ~OpenSSLServerSocket();
 
-    public:
+                public:  // SSLServerSocket overrides
+                    /**
+                     * {@inheritDoc}
+                     */
+                    virtual std::vector<std::string> getSupportedCipherSuites()
+                        const;
 
-        OpenSSLServerSocket( OpenSSLParameters* parameters );
+                    /**
+                     * {@inheritDoc}
+                     */
+                    virtual std::vector<std::string> getSupportedProtocols()
+                        const;
 
-        virtual ~OpenSSLServerSocket();
+                    /**
+                     * {@inheritDoc}
+                     */
+                    virtual std::vector<std::string> getEnabledCipherSuites()
+                        const;
 
-    public: // SSLServerSocket overrides
+                    /**
+                     * {@inheritDoc}
+                     */
+                    virtual void setEnabledCipherSuites(
+                        const std::vector<std::string>& suites);
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual std::vector<std::string> getSupportedCipherSuites() const;
+                    /**
+                     * {@inheritDoc}
+                     */
+                    virtual std::vector<std::string> getEnabledProtocols() const;
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual std::vector<std::string> getSupportedProtocols() const;
+                    /**
+                     * {@inheritDoc}
+                     */
+                    virtual void setEnabledProtocols(
+                        const std::vector<std::string>& protocols);
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual std::vector<std::string> getEnabledCipherSuites() const;
+                    /**
+                     * {@inheritDoc}
+                     */
+                    virtual bool getWantClientAuth() const;
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual void setEnabledCipherSuites( const std::vector<std::string>& suites );
+                    /**
+                     * {@inheritDoc}
+                     */
+                    virtual void setWantClientAuth(bool value);
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual std::vector<std::string> getEnabledProtocols() const;
+                    /**
+                     * {@inheritDoc}
+                     */
+                    virtual bool getNeedClientAuth() const;
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual void setEnabledProtocols( const std::vector<std::string>& protocols );
+                    /**
+                     * {@inheritDoc}
+                     */
+                    virtual void setNeedClientAuth(bool value);
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual bool getWantClientAuth() const;
+                public:  // ServerSocket overrides
+                    /**
+                     * {@inheritDoc}
+                     */
+                    virtual decaf::net::Socket* accept();
+                };
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual void setWantClientAuth( bool value );
-
-        /**
-         * {@inheritDoc}
-         */
-        virtual bool getNeedClientAuth() const;
-
-        /**
-         * {@inheritDoc}
-         */
-        virtual void setNeedClientAuth( bool value );
-
-    public:  // ServerSocket overrides
-
-        /**
-         * {@inheritDoc}
-         */
-        virtual decaf::net::Socket* accept();
-
-    };
-
-}}}}}
+            }  // namespace openssl
+        }  // namespace ssl
+    }  // namespace net
+}  // namespace internal
+}  // namespace decaf
 
 #endif /* _DECAF_INTERNAL_NET_SSL_OPENSSL_OPENSSLSERVERSOCKET_H_ */

@@ -18,56 +18,59 @@
 #define _ACTIVEMQ_CMSUTIL_DYNAMICDESTINATIONRESOLVER_H_
 
 #include <activemq/cmsutil/DestinationResolver.h>
+#include <activemq/util/Config.h>
 #include <cms/Session.h>
 #include <decaf/util/StlMap.h>
-#include <activemq/util/Config.h>
 
-namespace activemq {
-namespace cmsutil {
+namespace activemq
+{
+namespace cmsutil
+{
 
     /**
      * Resolves a CMS destination name to a <code>Destination</code>.
      */
-    class AMQCPP_API DynamicDestinationResolver : public DestinationResolver {
+    class AMQCPP_API DynamicDestinationResolver : public DestinationResolver
+    {
     private:
-
         /**
          * Manages maps of names to topics and queues for a single session.
          */
-        class SessionResolver {
+        class SessionResolver
+        {
         private:
-
             ResourceLifecycleManager* resourceLifecycleManager;
-            cms::Session* session;
+            cms::Session*             session;
             decaf::util::StlMap<std::string, cms::Topic*> topicMap;
             decaf::util::StlMap<std::string, cms::Queue*> queueMap;
 
         private:
-
             SessionResolver(const SessionResolver&);
             SessionResolver& operator=(const SessionResolver&);
 
         public:
-
-            SessionResolver(cms::Session* session, ResourceLifecycleManager* resourceLifecycleManager )
-                : resourceLifecycleManager( resourceLifecycleManager ),
-                  session( session ),
+            SessionResolver(cms::Session*             session,
+                            ResourceLifecycleManager* resourceLifecycleManager)
+                : resourceLifecycleManager(resourceLifecycleManager),
+                  session(session),
                   topicMap(),
-                  queueMap() {
+                  queueMap()
+            {
             }
 
-            virtual ~SessionResolver() {}
+            virtual ~SessionResolver()
+            {
+            }
 
             cms::Topic* getTopic(const std::string& topicName);
 
             cms::Queue* getQueue(const std::string& queueName);
-
         };
 
         /**
          * Maps a given session to the resolver for that session.
          */
-        decaf::util::StlMap< cms::Session*, SessionResolver*> sessionResolverMap;
+        decaf::util::StlMap<cms::Session*, SessionResolver*> sessionResolverMap;
 
         /**
          * Manages lifecycle of any allocated topics/queues.
@@ -75,18 +78,16 @@ namespace cmsutil {
         ResourceLifecycleManager* resourceLifecycleManager;
 
     private:
-
         DynamicDestinationResolver(const DynamicDestinationResolver&);
         DynamicDestinationResolver& operator=(const DynamicDestinationResolver&);
 
     public:
-
         DynamicDestinationResolver();
 
         virtual ~DynamicDestinationResolver();
 
-        virtual void init(ResourceLifecycleManager* mgr) {
-
+        virtual void init(ResourceLifecycleManager* mgr)
+        {
             // since we're changing the lifecycle manager, clear out references
             // to old resources.
             destroy();
@@ -114,12 +115,13 @@ namespace cmsutil {
          *
          * @throws cms::CMSException if resolution failed.
          */
-        virtual cms::Destination* resolveDestinationName(cms::Session* session,
-                                                         const std::string& destName,
-                                                         bool pubSubDomain);
-
+        virtual cms::Destination* resolveDestinationName(
+            cms::Session*      session,
+            const std::string& destName,
+            bool               pubSubDomain);
     };
 
-}}
+}  // namespace cmsutil
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_CMSUTIL_DYNAMICDESTINATIONRESOLVER_H_ */

@@ -38,17 +38,19 @@ using namespace decaf::lang::exceptions;
  */
 
 ////////////////////////////////////////////////////////////////////////////////
-FlushCommand::FlushCommand() :
-    BaseCommand() {
-
+FlushCommand::FlushCommand()
+    : BaseCommand()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-FlushCommand::~FlushCommand() {
+FlushCommand::~FlushCommand()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-FlushCommand* FlushCommand::cloneDataStructure() const {
+FlushCommand* FlushCommand::cloneDataStructure() const
+{
     std::unique_ptr<FlushCommand> flushCommand(new FlushCommand());
 
     // Copy the data from the base class or classes
@@ -58,34 +60,37 @@ FlushCommand* FlushCommand::cloneDataStructure() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FlushCommand::copyDataStructure(const DataStructure* src) {
-
+void FlushCommand::copyDataStructure(const DataStructure* src)
+{
     // Protect against invalid self assignment.
-    if (this == src) {
+    if (this == src)
+    {
         return;
     }
 
     const FlushCommand* srcPtr = dynamic_cast<const FlushCommand*>(src);
 
-    if (srcPtr == NULL || src == NULL) {
+    if (srcPtr == NULL || src == NULL)
+    {
         throw decaf::lang::exceptions::NullPointerException(
-            __FILE__, __LINE__,
+            __FILE__,
+            __LINE__,
             "FlushCommand::copyDataStructure - src is NULL or invalid");
     }
 
     // Copy the data of the base class or classes
     BaseCommand::copyDataStructure(src);
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-unsigned char FlushCommand::getDataStructureType() const {
+unsigned char FlushCommand::getDataStructureType() const
+{
     return FlushCommand::ID_FLUSHCOMMAND;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string FlushCommand::toString() const {
-
+std::string FlushCommand::toString() const
+{
     ostringstream stream;
 
     stream << "FlushCommand { "
@@ -97,25 +102,30 @@ std::string FlushCommand::toString() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool FlushCommand::equals(const DataStructure* value) const {
-
-    if (this == value) {
+bool FlushCommand::equals(const DataStructure* value) const
+{
+    if (this == value)
+    {
         return true;
     }
 
     const FlushCommand* valuePtr = dynamic_cast<const FlushCommand*>(value);
 
-    if (valuePtr == NULL || value == NULL) {
+    if (valuePtr == NULL || value == NULL)
+    {
         return false;
     }
 
-    if (!BaseCommand::equals(value)) {
+    if (!BaseCommand::equals(value))
+    {
         return false;
     }
     return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<commands::Command> FlushCommand::visit(activemq::state::CommandVisitor* visitor) {
+decaf::lang::Pointer<commands::Command> FlushCommand::visit(
+    activemq::state::CommandVisitor* visitor)
+{
     return visitor->processFlushCommand(this);
 }

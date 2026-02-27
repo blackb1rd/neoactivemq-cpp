@@ -18,26 +18,36 @@
 #ifndef _DECAF_INTERNAL_UTIL_CONCURRENT_EXECUTORSSUPPORT_H_
 #define _DECAF_INTERNAL_UTIL_CONCURRENT_EXECUTORSSUPPORT_H_
 
-namespace decaf {
-namespace internal {
-namespace util {
-namespace concurrent {
+namespace decaf
+{
+namespace internal
+{
+    namespace util
+    {
+        namespace concurrent
+        {
 
-    /**
-     * Various support methods for use in Executors and surrounding classes.
-     *
-     * @since 1.0
-     */
-    class ExecutorsSupport {
-    private:
+            /**
+             * Various support methods for use in Executors and surrounding
+             * classes.
+             *
+             * @since 1.0
+             */
+            class ExecutorsSupport
+            {
+            private:
+                ExecutorsSupport()
+                {
+                }
 
-        ExecutorsSupport() {}
-        ExecutorsSupport(const ExecutorsSupport&);
+                ExecutorsSupport(const ExecutorsSupport&);
 
-    public:
+            public:
+            };
 
-    };
-
-}}}}
+        }  // namespace concurrent
+    }  // namespace util
+}  // namespace internal
+}  // namespace decaf
 
 #endif /* _DECAF_INTERNAL_UTIL_CONCURRENT_EXECUTORSSUPPORT_H_ */

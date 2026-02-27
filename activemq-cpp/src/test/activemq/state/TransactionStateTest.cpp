@@ -17,9 +17,9 @@
 
 #include <gtest/gtest.h>
 
-#include <activemq/state/TransactionState.h>
-#include <activemq/commands/TransactionInfo.h>
 #include <activemq/commands/LocalTransactionId.h>
+#include <activemq/commands/TransactionInfo.h>
+#include <activemq/state/TransactionState.h>
 #include <decaf/lang/Pointer.h>
 
 using namespace std;
@@ -28,20 +28,20 @@ using namespace activemq::state;
 using namespace activemq::commands;
 using namespace decaf::lang;
 
-    class TransactionStateTest : public ::testing::Test {
-    };
-
+class TransactionStateTest : public ::testing::Test
+{
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(TransactionStateTest, test) {
-
+TEST_F(TransactionStateTest, test)
+{
     Pointer<ConnectionId> connectionId(new ConnectionId);
     connectionId->setValue("CONNECTION");
 
-    Pointer<LocalTransactionId> id( new LocalTransactionId() );
+    Pointer<LocalTransactionId> id(new LocalTransactionId());
     id->setConnectionId(connectionId);
-    id->setValue( 42 );
-    TransactionState state( id );
+    id->setValue(42);
+    TransactionState state(id);
 
     ASSERT_TRUE(state.toString() != "NULL");
     ASSERT_TRUE(state.getId() != NULL);

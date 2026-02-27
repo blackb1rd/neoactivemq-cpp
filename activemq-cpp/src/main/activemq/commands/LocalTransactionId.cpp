@@ -41,25 +41,32 @@ using namespace decaf::internal::util;
  */
 
 ////////////////////////////////////////////////////////////////////////////////
-LocalTransactionId::LocalTransactionId() :
-    TransactionId(), value(0), connectionId(NULL) {
-
+LocalTransactionId::LocalTransactionId()
+    : TransactionId(),
+      value(0),
+      connectionId(NULL)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-LocalTransactionId::LocalTransactionId(const LocalTransactionId& other) :
-    TransactionId(), value(0), connectionId(NULL) {
-
+LocalTransactionId::LocalTransactionId(const LocalTransactionId& other)
+    : TransactionId(),
+      value(0),
+      connectionId(NULL)
+{
     this->copyDataStructure(&other);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-LocalTransactionId::~LocalTransactionId() {
+LocalTransactionId::~LocalTransactionId()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-LocalTransactionId* LocalTransactionId::cloneDataStructure() const {
-    std::unique_ptr<LocalTransactionId> localTransactionId(new LocalTransactionId());
+LocalTransactionId* LocalTransactionId::cloneDataStructure() const
+{
+    std::unique_ptr<LocalTransactionId> localTransactionId(
+        new LocalTransactionId());
 
     // Copy the data from the base class or classes
     localTransactionId->copyDataStructure(this);
@@ -68,18 +75,22 @@ LocalTransactionId* LocalTransactionId::cloneDataStructure() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LocalTransactionId::copyDataStructure(const DataStructure* src) {
-
+void LocalTransactionId::copyDataStructure(const DataStructure* src)
+{
     // Protect against invalid self assignment.
-    if (this == src) {
+    if (this == src)
+    {
         return;
     }
 
-    const LocalTransactionId* srcPtr = dynamic_cast<const LocalTransactionId*>(src);
+    const LocalTransactionId* srcPtr =
+        dynamic_cast<const LocalTransactionId*>(src);
 
-    if (srcPtr == NULL || src == NULL) {
+    if (srcPtr == NULL || src == NULL)
+    {
         throw decaf::lang::exceptions::NullPointerException(
-            __FILE__, __LINE__,
+            __FILE__,
+            __LINE__,
             "LocalTransactionId::copyDataStructure - src is NULL or invalid");
     }
 
@@ -91,91 +102,111 @@ void LocalTransactionId::copyDataStructure(const DataStructure* src) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-unsigned char LocalTransactionId::getDataStructureType() const {
+unsigned char LocalTransactionId::getDataStructureType() const
+{
     return LocalTransactionId::ID_LOCALTRANSACTIONID;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string LocalTransactionId::toString() const {
-
+std::string LocalTransactionId::toString() const
+{
     ostringstream stream;
 
-    stream << "TX:"
-           << this->connectionId->toString() << ":"
-           << this->value;
+    stream << "TX:" << this->connectionId->toString() << ":" << this->value;
 
     return stream.str();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool LocalTransactionId::equals(const DataStructure* value) const {
-
-    if (this == value) {
+bool LocalTransactionId::equals(const DataStructure* value) const
+{
+    if (this == value)
+    {
         return true;
     }
 
-    const LocalTransactionId* valuePtr = dynamic_cast<const LocalTransactionId*>(value);
+    const LocalTransactionId* valuePtr =
+        dynamic_cast<const LocalTransactionId*>(value);
 
-    if (valuePtr == NULL || value == NULL) {
+    if (valuePtr == NULL || value == NULL)
+    {
         return false;
     }
 
-    if (this->getValue() != valuePtr->getValue()) {
+    if (this->getValue() != valuePtr->getValue())
+    {
         return false;
     }
-    if (this->getConnectionId() != NULL) {
-        if (!this->getConnectionId()->equals(valuePtr->getConnectionId().get())) {
+    if (this->getConnectionId() != NULL)
+    {
+        if (!this->getConnectionId()->equals(valuePtr->getConnectionId().get()))
+        {
             return false;
         }
-    } else if (valuePtr->getConnectionId() != NULL) {
+    }
+    else if (valuePtr->getConnectionId() != NULL)
+    {
         return false;
     }
-    if (!TransactionId::equals(value)) {
+    if (!TransactionId::equals(value))
+    {
         return false;
     }
     return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-long long LocalTransactionId::getValue() const {
+long long LocalTransactionId::getValue() const
+{
     return value;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LocalTransactionId::setValue(long long value) {
+void LocalTransactionId::setValue(long long value)
+{
     this->value = value;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const decaf::lang::Pointer<ConnectionId>& LocalTransactionId::getConnectionId() const {
+const decaf::lang::Pointer<ConnectionId>& LocalTransactionId::getConnectionId()
+    const
+{
     return connectionId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<ConnectionId>& LocalTransactionId::getConnectionId() {
+decaf::lang::Pointer<ConnectionId>& LocalTransactionId::getConnectionId()
+{
     return connectionId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LocalTransactionId::setConnectionId(const decaf::lang::Pointer<ConnectionId>& connectionId) {
+void LocalTransactionId::setConnectionId(
+    const decaf::lang::Pointer<ConnectionId>& connectionId)
+{
     this->connectionId = connectionId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int LocalTransactionId::compareTo(const LocalTransactionId& value) const {
-
-    if (this == &value) {
+int LocalTransactionId::compareTo(const LocalTransactionId& value) const
+{
+    if (this == &value)
+    {
         return 0;
     }
 
-    if (this->value > value.value) {
+    if (this->value > value.value)
+    {
         return 1;
-    } else if(this->value < value.value) {
+    }
+    else if (this->value < value.value)
+    {
         return -1;
     }
 
     int connectionIdComp = this->connectionId->compareTo(*(value.connectionId));
-    if (connectionIdComp != 0) {
+    if (connectionIdComp != 0)
+    {
         return connectionIdComp;
     }
 
@@ -183,28 +214,33 @@ int LocalTransactionId::compareTo(const LocalTransactionId& value) const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool LocalTransactionId::equals(const LocalTransactionId& value) const {
+bool LocalTransactionId::equals(const LocalTransactionId& value) const
+{
     return this->equals((const DataStructure*)&value);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool LocalTransactionId::operator==(const LocalTransactionId& value) const {
+bool LocalTransactionId::operator==(const LocalTransactionId& value) const
+{
     return this->compareTo(value) == 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool LocalTransactionId::operator<(const LocalTransactionId& value) const {
+bool LocalTransactionId::operator<(const LocalTransactionId& value) const
+{
     return this->compareTo(value) < 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-LocalTransactionId& LocalTransactionId::operator= (const LocalTransactionId& other) {
+LocalTransactionId& LocalTransactionId::operator=(
+    const LocalTransactionId& other)
+{
     this->copyDataStructure(&other);
     return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int LocalTransactionId::getHashCode() const {
+int LocalTransactionId::getHashCode() const
+{
     return decaf::util::HashCode<std::string>()(this->toString());
 }
-

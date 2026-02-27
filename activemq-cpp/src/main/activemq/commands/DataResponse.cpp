@@ -38,17 +38,20 @@ using namespace decaf::lang::exceptions;
  */
 
 ////////////////////////////////////////////////////////////////////////////////
-DataResponse::DataResponse() :
-    Response(), data(NULL) {
-
+DataResponse::DataResponse()
+    : Response(),
+      data(NULL)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DataResponse::~DataResponse() {
+DataResponse::~DataResponse()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DataResponse* DataResponse::cloneDataStructure() const {
+DataResponse* DataResponse::cloneDataStructure() const
+{
     std::unique_ptr<DataResponse> dataResponse(new DataResponse());
 
     // Copy the data from the base class or classes
@@ -58,18 +61,21 @@ DataResponse* DataResponse::cloneDataStructure() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DataResponse::copyDataStructure(const DataStructure* src) {
-
+void DataResponse::copyDataStructure(const DataStructure* src)
+{
     // Protect against invalid self assignment.
-    if (this == src) {
+    if (this == src)
+    {
         return;
     }
 
     const DataResponse* srcPtr = dynamic_cast<const DataResponse*>(src);
 
-    if (srcPtr == NULL || src == NULL) {
+    if (srcPtr == NULL || src == NULL)
+    {
         throw decaf::lang::exceptions::NullPointerException(
-            __FILE__, __LINE__,
+            __FILE__,
+            __LINE__,
             "DataResponse::copyDataStructure - src is NULL or invalid");
     }
 
@@ -80,20 +86,24 @@ void DataResponse::copyDataStructure(const DataStructure* src) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-unsigned char DataResponse::getDataStructureType() const {
+unsigned char DataResponse::getDataStructureType() const
+{
     return DataResponse::ID_DATARESPONSE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string DataResponse::toString() const {
-
+std::string DataResponse::toString() const
+{
     ostringstream stream;
 
     stream << "DataResponse { ";
     stream << "Data = ";
-    if (this->getData() != NULL) {
+    if (this->getData() != NULL)
+    {
         stream << this->getData()->toString();
-    } else {
+    }
+    else
+    {
         stream << "NULL";
     }
     stream << " }";
@@ -102,43 +112,52 @@ std::string DataResponse::toString() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool DataResponse::equals(const DataStructure* value) const {
-
-    if (this == value) {
+bool DataResponse::equals(const DataStructure* value) const
+{
+    if (this == value)
+    {
         return true;
     }
 
     const DataResponse* valuePtr = dynamic_cast<const DataResponse*>(value);
 
-    if (valuePtr == NULL || value == NULL) {
+    if (valuePtr == NULL || value == NULL)
+    {
         return false;
     }
 
-    if (this->getData() != NULL) {
-        if (!this->getData()->equals(valuePtr->getData().get())) {
+    if (this->getData() != NULL)
+    {
+        if (!this->getData()->equals(valuePtr->getData().get()))
+        {
             return false;
         }
-    } else if (valuePtr->getData() != NULL) {
+    }
+    else if (valuePtr->getData() != NULL)
+    {
         return false;
     }
-    if (!Response::equals(value)) {
+    if (!Response::equals(value))
+    {
         return false;
     }
     return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const decaf::lang::Pointer<DataStructure>& DataResponse::getData() const {
+const decaf::lang::Pointer<DataStructure>& DataResponse::getData() const
+{
     return data;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<DataStructure>& DataResponse::getData() {
+decaf::lang::Pointer<DataStructure>& DataResponse::getData()
+{
     return data;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DataResponse::setData(const decaf::lang::Pointer<DataStructure>& data) {
+void DataResponse::setData(const decaf::lang::Pointer<DataStructure>& data)
+{
     this->data = data;
 }
-

@@ -18,66 +18,69 @@
 #ifndef _ACTIVEMQ_TRANSPORT_IOTRANSPORT_H_
 #define _ACTIVEMQ_TRANSPORT_IOTRANSPORT_H_
 
-#include <activemq/util/Config.h>
-#include <activemq/transport/Transport.h>
-#include <activemq/transport/TransportListener.h>
 #include <activemq/commands/Command.h>
 #include <activemq/commands/Response.h>
+#include <activemq/transport/Transport.h>
+#include <activemq/transport/TransportListener.h>
+#include <activemq/util/Config.h>
 #include <activemq/wireformat/WireFormat.h>
 
-#include <decaf/lang/Runnable.h>
-#include <decaf/lang/Thread.h>
 #include <decaf/io/DataInputStream.h>
 #include <decaf/io/DataOutputStream.h>
+#include <decaf/lang/Runnable.h>
+#include <decaf/lang/Thread.h>
 #include <decaf/util/logging/LoggerDefines.h>
 
-namespace activemq {
-namespace commands {
+namespace activemq
+{
+namespace commands
+{
     class Message;
-}
-}
+}  // namespace commands
+}  // namespace activemq
 
-namespace activemq {
-namespace transport {
+namespace activemq
+{
+namespace transport
+{
 
-    using decaf::lang::Pointer;
     using activemq::commands::Command;
-    using activemq::commands::Response;
     using activemq::commands::Message;
+    using activemq::commands::Response;
+    using decaf::lang::Pointer;
 
     class IOTransportImpl;
 
     /**
-     * Implementation of the Transport interface that performs marshaling of commands
-     * to IO streams.
+     * Implementation of the Transport interface that performs marshaling of
+     * commands to IO streams.
      *
-     * This class does not implement the Transport::request method, it only handles
-     * oneway messages.  A thread polls on the input stream for in-coming commands.  When
-     * a command is received, the command listener is notified.  The polling thread is not
-     * started until the start method is called.  Polling can be suspending by calling stop;
-     * however, because the read operation is blocking the transport my still pull one command
-     * off the wire even after the stop method has been called.
+     * This class does not implement the Transport::request method, it only
+     * handles oneway messages.  A thread polls on the input stream for
+     * in-coming commands.  When a command is received, the command listener is
+     * notified.  The polling thread is not started until the start method is
+     * called.  Polling can be suspending by calling stop; however, because the
+     * read operation is blocking the transport my still pull one command off
+     * the wire even after the stop method has been called.
      *
      * The close method will close the associated
-     * streams.  Close can be called explicitly by the user, but is also called in the
-     * destructor.  Once this object has been closed, it cannot be restarted.
+     * streams.  Close can be called explicitly by the user, but is also called
+     * in the destructor.  Once this object has been closed, it cannot be
+     * restarted.
      */
     class AMQCPP_API IOTransport : public Transport,
-                                   public decaf::lang::Runnable {
-
+                                   public decaf::lang::Runnable
+    {
         LOGDECAF_DECLARE(logger)
 
     private:
-
         IOTransportImpl* impl;
 
     private:
-
         IOTransport(const IOTransport&);
         IOTransport& operator=(const IOTransport&);
 
     private:
-
         /**
          * Notify the exception listener
          *
@@ -104,15 +107,14 @@ namespace transport {
         void fire(const Pointer<Command> command);
 
     public:
-
         /**
          * Default Constructor
          */
         IOTransport();
 
         /**
-         * Create an instance of this Transport and assign its WireFormat instance
-         * at creation time.
+         * Create an instance of this Transport and assign its WireFormat
+         * instance at creation time.
          *
          * @param wireFormat
          *        Data encoder / decoder to use when reading and writing.
@@ -122,7 +124,8 @@ namespace transport {
         virtual ~IOTransport();
 
         /**
-         * Sets the stream from which this Transport implementation will read its data.
+         * Sets the stream from which this Transport implementation will read
+         * its data.
          *
          * @param is
          *      The InputStream that will be read from by this object.
@@ -130,7 +133,8 @@ namespace transport {
         virtual void setInputStream(decaf::io::DataInputStream* is);
 
         /**
-         * Sets the stream to which this Transport implementation will write its data.
+         * Sets the stream to which this Transport implementation will write its
+         * data.
          *
          * @param os
          *      The OuputStream that will be written to by this object.
@@ -138,7 +142,6 @@ namespace transport {
         virtual void setOutputStream(decaf::io::DataOutputStream* os);
 
     public:  // Transport methods
-
         virtual void oneway(const Pointer<Command> command);
 
         /**
@@ -146,8 +149,9 @@ namespace transport {
          *
          * This method always thrown an UnsupportedOperationException.
          */
-        virtual Pointer<FutureResponse> asyncRequest(const Pointer<Command> command,
-                                                     const Pointer<ResponseCallback> responseCallback);
+        virtual Pointer<FutureResponse> asyncRequest(
+            const Pointer<Command>          command,
+            const Pointer<ResponseCallback> responseCallback);
 
         /**
          * {@inheritDoc}
@@ -161,11 +165,13 @@ namespace transport {
          *
          * This method always thrown an UnsupportedOperationException.
          */
-        virtual Pointer<Response> request(const Pointer<Command> command, unsigned int timeout);
+        virtual Pointer<Response> request(const Pointer<Command> command,
+                                          unsigned int           timeout);
 
         virtual Pointer<wireformat::WireFormat> getWireFormat() const;
 
-        virtual void setWireFormat(const Pointer<wireformat::WireFormat> wireFormat);
+        virtual void setWireFormat(
+            const Pointer<wireformat::WireFormat> wireFormat);
 
         virtual void setTransportListener(TransportListener* listener);
 
@@ -177,15 +183,18 @@ namespace transport {
 
         virtual void close();
 
-        virtual Transport* narrow(const std::type_info& typeId) {
-            if (typeid(*this) == typeId) {
+        virtual Transport* narrow(const std::type_info& typeId)
+        {
+            if (typeid(*this) == typeId)
+            {
                 return this;
             }
 
             return NULL;
         }
 
-        virtual bool isFaultTolerant() const {
+        virtual bool isFaultTolerant() const
+        {
             return false;
         }
 
@@ -193,19 +202,25 @@ namespace transport {
 
         virtual bool isClosed() const;
 
-        virtual std::string getRemoteAddress() const {
+        virtual std::string getRemoteAddress() const
+        {
             return "";
         }
 
-        virtual bool isReconnectSupported() const {
+        virtual bool isReconnectSupported() const
+        {
             return false;
         }
 
-        virtual bool isUpdateURIsSupported() const {
+        virtual bool isUpdateURIsSupported() const
+        {
             return false;
         }
 
-        virtual void updateURIs(bool rebalance AMQCPP_UNUSED, const decaf::util::List<decaf::net::URI>& uris AMQCPP_UNUSED) {
+        virtual void updateURIs(bool rebalance AMQCPP_UNUSED,
+                                const decaf::util::List<decaf::net::URI>& uris
+                                    AMQCPP_UNUSED)
+        {
             throw decaf::io::IOException();
         }
 
@@ -214,14 +229,15 @@ namespace transport {
          *
          * This method does nothing in this subclass.
          */
-        virtual void reconnect(const decaf::net::URI& uri AMQCPP_UNUSED) {}
+        virtual void reconnect(const decaf::net::URI& uri AMQCPP_UNUSED)
+        {
+        }
 
     public:  // Runnable methods.
-
         virtual void run();
-
     };
 
-}}
+}  // namespace transport
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_TRANSPORT_IOTRANSPORT_H_*/

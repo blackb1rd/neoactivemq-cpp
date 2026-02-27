@@ -25,33 +25,40 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-Buffer::Buffer( int capacity ) : _position(0),
-                                 _capacity(capacity),
-                                 _limit(capacity),
-                                 _mark(0),
-                                 _markSet(false) {
+Buffer::Buffer(int capacity)
+    : _position(0),
+      _capacity(capacity),
+      _limit(capacity),
+      _mark(0),
+      _markSet(false)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Buffer::Buffer( const Buffer& other ) : _position(other._position),
-                                        _capacity(other._capacity),
-                                        _limit(other._limit),
-                                        _mark(other._mark),
-                                        _markSet(other._markSet) {
+Buffer::Buffer(const Buffer& other)
+    : _position(other._position),
+      _capacity(other._capacity),
+      _limit(other._limit),
+      _mark(other._mark),
+      _markSet(other._markSet)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Buffer& Buffer::position( int newPosition ) {
-
-    if( newPosition < 0 || newPosition > this->_limit ) {
+Buffer& Buffer::position(int newPosition)
+{
+    if (newPosition < 0 || newPosition > this->_limit)
+    {
         throw IllegalArgumentException(
-            __FILE__, __LINE__,
-            "Buffer::position - New Position is greater than set limit" );
+            __FILE__,
+            __LINE__,
+            "Buffer::position - New Position is greater than set limit");
     }
 
     this->_position = newPosition;
-    if( this->_markSet && ( this->_mark > newPosition ) ) {
-        this->_mark = 0;
+    if (this->_markSet && (this->_mark > newPosition))
+    {
+        this->_mark    = 0;
         this->_markSet = false;
     }
 
@@ -59,21 +66,25 @@ Buffer& Buffer::position( int newPosition ) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Buffer& Buffer::limit( int newLimit ) {
-
-    if( newLimit < 0 || newLimit > this->capacity() ) {
+Buffer& Buffer::limit(int newLimit)
+{
+    if (newLimit < 0 || newLimit > this->capacity())
+    {
         throw IllegalArgumentException(
-            __FILE__, __LINE__,
-            "Buffer::limit - new limit is larger than the capacity." );
+            __FILE__,
+            __LINE__,
+            "Buffer::limit - new limit is larger than the capacity.");
     }
 
     this->_limit = newLimit;
-    if( this->_position > newLimit ) {
+    if (this->_position > newLimit)
+    {
         this->_position = newLimit;
     }
 
-    if( this->_markSet && ( this->_mark > newLimit ) ) {
-        this->_mark = 0;
+    if (this->_markSet && (this->_mark > newLimit))
+    {
+        this->_mark    = 0;
         this->_markSet = false;
     }
 
@@ -81,21 +92,23 @@ Buffer& Buffer::limit( int newLimit ) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Buffer& Buffer::mark() {
-
-    this->_mark = this->_position;
+Buffer& Buffer::mark()
+{
+    this->_mark    = this->_position;
     this->_markSet = true;
 
     return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Buffer& Buffer::reset() {
-
-    if( !this->_markSet ) {
+Buffer& Buffer::reset()
+{
+    if (!this->_markSet)
+    {
         throw InvalidMarkException(
-            __FILE__, __LINE__,
-            "Buffer::reset - Buffer has not been Marked." );
+            __FILE__,
+            __LINE__,
+            "Buffer::reset - Buffer has not been Marked.");
     }
 
     this->_position = this->_mark;
@@ -104,30 +117,30 @@ Buffer& Buffer::reset() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Buffer& Buffer::clear() {
-
+Buffer& Buffer::clear()
+{
     this->_position = 0;
-    this->_mark = 0;
-    this->_markSet = false;
-    this->_limit = this->capacity();
+    this->_mark     = 0;
+    this->_markSet  = false;
+    this->_limit    = this->capacity();
     return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Buffer& Buffer::flip() {
-
-    this->_limit = this->_position;
+Buffer& Buffer::flip()
+{
+    this->_limit    = this->_position;
     this->_position = 0;
-    this->_mark = 0;
-    this->_markSet = false;
+    this->_mark     = 0;
+    this->_markSet  = false;
     return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Buffer& Buffer::rewind() {
-
+Buffer& Buffer::rewind()
+{
     this->_position = 0;
-    this->_mark = 0;
-    this->_markSet = false;
+    this->_mark     = 0;
+    this->_markSet  = false;
     return *this;
 }

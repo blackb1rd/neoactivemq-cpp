@@ -20,7 +20,7 @@
 
 // Turn off warning message for ignored exception specification
 #ifdef _MSC_VER
-#pragma warning( disable : 4290 )
+#pragma warning(disable : 4290)
 #endif
 
 #include <activemq/commands/ActiveMQDestination.h>
@@ -32,8 +32,10 @@
 #include <string>
 #include <vector>
 
-namespace activemq {
-namespace commands {
+namespace activemq
+{
+namespace commands
+{
 
     using decaf::lang::Pointer;
 
@@ -46,27 +48,24 @@ namespace commands {
      *         in the activemq-cpp-openwire-generator module
      *
      */
-    class AMQCPP_API JournalTopicAck : public BaseDataStructure {
+    class AMQCPP_API JournalTopicAck : public BaseDataStructure
+    {
     protected:
-
         Pointer<ActiveMQDestination> destination;
-        Pointer<MessageId> messageId;
-        long long messageSequenceId;
-        std::string subscritionName;
-        std::string clientId;
-        Pointer<TransactionId> transactionId;
+        Pointer<MessageId>           messageId;
+        long long                    messageSequenceId;
+        std::string                  subscritionName;
+        std::string                  clientId;
+        Pointer<TransactionId>       transactionId;
 
     public:
-
         const static unsigned char ID_JOURNALTOPICACK = 50;
 
     private:
-
         JournalTopicAck(const JournalTopicAck&);
-        JournalTopicAck& operator= (const JournalTopicAck&);
+        JournalTopicAck& operator=(const JournalTopicAck&);
 
     public:
-
         JournalTopicAck();
 
         virtual ~JournalTopicAck();
@@ -82,30 +81,32 @@ namespace commands {
         virtual bool equals(const DataStructure* value) const;
 
         virtual const Pointer<ActiveMQDestination>& getDestination() const;
-        virtual Pointer<ActiveMQDestination>& getDestination();
-        virtual void setDestination(const Pointer<ActiveMQDestination>& destination);
+        virtual Pointer<ActiveMQDestination>&       getDestination();
+        virtual void                                setDestination(
+                                           const Pointer<ActiveMQDestination>& destination);
 
         virtual const Pointer<MessageId>& getMessageId() const;
-        virtual Pointer<MessageId>& getMessageId();
+        virtual Pointer<MessageId>&       getMessageId();
         virtual void setMessageId(const Pointer<MessageId>& messageId);
 
         virtual long long getMessageSequenceId() const;
-        virtual void setMessageSequenceId(long long messageSequenceId);
+        virtual void      setMessageSequenceId(long long messageSequenceId);
 
         virtual const std::string& getSubscritionName() const;
-        virtual std::string& getSubscritionName();
+        virtual std::string&       getSubscritionName();
         virtual void setSubscritionName(const std::string& subscritionName);
 
         virtual const std::string& getClientId() const;
-        virtual std::string& getClientId();
-        virtual void setClientId(const std::string& clientId);
+        virtual std::string&       getClientId();
+        virtual void               setClientId(const std::string& clientId);
 
         virtual const Pointer<TransactionId>& getTransactionId() const;
-        virtual Pointer<TransactionId>& getTransactionId();
-        virtual void setTransactionId(const Pointer<TransactionId>& transactionId);
-
+        virtual Pointer<TransactionId>&       getTransactionId();
+        virtual void                          setTransactionId(
+                                     const Pointer<TransactionId>& transactionId);
     };
 
-}}
+}  // namespace commands
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_COMMANDS_JOURNALTOPICACK_H_*/

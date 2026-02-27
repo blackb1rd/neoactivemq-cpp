@@ -20,98 +20,104 @@
 
 #include <activemq/util/Config.h>
 
-#include <activemq/util/Suspendable.h>
 #include <activemq/transport/discovery/AbstractDiscoveryAgent.h>
+#include <activemq/util/Suspendable.h>
 
-namespace activemq {
-namespace transport {
-namespace discovery {
-namespace http {
+namespace activemq
+{
+namespace transport
+{
+    namespace discovery
+    {
+        namespace http
+        {
 
-    class HttpDiscoveryAgentImpl;
+            class HttpDiscoveryAgentImpl;
 
-    /**
-     * HTTP based discovery agent that reads a list of active Brokers from a GET
-     * request.
-     *
-     * @since 3.9.0
-     */
-    class AMQCPP_API HttpDiscoveryAgent : public AbstractDiscoveryAgent {
-    private:
+            /**
+             * HTTP based discovery agent that reads a list of active Brokers
+             * from a GET request.
+             *
+             * @since 3.9.0
+             */
+            class AMQCPP_API HttpDiscoveryAgent : public AbstractDiscoveryAgent
+            {
+            private:
+                HttpDiscoveryAgent(const HttpDiscoveryAgent&);
+                HttpDiscoveryAgent& operator=(const HttpDiscoveryAgent&);
 
-        HttpDiscoveryAgent(const HttpDiscoveryAgent&);
-        HttpDiscoveryAgent& operator= (const HttpDiscoveryAgent&);
+            private:
+                HttpDiscoveryAgentImpl* impl;
 
-    private:
+            public:
+                HttpDiscoveryAgent();
 
-        HttpDiscoveryAgentImpl* impl;
+                virtual ~HttpDiscoveryAgent();
 
-    public:
+                /**
+                 * Suspend updates from the configured HTTP registry service.
+                 */
+                virtual void suspend();
 
-        HttpDiscoveryAgent();
+                /**
+                 * Resume updates from the configured HTTP registry service.
+                 */
+                virtual void resume();
 
-        virtual ~HttpDiscoveryAgent();
+                /**
+                 * Sets the amount of time the agent waits before attempting to
+                 * fetch the list of registered Brokers from the configured HTTP
+                 * registry service.
+                 *
+                 * @param updateInterval
+                 *      Time in milliseconds to wait between update attempts.
+                 */
+                void setUpdateInterval(long long updateInterval);
 
-        /**
-         * Suspend updates from the configured HTTP registry service.
-         */
-        virtual void suspend();
+                /**
+                 * Gets the amount of time the agent waits before attempting to
+                 * fetch the list of registered Brokers from the configured HTTP
+                 * registry service.
+                 *
+                 * @return Time in milliseconds to wait between update attempts.
+                 */
+                long long getUpdateInterval() const;
 
-        /**
-         * Resume updates from the configured HTTP registry service.
-         */
-        virtual void resume();
+                /**
+                 * Sets the URL for the Broker registry where the agent gets its
+                 * updates.
+                 *
+                 * @param registryUrl
+                 *      The URL to poll for registry entries.
+                 */
+                void setRegistryURL(const std::string& registryUrl);
 
-        /**
-         * Sets the amount of time the agent waits before attempting to fetch the list
-         * of registered Brokers from the configured HTTP registry service.
-         *
-         * @param updateInterval
-         *      Time in milliseconds to wait between update attempts.
-         */
-        void setUpdateInterval(long long updateInterval);
+                /**
+                 * Gets the URL for the Broker registry where the agent gets its
+                 * updates.
+                 *
+                 * @return The URL to poll for registry entries.
+                 */
+                std::string getRegistryURL() const;
 
-        /**
-         * Gets the amount of time the agent waits before attempting to fetch the list
-         * of registered Brokers from the configured HTTP registry service.
-         *
-         * @return Time in milliseconds to wait between update attempts.
-         */
-        long long getUpdateInterval() const;
+            public:
+                virtual void doStart();
 
-        /**
-         * Sets the URL for the Broker registry where the agent gets its updates.
-         *
-         * @param registryUrl
-         *      The URL to poll for registry entries.
-         */
-        void setRegistryURL(const std::string& registryUrl);
+                virtual void doStop();
 
-        /**
-         * Gets the URL for the Broker registry where the agent gets its updates.
-         *
-         * @return The URL to poll for registry entries.
-         */
-        std::string getRegistryURL() const;
+                virtual void doAdvertizeSelf();
 
-    public:
+                virtual void doDiscovery();
 
-        virtual void doStart();
+                virtual std::string toString() const;
 
-        virtual void doStop();
+            protected:
+                virtual void updateServices();
+            };
 
-        virtual void doAdvertizeSelf();
-
-        virtual void doDiscovery();
-
-        virtual std::string toString() const;
-
-    protected:
-
-        virtual void updateServices();
-
-    };
-
-}}}}
+        }  // namespace http
+    }  // namespace discovery
+}  // namespace transport
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_TRANSPORT_DISCOVERY_HTTP_HTTPDISCOVERYAGENT_H_ */

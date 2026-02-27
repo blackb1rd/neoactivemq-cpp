@@ -18,37 +18,40 @@
 #ifndef _CMS_TRANSACTIONROLLEDBACKEXCEPTION_H_
 #define _CMS_TRANSACTIONROLLEDBACKEXCEPTION_H_
 
-#include <cms/Config.h>
 #include <cms/CMSException.h>
+#include <cms/Config.h>
 
-namespace cms {
+namespace cms
+{
 
-    /**
-     * This exception must be thrown when a call to Session.commit results in a rollback of the
-     * current transaction.
-     *
-     * @since 2.3
-     */
-    class CMS_API TransactionRolledBackException : public cms::CMSException {
-    public:
+/**
+ * This exception must be thrown when a call to Session.commit results in a
+ * rollback of the current transaction.
+ *
+ * @since 2.3
+ */
+class CMS_API TransactionRolledBackException : public cms::CMSException
+{
+public:
+    TransactionRolledBackException();
 
-        TransactionRolledBackException();
+    TransactionRolledBackException(const TransactionRolledBackException& ex);
 
-        TransactionRolledBackException(const TransactionRolledBackException& ex);
+    TransactionRolledBackException(const std::string& message);
 
-        TransactionRolledBackException(const std::string& message);
+    TransactionRolledBackException(const std::string&    message,
+                                   const std::exception* cause);
 
-        TransactionRolledBackException(const std::string& message, const std::exception* cause);
+    TransactionRolledBackException(
+        const std::string&                              message,
+        const std::exception*                           cause,
+        const std::vector<std::pair<std::string, int>>& stackTrace);
 
-        TransactionRolledBackException(const std::string& message, const std::exception* cause,
-                                       const std::vector<std::pair<std::string, int> >& stackTrace);
+    virtual ~TransactionRolledBackException() throw();
 
-        virtual ~TransactionRolledBackException() throw();
+    virtual TransactionRolledBackException* clone();
+};
 
-        virtual TransactionRolledBackException* clone();
-
-    };
-
-}
+}  // namespace cms
 
 #endif /* _CMS_TRANSACTIONROLLEDBACKEXCEPTION_H_ */

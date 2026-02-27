@@ -26,38 +26,50 @@ using namespace test::util;
 using namespace test::util::teamcity;
 
 ////////////////////////////////////////////////////////////////////////////////
-void TeamCityProgressListener::OnTestSuiteStart(const ::testing::TestSuite& test_suite) {
-    writeOpen( "testSuiteStarted" );
-    writeProperty( "name", test_suite.name() );
+void TeamCityProgressListener::OnTestSuiteStart(
+    const ::testing::TestSuite& test_suite)
+{
+    writeOpen("testSuiteStarted");
+    writeProperty("name", test_suite.name());
     writeClose();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TeamCityProgressListener::OnTestSuiteEnd(const ::testing::TestSuite& test_suite) {
-    writeOpen( "testSuiteFinished" );
-    writeProperty( "name", test_suite.name() );
+void TeamCityProgressListener::OnTestSuiteEnd(
+    const ::testing::TestSuite& test_suite)
+{
+    writeOpen("testSuiteFinished");
+    writeProperty("name", test_suite.name());
     writeClose();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TeamCityProgressListener::OnTestStart(const ::testing::TestInfo& test_info) {
-    writeOpen( "testStarted" );
-    writeProperty( "name", test_info.name() );
+void TeamCityProgressListener::OnTestStart(const ::testing::TestInfo& test_info)
+{
+    writeOpen("testStarted");
+    writeProperty("name", test_info.name());
     writeClose();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TeamCityProgressListener::OnTestEnd(const ::testing::TestInfo& test_info) {
-    if (test_info.result()->Failed()) {
+void TeamCityProgressListener::OnTestEnd(const ::testing::TestInfo& test_info)
+{
+    if (test_info.result()->Failed())
+    {
         std::string details;
 
-        for (int i = 0; i < test_info.result()->total_part_count(); ++i) {
-            const ::testing::TestPartResult& part = test_info.result()->GetTestPartResult(i);
-            if (part.failed()) {
-                if (!details.empty()) {
+        for (int i = 0; i < test_info.result()->total_part_count(); ++i)
+        {
+            const ::testing::TestPartResult& part =
+                test_info.result()->GetTestPartResult(i);
+            if (part.failed())
+            {
+                if (!details.empty())
+                {
                     details.append("\n");
                 }
-                if (part.file_name()) {
+                if (part.file_name())
+                {
                     details.append(part.file_name());
                     details.append(":");
                     details.append(std::to_string(part.line_number()));
@@ -67,45 +79,46 @@ void TeamCityProgressListener::OnTestEnd(const ::testing::TestInfo& test_info) {
             }
         }
 
-        writeOpen( "testFailed" );
-        writeProperty( "name", test_info.name() );
-        writeProperty( "message", "Test failed" );
-        writeProperty( "details", details );
+        writeOpen("testFailed");
+        writeProperty("name", test_info.name());
+        writeProperty("message", "Test failed");
+        writeProperty("details", details);
         writeClose();
     }
 
-    writeOpen( "testFinished" );
-    writeProperty( "name", test_info.name() );
+    writeOpen("testFinished");
+    writeProperty("name", test_info.name());
     writeClose();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string TeamCityProgressListener::escape( const std::string& value ) const {
-
+std::string TeamCityProgressListener::escape(const std::string& value) const
+{
     std::string result;
 
-    for( std::size_t i = 0; i < value.length(); i++ ) {
-
+    for (std::size_t i = 0; i < value.length(); i++)
+    {
         char c = value[i];
 
-        switch(c) {
+        switch (c)
+        {
             case '\n':
-                result.append( "|n" );
+                result.append("|n");
                 break;
             case '\r':
-                result.append( "|r" );
+                result.append("|r");
                 break;
             case '\'':
-                result.append( "|'" );
+                result.append("|'");
                 break;
             case '|':
-                result.append( "||" );
+                result.append("||");
                 break;
             case ']':
-                result.append( "|]" );
+                result.append("|]");
                 break;
             default:
-                result.append( &c, 1 );
+                result.append(&c, 1);
         }
     }
 
@@ -113,19 +126,21 @@ std::string TeamCityProgressListener::escape( const std::string& value ) const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TeamCityProgressListener::writeOpen( const std::string& name ) {
+void TeamCityProgressListener::writeOpen(const std::string& name)
+{
     std::cout << std::endl << "##teamcity[" << name;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TeamCityProgressListener::writeClose() {
+void TeamCityProgressListener::writeClose()
+{
     std::cout << "]" << std::endl;
     std::cout.flush();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TeamCityProgressListener::writeProperty( const std::string& name,
-                                              const std::string& value ) {
-
-    std::cout << " " << name << "='" << escape( value ) << "'";
+void TeamCityProgressListener::writeProperty(const std::string& name,
+                                             const std::string& value)
+{
+    std::cout << " " << name << "='" << escape(value) << "'";
 }

@@ -21,44 +21,44 @@
 #include <cms/Config.h>
 #include <cms/Destination.h>
 
-namespace cms {
+namespace cms
+{
+
+/**
+ * An event class that is used to wrap information related to Destination add
+ * and remove events from the CMS Provider.
+ *
+ * @since 3.2
+ */
+class CMS_API DestinationEvent
+{
+public:
+    virtual ~DestinationEvent();
 
     /**
-     * An event class that is used to wrap information related to Destination add and
-     * remove events from the CMS Provider.
+     * Returns the destination that this event is related to, the returned
+     * destination remains the property of this event and should be cloned
+     * if the caller wishes to store it beyond the lifetime of this event
+     * object.
      *
-     * @since 3.2
+     * @return a cms::Destination instance that this event relates to.
      */
-    class CMS_API DestinationEvent {
-    public:
+    virtual const cms::Destination* getDestination() const = 0;
 
-        virtual ~DestinationEvent();
+    /**
+     * Returns true if this events represents the addition of a Destination.
+     *
+     * @return true if this events represents the addition of a Destination.
+     */
+    virtual bool isAddOperation() const = 0;
 
-        /**
-         * Returns the destination that this event is related to, the returned
-         * destination remains the property of this event and should be cloned
-         * if the caller wishes to store it beyond the lifetime of this event
-         * object.
-         *
-         * @return a cms::Destination instance that this event relates to.
-         */
-        virtual const cms::Destination* getDestination() const = 0;
-
-        /**
-         * Returns true if this events represents the addition of a Destination.
-         *
-         * @return true if this events represents the addition of a Destination.
-         */
-        virtual bool isAddOperation() const = 0;
-
-        /**
-         * Returns true if this events represents the removal of a Destination.
-         *
-         * @return true if this events represents the removal of a Destination.
-         */
-        virtual bool isRemoveOperation() const = 0;
-
-    };
-}
+    /**
+     * Returns true if this events represents the removal of a Destination.
+     *
+     * @return true if this events represents the removal of a Destination.
+     */
+    virtual bool isRemoveOperation() const = 0;
+};
+}  // namespace cms
 
 #endif /* _CMS_DESTINATIONEVENT_H_ */

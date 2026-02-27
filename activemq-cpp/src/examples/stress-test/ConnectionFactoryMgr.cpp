@@ -24,30 +24,38 @@ using namespace decaf::lang;
 using namespace cms;
 using namespace cms::stress;
 
-StlMap<std::string, ConnectionFactory*> * ConnectionFactoryMgr::connectionFactories;
+StlMap<std::string, ConnectionFactory*>*
+    ConnectionFactoryMgr::connectionFactories;
 
 ////////////////////////////////////////////////////////////////////////////////
-ConnectionFactoryMgr::ConnectionFactoryMgr() {
+ConnectionFactoryMgr::ConnectionFactoryMgr()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ConnectionFactoryMgr::~ConnectionFactoryMgr() {
+ConnectionFactoryMgr::~ConnectionFactoryMgr()
+{
     unInitialize();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConnectionFactoryMgr::initialize() {
+void ConnectionFactoryMgr::initialize()
+{
     connectionFactories = new StlMap<std::string, ConnectionFactory*>();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConnectionFactoryMgr::unInitialize() {
+void ConnectionFactoryMgr::unInitialize()
+{
     connectionFactories->lock();
 
-    Pointer<Iterator<ConnectionFactory*> > iter(connectionFactories->values().iterator());
-    while (iter->hasNext()) {
+    Pointer<Iterator<ConnectionFactory*>> iter(
+        connectionFactories->values().iterator());
+    while (iter->hasNext())
+    {
         ConnectionFactory* connectionFactory = iter->next();
-        if (connectionFactory != NULL) {
+        if (connectionFactory != NULL)
+        {
             delete connectionFactory;
             connectionFactory = NULL;
         }
@@ -61,19 +69,25 @@ void ConnectionFactoryMgr::unInitialize() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ConnectionFactory* ConnectionFactoryMgr::getConnectionFactory(const std::string& url) {
-
+ConnectionFactory* ConnectionFactoryMgr::getConnectionFactory(
+    const std::string& url)
+{
     ConnectionFactory* connectionFactory = NULL;
 
     connectionFactories->lock();
-    try {
-        if (connectionFactories->containsKey(url)) {
+    try
+    {
+        if (connectionFactories->containsKey(url))
+        {
             connectionFactory = connectionFactories->get(url);
         }
-    } catch (NoSuchElementException& ex) {
+    }
+    catch (NoSuchElementException& ex)
+    {
     }
 
-    if (!connectionFactory) {
+    if (!connectionFactory)
+    {
         connectionFactory = new ActiveMQConnectionFactory(url);
         connectionFactories->put(url, connectionFactory);
     }

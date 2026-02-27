@@ -22,67 +22,71 @@
 using namespace activemq;
 using namespace activemq::util;
 
-    class PrimitiveValueNodeTest : public ::testing::Test {
-    };
+class PrimitiveValueNodeTest : public ::testing::Test
+{
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(PrimitiveValueNodeTest, testValueNode){
-
+TEST_F(PrimitiveValueNodeTest, testValueNode)
+{
     PrimitiveValueNode node;
 
-    node.setBool( true );
+    node.setBool(true);
     ASSERT_TRUE(node.getType() == PrimitiveValueNode::BOOLEAN_TYPE);
     ASSERT_TRUE(node.getBool() == true);
-    node.setBool( false );
+    node.setBool(false);
     ASSERT_TRUE(node.getType() == PrimitiveValueNode::BOOLEAN_TYPE);
     ASSERT_TRUE(node.getBool() == false);
 
-    node.setByte( 5 );
+    node.setByte(5);
     ASSERT_TRUE(node.getType() == PrimitiveValueNode::BYTE_TYPE);
     ASSERT_TRUE(node.getByte() == 5);
 
-    node.setChar( 'a' );
+    node.setChar('a');
     ASSERT_TRUE(node.getType() == PrimitiveValueNode::CHAR_TYPE);
     ASSERT_TRUE(node.getChar() == 'a');
 
-    node.setShort( 10 );
+    node.setShort(10);
     ASSERT_TRUE(node.getType() == PrimitiveValueNode::SHORT_TYPE);
     ASSERT_TRUE(node.getShort() == 10);
 
-    node.setInt( 10000 );
+    node.setInt(10000);
     ASSERT_TRUE(node.getType() == PrimitiveValueNode::INTEGER_TYPE);
     ASSERT_TRUE(node.getInt() == 10000);
 
-    node.setLong( 100000L );
+    node.setLong(100000L);
     ASSERT_TRUE(node.getType() == PrimitiveValueNode::LONG_TYPE);
     ASSERT_TRUE(node.getLong() == 100000L);
 
-    node.setDouble( 2.3 );
+    node.setDouble(2.3);
     ASSERT_TRUE(node.getType() == PrimitiveValueNode::DOUBLE_TYPE);
     ASSERT_TRUE(node.getDouble() == 2.3);
 
-    node.setFloat( 3.2f );
+    node.setFloat(3.2f);
     ASSERT_TRUE(node.getType() == PrimitiveValueNode::FLOAT_TYPE);
     ASSERT_TRUE(node.getFloat() == 3.2f);
 
-    node.setString( "hello" );
+    node.setString("hello");
     ASSERT_TRUE(node.getType() == PrimitiveValueNode::STRING_TYPE);
     ASSERT_TRUE(node.getString() == "hello");
 
     std::vector<unsigned char> byteArray;
-    byteArray.push_back( 'a' );
-    byteArray.push_back( 'b' );
-    byteArray.push_back( 'c' );
-    byteArray.push_back( 'd' );
+    byteArray.push_back('a');
+    byteArray.push_back('b');
+    byteArray.push_back('c');
+    byteArray.push_back('d');
 
-    node.setByteArray( byteArray );
+    node.setByteArray(byteArray);
     ASSERT_TRUE(node.getType() == PrimitiveValueNode::BYTE_ARRAY_TYPE);
     ASSERT_TRUE(node.getByteArray() == byteArray);
 
-    try{
+    try
+    {
         node.getFloat();
         ASSERT_TRUE(false);
-    } catch( decaf::util::NoSuchElementException& e ){
+    }
+    catch (decaf::util::NoSuchElementException& e)
+    {
     }
 
     node.clear();
@@ -90,17 +94,17 @@ TEST_F(PrimitiveValueNodeTest, testValueNode){
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(PrimitiveValueNodeTest, testValueNodeCtors){
-
-    PrimitiveValueNode tfvalue = true;
-    PrimitiveValueNode bvalue = (unsigned char)60;
-    PrimitiveValueNode cvalue = (char)60;
-    PrimitiveValueNode svalue = (short)32767;
-    PrimitiveValueNode ivalue = (int)4096;
-    PrimitiveValueNode lvalue = 555666777888LL;
-    PrimitiveValueNode fvalue = 0.125f;
-    PrimitiveValueNode dvalue = 10.056;
-    PrimitiveValueNode strValue = "TEST";
+TEST_F(PrimitiveValueNodeTest, testValueNodeCtors)
+{
+    PrimitiveValueNode tfvalue     = true;
+    PrimitiveValueNode bvalue      = (unsigned char)60;
+    PrimitiveValueNode cvalue      = (char)60;
+    PrimitiveValueNode svalue      = (short)32767;
+    PrimitiveValueNode ivalue      = (int)4096;
+    PrimitiveValueNode lvalue      = 555666777888LL;
+    PrimitiveValueNode fvalue      = 0.125f;
+    PrimitiveValueNode dvalue      = 10.056;
+    PrimitiveValueNode strValue    = "TEST";
     PrimitiveValueNode bArrayValue = std::vector<unsigned char>();
 
     ASSERT_TRUE(tfvalue.getBool() == true);

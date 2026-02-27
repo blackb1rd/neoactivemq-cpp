@@ -24,12 +24,14 @@
 #include <decaf/io/OutputStream.h>
 #include <decaf/net/URLConnection.h>
 
-namespace decaf {
-namespace net {
+namespace decaf
+{
+namespace net
+{
 
     /**
-     * This abstract subclass of URLConnection defines methods for managing HTTP connection
-     * according to the description given by RFC 2068.
+     * This abstract subclass of URLConnection defines methods for managing HTTP
+     * connection according to the description given by RFC 2068.
      *
      * @see ContentHandler
      * @see URL
@@ -38,11 +40,12 @@ namespace net {
      *
      * @since 1.0
      */
-    class DECAF_API HttpURLConnection : public URLConnection {
+    class DECAF_API HttpURLConnection : public URLConnection
+    {
     protected:
-
         /**
-         * The HTTP request method of this HttpURLConnection.  The default value is "GET".
+         * The HTTP request method of this HttpURLConnection.  The default value
+         * is "GET".
          */
         std::string method;
 
@@ -64,15 +67,15 @@ namespace net {
         std::string responseMessage;
 
         /**
-         * Flag to define whether the protocol will automatically follow redirects
-         * or not. The default value is {@code true}.
+         * Flag to define whether the protocol will automatically follow
+         * redirects or not. The default value is {@code true}.
          */
         bool instanceFollowRedirects;
 
         /**
          * If the HTTP chunked encoding is enabled this parameter defines the
-         * chunk-length. Default value is {@code -1} that means the chunked encoding
-         * mode is disabled.
+         * chunk-length. Default value is {@code -1} that means the chunked
+         * encoding mode is disabled.
          */
         int chunkLength;
 
@@ -84,7 +87,6 @@ namespace net {
         int fixedContentLength;
 
     public:
-
         /**
          * Numeric status code, 202: Accepted
          */
@@ -261,22 +263,18 @@ namespace net {
         static const int HTTP_VERSION;
 
     private:
-
         static bool followRedirects;
 
         static const int DEFAULT_CHUNK_LENGTH;
 
     private:
-
         HttpURLConnection(const HttpURLConnection&);
-        HttpURLConnection& operator= (const HttpURLConnection&);
+        HttpURLConnection& operator=(const HttpURLConnection&);
 
     protected:
-
         HttpURLConnection(const URL& url);
 
     public:
-
         virtual ~HttpURLConnection();
 
         /**
@@ -288,24 +286,26 @@ namespace net {
         virtual void disconnect() = 0;
 
         /**
-         * Returns an input stream from the server in the case of an error such as
-         * the requested file has not been found on the remote server. This stream
-         * can be used to read the data the server will send back.
+         * Returns an input stream from the server in the case of an error such
+         * as the requested file has not been found on the remote server. This
+         * stream can be used to read the data the server will send back.
          *
          * @return the error input stream returned by the server.
          */
-        virtual decaf::io::InputStream* getErrorStream() const {
+        virtual decaf::io::InputStream* getErrorStream() const
+        {
             return NULL;
         }
 
         /**
-         * Returns the request method which will be used to make the request to the
-         * remote HTTP server. All possible methods of this HTTP implementation is
-         * listed in the class definition.
+         * Returns the request method which will be used to make the request to
+         * the remote HTTP server. All possible methods of this HTTP
+         * implementation is listed in the class definition.
          *
          * @return the request method string.
          */
-        std::string getRequestMethod() const {
+        std::string getRequestMethod() const
+        {
             return method;
         }
 
@@ -321,15 +321,16 @@ namespace net {
         /**
          * Returns the response message returned by the remote HTTP server.
          *
-         * @return the response message. empty string if no such response exists.
+         * @return the response message. empty string if no such response
+         * exists.
          *
          * @throws IOException if there is an error during the retrieval.
          */
         std::string getResponseMessage();
 
         /**
-         * Sets the request command which will be sent to the remote HTTP server.
-         * This method can only be called before the connection is made.
+         * Sets the request command which will be sent to the remote HTTP
+         * server. This method can only be called before the connection is made.
          *
          * @param method
          *      the string representing the method to be used.
@@ -345,7 +346,8 @@ namespace net {
          *
          * @return if this connection follows redirects, false otherwise.
          */
-        bool getInstanceFollowRedirects() const {
+        bool getInstanceFollowRedirects() const
+        {
             return instanceFollowRedirects;
         }
 
@@ -355,61 +357,66 @@ namespace net {
          * @param followRedirects
          *      if this connection will follows redirects, false otherwise.
          */
-        void setInstanceFollowRedirects(bool followRedirects) {
+        void setInstanceFollowRedirects(bool followRedirects)
+        {
             instanceFollowRedirects = followRedirects;
         }
 
         /**
-         * If the length of a HTTP request body is known ahead, sets fixed length to
-         * enable streaming without buffering. Sets after connection will cause an
-         * exception.
+         * If the length of a HTTP request body is known ahead, sets fixed
+         * length to enable streaming without buffering. Sets after connection
+         * will cause an exception.
          *
          * @param contentLength
          *      the fixed length of the HTTP request body.
          *
-         * @throws IllegalStateException if already connected or an other mode already set.
+         * @throws IllegalStateException if already connected or an other mode
+         * already set.
          * @throws IllegalArgumentException if contentLength is less than zero.
-        */
+         */
         void setFixedLengthStreamingMode(int contentLength);
 
         /**
-         * If the length of a HTTP request body is NOT known ahead, enable chunked
-         * transfer encoding to enable streaming with buffering. Notice that not all
-         * http servers support this mode. Sets after connection will cause an
-         * exception.
+         * If the length of a HTTP request body is NOT known ahead, enable
+         * chunked transfer encoding to enable streaming with buffering. Notice
+         * that not all http servers support this mode. Sets after connection
+         * will cause an exception.
          *
          * @param chunklen
          *      the length of a chunk.
          *
-         * @throws IllegalStateException if already connected or an other mode already set.
+         * @throws IllegalStateException if already connected or an other mode
+         * already set.
          */
         void setChunkedStreamingMode(int chunklen);
 
     public:
-
         /**
-         * Returns the value of followRedirects which indicates if this connection follows
-         * a different URL redirected by the server. It is enabled by default.
+         * Returns the value of followRedirects which indicates if this
+         * connection follows a different URL redirected by the server. It is
+         * enabled by default.
          *
          * @return the value of the flag.
          */
-        static bool getFollowRedirects() {
+        static bool getFollowRedirects()
+        {
             return followRedirects;
         }
 
         /**
-         * Sets the flag of whether this connection will follow redirects returned
-         * by the remote server.
+         * Sets the flag of whether this connection will follow redirects
+         * returned by the remote server.
          *
          * @param follow
          *      the value to enable or disable this option.
          */
-        static void setFollowRedirects(bool follow) {
+        static void setFollowRedirects(bool follow)
+        {
             followRedirects = follow;
         }
-
     };
 
-}}
+}  // namespace net
+}  // namespace decaf
 
 #endif /* _DECAF_NET_HTTPURLCONNECTION_H_ */

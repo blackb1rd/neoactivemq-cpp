@@ -18,22 +18,24 @@
 #ifndef _DECAF_UTIL_UUID_H_
 #define _DECAF_UTIL_UUID_H_
 
-#include <decaf/util/Config.h>
 #include <decaf/lang/Comparable.h>
+#include <decaf/util/Config.h>
 #include <string>
 #include <vector>
 
-namespace decaf {
-namespace util {
+namespace decaf
+{
+namespace util
+{
 
     class UUIDImpl;
 
     /**
-     * A class that represents an immutable universally unique identifier (UUID).
-     * A UUID represents a 128-bit value.
+     * A class that represents an immutable universally unique identifier
+     * (UUID). A UUID represents a 128-bit value.
      *
-     * There exist different variants of these global identifiers. The methods of
-     * this class are for manipulating the Leach-Salz variant, although the
+     * There exist different variants of these global identifiers. The methods
+     * of this class are for manipulating the Leach-Salz variant, although the
      * constructors allow the creation of any variant of UUID (described below).
      *
      * The layout of a variant 2 (Leach-Salz) UUID is as follows: The most
@@ -50,26 +52,25 @@ namespace util {
      *  0x3FFF000000000000 clock_seq
      *  0x0000FFFFFFFFFFFF node
      *
-     * The variant field contains a value which identifies the layout of the UUID.
-     * The bit layout described above is valid only for a UUID with a variant value
-     * of 2, which indicates the Leach-Salz variant.
+     * The variant field contains a value which identifies the layout of the
+     * UUID. The bit layout described above is valid only for a UUID with a
+     * variant value of 2, which indicates the Leach-Salz variant.
      *
-     * The version field holds a value that describes the type of this UUID. There
-     * are four different basic types of UUIDs: time-based, DCE security, name-based,
-     * and randomly generated UUIDs. These types have a version value of 1, 2, 3 and
-     * 4, respectively.
+     * The version field holds a value that describes the type of this UUID.
+     * There are four different basic types of UUIDs: time-based, DCE security,
+     * name-based, and randomly generated UUIDs. These types have a version
+     * value of 1, 2, 3 and 4, respectively.
      *
      * For more information including algorithms used to create UUIDs, see the
      * Internet-Draft UUIDs and GUIDs or the standards body definition at
      * ISO/IEC 11578:1996.
      */
-    class DECAF_API UUID : public lang::Comparable<UUID> {
+    class DECAF_API UUID : public lang::Comparable<UUID>
+    {
     private:
-
         UUIDImpl* uuid;
 
     public:
-
         /**
          * Static factory to retrieve a type 4 (pseudo randomly generated) UUID.
          * The UUID is generated using a cryptographically strong pseudo random
@@ -117,7 +118,6 @@ namespace util {
         static UUID fromString(const std::string& name);
 
     public:
-
         /**
          * Constructs a new UUID using the specified data. mostSigBits is used
          * for the most significant 64 bits of the UUID and leastSigBits becomes
@@ -137,14 +137,15 @@ namespace util {
         UUID(const UUID& source);
 
         /**
-         * Copy the source UUID and return a reference to this UUID for chaining.
+         * Copy the source UUID and return a reference to this UUID for
+         * chaining.
          *
          * @param source
          *      The UUID whose value replaces the current values in this UUID
          *
          * @return a reference to this UUID
          */
-        UUID& operator= (const UUID& source);
+        UUID& operator=(const UUID& source);
 
         virtual ~UUID();
 
@@ -223,57 +224,62 @@ namespace util {
         /**
          * The node value associated with this UUID.
          *
-         * The 48 bit node value is constructed from the node field of this UUID.
-         * This field is intended to hold the IEEE 802 address of the machine that
-         * generated this UUID to guarantee spatial uniqueness.
+         * The 48 bit node value is constructed from the node field of this
+         * UUID. This field is intended to hold the IEEE 802 address of the
+         * machine that generated this UUID to guarantee spatial uniqueness.
          *
          * The node value is only meaningful in a time-based UUID, which has
-         * version type 1. If this UUID is not a time-based UUID then this method
-         * throws UnsupportedOperationException.
+         * version type 1. If this UUID is not a time-based UUID then this
+         * method throws UnsupportedOperationException.
          *
          * @return the node value of this UUID
          *
-         * @throws UnsupportedOperationException if this UUID version does not support this operation.
+         * @throws UnsupportedOperationException if this UUID version does not
+         * support this operation.
          */
         long long node();
 
         /**
          * The timestamp value associated with this UUID.
          *
-         * The 60 bit timestamp value is constructed from the time_low, time_mid,
-         * and time_hi fields of this UUID. The resulting timestamp is measured in
-         * 100-nanosecond units since midnight, October 15, 1582 UTC.
+         * The 60 bit timestamp value is constructed from the time_low,
+         * time_mid, and time_hi fields of this UUID. The resulting timestamp is
+         * measured in 100-nanosecond units since midnight, October 15, 1582
+         * UTC.
          *
-         * The timestamp value is only meaningful in a time-based UUID, which has
-         * version type 1. If this UUID is not a time-based UUID then this method
-         * throws UnsupportedOperationException.
+         * The timestamp value is only meaningful in a time-based UUID, which
+         * has version type 1. If this UUID is not a time-based UUID then this
+         * method throws UnsupportedOperationException.
          *
          * @return the timestamp associated with a V1 UUID
          *
-         * @throws UnsupportedOperationException if this UUID version does not support this operation.
+         * @throws UnsupportedOperationException if this UUID version does not
+         * support this operation.
          */
         long long timestamp();
 
         /**
          * The clock sequence value associated with this UUID.
          *
-         * The 14 bit clock sequence value is constructed from the clock sequence
-         * field of this UUID. The clock sequence field is used to guarantee temporal
-         * uniqueness in a time-based UUID.
+         * The 14 bit clock sequence value is constructed from the clock
+         * sequence field of this UUID. The clock sequence field is used to
+         * guarantee temporal uniqueness in a time-based UUID.
          *
-         * The clockSequence value is only meaningful in a time-based UUID, which
-         * has version type 1. If this UUID is not a time-based UUID then this
-         * method throws UnsupportedOperationException.
+         * The clockSequence value is only meaningful in a time-based UUID,
+         * which has version type 1. If this UUID is not a time-based UUID then
+         * this method throws UnsupportedOperationException.
          *
          * @return the clockSequeunce associated with a V1 UUID
          *
-         * @throws UnsupportedOperationException if this UUID version does not support this operation.
+         * @throws UnsupportedOperationException if this UUID version does not
+         * support this operation.
          */
         int clockSequence();
 
         /**
-         * The variant number associated with this UUID. The variant number describes
-         * the layout of the UUID. The variant number has the following meaning:
+         * The variant number associated with this UUID. The variant number
+         * describes the layout of the UUID. The variant number has the
+         * following meaning:
          *
          *     * 0 Reserved for NCS backward compatibility
          *     * 2 The Leach-Salz variant (used by this class)
@@ -282,13 +288,15 @@ namespace util {
          *
          * @return the variant associated with a V1 UUID
          *
-         * @throws UnsupportedOperationException if this UUID version does not support this operation.
+         * @throws UnsupportedOperationException if this UUID version does not
+         * support this operation.
          */
         int variant();
 
         /**
-         * The version number associated with this UUID. The version number describes
-         * how this UUID was generated. The version number has the following meaning:
+         * The version number associated with this UUID. The version number
+         * describes how this UUID was generated. The version number has the
+         * following meaning:
          *
          *     * 1 Time-based UUID
          *     * 2 DCE security UUID
@@ -297,12 +305,13 @@ namespace util {
          *
          * @return the version associated with a V1 UUID
          *
-         * @throws UnsupportedOperationException if this UUID version does not support this operation.
+         * @throws UnsupportedOperationException if this UUID version does not
+         * support this operation.
          */
         int version();
-
     };
 
-}}
+}  // namespace util
+}  // namespace decaf
 
 #endif /*_DECAF_UTIL_UUID_H_*/

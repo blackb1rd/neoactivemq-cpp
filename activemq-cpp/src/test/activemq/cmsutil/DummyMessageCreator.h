@@ -18,21 +18,27 @@
 #ifndef ACTIVEMQ_CMSUTIL_DUMMYMESSAGECREATOR_H_
 #define ACTIVEMQ_CMSUTIL_DUMMYMESSAGECREATOR_H_
 
-#include <activemq/cmsutil/MessageCreator.h>
 #include <activemq/cmsutil/DummyMessage.h>
+#include <activemq/cmsutil/MessageCreator.h>
 
-namespace activemq {
-namespace cmsutil {
+namespace activemq
+{
+namespace cmsutil
+{
 
-    class DummyMessageCreator : public MessageCreator {
+    class DummyMessageCreator : public MessageCreator
+    {
     public:
+        virtual ~DummyMessageCreator()
+        {
+        }
 
-        virtual ~DummyMessageCreator() {}
-
-        virtual cms::Message* createMessage(cms::Session* session ) {
+        virtual cms::Message* createMessage(cms::Session* session)
+        {
             return new DummyMessage();
         }
     };
-}}
+}  // namespace cmsutil
+}  // namespace activemq
 
 #endif /*ACTIVEMQ_CMSUTIL_DUMMYMESSAGECREATOR_H_*/

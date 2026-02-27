@@ -18,34 +18,38 @@
 #ifndef ACTIVEMQ_TRANSPORT_TRANSPORT_H_
 #define ACTIVEMQ_TRANSPORT_TRANSPORT_H_
 
-#include <decaf/io/InputStream.h>
-#include <decaf/io/OutputStream.h>
-#include <decaf/io/IOException.h>
-#include <decaf/io/Closeable.h>
-#include <decaf/util/List.h>
-#include <decaf/net/URI.h>
-#include <decaf/lang/Pointer.h>
-#include <decaf/lang/exceptions/UnsupportedOperationException.h>
-#include <activemq/util/Config.h>
-#include <activemq/util/Service.h>
-#include <activemq/transport/ResponseCallback.h>
-#include <activemq/transport/FutureResponse.h>
 #include <activemq/commands/Command.h>
 #include <activemq/commands/Response.h>
+#include <activemq/transport/FutureResponse.h>
+#include <activemq/transport/ResponseCallback.h>
+#include <activemq/util/Config.h>
+#include <activemq/util/Service.h>
+#include <decaf/io/Closeable.h>
+#include <decaf/io/IOException.h>
+#include <decaf/io/InputStream.h>
+#include <decaf/io/OutputStream.h>
+#include <decaf/lang/Pointer.h>
+#include <decaf/lang/exceptions/UnsupportedOperationException.h>
+#include <decaf/net/URI.h>
+#include <decaf/util/List.h>
 #include <typeinfo>
 
-namespace activemq{
-namespace wireformat{
+namespace activemq
+{
+namespace wireformat
+{
     class WireFormat;
-}
-namespace transport{
+}  // namespace wireformat
+
+namespace transport
+{
 
     // Forward declarations.
     class TransportListener;
 
-    using decaf::lang::Pointer;
     using activemq::commands::Command;
     using activemq::commands::Response;
+    using decaf::lang::Pointer;
 
     /**
      * Interface for a transport layer for command objects.  Callers can
@@ -57,14 +61,15 @@ namespace transport{
      * object when created so that they can turn the built in Commands to /
      * from the required wire format encoding.
      */
-    class AMQCPP_API Transport : public activemq::util::Service, public decaf::io::Closeable {
+    class AMQCPP_API Transport : public activemq::util::Service,
+                                 public decaf::io::Closeable
+    {
     public:
-
         virtual ~Transport();
 
         /**
-         * Starts the Transport, the send methods of a Transport will throw an exception
-         * if used before the Transport is started.
+         * Starts the Transport, the send methods of a Transport will throw an
+         * exception if used before the Transport is started.
          *
          * @throw IOException if and error occurs while starting the Transport.
          */
@@ -84,45 +89,54 @@ namespace transport{
          * @param command
          *      The command to be sent.
          *
-         * @throws IOException if an exception occurs during writing of the command.
-         * @throws UnsupportedOperationException if this method is not implemented
-         *         by this transport.
+         * @throws IOException if an exception occurs during writing of the
+         * command.
+         * @throws UnsupportedOperationException if this method is not
+         * implemented by this transport.
          */
         virtual void oneway(const Pointer<Command> command) = 0;
 
         /**
-         * Sends a commands asynchronously, returning a FutureResponse object that the caller
-         * can use to check to find out the response from the broker.
+         * Sends a commands asynchronously, returning a FutureResponse object
+         * that the caller can use to check to find out the response from the
+         * broker.
          *
          * @param command
          *      The Command object that is to sent out.
          * @param responseCallback
-         *      A callback object that will be notified once a response to the command is received.
+         *      A callback object that will be notified once a response to the
+         * command is received.
          *
-         * @return A FutureResponse instance that can be queried for the Response to the Command.
+         * @return A FutureResponse instance that can be queried for the
+         * Response to the Command.
          *
-         * @throws IOException if an exception occurs during the read of the command.
-         * @throws UnsupportedOperationException if this method is not implemented
-         *         by this transport.
+         * @throws IOException if an exception occurs during the read of the
+         * command.
+         * @throws UnsupportedOperationException if this method is not
+         * implemented by this transport.
          */
-        virtual Pointer<FutureResponse> asyncRequest(const Pointer<Command> command,
-                                                     const Pointer<ResponseCallback> responseCallback) = 0;
+        virtual Pointer<FutureResponse> asyncRequest(
+            const Pointer<Command>          command,
+            const Pointer<ResponseCallback> responseCallback) = 0;
 
         /**
-         * Sends the given command to the broker and then waits for the response.
+         * Sends the given command to the broker and then waits for the
+         * response.
          *
          * @param command the command to be sent.
          *
          * @return the response from the broker.
          *
-         * @throws IOException if an exception occurs during the read of the command.
-         * @throws UnsupportedOperationException if this method is not implemented
-         *         by this transport.
+         * @throws IOException if an exception occurs during the read of the
+         * command.
+         * @throws UnsupportedOperationException if this method is not
+         * implemented by this transport.
          */
         virtual Pointer<Response> request(const Pointer<Command> command) = 0;
 
         /**
-         * Sends the given command to the broker and then waits for the response.
+         * Sends the given command to the broker and then waits for the
+         * response.
          *
          * @param command
          *      The command to be sent.
@@ -131,16 +145,18 @@ namespace transport{
          *
          * @return the response from the broker.
          *
-         * @throws IOException if an exception occurs during the read of the command.
-         * @throws UnsupportedOperationException if this method is not implemented
-         *         by this transport.
+         * @throws IOException if an exception occurs during the read of the
+         * command.
+         * @throws UnsupportedOperationException if this method is not
+         * implemented by this transport.
          */
-        virtual Pointer<Response> request(const Pointer<Command> command, unsigned int timeout) = 0;
+        virtual Pointer<Response> request(const Pointer<Command> command,
+                                          unsigned int           timeout) = 0;
 
         /**
-         * Gets the WireFormat instance that is in use by this transport.  In the case of
-         * nested transport this method delegates down to the lowest level transport that
-         * actually maintains a WireFormat info instance.
+         * Gets the WireFormat instance that is in use by this transport.  In
+         * the case of nested transport this method delegates down to the lowest
+         * level transport that actually maintains a WireFormat info instance.
          *
          * @return The WireFormat the object used to encode / decode commands.
          */
@@ -151,7 +167,8 @@ namespace transport{
          * @param wireFormat
          *      The WireFormat the object used to encode / decode commands.
          */
-        virtual void setWireFormat(const Pointer<wireformat::WireFormat> wireFormat) = 0;
+        virtual void setWireFormat(
+            const Pointer<wireformat::WireFormat> wireFormat) = 0;
 
         /**
          * Sets the observer of asynchronous events from this transport.
@@ -224,20 +241,24 @@ namespace transport{
         virtual void reconnect(const decaf::net::URI& uri) = 0;
 
         /**
-         * Updates the set of URIs the Transport can connect to.  If the Transport
-         * doesn't support updating its URIs then an IOException is thrown.
+         * Updates the set of URIs the Transport can connect to.  If the
+         * Transport doesn't support updating its URIs then an IOException is
+         * thrown.
          *
          * @param rebalance
-         *      Indicates if a forced reconnection should be performed as a result of the update.
+         *      Indicates if a forced reconnection should be performed as a
+         * result of the update.
          * @param uris
          *      The new list of URIs that can be used for connection.
          *
          * @throws IOException if an error occurs or updates aren't supported.
          */
-        virtual void updateURIs(bool rebalance, const decaf::util::List<decaf::net::URI>& uris) = 0;
-
+        virtual void updateURIs(
+            bool                                      rebalance,
+            const decaf::util::List<decaf::net::URI>& uris) = 0;
     };
 
-}}
+}  // namespace transport
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_TRANSPORT_TRANSPORT_H_*/

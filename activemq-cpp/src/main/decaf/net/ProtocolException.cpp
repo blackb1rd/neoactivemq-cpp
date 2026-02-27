@@ -22,26 +22,38 @@ using namespace decaf::net;
 using namespace decaf::lang;
 
 ////////////////////////////////////////////////////////////////////////////////
-ProtocolException::ProtocolException() : io::IOException() {
+ProtocolException::ProtocolException()
+    : io::IOException()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ProtocolException::~ProtocolException() throw() {
+ProtocolException::~ProtocolException() throw()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ProtocolException::ProtocolException(const Exception& ex) : io::IOException() {
-    *(Exception*) this = ex;
+ProtocolException::ProtocolException(const Exception& ex)
+    : io::IOException()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ProtocolException::ProtocolException(const ProtocolException& ex) : io::IOException() {
-    *(Exception*) this = ex;
+ProtocolException::ProtocolException(const ProtocolException& ex)
+    : io::IOException()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ProtocolException::ProtocolException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...) : io::IOException(cause) {
-
+ProtocolException::ProtocolException(const char*           file,
+                                     const int             lineNumber,
+                                     const std::exception* cause,
+                                     const char*           msg,
+                                     ...)
+    : io::IOException(cause)
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -51,12 +63,18 @@ ProtocolException::ProtocolException(const char* file, const int lineNumber, con
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ProtocolException::ProtocolException(const std::exception* cause) : io::IOException(cause) {
+ProtocolException::ProtocolException(const std::exception* cause)
+    : io::IOException(cause)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ProtocolException::ProtocolException(const char* file, const int lineNumber, const char* msg, ...) : io::IOException() {
-
+ProtocolException::ProtocolException(const char* file,
+                                     const int   lineNumber,
+                                     const char* msg,
+                                     ...)
+    : io::IOException()
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);

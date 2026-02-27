@@ -16,12 +16,12 @@
  */
 
 #include "PooledSession.h"
-#include "SessionPool.h"
 #include "ResourceLifecycleManager.h"
+#include "SessionPool.h"
 #include <cms/CMSException.h>
 
-#include <decaf/util/Set.h>
 #include <decaf/util/Iterator.h>
+#include <decaf/util/Set.h>
 
 #include <memory>
 
@@ -32,62 +32,87 @@ using namespace activemq::cmsutil;
 /**
  * A catch-all that throws an CMSException.
  */
-#define CMSTEMPLATE_CATCHALL() \
-    catch( cms::CMSException& ex ){ \
-        throw; \
-    } catch( ... ){ \
+#define CMSTEMPLATE_CATCHALL()                                \
+    catch (cms::CMSException & ex)                            \
+    {                                                         \
+        throw;                                                \
+    }                                                         \
+    catch (...)                                               \
+    {                                                         \
         throw CMSException("caught unknown exception", NULL); \
     }
 
 ////////////////////////////////////////////////////////////////////////////////
-PooledSession::PooledSession(SessionPool* pool, cms::Session* session) :
-    pool(pool), session(session), producerCache(), consumerCache() {
+PooledSession::PooledSession(SessionPool* pool, cms::Session* session)
+    : pool(pool),
+      session(session),
+      producerCache(),
+      consumerCache()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-PooledSession::~PooledSession() {
-
+PooledSession::~PooledSession()
+{
     // Destroy cached producers.
-    std::unique_ptr<Iterator<CachedProducer*> > producers(producerCache.values().iterator());
-    while (producers->hasNext()) {
-        try {
+    std::unique_ptr<Iterator<CachedProducer*>> producers(
+        producerCache.values().iterator());
+    while (producers->hasNext())
+    {
+        try
+        {
             delete producers->next();
-        } catch (...) {}
+        }
+        catch (...)
+        {
+        }
     }
 
     // Destroy cached consumers.
-    std::unique_ptr<Iterator<CachedConsumer*> > consumers(consumerCache.values().iterator());
-    while (consumers->hasNext()) {
-        try {
+    std::unique_ptr<Iterator<CachedConsumer*>> consumers(
+        consumerCache.values().iterator());
+    while (consumers->hasNext())
+    {
+        try
+        {
             delete consumers->next();
-        } catch (...) {}
+        }
+        catch (...)
+        {
+        }
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PooledSession::close() {
-
-    if (pool != NULL) {
+void PooledSession::close()
+{
+    if (pool != NULL)
+    {
         pool->returnSession(this);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-cms::QueueBrowser* PooledSession::createBrowser(const cms::Queue* queue) {
+cms::QueueBrowser* PooledSession::createBrowser(const cms::Queue* queue)
+{
     return session->createBrowser(queue);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-cms::QueueBrowser* PooledSession::createBrowser(const cms::Queue* queue, const std::string& selector) {
+cms::QueueBrowser* PooledSession::createBrowser(const cms::Queue*  queue,
+                                                const std::string& selector)
+{
     return session->createBrowser(queue, selector);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-cms::MessageProducer* PooledSession::createCachedProducer(const cms::Destination* destination) {
-
-    try {
-
-        if (destination == NULL) {
+cms::MessageProducer* PooledSession::createCachedProducer(
+    const cms::Destination* destination)
+{
+    try
+    {
+        if (destination == NULL)
+        {
             throw CMSException("destination is NULL", NULL);
         }
 
@@ -95,10 +120,12 @@ cms::MessageProducer* PooledSession::createCachedProducer(const cms::Destination
 
         // Check the cache - add it if necessary.
         CachedProducer* cachedProducer = NULL;
-        try {
+        try
+        {
             cachedProducer = producerCache.get(key);
-        } catch (decaf::util::NoSuchElementException& e) {
-
+        }
+        catch (decaf::util::NoSuchElementException& e)
+        {
             // No producer exists for this destination - start by creating
             // a new producer resource.
             cms::MessageProducer* p = session->createProducer(destination);
@@ -119,11 +146,15 @@ cms::MessageProducer* PooledSession::createCachedProducer(const cms::Destination
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-cms::MessageConsumer* PooledSession::createCachedConsumer(const cms::Destination* destination, const std::string& selector, bool noLocal) {
-
-    try {
-
-        if (destination == NULL) {
+cms::MessageConsumer* PooledSession::createCachedConsumer(
+    const cms::Destination* destination,
+    const std::string&      selector,
+    bool                    noLocal)
+{
+    try
+    {
+        if (destination == NULL)
+        {
             throw CMSException("destination is NULL", NULL);
         }
 
@@ -136,13 +167,16 @@ cms::MessageConsumer* PooledSession::createCachedConsumer(const cms::Destination
 
         // Check the cache - add it if necessary.
         CachedConsumer* cachedConsumer = NULL;
-        try {
+        try
+        {
             cachedConsumer = consumerCache.get(key);
-        } catch (decaf::util::NoSuchElementException& e) {
-
+        }
+        catch (decaf::util::NoSuchElementException& e)
+        {
             // No producer exists for this destination - start by creating
             // a new consumer resource.
-            cms::MessageConsumer* c = session->createConsumer(destination, selector, noLocal);
+            cms::MessageConsumer* c =
+                session->createConsumer(destination, selector, noLocal);
 
             // Add the consumer resource to the resource lifecycle manager.
             pool->getResourceLifecycleManager()->addMessageConsumer(c);
@@ -160,15 +194,19 @@ cms::MessageConsumer* PooledSession::createCachedConsumer(const cms::Destination
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string PooledSession::getUniqueDestName(const cms::Destination* dest) {
-
-    std::string destName = "[";
-    const cms::Queue* queue = dynamic_cast<const cms::Queue*>(dest);
-    if (queue != NULL) {
+std::string PooledSession::getUniqueDestName(const cms::Destination* dest)
+{
+    std::string       destName = "[";
+    const cms::Queue* queue    = dynamic_cast<const cms::Queue*>(dest);
+    if (queue != NULL)
+    {
         destName += "q:" + queue->getQueueName();
-    } else {
+    }
+    else
+    {
         const cms::Topic* topic = dynamic_cast<const cms::Topic*>(dest);
-        if (topic != NULL) {
+        if (topic != NULL)
+        {
             destName += "t:" + topic->getTopicName();
         }
     }

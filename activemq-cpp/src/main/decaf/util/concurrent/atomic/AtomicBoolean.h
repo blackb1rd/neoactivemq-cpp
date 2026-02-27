@@ -18,87 +18,96 @@
 #ifndef _DECAF_UTIL_CONCURRENT_ATOMIC_ATOMICBOOLEAN_H_
 #define _DECAF_UTIL_CONCURRENT_ATOMIC_ATOMICBOOLEAN_H_
 
-#include <string>
 #include <decaf/util/Config.h>
+#include <string>
 
-namespace decaf {
-namespace util {
-namespace concurrent {
-namespace atomic {
+namespace decaf
+{
+namespace util
+{
+    namespace concurrent
+    {
+        namespace atomic
+        {
 
-    /**
-     * A boolean value that may be updated atomically. An AtomicBoolean is used
-     * in applications such as atomically updated flags, and cannot be used as a
-     * replacement for a Boolean.
-     */
-    class DECAF_API AtomicBoolean {
-    private:
+            /**
+             * A boolean value that may be updated atomically. An AtomicBoolean
+             * is used in applications such as atomically updated flags, and
+             * cannot be used as a replacement for a Boolean.
+             */
+            class DECAF_API AtomicBoolean
+            {
+            private:
+                volatile int value;
 
-        volatile int value;
+            private:
+                AtomicBoolean(const AtomicBoolean&);
+                AtomicBoolean& operator=(const AtomicBoolean&);
 
-    private:
+            public:
+                /**
+                 * Creates a new AtomicBoolean whose initial value is false.
+                 */
+                AtomicBoolean();
 
-        AtomicBoolean(const AtomicBoolean&);
-        AtomicBoolean& operator= (const AtomicBoolean&);
+                /**
+                 * Creates a new AtomicBoolean with the initial value.
+                 * @param initialValue - The initial value of this boolean.
+                 */
+                AtomicBoolean(bool initialValue);
 
-    public:
+                virtual ~AtomicBoolean()
+                {
+                }
 
-        /**
-         * Creates a new AtomicBoolean whose initial value is false.
-         */
-        AtomicBoolean();
+                /**
+                 * Gets the current value of this AtomicBoolean.
+                 * @return the currently set value.
+                 */
+                bool get() const
+                {
+                    return value == 0 ? false : true;
+                }
 
-        /**
-         * Creates a new AtomicBoolean with the initial value.
-         * @param initialValue - The initial value of this boolean.
-         */
-        AtomicBoolean(bool initialValue);
+                /**
+                 * Unconditionally sets to the given value.
+                 * @param newValue - the new value
+                 */
+                void set(bool newValue)
+                {
+                    this->value = newValue ? 1 : 0;
+                }
 
-        virtual ~AtomicBoolean() {}
+                /**
+                 * Atomically sets the value to the given updated value if the
+                 * current value == the expected value.
+                 *
+                 * @param expect - the expected value
+                 * @param update - the new value
+                 * @return true if successful. False return indicates that the
+                 * actual value was not equal to the expected value.
+                 */
+                bool compareAndSet(bool expect, bool update);
 
-        /**
-         * Gets the current value of this AtomicBoolean.
-         * @return the currently set value.
-         */
-        bool get() const {
-            return value == 0 ? false : true;
-        }
+                /**
+                 * Atomically sets to the given value and returns the previous
+                 * value.
+                 *
+                 * @param newValue - the new value
+                 * @return the previous value
+                 */
+                bool getAndSet(bool newValue);
 
-        /**
-         * Unconditionally sets to the given value.
-         * @param newValue - the new value
-         */
-        void set(bool newValue) {
-            this->value = newValue ? 1 : 0;
-        }
+                /**
+                 * Returns the String representation of the current value.
+                 * @return the String representation of the current value.
+                 */
+                std::string toString() const;
+            };
 
-        /**
-         * Atomically sets the value to the given updated value if the current
-         * value == the expected value.
-         *
-         * @param expect - the expected value
-         * @param update - the new value
-         * @return true if successful. False return indicates that the actual value
-         * was not equal to the expected value.
-         */
-        bool compareAndSet(bool expect, bool update);
-
-        /**
-         * Atomically sets to the given value and returns the previous value.
-         *
-         * @param newValue - the new value
-         * @return the previous value
-         */
-        bool getAndSet(bool newValue);
-
-        /**
-         * Returns the String representation of the current value.
-         * @return the String representation of the current value.
-         */
-        std::string toString() const;
-
-    };
-
-}}}}
+        }  // namespace atomic
+    }  // namespace concurrent
+}  // namespace util
+}  // namespace decaf
 
 #endif /*_DECAF_UTIL_CONCURRENT_ATOMIC_ATOMICBOOLEAN_H_*/

@@ -17,8 +17,8 @@
 
 #include <gtest/gtest.h>
 
-#include <activemq/state/ConsumerState.h>
 #include <activemq/commands/ConsumerInfo.h>
+#include <activemq/state/ConsumerState.h>
 #include <decaf/lang/Pointer.h>
 
 using namespace std;
@@ -27,19 +27,21 @@ using namespace activemq::state;
 using namespace activemq::commands;
 using namespace decaf::lang;
 
-class ConsumerStateTest : public ::testing::Test {};
+class ConsumerStateTest : public ::testing::Test
+{
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ConsumerStateTest, test) {
+TEST_F(ConsumerStateTest, test)
+{
+    Pointer<ConsumerId> id(new ConsumerId);
+    id->setConnectionId("CONNECTION");
+    id->setSessionId(4096);
+    id->setValue(42);
 
-    Pointer<ConsumerId> id( new ConsumerId );
-    id->setConnectionId( "CONNECTION" );
-    id->setSessionId( 4096 );
-    id->setValue( 42 );
-
-    Pointer<ConsumerInfo> info( new ConsumerInfo() );
-    info->setConsumerId( id );
-    ConsumerState state( info );
+    Pointer<ConsumerInfo> info(new ConsumerInfo());
+    info->setConsumerId(id);
+    ConsumerState state(info);
 
     ASSERT_TRUE(state.toString() != "NULL");
     ASSERT_TRUE(info == state.getInfo());

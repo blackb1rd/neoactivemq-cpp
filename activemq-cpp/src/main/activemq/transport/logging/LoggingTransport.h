@@ -18,54 +18,59 @@
 #ifndef _ACTIVEMQ_TRANSPORT_LOGGING_LOGGINGTRANSPORT_H_
 #define _ACTIVEMQ_TRANSPORT_LOGGING_LOGGINGTRANSPORT_H_
 
-#include <activemq/util/Config.h>
 #include <activemq/transport/TransportFilter.h>
+#include <activemq/util/Config.h>
 #include <decaf/lang/Pointer.h>
 
-namespace activemq{
-namespace transport{
-namespace logging{
+namespace activemq
+{
+namespace transport
+{
+    namespace logging
+    {
 
-    using decaf::lang::Pointer;
-
-    /**
-     * A transport filter that logs commands as they are sent/received.
-     */
-    class AMQCPP_API LoggingTransport: public TransportFilter {
-    public:
+        using decaf::lang::Pointer;
 
         /**
-         * Constructor.
-         * @param next - the next Transport in the chain
+         * A transport filter that logs commands as they are sent/received.
          */
-        LoggingTransport(const Pointer<Transport> next);
+        class AMQCPP_API LoggingTransport : public TransportFilter
+        {
+        public:
+            /**
+             * Constructor.
+             * @param next - the next Transport in the chain
+             */
+            LoggingTransport(const Pointer<Transport> next);
 
-        virtual ~LoggingTransport() {}
+            virtual ~LoggingTransport()
+            {
+            }
 
-    public: // TransportFilter methods.
+        public:  // TransportFilter methods.
+            virtual void onCommand(const Pointer<Command> command);
 
-        virtual void onCommand(const Pointer<Command> command);
+        public:  // TransportFilter methods.
+            virtual void oneway(const Pointer<Command> command);
 
-    public: // TransportFilter methods.
+            /**
+             * {@inheritDoc}
+             *
+             * Not supported by this class - throws an exception.
+             */
+            virtual Pointer<Response> request(const Pointer<Command> command);
 
-        virtual void oneway(const Pointer<Command> command);
+            /**
+             * {@inheritDoc}
+             *
+             * Not supported by this class - throws an exception.
+             */
+            virtual Pointer<Response> request(const Pointer<Command> command,
+                                              unsigned int           timeout);
+        };
 
-        /**
-         * {@inheritDoc}
-         *
-         * Not supported by this class - throws an exception.
-         */
-        virtual Pointer<Response> request(const Pointer<Command> command);
-
-        /**
-         * {@inheritDoc}
-         *
-         * Not supported by this class - throws an exception.
-         */
-        virtual Pointer<Response> request(const Pointer<Command> command, unsigned int timeout);
-
-    };
-
-}}}
+    }  // namespace logging
+}  // namespace transport
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_TRANSPORT_LOGGING_LOGGINGTRANSPORT_H_*/

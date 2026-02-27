@@ -24,18 +24,23 @@ using namespace cms;
 using namespace cmstemplate;
 
 ////////////////////////////////////////////////////////////////////////////////
-CmsMessageCreator::CmsMessageCreator(const std::string& text) : text(text) {
+CmsMessageCreator::CmsMessageCreator(const std::string& text)
+    : text(text)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-CmsMessageCreator::~CmsMessageCreator() {
+CmsMessageCreator::~CmsMessageCreator()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-cms::Message* CmsMessageCreator::createMessage(cms::Session* session) {
+cms::Message* CmsMessageCreator::createMessage(cms::Session* session)
+{
     std::unique_ptr<cms::Message> message;
 
-    if (session) {
+    if (session)
+    {
         message.reset(session->createTextMessage(text));
     }
 

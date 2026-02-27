@@ -18,7 +18,7 @@
 #define _DECAF_LANG_EXCEPTION_EXCEPTION_H_
 
 #ifdef _WIN32
-#pragma warning( disable: 4251 )
+#pragma warning(disable : 4251)
 #endif
 
 #include <decaf/lang/Throwable.h>
@@ -27,21 +27,22 @@
 #include <stdarg.h>
 #include <sstream>
 
-namespace decaf {
-namespace lang {
+namespace decaf
+{
+namespace lang
+{
 
     class ExceptionData;
 
     /*
      * Base class for all exceptions.
      */
-    class DECAF_API Exception : public Throwable {
+    class DECAF_API Exception : public Throwable
+    {
     protected:
-
         ExceptionData* data;
 
     public:
-
         /**
          * Default Constructor
          */
@@ -98,7 +99,11 @@ namespace lang {
          * @param ...
          *      list of primitives that are formatted into the message
          */
-        Exception(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...);
+        Exception(const char*           file,
+                  const int             lineNumber,
+                  const std::exception* cause,
+                  const char*           msg,
+                  ...);
 
         virtual ~Exception() throw();
 
@@ -116,15 +121,17 @@ namespace lang {
          * type of exception and wishes to respond to it.
          *
          * @return a const pointer reference to the causal exception, if there
-         *          was no cause associated with this exception then NULL is returned.
+         *          was no cause associated with this exception then NULL is
+         * returned.
          */
         virtual const std::exception* getCause() const;
 
         /**
-         * Initializes the contained cause exception with the one given.  The caller should
-         * ensure that a valid copy of the causal exception is passed as this Exception object
-         * will take ownership of the passed pointer.  Do not pass a pointer to the address of
-         * an exception allocated on the stack or from an exception in a catch block.
+         * Initializes the contained cause exception with the one given.  The
+         * caller should ensure that a valid copy of the causal exception is
+         * passed as this Exception object will take ownership of the passed
+         * pointer.  Do not pass a pointer to the address of an exception
+         * allocated on the stack or from an exception in a catch block.
          *
          * @param cause
          *      The exception that was the cause of this one.
@@ -136,7 +143,7 @@ namespace lang {
          *
          * @return the const char* of <code>getMessage()</code>.
          */
-        virtual const char* what() const throw ();
+        virtual const char* what() const throw();
 
         /**
          * Sets the cause for this exception.
@@ -160,21 +167,22 @@ namespace lang {
 
         /**
          * Clones this exception.  This is useful for cases where you need
-         * to preserve the type of the original exception as well as the message.
-         * All subclasses should override.
+         * to preserve the type of the original exception as well as the
+         * message. All subclasses should override.
          *
          * @return Copy of this Exception object
          */
         virtual Exception* clone() const;
 
         /**
-         * Provides the stack trace for every point where this exception was caught,
-         * marked, and rethrown.  The first item in the returned vector is the first
-         * point where the mark was set (e.g. where the exception was created).
+         * Provides the stack trace for every point where this exception was
+         * caught, marked, and rethrown.  The first item in the returned vector
+         * is the first point where the mark was set (e.g. where the exception
+         * was created).
          *
          * @return the stack trace.
          */
-        virtual std::vector< std::pair< std::string, int> > getStackTrace() const;
+        virtual std::vector<std::pair<std::string, int>> getStackTrace() const;
 
         /**
          * Prints the stack trace to std::err
@@ -202,16 +210,16 @@ namespace lang {
          * @param ex
          *      const reference to another Exception
          */
-        Exception& operator =(const Exception& ex);
+        Exception& operator=(const Exception& ex);
 
     protected:
-
-        virtual void setStackTrace(const std::vector<std::pair<std::string, int> >& trace);
+        virtual void setStackTrace(
+            const std::vector<std::pair<std::string, int>>& trace);
 
         virtual void buildMessage(const char* format, va_list& vargs);
+    };
 
-   };
-
-}}
+}  // namespace lang
+}  // namespace decaf
 
 #endif /*_DECAF_LANG_EXCEPTION_EXCEPTION_H_*/

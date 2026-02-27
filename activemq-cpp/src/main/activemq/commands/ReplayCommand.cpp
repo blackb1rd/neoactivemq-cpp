@@ -38,17 +38,21 @@ using namespace decaf::lang::exceptions;
  */
 
 ////////////////////////////////////////////////////////////////////////////////
-ReplayCommand::ReplayCommand() :
-    BaseCommand(), firstNakNumber(0), lastNakNumber(0) {
-
+ReplayCommand::ReplayCommand()
+    : BaseCommand(),
+      firstNakNumber(0),
+      lastNakNumber(0)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ReplayCommand::~ReplayCommand() {
+ReplayCommand::~ReplayCommand()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ReplayCommand* ReplayCommand::cloneDataStructure() const {
+ReplayCommand* ReplayCommand::cloneDataStructure() const
+{
     std::unique_ptr<ReplayCommand> replayCommand(new ReplayCommand());
 
     // Copy the data from the base class or classes
@@ -58,18 +62,21 @@ ReplayCommand* ReplayCommand::cloneDataStructure() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReplayCommand::copyDataStructure(const DataStructure* src) {
-
+void ReplayCommand::copyDataStructure(const DataStructure* src)
+{
     // Protect against invalid self assignment.
-    if (this == src) {
+    if (this == src)
+    {
         return;
     }
 
     const ReplayCommand* srcPtr = dynamic_cast<const ReplayCommand*>(src);
 
-    if (srcPtr == NULL || src == NULL) {
+    if (srcPtr == NULL || src == NULL)
+    {
         throw decaf::lang::exceptions::NullPointerException(
-            __FILE__, __LINE__,
+            __FILE__,
+            __LINE__,
             "ReplayCommand::copyDataStructure - src is NULL or invalid");
     }
 
@@ -81,13 +88,14 @@ void ReplayCommand::copyDataStructure(const DataStructure* src) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-unsigned char ReplayCommand::getDataStructureType() const {
+unsigned char ReplayCommand::getDataStructureType() const
+{
     return ReplayCommand::ID_REPLAYCOMMAND;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string ReplayCommand::toString() const {
-
+std::string ReplayCommand::toString() const
+{
     ostringstream stream;
 
     stream << "ReplayCommand { "
@@ -103,51 +111,62 @@ std::string ReplayCommand::toString() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool ReplayCommand::equals(const DataStructure* value) const {
-
-    if (this == value) {
+bool ReplayCommand::equals(const DataStructure* value) const
+{
+    if (this == value)
+    {
         return true;
     }
 
     const ReplayCommand* valuePtr = dynamic_cast<const ReplayCommand*>(value);
 
-    if (valuePtr == NULL || value == NULL) {
+    if (valuePtr == NULL || value == NULL)
+    {
         return false;
     }
 
-    if (this->getFirstNakNumber() != valuePtr->getFirstNakNumber()) {
+    if (this->getFirstNakNumber() != valuePtr->getFirstNakNumber())
+    {
         return false;
     }
-    if (this->getLastNakNumber() != valuePtr->getLastNakNumber()) {
+    if (this->getLastNakNumber() != valuePtr->getLastNakNumber())
+    {
         return false;
     }
-    if (!BaseCommand::equals(value)) {
+    if (!BaseCommand::equals(value))
+    {
         return false;
     }
     return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int ReplayCommand::getFirstNakNumber() const {
+int ReplayCommand::getFirstNakNumber() const
+{
     return firstNakNumber;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReplayCommand::setFirstNakNumber(int firstNakNumber) {
+void ReplayCommand::setFirstNakNumber(int firstNakNumber)
+{
     this->firstNakNumber = firstNakNumber;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int ReplayCommand::getLastNakNumber() const {
+int ReplayCommand::getLastNakNumber() const
+{
     return lastNakNumber;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReplayCommand::setLastNakNumber(int lastNakNumber) {
+void ReplayCommand::setLastNakNumber(int lastNakNumber)
+{
     this->lastNakNumber = lastNakNumber;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<commands::Command> ReplayCommand::visit(activemq::state::CommandVisitor* visitor) {
+decaf::lang::Pointer<commands::Command> ReplayCommand::visit(
+    activemq::state::CommandVisitor* visitor)
+{
     return visitor->processReplayCommand(this);
 }

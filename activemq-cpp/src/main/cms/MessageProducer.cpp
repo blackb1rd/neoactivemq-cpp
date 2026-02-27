@@ -20,7 +20,6 @@
 using namespace cms;
 
 ////////////////////////////////////////////////////////////////////////////////
-MessageProducer::~MessageProducer() {
-
+MessageProducer::~MessageProducer()
+{
 }
-

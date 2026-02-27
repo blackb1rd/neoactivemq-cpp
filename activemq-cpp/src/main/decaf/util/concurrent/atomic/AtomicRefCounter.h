@@ -21,59 +21,75 @@
 #include <decaf/util/concurrent/atomic/AtomicInteger.h>
 #include <algorithm>
 
-namespace decaf{
-namespace util{
-namespace concurrent{
-namespace atomic{
+namespace decaf
+{
+namespace util
+{
+    namespace concurrent
+    {
+        namespace atomic
+        {
 
-    class AtomicRefCounter {
-    private:
+            class AtomicRefCounter
+            {
+            private:
+                decaf::util::concurrent::atomic::AtomicInteger* counter;
 
-        decaf::util::concurrent::atomic::AtomicInteger* counter;
+            private:
+                AtomicRefCounter& operator=(const AtomicRefCounter&);
 
-    private:
+            public:
+                AtomicRefCounter()
+                    : counter(
+                          new decaf::util::concurrent::atomic::AtomicInteger(1))
+                {
+                }
 
-        AtomicRefCounter& operator= ( const AtomicRefCounter& );
+                AtomicRefCounter(const AtomicRefCounter& other)
+                    : counter(other.counter)
+                {
+                    this->counter->incrementAndGet();
+                }
 
-    public:
+                virtual ~AtomicRefCounter()
+                {
+                }
 
-        AtomicRefCounter() :
-            counter( new decaf::util::concurrent::atomic::AtomicInteger( 1 ) ) {}
-        AtomicRefCounter( const AtomicRefCounter& other ) : counter( other.counter ) {
-            this->counter->incrementAndGet();
-        }
+            protected:
+                /**
+                 * Swaps this instance's reference counter with the one given,
+                 * this allows for copy-and-swap semantics of this object.
+                 *
+                 * @param other
+                 *      The value to swap with this one's.
+                 */
+                void swap(AtomicRefCounter& other)
+                {
+                    std::swap(this->counter, other.counter);
+                }
 
-        virtual ~AtomicRefCounter() {}
+                /**
+                 * Removes a reference to the counter Atomically and returns if
+                 * the counter has reached zero, once the counter hits zero, the
+                 * internal counter is destroyed and this instance is now
+                 * considered to be unreferenced.
+                 *
+                 * @return true if the count is now zero.
+                 */
+                bool release()
+                {
+                    if (this->counter->decrementAndGet() == 0)
+                    {
+                        delete this->counter;
+                        return true;
+                    }
+                    return false;
+                }
+            };
 
-    protected:
-
-        /**
-         * Swaps this instance's reference counter with the one given, this allows
-         * for copy-and-swap semantics of this object.
-         *
-         * @param other
-         *      The value to swap with this one's.
-         */
-        void swap( AtomicRefCounter& other ) {
-            std::swap( this->counter, other.counter );
-        }
-
-        /**
-         * Removes a reference to the counter Atomically and returns if the counter
-         * has reached zero, once the counter hits zero, the internal counter is
-         * destroyed and this instance is now considered to be unreferenced.
-         *
-         * @return true if the count is now zero.
-         */
-        bool release() {
-            if( this->counter->decrementAndGet() == 0 ) {
-                delete this->counter;
-                return true;
-            }
-            return false;
-        }
-    };
-
-}}}}
+        }  // namespace atomic
+    }  // namespace concurrent
+}  // namespace util
+}  // namespace decaf
 
 #endif /* _DECAF_UTIL_CONCURRENT_ATOMIC_ATOMICREFCOUNTER_H_ */

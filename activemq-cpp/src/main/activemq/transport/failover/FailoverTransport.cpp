@@ -17,34 +17,33 @@
 
 #include "FailoverTransport.h"
 
+#include <activemq/commands/ConnectionControl.h>
+#include <activemq/commands/RemoveInfo.h>
+#include <activemq/commands/ShutdownInfo.h>
+#include <activemq/threads/CompositeTaskRunner.h>
+#include <activemq/threads/DedicatedTaskRunner.h>
+#include <activemq/transport/DefaultTransportListener.h>
+#include <activemq/transport/TransportRegistry.h>
+#include <activemq/transport/failover/BackupTransportPool.h>
+#include <activemq/transport/failover/BrokerStateInfo.h>
+#include <activemq/transport/failover/CloseTransportsTask.h>
+#include <activemq/transport/failover/FailoverTransportListener.h>
+#include <activemq/transport/failover/URIPool.h>
+#include <activemq/util/AMQLog.h>
+#include <activemq/util/URISupport.h>
+#include <decaf/lang/Integer.h>
+#include <decaf/lang/Long.h>
+#include <decaf/lang/System.h>
+#include <decaf/lang/exceptions/IllegalThreadStateException.h>
+#include <decaf/util/LinkedList.h>
+#include <decaf/util/Random.h>
+#include <decaf/util/StlMap.h>
+#include <decaf/util/StringTokenizer.h>
+#include <decaf/util/concurrent/Mutex.h>
+#include <decaf/util/concurrent/TimeUnit.h>
 #include <atomic>
 #include <sstream>
 #include <vector>
-#include <activemq/util/AMQLog.h>
-#include <activemq/transport/failover/BrokerStateInfo.h>
-#include <activemq/commands/ConnectionControl.h>
-#include <activemq/commands/ShutdownInfo.h>
-#include <activemq/commands/RemoveInfo.h>
-#include <activemq/transport/TransportRegistry.h>
-#include <activemq/threads/DedicatedTaskRunner.h>
-#include <activemq/threads/CompositeTaskRunner.h>
-#include <activemq/transport/failover/BackupTransportPool.h>
-#include <activemq/transport/failover/URIPool.h>
-#include <activemq/transport/DefaultTransportListener.h>
-#include <activemq/transport/failover/FailoverTransportListener.h>
-#include <activemq/transport/failover/CloseTransportsTask.h>
-#include <activemq/transport/failover/URIPool.h>
-#include <decaf/util/Random.h>
-#include <decaf/util/StringTokenizer.h>
-#include <decaf/util/LinkedList.h>
-#include <decaf/util/StlMap.h>
-#include <decaf/util/concurrent/TimeUnit.h>
-#include <decaf/util/concurrent/Mutex.h>
-#include <decaf/lang/System.h>
-#include <decaf/lang/Integer.h>
-#include <decaf/lang/Long.h>
-#include <decaf/lang/exceptions/IllegalThreadStateException.h>
-#include <activemq/util/URISupport.h>
 
 using namespace std;
 using namespace activemq;
@@ -64,399 +63,489 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace activemq {
-namespace transport {
-namespace failover {
+namespace activemq
+{
+namespace transport
+{
+    namespace failover
+    {
 
-    class FailoverTransportImpl {
-    private:
+        class FailoverTransportImpl
+        {
+        private:
+            FailoverTransportImpl(const FailoverTransportImpl&);
+            FailoverTransportImpl& operator=(const FailoverTransportImpl&);
 
-        FailoverTransportImpl(const FailoverTransportImpl&);
-        FailoverTransportImpl& operator= (const FailoverTransportImpl&);
+            static const int DEFAULT_INITIAL_RECONNECT_DELAY;
+            static const int INFINITE_WAIT;
 
-        static const int DEFAULT_INITIAL_RECONNECT_DELAY;
-        static const int INFINITE_WAIT;
+        public:
+            std::atomic<bool> closed;
+            std::atomic<bool> connected;
+            std::atomic<bool> started;
 
-    public:
+            long long     timeout;
+            long long     initialReconnectDelay;
+            long long     maxReconnectDelay;
+            long long     backOffMultiplier;
+            bool          useExponentialBackOff;
+            bool          initialized;
+            int           maxReconnectAttempts;
+            int           startupMaxReconnectAttempts;
+            int           connectFailures;
+            long long     reconnectDelay;
+            bool          trackMessages;
+            bool          trackTransactionProducers;
+            int           maxCacheSize;
+            int           maxPullCacheSize;
+            bool          connectionInterruptProcessingComplete;
+            bool          firstConnection;
+            bool          updateURIsSupported;
+            bool          reconnectSupported;
+            bool          rebalanceUpdateURIs;
+            bool          priorityBackup;
+            bool          backupsEnabled;
+            volatile bool shutdown;
 
-        std::atomic<bool> closed;
-        std::atomic<bool> connected;
-        std::atomic<bool> started;
+            bool doRebalance;
+            bool connectedToPrioirty;
 
-        long long timeout;
-        long long initialReconnectDelay;
-        long long maxReconnectDelay;
-        long long backOffMultiplier;
-        bool useExponentialBackOff;
-        bool initialized;
-        int maxReconnectAttempts;
-        int startupMaxReconnectAttempts;
-        int connectFailures;
-        long long reconnectDelay;
-        bool trackMessages;
-        bool trackTransactionProducers;
-        int maxCacheSize;
-        int maxPullCacheSize;
-        bool connectionInterruptProcessingComplete;
-        bool firstConnection;
-        bool updateURIsSupported;
-        bool reconnectSupported;
-        bool rebalanceUpdateURIs;
-        bool priorityBackup;
-        bool backupsEnabled;
-        volatile bool shutdown;
+            mutable Mutex reconnectMutex;
+            mutable Mutex sleepMutex;
+            mutable Mutex listenerMutex;
 
-        bool doRebalance;
-        bool connectedToPrioirty;
+            StlMap<int, Pointer<Command>>    requestMap;
+            StlMap<std::string, BrokerState> brokerStates;  // Per-broker state
+                                                            // tracking
 
-        mutable Mutex reconnectMutex;
-        mutable Mutex sleepMutex;
-        mutable Mutex listenerMutex;
+            Pointer<URIPool>             uris;
+            Pointer<URIPool>             priorityUris;
+            Pointer<URIPool>             updated;
+            Pointer<URI>                 connectedTransportURI;
+            Pointer<Transport>           connectedTransport;
+            Pointer<Transport>           connectingTransport;
+            Pointer<Exception>           connectionFailure;
+            Pointer<BackupTransportPool> backups;
+            Pointer<CloseTransportsTask> closeTask;
+            Pointer<CompositeTaskRunner> taskRunner;
+            Pointer<TransportListener>   disposedListener;
+            Pointer<TransportListener>   myTransportListener;
 
-        StlMap<int, Pointer<Command> > requestMap;
-        StlMap<std::string, BrokerState> brokerStates;  // Per-broker state tracking
+            TransportListener* transportListener;
 
-        Pointer<URIPool> uris;
-        Pointer<URIPool> priorityUris;
-        Pointer<URIPool> updated;
-        Pointer<URI> connectedTransportURI;
-        Pointer<Transport> connectedTransport;
-        Pointer<Transport> connectingTransport;
-        Pointer<Exception> connectionFailure;
-        Pointer<BackupTransportPool> backups;
-        Pointer<CloseTransportsTask> closeTask;
-        Pointer<CompositeTaskRunner> taskRunner;
-        Pointer<TransportListener> disposedListener;
-        Pointer<TransportListener> myTransportListener;
+            FailoverTransportImpl(FailoverTransport* parent)
+                : closed(false),
+                  connected(false),
+                  started(false),
+                  timeout(30000),  // 30 second timeout instead of infinite to
+                                   // avoid hanging
+                  initialReconnectDelay(DEFAULT_INITIAL_RECONNECT_DELAY),
+                  maxReconnectDelay(1000 * 30),
+                  backOffMultiplier(2),
+                  useExponentialBackOff(true),
+                  initialized(false),
+                  maxReconnectAttempts(20),
+                  startupMaxReconnectAttempts(20),
+                  connectFailures(0),
+                  reconnectDelay(DEFAULT_INITIAL_RECONNECT_DELAY),
+                  trackMessages(false),
+                  trackTransactionProducers(true),
+                  maxCacheSize(128 * 1024),
+                  maxPullCacheSize(10),
+                  connectionInterruptProcessingComplete(false),
+                  firstConnection(true),
+                  updateURIsSupported(true),
+                  reconnectSupported(true),
+                  rebalanceUpdateURIs(true),
+                  priorityBackup(false),
+                  backupsEnabled(false),
+                  shutdown(false),
+                  doRebalance(false),
+                  connectedToPrioirty(false),
+                  reconnectMutex(),
+                  sleepMutex(),
+                  listenerMutex(),
+                  requestMap(),
+                  uris(new URIPool()),
+                  priorityUris(new URIPool()),
+                  updated(new URIPool()),
+                  connectedTransportURI(),
+                  connectedTransport(),
+                  connectionFailure(),
+                  backups(),
+                  closeTask(new CloseTransportsTask()),
+                  taskRunner(new CompositeTaskRunner()),
+                  disposedListener(new DefaultTransportListener()),
+                  myTransportListener(new FailoverTransportListener(parent)),
+                  transportListener(NULL)
+            {
+                this->backups.reset(new BackupTransportPool(parent,
+                                                            taskRunner,
+                                                            closeTask,
+                                                            uris,
+                                                            updated,
+                                                            priorityUris));
 
-        TransportListener* transportListener;
-
-        FailoverTransportImpl(FailoverTransport* parent) :
-            closed(false),
-            connected(false),
-            started(false),
-            timeout(30000),  // 30 second timeout instead of infinite to avoid hanging
-            initialReconnectDelay(DEFAULT_INITIAL_RECONNECT_DELAY),
-            maxReconnectDelay(1000*30),
-            backOffMultiplier(2),
-            useExponentialBackOff(true),
-            initialized(false),
-            maxReconnectAttempts(20),
-            startupMaxReconnectAttempts(20),
-            connectFailures(0),
-            reconnectDelay(DEFAULT_INITIAL_RECONNECT_DELAY),
-            trackMessages(false),
-            trackTransactionProducers(true),
-            maxCacheSize(128*1024),
-            maxPullCacheSize(10),
-            connectionInterruptProcessingComplete(false),
-            firstConnection(true),
-            updateURIsSupported(true),
-            reconnectSupported(true),
-            rebalanceUpdateURIs(true),
-            priorityBackup(false),
-            backupsEnabled(false),
-            shutdown(false),
-            doRebalance(false),
-            connectedToPrioirty(false),
-            reconnectMutex(),
-            sleepMutex(),
-            listenerMutex(),
-            requestMap(),
-            uris(new URIPool()),
-            priorityUris(new URIPool()),
-            updated(new URIPool()),
-            connectedTransportURI(),
-            connectedTransport(),
-            connectionFailure(),
-            backups(),
-            closeTask(new CloseTransportsTask()),
-            taskRunner(new CompositeTaskRunner()),
-            disposedListener(new DefaultTransportListener()),
-            myTransportListener(new FailoverTransportListener(parent)),
-            transportListener(NULL) {
-
-            this->backups.reset(
-                new BackupTransportPool(parent, taskRunner, closeTask, uris, updated, priorityUris));
-
-            this->taskRunner->addTask(parent);
-            this->taskRunner->addTask(this->closeTask.get());
-        }
-
-        /**
-         * Get or create broker state for a URI.
-         */
-        BrokerState& getBrokerState(const decaf::net::URI& uri) {
-            std::string uriStr = uri.toString();
-            if (!brokerStates.containsKey(uriStr)) {
-                brokerStates.put(uriStr, BrokerState());
+                this->taskRunner->addTask(parent);
+                this->taskRunner->addTask(this->closeTask.get());
             }
-            return brokerStates.get(uriStr);
-        }
 
-        /**
-         * Get broker state (const version).
-         */
-        const BrokerState& getBrokerState(const decaf::net::URI& uri) const {
-            std::string uriStr = uri.toString();
-            if (brokerStates.containsKey(uriStr)) {
+            /**
+             * Get or create broker state for a URI.
+             */
+            BrokerState& getBrokerState(const decaf::net::URI& uri)
+            {
+                std::string uriStr = uri.toString();
+                if (!brokerStates.containsKey(uriStr))
+                {
+                    brokerStates.put(uriStr, BrokerState());
+                }
                 return brokerStates.get(uriStr);
             }
-            static const BrokerState defaultState;
-            return defaultState;
-        }
 
-        /**
-         * Mark broker connection attempt started.
-         */
-        void markBrokerConnecting(const decaf::net::URI& uri) {
-            BrokerState& state = getBrokerState(uri);
-            state.status = BrokerStatus::CONNECTING;
-            state.lastAttemptTime = System::currentTimeMillis();
-        }
-
-        /**
-         * Mark broker connection succeeded.
-         */
-        void markBrokerConnected(const decaf::net::URI& uri) {
-            BrokerState& state = getBrokerState(uri);
-            state.status = BrokerStatus::CONNECTED;
-            state.failureCount = 0;
-            state.lastSuccessTime = System::currentTimeMillis();
-            state.lastError = "";
-        }
-
-        /**
-         * Mark broker connection failed.
-         */
-        void markBrokerFailed(const decaf::net::URI& uri, const std::string& error, int maxAttempts) {
-            BrokerState& state = getBrokerState(uri);
-            state.failureCount++;
-            state.lastError = error;
-
-            // Determine if broker should be marked as exhausted
-            if (maxAttempts >= 0 && state.failureCount >= maxAttempts) {
-                state.status = BrokerStatus::EXHAUSTED;
-                AMQ_LOG_WARN("FailoverTransport", "Broker " << uri.toString()
-                    << " marked as EXHAUSTED after " << state.failureCount << " failures");
-            } else {
-                state.status = BrokerStatus::FAILED;
+            /**
+             * Get broker state (const version).
+             */
+            const BrokerState& getBrokerState(const decaf::net::URI& uri) const
+            {
+                std::string uriStr = uri.toString();
+                if (brokerStates.containsKey(uriStr))
+                {
+                    return brokerStates.get(uriStr);
+                }
+                static const BrokerState defaultState;
+                return defaultState;
             }
-        }
 
-        /**
-         * Get the failure count for a specific URI.
-         */
-        int getUriFailureCount(const decaf::net::URI& uri) const {
-            return getBrokerState(uri).failureCount;
-        }
-
-        /**
-         * Check if a URI has exceeded its max reconnect attempts.
-         */
-        bool isUriExhausted(const decaf::net::URI& uri, int maxAttempts) const {
-            if (maxAttempts < 0) {
-                return false;  // Infinite retries
+            /**
+             * Mark broker connection attempt started.
+             */
+            void markBrokerConnecting(const decaf::net::URI& uri)
+            {
+                BrokerState& state    = getBrokerState(uri);
+                state.status          = BrokerStatus::CONNECTING;
+                state.lastAttemptTime = System::currentTimeMillis();
             }
-            const BrokerState& state = getBrokerState(uri);
-            return state.status == BrokerStatus::EXHAUSTED || state.failureCount >= maxAttempts;
-        }
 
-        /**
-         * Check if all URIs in a list have exceeded their max reconnect attempts.
-         */
-        bool allUrisExhausted(const decaf::util::List<decaf::net::URI>& uriList, int maxAttempts) const {
-            if (maxAttempts < 0) {
-                return false;  // Infinite retries
+            /**
+             * Mark broker connection succeeded.
+             */
+            void markBrokerConnected(const decaf::net::URI& uri)
+            {
+                BrokerState& state    = getBrokerState(uri);
+                state.status          = BrokerStatus::CONNECTED;
+                state.failureCount    = 0;
+                state.lastSuccessTime = System::currentTimeMillis();
+                state.lastError       = "";
             }
-            for (int i = 0; i < uriList.size(); i++) {
-                if (!isUriExhausted(uriList.get(i), maxAttempts)) {
-                    return false;
+
+            /**
+             * Mark broker connection failed.
+             */
+            void markBrokerFailed(const decaf::net::URI& uri,
+                                  const std::string&     error,
+                                  int                    maxAttempts)
+            {
+                BrokerState& state = getBrokerState(uri);
+                state.failureCount++;
+                state.lastError = error;
+
+                // Determine if broker should be marked as exhausted
+                if (maxAttempts >= 0 && state.failureCount >= maxAttempts)
+                {
+                    state.status = BrokerStatus::EXHAUSTED;
+                    AMQ_LOG_WARN("FailoverTransport",
+                                 "Broker " << uri.toString()
+                                           << " marked as EXHAUSTED after "
+                                           << state.failureCount
+                                           << " failures");
+                }
+                else
+                {
+                    state.status = BrokerStatus::FAILED;
                 }
             }
-            return true;
-        }
 
-        /**
-         * Reset all broker states (called on successful connection).
-         */
-        void resetAllUriFailureCounts() {
-            // Reset all brokers to AVAILABLE state with zero failures
-            Pointer<Iterator<std::string>> iter(brokerStates.keySet().iterator());
-            while (iter->hasNext()) {
-                std::string key = iter->next();
-                BrokerState& state = brokerStates.get(key);
-                if (state.status != BrokerStatus::CONNECTED) {
-                    state.status = BrokerStatus::AVAILABLE;
-                    state.failureCount = 0;
+            /**
+             * Get the failure count for a specific URI.
+             */
+            int getUriFailureCount(const decaf::net::URI& uri) const
+            {
+                return getBrokerState(uri).failureCount;
+            }
+
+            /**
+             * Check if a URI has exceeded its max reconnect attempts.
+             */
+            bool isUriExhausted(const decaf::net::URI& uri,
+                                int                    maxAttempts) const
+            {
+                if (maxAttempts < 0)
+                {
+                    return false;  // Infinite retries
                 }
+                const BrokerState& state = getBrokerState(uri);
+                return state.status == BrokerStatus::EXHAUSTED ||
+                       state.failureCount >= maxAttempts;
             }
-        }
 
-        /**
-         * Recover exhausted brokers after a cooldown period (5 minutes).
-         */
-        void recoverExhaustedBrokers() {
-            const long long RECOVERY_COOLDOWN = 300000;  // 5 minutes
-            long long now = System::currentTimeMillis();
-
-            Pointer<Iterator<std::string>> iter(brokerStates.keySet().iterator());
-            while (iter->hasNext()) {
-                std::string key = iter->next();
-                BrokerState& state = brokerStates.get(key);
-
-                if (state.status == BrokerStatus::EXHAUSTED &&
-                    (now - state.lastAttemptTime) > RECOVERY_COOLDOWN) {
-                    AMQ_LOG_INFO("FailoverTransport", "Recovering exhausted broker: " << key
-                        << " after cooldown period");
-                    state.status = BrokerStatus::AVAILABLE;
-                    state.failureCount = 0;
+            /**
+             * Check if all URIs in a list have exceeded their max reconnect
+             * attempts.
+             */
+            bool allUrisExhausted(
+                const decaf::util::List<decaf::net::URI>& uriList,
+                int                                       maxAttempts) const
+            {
+                if (maxAttempts < 0)
+                {
+                    return false;  // Infinite retries
                 }
+                for (int i = 0; i < uriList.size(); i++)
+                {
+                    if (!isUriExhausted(uriList.get(i), maxAttempts))
+                    {
+                        return false;
+                    }
+                }
+                return true;
             }
-        }
 
-        bool isPriority(const decaf::net::URI& uri) {
-            return priorityUris->contains(uri) || uris->isPriority(uri);
-        }
-
-        Pointer<URIPool> getConnectList() {
-            // Pick an appropriate URI pool, updated is always preferred if updates are
-            // enabled and we have any, otherwise we fallback to our original list so that
-            // we ensure we always try something.
-            Pointer<URIPool> uris = this->uris;
-            if (this->updateURIsSupported && !this->updated->isEmpty()) {
-                uris = this->updated;
-            }
-            return uris;
-        }
-
-        void doDelay() {
-            if (reconnectDelay > 0) {
-                synchronized (&sleepMutex) {
-                    try {
-                        sleepMutex.wait(reconnectDelay);
-                    } catch (InterruptedException& e) {
-                        Thread::currentThread()->interrupt();
+            /**
+             * Reset all broker states (called on successful connection).
+             */
+            void resetAllUriFailureCounts()
+            {
+                // Reset all brokers to AVAILABLE state with zero failures
+                Pointer<Iterator<std::string>> iter(
+                    brokerStates.keySet().iterator());
+                while (iter->hasNext())
+                {
+                    std::string  key   = iter->next();
+                    BrokerState& state = brokerStates.get(key);
+                    if (state.status != BrokerStatus::CONNECTED)
+                    {
+                        state.status       = BrokerStatus::AVAILABLE;
+                        state.failureCount = 0;
                     }
                 }
             }
 
-            if (useExponentialBackOff) {
-                // Exponential increment of reconnect delay.
-                reconnectDelay *= backOffMultiplier;
-                if (reconnectDelay > maxReconnectDelay) {
-                    reconnectDelay = maxReconnectDelay;
-                }
-            }
-        }
+            /**
+             * Recover exhausted brokers after a cooldown period (5 minutes).
+             */
+            void recoverExhaustedBrokers()
+            {
+                const long long RECOVERY_COOLDOWN = 300000;  // 5 minutes
+                long long       now               = System::currentTimeMillis();
 
-        int calculateReconnectAttemptLimit() const {
-            int maxReconnectValue = maxReconnectAttempts;
-            if (firstConnection && startupMaxReconnectAttempts != INFINITE_WAIT) {
-                maxReconnectValue = startupMaxReconnectAttempts;
-            }
-            return maxReconnectValue;
-        }
+                Pointer<Iterator<std::string>> iter(
+                    brokerStates.keySet().iterator());
+                while (iter->hasNext())
+                {
+                    std::string  key   = iter->next();
+                    BrokerState& state = brokerStates.get(key);
 
-        bool canReconnect() const {
-            return started && 0 != calculateReconnectAttemptLimit();
-        }
-
-        /**
-         * This must be called with the reconnect mutex locked.
-         */
-        void propagateFailureToExceptionListener() {
-            if (this->transportListener != NULL) {
-
-                Pointer<IOException> ioException;
-                try {
-                    ioException = this->connectionFailure.dynamicCast<IOException>();
-                }
-                AMQ_CATCH_NOTHROW(ClassCastException)
-
-                if (ioException != NULL) {
-                    transportListener->onException(*this->connectionFailure);
-                } else {
-                    transportListener->onException(IOException(*this->connectionFailure));
+                    if (state.status == BrokerStatus::EXHAUSTED &&
+                        (now - state.lastAttemptTime) > RECOVERY_COOLDOWN)
+                    {
+                        AMQ_LOG_INFO("FailoverTransport",
+                                     "Recovering exhausted broker: "
+                                         << key << " after cooldown period");
+                        state.status       = BrokerStatus::AVAILABLE;
+                        state.failureCount = 0;
+                    }
                 }
             }
 
-            reconnectMutex.notifyAll();
-        }
-
-        void resetReconnectDelay() {
-            if (!useExponentialBackOff || reconnectDelay == DEFAULT_INITIAL_RECONNECT_DELAY) {
-                reconnectDelay = initialReconnectDelay;
+            bool isPriority(const decaf::net::URI& uri)
+            {
+                return priorityUris->contains(uri) || uris->isPriority(uri);
             }
-        }
 
-        bool isClosedOrFailed() const {
-            return closed || connectionFailure != NULL;
-        }
+            Pointer<URIPool> getConnectList()
+            {
+                // Pick an appropriate URI pool, updated is always preferred if
+                // updates are enabled and we have any, otherwise we fallback to
+                // our original list so that we ensure we always try something.
+                Pointer<URIPool> uris = this->uris;
+                if (this->updateURIsSupported && !this->updated->isEmpty())
+                {
+                    uris = this->updated;
+                }
+                return uris;
+            }
 
-        bool isConnectionStateValid() const {
-            return connectedTransport != NULL && !doRebalance && !backups->isPriorityBackupAvailable();
-        }
-
-        void disconnect() {
-            Pointer<Transport> transport;
-            transport.swap(this->connectedTransport);
-
-            if (transport != NULL) {
-
-                if (this->disposedListener != NULL) {
-                    transport->setTransportListener(this->disposedListener.get());
+            void doDelay()
+            {
+                if (reconnectDelay > 0)
+                {
+                    synchronized(&sleepMutex)
+                    {
+                        try
+                        {
+                            sleepMutex.wait(reconnectDelay);
+                        }
+                        catch (InterruptedException& e)
+                        {
+                            Thread::currentThread()->interrupt();
+                        }
+                    }
                 }
 
-                // Hand off to the close task so it gets done in a different thread.
-                this->closeTask->add(transport);
-                this->taskRunner->wakeup();
-
-                if (this->connectedTransportURI != NULL) {
-                    this->uris->addURI(*this->connectedTransportURI);
-                    this->connectedTransportURI.reset(NULL);
-                }
-
-                if (transportListener != NULL) {
-                    transportListener->transportInterrupted();
+                if (useExponentialBackOff)
+                {
+                    // Exponential increment of reconnect delay.
+                    reconnectDelay *= backOffMultiplier;
+                    if (reconnectDelay > maxReconnectDelay)
+                    {
+                        reconnectDelay = maxReconnectDelay;
+                    }
                 }
             }
-        }
 
-        bool willReconnect() {
-            return firstConnection || 0 != calculateReconnectAttemptLimit();
-        }
-    };
+            int calculateReconnectAttemptLimit() const
+            {
+                int maxReconnectValue = maxReconnectAttempts;
+                if (firstConnection &&
+                    startupMaxReconnectAttempts != INFINITE_WAIT)
+                {
+                    maxReconnectValue = startupMaxReconnectAttempts;
+                }
+                return maxReconnectValue;
+            }
 
-    const int FailoverTransportImpl::DEFAULT_INITIAL_RECONNECT_DELAY = 10;
-    const int FailoverTransportImpl::INFINITE_WAIT = -1;
+            bool canReconnect() const
+            {
+                return started && 0 != calculateReconnectAttemptLimit();
+            }
 
-}}}
+            /**
+             * This must be called with the reconnect mutex locked.
+             */
+            void propagateFailureToExceptionListener()
+            {
+                if (this->transportListener != NULL)
+                {
+                    Pointer<IOException> ioException;
+                    try
+                    {
+                        ioException =
+                            this->connectionFailure.dynamicCast<IOException>();
+                    }
+                    AMQ_CATCH_NOTHROW(ClassCastException)
+
+                    if (ioException != NULL)
+                    {
+                        transportListener->onException(
+                            *this->connectionFailure);
+                    }
+                    else
+                    {
+                        transportListener->onException(
+                            IOException(*this->connectionFailure));
+                    }
+                }
+
+                reconnectMutex.notifyAll();
+            }
+
+            void resetReconnectDelay()
+            {
+                if (!useExponentialBackOff ||
+                    reconnectDelay == DEFAULT_INITIAL_RECONNECT_DELAY)
+                {
+                    reconnectDelay = initialReconnectDelay;
+                }
+            }
+
+            bool isClosedOrFailed() const
+            {
+                return closed || connectionFailure != NULL;
+            }
+
+            bool isConnectionStateValid() const
+            {
+                return connectedTransport != NULL && !doRebalance &&
+                       !backups->isPriorityBackupAvailable();
+            }
+
+            void disconnect()
+            {
+                Pointer<Transport> transport;
+                transport.swap(this->connectedTransport);
+
+                if (transport != NULL)
+                {
+                    if (this->disposedListener != NULL)
+                    {
+                        transport->setTransportListener(
+                            this->disposedListener.get());
+                    }
+
+                    // Hand off to the close task so it gets done in a different
+                    // thread.
+                    this->closeTask->add(transport);
+                    this->taskRunner->wakeup();
+
+                    if (this->connectedTransportURI != NULL)
+                    {
+                        this->uris->addURI(*this->connectedTransportURI);
+                        this->connectedTransportURI.reset(NULL);
+                    }
+
+                    if (transportListener != NULL)
+                    {
+                        transportListener->transportInterrupted();
+                    }
+                }
+            }
+
+            bool willReconnect()
+            {
+                return firstConnection || 0 != calculateReconnectAttemptLimit();
+            }
+        };
+
+        const int FailoverTransportImpl::DEFAULT_INITIAL_RECONNECT_DELAY = 10;
+        const int FailoverTransportImpl::INFINITE_WAIT                   = -1;
+
+    }  // namespace failover
+}  // namespace transport
+}  // namespace activemq
 
 ////////////////////////////////////////////////////////////////////////////////
-FailoverTransport::FailoverTransport() : stateTracker(), impl(NULL) {
+FailoverTransport::FailoverTransport()
+    : stateTracker(),
+      impl(NULL)
+{
     this->impl = new FailoverTransportImpl(this);
     this->stateTracker.setTrackTransactions(true);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-FailoverTransport::~FailoverTransport() {
-    try {
+FailoverTransport::~FailoverTransport()
+{
+    try
+    {
         close();
     }
     AMQ_CATCHALL_NOTHROW()
 
-    try {
+    try
+    {
         delete this->impl;
     }
     AMQ_CATCHALL_NOTHROW()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransport::add(bool rebalance, const std::string& uri) {
-
-    try {
-        if (this->impl->uris->addURI(URI(uri))) {
+void FailoverTransport::add(bool rebalance, const std::string& uri)
+{
+    try
+    {
+        if (this->impl->uris->addURI(URI(uri)))
+        {
             reconnect(rebalance);
         }
     }
@@ -464,46 +553,55 @@ void FailoverTransport::add(bool rebalance, const std::string& uri) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransport::addURI(bool rebalance, const List<URI>& uris) {
-
+void FailoverTransport::addURI(bool rebalance, const List<URI>& uris)
+{
     bool newUri = false;
 
-    std::unique_ptr<Iterator<URI> > iter(uris.iterator());
-    while (iter->hasNext()) {
-        if (this->impl->uris->addURI(iter->next())) {
+    std::unique_ptr<Iterator<URI>> iter(uris.iterator());
+    while (iter->hasNext())
+    {
+        if (this->impl->uris->addURI(iter->next()))
+        {
             newUri = true;
         }
     }
 
-    if (newUri) {
+    if (newUri)
+    {
         reconnect(rebalance);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransport::removeURI(bool rebalance, const List<URI>& uris) {
-
+void FailoverTransport::removeURI(bool rebalance, const List<URI>& uris)
+{
     bool changed = false;
 
-    std::unique_ptr<Iterator<URI> > iter(uris.iterator());
-    synchronized( &this->impl->reconnectMutex ) {
-        while (iter->hasNext()) {
-            if (this->impl->uris->removeURI(iter->next())) {
+    std::unique_ptr<Iterator<URI>> iter(uris.iterator());
+    synchronized(&this->impl->reconnectMutex)
+    {
+        while (iter->hasNext())
+        {
+            if (this->impl->uris->removeURI(iter->next()))
+            {
                 changed = true;
             }
         }
     }
 
-    if (changed) {
+    if (changed)
+    {
         reconnect(rebalance);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransport::reconnect(const decaf::net::URI& uri) {
-
-    try {
-        if (this->impl->uris->addURI(uri)) {
+void FailoverTransport::reconnect(const decaf::net::URI& uri)
+{
+    try
+    {
+        if (this->impl->uris->addURI(uri))
+        {
             reconnect(true);
         }
     }
@@ -513,46 +611,61 @@ void FailoverTransport::reconnect(const decaf::net::URI& uri) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransport::setTransportListener(TransportListener* listener) {
+void FailoverTransport::setTransportListener(TransportListener* listener)
+{
     // Try to acquire the lock with a timeout to avoid deadlock during shutdown
-    // Iterate thread may hold this lock for up to 2 seconds, so we need longer timeout
+    // Iterate thread may hold this lock for up to 2 seconds, so we need longer
+    // timeout
     bool acquired = false;
 
-    for (int attempt = 0; attempt < 50 && !acquired; ++attempt) {
+    for (int attempt = 0; attempt < 50 && !acquired; ++attempt)
+    {
         acquired = this->impl->listenerMutex.tryLock();
-        if (!acquired && attempt < 49) {
+        if (!acquired && attempt < 49)
+        {
             Thread::sleep(50);
         }
     }
 
-    if (acquired) {
-        try {
+    if (acquired)
+    {
+        try
+        {
             this->impl->transportListener = listener;
             this->impl->listenerMutex.notifyAll();
             this->impl->listenerMutex.unlock();
-        } catch (...) {
+        }
+        catch (...)
+        {
             this->impl->listenerMutex.unlock();
             throw;
         }
-    } else {
+    }
+    else
+    {
         // Fallback: Set without lock during shutdown to avoid deadlock
         this->impl->transportListener = listener;
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TransportListener* FailoverTransport::getTransportListener() const {
+TransportListener* FailoverTransport::getTransportListener() const
+{
     TransportListener* listener = NULL;
-    synchronized( &this->impl->listenerMutex ) {
+    synchronized(&this->impl->listenerMutex)
+    {
         listener = this->impl->transportListener;
     }
     return listener;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string FailoverTransport::getRemoteAddress() const {
-    synchronized( &this->impl->reconnectMutex ) {
-        if (this->impl->connectedTransportURI != NULL) {
+std::string FailoverTransport::getRemoteAddress() const
+{
+    synchronized(&this->impl->reconnectMutex)
+    {
+        if (this->impl->connectedTransportURI != NULL)
+        {
             return this->impl->connectedTransportURI->toString();
         }
     }
@@ -560,37 +673,47 @@ std::string FailoverTransport::getRemoteAddress() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransport::oneway(const Pointer<Command> command) {
-
+void FailoverTransport::oneway(const Pointer<Command> command)
+{
     Pointer<Exception> error;
 
-    try {
-
-        synchronized(&this->impl->reconnectMutex) {
-
-            if (command != NULL && this->impl->connectedTransport == NULL) {
-
-                if (command->isShutdownInfo()) {
+    try
+    {
+        synchronized(&this->impl->reconnectMutex)
+        {
+            if (command != NULL && this->impl->connectedTransport == NULL)
+            {
+                if (command->isShutdownInfo())
+                {
                     // Skipping send of ShutdownInfo command when not connected.
                     return;
                 }
 
-                if (command->isRemoveInfo() || command->isMessageAck()) {
-                    // Simulate response to RemoveInfo command or Ack as they will be stale.
+                if (command->isRemoveInfo() || command->isMessageAck())
+                {
+                    // Simulate response to RemoveInfo command or Ack as they
+                    // will be stale.
                     stateTracker.track(command);
 
-                    if (command->isResponseRequired()) {
+                    if (command->isResponseRequired())
+                    {
                         Pointer<Response> response(new Response());
                         response->setCorrelationId(command->getCommandId());
                         this->impl->myTransportListener->onCommand(response);
                     }
 
                     return;
-                } else if (command->isMessagePull()) {
-                    // Simulate response to MessagePull if timed as we can't honor that now.
-                    Pointer<MessagePull> pullRequest = command.dynamicCast<MessagePull>();
-                    if (pullRequest->getTimeout() != 0) {
-                        Pointer<MessageDispatch> dispatch(new MessageDispatch());
+                }
+                else if (command->isMessagePull())
+                {
+                    // Simulate response to MessagePull if timed as we can't
+                    // honor that now.
+                    Pointer<MessagePull> pullRequest =
+                        command.dynamicCast<MessagePull>();
+                    if (pullRequest->getTimeout() != 0)
+                    {
+                        Pointer<MessageDispatch> dispatch(
+                            new MessageDispatch());
                         dispatch->setConsumerId(pullRequest->getConsumerId());
                         dispatch->setDestination(pullRequest->getDestination());
                         this->impl->myTransportListener->onCommand(dispatch);
@@ -601,19 +724,24 @@ void FailoverTransport::oneway(const Pointer<Command> command) {
             }
 
             // Keep trying until the message is sent.
-            for (int i = 0; !this->impl->closed; i++) {
-                try {
-
+            for (int i = 0; !this->impl->closed; i++)
+            {
+                try
+                {
                     // Wait for transport to be connected.
-                    Pointer<Transport> transport = this->impl->connectedTransport;
-                    long long start = System::currentTimeMillis();
-                    bool timedout = false;
+                    Pointer<Transport> transport =
+                        this->impl->connectedTransport;
+                    long long start    = System::currentTimeMillis();
+                    bool      timedout = false;
 
                     while (transport == NULL && !this->impl->closed &&
-                           this->impl->connectionFailure == NULL && this->impl->willReconnect()) {
-
+                           this->impl->connectionFailure == NULL &&
+                           this->impl->willReconnect())
+                    {
                         long long end = System::currentTimeMillis();
-                        if (command->isMessage() && this->impl->timeout > 0 && (end - start > this->impl->timeout)) {
+                        if (command->isMessage() && this->impl->timeout > 0 &&
+                            (end - start > this->impl->timeout))
+                        {
                             timedout = true;
                             break;
                         }
@@ -622,139 +750,218 @@ void FailoverTransport::oneway(const Pointer<Command> command) {
                         transport = this->impl->connectedTransport;
                     }
 
-                    if (transport == NULL) {
-                        // Previous loop may have exited due to us being disposed.
-                        if (this->impl->closed) {
-                            error.reset(new IOException(__FILE__, __LINE__, "Transport disposed."));
-                        } else if (this->impl->connectionFailure != NULL) {
+                    if (transport == NULL)
+                    {
+                        // Previous loop may have exited due to us being
+                        // disposed.
+                        if (this->impl->closed)
+                        {
+                            error.reset(new IOException(__FILE__,
+                                                        __LINE__,
+                                                        "Transport disposed."));
+                        }
+                        else if (this->impl->connectionFailure != NULL)
+                        {
                             error = this->impl->connectionFailure;
-                        } else if (timedout == true) {
-                            error.reset(new IOException(__FILE__, __LINE__,
-                                "Failover timeout of %d ms reached.", this->impl->timeout));
-                        } else if (!this->impl->willReconnect()) {
-                            error.reset(new IOException(__FILE__, __LINE__,
+                        }
+                        else if (timedout == true)
+                        {
+                            error.reset(new IOException(
+                                __FILE__,
+                                __LINE__,
+                                "Failover timeout of %d ms reached.",
+                                this->impl->timeout));
+                        }
+                        else if (!this->impl->willReconnect())
+                        {
+                            error.reset(new IOException(
+                                __FILE__,
+                                __LINE__,
                                 "Maximum reconnection attempts exceeded"));
-                        } else {
-                            error.reset(new IOException(__FILE__, __LINE__, "Unexpected failure."));
+                        }
+                        else
+                        {
+                            error.reset(new IOException(__FILE__,
+                                                        __LINE__,
+                                                        "Unexpected failure."));
                         }
 
                         break;
                     }
 
-                    // If it was a request and it was not being tracked by the state
-                    // tracker, then hold it in the requestMap so that we can replay
-                    // it later.
+                    // If it was a request and it was not being tracked by the
+                    // state tracker, then hold it in the requestMap so that we
+                    // can replay it later.
                     Pointer<Tracked> tracked;
-                    try {
+                    try
+                    {
                         tracked = stateTracker.track(command);
-                        synchronized(&this->impl->requestMap) {
-                            if (tracked != NULL && tracked->isWaitingForResponse()) {
-                                this->impl->requestMap.put(command->getCommandId(), tracked);
-                            } else if (tracked == NULL && command->isResponseRequired()) {
-                                this->impl->requestMap.put(command->getCommandId(), command);
+                        synchronized(&this->impl->requestMap)
+                        {
+                            if (tracked != NULL &&
+                                tracked->isWaitingForResponse())
+                            {
+                                this->impl->requestMap.put(
+                                    command->getCommandId(),
+                                    tracked);
+                            }
+                            else if (tracked == NULL &&
+                                     command->isResponseRequired())
+                            {
+                                this->impl->requestMap.put(
+                                    command->getCommandId(),
+                                    command);
                             }
                         }
-                    } catch (Exception& ex) {
+                    }
+                    catch (Exception& ex)
+                    {
                         ex.setMark(__FILE__, __LINE__);
                         error.reset(ex.clone());
                         break;
                     }
 
                     // Send the message.
-                    try {
+                    try
+                    {
                         transport->oneway(command);
                         stateTracker.trackBack(command);
-                        if (command->isShutdownInfo()) {
+                        if (command->isShutdownInfo())
+                        {
                             this->impl->shutdown = true;
                         }
-                    } catch (IOException& e) {
-
+                    }
+                    catch (IOException& e)
+                    {
                         e.setMark(__FILE__, __LINE__);
-                        AMQ_LOG_DEBUG("FailoverTransport", "oneway() send failed for cmdId=" << command->getCommandId() << ": " << e.getMessage());
+                        AMQ_LOG_DEBUG("FailoverTransport",
+                                      "oneway() send failed for cmdId="
+                                          << command->getCommandId() << ": "
+                                          << e.getMessage());
 
-                        // If the command was not tracked.. we will retry in this method
-                        if (tracked == NULL && this->impl->canReconnect()) {
-
-                            // since we will retry in this method.. take it out of the
-                            // request map so that it is not sent 2 times on recovery
-                            if (command->isResponseRequired()) {
-                                synchronized(&this->impl->requestMap) {
-                                    this->impl->requestMap.remove(command->getCommandId());
+                        // If the command was not tracked.. we will retry in
+                        // this method
+                        if (tracked == NULL && this->impl->canReconnect())
+                        {
+                            // since we will retry in this method.. take it out
+                            // of the request map so that it is not sent 2 times
+                            // on recovery
+                            if (command->isResponseRequired())
+                            {
+                                synchronized(&this->impl->requestMap)
+                                {
+                                    this->impl->requestMap.remove(
+                                        command->getCommandId());
                                 }
                             }
 
-                            // re-throw the exception so it will handled by the outer catch
+                            // re-throw the exception so it will handled by the
+                            // outer catch
                             throw;
-                        } else {
-                            // Trigger the reconnect since we can't count on inactivity or
-                            // other socket events to trip the failover condition.
+                        }
+                        else
+                        {
+                            // Trigger the reconnect since we can't count on
+                            // inactivity or other socket events to trip the
+                            // failover condition.
                             handleTransportFailure(e);
                         }
                     }
 
                     return;
-                } catch (IOException& e) {
+                }
+                catch (IOException& e)
+                {
                     e.setMark(__FILE__, __LINE__);
                     handleTransportFailure(e);
                 }
             }
         }
-    } catch (InterruptedException& ex) {
+    }
+    catch (InterruptedException& ex)
+    {
         Thread::currentThread()->interrupt();
-        throw InterruptedIOException(__FILE__, __LINE__, "FailoverTransport oneway() interrupted");
+        throw InterruptedIOException(__FILE__,
+                                     __LINE__,
+                                     "FailoverTransport oneway() interrupted");
     }
     AMQ_CATCHALL_NOTHROW()
 
-    if (!this->impl->closed) {
-        if (error != NULL) {
+    if (!this->impl->closed)
+    {
+        if (error != NULL)
+        {
             throw IOException(*error);
         }
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<FutureResponse> FailoverTransport::asyncRequest(const Pointer<Command> command AMQCPP_UNUSED,
-                                                        const Pointer<ResponseCallback> responseCallback AMQCPP_UNUSED) {
-    throw decaf::lang::exceptions::UnsupportedOperationException(__FILE__, __LINE__, "FailoverTransport::asyncRequest - Not Supported");
+Pointer<FutureResponse> FailoverTransport::asyncRequest(
+    const Pointer<Command> command                   AMQCPP_UNUSED,
+    const Pointer<ResponseCallback> responseCallback AMQCPP_UNUSED)
+{
+    throw decaf::lang::exceptions::UnsupportedOperationException(
+        __FILE__,
+        __LINE__,
+        "FailoverTransport::asyncRequest - Not Supported");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Response> FailoverTransport::request(const Pointer<Command> command AMQCPP_UNUSED) {
-    throw decaf::lang::exceptions::UnsupportedOperationException(__FILE__, __LINE__, "FailoverTransport::request - Not Supported");
+Pointer<Response> FailoverTransport::request(
+    const Pointer<Command> command AMQCPP_UNUSED)
+{
+    throw decaf::lang::exceptions::UnsupportedOperationException(
+        __FILE__,
+        __LINE__,
+        "FailoverTransport::request - Not Supported");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Response> FailoverTransport::request(const Pointer<Command> command AMQCPP_UNUSED, unsigned int timeout AMQCPP_UNUSED) {
-    throw decaf::lang::exceptions::UnsupportedOperationException(__FILE__, __LINE__, "FailoverTransport::request - Not Supported");
+Pointer<Response> FailoverTransport::request(const Pointer<Command> command
+                                                                  AMQCPP_UNUSED,
+                                             unsigned int timeout AMQCPP_UNUSED)
+{
+    throw decaf::lang::exceptions::UnsupportedOperationException(
+        __FILE__,
+        __LINE__,
+        "FailoverTransport::request - Not Supported");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransport::start() {
-
-    try {
-
-        synchronized(&this->impl->reconnectMutex) {
-
-            if (this->impl->started) {
+void FailoverTransport::start()
+{
+    try
+    {
+        synchronized(&this->impl->reconnectMutex)
+        {
+            if (this->impl->started)
+            {
                 return;
             }
 
             AMQ_LOG_INFO("FailoverTransport", "Starting failover transport");
             this->impl->started = true;
 
-            if (this->impl->backupsEnabled || this->impl->priorityBackup) {
+            if (this->impl->backupsEnabled || this->impl->priorityBackup)
+            {
                 this->impl->backups->setEnabled(true);
             }
             this->impl->taskRunner->start();
 
             stateTracker.setMaxMessageCacheSize(this->getMaxCacheSize());
-            stateTracker.setMaxMessagePullCacheSize(this->getMaxPullCacheSize());
+            stateTracker.setMaxMessagePullCacheSize(
+                this->getMaxPullCacheSize());
             stateTracker.setTrackMessages(this->isTrackMessages());
-            stateTracker.setTrackTransactionProducers(this->isTrackTransactionProducers());
+            stateTracker.setTrackTransactionProducers(
+                this->isTrackTransactionProducers());
 
-            if (this->impl->connectedTransport != NULL) {
+            if (this->impl->connectedTransport != NULL)
+            {
                 stateTracker.restore(this->impl->connectedTransport);
-            } else {
+            }
+            else
+            {
                 reconnect(false);
             }
         }
@@ -765,10 +972,12 @@ void FailoverTransport::start() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransport::stop() {
-
-    try {
-        synchronized(&this->impl->reconnectMutex) {
+void FailoverTransport::stop()
+{
+    try
+    {
+        synchronized(&this->impl->reconnectMutex)
+        {
             this->impl->started = false;
             this->impl->backups->setEnabled(false);
             this->impl->reconnectMutex.notifyAll();
@@ -780,31 +989,38 @@ void FailoverTransport::stop() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransport::close() {
-
-    try {
-
+void FailoverTransport::close()
+{
+    try
+    {
         Pointer<Transport> transportToStop;
 
-        synchronized(&this->impl->reconnectMutex) {
-            if (this->impl->closed) {
+        synchronized(&this->impl->reconnectMutex)
+        {
+            if (this->impl->closed)
+            {
                 return;
             }
 
             AMQ_LOG_INFO("FailoverTransport", "Closing failover transport");
             this->impl->started = false;
-            this->impl->closed = true;
+            this->impl->closed  = true;
             this->impl->connected.store(false, std::memory_order_release);
 
             this->impl->backups->setEnabled(false);
-            synchronized(&this->impl->requestMap) {
+            synchronized(&this->impl->requestMap)
+            {
                 this->impl->requestMap.clear();
             }
 
-            if (this->impl->connectedTransport != NULL) {
+            if (this->impl->connectedTransport != NULL)
+            {
                 transportToStop.swap(this->impl->connectedTransport);
-            } else if (this->impl->connectingTransport != NULL) {
-                // If we're in the middle of connecting, attempt to stop that transport too
+            }
+            else if (this->impl->connectingTransport != NULL)
+            {
+                // If we're in the middle of connecting, attempt to stop that
+                // transport too
                 transportToStop.swap(this->impl->connectingTransport);
             }
 
@@ -813,17 +1029,22 @@ void FailoverTransport::close() {
 
         this->impl->backups->close();
 
-        synchronized( &this->impl->sleepMutex ) {
+        synchronized(&this->impl->sleepMutex)
+        {
             this->impl->sleepMutex.notifyAll();
         }
 
-        // Notify listenerMutex to wake up any thread waiting for transport listener
-        synchronized( &this->impl->listenerMutex ) {
+        // Notify listenerMutex to wake up any thread waiting for transport
+        // listener
+        synchronized(&this->impl->listenerMutex)
+        {
             this->impl->listenerMutex.notifyAll();
         }
 
-        // Close the transport BEFORE calling shutdown to interrupt any blocking operations
-        if (transportToStop != NULL) {
+        // Close the transport BEFORE calling shutdown to interrupt any blocking
+        // operations
+        if (transportToStop != NULL)
+        {
             transportToStop->close();
         }
 
@@ -835,20 +1056,25 @@ void FailoverTransport::close() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransport::reconnect(bool rebalance) {
-
+void FailoverTransport::reconnect(bool rebalance)
+{
     Pointer<Transport> transport;
 
-    synchronized( &this->impl->reconnectMutex ) {
-        if (this->impl->started) {
-
-            if (rebalance) {
+    synchronized(&this->impl->reconnectMutex)
+    {
+        if (this->impl->started)
+        {
+            if (rebalance)
+            {
                 this->impl->doRebalance = true;
             }
 
-            try {
+            try
+            {
                 this->impl->taskRunner->wakeup();
-            } catch (InterruptedException& ex) {
+            }
+            catch (InterruptedException& ex)
+            {
                 Thread::currentThread()->interrupt();
             }
         }
@@ -856,33 +1082,41 @@ void FailoverTransport::reconnect(bool rebalance) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransport::restoreTransport(const Pointer<Transport> transport, bool alreadyStarted) {
-
-    try {
-
-        AMQ_LOG_DEBUG("FailoverTransport", "Restoring transport state, alreadyStarted=" << alreadyStarted);
+void FailoverTransport::restoreTransport(const Pointer<Transport> transport,
+                                         bool alreadyStarted)
+{
+    try
+    {
+        AMQ_LOG_DEBUG(
+            "FailoverTransport",
+            "Restoring transport state, alreadyStarted=" << alreadyStarted);
 
         // Only start the transport if it hasn't been started already.
-        // Backup transports are pre-started, so we skip the start() call for them.
-        if (!alreadyStarted) {
+        // Backup transports are pre-started, so we skip the start() call for
+        // them.
+        if (!alreadyStarted)
+        {
             transport->start();
         }
 
-        //send information to the broker - informing it we are an ft client
+        // send information to the broker - informing it we are an ft client
         Pointer<ConnectionControl> cc(new ConnectionControl());
         cc->setFaultTolerant(true);
         transport->oneway(cc);
 
         stateTracker.restore(transport);
-        AMQ_LOG_DEBUG("FailoverTransport", "Transport state restored successfully");
+        AMQ_LOG_DEBUG("FailoverTransport",
+                      "Transport state restored successfully");
 
-        decaf::util::StlMap<int, Pointer<Command> > commands;
-        synchronized(&this->impl->requestMap) {
+        decaf::util::StlMap<int, Pointer<Command>> commands;
+        synchronized(&this->impl->requestMap)
+        {
             commands.copy(this->impl->requestMap);
         }
 
-        Pointer<Iterator<Pointer<Command> > > iter(commands.values().iterator());
-        while (iter->hasNext()) {
+        Pointer<Iterator<Pointer<Command>>> iter(commands.values().iterator());
+        while (iter->hasNext())
+        {
             transport->oneway(iter->next());
         }
     }
@@ -892,29 +1126,35 @@ void FailoverTransport::restoreTransport(const Pointer<Transport> transport, boo
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransport::handleTransportFailure(const decaf::lang::Exception& error) {
-
-    if (this->impl->shutdown) {
-        // shutdown info sent and remote socket closed and we see that before a local close
-        // let the close do the work
+void FailoverTransport::handleTransportFailure(
+    const decaf::lang::Exception& error)
+{
+    if (this->impl->shutdown)
+    {
+        // shutdown info sent and remote socket closed and we see that before a
+        // local close let the close do the work
         return;
     }
 
-    AMQ_LOG_ERROR("FailoverTransport", "Transport failure detected: " << error.getMessage());
+    AMQ_LOG_ERROR("FailoverTransport",
+                  "Transport failure detected: " << error.getMessage());
 
-    synchronized(&this->impl->reconnectMutex) {
-
-        if (this->impl->shutdown) {
+    synchronized(&this->impl->reconnectMutex)
+    {
+        if (this->impl->shutdown)
+        {
             return;
         }
 
         Pointer<Transport> transport;
         this->impl->connectedTransport.swap(transport);
 
-        if (transport != NULL) {
-
-            if (this->impl->disposedListener != NULL) {
-                transport->setTransportListener(this->impl->disposedListener.get());
+        if (transport != NULL)
+        {
+            if (this->impl->disposedListener != NULL)
+            {
+                transport->setTransportListener(
+                    this->impl->disposedListener.get());
             }
 
             // Hand off to the close task so it gets done in a different thread.
@@ -922,29 +1162,34 @@ void FailoverTransport::handleTransportFailure(const decaf::lang::Exception& err
             this->impl->taskRunner->wakeup();
 
             bool reconnectOk = this->impl->canReconnect();
-            URI failedUri = *this->impl->connectedTransportURI;
+            URI  failedUri   = *this->impl->connectedTransportURI;
 
             this->impl->initialized = false;
             this->impl->uris->addURI(failedUri);
             this->impl->connectedTransportURI.reset(NULL);
             this->impl->connected.store(false, std::memory_order_release);
-            // Memory barrier to ensure connected state is immediately visible to other threads
+            // Memory barrier to ensure connected state is immediately visible
+            // to other threads
             std::atomic_thread_fence(std::memory_order_seq_cst);
             this->impl->connectedToPrioirty = false;
 
             // Place the State Tracker into a reconnection state.
             this->stateTracker.transportInterrupted();
 
-            // Notify before we attempt to reconnect so that the consumers have a chance
-            // to cleanup their state.
-            if (reconnectOk) {
-                if (this->impl->transportListener != NULL) {
+            // Notify before we attempt to reconnect so that the consumers have
+            // a chance to cleanup their state.
+            if (reconnectOk)
+            {
+                if (this->impl->transportListener != NULL)
+                {
                     this->impl->transportListener->transportInterrupted();
                 }
 
                 this->impl->updated->removeURI(failedUri);
                 this->impl->taskRunner->wakeup();
-            } else if (!this->impl->closed) {
+            }
+            else if (!this->impl->closed)
+            {
                 this->impl->connectionFailure.reset(error.clone());
                 this->impl->propagateFailureToExceptionListener();
             }
@@ -953,58 +1198,78 @@ void FailoverTransport::handleTransportFailure(const decaf::lang::Exception& err
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransport::handleConnectionControl(const Pointer<Command> control) {
-
-    try {
-
-        Pointer<ConnectionControl> ctrlCommand = control.dynamicCast<ConnectionControl>();
+void FailoverTransport::handleConnectionControl(const Pointer<Command> control)
+{
+    try
+    {
+        Pointer<ConnectionControl> ctrlCommand =
+            control.dynamicCast<ConnectionControl>();
 
         std::string reconnectStr = ctrlCommand->getReconnectTo();
-        if (!reconnectStr.empty()) {
+        if (!reconnectStr.empty())
+        {
+            reconnectStr.erase(
+                std::remove(reconnectStr.begin(), reconnectStr.end(), ' '),
+                reconnectStr.end());
 
-            reconnectStr.erase(std::remove(reconnectStr.begin(), reconnectStr.end(), ' '), reconnectStr.end());
-
-            if (reconnectStr.length() > 0) {
-                try {
-                    if (isReconnectSupported()) {
+            if (reconnectStr.length() > 0)
+            {
+                try
+                {
+                    if (isReconnectSupported())
+                    {
                         reconnect(URI(reconnectStr));
                     }
-                } catch (Exception& e) {
+                }
+                catch (Exception& e)
+                {
                 }
             }
         }
 
-        processNewTransports(ctrlCommand->isRebalanceConnection(), ctrlCommand->getConnectedBrokers());
+        processNewTransports(ctrlCommand->isRebalanceConnection(),
+                             ctrlCommand->getConnectedBrokers());
     }
     AMQ_CATCH_RETHROW(Exception)
     AMQ_CATCHALL_THROW(Exception)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransport::processNewTransports(bool rebalance, std::string newTransports) {
+void FailoverTransport::processNewTransports(bool        rebalance,
+                                             std::string newTransports)
+{
+    if (!newTransports.empty())
+    {
+        newTransports.erase(
+            std::remove(newTransports.begin(), newTransports.end(), ' '),
+            newTransports.end());
 
-    if (!newTransports.empty()) {
-
-        newTransports.erase(std::remove(newTransports.begin(), newTransports.end(), ' '), newTransports.end());
-
-        if (newTransports.length() > 0 && isUpdateURIsSupported()) {
-
+        if (newTransports.length() > 0 && isUpdateURIsSupported())
+        {
             LinkedList<URI> list;
             StringTokenizer tokenizer(newTransports, ",");
 
-            while (tokenizer.hasMoreTokens()) {
+            while (tokenizer.hasMoreTokens())
+            {
                 std::string str = tokenizer.nextToken();
-                try {
+                try
+                {
                     URI uri(str);
                     list.add(uri);
-                } catch (Exception& e) {
+                }
+                catch (Exception& e)
+                {
                 }
             }
 
-            if (!list.isEmpty()) {
-                try {
+            if (!list.isEmpty())
+            {
+                try
+                {
                     updateURIs(rebalance, list);
-                } catch (IOException& e) {
+                }
+                catch (IOException& e)
+                {
                 }
             }
         }
@@ -1012,31 +1277,36 @@ void FailoverTransport::processNewTransports(bool rebalance, std::string newTran
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransport::updateURIs(bool rebalance, const decaf::util::List<decaf::net::URI>& updatedURIs) {
-
-    if (isUpdateURIsSupported()) {
-
+void FailoverTransport::updateURIs(
+    bool                                      rebalance,
+    const decaf::util::List<decaf::net::URI>& updatedURIs)
+{
+    if (isUpdateURIsSupported())
+    {
         Pointer<URIPool> copy(new URIPool(*this->impl->updated));
         this->impl->updated->clear();
 
-        if (!updatedURIs.isEmpty()) {
-
+        if (!updatedURIs.isEmpty())
+        {
             StlSet<URI> set;
 
-            for (int i = 0; i < updatedURIs.size(); i++) {
+            for (int i = 0; i < updatedURIs.size(); i++)
+            {
                 set.add(updatedURIs.get(i));
             }
 
-            Pointer<Iterator<URI> > setIter(set.iterator());
-            while (setIter->hasNext()) {
+            Pointer<Iterator<URI>> setIter(set.iterator());
+            while (setIter->hasNext())
+            {
                 URI value = setIter->next();
                 this->impl->updated->addURI(value);
             }
 
             if (!(copy->isEmpty() && this->impl->updated->isEmpty()) &&
-                !(copy->equals(*this->impl->updated))) {
-
-                synchronized(&this->impl->reconnectMutex) {
+                !(copy->equals(*this->impl->updated)))
+            {
+                synchronized(&this->impl->reconnectMutex)
+                {
                     reconnect(rebalance);
                 }
             }
@@ -1045,19 +1315,28 @@ void FailoverTransport::updateURIs(bool rebalance, const decaf::util::List<decaf
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool FailoverTransport::isPending() const {
+bool FailoverTransport::isPending() const
+{
     bool result = false;
 
-    synchronized(&impl->reconnectMutex) {
-        if (!impl->isConnectionStateValid() && impl->started && !impl->isClosedOrFailed()) {
-
+    synchronized(&impl->reconnectMutex)
+    {
+        if (!impl->isConnectionStateValid() && impl->started &&
+            !impl->isClosedOrFailed())
+        {
             int maxReconnectAttempts = impl->calculateReconnectAttemptLimit();
 
-            if (impl->firstConnection && impl->connectFailures == 0) {
+            if (impl->firstConnection && impl->connectFailures == 0)
+            {
                 result = true;
-            } else if (maxReconnectAttempts != -1 && impl->connectFailures > maxReconnectAttempts) {
+            }
+            else if (maxReconnectAttempts != -1 &&
+                     impl->connectFailures > maxReconnectAttempts)
+            {
                 result = false;
-            } else {
+            }
+            else
+            {
                 result = true;
             }
         }
@@ -1067,151 +1346,214 @@ bool FailoverTransport::isPending() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool FailoverTransport::iterate() {
-
+bool FailoverTransport::iterate()
+{
     Pointer<Exception> failure;
 
-    AMQ_LOG_DEBUG("FailoverTransport", "iterate() called, firstConnection=" << this->impl->firstConnection
-        << ", connectFailures=" << this->impl->connectFailures
-        << ", closed=" << this->impl->closed);
+    AMQ_LOG_DEBUG("FailoverTransport",
+                  "iterate() called, firstConnection="
+                      << this->impl->firstConnection
+                      << ", connectFailures=" << this->impl->connectFailures
+                      << ", closed=" << this->impl->closed);
 
     {
-        // Use an explicit Lock instead of the synchronized macro so we can temporarily
-        // release reconnectMutex during the reconnect delay sleep.  This lets close()
-        // acquire the mutex, set closed=true, and interrupt the sleep via
-        // sleepMutex.notifyAll() without waiting up to 30 seconds for the sleep to expire.
+        // Use an explicit Lock instead of the synchronized macro so we can
+        // temporarily release reconnectMutex during the reconnect delay sleep.
+        // This lets close() acquire the mutex, set closed=true, and interrupt
+        // the sleep via sleepMutex.notifyAll() without waiting up to 30 seconds
+        // for the sleep to expire.
         Lock reconnectLock(&this->impl->reconnectMutex);
 
-        if (this->impl->isClosedOrFailed()) {
+        if (this->impl->isClosedOrFailed())
+        {
             this->impl->reconnectMutex.notifyAll();
         }
 
-        if (this->impl->isConnectionStateValid() || this->impl->isClosedOrFailed()) {
-            AMQ_LOG_DEBUG("FailoverTransport", "iterate() returning false - connectionValid=" << this->impl->isConnectionStateValid()
-                << ", closedOrFailed=" << this->impl->isClosedOrFailed());
+        if (this->impl->isConnectionStateValid() ||
+            this->impl->isClosedOrFailed())
+        {
+            AMQ_LOG_DEBUG("FailoverTransport",
+                          "iterate() returning false - connectionValid="
+                              << this->impl->isConnectionStateValid()
+                              << ", closedOrFailed="
+                              << this->impl->isClosedOrFailed());
             return false;
-        } else {
-
+        }
+        else
+        {
             // Recover exhausted brokers after cooldown period
             this->impl->recoverExhaustedBrokers();
 
             Pointer<URIPool> connectList = this->impl->getConnectList();
 
-            if (connectList->isEmpty() && !impl->backups->isEnabled()) {
-                AMQ_LOG_ERROR("FailoverTransport", "No URIs available for reconnect");
-                failure.reset(new IOException(__FILE__, __LINE__, "No URIs available for reconnect."));
-            } else {
-
-                if (this->impl->doRebalance) {
+            if (connectList->isEmpty() && !impl->backups->isEnabled())
+            {
+                AMQ_LOG_ERROR("FailoverTransport",
+                              "No URIs available for reconnect");
+                failure.reset(
+                    new IOException(__FILE__,
+                                    __LINE__,
+                                    "No URIs available for reconnect."));
+            }
+            else
+            {
+                if (this->impl->doRebalance)
+                {
                     if (this->impl->connectedTransportURI != NULL &&
-                        (this->impl->connectedToPrioirty || connectList->getPriorityURI().equals(*this->impl->connectedTransportURI))) {
-                        // already connected to first in the list, no need to rebalance
+                        (this->impl->connectedToPrioirty ||
+                         connectList->getPriorityURI().equals(
+                             *this->impl->connectedTransportURI)))
+                    {
+                        // already connected to first in the list, no need to
+                        // rebalance
                         this->impl->doRebalance = false;
                         return false;
-                    } else if (this->impl->connectedTransportURI != NULL) {
+                    }
+                    else if (this->impl->connectedTransportURI != NULL)
+                    {
                         // break any existing connect for rebalance.
                         this->impl->disconnect();
                     }
-                    // else: connectedTransportURI is NULL (transport already failed),
-                    // just clear the flag and proceed with normal reconnection.
+                    // else: connectedTransportURI is NULL (transport already
+                    // failed), just clear the flag and proceed with normal
+                    // reconnection.
 
                     this->impl->doRebalance = false;
                 }
 
                 this->impl->resetReconnectDelay();
 
-                LinkedList<URI> failures;
+                LinkedList<URI>    failures;
                 Pointer<Transport> transport;
-                URI uri;
-                bool transportAlreadyStarted = false;
+                URI                uri;
+                bool               transportAlreadyStarted = false;
 
-                // Check if we should disconnect from current connection to use a priority backup
-                if (this->impl->backups->isEnabled() && this->impl->priorityBackup &&
-                    !this->impl->connectedToPrioirty && this->impl->backups->isPriorityBackupAvailable()) {
-                    // We have a priority backup available and aren't connected to priority.
-                    // Use the priority backup's transport directly for fast switching.
-                    Pointer<BackupTransport> priorityBackup = this->impl->backups->getBackup();
-                    if (priorityBackup != NULL && priorityBackup->isPriority()) {
+                // Check if we should disconnect from current connection to use
+                // a priority backup
+                if (this->impl->backups->isEnabled() &&
+                    this->impl->priorityBackup &&
+                    !this->impl->connectedToPrioirty &&
+                    this->impl->backups->isPriorityBackupAvailable())
+                {
+                    // We have a priority backup available and aren't connected
+                    // to priority. Use the priority backup's transport directly
+                    // for fast switching.
+                    Pointer<BackupTransport> priorityBackup =
+                        this->impl->backups->getBackup();
+                    if (priorityBackup != NULL && priorityBackup->isPriority())
+                    {
                         this->impl->disconnect();
                         transport = priorityBackup->getTransport();
-                        uri = priorityBackup->getUri();
-                        // Set the transport listener immediately to prevent use-after-free.
-                        // The BackupTransport object is the current listener, but it will be
-                        // destroyed when priorityBackup goes out of scope. We must redirect
-                        // IO events before that happens.
-                        transport->setTransportListener(this->impl->myTransportListener.get());
+                        uri       = priorityBackup->getUri();
+                        // Set the transport listener immediately to prevent
+                        // use-after-free. The BackupTransport object is the
+                        // current listener, but it will be destroyed when
+                        // priorityBackup goes out of scope. We must redirect IO
+                        // events before that happens.
+                        transport->setTransportListener(
+                            this->impl->myTransportListener.get());
                         // Take ownership of the transport
                         priorityBackup->setTransport(Pointer<Transport>());
                         transportAlreadyStarted = true;
                     }
 
                     // Clean up any remaining priority backups
-                    while (this->impl->backups->isPriorityBackupAvailable()) {
-                        Pointer<BackupTransport> remaining = this->impl->backups->getBackup();
-                        if (remaining != NULL && remaining->isPriority()) {
-                            try {
-                                if (remaining->getTransport() != NULL) {
+                    while (this->impl->backups->isPriorityBackupAvailable())
+                    {
+                        Pointer<BackupTransport> remaining =
+                            this->impl->backups->getBackup();
+                        if (remaining != NULL && remaining->isPriority())
+                        {
+                            try
+                            {
+                                if (remaining->getTransport() != NULL)
+                                {
                                     remaining->getTransport()->close();
                                 }
-                            } catch (...) {}
+                            }
+                            catch (...)
+                            {
+                            }
                             remaining->setTransport(Pointer<Transport>());
-                        } else {
+                        }
+                        else
+                        {
                             break;
                         }
                     }
-                } else if (this->impl->backups->isEnabled()) {
+                }
+                else if (this->impl->backups->isEnabled())
+                {
                     // Get backup transport if available
-                    Pointer<BackupTransport> backupTransport = this->impl->backups->getBackup();
-                    if (backupTransport != NULL) {
+                    Pointer<BackupTransport> backupTransport =
+                        this->impl->backups->getBackup();
+                    if (backupTransport != NULL)
+                    {
                         transport = backupTransport->getTransport();
-                        uri = backupTransport->getUri();
-                        // Set the transport listener immediately to prevent use-after-free.
-                        // The BackupTransport object is the current listener, but it will be
-                        // destroyed when backupTransport goes out of scope. We must redirect
+                        uri       = backupTransport->getUri();
+                        // Set the transport listener immediately to prevent
+                        // use-after-free. The BackupTransport object is the
+                        // current listener, but it will be destroyed when
+                        // backupTransport goes out of scope. We must redirect
                         // IO events before that happens.
-                        transport->setTransportListener(this->impl->myTransportListener.get());
-                        // Take ownership of the transport: clear the backup's reference
-                        // so its destructor won't close the transport we're about to use.
+                        transport->setTransportListener(
+                            this->impl->myTransportListener.get());
+                        // Take ownership of the transport: clear the backup's
+                        // reference so its destructor won't close the transport
+                        // we're about to use.
                         backupTransport->setTransport(Pointer<Transport>());
                         transportAlreadyStarted = true;
                     }
                 }
 
                 // Capture the reconnect delay before releasing reconnectMutex.
-                // The actual sleep happens OUTSIDE reconnectMutex (below) so that close()
-                // can acquire the mutex, set closed=true, and interrupt the sleep via
-                // sleepMutex.notifyAll().  Previously the sleep held reconnectMutex,
-                // which blocked close() for the full reconnectDelay (up to 30 seconds).
+                // The actual sleep happens OUTSIDE reconnectMutex (below) so
+                // that close() can acquire the mutex, set closed=true, and
+                // interrupt the sleep via sleepMutex.notifyAll().  Previously
+                // the sleep held reconnectMutex, which blocked close() for the
+                // full reconnectDelay (up to 30 seconds).
                 long long sleepDelay = 0;
                 if (transport == NULL && !this->impl->firstConnection &&
-                    (this->impl->reconnectDelay > 0) && !this->impl->closed) {
+                    (this->impl->reconnectDelay > 0) && !this->impl->closed)
+                {
                     sleepDelay = this->impl->reconnectDelay;
                 }
 
-                // Release reconnectMutex before sleeping so close() can acquire it and:
+                // Release reconnectMutex before sleeping so close() can acquire
+                // it and:
                 //   1. Set closed=true immediately
                 //   2. Signal sleepMutex to wake us up early
                 reconnectLock.unlock();
 
-                // Sleep OUTSIDE reconnectMutex - close() can now interrupt us via
-                // sleepMutex.notifyAll() without waiting for us to finish sleeping.
-                if (sleepDelay > 0) {
-                    synchronized(&this->impl->sleepMutex) {
-                        try {
+                // Sleep OUTSIDE reconnectMutex - close() can now interrupt us
+                // via sleepMutex.notifyAll() without waiting for us to finish
+                // sleeping.
+                if (sleepDelay > 0)
+                {
+                    synchronized(&this->impl->sleepMutex)
+                    {
+                        try
+                        {
                             this->impl->sleepMutex.wait(sleepDelay);
-                        } catch (InterruptedException& e) {
+                        }
+                        catch (InterruptedException& e)
+                        {
                             Thread::currentThread()->interrupt();
                         }
                     }
                 }
 
-                // Re-acquire reconnectMutex after sleep to proceed with reconnection.
+                // Re-acquire reconnectMutex after sleep to proceed with
+                // reconnection.
                 reconnectLock.lock();
 
-                // Re-check state: close()/handleTransportFailure() may have run while we slept.
-                if (this->impl->isClosedOrFailed()) {
+                // Re-check state: close()/handleTransportFailure() may have run
+                // while we slept.
+                if (this->impl->isClosedOrFailed())
+                {
                     this->impl->reconnectMutex.notifyAll();
-                    if (transport != NULL) {
+                    if (transport != NULL)
+                    {
                         this->impl->closeTask->add(transport);
                         this->impl->taskRunner->wakeup();
                         transport.reset(NULL);
@@ -1219,8 +1561,10 @@ bool FailoverTransport::iterate() {
                     return false;
                 }
 
-                if (this->impl->isConnectionStateValid()) {
-                    if (transport != NULL) {
+                if (this->impl->isConnectionStateValid())
+                {
+                    if (transport != NULL)
+                    {
                         this->impl->closeTask->add(transport);
                         this->impl->taskRunner->wakeup();
                         transport.reset(NULL);
@@ -1228,137 +1572,213 @@ bool FailoverTransport::iterate() {
                     return false;
                 }
 
-                while ((transport != NULL || !connectList->isEmpty()) && this->impl->connectedTransport == NULL && !this->impl->closed) {
-                    try {
+                while ((transport != NULL || !connectList->isEmpty()) &&
+                       this->impl->connectedTransport == NULL &&
+                       !this->impl->closed)
+                {
+                    try
+                    {
                         // We could be starting the loop with a backup already.
-                        if (transport == NULL) {
-                            try {
+                        if (transport == NULL)
+                        {
+                            try
+                            {
                                 uri = connectList->getURI();
-                            } catch (NoSuchElementException& ex) {
+                            }
+                            catch (NoSuchElementException& ex)
+                            {
                                 break;
                             }
 
-                            // Skip this URI if it has exceeded its per-host max reconnect attempts
-                            // (Only check exhaustion for reconnection attempts, not the first connection)
-                            int reconnectAttempts = this->impl->calculateReconnectAttemptLimit();
-                            if (!this->impl->firstConnection && this->impl->isUriExhausted(uri, reconnectAttempts)) {
-                                AMQ_LOG_DEBUG("FailoverTransport", "Skipping exhausted URI: " << uri.toString()
-                                    << " (failures: " << this->impl->getUriFailureCount(uri) << ")");
-                                failures.add(uri);  // Add back to failures so it returns to pool
-                                continue;  // Try next URI
+                            // Skip this URI if it has exceeded its per-host max
+                            // reconnect attempts (Only check exhaustion for
+                            // reconnection attempts, not the first connection)
+                            int reconnectAttempts =
+                                this->impl->calculateReconnectAttemptLimit();
+                            if (!this->impl->firstConnection &&
+                                this->impl->isUriExhausted(uri,
+                                                           reconnectAttempts))
+                            {
+                                AMQ_LOG_DEBUG(
+                                    "FailoverTransport",
+                                    "Skipping exhausted URI: "
+                                        << uri.toString() << " (failures: "
+                                        << this->impl->getUriFailureCount(uri)
+                                        << ")");
+                                failures.add(uri);  // Add back to failures so
+                                                    // it returns to pool
+                                continue;           // Try next URI
                             }
 
                             transport = createTransport(uri);
-                            // Mark this transport as the one being connected so close()
-                            // can cancel it if requested concurrently.
+                            // Mark this transport as the one being connected so
+                            // close() can cancel it if requested concurrently.
                             this->impl->connectingTransport = transport;
                             // Mark broker state as CONNECTING
                             this->impl->markBrokerConnecting(uri);
                         }
 
-                        transport->setTransportListener(this->impl->myTransportListener.get());
+                        transport->setTransportListener(
+                            this->impl->myTransportListener.get());
 
-                        // Only start the transport if it's not already started (i.e., not from backup pool)
-                        if (!transportAlreadyStarted) {
-                            AMQ_LOG_DEBUG("FailoverTransport", "Attempting connection to " << uri.toString()
-                                << " (attempt " << (this->impl->getUriFailureCount(uri) + 1) << ")");
+                        // Only start the transport if it's not already started
+                        // (i.e., not from backup pool)
+                        if (!transportAlreadyStarted)
+                        {
+                            AMQ_LOG_DEBUG(
+                                "FailoverTransport",
+                                "Attempting connection to "
+                                    << uri.toString() << " (attempt "
+                                    << (this->impl->getUriFailureCount(uri) + 1)
+                                    << ")");
                             transport->start();
                         }
 
-                        // Clear the connectingTransport marker now that start() returned.
+                        // Clear the connectingTransport marker now that start()
+                        // returned.
                         this->impl->connectingTransport.reset(NULL);
 
-                        // Check if we were closed during the blocking start() operation
-                        if (this->impl->closed) {
+                        // Check if we were closed during the blocking start()
+                        // operation
+                        if (this->impl->closed)
+                        {
                             transport->close();
                             return false;
                         }
 
-                        if (this->impl->started && !this->impl->firstConnection) {
-                            restoreTransport(transport, transportAlreadyStarted);
+                        if (this->impl->started && !this->impl->firstConnection)
+                        {
+                            restoreTransport(transport,
+                                             transportAlreadyStarted);
                         }
 
-                        transportAlreadyStarted = false;  // Reset for next iteration
-                        // Check if we were closed during the blocking restoreTransport() operation
-                        if (this->impl->closed) {
+                        transportAlreadyStarted =
+                            false;  // Reset for next iteration
+                        // Check if we were closed during the blocking
+                        // restoreTransport() operation
+                        if (this->impl->closed)
+                        {
                             transport->close();
                             return false;
                         }
 
-                        this->impl->reconnectDelay = this->impl->initialReconnectDelay;
+                        this->impl->reconnectDelay =
+                            this->impl->initialReconnectDelay;
                         this->impl->connectedTransportURI.reset(new URI(uri));
                         this->impl->connectedTransport = transport;
                         this->impl->reconnectMutex.notifyAll();
                         this->impl->connectFailures = 0;
-                        this->impl->resetAllUriFailureCounts();  // Reset per-URI failure counts on success
+                        this->impl
+                            ->resetAllUriFailureCounts();  // Reset per-URI
+                                                           // failure counts on
+                                                           // success
                         // Mark broker as successfully CONNECTED
                         this->impl->markBrokerConnected(uri);
-                        AMQ_LOG_INFO("FailoverTransport", "Successfully connected to " << uri.toString());
+                        AMQ_LOG_INFO("FailoverTransport",
+                                     "Successfully connected to "
+                                         << uri.toString());
 
-                        if (isPriorityBackup()) {
-                            this->impl->connectedToPrioirty = connectList->getPriorityURI().equals(uri) ||
-                                                              this->impl->priorityUris->contains(uri);
-                        } else {
+                        if (isPriorityBackup())
+                        {
+                            this->impl->connectedToPrioirty =
+                                connectList->getPriorityURI().equals(uri) ||
+                                this->impl->priorityUris->contains(uri);
+                        }
+                        else
+                        {
                             this->impl->connectedToPrioirty = false;
                         }
 
-                        // Make sure on initial startup, that the transportListener
-                        // has been initialized for this instance.
-                        // Wait in smaller increments so we can check for shutdown
-                        for (int waitAttempt = 0; waitAttempt < 20 && this->impl->transportListener == NULL && !this->impl->closed; ++waitAttempt) {
-                            synchronized(&this->impl->listenerMutex) {
-                                if (this->impl->transportListener == NULL && !this->impl->closed) {
+                        // Make sure on initial startup, that the
+                        // transportListener has been initialized for this
+                        // instance. Wait in smaller increments so we can check
+                        // for shutdown
+                        for (int waitAttempt = 0;
+                             waitAttempt < 20 &&
+                             this->impl->transportListener == NULL &&
+                             !this->impl->closed;
+                             ++waitAttempt)
+                        {
+                            synchronized(&this->impl->listenerMutex)
+                            {
+                                if (this->impl->transportListener == NULL &&
+                                    !this->impl->closed)
+                                {
                                     this->impl->listenerMutex.wait(100);
                                 }
                             }
                         }
 
-                        if (this->impl->firstConnection) {
+                        if (this->impl->firstConnection)
+                        {
                             this->impl->firstConnection = false;
                         }
 
-                        // Return the failures to the pool, we will try again on the next iteration.
+                        // Return the failures to the pool, we will try again on
+                        // the next iteration.
                         connectList->addURIs(failures);
 
-                        // Set connected BEFORE notifying listener to prevent race condition
-                        this->impl->connected.store(true, std::memory_order_release);
+                        // Set connected BEFORE notifying listener to prevent
+                        // race condition
+                        this->impl->connected.store(true,
+                                                    std::memory_order_release);
                         // Memory barrier to ensure connected state is visible
                         std::atomic_thread_fence(std::memory_order_seq_cst);
-                        AMQ_LOG_DEBUG("FailoverTransport", "Connection established, connected=true");
+                        AMQ_LOG_DEBUG("FailoverTransport",
+                                      "Connection established, connected=true");
 
-                        synchronized(&this->impl->listenerMutex) {
-                            if (this->impl->transportListener != NULL) {
-                                this->impl->transportListener->transportResumed();
+                        synchronized(&this->impl->listenerMutex)
+                        {
+                            if (this->impl->transportListener != NULL)
+                            {
+                                this->impl->transportListener
+                                    ->transportResumed();
                             }
                         }
 
                         return false;
-
-                    } catch (Exception& e) {
+                    }
+                    catch (Exception& e)
+                    {
                         e.setMark(__FILE__, __LINE__);
-                        AMQ_LOG_DEBUG("FailoverTransport", "Connection attempt to " << uri.toString() << " failed: " << e.getMessage());
-                        // Reset so next iteration creates and starts a fresh transport
+                        AMQ_LOG_DEBUG("FailoverTransport",
+                                      "Connection attempt to "
+                                          << uri.toString()
+                                          << " failed: " << e.getMessage());
+                        // Reset so next iteration creates and starts a fresh
+                        // transport
                         transportAlreadyStarted = false;
-                        if (transport != NULL) {
-                            if (this->impl->disposedListener != NULL) {
-                                transport->setTransportListener(this->impl->disposedListener.get());
+                        if (transport != NULL)
+                        {
+                            if (this->impl->disposedListener != NULL)
+                            {
+                                transport->setTransportListener(
+                                    this->impl->disposedListener.get());
                             }
 
-                            try {
+                            try
+                            {
                                 transport->stop();
-                            } catch (...) {
+                            }
+                            catch (...)
+                            {
                             }
 
-                            // Hand off to the close task so it gets done in a different thread
-                            // this prevents a deadlock from occurring if the Transport happens
-                            // to call back through our onException method or locks in some other
-                            // way.
-                            this->impl->connected.store(false, std::memory_order_release);
+                            // Hand off to the close task so it gets done in a
+                            // different thread this prevents a deadlock from
+                            // occurring if the Transport happens to call back
+                            // through our onException method or locks in some
+                            // other way.
+                            this->impl->connected.store(
+                                false,
+                                std::memory_order_release);
                             this->impl->closeTask->add(transport);
                             this->impl->taskRunner->wakeup();
                             transport.reset(NULL);
-                            // Clear any connectingTransport marker if we failed while connecting.
-                            // We're already inside the reconnectMutex synchronized block, no need to lock again
+                            // Clear any connectingTransport marker if we failed
+                            // while connecting. We're already inside the
+                            // reconnectMutex synchronized block, no need to
+                            // lock again
                             this->impl->connectingTransport.reset(NULL);
                         }
 
@@ -1366,15 +1786,21 @@ bool FailoverTransport::iterate() {
                         failure.reset(e.clone());
 
                         // Mark broker as FAILED with error details
-                        int reconnectAttempts = this->impl->calculateReconnectAttemptLimit();
-                        this->impl->markBrokerFailed(uri, e.getMessage(), reconnectAttempts);
+                        int reconnectAttempts =
+                            this->impl->calculateReconnectAttemptLimit();
+                        this->impl->markBrokerFailed(uri,
+                                                     e.getMessage(),
+                                                     reconnectAttempts);
                         int uriAttempts = this->impl->getUriFailureCount(uri);
-                        AMQ_LOG_DEBUG("FailoverTransport", "URI " << uri.toString()
-                            << " failure count: " << uriAttempts);
+                        AMQ_LOG_DEBUG("FailoverTransport",
+                                      "URI "
+                                          << uri.toString()
+                                          << " failure count: " << uriAttempts);
                     }
                 }
 
-                // Return the failures to the pool, we will try again on the next iteration.
+                // Return the failures to the pool, we will try again on the
+                // next iteration.
                 connectList->addURIs(failures);
             }
         }
@@ -1382,36 +1808,56 @@ bool FailoverTransport::iterate() {
         int reconnectAttempts = this->impl->calculateReconnectAttemptLimit();
 
         // Check if ALL URIs have exceeded their per-URI max reconnect attempts
-        // maxReconnectAttempts is per-host, not global - only fail when ALL hosts are exhausted
+        // maxReconnectAttempts is per-host, not global - only fail when ALL
+        // hosts are exhausted
         Pointer<URIPool> checkList = this->impl->getConnectList();
-        bool allExhausted = reconnectAttempts >= 0 &&
-                           this->impl->allUrisExhausted(checkList->getURIList(), reconnectAttempts);
+        bool             allExhausted =
+            reconnectAttempts >= 0 &&
+            this->impl->allUrisExhausted(checkList->getURIList(),
+                                         reconnectAttempts);
 
         // Also increment global counter for backwards compatibility
         ++this->impl->connectFailures;
 
-        if (allExhausted) {
-            AMQ_LOG_ERROR("FailoverTransport", "All URIs have exceeded max reconnect attempts ("
-                << reconnectAttempts << ") per host");
+        if (allExhausted)
+        {
+            AMQ_LOG_ERROR("FailoverTransport",
+                          "All URIs have exceeded max reconnect attempts ("
+                              << reconnectAttempts << ") per host");
             this->impl->connectionFailure = failure;
 
-            // If this was a first connection failure and we've exhausted startupMaxReconnectAttempts,
-            // transition to using maxReconnectAttempts for future attempts
+            // If this was a first connection failure and we've exhausted
+            // startupMaxReconnectAttempts, transition to using
+            // maxReconnectAttempts for future attempts
             bool wasFirstConnection = this->impl->firstConnection;
-            if (this->impl->firstConnection) {
-                AMQ_LOG_INFO("FailoverTransport", "Transitioning from startup phase to reconnection phase");
+            if (this->impl->firstConnection)
+            {
+                AMQ_LOG_INFO(
+                    "FailoverTransport",
+                    "Transitioning from startup phase to reconnection phase");
                 this->impl->firstConnection = false;
-                this->impl->connectFailures = 0;  // Reset counter for subsequent reconnection attempts with maxReconnectAttempts
-                this->impl->resetAllUriFailureCounts();  // Reset per-URI counts for new phase
-                this->impl->resetReconnectDelay();  // Reset delay back to initial value
+                this->impl->connectFailures =
+                    0;  // Reset counter for subsequent reconnection attempts
+                        // with maxReconnectAttempts
+                this->impl->resetAllUriFailureCounts();  // Reset per-URI counts
+                                                         // for new phase
+                this->impl->resetReconnectDelay();       // Reset delay back to
+                                                         // initial value
             }
 
-            // Make sure on initial startup, that the transportListener has been initialized
-            // for this instance.
-            // Wait in smaller increments so we can check for shutdown
-            for (int waitAttempt = 0; waitAttempt < 20 && this->impl->transportListener == NULL && !this->impl->closed; ++waitAttempt) {
-                synchronized(&this->impl->listenerMutex) {
-                    if (this->impl->transportListener == NULL && !this->impl->closed) {
+            // Make sure on initial startup, that the transportListener has been
+            // initialized for this instance. Wait in smaller increments so we
+            // can check for shutdown
+            for (int waitAttempt = 0;
+                 waitAttempt < 20 && this->impl->transportListener == NULL &&
+                 !this->impl->closed;
+                 ++waitAttempt)
+            {
+                synchronized(&this->impl->listenerMutex)
+                {
+                    if (this->impl->transportListener == NULL &&
+                        !this->impl->closed)
+                    {
                         this->impl->listenerMutex.wait(100);
                     }
                 }
@@ -1421,19 +1867,25 @@ bool FailoverTransport::iterate() {
 
             // Clear failure after propagating to allow continued reconnection
             // Only if we're transitioning to a different reconnect limit.
-            // startupMaxReconnectAttempts == 0 means "fail fast on first connect" — never transition.
-            bool transitioningToDifferentLimit = wasFirstConnection &&
+            // startupMaxReconnectAttempts == 0 means "fail fast on first
+            // connect" — never transition.
+            bool transitioningToDifferentLimit =
+                wasFirstConnection &&
                 this->impl->startupMaxReconnectAttempts > 0 &&
-                this->impl->startupMaxReconnectAttempts != this->impl->maxReconnectAttempts;
+                this->impl->startupMaxReconnectAttempts !=
+                    this->impl->maxReconnectAttempts;
 
-            if (transitioningToDifferentLimit) {
+            if (transitioningToDifferentLimit)
+            {
                 this->impl->connectionFailure.reset(NULL);
             }
 
-            // If this was the first connection exhaustion AND we're transitioning to a different limit,
-            // continue trying with maxReconnectAttempts
-            // Otherwise, we've truly exhausted all reconnection attempts
-            if (!wasFirstConnection || !transitioningToDifferentLimit) {
+            // If this was the first connection exhaustion AND we're
+            // transitioning to a different limit, continue trying with
+            // maxReconnectAttempts Otherwise, we've truly exhausted all
+            // reconnection attempts
+            if (!wasFirstConnection || !transitioningToDifferentLimit)
+            {
                 return false;
             }
             // For first connection transition, immediately retry without delay
@@ -1441,7 +1893,8 @@ bool FailoverTransport::iterate() {
         }
     }
 
-    if (!this->impl->closed) {
+    if (!this->impl->closed)
+    {
         this->impl->doDelay();
     }
 
@@ -1450,26 +1903,37 @@ bool FailoverTransport::iterate() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Transport> FailoverTransport::createTransport(const URI& location) const {
+Pointer<Transport> FailoverTransport::createTransport(const URI& location) const
+{
+    try
+    {
+        TransportFactory* factory =
+            TransportRegistry::getInstance().findFactory(location.getScheme());
 
-    try {
-
-        TransportFactory* factory = TransportRegistry::getInstance().findFactory(location.getScheme());
-
-        if (factory == NULL) {
-            throw new IOException(__FILE__, __LINE__, "Invalid URI specified, no valid Factory Found.");
+        if (factory == NULL)
+        {
+            throw new IOException(
+                __FILE__,
+                __LINE__,
+                "Invalid URI specified, no valid Factory Found.");
         }
 
-        // Apply failover timeout as soConnectTimeout if not already specified in the URI
+        // Apply failover timeout as soConnectTimeout if not already specified
+        // in the URI
         URI transportUri = location;
-        if (this->impl->timeout > 0) {
+        if (this->impl->timeout > 0)
+        {
             Properties params = URISupport::parseParameters(location);
-            if (!params.hasProperty("soConnectTimeout")) {
+            if (!params.hasProperty("soConnectTimeout"))
+            {
                 Properties newParams;
-                newParams.setProperty("soConnectTimeout", Long::toString(this->impl->timeout));
+                newParams.setProperty("soConnectTimeout",
+                                      Long::toString(this->impl->timeout));
                 transportUri = URISupport::applyParameters(location, newParams);
-                AMQ_LOG_DEBUG("FailoverTransport", "Applied connection timeout " << this->impl->timeout
-                    << "ms to " << transportUri.toString());
+                AMQ_LOG_DEBUG("FailoverTransport",
+                              "Applied connection timeout "
+                                  << this->impl->timeout << "ms to "
+                                  << transportUri.toString());
             }
         }
 
@@ -1483,42 +1947,50 @@ Pointer<Transport> FailoverTransport::createTransport(const URI& location) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransport::setConnectionInterruptProcessingComplete(const Pointer<commands::ConnectionId> connectionId) {
-
-    synchronized(&this->impl->reconnectMutex) {
+void FailoverTransport::setConnectionInterruptProcessingComplete(
+    const Pointer<commands::ConnectionId> connectionId)
+{
+    synchronized(&this->impl->reconnectMutex)
+    {
         stateTracker.connectionInterruptProcessingComplete(this, connectionId);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool FailoverTransport::isConnected() const {
+bool FailoverTransport::isConnected() const
+{
     // Use seq_cst to match the seq_cst fence used on the write side
     return this->impl->connected.load(std::memory_order_seq_cst);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool FailoverTransport::isClosed() const {
+bool FailoverTransport::isClosed() const
+{
     return this->impl->closed;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool FailoverTransport::isInitialized() const {
+bool FailoverTransport::isInitialized() const
+{
     return this->impl->initialized;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransport::setInitialized(bool value) {
+void FailoverTransport::setInitialized(bool value)
+{
     this->impl->initialized = value;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Transport* FailoverTransport::narrow(const std::type_info& typeId) {
-
-    if (typeid( *this ) == typeId) {
+Transport* FailoverTransport::narrow(const std::type_info& typeId)
+{
+    if (typeid(*this) == typeId)
+    {
         return this;
     }
 
-    if (this->impl->connectedTransport != NULL) {
+    if (this->impl->connectedTransport != NULL)
+    {
         return this->impl->connectedTransport->narrow(typeId);
     }
 
@@ -1526,20 +1998,27 @@ Transport* FailoverTransport::narrow(const std::type_info& typeId) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransport::processResponse(const Pointer<Response> response) {
-
+void FailoverTransport::processResponse(const Pointer<Response> response)
+{
     Pointer<Command> object;
 
-    synchronized(&(this->impl->requestMap)) {
-        try {
-            object = this->impl->requestMap.remove(response->getCorrelationId());
-        } catch (NoSuchElementException& ex) {
+    synchronized(&(this->impl->requestMap))
+    {
+        try
+        {
+            object =
+                this->impl->requestMap.remove(response->getCorrelationId());
+        }
+        catch (NoSuchElementException& ex)
+        {
             // Not tracking this request in our map, not an error.
         }
     }
 
-    if (object != NULL) {
-        try {
+    if (object != NULL)
+    {
+        try
+        {
             Pointer<Tracked> tracked = object.dynamicCast<Tracked>();
             tracked->onResponse();
         }
@@ -1548,12 +2027,13 @@ void FailoverTransport::processResponse(const Pointer<Response> response) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<wireformat::WireFormat> FailoverTransport::getWireFormat() const {
-
+Pointer<wireformat::WireFormat> FailoverTransport::getWireFormat() const
+{
     Pointer<wireformat::WireFormat> result;
-    Pointer<Transport> transport = this->impl->connectedTransport;
+    Pointer<Transport>              transport = this->impl->connectedTransport;
 
-    if (transport != NULL) {
+    if (transport != NULL)
+    {
         result = transport->getWireFormat();
     }
 
@@ -1561,236 +2041,284 @@ Pointer<wireformat::WireFormat> FailoverTransport::getWireFormat() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-long long FailoverTransport::getTimeout() const {
+long long FailoverTransport::getTimeout() const
+{
     return this->impl->timeout;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransport::setTimeout(long long value) {
+void FailoverTransport::setTimeout(long long value)
+{
     this->impl->timeout = value;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-long long FailoverTransport::getInitialReconnectDelay() const {
+long long FailoverTransport::getInitialReconnectDelay() const
+{
     return this->impl->initialReconnectDelay;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransport::setInitialReconnectDelay(long long value) {
+void FailoverTransport::setInitialReconnectDelay(long long value)
+{
     this->impl->initialReconnectDelay = value;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-long long FailoverTransport::getMaxReconnectDelay() const {
+long long FailoverTransport::getMaxReconnectDelay() const
+{
     return this->impl->maxReconnectDelay;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransport::setMaxReconnectDelay(long long value) {
+void FailoverTransport::setMaxReconnectDelay(long long value)
+{
     this->impl->maxReconnectDelay = value;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-long long FailoverTransport::getBackOffMultiplier() const {
+long long FailoverTransport::getBackOffMultiplier() const
+{
     return this->impl->backOffMultiplier;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransport::setBackOffMultiplier(long long value) {
+void FailoverTransport::setBackOffMultiplier(long long value)
+{
     this->impl->backOffMultiplier = value;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool FailoverTransport::isUseExponentialBackOff() const {
+bool FailoverTransport::isUseExponentialBackOff() const
+{
     return this->impl->useExponentialBackOff;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransport::setUseExponentialBackOff(bool value) {
+void FailoverTransport::setUseExponentialBackOff(bool value)
+{
     this->impl->useExponentialBackOff = value;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool FailoverTransport::isRandomize() const {
+bool FailoverTransport::isRandomize() const
+{
     return this->impl->uris->isRandomize();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransport::setRandomize(bool value) {
+void FailoverTransport::setRandomize(bool value)
+{
     this->impl->uris->setRandomize(value);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int FailoverTransport::getMaxReconnectAttempts() const {
+int FailoverTransport::getMaxReconnectAttempts() const
+{
     return this->impl->maxReconnectAttempts;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransport::setMaxReconnectAttempts(int value) {
+void FailoverTransport::setMaxReconnectAttempts(int value)
+{
     this->impl->maxReconnectAttempts = value;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int FailoverTransport::getStartupMaxReconnectAttempts() const {
+int FailoverTransport::getStartupMaxReconnectAttempts() const
+{
     return this->impl->startupMaxReconnectAttempts;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransport::setStartupMaxReconnectAttempts(int value) {
+void FailoverTransport::setStartupMaxReconnectAttempts(int value)
+{
     this->impl->startupMaxReconnectAttempts = value;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-long long FailoverTransport::getReconnectDelay() const {
+long long FailoverTransport::getReconnectDelay() const
+{
     return this->impl->reconnectDelay;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransport::setReconnectDelay(long long value) {
+void FailoverTransport::setReconnectDelay(long long value)
+{
     this->impl->reconnectDelay = value;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool FailoverTransport::isBackup() const {
+bool FailoverTransport::isBackup() const
+{
     return this->impl->backupsEnabled;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransport::setBackup(bool value) {
+void FailoverTransport::setBackup(bool value)
+{
     this->impl->backupsEnabled = value;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int FailoverTransport::getBackupPoolSize() const {
+int FailoverTransport::getBackupPoolSize() const
+{
     return this->impl->backups->getBackupPoolSize();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransport::setBackupPoolSize(int value) {
+void FailoverTransport::setBackupPoolSize(int value)
+{
     this->impl->backups->setBackupPoolSize(value);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool FailoverTransport::isTrackMessages() const {
+bool FailoverTransport::isTrackMessages() const
+{
     return this->impl->trackMessages;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransport::setTrackMessages(bool value) {
+void FailoverTransport::setTrackMessages(bool value)
+{
     this->impl->trackMessages = value;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool FailoverTransport::isTrackTransactionProducers() const {
+bool FailoverTransport::isTrackTransactionProducers() const
+{
     return this->impl->trackTransactionProducers;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransport::setTrackTransactionProducers(bool value) {
+void FailoverTransport::setTrackTransactionProducers(bool value)
+{
     this->impl->trackTransactionProducers = value;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int FailoverTransport::getMaxCacheSize() const {
+int FailoverTransport::getMaxCacheSize() const
+{
     return this->impl->maxCacheSize;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransport::setMaxCacheSize(int value) {
+void FailoverTransport::setMaxCacheSize(int value)
+{
     this->impl->maxCacheSize = value;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int FailoverTransport::getMaxPullCacheSize() const {
+int FailoverTransport::getMaxPullCacheSize() const
+{
     return this->impl->maxPullCacheSize;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransport::setMaxPullCacheSize(int value) {
+void FailoverTransport::setMaxPullCacheSize(int value)
+{
     this->impl->maxPullCacheSize = value;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool FailoverTransport::isReconnectSupported() const {
+bool FailoverTransport::isReconnectSupported() const
+{
     return this->impl->reconnectSupported;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransport::setReconnectSupported(bool value) {
+void FailoverTransport::setReconnectSupported(bool value)
+{
     this->impl->reconnectSupported = value;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool FailoverTransport::isUpdateURIsSupported() const {
+bool FailoverTransport::isUpdateURIsSupported() const
+{
     return this->impl->updateURIsSupported;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransport::setUpdateURIsSupported(bool value) {
+void FailoverTransport::setUpdateURIsSupported(bool value)
+{
     this->impl->updateURIsSupported = value;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool FailoverTransport::isRebalanceUpdateURIs() const {
+bool FailoverTransport::isRebalanceUpdateURIs() const
+{
     return this->impl->rebalanceUpdateURIs;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransport::setRebalanceUpdateURIs(bool rebalanceUpdateURIs) {
+void FailoverTransport::setRebalanceUpdateURIs(bool rebalanceUpdateURIs)
+{
     this->impl->rebalanceUpdateURIs = rebalanceUpdateURIs;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool FailoverTransport::isPriorityBackup() const {
+bool FailoverTransport::isPriorityBackup() const
+{
     return this->impl->priorityBackup;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransport::setPriorityBackup(bool priorityBackup) {
+void FailoverTransport::setPriorityBackup(bool priorityBackup)
+{
     this->impl->priorityBackup = priorityBackup;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool FailoverTransport::isConnectedToPriority() const {
+bool FailoverTransport::isConnectedToPriority() const
+{
     return this->impl->connectedToPrioirty;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransport::setPriorityURIs(const std::string& priorityURIs AMQCPP_UNUSED) {
+void FailoverTransport::setPriorityURIs(
+    const std::string& priorityURIs AMQCPP_UNUSED)
+{
     StringTokenizer tokenizer(priorityURIs, ",");
-    while (tokenizer.hasMoreTokens()) {
+    while (tokenizer.hasMoreTokens())
+    {
         std::string str = tokenizer.nextToken();
-        try {
+        try
+        {
             this->impl->priorityUris->addURI(URI(str));
-        } catch (Exception& e) {
+        }
+        catch (Exception& e)
+        {
         }
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const List<URI>& FailoverTransport::getPriorityURIs() const {
+const List<URI>& FailoverTransport::getPriorityURIs() const
+{
     return this->impl->priorityUris->getURIList();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::vector<BrokerStateInfo> FailoverTransport::getBrokerStates() const {
+std::vector<BrokerStateInfo> FailoverTransport::getBrokerStates() const
+{
     std::vector<BrokerStateInfo> states;
 
-    synchronized(&this->impl->reconnectMutex) {
-        Pointer<Iterator<std::string>> iter(this->impl->brokerStates.keySet().iterator());
+    synchronized(&this->impl->reconnectMutex)
+    {
+        Pointer<Iterator<std::string>> iter(
+            this->impl->brokerStates.keySet().iterator());
 
-        while (iter->hasNext()) {
-            std::string uriStr = iter->next();
-            const BrokerState& state = this->impl->brokerStates.get(uriStr);
+        while (iter->hasNext())
+        {
+            std::string        uriStr = iter->next();
+            const BrokerState& state  = this->impl->brokerStates.get(uriStr);
 
-            states.push_back(BrokerStateInfo(
-                uriStr,
-                state.status,
-                state.failureCount,
-                state.lastAttemptTime,
-                state.lastSuccessTime,
-                state.lastError
-            ));
+            states.push_back(BrokerStateInfo(uriStr,
+                                             state.status,
+                                             state.failureCount,
+                                             state.lastAttemptTime,
+                                             state.lastSuccessTime,
+                                             state.lastError));
         }
     }
 

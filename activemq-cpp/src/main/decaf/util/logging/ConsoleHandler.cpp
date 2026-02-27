@@ -25,20 +25,25 @@ using namespace decaf::util;
 using namespace decaf::util::logging;
 
 ////////////////////////////////////////////////////////////////////////////////
-ConsoleHandler::ConsoleHandler() : StreamHandler( &stream, &formatter ), stream(), formatter() {
-
+ConsoleHandler::ConsoleHandler()
+    : StreamHandler(&stream, &formatter),
+      stream(),
+      formatter()
+{
     // Defaults level to Info
-    setLevel( Level::INFO );
+    setLevel(Level::INFO);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConsoleHandler::close() {
-    StreamHandler::close( true );
+void ConsoleHandler::close()
+{
+    StreamHandler::close(true);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConsoleHandler::publish( const LogRecord& record ) {
-    StreamHandler::publish( record );
+void ConsoleHandler::publish(const LogRecord& record)
+{
+    StreamHandler::publish(record);
 
     this->flush();
 }

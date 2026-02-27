@@ -20,19 +20,20 @@
 
 #include <activemq/util/Config.h>
 #include <decaf/io/FilterInputStream.h>
-#include <decaf/util/logging/LoggerDefines.h>
 #include <decaf/lang/exceptions/NullPointerException.h>
+#include <decaf/util/logging/LoggerDefines.h>
 
-namespace activemq{
-namespace io{
+namespace activemq
+{
+namespace io
+{
 
-    class AMQCPP_API LoggingInputStream : public decaf::io::FilterInputStream {
+    class AMQCPP_API LoggingInputStream : public decaf::io::FilterInputStream
+    {
     private:
-
         LOGDECAF_DECLARE(logger)
 
     public:
-
         /**
          * Creates a DataInputStream that uses the specified underlying
          * InputStream.
@@ -40,26 +41,29 @@ namespace io{
          * @param inputStream
          *      the InputStream instance to wrap.
          * @param own
-         *      indicates if this class owns the wrapped string defaults to false.
+         *      indicates if this class owns the wrapped string defaults to
+         * false.
          */
-        LoggingInputStream(decaf::io::InputStream* inputStream, bool own = false);
+        LoggingInputStream(decaf::io::InputStream* inputStream,
+                           bool                    own = false);
 
         virtual ~LoggingInputStream();
 
     protected:
-
         virtual int doReadByte();
 
-        virtual int doReadArrayBounded(unsigned char* buffer, int size, int offset, int length);
+        virtual int doReadArrayBounded(unsigned char* buffer,
+                                       int            size,
+                                       int            offset,
+                                       int            length);
 
     private:
-
         /**
          * Logs the data in the buffer.
          */
         void log(const unsigned char* buffer, int len);
-
     };
 
-}}
+}  // namespace io
+}  // namespace activemq
 #endif /*_ACTIVEMQ_IO_LOGGINGINPUTSTREAM_H_*/

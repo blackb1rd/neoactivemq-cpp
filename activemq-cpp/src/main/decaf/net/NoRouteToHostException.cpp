@@ -22,26 +22,38 @@ using namespace decaf::net;
 using namespace decaf::lang;
 
 ////////////////////////////////////////////////////////////////////////////////
-NoRouteToHostException::NoRouteToHostException() : SocketException() {
+NoRouteToHostException::NoRouteToHostException()
+    : SocketException()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-NoRouteToHostException::~NoRouteToHostException() throw() {
+NoRouteToHostException::~NoRouteToHostException() throw()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-NoRouteToHostException::NoRouteToHostException(const Exception& ex) : SocketException() {
-    *(Exception*) this = ex;
+NoRouteToHostException::NoRouteToHostException(const Exception& ex)
+    : SocketException()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-NoRouteToHostException::NoRouteToHostException(const NoRouteToHostException& ex) : SocketException() {
-    *(Exception*) this = ex;
+NoRouteToHostException::NoRouteToHostException(const NoRouteToHostException& ex)
+    : SocketException()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-NoRouteToHostException::NoRouteToHostException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...) : SocketException(cause) {
-
+NoRouteToHostException::NoRouteToHostException(const char*           file,
+                                               const int             lineNumber,
+                                               const std::exception* cause,
+                                               const char*           msg,
+                                               ...)
+    : SocketException(cause)
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -51,12 +63,18 @@ NoRouteToHostException::NoRouteToHostException(const char* file, const int lineN
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-NoRouteToHostException::NoRouteToHostException(const std::exception* cause) : SocketException(cause) {
+NoRouteToHostException::NoRouteToHostException(const std::exception* cause)
+    : SocketException(cause)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-NoRouteToHostException::NoRouteToHostException(const char* file, const int lineNumber, const char* msg, ...) : SocketException() {
-
+NoRouteToHostException::NoRouteToHostException(const char* file,
+                                               const int   lineNumber,
+                                               const char* msg,
+                                               ...)
+    : SocketException()
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);

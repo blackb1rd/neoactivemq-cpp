@@ -20,7 +20,7 @@
 
 // Turn off warning message for ignored exception specification
 #ifdef _MSC_VER
-#pragma warning( disable : 4290 )
+#pragma warning(disable : 4290)
 #endif
 
 #include <activemq/commands/BaseDataStructure.h>
@@ -31,8 +31,10 @@
 #include <string>
 #include <vector>
 
-namespace activemq {
-namespace commands {
+namespace activemq
+{
+namespace commands
+{
 
     class ProducerId;
     class ConsumerId;
@@ -48,24 +50,22 @@ namespace commands {
      *         in the activemq-cpp-openwire-generator module
      *
      */
-    class AMQCPP_API SessionId : public BaseDataStructure, public decaf::lang::Comparable<SessionId> {
+    class AMQCPP_API SessionId : public BaseDataStructure,
+                                 public decaf::lang::Comparable<SessionId>
+    {
     protected:
-
         std::string connectionId;
-        long long value;
+        long long   value;
 
     public:
-
         const static unsigned char ID_SESSIONID = 121;
 
         typedef decaf::lang::PointerComparator<SessionId> COMPARATOR;
 
     private:
-
         mutable Pointer<ConnectionId> parentId;
 
     public:
-
         SessionId();
 
         SessionId(const SessionId& other);
@@ -91,11 +91,11 @@ namespace commands {
         const Pointer<ConnectionId>& getParentId() const;
 
         virtual const std::string& getConnectionId() const;
-        virtual std::string& getConnectionId();
+        virtual std::string&       getConnectionId();
         virtual void setConnectionId(const std::string& connectionId);
 
         virtual long long getValue() const;
-        virtual void setValue(long long value);
+        virtual void      setValue(long long value);
 
         virtual int compareTo(const SessionId& value) const;
 
@@ -105,12 +105,12 @@ namespace commands {
 
         virtual bool operator<(const SessionId& value) const;
 
-        SessionId& operator= (const SessionId& other);
+        SessionId& operator=(const SessionId& other);
 
         int getHashCode() const;
-
     };
 
-}}
+}  // namespace commands
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_COMMANDS_SESSIONID_H_*/

@@ -31,116 +31,148 @@ using namespace decaf::internal;
 using namespace decaf::internal::net;
 
 ////////////////////////////////////////////////////////////////////////////////
-DefaultSocketFactory::DefaultSocketFactory() : SocketFactory() {
+DefaultSocketFactory::DefaultSocketFactory()
+    : SocketFactory()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DefaultSocketFactory::~DefaultSocketFactory() {
+DefaultSocketFactory::~DefaultSocketFactory()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Socket* DefaultSocketFactory::createSocket() {
-
-    try{
-
-        std::unique_ptr<Socket> socket( new Socket() );
+Socket* DefaultSocketFactory::createSocket()
+{
+    try
+    {
+        std::unique_ptr<Socket> socket(new Socket());
 
         return socket.release();
     }
-    DECAF_CATCH_RETHROW( IOException )
-    DECAF_CATCHALL_THROW( IOException )
+    DECAF_CATCH_RETHROW(IOException)
+    DECAF_CATCHALL_THROW(IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Socket* DefaultSocketFactory::createSocket( const decaf::net::InetAddress* host, int port ) {
-
-    try {
-
+Socket* DefaultSocketFactory::createSocket(const decaf::net::InetAddress* host,
+                                           int                            port)
+{
+    try
+    {
         // Ensure something is actually passed in for the URI
-        if( host == NULL ) {
-            throw SocketException( __FILE__, __LINE__, "host address not provided" );
+        if (host == NULL)
+        {
+            throw SocketException(__FILE__,
+                                  __LINE__,
+                                  "host address not provided");
         }
 
-        if( port <= 0 ) {
-            throw SocketException( __FILE__, __LINE__, "valid port not provided" );
+        if (port <= 0)
+        {
+            throw SocketException(__FILE__,
+                                  __LINE__,
+                                  "valid port not provided");
         }
 
-        std::unique_ptr<Socket> socket( new Socket( host, port ) );
+        std::unique_ptr<Socket> socket(new Socket(host, port));
 
         return socket.release();
     }
-    DECAF_CATCH_RETHROW( IOException )
-    DECAF_CATCH_EXCEPTION_CONVERT( Exception, IOException )
-    DECAF_CATCHALL_THROW( IOException )
+    DECAF_CATCH_RETHROW(IOException)
+    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IOException)
+    DECAF_CATCHALL_THROW(IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Socket* DefaultSocketFactory::createSocket( const decaf::net::InetAddress* host, int port,
-                                            const decaf::net::InetAddress* ifAddress, int localPort ) {
-
-    try {
-
+Socket* DefaultSocketFactory::createSocket(
+    const decaf::net::InetAddress* host,
+    int                            port,
+    const decaf::net::InetAddress* ifAddress,
+    int                            localPort)
+{
+    try
+    {
         // Ensure something is actually passed in for the URI
-        if( host == NULL ) {
-            throw SocketException( __FILE__, __LINE__, "host addres not provided" );
+        if (host == NULL)
+        {
+            throw SocketException(__FILE__,
+                                  __LINE__,
+                                  "host addres not provided");
         }
 
-        if( port <= 0 ) {
-            throw SocketException( __FILE__, __LINE__, "valid port not provided" );
+        if (port <= 0)
+        {
+            throw SocketException(__FILE__,
+                                  __LINE__,
+                                  "valid port not provided");
         }
 
-        std::unique_ptr<Socket> socket( new Socket( host, port, ifAddress, localPort ) );
+        std::unique_ptr<Socket> socket(
+            new Socket(host, port, ifAddress, localPort));
 
         return socket.release();
     }
-    DECAF_CATCH_RETHROW( IOException )
-    DECAF_CATCH_EXCEPTION_CONVERT( Exception, IOException )
-    DECAF_CATCHALL_THROW( IOException )
+    DECAF_CATCH_RETHROW(IOException)
+    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IOException)
+    DECAF_CATCHALL_THROW(IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Socket* DefaultSocketFactory::createSocket( const std::string& hostname, int port ) {
-
-    try {
-
+Socket* DefaultSocketFactory::createSocket(const std::string& hostname,
+                                           int                port)
+{
+    try
+    {
         // Ensure something is actually passed in for the URI
-        if( hostname == "" ) {
-            throw SocketException( __FILE__, __LINE__, "uri not provided" );
+        if (hostname == "")
+        {
+            throw SocketException(__FILE__, __LINE__, "uri not provided");
         }
 
-        if( port <= 0 ) {
-            throw SocketException( __FILE__, __LINE__, "valid port not provided" );
+        if (port <= 0)
+        {
+            throw SocketException(__FILE__,
+                                  __LINE__,
+                                  "valid port not provided");
         }
 
-        std::unique_ptr<Socket> socket( new Socket( hostname, port ) );
+        std::unique_ptr<Socket> socket(new Socket(hostname, port));
 
         return socket.release();
     }
-    DECAF_CATCH_RETHROW( IOException )
-    DECAF_CATCH_EXCEPTION_CONVERT( Exception, IOException )
-    DECAF_CATCHALL_THROW( IOException )
+    DECAF_CATCH_RETHROW(IOException)
+    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IOException)
+    DECAF_CATCHALL_THROW(IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Socket* DefaultSocketFactory::createSocket( const std::string& hostname, int port,
-                                            const InetAddress* ifAddress, int localPort ) {
-
-    try {
-
+Socket* DefaultSocketFactory::createSocket(const std::string& hostname,
+                                           int                port,
+                                           const InetAddress* ifAddress,
+                                           int                localPort)
+{
+    try
+    {
         // Ensure something is actually passed in for the URI
-        if( hostname == "" ) {
-            throw SocketException( __FILE__, __LINE__, "uri not provided" );
+        if (hostname == "")
+        {
+            throw SocketException(__FILE__, __LINE__, "uri not provided");
         }
 
-        if( port <= 0 ) {
-            throw SocketException( __FILE__, __LINE__, "valid port not provided" );
+        if (port <= 0)
+        {
+            throw SocketException(__FILE__,
+                                  __LINE__,
+                                  "valid port not provided");
         }
 
-        std::unique_ptr<Socket> socket( new Socket( hostname, port, ifAddress, localPort ) );
+        std::unique_ptr<Socket> socket(
+            new Socket(hostname, port, ifAddress, localPort));
 
         return socket.release();
     }
-    DECAF_CATCH_RETHROW( IOException )
-    DECAF_CATCH_EXCEPTION_CONVERT( Exception, IOException )
-    DECAF_CATCHALL_THROW( IOException )
+    DECAF_CATCH_RETHROW(IOException)
+    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IOException)
+    DECAF_CATCHALL_THROW(IOException)
 }

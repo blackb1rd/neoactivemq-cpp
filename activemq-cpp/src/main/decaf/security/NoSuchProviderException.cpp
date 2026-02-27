@@ -21,22 +21,34 @@ using namespace decaf;
 using namespace decaf::security;
 
 ////////////////////////////////////////////////////////////////////////////////
-NoSuchProviderException::NoSuchProviderException() : GeneralSecurityException() {
+NoSuchProviderException::NoSuchProviderException()
+    : GeneralSecurityException()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-NoSuchProviderException::NoSuchProviderException(const Exception& ex) : GeneralSecurityException() {
-    *(Exception*) this = ex;
+NoSuchProviderException::NoSuchProviderException(const Exception& ex)
+    : GeneralSecurityException()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-NoSuchProviderException::NoSuchProviderException(const NoSuchProviderException& ex) : GeneralSecurityException() {
-    *(Exception*) this = ex;
+NoSuchProviderException::NoSuchProviderException(
+    const NoSuchProviderException& ex)
+    : GeneralSecurityException()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-NoSuchProviderException::NoSuchProviderException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...) : GeneralSecurityException(cause) {
-
+NoSuchProviderException::NoSuchProviderException(const char* file,
+                                                 const int   lineNumber,
+                                                 const std::exception* cause,
+                                                 const char*           msg,
+                                                 ...)
+    : GeneralSecurityException(cause)
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -46,12 +58,18 @@ NoSuchProviderException::NoSuchProviderException(const char* file, const int lin
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-NoSuchProviderException::NoSuchProviderException(const std::exception* cause) : GeneralSecurityException(cause) {
+NoSuchProviderException::NoSuchProviderException(const std::exception* cause)
+    : GeneralSecurityException(cause)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-NoSuchProviderException::NoSuchProviderException(const char* file, const int lineNumber, const char* msg, ...) : GeneralSecurityException() {
-
+NoSuchProviderException::NoSuchProviderException(const char* file,
+                                                 const int   lineNumber,
+                                                 const char* msg,
+                                                 ...)
+    : GeneralSecurityException()
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -61,5 +79,6 @@ NoSuchProviderException::NoSuchProviderException(const char* file, const int lin
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-NoSuchProviderException::~NoSuchProviderException() throw () {
+NoSuchProviderException::~NoSuchProviderException() throw()
+{
 }

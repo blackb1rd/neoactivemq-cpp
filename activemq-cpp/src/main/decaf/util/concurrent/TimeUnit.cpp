@@ -27,24 +27,22 @@ using namespace decaf::util;
 using namespace decaf::util::concurrent;
 
 ////////////////////////////////////////////////////////////////////////////////
-DECAF_API const TimeUnit TimeUnit::NANOSECONDS( 0, "NANOSECONDS" );
-DECAF_API const TimeUnit TimeUnit::MICROSECONDS( 1, "MICROSECONDS" );
-DECAF_API const TimeUnit TimeUnit::MILLISECONDS( 2, "MILLISECONDS" );
-DECAF_API const TimeUnit TimeUnit::SECONDS( 3, "SECONDS" );
-DECAF_API const TimeUnit TimeUnit::MINUTES( 4, "MINUTES" );
-DECAF_API const TimeUnit TimeUnit::HOURS( 5, "HOURS" );
-DECAF_API const TimeUnit TimeUnit::DAYS( 6, "DAYS" );
+DECAF_API const TimeUnit TimeUnit::NANOSECONDS(0, "NANOSECONDS");
+DECAF_API const TimeUnit TimeUnit::MICROSECONDS(1, "MICROSECONDS");
+DECAF_API const TimeUnit TimeUnit::MILLISECONDS(2, "MILLISECONDS");
+DECAF_API const TimeUnit TimeUnit::SECONDS(3, "SECONDS");
+DECAF_API const TimeUnit TimeUnit::MINUTES(4, "MINUTES");
+DECAF_API const TimeUnit TimeUnit::HOURS(5, "HOURS");
+DECAF_API const TimeUnit TimeUnit::DAYS(6, "DAYS");
 
 ////////////////////////////////////////////////////////////////////////////////
-const TimeUnit* const TimeUnit::values[] = {
-    &NANOSECONDS,
-    &MICROSECONDS,
-    &MILLISECONDS,
-    &SECONDS,
-    &MINUTES,
-    &HOURS,
-    &DAYS
-};
+const TimeUnit* const TimeUnit::values[] = {&NANOSECONDS,
+                                            &MICROSECONDS,
+                                            &MILLISECONDS,
+                                            &SECONDS,
+                                            &MINUTES,
+                                            &HOURS,
+                                            &DAYS};
 
 ////////////////////////////////////////////////////////////////////////////////
 const long long TimeUnit::multipliers[] = {
@@ -58,25 +56,38 @@ const long long TimeUnit::multipliers[] = {
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-TimeUnit::TimeUnit( int index, const std::string& name ) : index(index), name(name) {
+TimeUnit::TimeUnit(int index, const std::string& name)
+    : index(index),
+      name(name)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-long long TimeUnit::convert( long long sourceDuration, const TimeUnit& sourceUnit ) const {
-    return this->doConvert( sourceUnit.index, this->index, sourceDuration );
+long long TimeUnit::convert(long long       sourceDuration,
+                            const TimeUnit& sourceUnit) const
+{
+    return this->doConvert(sourceUnit.index, this->index, sourceDuration);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-long long TimeUnit::doConvert( int srcIndex, int destIndex, long long duration ) const {
-
-    if( duration == 0 ) {
+long long TimeUnit::doConvert(int       srcIndex,
+                              int       destIndex,
+                              long long duration) const
+{
+    if (duration == 0)
+    {
         return duration;
-    } else if( srcIndex > destIndex ) {
-        return scale( duration,
-                      multipliers[srcIndex] / multipliers[destIndex],
-                      Long::MAX_VALUE / ( multipliers[srcIndex] / multipliers[destIndex] ) );
-    } else if( srcIndex < destIndex ) {
-        return duration / ( multipliers[destIndex] / multipliers[srcIndex] );
+    }
+    else if (srcIndex > destIndex)
+    {
+        return scale(
+            duration,
+            multipliers[srcIndex] / multipliers[destIndex],
+            Long::MAX_VALUE / (multipliers[srcIndex] / multipliers[destIndex]));
+    }
+    else if (srcIndex < destIndex)
+    {
+        return duration / (multipliers[destIndex] / multipliers[srcIndex]);
     }
 
     // Same unit, no conversion.
@@ -84,87 +95,108 @@ long long TimeUnit::doConvert( int srcIndex, int destIndex, long long duration )
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int TimeUnit::excessNanos( long long time, long long ms ) const {
-
-    if( *this == NANOSECONDS ) {
-        return (int)( time - ( ms * 1000 * 1000 ) );
-    } else if( *this == MICROSECONDS ) {
-        return (int)( ( time * 1000 ) - ( ms * 1000 * 1000 ) );
+int TimeUnit::excessNanos(long long time, long long ms) const
+{
+    if (*this == NANOSECONDS)
+    {
+        return (int)(time - (ms * 1000 * 1000));
+    }
+    else if (*this == MICROSECONDS)
+    {
+        return (int)((time * 1000) - (ms * 1000 * 1000));
     }
 
     return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TimeUnit::sleep( long long timeout ) const {
-
-    if( timeout > 0 ) {
-        long long ms = toMillis( timeout );
-        int ns = excessNanos( timeout, ms );
-        Thread::sleep( ms, ns );
+void TimeUnit::sleep(long long timeout) const
+{
+    if (timeout > 0)
+    {
+        long long ms = toMillis(timeout);
+        int       ns = excessNanos(timeout, ms);
+        Thread::sleep(ms, ns);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TimeUnit::timedWait( Synchronizable* obj, long long timeout ) const {
-
-    if( obj == NULL ) {
-        throw NullPointerException(
-            __FILE__, __LINE__, "Synchronizable object pointer was null." );
+void TimeUnit::timedWait(Synchronizable* obj, long long timeout) const
+{
+    if (obj == NULL)
+    {
+        throw NullPointerException(__FILE__,
+                                   __LINE__,
+                                   "Synchronizable object pointer was null.");
     }
 
-    if( timeout > 0 ) {
-        long long ms = toMillis( timeout );
-        int ns = excessNanos( timeout, ms );
-        obj->wait( ms, ns );
-    }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void TimeUnit::timedJoin( Thread* thread, long long timeout ) {
-
-    if( thread == NULL ) {
-        throw NullPointerException(
-            __FILE__, __LINE__, "Thread object pointer was null." );
-    }
-
-    if( timeout > 0 ) {
-        long long ms = toMillis( timeout );
-        int ns = excessNanos( timeout, ms );
-        thread->join( ms, ns );
+    if (timeout > 0)
+    {
+        long long ms = toMillis(timeout);
+        int       ns = excessNanos(timeout, ms);
+        obj->wait(ms, ns);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string TimeUnit::toString() const {
+void TimeUnit::timedJoin(Thread* thread, long long timeout)
+{
+    if (thread == NULL)
+    {
+        throw NullPointerException(__FILE__,
+                                   __LINE__,
+                                   "Thread object pointer was null.");
+    }
+
+    if (timeout > 0)
+    {
+        long long ms = toMillis(timeout);
+        int       ns = excessNanos(timeout, ms);
+        thread->join(ms, ns);
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+std::string TimeUnit::toString() const
+{
     return this->name;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int TimeUnit::compareTo( const TimeUnit& value ) const {
-    return index == value.index ? 0 : ( index > value.index ? 1 : -1 );
+int TimeUnit::compareTo(const TimeUnit& value) const
+{
+    return index == value.index ? 0 : (index > value.index ? 1 : -1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool TimeUnit::equals( const TimeUnit& value ) const {
+bool TimeUnit::equals(const TimeUnit& value) const
+{
     return index == value.index;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool TimeUnit::operator==( const TimeUnit& value ) const {
+bool TimeUnit::operator==(const TimeUnit& value) const
+{
     return index == value.index;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool TimeUnit::operator<( const TimeUnit& value ) const {
-    return this->compareTo( value ) == -1;
+bool TimeUnit::operator<(const TimeUnit& value) const
+{
+    return this->compareTo(value) == -1;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-long long TimeUnit::scale( long long duration, long long multiplier, long long overflow ) {
-    if( duration > overflow ) {
+long long TimeUnit::scale(long long duration,
+                          long long multiplier,
+                          long long overflow)
+{
+    if (duration > overflow)
+    {
         return Long::MAX_VALUE;
-    } else if( duration < -overflow ) {
+    }
+    else if (duration < -overflow)
+    {
         return Long::MIN_VALUE;
     }
 
@@ -172,16 +204,19 @@ long long TimeUnit::scale( long long duration, long long multiplier, long long o
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const TimeUnit& TimeUnit::valueOf( const std::string& name ) {
-
-    for( int i = 0; i < 7; ++i ) {
-        if( values[i]->name == name ) {
+const TimeUnit& TimeUnit::valueOf(const std::string& name)
+{
+    for (int i = 0; i < 7; ++i)
+    {
+        if (values[i]->name == name)
+        {
             return *values[i];
         }
     }
 
     throw IllegalArgumentException(
-        __FILE__, __LINE__,
+        __FILE__,
+        __LINE__,
         "Passed TimeUnit name; %s, Does not match any instances of TimeUnit",
-        name.c_str() );
+        name.c_str());
 }

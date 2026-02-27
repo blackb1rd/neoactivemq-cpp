@@ -18,44 +18,44 @@
 #ifndef _ACTIVEMQ_CMSUTIL_RESOURCELIFECYCLEMANAGER_H_
 #define _ACTIVEMQ_CMSUTIL_RESOURCELIFECYCLEMANAGER_H_
 
-#include <cms/Connection.h>
-#include <cms/Session.h>
-#include <cms/Destination.h>
-#include <cms/MessageProducer.h>
-#include <cms/MessageConsumer.h>
 #include <activemq/util/Config.h>
+#include <cms/Connection.h>
+#include <cms/Destination.h>
+#include <cms/MessageConsumer.h>
+#include <cms/MessageProducer.h>
+#include <cms/Session.h>
 #include <decaf/util/LinkedList.h>
 
-namespace activemq {
-namespace cmsutil {
+namespace activemq
+{
+namespace cmsutil
+{
 
     /**
      * Manages the lifecycle of a set of CMS resources.  A call to
      * <code>destroy</code> will close and destroy all of the contained
      * resources in the appropriate manner.
      */
-    class AMQCPP_API ResourceLifecycleManager {
+    class AMQCPP_API ResourceLifecycleManager
+    {
     private:
+        typedef decaf::util::LinkedList<cms::Connection*>      ConnectionList;
+        typedef decaf::util::LinkedList<cms::Session*>         SessionList;
+        typedef decaf::util::LinkedList<cms::Destination*>     DestinationList;
+        typedef decaf::util::LinkedList<cms::MessageProducer*> ProducerList;
+        typedef decaf::util::LinkedList<cms::MessageConsumer*> ConsumerList;
 
-        typedef decaf::util::LinkedList< cms::Connection* > ConnectionList;
-        typedef decaf::util::LinkedList< cms::Session* > SessionList;
-        typedef decaf::util::LinkedList< cms::Destination* > DestinationList;
-        typedef decaf::util::LinkedList< cms::MessageProducer* > ProducerList;
-        typedef decaf::util::LinkedList< cms::MessageConsumer* > ConsumerList;
-
-        ConnectionList connections;
-        SessionList sessions;
+        ConnectionList  connections;
+        SessionList     sessions;
         DestinationList destinations;
-        ProducerList producers;
-        ConsumerList consumers;
+        ProducerList    producers;
+        ConsumerList    consumers;
 
     protected:
-
         ResourceLifecycleManager(const ResourceLifecycleManager&);
         ResourceLifecycleManager& operator=(const ResourceLifecycleManager&);
 
     public:
-
         ResourceLifecycleManager();
 
         /**
@@ -70,7 +70,8 @@ namespace cmsutil {
          * @param connection
          *         the object to be managed
          *
-         * @throws CMSException if an error occurs while performing this operation.
+         * @throws CMSException if an error occurs while performing this
+         * operation.
          */
         void addConnection(cms::Connection* connection);
 
@@ -81,7 +82,8 @@ namespace cmsutil {
          * @param session
          *         the object to be managed
          *
-         * @throws CMSException if an error occurs while performing this operation.
+         * @throws CMSException if an error occurs while performing this
+         * operation.
          */
         void addSession(cms::Session* session);
 
@@ -92,7 +94,8 @@ namespace cmsutil {
          * @param dest
          *         the object to be managed
          *
-         * @throws CMSException if an error occurs while performing this operation.
+         * @throws CMSException if an error occurs while performing this
+         * operation.
          */
         void addDestination(cms::Destination* dest);
 
@@ -103,7 +106,8 @@ namespace cmsutil {
          * @param producer
          *         the object to be managed
          *
-         * @throws CMSException if an error occurs while performing this operation.
+         * @throws CMSException if an error occurs while performing this
+         * operation.
          */
         void addMessageProducer(cms::MessageProducer* producer);
 
@@ -114,7 +118,8 @@ namespace cmsutil {
          * @param consumer
          *         the object to be managed
          *
-         * @throws CMSException if an error occurs while performing this operation.
+         * @throws CMSException if an error occurs while performing this
+         * operation.
          */
         void addMessageConsumer(cms::MessageConsumer* consumer);
 
@@ -130,9 +135,9 @@ namespace cmsutil {
          * object will no longer control their lifetimes.
          */
         void releaseAll();
-
     };
 
-}}
+}  // namespace cmsutil
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_CMSUTIL_RESOURCELIFECYCLEMANAGER_H_*/

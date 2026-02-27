@@ -21,13 +21,17 @@
 #include <activemq/util/Config.h>
 #include <activemq/wireformat/MarshalAware.h>
 
-namespace activemq{
-namespace commands{
+namespace activemq
+{
+namespace commands
+{
 
-    class AMQCPP_API DataStructure : public wireformat::MarshalAware {
+    class AMQCPP_API DataStructure : public wireformat::MarshalAware
+    {
     public:
-
-        virtual ~DataStructure() {}
+        virtual ~DataStructure()
+        {
+        }
 
         /**
          * Get the DataStructure Type as defined in CommandTypes.h
@@ -47,7 +51,7 @@ namespace commands{
          * members, overwriting any existing data.
          * @return src - Source Object
          */
-        virtual void copyDataStructure( const DataStructure* src ) = 0;
+        virtual void copyDataStructure(const DataStructure* src) = 0;
 
         /**
          * Returns a string containing the information for this DataStructure
@@ -62,10 +66,10 @@ namespace commands{
          * same type, and that each element of the objects are the same.
          * @return true if DataStructure's are Equal.
          */
-        virtual bool equals( const DataStructure* value ) const = 0;
-
+        virtual bool equals(const DataStructure* value) const = 0;
     };
 
-}}
+}  // namespace commands
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_COMMANDS_DATASTRUCTURE_H_*/

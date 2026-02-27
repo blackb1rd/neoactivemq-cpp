@@ -25,48 +25,58 @@ using namespace decaf::util::concurrent;
 using namespace decaf::lang;
 
 ////////////////////////////////////////////////////////////////////////////////
-Lock::Lock( Synchronizable* object, const bool intiallyLocked ) : locked( false ), syncObject( object ) {
-
-    try{
-        if( intiallyLocked ) {
+Lock::Lock(Synchronizable* object, const bool intiallyLocked)
+    : locked(false),
+      syncObject(object)
+{
+    try
+    {
+        if (intiallyLocked)
+        {
             lock();
         }
     }
-    DECAF_CATCH_RETHROW( lang::Exception )
-    DECAF_CATCHALL_THROW( lang::Exception )
+    DECAF_CATCH_RETHROW(lang::Exception)
+    DECAF_CATCHALL_THROW(lang::Exception)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Lock::~Lock() {
-
-    try{
-        if( locked ) {
+Lock::~Lock()
+{
+    try
+    {
+        if (locked)
+        {
             syncObject->unlock();
         }
     }
-    DECAF_CATCH_NOTHROW( Exception )
+    DECAF_CATCH_NOTHROW(Exception)
     DECAF_CATCHALL_NOTHROW()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Lock::lock() {
-    try{
+void Lock::lock()
+{
+    try
+    {
         syncObject->lock();
         locked = true;
     }
-    DECAF_CATCH_RETHROW( Exception )
-    DECAF_CATCHALL_THROW( Exception )
+    DECAF_CATCH_RETHROW(Exception)
+    DECAF_CATCHALL_THROW(Exception)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Lock::unlock() {
-
-    try{
-         if( locked ) {
-             syncObject->unlock();
-             locked = false;
-         }
+void Lock::unlock()
+{
+    try
+    {
+        if (locked)
+        {
+            syncObject->unlock();
+            locked = false;
+        }
     }
-    DECAF_CATCH_RETHROW( Exception )
-    DECAF_CATCHALL_THROW( Exception )
+    DECAF_CATCH_RETHROW(Exception)
+    DECAF_CATCHALL_THROW(Exception)
 }

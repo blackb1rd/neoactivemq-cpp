@@ -22,30 +22,43 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-NullPointerException::NullPointerException() : Exception() {
+NullPointerException::NullPointerException()
+    : Exception()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-NullPointerException::~NullPointerException() throw () {
+NullPointerException::~NullPointerException() throw()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-NullPointerException::NullPointerException(const Exception& ex) : Exception() {
-    *(Exception*) this = ex;
+NullPointerException::NullPointerException(const Exception& ex)
+    : Exception()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-NullPointerException::NullPointerException(const NullPointerException& ex) : Exception() {
-    *(Exception*) this = ex;
+NullPointerException::NullPointerException(const NullPointerException& ex)
+    : Exception()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-NullPointerException::NullPointerException(const std::exception* cause) : Exception(cause) {
+NullPointerException::NullPointerException(const std::exception* cause)
+    : Exception(cause)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-NullPointerException::NullPointerException(const char* file, const int lineNumber, const char* msg, ...) : Exception() {
-
+NullPointerException::NullPointerException(const char* file,
+                                           const int   lineNumber,
+                                           const char* msg,
+                                           ...)
+    : Exception()
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -55,8 +68,13 @@ NullPointerException::NullPointerException(const char* file, const int lineNumbe
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-NullPointerException::NullPointerException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...) : Exception(cause) {
-
+NullPointerException::NullPointerException(const char*           file,
+                                           const int             lineNumber,
+                                           const std::exception* cause,
+                                           const char*           msg,
+                                           ...)
+    : Exception(cause)
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);

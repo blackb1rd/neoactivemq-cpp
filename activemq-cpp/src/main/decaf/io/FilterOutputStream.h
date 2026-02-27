@@ -18,13 +18,15 @@
 #ifndef _DECAF_IO_FILTEROUTPUTSTREAM_H_
 #define _DECAF_IO_FILTEROUTPUTSTREAM_H_
 
-#include <decaf/io/OutputStream.h>
 #include <decaf/io/IOException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
+#include <decaf/io/OutputStream.h>
 #include <decaf/lang/exceptions/IndexOutOfBoundsException.h>
+#include <decaf/lang/exceptions/NullPointerException.h>
 
-namespace decaf{
-namespace io{
+namespace decaf
+{
+namespace io
+{
 
     /**
      * This class is the superclass of all classes that filter output
@@ -46,9 +48,9 @@ namespace io{
      *
      *  DataOutputStream os = new DataOutputStream( new OutputStream(), true )
      */
-    class DECAF_API FilterOutputStream: public OutputStream {
+    class DECAF_API FilterOutputStream : public OutputStream
+    {
     protected:
-
         // The output Stream to wrap
         OutputStream* outputStream;
 
@@ -59,12 +61,10 @@ namespace io{
         volatile bool closed;
 
     private:
-
         FilterOutputStream(const FilterOutputStream&);
         FilterOutputStream& operator=(const FilterOutputStream&);
 
     public:
-
         /**
          * Constructor, creates a wrapped output stream
          * @param outputStream the OutputStream to wrap
@@ -86,36 +86,37 @@ namespace io{
         /**
          * {@inheritDoc}
          *
-         * The close method of FilterOutputStream calls its flush method, and then
-         * calls the close method of its underlying output stream.
+         * The close method of FilterOutputStream calls its flush method, and
+         * then calls the close method of its underlying output stream.
          */
         virtual void close();
 
         /**
          * {@inheritDoc}
          *
-         * The toString method of FilterOutputStream calls the toString method of its
-         * underlying output stream.
+         * The toString method of FilterOutputStream calls the toString method
+         * of its underlying output stream.
          */
         virtual std::string toString() const;
 
     protected:
-
         virtual void doWriteByte(unsigned char value);
 
         virtual void doWriteArray(const unsigned char* buffer, int size);
 
-        virtual void doWriteArrayBounded(const unsigned char* buffer, int size, int offset, int length);
+        virtual void doWriteArrayBounded(const unsigned char* buffer,
+                                         int                  size,
+                                         int                  offset,
+                                         int                  length);
 
     protected:
-
         /**
          * @return true if this stream has been closed.
          */
         virtual bool isClosed() const;
-
     };
 
-}}
+}  // namespace io
+}  // namespace decaf
 
 #endif /*_DECAF_IO_FILTEROUTPUTSTREAM_H_*/

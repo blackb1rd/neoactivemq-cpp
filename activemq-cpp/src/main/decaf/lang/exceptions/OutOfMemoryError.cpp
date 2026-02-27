@@ -22,30 +22,43 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-OutOfMemoryError::OutOfMemoryError() : Exception() {
+OutOfMemoryError::OutOfMemoryError()
+    : Exception()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-OutOfMemoryError::~OutOfMemoryError() throw () {
+OutOfMemoryError::~OutOfMemoryError() throw()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-OutOfMemoryError::OutOfMemoryError(const Exception& ex) : Exception() {
-    *(Exception*) this = ex;
+OutOfMemoryError::OutOfMemoryError(const Exception& ex)
+    : Exception()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-OutOfMemoryError::OutOfMemoryError(const OutOfMemoryError& ex) : Exception() {
-    *(Exception*) this = ex;
+OutOfMemoryError::OutOfMemoryError(const OutOfMemoryError& ex)
+    : Exception()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-OutOfMemoryError::OutOfMemoryError(const std::exception* cause) : Exception(cause) {
+OutOfMemoryError::OutOfMemoryError(const std::exception* cause)
+    : Exception(cause)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-OutOfMemoryError::OutOfMemoryError(const char* file, const int lineNumber, const char* msg, ...) : Exception() {
-
+OutOfMemoryError::OutOfMemoryError(const char* file,
+                                   const int   lineNumber,
+                                   const char* msg,
+                                   ...)
+    : Exception()
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -55,8 +68,13 @@ OutOfMemoryError::OutOfMemoryError(const char* file, const int lineNumber, const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-OutOfMemoryError::OutOfMemoryError(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...) : Exception(cause) {
-
+OutOfMemoryError::OutOfMemoryError(const char*           file,
+                                   const int             lineNumber,
+                                   const std::exception* cause,
+                                   const char*           msg,
+                                   ...)
+    : Exception(cause)
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);

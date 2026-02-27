@@ -18,65 +18,71 @@
 #ifndef _ACTIVEMQ_TRANSPORT_MOCK_INTERNALCOMMANDLISTENER_H_
 #define _ACTIVEMQ_TRANSPORT_MOCK_INTERNALCOMMANDLISTENER_H_
 
-#include <activemq/util/Config.h>
-#include <activemq/transport/mock/ResponseBuilder.h>
 #include <activemq/transport/DefaultTransportListener.h>
+#include <activemq/transport/mock/ResponseBuilder.h>
+#include <activemq/util/Config.h>
 
-#include <decaf/lang/Thread.h>
 #include <decaf/lang/Pointer.h>
+#include <decaf/lang/Thread.h>
 #include <decaf/util/LinkedList.h>
 #include <decaf/util/concurrent/Concurrent.h>
-#include <decaf/util/concurrent/atomic/AtomicInteger.h>
 #include <decaf/util/concurrent/CountDownLatch.h>
+#include <decaf/util/concurrent/atomic/AtomicInteger.h>
 
-namespace activemq {
-namespace transport {
-namespace mock {
+namespace activemq
+{
+namespace transport
+{
+    namespace mock
+    {
 
-    class MockTransport;
+        class MockTransport;
 
-    /**
-     * Listens for Commands sent from the MockTransport.  This class
-     * processes all outbound commands and sends responses that are
-     * constructed by calling the Protocol provided ResponseBuilder
-     * and getting a set of Commands to send back into the MockTransport
-     * as incoming Commands and Responses.
-     */
-    class AMQCPP_API InternalCommandListener : public DefaultTransportListener,
-                                               public decaf::lang::Thread {
-    private:
+        /**
+         * Listens for Commands sent from the MockTransport.  This class
+         * processes all outbound commands and sends responses that are
+         * constructed by calling the Protocol provided ResponseBuilder
+         * and getting a set of Commands to send back into the MockTransport
+         * as incoming Commands and Responses.
+         */
+        class AMQCPP_API InternalCommandListener
+            : public DefaultTransportListener,
+              public decaf::lang::Thread
+        {
+        private:
+            MockTransport*                            transport;
+            Pointer<ResponseBuilder>                  responseBuilder;
+            bool                                      done;
+            decaf::util::concurrent::CountDownLatch   startedLatch;
+            decaf::util::LinkedList<Pointer<Command>> inboundQueue;
 
-        MockTransport* transport;
-        Pointer<ResponseBuilder> responseBuilder;
-        bool done;
-        decaf::util::concurrent::CountDownLatch startedLatch;
-        decaf::util::LinkedList<Pointer<Command> > inboundQueue;
+        private:
+            InternalCommandListener(const InternalCommandListener&);
+            InternalCommandListener operator=(const InternalCommandListener&);
 
-    private:
+        public:
+            InternalCommandListener();
 
-        InternalCommandListener(const InternalCommandListener&);
-        InternalCommandListener operator=(const InternalCommandListener&);
+            virtual ~InternalCommandListener();
 
-    public:
+            void setTransport(MockTransport* transport)
+            {
+                this->transport = transport;
+            }
 
-        InternalCommandListener();
+            void setResponseBuilder(
+                const Pointer<ResponseBuilder> responseBuilder)
+            {
+                this->responseBuilder = responseBuilder;
+            }
 
-        virtual ~InternalCommandListener();
+            virtual void onCommand(const Pointer<Command> command);
 
-        void setTransport(MockTransport* transport) {
-            this->transport = transport;
-        }
+            void run();
+        };
 
-        void setResponseBuilder(const Pointer<ResponseBuilder> responseBuilder) {
-            this->responseBuilder = responseBuilder;
-        }
-
-        virtual void onCommand(const Pointer<Command> command);
-
-        void run();
-
-    };
-
-}}}
+    }  // namespace mock
+}  // namespace transport
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_TRANSPORT_MOCK_INTERNALCOMMANDLISTENER_H_ */

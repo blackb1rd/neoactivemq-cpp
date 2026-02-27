@@ -17,16 +17,16 @@
 
 #include "DiscoveryTransport.h"
 
-#include <activemq/util/URISupport.h>
-#include <activemq/util/Suspendable.h>
 #include <activemq/exceptions/ActiveMQException.h>
+#include <activemq/util/Suspendable.h>
+#include <activemq/util/URISupport.h>
 
-#include <decaf/util/HashMap.h>
-#include <decaf/util/StlMap.h>
-#include <decaf/util/Properties.h>
-#include <decaf/util/concurrent/Mutex.h>
-#include <decaf/net/URISyntaxException.h>
 #include <decaf/lang/exceptions/NullPointerException.h>
+#include <decaf/net/URISyntaxException.h>
+#include <decaf/util/HashMap.h>
+#include <decaf/util/Properties.h>
+#include <decaf/util/StlMap.h>
+#include <decaf/util/concurrent/Mutex.h>
 
 using namespace decaf;
 using namespace decaf::util;
@@ -46,52 +46,71 @@ using namespace activemq::transport::discovery;
 const std::string DiscoveryTransport::DISCOVERED_OPTION_PREFIX = "discovered.";
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace activemq {
-namespace transport {
-namespace discovery {
+namespace activemq
+{
+namespace transport
+{
+    namespace discovery
+    {
 
-    class DiscoveryTransportData {
-    public:
+        class DiscoveryTransportData
+        {
+        public:
+            Pointer<CompositeTransport> next;
+            Pointer<DiscoveryAgent>     agent;
+            StlMap<std::string, URI>    serviceURIs;
+            Properties                  parameters;
+            Mutex                       lock;
 
-        Pointer<CompositeTransport> next;
-        Pointer<DiscoveryAgent> agent;
-        StlMap<std::string, URI> serviceURIs;
-        Properties parameters;
-        Mutex lock;
+        private:
+            DiscoveryTransportData(const DiscoveryTransportData&);
+            DiscoveryTransportData& operator=(const DiscoveryTransportData&);
 
-    private:
+        public:
+            DiscoveryTransportData()
+                : next(),
+                  agent(),
+                  serviceURIs(),
+                  parameters(),
+                  lock()
+            {
+            }
+        };
 
-        DiscoveryTransportData(const DiscoveryTransportData&);
-        DiscoveryTransportData& operator= (const DiscoveryTransportData&);
-
-    public:
-
-        DiscoveryTransportData() : next(), agent(), serviceURIs(), parameters(), lock() {}
-    };
-
-}}}
+    }  // namespace discovery
+}  // namespace transport
+}  // namespace activemq
 
 ////////////////////////////////////////////////////////////////////////////////
-DiscoveryTransport::DiscoveryTransport(Pointer<CompositeTransport> next) :
-    TransportFilter(next), impl(new DiscoveryTransportData) {
+DiscoveryTransport::DiscoveryTransport(Pointer<CompositeTransport> next)
+    : TransportFilter(next),
+      impl(new DiscoveryTransportData)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DiscoveryTransport::~DiscoveryTransport() {
-    try {
+DiscoveryTransport::~DiscoveryTransport()
+{
+    try
+    {
         this->close();
     }
     AMQ_CATCHALL_NOTHROW()
-    try {
+    try
+    {
         delete this->impl;
     }
     AMQ_CATCHALL_NOTHROW()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DiscoveryTransport::start() {
-    if (this->impl->agent == NULL) {
-        throw IllegalStateException(__FILE__, __LINE__, "discoveryAgent not configured");
+void DiscoveryTransport::start()
+{
+    if (this->impl->agent == NULL)
+    {
+        throw IllegalStateException(__FILE__,
+                                    __LINE__,
+                                    "discoveryAgent not configured");
     }
 
     // lets pass into the agent the broker name and connection details
@@ -102,31 +121,40 @@ void DiscoveryTransport::start() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DiscoveryTransport::stop() {
-
-    try {
+void DiscoveryTransport::stop()
+{
+    try
+    {
         IOException error;
-        bool hasException = false;
+        bool        hasException = false;
 
-        try {
+        try
+        {
             this->impl->agent->stop();
-        } catch (IOException& ex) {
+        }
+        catch (IOException& ex)
+        {
             error = ex;
             error.setMark(__FILE__, __LINE__);
             hasException = true;
         }
 
-        try {
+        try
+        {
             TransportFilter::stop();
-        } catch (IOException& ex) {
-            if (!hasException) {
+        }
+        catch (IOException& ex)
+        {
+            if (!hasException)
+            {
                 error = ex;
                 error.setMark(__FILE__, __LINE__);
                 hasException = true;
             }
         }
 
-        if (hasException) {
+        if (hasException)
+        {
             throw error;
         }
     }
@@ -136,8 +164,10 @@ void DiscoveryTransport::stop() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DiscoveryTransport::doClose() {
-    try {
+void DiscoveryTransport::doClose()
+{
+    try
+    {
         this->impl->next.reset(NULL);
     }
     AMQ_CATCH_RETHROW(IOException)
@@ -146,70 +176,97 @@ void DiscoveryTransport::doClose() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DiscoveryTransport::setDiscoveryAgent(decaf::lang::Pointer<DiscoveryAgent> agent) {
-    if (agent == NULL) {
-        throw NullPointerException(__FILE__, __LINE__, "DiscoveryAgent required to be non-null");
+void DiscoveryTransport::setDiscoveryAgent(
+    decaf::lang::Pointer<DiscoveryAgent> agent)
+{
+    if (agent == NULL)
+    {
+        throw NullPointerException(__FILE__,
+                                   __LINE__,
+                                   "DiscoveryAgent required to be non-null");
     }
 
     this->impl->agent = agent;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<DiscoveryAgent> DiscoveryTransport::getDiscoveryAgent() const {
+Pointer<DiscoveryAgent> DiscoveryTransport::getDiscoveryAgent() const
+{
     return this->impl->agent;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DiscoveryTransport::setParameters(const Properties& properties) {
+void DiscoveryTransport::setParameters(const Properties& properties)
+{
     this->impl->parameters = properties;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Properties DiscoveryTransport::getParameters() const {
+Properties DiscoveryTransport::getParameters() const
+{
     return this->impl->parameters;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DiscoveryTransport::onServiceAdd(const DiscoveryEvent* event) {
+void DiscoveryTransport::onServiceAdd(const DiscoveryEvent* event)
+{
     std::string url = event->getServiceName();
-    if (!url.empty()) {
-        try {
+    if (!url.empty())
+    {
+        try
+        {
             URI uri(url);
-            uri = URISupport::applyParameters(uri, this->impl->parameters, DISCOVERED_OPTION_PREFIX);
-            synchronized(&this->impl->lock) {
+            uri = URISupport::applyParameters(uri,
+                                              this->impl->parameters,
+                                              DISCOVERED_OPTION_PREFIX);
+            synchronized(&this->impl->lock)
+            {
                 this->impl->serviceURIs.put(event->getServiceName(), uri);
             }
             LinkedList<URI> uris;
             uris.add(uri);
             this->impl->next->addURI(false, uris);
-        } catch (URISyntaxException& e) {
+        }
+        catch (URISyntaxException& e)
+        {
         }
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DiscoveryTransport::onServiceRemove(const DiscoveryEvent* event) {
-    try {
+void DiscoveryTransport::onServiceRemove(const DiscoveryEvent* event)
+{
+    try
+    {
         URI uri;
-        synchronized(&this->impl->lock) {
+        synchronized(&this->impl->lock)
+        {
             uri = this->impl->serviceURIs.get(event->getServiceName());
         }
         LinkedList<URI> uris;
         uris.add(uri);
         this->impl->next->removeURI(false, uris);
-    } catch (NoSuchElementException& e) {}
+    }
+    catch (NoSuchElementException& e)
+    {
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DiscoveryTransport::transportInterrupted() {
-
+void DiscoveryTransport::transportInterrupted()
+{
     Pointer<Suspendable> suspendable;
-    try {
+    try
+    {
         suspendable = this->impl->next.dynamicCast<Suspendable>();
         suspendable->resume();
-    } catch (ClassCastException& e) {
+    }
+    catch (ClassCastException& e)
+    {
         // Not a Suspendable instance.
-    } catch (Exception& e) {
+    }
+    catch (Exception& e)
+    {
         // Failed to Resume
     }
 
@@ -217,14 +274,20 @@ void DiscoveryTransport::transportInterrupted() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DiscoveryTransport::transportResumed() {
+void DiscoveryTransport::transportResumed()
+{
     Pointer<Suspendable> suspendable;
-    try {
+    try
+    {
         suspendable = this->impl->next.dynamicCast<Suspendable>();
         suspendable->suspend();
-    } catch (ClassCastException& e) {
+    }
+    catch (ClassCastException& e)
+    {
         // Not a Suspendable instance.
-    } catch (Exception& e) {
+    }
+    catch (Exception& e)
+    {
         // Failed to Suspend
     }
 

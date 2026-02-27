@@ -18,25 +18,26 @@
 #ifndef _DECAF_LANG_DOUBLE_H_
 #define _DECAF_LANG_DOUBLE_H_
 
-#include <decaf/util/Config.h>
 #include <decaf/lang/Comparable.h>
 #include <decaf/lang/Number.h>
 #include <decaf/lang/String.h>
 #include <decaf/lang/exceptions/NumberFormatException.h>
+#include <decaf/util/Config.h>
 #include <string>
 
-namespace decaf {
-namespace lang {
+namespace decaf
+{
+namespace lang
+{
 
     class DECAF_API Double : public Number,
                              public Comparable<Double>,
-                             public Comparable<double> {
+                             public Comparable<double>
+    {
     private:
-
         double value;
 
     public:
-
         /** The size in bits of the primitive int type */
         static const int SIZE;
 
@@ -56,9 +57,9 @@ namespace lang {
         static const double NEGATIVE_INFINITY;
 
     public:
-
         /**
-         * Constructs a new instance of a Double object and assigns it the given value.
+         * Constructs a new instance of a Double object and assigns it the given
+         * value.
          *
          * @param value
          *      The primitive type to wrap.
@@ -66,9 +67,10 @@ namespace lang {
         Double(double value);
 
         /**
-         * Constructs a new Double and attempts to convert the given string to a double
-         * value, assigning it to the new object is successful or throwing a
-         * NumberFormatException if the string is not a properly formatted double.
+         * Constructs a new Double and attempts to convert the given string to a
+         * double value, assigning it to the new object is successful or
+         * throwing a NumberFormatException if the string is not a properly
+         * formatted double.
          *
          * @param value
          *      The string to convert to a primitive type to wrap.
@@ -77,7 +79,9 @@ namespace lang {
          */
         Double(const String& value);
 
-        virtual ~Double() {}
+        virtual ~Double()
+        {
+        }
 
         /**
          * Compares this Double instance with another.
@@ -93,7 +97,8 @@ namespace lang {
          * @param d - the Double object to compare against.
          * @return true if the two Double Objects have the same value.
          */
-        bool equals(const Double& d) const {
+        bool equals(const Double& d) const
+        {
             return this->value == d.value;
         }
 
@@ -102,7 +107,8 @@ namespace lang {
          * @param d - the value to be compared to this one.
          * @return true if this object is equal to the one passed.
          */
-        virtual bool operator==(const Double& d) const {
+        virtual bool operator==(const Double& d) const
+        {
             return this->value == d.value;
         }
 
@@ -112,7 +118,8 @@ namespace lang {
          * @param d - the value to be compared to this one.
          * @return true if this object is equal to the one passed.
          */
-        virtual bool operator<(const Double& d) const {
+        virtual bool operator<(const Double& d) const
+        {
             return this->value < d.value;
         }
 
@@ -130,7 +137,8 @@ namespace lang {
          * @param d - the Double object to compare against.
          * @return true if the two Double Objects have the same value.
          */
-        bool equals(const double& d) const {
+        bool equals(const double& d) const
+        {
             return this->value == d;
         }
 
@@ -139,7 +147,8 @@ namespace lang {
          * @param d - the value to be compared to this one.
          * @return true if this object is equal to the one passed.
          */
-        virtual bool operator==(const double& d) const {
+        virtual bool operator==(const double& d) const
+        {
             return this->value == d;
         }
 
@@ -149,7 +158,8 @@ namespace lang {
          * @param d - the value to be compared to this one.
          * @return true if this object is equal to the one passed.
          */
-        virtual bool operator<(const double& d) const {
+        virtual bool operator<(const double& d) const
+        {
             return this->value < d;
         }
 
@@ -162,7 +172,8 @@ namespace lang {
          * Answers the double value which the receiver represents
          * @return double the value of the receiver.
          */
-        virtual double doubleValue() const {
+        virtual double doubleValue() const
+        {
             return this->value;
         }
 
@@ -170,40 +181,45 @@ namespace lang {
          * Answers the float value which the receiver represents
          * @return float the value of the receiver.
          */
-        virtual float floatValue() const {
-            return (float) this->value;
+        virtual float floatValue() const
+        {
+            return (float)this->value;
         }
 
         /**
          * Answers the byte value which the receiver represents
          * @return byte the value of the receiver.
          */
-        virtual unsigned char byteValue() const {
-            return (unsigned char) this->value;
+        virtual unsigned char byteValue() const
+        {
+            return (unsigned char)this->value;
         }
 
         /**
          * Answers the short value which the receiver represents
          * @return short the value of the receiver.
          */
-        virtual short shortValue() const {
-            return (short) this->value;
+        virtual short shortValue() const
+        {
+            return (short)this->value;
         }
 
         /**
          * Answers the int value which the receiver represents
          * @return int the value of the receiver.
          */
-        virtual int intValue() const {
-            return (int) this->value;
+        virtual int intValue() const
+        {
+            return (int)this->value;
         }
 
         /**
          * Answers the long value which the receiver represents
          * @return long the value of the receiver.
          */
-        virtual long long longValue() const {
-            return (long long) this->value;
+        virtual long long longValue() const
+        {
+            return (long long)this->value;
         }
 
         /**
@@ -217,66 +233,65 @@ namespace lang {
         bool isNaN() const;
 
     public:
-
         /**
-         * Compares the two specified double values. The sign of the integer value
-         * returned is the same as that of the integer that would be returned by the
-         * call:
-         *        new Double(d1).compareTo(new Double(d2))
+         * Compares the two specified double values. The sign of the integer
+         * value returned is the same as that of the integer that would be
+         * returned by the call: new Double(d1).compareTo(new Double(d2))
          * @param d1 - the first double to compare
          * @param d2 - the second double to compare
-         * @return the value 0 if d1 is numerically equal to d2; a value less than
-         * 0 if d1 is numerically less than d2; and a value greater than 0  if d1 is
-         * numerically greater than d2.
+         * @return the value 0 if d1 is numerically equal to d2; a value less
+         * than 0 if d1 is numerically less than d2; and a value greater than 0
+         * if d1 is numerically greater than d2.
          */
         static int compare(double d1, double d2);
 
         /**
-         * Returns a representation of the specified floating-point value according
-         * to the IEEE 754 floating-point "double format" bit layout.
+         * Returns a representation of the specified floating-point value
+         * according to the IEEE 754 floating-point "double format" bit layout.
          *
          * Bit 63 (the bit that is selected by the mask 0x8000000000000000L)
-         * represents the sign of the floating-point number. Bits 62-52 (the bits
-         * that are selected by the mask 0x7ff0000000000000L) represent the exponent.
-         * Bits 51-0 (the bits that are selected by the mask 0x000fffffffffffffL)
-         * represent the significand (sometimes called the mantissa) of the
-         * floating-point number.
+         * represents the sign of the floating-point number. Bits 62-52 (the
+         * bits that are selected by the mask 0x7ff0000000000000L) represent the
+         * exponent. Bits 51-0 (the bits that are selected by the mask
+         * 0x000fffffffffffffL) represent the significand (sometimes called the
+         * mantissa) of the floating-point number.
          *
-         * If the argument is positive infinity, the result is 0x7ff0000000000000L.
-         * If the argument is negative infinity, the result is 0xfff0000000000000L.
-         * If the argument is NaN, the result is 0x7ff8000000000000L.
+         * If the argument is positive infinity, the result is
+         * 0x7ff0000000000000L. If the argument is negative infinity, the result
+         * is 0xfff0000000000000L. If the argument is NaN, the result is
+         * 0x7ff8000000000000L.
          *
          * In all cases, the result is a long integer that, when given to the
-         * longBitsToDouble(long) method, will produce a floating-point value the
-         * same as the argument to doubleToLongBits (except all NaN values are
-         * collapsed to a single "canonical" NaN value).
+         * longBitsToDouble(long) method, will produce a floating-point value
+         * the same as the argument to doubleToLongBits (except all NaN values
+         * are collapsed to a single "canonical" NaN value).
          * @param value - double to be converted
          * @return the long long bits that make up the double
          */
         static long long doubleToLongBits(double value);
 
         /**
-         * Returns a representation of the specified floating-point value according
-         * to the IEEE 754 floating-point "double format" bit layout, preserving
-         * Not-a-Number (NaN) values.
+         * Returns a representation of the specified floating-point value
+         * according to the IEEE 754 floating-point "double format" bit layout,
+         * preserving Not-a-Number (NaN) values.
          *
          * Bit 63 (the bit that is selected by the mask 0x8000000000000000LL)
-         * represents the sign of the floating-point number. Bits 62-52 (the bits
-         * that are selected by the mask 0x7ff0000000000000L) represent the exponent.
-         * Bits 51-0 (the bits that are selected by the mask 0x000fffffffffffffL)
-         * represent the significand (sometimes called the mantissa) of the
-         * floating-point number.
+         * represents the sign of the floating-point number. Bits 62-52 (the
+         * bits that are selected by the mask 0x7ff0000000000000L) represent the
+         * exponent. Bits 51-0 (the bits that are selected by the mask
+         * 0x000fffffffffffffL) represent the significand (sometimes called the
+         * mantissa) of the floating-point number.
          *
-         * If the argument is positive infinity, the result is 0x7ff0000000000000LL.
-         * If the argument is negative infinity, the result is 0xfff0000000000000LL.
-         * If the argument is NaN, the result is the long integer representing the
-         * actual NaN value. Unlike the doubleToLongBits method, doubleToRawLongBits
-         * does not collapse all the bit patterns encoding a NaN to a single
-         * "canonical" NaN value.
+         * If the argument is positive infinity, the result is
+         * 0x7ff0000000000000LL. If the argument is negative infinity, the
+         * result is 0xfff0000000000000LL. If the argument is NaN, the result is
+         * the long integer representing the actual NaN value. Unlike the
+         * doubleToLongBits method, doubleToRawLongBits does not collapse all
+         * the bit patterns encoding a NaN to a single "canonical" NaN value.
          *
          * In all cases, the result is a long integer that, when given to the
-         * longBitsToDouble(long) method, will produce a floating-point value the
-         * same as the argument to doubleToRawLongBits.
+         * longBitsToDouble(long) method, will produce a floating-point value
+         * the same as the argument to doubleToRawLongBits.
          * @param value - double to be converted
          * @return the long long bits that make up the double
          */
@@ -297,16 +312,18 @@ namespace lang {
         /**
          * Returns the double value corresponding to a given bit representation.
          * The argument is considered to be a representation of a floating-point
-         * value according to the IEEE 754 floating-point "double format" bit layout.
+         * value according to the IEEE 754 floating-point "double format" bit
+         * layout.
          *
-         * If the argument is 0x7ff0000000000000L, the result is positive infinity.
-         * If the argument is 0xfff0000000000000L, the result is negative infinity.
-         * If the argument is any value in the range 0x7ff0000000000001L through
-         * 0x7fffffffffffffffL or in the range 0xfff0000000000001L through
-         * 0xffffffffffffffffL, the result is a NaN. No IEEE 754 floating-point
-         * operation provided by C++ can distinguish between two NaN values of the
-         * same type with different bit patterns. Distinct values of NaN are only
-         * distinguishable by use of the Double.doubleToRawLongBits method.
+         * If the argument is 0x7ff0000000000000L, the result is positive
+         * infinity. If the argument is 0xfff0000000000000L, the result is
+         * negative infinity. If the argument is any value in the range
+         * 0x7ff0000000000001L through 0x7fffffffffffffffL or in the range
+         * 0xfff0000000000001L through 0xffffffffffffffffL, the result is a NaN.
+         * No IEEE 754 floating-point operation provided by C++ can distinguish
+         * between two NaN values of the same type with different bit patterns.
+         * Distinct values of NaN are only distinguishable by use of the
+         * Double.doubleToRawLongBits method.
          * @param bits - the long long bits to convert to double
          * @return the double converted from the bits
          */
@@ -326,35 +343,36 @@ namespace lang {
         static double parseDouble(const String& value);
 
         /**
-         * Returns a hexadecimal string representation of the double argument. All
-         * characters mentioned below are ASCII characters.
+         * Returns a hexadecimal string representation of the double argument.
+         * All characters mentioned below are ASCII characters.
          *
          *  * If the argument is NaN, the result is the string "NaN".
-         *  * Otherwise, the result is a string that represents the sign and magnitude
-         *    (absolute value) of the argument. If the sign is negative, the first
-         *    character of the result is '-'; if the sign is positive, no sign
-         *    character appears in the result. As for the magnitude m:
-         *      o If m is infinity, it is represented by the string "Infinity"; thus,
+         *  * Otherwise, the result is a string that represents the sign and
+         * magnitude (absolute value) of the argument. If the sign is negative,
+         * the first character of the result is '-'; if the sign is positive, no
+         * sign character appears in the result. As for the magnitude m: o If m
+         * is infinity, it is represented by the string "Infinity"; thus,
          *        positive infinity produces the result "Infinity" and negative
          *        infinity produces the result "-Infinity".
          *      o If m is zero, it is represented by the string "0x0.0p0"; thus,
          *        negative zero produces the result "-0x0.0p0" and positive zero
          *        produces the result "0x0.0p0".
-         *      o If m is a double value with a normalized representation, substrings
-         *        are used to represent the significand and exponent fields. The
-         *        significand is represented by the characters "0x1." followed by a
+         *      o If m is a double value with a normalized representation,
+         * substrings are used to represent the significand and exponent fields.
+         * The significand is represented by the characters "0x1." followed by a
          *        lowercase hexadecimal representation of the rest of the
          *        significand as a fraction. Trailing zeros in the hexadecimal
-         *        representation are removed unless all the digits are zero, in which
-         *        case a single zero is used. Next, the exponent is represented by
-         *        "p" followed by a decimal string of the unbiased exponent as if
+         *        representation are removed unless all the digits are zero, in
+         * which case a single zero is used. Next, the exponent is represented
+         * by "p" followed by a decimal string of the unbiased exponent as if
          *        produced by a call to Integer.toString on the exponent value.
          *      o If m is a double value with a subnormal representation, the
-         *        significand is represented by the characters "0x0." followed by a
-         *        hexadecimal representation of the rest of the significand as a
+         *        significand is represented by the characters "0x0." followed
+         * by a hexadecimal representation of the rest of the significand as a
          *        fraction. Trailing zeros in the hexadecimal representation are
-         *        removed. Next, the exponent is represented by "p-126". Note that
-         *        there must be at least one nonzero digit in a subnormal significand.
+         *        removed. Next, the exponent is represented by "p-126". Note
+         * that there must be at least one nonzero digit in a subnormal
+         * significand.
          *
          * @param value - The double to convert to a string
          * @return the Hex formatted double string.
@@ -362,33 +380,32 @@ namespace lang {
         static std::string toHexString(double value);
 
         /**
-         * Returns a string representation of the double argument. All characters
-         * mentioned below are ASCII characters.
+         * Returns a string representation of the double argument. All
+         * characters mentioned below are ASCII characters.
          *
          * If the argument is NaN, the result is the string "NaN".
-         * Otherwise, the result is a string that represents the sign and magnitude
-         * (absolute value) of the argument. If the sign is negative, the first
-         * character of the result is '-'; if the sign is positive, no
+         * Otherwise, the result is a string that represents the sign and
+         * magnitude (absolute value) of the argument. If the sign is negative,
+         * the first character of the result is '-'; if the sign is positive, no
          * sign character appears in the result. As for the magnitude m:
-         *  o If m is infinity, it is represented by the characters "Infinity"; thus,
-         *    positive infinity produces the result "Infinity" and negative infinity
-         *    produces the result "-Infinity".
-         *  o If m is zero, it is represented by the characters "0.0"; thus, negative
-         *    zero produces the result "-0.0" and positive zero produces the result
-         *    "0.0".
-         *  o If m is greater than or equal to 10-3 but less than 107, then it is
-         *    represented as the integer part of m, in decimal form with no leading
-         *    zeroes, followed by '.', followed by one or more decimal digits
-         *    representing the fractional part of m.
-         *  o If m is less than 10-3 or greater than or equal to 107, then it is
-         *    represented in so-called "computerized scientific notation." Let n be
-         *    the unique integer such that 10n <= m < 10n+1; then let a be the
-         *    mathematically exact quotient of m and 10n so that 1 <= a < 10.
-         *    The magnitude is then represented as the integer part of a, as a
-         *    single decimal digit, followed by '.', followed by decimal digits
-         *    representing the fractional part of a, followed by the letter 'E',
-         *    followed by a representation of n as a decimal integer, as produced
-         *    by the method Integer.toString(int).
+         *  o If m is infinity, it is represented by the characters "Infinity";
+         * thus, positive infinity produces the result "Infinity" and negative
+         * infinity produces the result "-Infinity". o If m is zero, it is
+         * represented by the characters "0.0"; thus, negative zero produces the
+         * result "-0.0" and positive zero produces the result "0.0". o If m is
+         * greater than or equal to 10-3 but less than 107, then it is
+         *    represented as the integer part of m, in decimal form with no
+         * leading zeroes, followed by '.', followed by one or more decimal
+         * digits representing the fractional part of m. o If m is less than
+         * 10-3 or greater than or equal to 107, then it is represented in
+         * so-called "computerized scientific notation." Let n be the unique
+         * integer such that 10n <= m < 10n+1; then let a be the mathematically
+         * exact quotient of m and 10n so that 1 <= a < 10. The magnitude is
+         * then represented as the integer part of a, as a single decimal digit,
+         * followed by '.', followed by decimal digits representing the
+         * fractional part of a, followed by the letter 'E', followed by a
+         * representation of n as a decimal integer, as produced by the method
+         * Integer.toString(int).
          * @param value - The double to convert to a string
          * @return the formatted double string.
          */
@@ -405,8 +422,8 @@ namespace lang {
         static Double valueOf(double value);
 
         /**
-         * Returns a Double instance that wraps a primitive double which is parsed
-         * from the string value passed.
+         * Returns a Double instance that wraps a primitive double which is
+         * parsed from the string value passed.
          *
          * @param value
          *      The string to parse
@@ -418,14 +435,13 @@ namespace lang {
         static Double valueOf(const String& value);
 
     private:
-
         static const long long DOUBLE_SIGN_MASK;
         static const long long DOUBLE_EXPONENT_MASK;
         static const long long DOUBLE_MANTISSA_MASK;
         static const long long DOUBLE_NAN_BITS;
-
     };
 
-}}
+}  // namespace lang
+}  // namespace decaf
 
 #endif /*_DECAF_LANG_DOUBLE_H_*/

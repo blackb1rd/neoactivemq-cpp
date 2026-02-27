@@ -18,21 +18,24 @@
 #ifndef _ACTIVEMQ_CORE_SIMPLEPRIORITYMESSAGEDISPATCHCHANNEL_H_
 #define _ACTIVEMQ_CORE_SIMPLEPRIORITYMESSAGEDISPATCHCHANNEL_H_
 
-#include <activemq/util/Config.h>
 #include <activemq/core/MessageDispatchChannel.h>
+#include <activemq/util/Config.h>
 
-#include <decaf/util/LinkedList.h>
 #include <decaf/lang/ArrayPointer.h>
+#include <decaf/util/LinkedList.h>
 #include <decaf/util/concurrent/Mutex.h>
 
-namespace activemq {
-namespace core {
+namespace activemq
+{
+namespace core
+{
 
     using decaf::lang::ArrayPointer;
 
-    class AMQCPP_API SimplePriorityMessageDispatchChannel : public MessageDispatchChannel {
+    class AMQCPP_API SimplePriorityMessageDispatchChannel
+        : public MessageDispatchChannel
+    {
     private:
-
         static const int MAX_PRIORITIES;
 
         bool closed;
@@ -40,17 +43,18 @@ namespace core {
 
         mutable decaf::util::concurrent::Mutex mutex;
 
-        mutable ArrayPointer< decaf::util::LinkedList< Pointer<MessageDispatch> > > channels;
+        mutable ArrayPointer<decaf::util::LinkedList<Pointer<MessageDispatch>>>
+            channels;
 
         int enqueued;
 
     private:
-
-        SimplePriorityMessageDispatchChannel(const SimplePriorityMessageDispatchChannel&);
-        SimplePriorityMessageDispatchChannel& operator=(const SimplePriorityMessageDispatchChannel&);
+        SimplePriorityMessageDispatchChannel(
+            const SimplePriorityMessageDispatchChannel&);
+        SimplePriorityMessageDispatchChannel& operator=(
+            const SimplePriorityMessageDispatchChannel&);
 
     public:
-
         SimplePriorityMessageDispatchChannel();
         virtual ~SimplePriorityMessageDispatchChannel();
 
@@ -60,11 +64,13 @@ namespace core {
 
         virtual bool isEmpty() const;
 
-        virtual bool isClosed() const {
+        virtual bool isClosed() const
+        {
             return this->closed;
         }
 
-        virtual bool isRunning() const {
+        virtual bool isRunning() const
+        {
             return this->running;
         }
 
@@ -84,52 +90,59 @@ namespace core {
 
         virtual int size() const;
 
-        virtual std::vector<Pointer<MessageDispatch> > removeAll();
+        virtual std::vector<Pointer<MessageDispatch>> removeAll();
 
     public:
-
-        virtual void lock() {
+        virtual void lock()
+        {
             mutex.lock();
         }
 
-        virtual bool tryLock() {
+        virtual bool tryLock()
+        {
             return mutex.tryLock();
         }
 
-        virtual void unlock() {
+        virtual void unlock()
+        {
             mutex.unlock();
         }
 
-        virtual void wait() {
+        virtual void wait()
+        {
             mutex.wait();
         }
 
-        virtual void wait(long long millisecs) {
+        virtual void wait(long long millisecs)
+        {
             mutex.wait(millisecs);
         }
 
-        virtual void wait(long long millisecs, int nanos) {
+        virtual void wait(long long millisecs, int nanos)
+        {
             mutex.wait(millisecs, nanos);
         }
 
-        virtual void notify() {
+        virtual void notify()
+        {
             mutex.notify();
         }
 
-        virtual void notifyAll() {
+        virtual void notifyAll()
+        {
             mutex.notifyAll();
         }
 
     private:
-
-        decaf::util::LinkedList<Pointer<MessageDispatch> >& getChannel(const Pointer<MessageDispatch>& dispatch);
+        decaf::util::LinkedList<Pointer<MessageDispatch>>& getChannel(
+            const Pointer<MessageDispatch>& dispatch);
 
         Pointer<MessageDispatch> removeFirst();
 
         Pointer<MessageDispatch> getFirst() const;
-
     };
 
-}}
+}  // namespace core
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_CORE_SIMPLEPRIORITYMESSAGEDISPATCHCHANNEL_H_ */

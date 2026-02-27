@@ -18,48 +18,53 @@
 #ifndef _ACTIVEMQCPP_EXAMPLES_ADVISORIES_TEMPDESTINATIONADVISORYCONSUMER_H_
 #define _ACTIVEMQCPP_EXAMPLES_ADVISORIES_TEMPDESTINATIONADVISORYCONSUMER_H_
 
-#include <string>
 #include <memory>
+#include <string>
 
-#include <cms/Session.h>
-#include <cms/MessageProducer.h>
 #include <cms/MessageConsumer.h>
 #include <cms/MessageListener.h>
+#include <cms/MessageProducer.h>
+#include <cms/Session.h>
 
 #include <decaf/lang/Runnable.h>
 
-namespace activemqcpp {
-namespace examples {
-namespace advisories {
-
-    /**
-     * Monitors a Broker for Temporary Topic creation and destruction.
-     *
-     * @since 3.0
-     */
-    class TempDestinationAdvisoryConsumer : public cms::MessageListener {
-    private:
-
-        cms::Session* session;
-        std::unique_ptr<cms::MessageConsumer> consumer;
-
-    private:
-
-        TempDestinationAdvisoryConsumer(const TempDestinationAdvisoryConsumer&);
-        TempDestinationAdvisoryConsumer& operator=(const TempDestinationAdvisoryConsumer&);
-
-    public:
-
-        TempDestinationAdvisoryConsumer(cms::Session* session);
-        virtual ~TempDestinationAdvisoryConsumer();
+namespace activemqcpp
+{
+namespace examples
+{
+    namespace advisories
+    {
 
         /**
-         * Async Message callback.
+         * Monitors a Broker for Temporary Topic creation and destruction.
+         *
+         * @since 3.0
          */
-        virtual void onMessage(const cms::Message* message);
+        class TempDestinationAdvisoryConsumer : public cms::MessageListener
+        {
+        private:
+            cms::Session*                         session;
+            std::unique_ptr<cms::MessageConsumer> consumer;
 
-    };
+        private:
+            TempDestinationAdvisoryConsumer(
+                const TempDestinationAdvisoryConsumer&);
+            TempDestinationAdvisoryConsumer& operator=(
+                const TempDestinationAdvisoryConsumer&);
 
-}}}
+        public:
+            TempDestinationAdvisoryConsumer(cms::Session* session);
+            virtual ~TempDestinationAdvisoryConsumer();
 
-#endif /* _ACTIVEMQCPP_EXAMPLES_ADVISORIES_TEMPDESTINATIONADVISORYCONSUMER_H_ */
+            /**
+             * Async Message callback.
+             */
+            virtual void onMessage(const cms::Message* message);
+        };
+
+    }  // namespace advisories
+}  // namespace examples
+}  // namespace activemqcpp
+
+#endif /* _ACTIVEMQCPP_EXAMPLES_ADVISORIES_TEMPDESTINATIONADVISORYCONSUMER_H_ \
+        */

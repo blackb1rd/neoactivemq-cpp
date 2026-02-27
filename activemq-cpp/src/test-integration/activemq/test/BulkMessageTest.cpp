@@ -17,12 +17,12 @@
 
 #include "BulkMessageTest.h"
 
-#include <activemq/util/CMSListener.h>
 #include <activemq/exceptions/ActiveMQException.h>
+#include <activemq/util/CMSListener.h>
 
+#include <decaf/lang/Pointer.h>
 #include <decaf/lang/Thread.h>
 #include <decaf/util/UUID.h>
-#include <decaf/lang/Pointer.h>
 
 using namespace std;
 using namespace cms;
@@ -35,74 +35,95 @@ using namespace decaf::lang;
 using namespace decaf::util;
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class ProducerThread : public Thread {
-    private:
+class ProducerThread : public Thread
+{
+private:
+    std::unique_ptr<activemq::util::CMSProvider> cmsProducerProvider;
+    int                                          num;
+    int                                          size;
 
-        std::unique_ptr<activemq::util::CMSProvider> cmsProducerProvider;
-        int num;
-        int size;
+private:
+    ProducerThread(const ProducerThread&);
+    ProducerThread& operator=(const ProducerThread&);
 
-    private:
+public:
+    ProducerThread(const std::string& brokerURL,
+                   const std::string& destinationName,
+                   const std::string& subscription,
+                   int                num,
+                   int                size)
+        : cmsProducerProvider(new activemq::util::CMSProvider(brokerURL,
+                                                              destinationName,
+                                                              subscription)),
+          num(num),
+          size(size)
+    {
+    }
 
-        ProducerThread(const ProducerThread&);
-        ProducerThread& operator= (const ProducerThread&);
+    virtual ~ProducerThread()
+    {
+    }
 
-    public:
+    virtual void run()
+    {
+        cms::Session* session(cmsProducerProvider->getSession());
+        Destination*  destination = cmsProducerProvider->getDestination();
+        Pointer<MessageProducer> producer(session->createProducer(destination));
+        producer->setDeliveryMode(cms::DeliveryMode::NON_PERSISTENT);
 
-        ProducerThread(const std::string& brokerURL, const std::string& destinationName, const std::string& subscription, int num, int size) :
-            cmsProducerProvider(new activemq::util::CMSProvider(brokerURL, destinationName, subscription)), num(num), size(size) {
+        std::string DATA = "abcdefghijklmnopqrstuvwxyz";
+        std::string body = "";
+        for (int i = 0; i < size; i++)
+        {
+            body += DATA.at(i % DATA.length());
         }
 
-        virtual ~ProducerThread() {}
+        Pointer<BytesMessage> message;
 
-        virtual void run() {
-
-            cms::Session* session( cmsProducerProvider->getSession() );
-            Destination* destination = cmsProducerProvider->getDestination();
-            Pointer<MessageProducer> producer( session->createProducer( destination ) );
-            producer->setDeliveryMode( cms::DeliveryMode::NON_PERSISTENT );
-
-            std::string DATA = "abcdefghijklmnopqrstuvwxyz";
-            std::string body = "";
-            for( int i=0; i < size; i ++) {
-                body += DATA.at(i % DATA.length());
-            }
-
-            Pointer<BytesMessage> message;
-
-            for( int i = 0; i < num; ++i ) {
-                message.reset( session->createBytesMessage( (const unsigned char*) body.c_str(), (int) body.length() ) );
-                producer->send( message.get() );
-            }
+        for (int i = 0; i < num; ++i)
+        {
+            message.reset(
+                session->createBytesMessage((const unsigned char*)body.c_str(),
+                                            (int)body.length()));
+            producer->send(message.get());
         }
-    };
+    }
+};
+}  // namespace
+
+////////////////////////////////////////////////////////////////////////////////
+BulkMessageTest::BulkMessageTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-BulkMessageTest::BulkMessageTest() {
+BulkMessageTest::~BulkMessageTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-BulkMessageTest::~BulkMessageTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void BulkMessageTest::testBulkMessageSendReceive() {
-
+void BulkMessageTest::testBulkMessageSendReceive()
+{
     static const int MSG_COUNT = 5000;
-    static const int MSG_SIZE = 8192;
+    static const int MSG_SIZE  = 8192;
 
     // Create CMS Object for consumer Comms
     cms::MessageConsumer* consumer = cmsProvider->getConsumer();
 
-    ProducerThread thread(this->getBrokerURL(), cmsProvider->getDestinationName(), cmsProvider->getSubscription(), MSG_COUNT, MSG_SIZE);
+    ProducerThread thread(this->getBrokerURL(),
+                          cmsProvider->getDestinationName(),
+                          cmsProvider->getSubscription(),
+                          MSG_COUNT,
+                          MSG_SIZE);
     thread.start();
 
     Pointer<cms::Message> message;
 
-    for (int i = 0; i < MSG_COUNT; ++i) {
+    for (int i = 0; i < MSG_COUNT; ++i)
+    {
         ASSERT_NO_THROW(message.reset(consumer->receive(2000)));
         ASSERT_TRUE(message.get() != NULL);
     }

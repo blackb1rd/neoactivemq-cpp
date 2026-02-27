@@ -18,10 +18,10 @@
 
 #include <activemq/util/CMSExceptionSupport.h>
 
-#include <decaf/io/FilterOutputStream.h>
 #include <decaf/io/ByteArrayInputStream.h>
 #include <decaf/io/ByteArrayOutputStream.h>
 #include <decaf/io/EOFException.h>
+#include <decaf/io/FilterOutputStream.h>
 #include <decaf/io/IOException.h>
 
 #include <decaf/util/zip/DeflaterOutputStream.h>
@@ -42,23 +42,28 @@ using namespace decaf::util::zip;
 const unsigned char ActiveMQObjectMessage::ID_ACTIVEMQOBJECTMESSAGE = 26;
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQObjectMessage::ActiveMQObjectMessage() : ActiveMQMessageTemplate<cms::ObjectMessage> () {
+ActiveMQObjectMessage::ActiveMQObjectMessage()
+    : ActiveMQMessageTemplate<cms::ObjectMessage>()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-unsigned char ActiveMQObjectMessage::getDataStructureType() const {
+unsigned char ActiveMQObjectMessage::getDataStructureType() const
+{
     return ActiveMQObjectMessage::ID_ACTIVEMQOBJECTMESSAGE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQObjectMessage* ActiveMQObjectMessage::cloneDataStructure() const {
+ActiveMQObjectMessage* ActiveMQObjectMessage::cloneDataStructure() const
+{
     std::unique_ptr<ActiveMQObjectMessage> message(new ActiveMQObjectMessage());
     message->copyDataStructure(this);
     return message.release();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-cms::Message* ActiveMQObjectMessage::clone() const {
+cms::Message* ActiveMQObjectMessage::clone() const
+{
     ActiveMQObjectMessage* clone = this->cloneDataStructure();
     clone->setReadOnlyBody(false);
     clone->setReadOnlyProperties(false);
@@ -66,42 +71,53 @@ cms::Message* ActiveMQObjectMessage::clone() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQObjectMessage::copyDataStructure(const DataStructure* src) {
+void ActiveMQObjectMessage::copyDataStructure(const DataStructure* src)
+{
     ActiveMQMessageTemplate<cms::ObjectMessage>::copyDataStructure(src);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string ActiveMQObjectMessage::toString() const {
+std::string ActiveMQObjectMessage::toString() const
+{
     return ActiveMQMessageTemplate<cms::ObjectMessage>::toString();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool ActiveMQObjectMessage::equals(const DataStructure* value) const {
+bool ActiveMQObjectMessage::equals(const DataStructure* value) const
+{
     return ActiveMQMessageTemplate<cms::ObjectMessage>::equals(value);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQObjectMessage::setObjectBytes(const std::vector<unsigned char>& bytes) {
-
+void ActiveMQObjectMessage::setObjectBytes(
+    const std::vector<unsigned char>& bytes)
+{
     this->failIfReadOnlyBody();
-    try {
-
-        if (bytes.size() == 0) {
+    try
+    {
+        if (bytes.size() == 0)
+        {
             return;
         }
 
-        if (this->connection != NULL && this->connection->isUseCompression()) {
+        if (this->connection != NULL && this->connection->isUseCompression())
+        {
             this->compressed = true;
 
             ByteArrayOutputStream bytesOut;
-            Deflater* deflator = new Deflater(this->connection->getCompressionLevel());
+            Deflater*             deflator =
+                new Deflater(this->connection->getCompressionLevel());
             DeflaterOutputStream out(&bytesOut, deflator, false, true);
             out.write(&bytes[0], (int)bytes.size());
 
             std::pair<unsigned char*, int> array = bytesOut.toByteArray();
-            this->setContent(std::vector<unsigned char>(array.first, array.first + array.second));
+            this->setContent(
+                std::vector<unsigned char>(array.first,
+                                           array.first + array.second));
             delete[] array.first;
-        } else {
+        }
+        else
+        {
             this->setContent(bytes);
         }
     }
@@ -109,28 +125,31 @@ void ActiveMQObjectMessage::setObjectBytes(const std::vector<unsigned char>& byt
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::vector<unsigned char> ActiveMQObjectMessage::getObjectBytes() const {
-
+std::vector<unsigned char> ActiveMQObjectMessage::getObjectBytes() const
+{
     this->failIfWriteOnlyBody();
-    try {
-
-        if (this->isCompressed()) {
-
-            int length = 0;
-            ByteArrayInputStream is(this->getContent());
+    try
+    {
+        if (this->isCompressed())
+        {
+            int                        length = 0;
+            ByteArrayInputStream       is(this->getContent());
             std::vector<unsigned char> uncompressed;
 
-            try {
-
+            try
+            {
                 DataInputStream dis(&is);
                 length = dis.readInt();
 
-                if (length == 0) {
+                if (length == 0)
+                {
                     return std::vector<unsigned char>();
                 }
 
-                uncompressed.resize((std::size_t) length);
-            } catch (IOException& ex) {
+                uncompressed.resize((std::size_t)length);
+            }
+            catch (IOException& ex)
+            {
                 throw CMSExceptionSupport::create(ex);
             }
 
@@ -139,7 +158,9 @@ std::vector<unsigned char> ActiveMQObjectMessage::getObjectBytes() const {
             inflater.close();
 
             return uncompressed;
-        } else {
+        }
+        else
+        {
             return this->getContent();
         }
     }

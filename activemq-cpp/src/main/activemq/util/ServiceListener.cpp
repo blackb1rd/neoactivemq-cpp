@@ -21,5 +21,6 @@ using namespace activemq;
 using namespace activemq::util;
 
 ////////////////////////////////////////////////////////////////////////////////
-ServiceListener::~ServiceListener() {
+ServiceListener::~ServiceListener()
+{
 }

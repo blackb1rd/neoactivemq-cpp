@@ -32,83 +32,101 @@ using namespace decaf::net;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
-    class AbstractDiscoveryAgentFactoryTest : public ::testing::Test {
+class AbstractDiscoveryAgentFactoryTest : public ::testing::Test
+{
 public:
+    AbstractDiscoveryAgentFactoryTest();
+    virtual ~AbstractDiscoveryAgentFactoryTest();
 
-        AbstractDiscoveryAgentFactoryTest();
-        virtual ~AbstractDiscoveryAgentFactoryTest();
-
-        void test();
-
-    };
-
+    void test();
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class MockDiscoveryAgent : public AbstractDiscoveryAgent {
-    private:
+class MockDiscoveryAgent : public AbstractDiscoveryAgent
+{
+private:
+    bool reported;
 
-        bool reported;
+public:
+    virtual ~MockDiscoveryAgent()
+    {
+    }
 
-    public:
+    virtual std::string toString() const
+    {
+        return "MockDiscoveryAgent";
+    }
 
-        virtual ~MockDiscoveryAgent() {}
+protected:
+    virtual void doStart()
+    {
+        reported = false;
+    }
 
-        virtual std::string toString() const { return "MockDiscoveryAgent"; }
+    virtual void doStop()
+    {
+    }
 
-    protected:
+    virtual void doAdvertizeSelf()
+    {
+    }
 
-        virtual void doStart() {
-            reported = false;
-        }
-
-        virtual void doStop() {}
-
-        virtual void doAdvertizeSelf() {}
-
-        virtual void doDiscovery() {
-            try {
-                if (!reported) {
-                    Thread::sleep(1000);
-                    processLiveService("dummy", "mock://localhost");
-                    reported = true;
-                } else {
-                    Thread::sleep(500);
-                }
-            } catch (InterruptedException& ex) {
+    virtual void doDiscovery()
+    {
+        try
+        {
+            if (!reported)
+            {
+                Thread::sleep(1000);
+                processLiveService("dummy", "mock://localhost");
+                reported = true;
+            }
+            else
+            {
+                Thread::sleep(500);
             }
         }
-    };
-
-    class MockDiscoveryAgentFactory : public AbstractDiscoveryAgentFactory {
-    public:
-
-        virtual ~MockDiscoveryAgentFactory() {}
-
-        virtual decaf::lang::Pointer<AbstractDiscoveryAgent> doCreateAgent() {
-            return Pointer<AbstractDiscoveryAgent>(new MockDiscoveryAgent);
+        catch (InterruptedException& ex)
+        {
         }
+    }
+};
 
-    };
+class MockDiscoveryAgentFactory : public AbstractDiscoveryAgentFactory
+{
+public:
+    virtual ~MockDiscoveryAgentFactory()
+    {
+    }
 
+    virtual decaf::lang::Pointer<AbstractDiscoveryAgent> doCreateAgent()
+    {
+        return Pointer<AbstractDiscoveryAgent>(new MockDiscoveryAgent);
+    }
+};
+
+}  // namespace
+
+////////////////////////////////////////////////////////////////////////////////
+AbstractDiscoveryAgentFactoryTest::AbstractDiscoveryAgentFactoryTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-AbstractDiscoveryAgentFactoryTest::AbstractDiscoveryAgentFactoryTest() {
+AbstractDiscoveryAgentFactoryTest::~AbstractDiscoveryAgentFactoryTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-AbstractDiscoveryAgentFactoryTest::~AbstractDiscoveryAgentFactoryTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void AbstractDiscoveryAgentFactoryTest::test() {
-
+void AbstractDiscoveryAgentFactoryTest::test()
+{
     DiscoveryAgentRegistry& registry = DiscoveryAgentRegistry::getInstance();
     registry.registerFactory("mock", new MockDiscoveryAgentFactory);
 
-    ASSERT_EQ(1, (int) registry.getAgentNames().size());
+    ASSERT_EQ(1, (int)registry.getAgentNames().size());
 
     DiscoveryAgentFactory* factory = registry.findFactory("mock");
     ASSERT_TRUE(factory != NULL);

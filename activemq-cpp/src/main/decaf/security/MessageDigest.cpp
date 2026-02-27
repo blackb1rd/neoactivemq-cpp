@@ -17,12 +17,12 @@
 
 #include "MessageDigest.h"
 
-#include <decaf/security/MessageDigestSpi.h>
-#include <decaf/security/Provider.h>
-#include <decaf/security/NoSuchAlgorithmException.h>
-#include <decaf/lang/exceptions/CloneNotSupportedException.h>
 #include <decaf/internal/security/Engine.h>
 #include <decaf/lang/Pointer.h>
+#include <decaf/lang/exceptions/CloneNotSupportedException.h>
+#include <decaf/security/MessageDigestSpi.h>
+#include <decaf/security/NoSuchAlgorithmException.h>
+#include <decaf/security/Provider.h>
 
 using namespace decaf;
 using namespace decaf::lang;
@@ -31,21 +31,32 @@ using namespace decaf::security;
 using namespace decaf::internal::security;
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace decaf {
-namespace security {
+namespace decaf
+{
+namespace security
+{
 
-    class MessageDigestImpl {
+    class MessageDigestImpl
+    {
     public:
     };
-}}
+}  // namespace security
+}  // namespace decaf
 
 ////////////////////////////////////////////////////////////////////////////////
-MessageDigest::MessageDigest(const std::string& name) : impl(NULL), spi(), provider(), algorithm(name) {
+MessageDigest::MessageDigest(const std::string& name)
+    : impl(NULL),
+      spi(),
+      provider(),
+      algorithm(name)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-MessageDigest::~MessageDigest() {
-    try {
+MessageDigest::~MessageDigest()
+{
+    try
+    {
         delete this->spi;
         delete this->impl;
     }
@@ -53,10 +64,13 @@ MessageDigest::~MessageDigest() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-MessageDigest* MessageDigest::getInstance(const std::string& algorithm) {
-
-    if (algorithm.empty()) {
-        throw NoSuchAlgorithmException(__FILE__, __LINE__, "Supplied algorithm string is empty.");
+MessageDigest* MessageDigest::getInstance(const std::string& algorithm)
+{
+    if (algorithm.empty())
+    {
+        throw NoSuchAlgorithmException(__FILE__,
+                                       __LINE__,
+                                       "Supplied algorithm string is empty.");
     }
 
     static Engine engine("MessageDigest");
@@ -64,23 +78,28 @@ MessageDigest* MessageDigest::getInstance(const std::string& algorithm) {
     SecuritySpi* newSpi = engine.newInstance(algorithm);
 
     MessageDigestSpi* spi = dynamic_cast<MessageDigestSpi*>(newSpi);
-    if (spi == NULL) {
+    if (spi == NULL)
+    {
         delete newSpi;
-        throw NoSuchAlgorithmException(__FILE__, __LINE__,
+        throw NoSuchAlgorithmException(
+            __FILE__,
+            __LINE__,
             "Supplied algorithm not a MessageDigest algorithm.");
     }
 
     MessageDigest* digest = new MessageDigest(algorithm);
-    digest->provider = engine.getProvider();
-    digest->spi = spi;
+    digest->provider      = engine.getProvider();
+    digest->spi           = spi;
 
     return digest;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 bool MessageDigest::isEqual(const std::vector<unsigned char>& digesta,
-                            const std::vector<unsigned char>& digestb) {
-    if (digesta.size() != digestb.size()) {
+                            const std::vector<unsigned char>& digestb)
+{
+    if (digesta.size() != digestb.size())
+    {
         return false;
     }
 
@@ -88,8 +107,10 @@ bool MessageDigest::isEqual(const std::vector<unsigned char>& digesta,
     // We must not return false until all elements are compared
     // to keep the computing time constant
     bool result = true;
-    for (int i = 0; i < (int)digesta.size(); i++) {
-        if (digesta[i] != digestb[i]) {
+    for (int i = 0; i < (int)digesta.size(); i++)
+    {
+        if (digesta[i] != digestb[i])
+        {
             result = false;
         }
     }
@@ -97,51 +118,65 @@ bool MessageDigest::isEqual(const std::vector<unsigned char>& digesta,
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::vector<unsigned char> MessageDigest::digest() {
+std::vector<unsigned char> MessageDigest::digest()
+{
     return this->spi->engineDigest();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int MessageDigest::digest(unsigned char* input, int size, int offset, int length) {
+int MessageDigest::digest(unsigned char* input, int size, int offset, int length)
+{
     return this->spi->engineDigest(input, size, offset, length);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::vector<unsigned char> MessageDigest::digest(const unsigned char* input, int size) {
+std::vector<unsigned char> MessageDigest::digest(const unsigned char* input,
+                                                 int                  size)
+{
     this->spi->engineUpdate(input, size, 0, size);
     return this->spi->engineDigest();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::vector<unsigned char> MessageDigest::digest(const std::vector<unsigned char>& input) {
+std::vector<unsigned char> MessageDigest::digest(
+    const std::vector<unsigned char>& input)
+{
     this->spi->engineUpdate(input);
     return this->spi->engineDigest();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MessageDigest::update(unsigned char input) {
+void MessageDigest::update(unsigned char input)
+{
     this->spi->engineUpdate(input);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MessageDigest::update(unsigned char* input, int size, int offset, int length) {
+void MessageDigest::update(unsigned char* input,
+                           int            size,
+                           int            offset,
+                           int            length)
+{
     this->spi->engineUpdate(input, size, offset, length);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MessageDigest::update(const std::vector<unsigned char>& input) {
+void MessageDigest::update(const std::vector<unsigned char>& input)
+{
     this->spi->engineUpdate(input);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MessageDigest::update(nio::ByteBuffer& input) {
+void MessageDigest::update(nio::ByteBuffer& input)
+{
     this->spi->engineUpdate(input);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int MessageDigest::getDigestLength() const {
-
-    if (!this->spi->isCloneable()) {
+int MessageDigest::getDigestLength() const
+{
+    if (!this->spi->isCloneable())
+    {
         return 0;
     }
 
@@ -149,26 +184,31 @@ int MessageDigest::getDigestLength() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-MessageDigest* MessageDigest::clone() {
-
-    if (!this->spi->isCloneable()) {
-        throw CloneNotSupportedException(__FILE__, __LINE__,
-                "MessageDigestSpi in use not cloneable.");
+MessageDigest* MessageDigest::clone()
+{
+    if (!this->spi->isCloneable())
+    {
+        throw CloneNotSupportedException(
+            __FILE__,
+            __LINE__,
+            "MessageDigestSpi in use not cloneable.");
     }
 
     MessageDigest* clone = new MessageDigest(this->algorithm);
-    clone->provider = this->provider;
-    clone->spi = this->spi->clone();
+    clone->provider      = this->provider;
+    clone->spi           = this->spi->clone();
 
     return clone;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MessageDigest::reset() {
+void MessageDigest::reset()
+{
     this->spi->engineReset();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string MessageDigest::toString() const {
+std::string MessageDigest::toString() const
+{
     return std::string("MESSAGE DIGEST ") + algorithm;
 }

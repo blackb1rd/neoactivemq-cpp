@@ -38,17 +38,19 @@ using namespace decaf::lang::exceptions;
  */
 
 ////////////////////////////////////////////////////////////////////////////////
-KeepAliveInfo::KeepAliveInfo() :
-    BaseCommand() {
-
+KeepAliveInfo::KeepAliveInfo()
+    : BaseCommand()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-KeepAliveInfo::~KeepAliveInfo() {
+KeepAliveInfo::~KeepAliveInfo()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-KeepAliveInfo* KeepAliveInfo::cloneDataStructure() const {
+KeepAliveInfo* KeepAliveInfo::cloneDataStructure() const
+{
     std::unique_ptr<KeepAliveInfo> keepAliveInfo(new KeepAliveInfo());
 
     // Copy the data from the base class or classes
@@ -58,34 +60,37 @@ KeepAliveInfo* KeepAliveInfo::cloneDataStructure() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void KeepAliveInfo::copyDataStructure(const DataStructure* src) {
-
+void KeepAliveInfo::copyDataStructure(const DataStructure* src)
+{
     // Protect against invalid self assignment.
-    if (this == src) {
+    if (this == src)
+    {
         return;
     }
 
     const KeepAliveInfo* srcPtr = dynamic_cast<const KeepAliveInfo*>(src);
 
-    if (srcPtr == NULL || src == NULL) {
+    if (srcPtr == NULL || src == NULL)
+    {
         throw decaf::lang::exceptions::NullPointerException(
-            __FILE__, __LINE__,
+            __FILE__,
+            __LINE__,
             "KeepAliveInfo::copyDataStructure - src is NULL or invalid");
     }
 
     // Copy the data of the base class or classes
     BaseCommand::copyDataStructure(src);
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-unsigned char KeepAliveInfo::getDataStructureType() const {
+unsigned char KeepAliveInfo::getDataStructureType() const
+{
     return KeepAliveInfo::ID_KEEPALIVEINFO;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string KeepAliveInfo::toString() const {
-
+std::string KeepAliveInfo::toString() const
+{
     ostringstream stream;
 
     stream << "KeepAliveInfo { "
@@ -97,25 +102,30 @@ std::string KeepAliveInfo::toString() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool KeepAliveInfo::equals(const DataStructure* value) const {
-
-    if (this == value) {
+bool KeepAliveInfo::equals(const DataStructure* value) const
+{
+    if (this == value)
+    {
         return true;
     }
 
     const KeepAliveInfo* valuePtr = dynamic_cast<const KeepAliveInfo*>(value);
 
-    if (valuePtr == NULL || value == NULL) {
+    if (valuePtr == NULL || value == NULL)
+    {
         return false;
     }
 
-    if (!BaseCommand::equals(value)) {
+    if (!BaseCommand::equals(value))
+    {
         return false;
     }
     return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<commands::Command> KeepAliveInfo::visit(activemq::state::CommandVisitor* visitor) {
+decaf::lang::Pointer<commands::Command> KeepAliveInfo::visit(
+    activemq::state::CommandVisitor* visitor)
+{
     return visitor->processKeepAliveInfo(this);
 }

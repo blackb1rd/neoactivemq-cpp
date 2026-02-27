@@ -22,30 +22,44 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-IndexOutOfBoundsException::IndexOutOfBoundsException() : Exception() {
+IndexOutOfBoundsException::IndexOutOfBoundsException()
+    : Exception()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-IndexOutOfBoundsException::~IndexOutOfBoundsException() throw () {
+IndexOutOfBoundsException::~IndexOutOfBoundsException() throw()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-IndexOutOfBoundsException::IndexOutOfBoundsException(const Exception& ex) : Exception() {
-    *(Exception*) this = ex;
+IndexOutOfBoundsException::IndexOutOfBoundsException(const Exception& ex)
+    : Exception()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-IndexOutOfBoundsException::IndexOutOfBoundsException(const IndexOutOfBoundsException& ex) : Exception() {
-    *(Exception*) this = ex;
+IndexOutOfBoundsException::IndexOutOfBoundsException(
+    const IndexOutOfBoundsException& ex)
+    : Exception()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-IndexOutOfBoundsException::IndexOutOfBoundsException(const std::exception* cause) : Exception(cause) {
+IndexOutOfBoundsException::IndexOutOfBoundsException(const std::exception* cause)
+    : Exception(cause)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-IndexOutOfBoundsException::IndexOutOfBoundsException(const char* file, const int lineNumber, const char* msg, ...) : Exception() {
-
+IndexOutOfBoundsException::IndexOutOfBoundsException(const char* file,
+                                                     const int   lineNumber,
+                                                     const char* msg,
+                                                     ...)
+    : Exception()
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -55,8 +69,13 @@ IndexOutOfBoundsException::IndexOutOfBoundsException(const char* file, const int
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-IndexOutOfBoundsException::IndexOutOfBoundsException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...) : Exception(cause) {
-
+IndexOutOfBoundsException::IndexOutOfBoundsException(const char* file,
+                                                     const int   lineNumber,
+                                                     const std::exception* cause,
+                                                     const char* msg,
+                                                     ...)
+    : Exception(cause)
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);

@@ -22,12 +22,15 @@
 
 #include <decaf/lang/exceptions/RuntimeException.h>
 
-namespace decaf {
-namespace security {
+namespace decaf
+{
+namespace security
+{
 
-    class DECAF_API ProviderException: public decaf::lang::exceptions::RuntimeException {
+    class DECAF_API ProviderException
+        : public decaf::lang::exceptions::RuntimeException
+    {
     public:
-
         /**
          * Default Constructor
          */
@@ -65,7 +68,11 @@ namespace security {
          * @param ...
          *      list of primitives that are formatted into the message
          */
-        ProviderException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...);
+        ProviderException(const char*           file,
+                          const int             lineNumber,
+                          const std::exception* cause,
+                          const char*           msg,
+                          ...);
 
         /**
          * Convenience Constructor
@@ -90,22 +97,27 @@ namespace security {
          * @param ...
          *      list of primitives that are formatted into the message
          */
-        ProviderException(const char* file, const int lineNumber, const char* msg, ...);
+        ProviderException(const char* file,
+                          const int   lineNumber,
+                          const char* msg,
+                          ...);
 
         /**
          * Clones this exception.  This is useful for cases where you need
-         * to preserve the type of the original exception as well as the message.
-         * All subclasses should override.
+         * to preserve the type of the original exception as well as the
+         * message. All subclasses should override.
          *
          * @return A deep copy of this exception.
          */
-        virtual ProviderException* clone() const {
+        virtual ProviderException* clone() const
+        {
             return new ProviderException(*this);
         }
 
         virtual ~ProviderException() throw();
     };
 
-}}
+}  // namespace security
+}  // namespace decaf
 
 #endif /* _DECAF_SECURITY_PROVIDEREXCEPTION_H_ */

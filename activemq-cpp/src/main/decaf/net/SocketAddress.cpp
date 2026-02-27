@@ -21,6 +21,6 @@ using namespace decaf;
 using namespace decaf::net;
 
 ////////////////////////////////////////////////////////////////////////////////
-SocketAddress::~SocketAddress() {
-
+SocketAddress::~SocketAddress()
+{
 }

@@ -20,33 +20,46 @@
 using namespace cms;
 
 ////////////////////////////////////////////////////////////////////////////////
-MessageEOFException::MessageEOFException() : CMSException() {
+MessageEOFException::MessageEOFException()
+    : CMSException()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-MessageEOFException::MessageEOFException(const MessageEOFException& ex) : CMSException(ex) {
+MessageEOFException::MessageEOFException(const MessageEOFException& ex)
+    : CMSException(ex)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-MessageEOFException::MessageEOFException(const std::string& message) : CMSException(message, NULL) {
+MessageEOFException::MessageEOFException(const std::string& message)
+    : CMSException(message, NULL)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-MessageEOFException::MessageEOFException(const std::string& message, const std::exception* cause) :
-    CMSException(message, cause) {
+MessageEOFException::MessageEOFException(const std::string&    message,
+                                         const std::exception* cause)
+    : CMSException(message, cause)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-MessageEOFException::MessageEOFException(const std::string& message, const std::exception* cause,
-                                         const std::vector<std::pair<std::string, int> >& stackTrace) :
-    CMSException(message, cause, stackTrace) {
+MessageEOFException::MessageEOFException(
+    const std::string&                              message,
+    const std::exception*                           cause,
+    const std::vector<std::pair<std::string, int>>& stackTrace)
+    : CMSException(message, cause, stackTrace)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-MessageEOFException::~MessageEOFException() throw() {
+MessageEOFException::~MessageEOFException() throw()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-MessageEOFException* MessageEOFException::clone() {
+MessageEOFException* MessageEOFException::clone()
+{
     return new MessageEOFException(*this);
 }

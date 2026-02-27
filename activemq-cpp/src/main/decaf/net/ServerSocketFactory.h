@@ -21,99 +21,112 @@
 
 #include <decaf/net/InetAddress.h>
 
-namespace decaf {
-namespace net {
+namespace decaf
+{
+namespace net
+{
 
     class ServerSocket;
 
     /**
-     * Class used to create Server Sockets, subclasses can be created that create certain
-     * types of server sockets according to specific policies.
+     * Class used to create Server Sockets, subclasses can be created that
+     * create certain types of server sockets according to specific policies.
      *
      * @since 1.0
      */
-    class DECAF_API ServerSocketFactory {
+    class DECAF_API ServerSocketFactory
+    {
     private:
-
         static ServerSocketFactory* defaultFactory;
 
     protected:
-
         ServerSocketFactory();
 
     public:
-
         virtual ~ServerSocketFactory();
 
         /**
-         * Create a new ServerSocket that is unbound.  The ServerSocket will have been configured
-         * with the defaults from the factory.
+         * Create a new ServerSocket that is unbound.  The ServerSocket will
+         * have been configured with the defaults from the factory.
          *
          * @return new ServerSocket pointer that is owned by the caller.
          *
-         * @throw IOException if the ServerSocket cannot be created for some reason.
+         * @throw IOException if the ServerSocket cannot be created for some
+         * reason.
          */
         virtual ServerSocket* createServerSocket();
 
         /**
-         * Create a new ServerSocket that is bound to the given port.  The ServerSocket will have
-         * been configured with the defaults from the factory.
+         * Create a new ServerSocket that is bound to the given port.  The
+         * ServerSocket will have been configured with the defaults from the
+         * factory.
          *
          * @param port
          *      The port to bind the ServerSocket to.
          *
          * @return new ServerSocket pointer that is owned by the caller.
          *
-         * @throw IOException if the ServerSocket cannot be created for some reason.
+         * @throw IOException if the ServerSocket cannot be created for some
+         * reason.
          */
-        virtual ServerSocket* createServerSocket( int port ) = 0;
+        virtual ServerSocket* createServerSocket(int port) = 0;
 
         /**
-         * Create a new ServerSocket that is bound to the given port.  The ServerSocket will have
-         * been configured with the defaults from the factory.  The ServerSocket will use the
-         * specified connection backlog setting.
+         * Create a new ServerSocket that is bound to the given port.  The
+         * ServerSocket will have been configured with the defaults from the
+         * factory.  The ServerSocket will use the specified connection backlog
+         * setting.
          *
          * @param port
          *      The port to bind the ServerSocket to.
          * @param backlog
-         *      The number of pending connect request the ServerSocket can queue.
+         *      The number of pending connect request the ServerSocket can
+         * queue.
          *
          * @return new ServerSocket pointer that is owned by the caller.
          *
-         * @throw IOException if the ServerSocket cannot be created for some reason.
+         * @throw IOException if the ServerSocket cannot be created for some
+         * reason.
          */
-        virtual ServerSocket* createServerSocket( int port, int backlog ) = 0;
+        virtual ServerSocket* createServerSocket(int port, int backlog) = 0;
 
         /**
-         * Create a new ServerSocket that is bound to the given port.  The ServerSocket will have
-         * been configured with the defaults from the factory.  The ServerSocket will bind to the
-         * specified interface on the local host, and accept connections only on that interface.
-         * If the address parameter is NULL than the ServerSocket will listen on all interfaces.
+         * Create a new ServerSocket that is bound to the given port.  The
+         * ServerSocket will have been configured with the defaults from the
+         * factory.  The ServerSocket will bind to the specified interface on
+         * the local host, and accept connections only on that interface. If the
+         * address parameter is NULL than the ServerSocket will listen on all
+         * interfaces.
          *
          * @param port
          *      The port to bind the ServerSocket to.
          * @param backlog
-         *      The number of pending connect request the ServerSocket can queue.
+         *      The number of pending connect request the ServerSocket can
+         * queue.
          * @param address
          *      The address of the interface on the local machine to bind to.
          *
          * @return new ServerSocket pointer that is owned by the caller.
          *
-         * @throw IOException if the ServerSocket cannot be created for some reason.
+         * @throw IOException if the ServerSocket cannot be created for some
+         * reason.
          */
-        virtual ServerSocket* createServerSocket( int port, int backlog, const InetAddress* address ) = 0;
+        virtual ServerSocket* createServerSocket(int port,
+                                                 int backlog,
+                                                 const InetAddress* address) = 0;
 
         /**
-         * Returns the Default ServerSocket factory, the pointer is owned by the Decaf runtime and
-         * should not be deleted by the caller.  Only one default ServerSocketFactory exists for the
-         * lifetime of the Application.
+         * Returns the Default ServerSocket factory, the pointer is owned by the
+         * Decaf runtime and should not be deleted by the caller.  Only one
+         * default ServerSocketFactory exists for the lifetime of the
+         * Application.
          *
          * @return the default ServerSocketFactory for this application.
          */
         static ServerSocketFactory* getDefault();
-
     };
 
-}}
+}  // namespace net
+}  // namespace decaf
 
 #endif /* _DECAF_NET_SERVERSOCKETFACTORY_H_ */

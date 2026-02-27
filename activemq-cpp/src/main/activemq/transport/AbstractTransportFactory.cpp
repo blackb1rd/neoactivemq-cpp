@@ -17,12 +17,12 @@
 
 #include "AbstractTransportFactory.h"
 
-#include <memory>
-#include <string>
+#include <activemq/transport/logging/LoggingTransport.h>
+#include <activemq/util/URISupport.h>
 #include <activemq/wireformat/WireFormat.h>
 #include <activemq/wireformat/WireFormatRegistry.h>
-#include <activemq/util/URISupport.h>
-#include <activemq/transport/logging/LoggingTransport.h>
+#include <memory>
+#include <string>
 
 using namespace std;
 using namespace activemq;
@@ -37,14 +37,20 @@ using namespace decaf::net;
 using namespace decaf::util;
 
 ////////////////////////////////////////////////////////////////////////////////
-AbstractTransportFactory::~AbstractTransportFactory() {
+AbstractTransportFactory::~AbstractTransportFactory()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<WireFormat> AbstractTransportFactory::createWireFormat(const decaf::util::Properties& properties) {
-    try {
-        std::string wireFormat = properties.getProperty("wireFormat", "openwire");
-        WireFormatFactory* factory = WireFormatRegistry::getInstance().findFactory(wireFormat);
+Pointer<WireFormat> AbstractTransportFactory::createWireFormat(
+    const decaf::util::Properties& properties)
+{
+    try
+    {
+        std::string wireFormat =
+            properties.getProperty("wireFormat", "openwire");
+        WireFormatFactory* factory =
+            WireFormatRegistry::getInstance().findFactory(wireFormat);
         return factory->createWireFormat(properties);
     }
     AMQ_CATCH_RETHROW(NoSuchElementException)

@@ -17,18 +17,27 @@
 
 #include <activemq/test/BulkMessageTest.h>
 
-namespace activemq{
-namespace test{
-namespace stomp{
-    class StompBulkMessageTest : public BulkMessageTest {
-public:
-        StompBulkMessageTest();
-        virtual ~StompBulkMessageTest();
-        std::string getBrokerURL() const override {
-            return activemq::util::IntegrationCommon::getInstance().getStompURL();
-        }
-    };
-}}}
+namespace activemq
+{
+namespace test
+{
+    namespace stomp
+    {
+        class StompBulkMessageTest : public BulkMessageTest
+        {
+        public:
+            StompBulkMessageTest();
+            virtual ~StompBulkMessageTest();
+
+            std::string getBrokerURL() const override
+            {
+                return activemq::util::IntegrationCommon::getInstance()
+                    .getStompURL();
+            }
+        };
+    }  // namespace stomp
+}  // namespace test
+}  // namespace activemq
 
 using namespace std;
 using namespace cms;
@@ -37,13 +46,18 @@ using namespace activemq::test;
 using namespace activemq::test::stomp;
 
 ////////////////////////////////////////////////////////////////////////////////
-StompBulkMessageTest::StompBulkMessageTest() {
+StompBulkMessageTest::StompBulkMessageTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-StompBulkMessageTest::~StompBulkMessageTest() {
+StompBulkMessageTest::~StompBulkMessageTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Test registration
-TEST_F(StompBulkMessageTest, DISABLED_testBulkMessageSendReceive) { testBulkMessageSendReceive(); }
+TEST_F(StompBulkMessageTest, DISABLED_testBulkMessageSendReceive)
+{
+    testBulkMessageSendReceive();
+}

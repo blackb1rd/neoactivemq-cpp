@@ -17,8 +17,8 @@
 
 #include <gtest/gtest.h>
 
-#include <activemq/state/SessionState.h>
 #include <activemq/commands/SessionInfo.h>
+#include <activemq/state/SessionState.h>
 #include <decaf/lang/Pointer.h>
 
 using namespace std;
@@ -27,51 +27,52 @@ using namespace activemq::state;
 using namespace activemq::commands;
 using namespace decaf::lang;
 
-class SessionStateTest : public ::testing::Test {};
+class SessionStateTest : public ::testing::Test
+{
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(SessionStateTest, test) {
-
+TEST_F(SessionStateTest, test)
+{
     // Create a Consumer
-    Pointer<ConsumerId> cid( new ConsumerId );
-    cid->setConnectionId( "CONNECTION" );
-    cid->setSessionId( 4096 );
-    cid->setValue( 42 );
-    Pointer<ConsumerInfo> cinfo( new ConsumerInfo() );
-    cinfo->setConsumerId( cid );
+    Pointer<ConsumerId> cid(new ConsumerId);
+    cid->setConnectionId("CONNECTION");
+    cid->setSessionId(4096);
+    cid->setValue(42);
+    Pointer<ConsumerInfo> cinfo(new ConsumerInfo());
+    cinfo->setConsumerId(cid);
 
     // Create a Producer
-    Pointer<ProducerId> pid( new ProducerId );
-    pid->setConnectionId( "CONNECTION" );
-    pid->setSessionId( 42 );
-    pid->setValue( 4096 );
-    Pointer<ProducerInfo> pinfo( new ProducerInfo() );
-    pinfo->setProducerId( pid );
+    Pointer<ProducerId> pid(new ProducerId);
+    pid->setConnectionId("CONNECTION");
+    pid->setSessionId(42);
+    pid->setValue(4096);
+    Pointer<ProducerInfo> pinfo(new ProducerInfo());
+    pinfo->setProducerId(pid);
 
     // Create a Session
-    Pointer<SessionId> id( new SessionId );
-    id->setConnectionId( "CONNECTION" );
-    id->setValue( 42 );
-    Pointer<SessionInfo> info( new SessionInfo );
-    info->setSessionId( id );
+    Pointer<SessionId> id(new SessionId);
+    id->setConnectionId("CONNECTION");
+    id->setValue(42);
+    Pointer<SessionInfo> info(new SessionInfo);
+    info->setSessionId(id);
 
-    SessionState state( info );
+    SessionState state(info);
     ASSERT_TRUE(state.getInfo() == info);
 
-    state.addProducer( pinfo );
-    state.addConsumer( cinfo );
+    state.addProducer(pinfo);
+    state.addConsumer(cinfo);
 
     ASSERT_TRUE(state.getConsumerStates().size() == 1);
     ASSERT_TRUE(state.getProducerStates().size() == 1);
 
-    state.removeProducer( pinfo->getProducerId() );
-    state.removeConsumer( cinfo->getConsumerId() );
+    state.removeProducer(pinfo->getProducerId());
+    state.removeConsumer(cinfo->getConsumerId());
 
     ASSERT_TRUE(state.getConsumerStates().size() == 0);
     ASSERT_TRUE(state.getProducerStates().size() == 0);
 
-    state.addProducer( pinfo );
-    state.addProducer( pinfo );
+    state.addProducer(pinfo);
+    state.addProducer(pinfo);
     ASSERT_TRUE(state.getProducerStates().size() == 1);
-
 }

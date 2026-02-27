@@ -20,16 +20,18 @@
 
 #include <activemq/util/Config.h>
 
-namespace activemq {
-namespace core {
+namespace activemq
+{
+namespace core
+{
 
     /**
-     * Transacted Object Synchronization, used to sync the events of a Transaction
-     * with the items in the Transaction.
+     * Transacted Object Synchronization, used to sync the events of a
+     * Transaction with the items in the Transaction.
      */
-    class AMQCPP_API Synchronization {
+    class AMQCPP_API Synchronization
+    {
     public:
-
         virtual ~Synchronization();
 
         virtual void beforeEnd() = 0;
@@ -37,9 +39,9 @@ namespace core {
         virtual void afterCommit() = 0;
 
         virtual void afterRollback() = 0;
-
     };
 
-}}
+}  // namespace core
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_CORE_SYNCHRONIZATION_H_ */

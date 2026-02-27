@@ -18,57 +18,59 @@
 #ifndef _ACTIVEMQCPP_EXAMPLES_ADVISORIES_ADVISORYCONSUMER_H_
 #define _ACTIVEMQCPP_EXAMPLES_ADVISORIES_ADVISORYCONSUMER_H_
 
-#include <string>
 #include <memory>
+#include <string>
 
 #include <cms/Closeable.h>
-#include <cms/Session.h>
 #include <cms/MessageConsumer.h>
 #include <cms/MessageListener.h>
+#include <cms/Session.h>
 
-namespace activemqcpp {
-namespace examples {
-namespace advisories {
-
-    /**
-     * A simple Consumer that compliements the AdvisoryProducer example.  This
-     * consumer listens on the Topic that the Producer is waiting to publish on
-     * and will display the count of Producers that are active on the Topic
-     * any time that it sees an advisory message indicating a consumer has
-     * stopped or started.
-     *
-     * @since 3.0
-     */
-    class AdvisoryConsumer : public cms::Closeable,
-                             public cms::MessageListener {
-     private:
-
-         cms::Session* session;
-         std::unique_ptr<cms::MessageConsumer> consumer;
-         std::unique_ptr<cms::MessageConsumer> advisoryConsumer;
-
-     private:
-
-         AdvisoryConsumer(const AdvisoryConsumer&);
-        AdvisoryConsumer& operator=(const AdvisoryConsumer&);
-
-    public:
-
-        AdvisoryConsumer(cms::Session* session);
-        virtual ~AdvisoryConsumer();
+namespace activemqcpp
+{
+namespace examples
+{
+    namespace advisories
+    {
 
         /**
-         * Close down Consumer resources.
+         * A simple Consumer that compliements the AdvisoryProducer example.
+         * This consumer listens on the Topic that the Producer is waiting to
+         * publish on and will display the count of Producers that are active on
+         * the Topic any time that it sees an advisory message indicating a
+         * consumer has stopped or started.
+         *
+         * @since 3.0
          */
-        virtual void close();
+        class AdvisoryConsumer : public cms::Closeable,
+                                 public cms::MessageListener
+        {
+        private:
+            cms::Session*                         session;
+            std::unique_ptr<cms::MessageConsumer> consumer;
+            std::unique_ptr<cms::MessageConsumer> advisoryConsumer;
 
-        /**
-         * Async Message callback.
-         */
-        virtual void onMessage(const cms::Message* message);
+        private:
+            AdvisoryConsumer(const AdvisoryConsumer&);
+            AdvisoryConsumer& operator=(const AdvisoryConsumer&);
 
-    };
+        public:
+            AdvisoryConsumer(cms::Session* session);
+            virtual ~AdvisoryConsumer();
 
-}}}
+            /**
+             * Close down Consumer resources.
+             */
+            virtual void close();
+
+            /**
+             * Async Message callback.
+             */
+            virtual void onMessage(const cms::Message* message);
+        };
+
+    }  // namespace advisories
+}  // namespace examples
+}  // namespace activemqcpp
 
 #endif /* _ACTIVEMQCPP_EXAMPLES_ADVISORIES_ADVISORYCONSUMER_H_ */

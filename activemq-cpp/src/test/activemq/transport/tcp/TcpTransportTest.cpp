@@ -17,21 +17,21 @@
 
 #include <gtest/gtest.h>
 
-#include <activemq/transport/tcp/TcpTransportFactory.h>
 #include <activemq/transport/tcp/TcpTransport.h>
+#include <activemq/transport/tcp/TcpTransportFactory.h>
 
 #include <activemq/wireformat/openwire/OpenWireFormat.h>
 
-#include <decaf/lang/Pointer.h>
-#include <decaf/lang/Integer.h>
-#include <decaf/net/Socket.h>
-#include <decaf/net/SocketFactory.h>
-#include <decaf/net/ServerSocket.h>
-#include <decaf/net/SocketTimeoutException.h>
+#include <activemq/util/Config.h>
 #include <decaf/io/InputStream.h>
 #include <decaf/io/OutputStream.h>
+#include <decaf/lang/Integer.h>
+#include <decaf/lang/Pointer.h>
+#include <decaf/net/ServerSocket.h>
+#include <decaf/net/Socket.h>
+#include <decaf/net/SocketFactory.h>
+#include <decaf/net/SocketTimeoutException.h>
 #include <decaf/util/Random.h>
-#include <activemq/util/Config.h>
 
 using namespace decaf;
 using namespace decaf::lang;
@@ -45,171 +45,224 @@ using namespace activemq::wireformat::openwire;
 using namespace activemq::transport;
 using namespace activemq::transport::tcp;
 
-    class TcpTransportTest : public ::testing::Test {
-    protected:
-        void SetUp() override;
-        void TearDown() override;
-    };
+class TcpTransportTest : public ::testing::Test
+{
+protected:
+    void SetUp() override;
+    void TearDown() override;
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class TestServer : public lang::Thread{
-    private:
+class TestServer : public lang::Thread
+{
+private:
+    bool                    done;
+    bool                    error;
+    Pointer<ServerSocket>   server;
+    Pointer<OpenWireFormat> wireFormat;
+    CountDownLatch          started;
+    Random                  rand;
 
-        bool done;
-        bool error;
-        Pointer<ServerSocket> server;
-        Pointer<OpenWireFormat> wireFormat;
-        CountDownLatch started;
-        Random rand;
+public:
+    TestServer()
+        : Thread(),
+          done(false),
+          error(false),
+          server(),
+          started(1),
+          rand()
+    {
+        server.reset(new ServerSocket(0));
+        server->setSoTimeout(100);  // 100ms timeout for quick shutdown response
 
-    public:
+        Properties properties;
+        this->wireFormat.reset(new OpenWireFormat(properties));
 
-        TestServer() : Thread(), done(false), error(false), server(), started(1), rand() {
-            server.reset(new ServerSocket(0));
-            server->setSoTimeout(100); // 100ms timeout for quick shutdown response
+        this->rand.setSeed(System::currentTimeMillis());
+    }
 
-            Properties properties;
-            this->wireFormat.reset(new OpenWireFormat(properties));
+    virtual ~TestServer()
+    {
+        stop();
+    }
 
-            this->rand.setSeed(System::currentTimeMillis());
+    int getLocalPort()
+    {
+        if (this->server.get() != NULL)
+        {
+            return server->getLocalPort();
         }
 
-        virtual ~TestServer() {
-            stop();
-        }
+        return 0;
+    }
 
-        int getLocalPort() {
-            if (this->server.get() != NULL) {
-                return server->getLocalPort();
+    void waitUntilStarted()
+    {
+        this->started.await();
+    }
+
+    void waitUntilStopped()
+    {
+        // Thread should exit cleanly now that done is set and socket timeout
+        // allows periodic checks
+        this->join();
+    }
+
+    void stop()
+    {
+        try
+        {
+            done = true;
+
+            // On Windows, closing the socket doesn't always interrupt accept()
+            // Unblock it by connecting to it BEFORE closing
+            try
+            {
+                int port = getLocalPort();
+                if (port > 0 && server.get() != NULL)
+                {
+                    Pointer<Socket> wakeupSocket(
+                        SocketFactory::getDefault()->createSocket());
+                    try
+                    {
+                        wakeupSocket->connect("127.0.0.1", port, 100);
+                        wakeupSocket->close();
+                    }
+                    catch (...)
+                    {
+                    }
+                }
+            }
+            catch (...)
+            {
             }
 
-            return 0;
-        }
-
-        void waitUntilStarted() {
-            this->started.await();
-        }
-
-        void waitUntilStopped() {
-            // Thread should exit cleanly now that done is set and socket timeout allows periodic checks
-            this->join();
-        }
-
-        void stop() {
-            try {
-                done = true;
-
-                // On Windows, closing the socket doesn't always interrupt accept()
-                // Unblock it by connecting to it BEFORE closing
-                try {
-                    int port = getLocalPort();
-                    if (port > 0 && server.get() != NULL) {
-                        Pointer<Socket> wakeupSocket(SocketFactory::getDefault()->createSocket());
-                        try {
-                            wakeupSocket->connect("127.0.0.1", port, 100);
-                            wakeupSocket->close();
-                        } catch (...) {}
-                    }
-                } catch (...) {}
-
-                // Now close the server socket
-                if (server.get() != NULL) {
-                    try {
-                        server->close();
-                    } catch (...) {}
+            // Now close the server socket
+            if (server.get() != NULL)
+            {
+                try
+                {
+                    server->close();
                 }
-            } catch (...) {}
+                catch (...)
+                {
+                }
+            }
         }
+        catch (...)
+        {
+        }
+    }
 
-        virtual void run() {
-            try {
+    virtual void run()
+    {
+        try
+        {
+            started.countDown();
 
-                started.countDown();
+            while (!done)
+            {
+                try
+                {
+                    std::unique_ptr<Socket> socket(server->accept());
+                    socket->setSoLinger(false, 0);
 
-                while (!done) {
-                    try {
-                        std::unique_ptr<Socket> socket(server->accept());
-                        socket->setSoLinger(false, 0);
-
-                        // Immediate fail sometimes.
-                        if (rand.nextBoolean()) {
-                            socket->close();
-                            continue;
-                        }
-
-                        OutputStream* os = socket->getOutputStream();
-                        DataOutputStream dataOut(os);
-
-                        InputStream* is = socket->getInputStream();
-                        DataInputStream dataIn(is);
-
-                        // random sleep before terminate
-                        TimeUnit::MILLISECONDS.sleep(rand.nextInt(20));
-
+                    // Immediate fail sometimes.
+                    if (rand.nextBoolean())
+                    {
                         socket->close();
-                    } catch (SocketTimeoutException& ste) {
-                        // Timeout on accept - check done flag and continue
-                        // This is expected and allows periodic checking of done flag
                         continue;
-                    } catch (IOException& io) {
-                        // IOException during accept usually means socket was closed
-                        // Check if we're shutting down
-                        if (done) {
-                            break;
-                        }
-                        // Otherwise it's an actual error
-                        error = true;
+                    }
+
+                    OutputStream*    os = socket->getOutputStream();
+                    DataOutputStream dataOut(os);
+
+                    InputStream*    is = socket->getInputStream();
+                    DataInputStream dataIn(is);
+
+                    // random sleep before terminate
+                    TimeUnit::MILLISECONDS.sleep(rand.nextInt(20));
+
+                    socket->close();
+                }
+                catch (SocketTimeoutException& ste)
+                {
+                    // Timeout on accept - check done flag and continue
+                    // This is expected and allows periodic checking of done
+                    // flag
+                    continue;
+                }
+                catch (IOException& io)
+                {
+                    // IOException during accept usually means socket was closed
+                    // Check if we're shutting down
+                    if (done)
+                    {
                         break;
                     }
-                }
-
-            } catch (IOException& ex) {
-                // Only set error if not shutting down
-                if (!done) {
+                    // Otherwise it's an actual error
                     error = true;
-                }
-            } catch (...) {
-                if (!done) {
-                    error = true;
+                    break;
                 }
             }
         }
-    };
+        catch (IOException& ex)
+        {
+            // Only set error if not shutting down
+            if (!done)
+            {
+                error = true;
+            }
+        }
+        catch (...)
+        {
+            if (!done)
+            {
+                error = true;
+            }
+        }
+    }
+};
 
-    TestServer* server;
-}
+TestServer* server;
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-void TcpTransportTest::SetUp() {
-
+void TcpTransportTest::SetUp()
+{
     server = new TestServer();
     server->start();
     server->waitUntilStarted();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TcpTransportTest::TearDown() {
-
-    try {
-        if (server == NULL) {
+void TcpTransportTest::TearDown()
+{
+    try
+    {
+        if (server == NULL)
+        {
             return;
         }
 
         server->stop();
         server->waitUntilStopped();
         delete server;
-    } catch (...) {
+    }
+    catch (...)
+    {
         delete server;
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(TcpTransportTest, testTransportCreateWithRadomFailures) {
-
-    Properties properties;
-    OpenWireFormat wireFormat(properties);
+TEST_F(TcpTransportTest, testTransportCreateWithRadomFailures)
+{
+    Properties          properties;
+    OpenWireFormat      wireFormat(properties);
     TcpTransportFactory factory;
 
     int port = server->getLocalPort();
@@ -218,17 +271,30 @@ TEST_F(TcpTransportTest, testTransportCreateWithRadomFailures) {
     Pointer<Transport> transport;
 
     // Test rapid creation with random connect failures.
-    for (int i = 0; i < 1000; ++i) {
-        try {
-             transport = factory.create(connectUri);
-        } catch (Exception& ex) {}
+    for (int i = 0; i < 1000; ++i)
+    {
+        try
+        {
+            transport = factory.create(connectUri);
+        }
+        catch (Exception& ex)
+        {
+        }
 
-        try {
+        try
+        {
             transport->start();
-        } catch (Exception& ex) {}
+        }
+        catch (Exception& ex)
+        {
+        }
 
-        try {
+        try
+        {
             transport->close();
-        } catch (Exception& ex) {}
+        }
+        catch (Exception& ex)
+        {
+        }
     }
 }

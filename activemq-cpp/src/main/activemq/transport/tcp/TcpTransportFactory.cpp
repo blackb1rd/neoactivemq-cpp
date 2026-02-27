@@ -18,15 +18,15 @@
 #include "TcpTransportFactory.h"
 
 #include <activemq/transport/IOTransport.h>
-#include <activemq/transport/tcp/TcpTransport.h>
 #include <activemq/transport/correlator/ResponseCorrelator.h>
-#include <activemq/transport/logging/LoggingTransport.h>
 #include <activemq/transport/inactivity/InactivityMonitor.h>
+#include <activemq/transport/logging/LoggingTransport.h>
+#include <activemq/transport/tcp/TcpTransport.h>
 #include <activemq/util/URISupport.h>
 #include <activemq/wireformat/WireFormat.h>
-#include <decaf/util/Properties.h>
-#include <decaf/lang/Integer.h>
 #include <decaf/lang/Boolean.h>
+#include <decaf/lang/Integer.h>
+#include <decaf/util/Properties.h>
 
 using namespace activemq;
 using namespace activemq::util;
@@ -42,17 +42,20 @@ using namespace decaf::lang;
 using namespace decaf::util;
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Transport> TcpTransportFactory::create(const decaf::net::URI& location) {
-
-    try {
-
-        Properties properties = activemq::util::URISupport::parseQuery(location.getQuery());
+Pointer<Transport> TcpTransportFactory::create(const decaf::net::URI& location)
+{
+    try
+    {
+        Properties properties =
+            activemq::util::URISupport::parseQuery(location.getQuery());
 
         Pointer<WireFormat> wireFormat = this->createWireFormat(properties);
 
-        // Create the initial Composite Transport, then wrap it in the normal Filters
-        // for a non-composite Transport which right now is just a ResponseCorrelator
-        Pointer<Transport> transport(doCreateComposite(location, wireFormat, properties));
+        // Create the initial Composite Transport, then wrap it in the normal
+        // Filters for a non-composite Transport which right now is just a
+        // ResponseCorrelator
+        Pointer<Transport> transport(
+            doCreateComposite(location, wireFormat, properties));
 
         transport.reset(new ResponseCorrelator(transport));
 
@@ -64,11 +67,13 @@ Pointer<Transport> TcpTransportFactory::create(const decaf::net::URI& location) 
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Transport> TcpTransportFactory::createComposite(const decaf::net::URI& location) {
-
-    try {
-
-        Properties properties = activemq::util::URISupport::parseQuery(location.getQuery());
+Pointer<Transport> TcpTransportFactory::createComposite(
+    const decaf::net::URI& location)
+{
+    try
+    {
+        Properties properties =
+            activemq::util::URISupport::parseQuery(location.getQuery());
 
         Pointer<WireFormat> wireFormat = this->createWireFormat(properties);
 
@@ -81,12 +86,13 @@ Pointer<Transport> TcpTransportFactory::createComposite(const decaf::net::URI& l
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Transport> TcpTransportFactory::doCreateComposite(const decaf::net::URI& location,
-                                                          const Pointer<wireformat::WireFormat> wireFormat,
-                                                          const decaf::util::Properties& properties) {
-
-    try {
-
+Pointer<Transport> TcpTransportFactory::doCreateComposite(
+    const decaf::net::URI&                location,
+    const Pointer<wireformat::WireFormat> wireFormat,
+    const decaf::util::Properties&        properties)
+{
+    try
+    {
         Pointer<Transport> transport(new IOTransport(wireFormat));
 
         transport.reset(new TcpTransport(transport, location));
@@ -95,21 +101,26 @@ Pointer<Transport> TcpTransportFactory::doCreateComposite(const decaf::net::URI&
         // are set in the properties object.
         doConfigureTransport(transport, properties);
 
-        if (properties.getProperty("transport.useInactivityMonitor", "true") == "true") {
-            transport.reset(new InactivityMonitor(transport, properties, wireFormat));
+        if (properties.getProperty("transport.useInactivityMonitor", "true") ==
+            "true")
+        {
+            transport.reset(
+                new InactivityMonitor(transport, properties, wireFormat));
         }
 
-        // If command tracing was enabled, wrap the transport with a logging transport.
-        // We support the old CMS value, the ActiveMQ trace value and the NMS useLogging
-        // value in order to be more friendly.
-        if (properties.getProperty("transport.commandTracingEnabled", "false") == "true" ||
+        // If command tracing was enabled, wrap the transport with a logging
+        // transport. We support the old CMS value, the ActiveMQ trace value and
+        // the NMS useLogging value in order to be more friendly.
+        if (properties.getProperty("transport.commandTracingEnabled",
+                                   "false") == "true" ||
             properties.getProperty("transport.useLogging", "false") == "true" ||
-            properties.getProperty("transport.trace", "false") == "true") {
-
+            properties.getProperty("transport.trace", "false") == "true")
+        {
             transport.reset(new LoggingTransport(transport));
         }
 
-        if (wireFormat->hasNegotiator()) {
+        if (wireFormat->hasNegotiator())
+        {
             transport = wireFormat->createNegotiator(transport);
         }
 
@@ -121,22 +132,32 @@ Pointer<Transport> TcpTransportFactory::doCreateComposite(const decaf::net::URI&
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TcpTransportFactory::doConfigureTransport(Pointer<Transport> transport,
-                                               const decaf::util::Properties& properties) {
-
-    try {
-
+void TcpTransportFactory::doConfigureTransport(
+    Pointer<Transport>             transport,
+    const decaf::util::Properties& properties)
+{
+    try
+    {
         Pointer<TcpTransport> tcp = transport.dynamicCast<TcpTransport>();
 
-        tcp->setInputBufferSize(Integer::parseInt(properties.getProperty("inputBufferSize", "8192")));
-        tcp->setOutputBufferSize(Integer::parseInt(properties.getProperty("outputBufferSize", "8192")));
-        tcp->setTrace(Boolean::parseBoolean(properties.getProperty("transport.tcpTracingEnabled", "false")));
-        tcp->setLinger(Integer::parseInt(properties.getProperty("soLinger", "-1")));
-        tcp->setKeepAlive(Boolean::parseBoolean(properties.getProperty("soKeepAlive", "false")));
-        tcp->setReceiveBufferSize(Integer::parseInt(properties.getProperty("soReceiveBufferSize", "-1")));
-        tcp->setSendBufferSize(Integer::parseInt(properties.getProperty("soSendBufferSize", "-1")));
-        tcp->setTcpNoDelay(Boolean::parseBoolean(properties.getProperty("tcpNoDelay", "true")));
-        tcp->setConnectTimeout(Integer::parseInt(properties.getProperty("soConnectTimeout", "3000")));
+        tcp->setInputBufferSize(Integer::parseInt(
+            properties.getProperty("inputBufferSize", "8192")));
+        tcp->setOutputBufferSize(Integer::parseInt(
+            properties.getProperty("outputBufferSize", "8192")));
+        tcp->setTrace(Boolean::parseBoolean(
+            properties.getProperty("transport.tcpTracingEnabled", "false")));
+        tcp->setLinger(
+            Integer::parseInt(properties.getProperty("soLinger", "-1")));
+        tcp->setKeepAlive(Boolean::parseBoolean(
+            properties.getProperty("soKeepAlive", "false")));
+        tcp->setReceiveBufferSize(Integer::parseInt(
+            properties.getProperty("soReceiveBufferSize", "-1")));
+        tcp->setSendBufferSize(Integer::parseInt(
+            properties.getProperty("soSendBufferSize", "-1")));
+        tcp->setTcpNoDelay(Boolean::parseBoolean(
+            properties.getProperty("tcpNoDelay", "true")));
+        tcp->setConnectTimeout(Integer::parseInt(
+            properties.getProperty("soConnectTimeout", "3000")));
     }
     AMQ_CATCH_RETHROW(ActiveMQException)
     AMQ_CATCH_EXCEPTION_CONVERT(Exception, ActiveMQException)

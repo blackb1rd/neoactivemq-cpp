@@ -17,18 +17,27 @@
 
 #include <activemq/test/SlowListenerTest.h>
 
-namespace activemq{
-namespace test{
-namespace stomp{
-    class StompSlowListenerTest : public SlowListenerTest {
-public:
-        StompSlowListenerTest();
-        virtual ~StompSlowListenerTest();
-        std::string getBrokerURL() const override {
-            return activemq::util::IntegrationCommon::getInstance().getStompURL();
-        }
-    };
-}}}
+namespace activemq
+{
+namespace test
+{
+    namespace stomp
+    {
+        class StompSlowListenerTest : public SlowListenerTest
+        {
+        public:
+            StompSlowListenerTest();
+            virtual ~StompSlowListenerTest();
+
+            std::string getBrokerURL() const override
+            {
+                return activemq::util::IntegrationCommon::getInstance()
+                    .getStompURL();
+            }
+        };
+    }  // namespace stomp
+}  // namespace test
+}  // namespace activemq
 
 using namespace std;
 using namespace cms;
@@ -38,13 +47,18 @@ using namespace activemq::test::stomp;
 using namespace activemq::util;
 
 ////////////////////////////////////////////////////////////////////////////////
-StompSlowListenerTest::StompSlowListenerTest() {
+StompSlowListenerTest::StompSlowListenerTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-StompSlowListenerTest::~StompSlowListenerTest() {
+StompSlowListenerTest::~StompSlowListenerTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Test registration
-TEST_F(StompSlowListenerTest, DISABLED_testSlowListener) { testSlowListener(); }
+TEST_F(StompSlowListenerTest, DISABLED_testSlowListener)
+{
+    testSlowListener();
+}

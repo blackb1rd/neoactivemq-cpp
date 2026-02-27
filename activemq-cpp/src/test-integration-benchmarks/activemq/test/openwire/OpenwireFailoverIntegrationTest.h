@@ -18,90 +18,98 @@
 #ifndef _ACTIVEMQ_TEST_OPENWIRE_OPENWIREFAILOVERINTEGRATIONTEST_H_
 #define _ACTIVEMQ_TEST_OPENWIRE_OPENWIREFAILOVERINTEGRATIONTEST_H_
 
-#include <gtest/gtest.h>
 #include <activemq/util/IntegrationCommon.h>
+#include <gtest/gtest.h>
 
 #include <cms/Connection.h>
-#include <cms/Session.h>
-#include <cms/MessageProducer.h>
 #include <cms/MessageConsumer.h>
+#include <cms/MessageProducer.h>
+#include <cms/Session.h>
 
 #include <memory>
 #include <string>
 
-namespace activemq {
-namespace test {
-namespace openwire {
-
-    /**
-     * Integration tests for failover transport functionality.
-     *
-     * REQUIRES: docker compose --profile failover up
-     *
-     * These tests verify:
-     * - Failover connection to multiple brokers
-     * - Reconnection when primary broker goes down
-     * - Message delivery during failover
-     * - Connection recovery after broker restart
-     */
-    class OpenwireFailoverIntegrationTest : public ::testing::Test {
-public:
-
-        OpenwireFailoverIntegrationTest();
-        virtual ~OpenwireFailoverIntegrationTest();
-
-        void SetUp() override;
-        void TearDown() override;
+namespace activemq
+{
+namespace test
+{
+    namespace openwire
+    {
 
         /**
-         * Test basic failover connection establishment
+         * Integration tests for failover transport functionality.
+         *
+         * REQUIRES: docker compose --profile failover up
+         *
+         * These tests verify:
+         * - Failover connection to multiple brokers
+         * - Reconnection when primary broker goes down
+         * - Message delivery during failover
+         * - Connection recovery after broker restart
          */
-        void testFailoverConnection();
+        class OpenwireFailoverIntegrationTest : public ::testing::Test
+        {
+        public:
+            OpenwireFailoverIntegrationTest();
+            virtual ~OpenwireFailoverIntegrationTest();
 
-        /**
-         * Test send/receive works normally with failover URL
-         */
-        void testSendReceiveWithFailover();
+            void SetUp() override;
+            void TearDown() override;
 
-        /**
-         * Test that connection reconnects when broker goes down.
-         * NOTE: This test requires manually stopping/starting brokers
-         * during execution to fully test, otherwise it tests the
-         * reconnection capability exists.
-         */
-        void testFailoverReconnectOnBrokerDown();
+            /**
+             * Test basic failover connection establishment
+             */
+            void testFailoverConnection();
 
-        /**
-         * Test message delivery continues after failover
-         */
-        void testMessageDeliveryDuringFailover();
+            /**
+             * Test send/receive works normally with failover URL
+             */
+            void testSendReceiveWithFailover();
 
-        /**
-         * Test async consumer with failover transport
-         */
-        void testFailoverWithAsyncConsumer();
+            /**
+             * Test that connection reconnects when broker goes down.
+             * NOTE: This test requires manually stopping/starting brokers
+             * during execution to fully test, otherwise it tests the
+             * reconnection capability exists.
+             */
+            void testFailoverReconnectOnBrokerDown();
 
-    protected:
+            /**
+             * Test message delivery continues after failover
+             */
+            void testMessageDeliveryDuringFailover();
 
-        std::string getFailoverURL() const {
-            return activemq::util::IntegrationCommon::getInstance().getFailoverURL();
-        }
+            /**
+             * Test async consumer with failover transport
+             */
+            void testFailoverWithAsyncConsumer();
 
-        std::string getBroker1URL() const {
-            return activemq::util::IntegrationCommon::getInstance().getOpenwireURL1();
-        }
+        protected:
+            std::string getFailoverURL() const
+            {
+                return activemq::util::IntegrationCommon::getInstance()
+                    .getFailoverURL();
+            }
 
-        std::string getBroker2URL() const {
-            return activemq::util::IntegrationCommon::getInstance().getOpenwireURL2();
-        }
+            std::string getBroker1URL() const
+            {
+                return activemq::util::IntegrationCommon::getInstance()
+                    .getOpenwireURL1();
+            }
 
-    private:
+            std::string getBroker2URL() const
+            {
+                return activemq::util::IntegrationCommon::getInstance()
+                    .getOpenwireURL2();
+            }
 
-        std::unique_ptr<cms::Connection> connection;
-        std::unique_ptr<cms::Session> session;
+        private:
+            std::unique_ptr<cms::Connection> connection;
+            std::unique_ptr<cms::Session>    session;
+        };
 
-    };
-
-}}}
+    }  // namespace openwire
+}  // namespace test
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_TEST_OPENWIRE_OPENWIREFAILOVERINTEGRATIONTEST_H_ */

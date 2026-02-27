@@ -20,42 +20,46 @@
 
 #include <activemq/util/Config.h>
 
-#include <cms/XASession.h>
 #include <activemq/core/kernels/ActiveMQSessionKernel.h>
+#include <cms/XASession.h>
 
-namespace activemq {
-namespace core {
-namespace kernels {
+namespace activemq
+{
+namespace core
+{
+    namespace kernels
+    {
 
-    using decaf::lang::Pointer;
+        using decaf::lang::Pointer;
 
-    class AMQCPP_API ActiveMQXASessionKernel : public cms::XASession, public ActiveMQSessionKernel {
-    public:
+        class AMQCPP_API ActiveMQXASessionKernel : public cms::XASession,
+                                                   public ActiveMQSessionKernel
+        {
+        public:
+            ActiveMQXASessionKernel(
+                ActiveMQConnection*                 connection,
+                const Pointer<commands::SessionId>& sessionId,
+                const decaf::util::Properties&      properties);
 
-        ActiveMQXASessionKernel(ActiveMQConnection* connection,
-                                const Pointer<commands::SessionId>& sessionId,
-                                const decaf::util::Properties& properties);
+            virtual ~ActiveMQXASessionKernel();
 
-        virtual ~ActiveMQXASessionKernel();
+        public:  // Override ActiveMQSessionKernel methods to make them XA Aware
+            virtual bool isTransacted() const;
 
-    public:  // Override ActiveMQSessionKernel methods to make them XA Aware
+            virtual bool isAutoAcknowledge() const;
 
-        virtual bool isTransacted() const;
+            virtual void doStartTransaction();
 
-        virtual bool isAutoAcknowledge() const;
+            virtual void commit();
 
-        virtual void doStartTransaction();
+            virtual void rollback();
 
-        virtual void commit();
+        public:  // XASession overrides
+            virtual cms::XAResource* getXAResource() const;
+        };
 
-        virtual void rollback();
-
-    public:  // XASession overrides
-
-        virtual cms::XAResource* getXAResource() const;
-
-    };
-
-}}}
+    }  // namespace kernels
+}  // namespace core
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_CORE_KERNELS_ACTIVEMQXASESSIONKERNEL_H_ */

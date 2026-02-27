@@ -18,43 +18,45 @@
 #ifndef _ACTIVEMQ_TRANSPORT_RESPONSECALLBACK_H_
 #define _ACTIVEMQ_TRANSPORT_RESPONSECALLBACK_H_
 
-#include <activemq/util/Config.h>
 #include <activemq/commands/Response.h>
+#include <activemq/util/Config.h>
 
 #include <decaf/lang/Pointer.h>
 
-namespace activemq {
-namespace transport {
+namespace activemq
+{
+namespace transport
+{
 
     /**
      * Allows an async send to complete at a later time via a Response event.
      */
-    class AMQCPP_API ResponseCallback {
+    class AMQCPP_API ResponseCallback
+    {
     private:
-
         ResponseCallback(const ResponseCallback&);
-        ResponseCallback& operator= (const ResponseCallback&);
+        ResponseCallback& operator=(const ResponseCallback&);
 
     public:
-
         ResponseCallback();
         virtual ~ResponseCallback();
 
     public:
-
         /**
          * When an Asynchronous operations completes this event is fired.
          *
-         * The provided FutureResponse can either contain the result of the operation
-         * or an exception indicating that the operation failed.
+         * The provided FutureResponse can either contain the result of the
+         * operation or an exception indicating that the operation failed.
          *
          * @param response
-         *      The result of the asynchronous operation that registered this call-back.
+         *      The result of the asynchronous operation that registered this
+         * call-back.
          */
-        virtual void onComplete(decaf::lang::Pointer<commands::Response> response) = 0;
-
+        virtual void onComplete(
+            decaf::lang::Pointer<commands::Response> response) = 0;
     };
 
-}}
+}  // namespace transport
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_TRANSPORT_RESPONSECALLBACK_H_ */

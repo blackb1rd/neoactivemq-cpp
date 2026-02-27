@@ -20,7 +20,7 @@
 
 // Turn off warning message for ignored exception specification
 #ifdef _MSC_VER
-#pragma warning( disable : 4290 )
+#pragma warning(disable : 4290)
 #endif
 
 #include <activemq/commands/BaseCommand.h>
@@ -29,8 +29,10 @@
 #include <string>
 #include <vector>
 
-namespace activemq {
-namespace commands {
+namespace activemq
+{
+namespace commands
+{
 
     using decaf::lang::Pointer;
 
@@ -43,23 +45,20 @@ namespace commands {
      *         in the activemq-cpp-openwire-generator module
      *
      */
-    class AMQCPP_API ReplayCommand : public BaseCommand {
+    class AMQCPP_API ReplayCommand : public BaseCommand
+    {
     protected:
-
         int firstNakNumber;
         int lastNakNumber;
 
     public:
-
         const static unsigned char ID_REPLAYCOMMAND = 65;
 
     private:
-
         ReplayCommand(const ReplayCommand&);
-        ReplayCommand& operator= (const ReplayCommand&);
+        ReplayCommand& operator=(const ReplayCommand&);
 
     public:
-
         ReplayCommand();
 
         virtual ~ReplayCommand();
@@ -74,23 +73,24 @@ namespace commands {
 
         virtual bool equals(const DataStructure* value) const;
 
-        virtual int getFirstNakNumber() const;
+        virtual int  getFirstNakNumber() const;
         virtual void setFirstNakNumber(int firstNakNumber);
 
-        virtual int getLastNakNumber() const;
+        virtual int  getLastNakNumber() const;
         virtual void setLastNakNumber(int lastNakNumber);
 
         /**
          * @return an answer of true to the isReplayCommand() query.
          */
-        virtual bool isReplayCommand() const {
+        virtual bool isReplayCommand() const
+        {
             return true;
         }
 
         virtual Pointer<Command> visit(activemq::state::CommandVisitor* visitor);
-
     };
 
-}}
+}  // namespace commands
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_COMMANDS_REPLAYCOMMAND_H_*/

@@ -38,18 +38,24 @@ using namespace decaf::lang::exceptions;
  */
 
 ////////////////////////////////////////////////////////////////////////////////
-JournalTransaction::JournalTransaction() :
-    BaseDataStructure(), transactionId(NULL), type(0), wasPrepared(false) {
-
+JournalTransaction::JournalTransaction()
+    : BaseDataStructure(),
+      transactionId(NULL),
+      type(0),
+      wasPrepared(false)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-JournalTransaction::~JournalTransaction() {
+JournalTransaction::~JournalTransaction()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-JournalTransaction* JournalTransaction::cloneDataStructure() const {
-    std::unique_ptr<JournalTransaction> journalTransaction(new JournalTransaction());
+JournalTransaction* JournalTransaction::cloneDataStructure() const
+{
+    std::unique_ptr<JournalTransaction> journalTransaction(
+        new JournalTransaction());
 
     // Copy the data from the base class or classes
     journalTransaction->copyDataStructure(this);
@@ -58,18 +64,22 @@ JournalTransaction* JournalTransaction::cloneDataStructure() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void JournalTransaction::copyDataStructure(const DataStructure* src) {
-
+void JournalTransaction::copyDataStructure(const DataStructure* src)
+{
     // Protect against invalid self assignment.
-    if (this == src) {
+    if (this == src)
+    {
         return;
     }
 
-    const JournalTransaction* srcPtr = dynamic_cast<const JournalTransaction*>(src);
+    const JournalTransaction* srcPtr =
+        dynamic_cast<const JournalTransaction*>(src);
 
-    if (srcPtr == NULL || src == NULL) {
+    if (srcPtr == NULL || src == NULL)
+    {
         throw decaf::lang::exceptions::NullPointerException(
-            __FILE__, __LINE__,
+            __FILE__,
+            __LINE__,
             "JournalTransaction::copyDataStructure - src is NULL or invalid");
     }
 
@@ -82,20 +92,24 @@ void JournalTransaction::copyDataStructure(const DataStructure* src) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-unsigned char JournalTransaction::getDataStructureType() const {
+unsigned char JournalTransaction::getDataStructureType() const
+{
     return JournalTransaction::ID_JOURNALTRANSACTION;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string JournalTransaction::toString() const {
-
+std::string JournalTransaction::toString() const
+{
     ostringstream stream;
 
     stream << "JournalTransaction { ";
     stream << "TransactionId = ";
-    if (this->getTransactionId() != NULL) {
+    if (this->getTransactionId() != NULL)
+    {
         stream << this->getTransactionId()->toString();
-    } else {
+    }
+    else
+    {
         stream << "NULL";
     }
     stream << ", ";
@@ -108,69 +122,88 @@ std::string JournalTransaction::toString() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool JournalTransaction::equals(const DataStructure* value) const {
-
-    if (this == value) {
+bool JournalTransaction::equals(const DataStructure* value) const
+{
+    if (this == value)
+    {
         return true;
     }
 
-    const JournalTransaction* valuePtr = dynamic_cast<const JournalTransaction*>(value);
+    const JournalTransaction* valuePtr =
+        dynamic_cast<const JournalTransaction*>(value);
 
-    if (valuePtr == NULL || value == NULL) {
+    if (valuePtr == NULL || value == NULL)
+    {
         return false;
     }
 
-    if (this->getTransactionId() != NULL) {
-        if (!this->getTransactionId()->equals(valuePtr->getTransactionId().get())) {
+    if (this->getTransactionId() != NULL)
+    {
+        if (!this->getTransactionId()->equals(
+                valuePtr->getTransactionId().get()))
+        {
             return false;
         }
-    } else if (valuePtr->getTransactionId() != NULL) {
+    }
+    else if (valuePtr->getTransactionId() != NULL)
+    {
         return false;
     }
-    if (this->getType() != valuePtr->getType()) {
+    if (this->getType() != valuePtr->getType())
+    {
         return false;
     }
-    if (this->getWasPrepared() != valuePtr->getWasPrepared()) {
+    if (this->getWasPrepared() != valuePtr->getWasPrepared())
+    {
         return false;
     }
-    if (!BaseDataStructure::equals(value)) {
+    if (!BaseDataStructure::equals(value))
+    {
         return false;
     }
     return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const decaf::lang::Pointer<TransactionId>& JournalTransaction::getTransactionId() const {
+const decaf::lang::Pointer<TransactionId>&
+JournalTransaction::getTransactionId() const
+{
     return transactionId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<TransactionId>& JournalTransaction::getTransactionId() {
+decaf::lang::Pointer<TransactionId>& JournalTransaction::getTransactionId()
+{
     return transactionId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void JournalTransaction::setTransactionId(const decaf::lang::Pointer<TransactionId>& transactionId) {
+void JournalTransaction::setTransactionId(
+    const decaf::lang::Pointer<TransactionId>& transactionId)
+{
     this->transactionId = transactionId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-unsigned char JournalTransaction::getType() const {
+unsigned char JournalTransaction::getType() const
+{
     return type;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void JournalTransaction::setType(unsigned char type) {
+void JournalTransaction::setType(unsigned char type)
+{
     this->type = type;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool JournalTransaction::getWasPrepared() const {
+bool JournalTransaction::getWasPrepared() const
+{
     return wasPrepared;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void JournalTransaction::setWasPrepared(bool wasPrepared) {
+void JournalTransaction::setWasPrepared(bool wasPrepared)
+{
     this->wasPrepared = wasPrepared;
 }
-

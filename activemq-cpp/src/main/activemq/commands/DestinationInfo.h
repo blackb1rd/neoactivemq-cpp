@@ -20,7 +20,7 @@
 
 // Turn off warning message for ignored exception specification
 #ifdef _MSC_VER
-#pragma warning( disable : 4290 )
+#pragma warning(disable : 4290)
 #endif
 
 #include <activemq/commands/ActiveMQDestination.h>
@@ -32,8 +32,10 @@
 #include <string>
 #include <vector>
 
-namespace activemq {
-namespace commands {
+namespace activemq
+{
+namespace commands
+{
 
     using decaf::lang::Pointer;
 
@@ -46,26 +48,23 @@ namespace commands {
      *         in the activemq-cpp-openwire-generator module
      *
      */
-    class AMQCPP_API DestinationInfo : public BaseCommand {
+    class AMQCPP_API DestinationInfo : public BaseCommand
+    {
     protected:
-
-        Pointer<ConnectionId> connectionId;
-        Pointer<ActiveMQDestination> destination;
-        unsigned char operationType;
-        long long timeout;
-        std::vector< decaf::lang::Pointer<BrokerId> > brokerPath;
+        Pointer<ConnectionId>                       connectionId;
+        Pointer<ActiveMQDestination>                destination;
+        unsigned char                               operationType;
+        long long                                   timeout;
+        std::vector<decaf::lang::Pointer<BrokerId>> brokerPath;
 
     public:
-
         const static unsigned char ID_DESTINATIONINFO = 8;
 
     private:
-
         DestinationInfo(const DestinationInfo&);
-        DestinationInfo& operator= (const DestinationInfo&);
+        DestinationInfo& operator=(const DestinationInfo&);
 
     public:
-
         DestinationInfo();
 
         virtual ~DestinationInfo();
@@ -81,27 +80,30 @@ namespace commands {
         virtual bool equals(const DataStructure* value) const;
 
         virtual const Pointer<ConnectionId>& getConnectionId() const;
-        virtual Pointer<ConnectionId>& getConnectionId();
+        virtual Pointer<ConnectionId>&       getConnectionId();
         virtual void setConnectionId(const Pointer<ConnectionId>& connectionId);
 
         virtual const Pointer<ActiveMQDestination>& getDestination() const;
-        virtual Pointer<ActiveMQDestination>& getDestination();
-        virtual void setDestination(const Pointer<ActiveMQDestination>& destination);
+        virtual Pointer<ActiveMQDestination>&       getDestination();
+        virtual void                                setDestination(
+                                           const Pointer<ActiveMQDestination>& destination);
 
         virtual unsigned char getOperationType() const;
-        virtual void setOperationType(unsigned char operationType);
+        virtual void          setOperationType(unsigned char operationType);
 
         virtual long long getTimeout() const;
-        virtual void setTimeout(long long timeout);
+        virtual void      setTimeout(long long timeout);
 
-        virtual const std::vector< decaf::lang::Pointer<BrokerId> >& getBrokerPath() const;
-        virtual std::vector< decaf::lang::Pointer<BrokerId> >& getBrokerPath();
-        virtual void setBrokerPath(const std::vector< decaf::lang::Pointer<BrokerId> >& brokerPath);
+        virtual const std::vector<decaf::lang::Pointer<BrokerId>>&
+        getBrokerPath() const;
+        virtual std::vector<decaf::lang::Pointer<BrokerId>>& getBrokerPath();
+        virtual void                                         setBrokerPath(
+                                                    const std::vector<decaf::lang::Pointer<BrokerId>>& brokerPath);
 
         virtual Pointer<Command> visit(activemq::state::CommandVisitor* visitor);
-
     };
 
-}}
+}  // namespace commands
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_COMMANDS_DESTINATIONINFO_H_*/

@@ -20,12 +20,14 @@
 
 #include <activemq/util/Config.h>
 #include <activemq/wireformat/WireFormat.h>
-#include <decaf/util/Properties.h>
 #include <decaf/lang/Pointer.h>
 #include <decaf/lang/exceptions/IllegalStateException.h>
+#include <decaf/util/Properties.h>
 
-namespace activemq {
-namespace wireformat {
+namespace activemq
+{
+namespace wireformat
+{
 
     using decaf::lang::Pointer;
 
@@ -35,9 +37,9 @@ namespace wireformat {
      * the properties that are set in the passed <code>Properties</code>
      * object.
      */
-    class AMQCPP_API WireFormatFactory {
+    class AMQCPP_API WireFormatFactory
+    {
     public:
-
         virtual ~WireFormatFactory();
 
         /**
@@ -49,12 +51,14 @@ namespace wireformat {
          *
          * @return Pointer to a new instance of a WireFormat object.
          *
-         * @throws IllegalStateException if the factory has not been initialized.
+         * @throws IllegalStateException if the factory has not been
+         * initialized.
          */
-        virtual Pointer<WireFormat> createWireFormat(const decaf::util::Properties& properties) = 0;
-
+        virtual Pointer<WireFormat> createWireFormat(
+            const decaf::util::Properties& properties) = 0;
     };
 
-}}
+}  // namespace wireformat
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_WIREFORMAT_WIREFORMATFACTORY_H_*/

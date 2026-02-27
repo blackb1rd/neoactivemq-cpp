@@ -19,81 +19,95 @@
 
 #include <decaf/lang/Exception.h>
 
-namespace decaf {
-namespace lang {
-namespace exceptions {
+namespace decaf
+{
+namespace lang
+{
+    namespace exceptions
+    {
 
-    /*
-     * Thrown when an unsupported method is called or an operation cannot be performed
-     * because it was not implemented.
-     *
-     * @since 1.0
-     */
-    class DECAF_API UnsupportedOperationException : public lang::Exception {
-    public:
-
-        /**
-         * Default Constructor
-         */
-        UnsupportedOperationException();
-
-        /**
-         * Conversion Constructor from some other Exception
-         * @param ex An exception that should become this type of Exception
-         */
-        UnsupportedOperationException(const Exception& ex);
-
-        /**
-         * Copy Constructor
-         * @param ex An exception that should become this type of Exception
-         */
-        UnsupportedOperationException(const UnsupportedOperationException& ex);
-
-        /**
-         * Constructor - Initializes the file name and line number where
-         * this message occurred.  Sets the message to report, using an
-         * optional list of arguments to parse into the message
-         * @param file The file name where exception occurs
-         * @param lineNumber The line number where the exception occurred.
-         * @param cause The exception that was the cause for this one to be thrown.
-         * @param msg The message to report
-         * @param ... list of primitives that are formatted into the message
-         */
-        UnsupportedOperationException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...);
-
-        /**
-         * Constructor
-         * @param cause Pointer to the exception that caused this one to
-         * be thrown, the object is cloned caller retains ownership.
-         */
-        UnsupportedOperationException(const std::exception* cause);
-
-        /**
-         * Constructor - Initializes the file name and line number where
-         * this message occurred.  Sets the message to report, using an
-         * optional list of arguments to parse into the message
-         * @param file The file name where exception occurs
-         * @param lineNumber The line number where the exception occurred.
-         * @param msg The message to report
-         * @param ... list of primitives that are formatted into the message
-         */
-        UnsupportedOperationException(const char* file, const int lineNumber, const char* msg, ...);
-
-        /**
-         * Clones this exception.  This is useful for cases where you need
-         * to preserve the type of the original exception as well as the message.
-         * All subclasses should override.
+        /*
+         * Thrown when an unsupported method is called or an operation cannot be
+         * performed because it was not implemented.
          *
-         * @return an new Exception instance that is a copy of this one.
+         * @since 1.0
          */
-        virtual UnsupportedOperationException* clone() const {
-            return new UnsupportedOperationException(*this);
-        }
+        class DECAF_API UnsupportedOperationException : public lang::Exception
+        {
+        public:
+            /**
+             * Default Constructor
+             */
+            UnsupportedOperationException();
 
-        virtual ~UnsupportedOperationException() throw();
+            /**
+             * Conversion Constructor from some other Exception
+             * @param ex An exception that should become this type of Exception
+             */
+            UnsupportedOperationException(const Exception& ex);
 
-    };
+            /**
+             * Copy Constructor
+             * @param ex An exception that should become this type of Exception
+             */
+            UnsupportedOperationException(
+                const UnsupportedOperationException& ex);
 
-}}}
+            /**
+             * Constructor - Initializes the file name and line number where
+             * this message occurred.  Sets the message to report, using an
+             * optional list of arguments to parse into the message
+             * @param file The file name where exception occurs
+             * @param lineNumber The line number where the exception occurred.
+             * @param cause The exception that was the cause for this one to be
+             * thrown.
+             * @param msg The message to report
+             * @param ... list of primitives that are formatted into the message
+             */
+            UnsupportedOperationException(const char*           file,
+                                          const int             lineNumber,
+                                          const std::exception* cause,
+                                          const char*           msg,
+                                          ...);
+
+            /**
+             * Constructor
+             * @param cause Pointer to the exception that caused this one to
+             * be thrown, the object is cloned caller retains ownership.
+             */
+            UnsupportedOperationException(const std::exception* cause);
+
+            /**
+             * Constructor - Initializes the file name and line number where
+             * this message occurred.  Sets the message to report, using an
+             * optional list of arguments to parse into the message
+             * @param file The file name where exception occurs
+             * @param lineNumber The line number where the exception occurred.
+             * @param msg The message to report
+             * @param ... list of primitives that are formatted into the message
+             */
+            UnsupportedOperationException(const char* file,
+                                          const int   lineNumber,
+                                          const char* msg,
+                                          ...);
+
+            /**
+             * Clones this exception.  This is useful for cases where you need
+             * to preserve the type of the original exception as well as the
+             * message. All subclasses should override.
+             *
+             * @return an new Exception instance that is a copy of this one.
+             */
+            virtual UnsupportedOperationException* clone() const
+            {
+                return new UnsupportedOperationException(*this);
+            }
+
+            virtual ~UnsupportedOperationException() throw();
+        };
+
+    }  // namespace exceptions
+}  // namespace lang
+}  // namespace decaf
 
 #endif /*_DECAF_LANG_EXCEPTIONS_UNSUPPORTEDOPERATIONEXCEPTION_H_*/

@@ -26,17 +26,26 @@ using namespace decaf;
 using namespace decaf::lang;
 
 ////////////////////////////////////////////////////////////////////////////////
-Tracked::Tracked() : commands::Response(), runnable() {
+Tracked::Tracked()
+    : commands::Response(),
+      runnable()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Tracked::Tracked(Pointer<Runnable> runnable) : commands::Response(), runnable(runnable) {
+Tracked::Tracked(Pointer<Runnable> runnable)
+    : commands::Response(),
+      runnable(runnable)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Tracked::onResponse() {
-    try {
-        if (this->runnable != NULL) {
+void Tracked::onResponse()
+{
+    try
+    {
+        if (this->runnable != NULL)
+        {
             this->runnable->run();
             this->runnable.reset(NULL);
         }

@@ -17,14 +17,14 @@
 
 #include "DiscoveryTransportFactory.h"
 
-#include <activemq/transport/discovery/DiscoveryTransport.h>
+#include <activemq/exceptions/ActiveMQException.h>
+#include <activemq/transport/correlator/ResponseCorrelator.h>
 #include <activemq/transport/discovery/DiscoveryAgentFactory.h>
 #include <activemq/transport/discovery/DiscoveryAgentRegistry.h>
+#include <activemq/transport/discovery/DiscoveryTransport.h>
 #include <activemq/transport/failover/FailoverTransport.h>
-#include <activemq/transport/correlator/ResponseCorrelator.h>
 #include <activemq/util/CompositeData.h>
 #include <activemq/util/URISupport.h>
-#include <activemq/exceptions/ActiveMQException.h>
 
 #include <decaf/lang/Boolean.h>
 #include <decaf/lang/Integer.h>
@@ -42,14 +42,16 @@ using namespace activemq::transport::failover;
 using namespace activemq::transport::correlator;
 
 ////////////////////////////////////////////////////////////////////////////////
-DiscoveryTransportFactory::~DiscoveryTransportFactory() {
+DiscoveryTransportFactory::~DiscoveryTransportFactory()
+{
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-Pointer<Transport> DiscoveryTransportFactory::create(const decaf::net::URI& location) {
-
-    try {
-
+Pointer<Transport> DiscoveryTransportFactory::create(
+    const decaf::net::URI& location)
+{
+    try
+    {
         // Create the initial Transport, then wrap it in the normal Filters
         Pointer<Transport> transport(doCreateTransport(location));
 
@@ -64,8 +66,11 @@ Pointer<Transport> DiscoveryTransportFactory::create(const decaf::net::URI& loca
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-Pointer<Transport> DiscoveryTransportFactory::createComposite(const decaf::net::URI& location) {
-    try {
+Pointer<Transport> DiscoveryTransportFactory::createComposite(
+    const decaf::net::URI& location)
+{
+    try
+    {
         return doCreateTransport(location);
     }
     AMQ_CATCH_RETHROW(ActiveMQException)
@@ -74,9 +79,11 @@ Pointer<Transport> DiscoveryTransportFactory::createComposite(const decaf::net::
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-Pointer<Transport> DiscoveryTransportFactory::doCreateTransport(const decaf::net::URI& location) {
-
-    try {
+Pointer<Transport> DiscoveryTransportFactory::doCreateTransport(
+    const decaf::net::URI& location)
+{
+    try
+    {
         CompositeData composite = URISupport::parseComposite(location);
 
         // TODO create using factory and pass in params.
@@ -89,7 +96,8 @@ Pointer<Transport> DiscoveryTransportFactory::doCreateTransport(const decaf::net
         URI agentURI = composite.getComponents().get(0);
 
         DiscoveryAgentFactory* agentFactory =
-            DiscoveryAgentRegistry::getInstance().findFactory(agentURI.getScheme());
+            DiscoveryAgentRegistry::getInstance().findFactory(
+                agentURI.getScheme());
 
         // TODO error?
 

@@ -20,7 +20,7 @@
 
 // Turn off warning message for ignored exception specification
 #ifdef _MSC_VER
-#pragma warning( disable : 4290 )
+#pragma warning(disable : 4290)
 #endif
 
 #include <activemq/commands/BaseCommand.h>
@@ -30,8 +30,10 @@
 #include <string>
 #include <vector>
 
-namespace activemq {
-namespace commands {
+namespace activemq
+{
+namespace commands
+{
 
     using decaf::lang::Pointer;
 
@@ -44,24 +46,21 @@ namespace commands {
      *         in the activemq-cpp-openwire-generator module
      *
      */
-    class AMQCPP_API RemoveSubscriptionInfo : public BaseCommand {
+    class AMQCPP_API RemoveSubscriptionInfo : public BaseCommand
+    {
     protected:
-
         Pointer<ConnectionId> connectionId;
-        std::string subcriptionName;
-        std::string clientId;
+        std::string           subcriptionName;
+        std::string           clientId;
 
     public:
-
         const static unsigned char ID_REMOVESUBSCRIPTIONINFO = 9;
 
     private:
-
         RemoveSubscriptionInfo(const RemoveSubscriptionInfo&);
-        RemoveSubscriptionInfo& operator= (const RemoveSubscriptionInfo&);
+        RemoveSubscriptionInfo& operator=(const RemoveSubscriptionInfo&);
 
     public:
-
         RemoveSubscriptionInfo();
 
         virtual ~RemoveSubscriptionInfo();
@@ -77,28 +76,29 @@ namespace commands {
         virtual bool equals(const DataStructure* value) const;
 
         virtual const Pointer<ConnectionId>& getConnectionId() const;
-        virtual Pointer<ConnectionId>& getConnectionId();
+        virtual Pointer<ConnectionId>&       getConnectionId();
         virtual void setConnectionId(const Pointer<ConnectionId>& connectionId);
 
         virtual const std::string& getSubcriptionName() const;
-        virtual std::string& getSubcriptionName();
+        virtual std::string&       getSubcriptionName();
         virtual void setSubcriptionName(const std::string& subcriptionName);
 
         virtual const std::string& getClientId() const;
-        virtual std::string& getClientId();
-        virtual void setClientId(const std::string& clientId);
+        virtual std::string&       getClientId();
+        virtual void               setClientId(const std::string& clientId);
 
         /**
          * @return an answer of true to the isRemoveSubscriptionInfo() query.
          */
-        virtual bool isRemoveSubscriptionInfo() const {
+        virtual bool isRemoveSubscriptionInfo() const
+        {
             return true;
         }
 
         virtual Pointer<Command> visit(activemq::state::CommandVisitor* visitor);
-
     };
 
-}}
+}  // namespace commands
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_COMMANDS_REMOVESUBSCRIPTIONINFO_H_*/

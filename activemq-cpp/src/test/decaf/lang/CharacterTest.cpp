@@ -15,33 +15,32 @@
  * limitations under the License.
  */
 
-#include <gtest/gtest.h>
 #include <decaf/lang/Character.h>
+#include <gtest/gtest.h>
 
 using namespace decaf;
 using namespace decaf::lang;
 
-    class CharacterTest : public ::testing::Test
-    {
+class CharacterTest : public ::testing::Test
+{
 public:
-
-        CharacterTest();
-
-    };
+    CharacterTest();
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-CharacterTest::CharacterTest() {
+CharacterTest::CharacterTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(CharacterTest, test) {
+TEST_F(CharacterTest, test)
+{
+    Character character('b');
 
-    Character character( 'b' );
-
-    ASSERT_TRUE(( character < 'a' ) == false);
-    ASSERT_TRUE(character.compareTo( 'a' ) == 1);
-    ASSERT_TRUE(character.compareTo( 'b' ) == 0);
-    ASSERT_TRUE(character.compareTo( 'c' ) == -1);
+    ASSERT_TRUE((character < 'a') == false);
+    ASSERT_TRUE(character.compareTo('a') == 1);
+    ASSERT_TRUE(character.compareTo('b') == 0);
+    ASSERT_TRUE(character.compareTo('c') == -1);
 
     ASSERT_TRUE(Character::isDigit('a') == false);
     ASSERT_TRUE(Character::isDigit('7') == true);
@@ -53,6 +52,5 @@ TEST_F(CharacterTest, test) {
     ASSERT_TRUE(Character::isLetter('8') == false);
     ASSERT_TRUE(Character::isLetterOrDigit('a') == true);
     ASSERT_TRUE(Character::isLetterOrDigit('&') == false);
-    ASSERT_TRUE(Character::digit( '9', 10 ) == 9);
-
+    ASSERT_TRUE(Character::digit('9', 10) == 9);
 }

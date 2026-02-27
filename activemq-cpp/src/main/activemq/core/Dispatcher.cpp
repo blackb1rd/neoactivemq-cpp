@@ -21,5 +21,6 @@ using namespace activemq;
 using namespace activemq::core;
 
 ////////////////////////////////////////////////////////////////////////////////
-Dispatcher::~Dispatcher() {}
-
+Dispatcher::~Dispatcher()
+{
+}

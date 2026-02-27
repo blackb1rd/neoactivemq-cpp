@@ -26,47 +26,67 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-SSLSocket::SSLSocket() : Socket() {
+SSLSocket::SSLSocket()
+    : Socket()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SSLSocket::SSLSocket(const InetAddress* address, int port) : Socket(address, port) {
+SSLSocket::SSLSocket(const InetAddress* address, int port)
+    : Socket(address, port)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SSLSocket::SSLSocket(const InetAddress* address, int port, const InetAddress* localAddress, int localPort) : Socket(address, port, localAddress, localPort) {
+SSLSocket::SSLSocket(const InetAddress* address,
+                     int                port,
+                     const InetAddress* localAddress,
+                     int                localPort)
+    : Socket(address, port, localAddress, localPort)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SSLSocket::SSLSocket(const std::string& host, int port) : Socket(host, port) {
+SSLSocket::SSLSocket(const std::string& host, int port)
+    : Socket(host, port)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SSLSocket::SSLSocket(const std::string& host, int port, const InetAddress* localAddress, int localPort) : Socket(host, port, localAddress, localPort) {
+SSLSocket::SSLSocket(const std::string& host,
+                     int                port,
+                     const InetAddress* localAddress,
+                     int                localPort)
+    : Socket(host, port, localAddress, localPort)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SSLSocket::~SSLSocket() {
+SSLSocket::~SSLSocket()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SSLParameters SSLSocket::getSSLParameters() const {
-
-    SSLParameters params(this->getEnabledCipherSuites(), this->getEnabledProtocols());
+SSLParameters SSLSocket::getSSLParameters() const
+{
+    SSLParameters params(this->getEnabledCipherSuites(),
+                         this->getEnabledProtocols());
 
     return params;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SSLSocket::setSSLParameters(const SSLParameters& value) {
-
-    try {
-
-        if (!value.getCipherSuites().empty()) {
+void SSLSocket::setSSLParameters(const SSLParameters& value)
+{
+    try
+    {
+        if (!value.getCipherSuites().empty())
+        {
             this->setEnabledCipherSuites(value.getCipherSuites());
         }
 
-        if (!value.getProtocols().empty()) {
+        if (!value.getProtocols().empty())
+        {
             this->setEnabledProtocols(value.getProtocols());
         }
     }

@@ -22,23 +22,28 @@
 #include <activemq/util/IntegrationCommon.h>
 #include <cms/Session.h>
 
-namespace activemq{
-namespace test{
+namespace activemq
+{
+namespace test
+{
 
-    class SimpleRollbackTest : public CMSTestFixture {
+    class SimpleRollbackTest : public CMSTestFixture
+    {
     public:
-
         SimpleRollbackTest();
         virtual ~SimpleRollbackTest();
 
-        void SetUp() override {
-            cmsProvider.reset(new util::CMSProvider(getBrokerURL(), cms::Session::SESSION_TRANSACTED));
+        void SetUp() override
+        {
+            cmsProvider.reset(
+                new util::CMSProvider(getBrokerURL(),
+                                      cms::Session::SESSION_TRANSACTED));
         };
 
         virtual void testRollbacks();
-
     };
 
-}}
+}  // namespace test
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_TEST_SIMPLEROLLBACKTEST_H_*/

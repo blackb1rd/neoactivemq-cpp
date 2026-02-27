@@ -22,30 +22,43 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-InvalidStateException::InvalidStateException() : Exception() {
+InvalidStateException::InvalidStateException()
+    : Exception()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-InvalidStateException::~InvalidStateException() throw () {
+InvalidStateException::~InvalidStateException() throw()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-InvalidStateException::InvalidStateException(const Exception& ex) : Exception() {
-    *(Exception*) this = ex;
+InvalidStateException::InvalidStateException(const Exception& ex)
+    : Exception()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-InvalidStateException::InvalidStateException(const InvalidStateException& ex) : Exception() {
-    *(Exception*) this = ex;
+InvalidStateException::InvalidStateException(const InvalidStateException& ex)
+    : Exception()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-InvalidStateException::InvalidStateException(const std::exception* cause) : Exception(cause) {
+InvalidStateException::InvalidStateException(const std::exception* cause)
+    : Exception(cause)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-InvalidStateException::InvalidStateException(const char* file, const int lineNumber, const char* msg, ...) : Exception() {
-
+InvalidStateException::InvalidStateException(const char* file,
+                                             const int   lineNumber,
+                                             const char* msg,
+                                             ...)
+    : Exception()
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -55,8 +68,13 @@ InvalidStateException::InvalidStateException(const char* file, const int lineNum
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-InvalidStateException::InvalidStateException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...) : Exception(cause) {
-
+InvalidStateException::InvalidStateException(const char*           file,
+                                             const int             lineNumber,
+                                             const std::exception* cause,
+                                             const char*           msg,
+                                             ...)
+    : Exception(cause)
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);

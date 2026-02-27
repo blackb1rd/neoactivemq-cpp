@@ -23,81 +23,93 @@
 #include <activemq/transport/tcp/TcpTransport.h>
 
 // Forward declarations
-namespace decaf {
-namespace net {
-namespace ssl {
-    class SSLSocket;
-}}}
+namespace decaf
+{
+namespace net
+{
+    namespace ssl
+    {
+        class SSLSocket;
+    }  // namespace ssl
+}  // namespace net
+}  // namespace decaf
 
-namespace activemq {
-namespace transport {
-namespace tcp {
-
-    /**
-     * Transport for connecting to a Broker using an SSL Socket.  This transport simply
-     * wraps the TcpTransport and provides the TcpTransport an SSL based Socket pointer
-     * allowing the core TcpTransport logic to be reused.
-     *
-     * @since 3.2.0
-     */
-    class AMQCPP_API SslTransport : public TcpTransport {
-    private:
-
-        decaf::net::ssl::SSLSocket* sslSocket;
-        decaf::util::Properties properties;
-
-        SslTransport(const SslTransport&);
-        SslTransport& operator=(const SslTransport&);
-
-    public:
+namespace activemq
+{
+namespace transport
+{
+    namespace tcp
+    {
 
         /**
-         * Creates a new instance of the SslTransport, the transport will not attempt to
-         * connect to a remote host until the connect method is called.
+         * Transport for connecting to a Broker using an SSL Socket.  This
+         * transport simply wraps the TcpTransport and provides the TcpTransport
+         * an SSL based Socket pointer allowing the core TcpTransport logic to
+         * be reused.
          *
-         * @param next
-         *      The next transport in the chain
-         * @param location
-         *      The URI of the host this transport is to connect to.
+         * @since 3.2.0
          */
-        SslTransport(const Pointer<Transport> next, const decaf::net::URI& location);
+        class AMQCPP_API SslTransport : public TcpTransport
+        {
+        private:
+            decaf::net::ssl::SSLSocket* sslSocket;
+            decaf::util::Properties     properties;
 
-        /**
-         * Creates a new instance of the SslTransport with URI properties.
-         *
-         * @param next
-         *      The next transport in the chain
-         * @param location
-         *      The URI of the host this transport is to connect to.
-         * @param properties
-         *      The properties parsed from the URI query string.
-         */
-        SslTransport(const Pointer<Transport> next, const decaf::net::URI& location,
-                    const decaf::util::Properties& properties);
+            SslTransport(const SslTransport&);
+            SslTransport& operator=(const SslTransport&);
 
-        virtual ~SslTransport();
+        public:
+            /**
+             * Creates a new instance of the SslTransport, the transport will
+             * not attempt to connect to a remote host until the connect method
+             * is called.
+             *
+             * @param next
+             *      The next transport in the chain
+             * @param location
+             *      The URI of the host this transport is to connect to.
+             */
+            SslTransport(const Pointer<Transport> next,
+                         const decaf::net::URI&   location);
 
-    protected:
+            /**
+             * Creates a new instance of the SslTransport with URI properties.
+             *
+             * @param next
+             *      The next transport in the chain
+             * @param location
+             *      The URI of the host this transport is to connect to.
+             * @param properties
+             *      The properties parsed from the URI query string.
+             */
+            SslTransport(const Pointer<Transport>       next,
+                         const decaf::net::URI&         location,
+                         const decaf::util::Properties& properties);
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual decaf::net::Socket* createSocket();
+            virtual ~SslTransport();
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual void configureSocket(decaf::net::Socket* socket);
+        protected:
+            /**
+             * {@inheritDoc}
+             */
+            virtual decaf::net::Socket* createSocket();
 
-        /**
-         * {@inheritDoc}
-         *
-         * Overridden to perform SSL handshake after socket connection and configuration.
-         */
-        virtual void beforeNextIsStarted();
+            /**
+             * {@inheritDoc}
+             */
+            virtual void configureSocket(decaf::net::Socket* socket);
 
-    };
+            /**
+             * {@inheritDoc}
+             *
+             * Overridden to perform SSL handshake after socket connection and
+             * configuration.
+             */
+            virtual void beforeNextIsStarted();
+        };
 
-}}}
+    }  // namespace tcp
+}  // namespace transport
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_TRANSPORT_TCP_SSLTRANSPORT_H_ */

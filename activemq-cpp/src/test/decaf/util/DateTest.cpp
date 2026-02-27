@@ -17,11 +17,11 @@
 
 #include <gtest/gtest.h>
 
-#include <decaf/util/Date.h>
-#include <decaf/lang/Thread.h>
-#include <cstdlib>
 #include <decaf/lang/System.h>
+#include <decaf/lang/Thread.h>
+#include <decaf/util/Date.h>
 #include <time.h>
+#include <cstdlib>
 
 #ifdef _WIN32
 #include <cstdlib>
@@ -35,11 +35,13 @@ using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::lang;
 
-    class DateTest : public ::testing::Test {};
+class DateTest : public ::testing::Test
+{
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(DateTest, test) {
-
+TEST_F(DateTest, test)
+{
     Date date1;
     ASSERT_TRUE(date1.getTime() != 0);
 
@@ -69,41 +71,49 @@ TEST_F(DateTest, test) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(DateTest, testToString) {
-
+TEST_F(DateTest, testToString)
+{
     // Save original timezone to restore later (avoid test pollution)
     const char* originalTz = std::getenv("TZ");
     std::string savedTz;
-    bool hadOriginalTz = (originalTz != nullptr);
-    if (hadOriginalTz) {
+    bool        hadOriginalTz = (originalTz != nullptr);
+    if (hadOriginalTz)
+    {
         savedTz = originalTz;
     }
 
     // Force the timezone to America/New_York for deterministic output
     setenv("TZ", "America/New_York", 1);
-    tzset(); // Must call tzset() to activate the TZ environment variable change
+    tzset();  // Must call tzset() to activate the TZ environment variable
+              // change
 
     // Use a winter date (January) to test EST instead of EDT
     // January 15, 2015, 20:56:14 UTC = 1421355374 seconds
     // EST (UTC-5): Should be 15:56:14 EST
-    Date now(1421355374000LL);
+    Date        now(1421355374000LL);
     std::string result = now.toString();
 
     // Restore original timezone to avoid polluting other tests
 #ifdef _WIN32
-    if (hadOriginalTz) {
+    if (hadOriginalTz)
+    {
         _putenv_s("TZ", savedTz.c_str());
-    } else {
+    }
+    else
+    {
         _putenv_s("TZ", "");
     }
 #else
-    if (hadOriginalTz) {
+    if (hadOriginalTz)
+    {
         setenv("TZ", savedTz.c_str(), 1);
-    } else {
+    }
+    else
+    {
         unsetenv("TZ");
     }
 #endif
-    tzset(); // Apply the restoration
+    tzset();  // Apply the restoration
 
     ASSERT_TRUE(result != "");
     ASSERT_TRUE(result.size() >= 20);

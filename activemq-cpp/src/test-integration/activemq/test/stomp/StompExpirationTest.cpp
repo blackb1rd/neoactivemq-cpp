@@ -17,18 +17,27 @@
 
 #include <activemq/test/ExpirationTest.h>
 
-namespace activemq{
-namespace test{
-namespace stomp{
-    class StompExpirationTest : public ExpirationTest {
-public:
-        StompExpirationTest();
-        virtual ~StompExpirationTest();
-        std::string getBrokerURL() const override {
-            return activemq::util::IntegrationCommon::getInstance().getStompURL();
-        }
-    };
-}}}
+namespace activemq
+{
+namespace test
+{
+    namespace stomp
+    {
+        class StompExpirationTest : public ExpirationTest
+        {
+        public:
+            StompExpirationTest();
+            virtual ~StompExpirationTest();
+
+            std::string getBrokerURL() const override
+            {
+                return activemq::util::IntegrationCommon::getInstance()
+                    .getStompURL();
+            }
+        };
+    }  // namespace stomp
+}  // namespace test
+}  // namespace activemq
 
 using namespace std;
 using namespace cms;
@@ -37,15 +46,28 @@ using namespace activemq::test;
 using namespace activemq::test::stomp;
 
 ////////////////////////////////////////////////////////////////////////////////
-StompExpirationTest::StompExpirationTest() {
+StompExpirationTest::StompExpirationTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-StompExpirationTest::~StompExpirationTest() {
+StompExpirationTest::~StompExpirationTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Test registration
-TEST_F(StompExpirationTest, DISABLED_testExpired) { testExpired(); }
-TEST_F(StompExpirationTest, DISABLED_testExpiredWithChecksDisabled) { testExpiredWithChecksDisabled(); }
-TEST_F(StompExpirationTest, DISABLED_testNotExpired) { testNotExpired(); }
+TEST_F(StompExpirationTest, DISABLED_testExpired)
+{
+    testExpired();
+}
+
+TEST_F(StompExpirationTest, DISABLED_testExpiredWithChecksDisabled)
+{
+    testExpiredWithChecksDisabled();
+}
+
+TEST_F(StompExpirationTest, DISABLED_testNotExpired)
+{
+    testNotExpired();
+}

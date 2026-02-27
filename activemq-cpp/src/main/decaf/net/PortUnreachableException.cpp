@@ -22,26 +22,39 @@ using namespace decaf::net;
 using namespace decaf::lang;
 
 ////////////////////////////////////////////////////////////////////////////////
-PortUnreachableException::PortUnreachableException() : SocketException() {
+PortUnreachableException::PortUnreachableException()
+    : SocketException()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-PortUnreachableException::~PortUnreachableException() throw() {
+PortUnreachableException::~PortUnreachableException() throw()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-PortUnreachableException::PortUnreachableException(const Exception& ex) : SocketException() {
-    *(Exception*) this = ex;
+PortUnreachableException::PortUnreachableException(const Exception& ex)
+    : SocketException()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-PortUnreachableException::PortUnreachableException(const PortUnreachableException& ex) : SocketException() {
-    *(Exception*) this = ex;
+PortUnreachableException::PortUnreachableException(
+    const PortUnreachableException& ex)
+    : SocketException()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-PortUnreachableException::PortUnreachableException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...) : SocketException(cause) {
-
+PortUnreachableException::PortUnreachableException(const char* file,
+                                                   const int   lineNumber,
+                                                   const std::exception* cause,
+                                                   const char*           msg,
+                                                   ...)
+    : SocketException(cause)
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -51,12 +64,18 @@ PortUnreachableException::PortUnreachableException(const char* file, const int l
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-PortUnreachableException::PortUnreachableException(const std::exception* cause) : SocketException(cause) {
+PortUnreachableException::PortUnreachableException(const std::exception* cause)
+    : SocketException(cause)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-PortUnreachableException::PortUnreachableException(const char* file, const int lineNumber, const char* msg, ...) : SocketException() {
-
+PortUnreachableException::PortUnreachableException(const char* file,
+                                                   const int   lineNumber,
+                                                   const char* msg,
+                                                   ...)
+    : SocketException()
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);

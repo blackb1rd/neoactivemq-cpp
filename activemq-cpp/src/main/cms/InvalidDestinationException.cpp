@@ -20,33 +20,49 @@
 using namespace cms;
 
 ////////////////////////////////////////////////////////////////////////////////
-InvalidDestinationException::InvalidDestinationException() : CMSException() {
+InvalidDestinationException::InvalidDestinationException()
+    : CMSException()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-InvalidDestinationException::InvalidDestinationException(const InvalidDestinationException& ex) : CMSException(ex) {
+InvalidDestinationException::InvalidDestinationException(
+    const InvalidDestinationException& ex)
+    : CMSException(ex)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-InvalidDestinationException::InvalidDestinationException(const std::string& message) : CMSException(message, NULL) {
+InvalidDestinationException::InvalidDestinationException(
+    const std::string& message)
+    : CMSException(message, NULL)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-InvalidDestinationException::InvalidDestinationException(const std::string& message, const std::exception* cause) :
-    CMSException(message, cause) {
+InvalidDestinationException::InvalidDestinationException(
+    const std::string&    message,
+    const std::exception* cause)
+    : CMSException(message, cause)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-InvalidDestinationException::InvalidDestinationException(const std::string& message, const std::exception* cause,
-                                                         const std::vector<std::pair<std::string, int> >& stackTrace) :
-    CMSException(message, cause, stackTrace) {
+InvalidDestinationException::InvalidDestinationException(
+    const std::string&                              message,
+    const std::exception*                           cause,
+    const std::vector<std::pair<std::string, int>>& stackTrace)
+    : CMSException(message, cause, stackTrace)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-InvalidDestinationException::~InvalidDestinationException() throw() {
+InvalidDestinationException::~InvalidDestinationException() throw()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-InvalidDestinationException* InvalidDestinationException::clone() {
+InvalidDestinationException* InvalidDestinationException::clone()
+{
     return new InvalidDestinationException(*this);
 }

@@ -180,6 +180,9 @@ else()
 	message(STATUS "AMQCPP: SSL support disabled; OpenSSL will be optional.")
 endif()
 
+## clang-format tooling
+include(cmake/ClangFormat.cmake)
+
 ## Inline `src/CMakeLists.txt` content so project can be configured from
 ## the top-level CMake without a separate `src` directory CMakeLists.
 

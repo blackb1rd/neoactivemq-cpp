@@ -24,44 +24,54 @@ using namespace benchmark;
 using namespace decaf::lang;
 
 ////////////////////////////////////////////////////////////////////////////////
-PerformanceTimer::PerformanceTimer() : numberOfRuns(0), times(), startTime(0), endTime(0) {
+PerformanceTimer::PerformanceTimer()
+    : numberOfRuns(0),
+      times(),
+      startTime(0),
+      endTime(0)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-PerformanceTimer::~PerformanceTimer(){
+PerformanceTimer::~PerformanceTimer()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PerformanceTimer::start(){
+void PerformanceTimer::start()
+{
     this->startTime = System::currentTimeMillis();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PerformanceTimer::stop(){
-
+void PerformanceTimer::stop()
+{
     this->endTime = System::currentTimeMillis();
-    times.push_back( endTime - startTime );
+    times.push_back(endTime - startTime);
     numberOfRuns++;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PerformanceTimer::reset(){
+void PerformanceTimer::reset()
+{
     this->startTime = 0;
-    this->endTime = 0;
+    this->endTime   = 0;
     this->times.clear();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-long long PerformanceTimer::getAverageTime() const{
+long long PerformanceTimer::getAverageTime() const
+{
+    std::vector<long long>::const_iterator iter      = times.begin();
+    long long                              totalTime = 0;
 
-    std::vector<long long>::const_iterator iter = times.begin();
-    long long totalTime = 0;
-
-    do{
+    do
+    {
         totalTime += *iter;
-    } while( ++iter != times.end() );
+    } while (++iter != times.end());
 
-    if( totalTime == 0 || numberOfRuns == 0 ) {
+    if (totalTime == 0 || numberOfRuns == 0)
+    {
         return 0;
     }
 

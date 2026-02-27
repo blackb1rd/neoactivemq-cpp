@@ -21,4 +21,6 @@ using namespace activemq;
 using namespace activemq::wireformat;
 
 ////////////////////////////////////////////////////////////////////////////////
-WireFormat::~WireFormat() {}
+WireFormat::~WireFormat()
+{
+}

@@ -15,17 +15,19 @@
  * limitations under the License.
  */
 
-#include <gtest/gtest.h>
 #include <activemq/util/LongSequenceGenerator.h>
+#include <gtest/gtest.h>
 
 using namespace activemq;
 using namespace activemq::util;
 
-class LongSequenceGeneratorTest : public ::testing::Test {};
+class LongSequenceGeneratorTest : public ::testing::Test
+{
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LongSequenceGeneratorTest, test) {
-
+TEST_F(LongSequenceGeneratorTest, test)
+{
     LongSequenceGenerator sequence;
 
     long long result1 = sequence.getNextSequenceId();
@@ -34,5 +36,4 @@ TEST_F(LongSequenceGeneratorTest, test) {
     ASSERT_TRUE(result1 < result2);
     ASSERT_TRUE(result2 == sequence.getLastSequenceId());
     ASSERT_TRUE(result2 < sequence.getNextSequenceId());
-
 }

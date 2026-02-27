@@ -21,19 +21,28 @@ using namespace std;
 using namespace cmstemplate;
 
 ////////////////////////////////////////////////////////////////////////////////
-MessagingTask::MessagingTask(Receiver* receiver, const string& message) : receiver(receiver), message(message) {
+MessagingTask::MessagingTask(Receiver* receiver, const string& message)
+    : receiver(receiver),
+      message(message)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-MessagingTask::~MessagingTask() {
+MessagingTask::~MessagingTask()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MessagingTask::run() {
-    try {
-        if (receiver != NULL) {
+void MessagingTask::run()
+{
+    try
+    {
+        if (receiver != NULL)
+        {
             receiver->executeMessagingTask(message);
         }
-    } catch (...) {
+    }
+    catch (...)
+    {
     }
 }

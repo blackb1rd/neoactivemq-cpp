@@ -20,80 +20,106 @@
 #include <decaf/lang/Boolean.h>
 #include <decaf/lang/Byte.h>
 #include <decaf/lang/Character.h>
-#include <decaf/lang/Short.h>
+#include <decaf/lang/Double.h>
+#include <decaf/lang/Float.h>
 #include <decaf/lang/Integer.h>
 #include <decaf/lang/Long.h>
-#include <decaf/lang/Float.h>
-#include <decaf/lang/Double.h>
+#include <decaf/lang/Short.h>
 
 using namespace activemq;
 using namespace activemq::util;
 
 ////////////////////////////////////////////////////////////////////////////////
-template<>
-bool PrimitiveValueConverter::convert<bool>(const PrimitiveValueNode& value) const {
-
-    switch( value.getType() ) {
+template <>
+bool PrimitiveValueConverter::convert<bool>(
+    const PrimitiveValueNode& value) const
+{
+    switch (value.getType())
+    {
         case PrimitiveValueNode::BOOLEAN_TYPE:
             return value.getBool();
         case PrimitiveValueNode::STRING_TYPE:
         case PrimitiveValueNode::BIG_STRING_TYPE:
         {
-            try{
-                return decaf::lang::Boolean::parseBoolean( value.getString() );
-            } catch( decaf::lang::Exception& ex ) {}
+            try
+            {
+                return decaf::lang::Boolean::parseBoolean(value.getString());
+            }
+            catch (decaf::lang::Exception& ex)
+            {
+            }
         }
         default:
             throw decaf::lang::exceptions::UnsupportedOperationException(
-                 __FILE__, __LINE__, "Unsupported Type Conversion" );
+                __FILE__,
+                __LINE__,
+                "Unsupported Type Conversion");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-template<>
-unsigned char PrimitiveValueConverter::convert<unsigned char>(const PrimitiveValueNode& value) const {
-
-    switch( value.getType() ) {
+template <>
+unsigned char PrimitiveValueConverter::convert<unsigned char>(
+    const PrimitiveValueNode& value) const
+{
+    switch (value.getType())
+    {
         case PrimitiveValueNode::BYTE_TYPE:
             return value.getByte();
         case PrimitiveValueNode::STRING_TYPE:
         case PrimitiveValueNode::BIG_STRING_TYPE:
         {
-            try{
-                return decaf::lang::Byte::parseByte( value.getString() );
-            } catch( decaf::lang::Exception& ex ) {}
+            try
+            {
+                return decaf::lang::Byte::parseByte(value.getString());
+            }
+            catch (decaf::lang::Exception& ex)
+            {
+            }
         }
         default:
             throw decaf::lang::exceptions::UnsupportedOperationException(
-                 __FILE__, __LINE__, "Unsupported Type Conversion" );
+                __FILE__,
+                __LINE__,
+                "Unsupported Type Conversion");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-template<>
-char PrimitiveValueConverter::convert<char>(const PrimitiveValueNode& value) const {
-
-    switch( value.getType() ) {
+template <>
+char PrimitiveValueConverter::convert<char>(
+    const PrimitiveValueNode& value) const
+{
+    switch (value.getType())
+    {
         case PrimitiveValueNode::CHAR_TYPE:
             return value.getChar();
         case PrimitiveValueNode::STRING_TYPE:
         case PrimitiveValueNode::BIG_STRING_TYPE:
         {
-            try{
-                return (char)decaf::lang::Byte::parseByte( value.getString() );
-            } catch( decaf::lang::Exception& ex ) {}
+            try
+            {
+                return (char)decaf::lang::Byte::parseByte(value.getString());
+            }
+            catch (decaf::lang::Exception& ex)
+            {
+            }
         }
         default:
             throw decaf::lang::exceptions::UnsupportedOperationException(
-                 __FILE__, __LINE__, "Unsupported Type Conversion" );
+                __FILE__,
+                __LINE__,
+                "Unsupported Type Conversion");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-template<>
-short PrimitiveValueConverter::convert<short>(const PrimitiveValueNode& value) const {
-
-    switch( value.getType() ) {
+template <>
+short PrimitiveValueConverter::convert<short>(
+    const PrimitiveValueNode& value) const
+{
+    switch (value.getType())
+    {
         case PrimitiveValueNode::BYTE_TYPE:
             return (short)value.getByte();
         case PrimitiveValueNode::SHORT_TYPE:
@@ -101,21 +127,28 @@ short PrimitiveValueConverter::convert<short>(const PrimitiveValueNode& value) c
         case PrimitiveValueNode::STRING_TYPE:
         case PrimitiveValueNode::BIG_STRING_TYPE:
         {
-            try{
-                return decaf::lang::Short::parseShort( value.getString() );
-            } catch( decaf::lang::Exception& ex ) {}
+            try
+            {
+                return decaf::lang::Short::parseShort(value.getString());
+            }
+            catch (decaf::lang::Exception& ex)
+            {
+            }
         }
         default:
             throw decaf::lang::exceptions::UnsupportedOperationException(
-                 __FILE__, __LINE__, "Unsupported Type Conversion" );
+                __FILE__,
+                __LINE__,
+                "Unsupported Type Conversion");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-template<>
-int PrimitiveValueConverter::convert<int>(const PrimitiveValueNode& value) const {
-
-    switch( value.getType() ) {
+template <>
+int PrimitiveValueConverter::convert<int>(const PrimitiveValueNode& value) const
+{
+    switch (value.getType())
+    {
         case PrimitiveValueNode::BYTE_TYPE:
             return (int)value.getByte();
         case PrimitiveValueNode::SHORT_TYPE:
@@ -125,21 +158,29 @@ int PrimitiveValueConverter::convert<int>(const PrimitiveValueNode& value) const
         case PrimitiveValueNode::STRING_TYPE:
         case PrimitiveValueNode::BIG_STRING_TYPE:
         {
-            try{
-                return decaf::lang::Integer::parseInt( value.getString() );
-            } catch( decaf::lang::Exception& ex ) {}
+            try
+            {
+                return decaf::lang::Integer::parseInt(value.getString());
+            }
+            catch (decaf::lang::Exception& ex)
+            {
+            }
         }
         default:
             throw decaf::lang::exceptions::UnsupportedOperationException(
-                __FILE__, __LINE__, "Unsupported Type Conversion" );
+                __FILE__,
+                __LINE__,
+                "Unsupported Type Conversion");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-template<>
-long long PrimitiveValueConverter::convert<long long>(const PrimitiveValueNode& value) const {
-
-    switch( value.getType() ) {
+template <>
+long long PrimitiveValueConverter::convert<long long>(
+    const PrimitiveValueNode& value) const
+{
+    switch (value.getType())
+    {
         case PrimitiveValueNode::BYTE_TYPE:
             return (long long)value.getByte();
         case PrimitiveValueNode::SHORT_TYPE:
@@ -151,41 +192,57 @@ long long PrimitiveValueConverter::convert<long long>(const PrimitiveValueNode& 
         case PrimitiveValueNode::STRING_TYPE:
         case PrimitiveValueNode::BIG_STRING_TYPE:
         {
-            try{
-                return decaf::lang::Long::parseLong( value.getString() );
-            } catch( decaf::lang::Exception& ex ) {}
+            try
+            {
+                return decaf::lang::Long::parseLong(value.getString());
+            }
+            catch (decaf::lang::Exception& ex)
+            {
+            }
         }
         default:
             throw decaf::lang::exceptions::UnsupportedOperationException(
-                __FILE__, __LINE__, "Unsupported Type Conversion" );
+                __FILE__,
+                __LINE__,
+                "Unsupported Type Conversion");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-template<>
-float PrimitiveValueConverter::convert<float>(const PrimitiveValueNode& value) const {
-
-    switch( value.getType() ) {
+template <>
+float PrimitiveValueConverter::convert<float>(
+    const PrimitiveValueNode& value) const
+{
+    switch (value.getType())
+    {
         case PrimitiveValueNode::FLOAT_TYPE:
             return value.getFloat();
         case PrimitiveValueNode::STRING_TYPE:
         case PrimitiveValueNode::BIG_STRING_TYPE:
         {
-            try{
-                return decaf::lang::Float::parseFloat( value.getString() );
-            } catch( decaf::lang::Exception& ex ) {}
+            try
+            {
+                return decaf::lang::Float::parseFloat(value.getString());
+            }
+            catch (decaf::lang::Exception& ex)
+            {
+            }
         }
         default:
             throw decaf::lang::exceptions::UnsupportedOperationException(
-                 __FILE__, __LINE__, "Unsupported Type Conversion" );
+                __FILE__,
+                __LINE__,
+                "Unsupported Type Conversion");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-template<>
-double PrimitiveValueConverter::convert<double>(const PrimitiveValueNode& value) const {
-
-    switch( value.getType() ) {
+template <>
+double PrimitiveValueConverter::convert<double>(
+    const PrimitiveValueNode& value) const
+{
+    switch (value.getType())
+    {
         case PrimitiveValueNode::FLOAT_TYPE:
             return (double)value.getFloat();
         case PrimitiveValueNode::DOUBLE_TYPE:
@@ -193,58 +250,72 @@ double PrimitiveValueConverter::convert<double>(const PrimitiveValueNode& value)
         case PrimitiveValueNode::STRING_TYPE:
         case PrimitiveValueNode::BIG_STRING_TYPE:
         {
-            try{
-                return decaf::lang::Double::parseDouble( value.getString() );
-            } catch( decaf::lang::Exception& ex ) {}
+            try
+            {
+                return decaf::lang::Double::parseDouble(value.getString());
+            }
+            catch (decaf::lang::Exception& ex)
+            {
+            }
         }
         default:
             throw decaf::lang::exceptions::UnsupportedOperationException(
-                 __FILE__, __LINE__, "Unsupported Type Conversion" );
+                __FILE__,
+                __LINE__,
+                "Unsupported Type Conversion");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-template<>
-std::string PrimitiveValueConverter::convert<std::string>(const PrimitiveValueNode& value) const {
-
-    switch( value.getType() ) {
+template <>
+std::string PrimitiveValueConverter::convert<std::string>(
+    const PrimitiveValueNode& value) const
+{
+    switch (value.getType())
+    {
         case PrimitiveValueNode::NULL_TYPE:
             return "";
         case PrimitiveValueNode::BOOLEAN_TYPE:
-            return decaf::lang::Boolean::toString( value.getBool() );
+            return decaf::lang::Boolean::toString(value.getBool());
         case PrimitiveValueNode::BYTE_TYPE:
-            return decaf::lang::Byte::toString( value.getByte() );
+            return decaf::lang::Byte::toString(value.getByte());
         case PrimitiveValueNode::CHAR_TYPE:
-            return decaf::lang::Character::valueOf( value.getChar() ).toString();
+            return decaf::lang::Character::valueOf(value.getChar()).toString();
         case PrimitiveValueNode::SHORT_TYPE:
-            return decaf::lang::Short::toString( value.getShort() );
+            return decaf::lang::Short::toString(value.getShort());
         case PrimitiveValueNode::INTEGER_TYPE:
-            return decaf::lang::Integer::toString( value.getInt() );
+            return decaf::lang::Integer::toString(value.getInt());
         case PrimitiveValueNode::LONG_TYPE:
-            return decaf::lang::Long::toString( value.getLong() );
+            return decaf::lang::Long::toString(value.getLong());
         case PrimitiveValueNode::FLOAT_TYPE:
-            return decaf::lang::Float::toString( value.getFloat() );
+            return decaf::lang::Float::toString(value.getFloat());
         case PrimitiveValueNode::DOUBLE_TYPE:
-            return decaf::lang::Double::toString( value.getDouble() );
+            return decaf::lang::Double::toString(value.getDouble());
         case PrimitiveValueNode::STRING_TYPE:
         case PrimitiveValueNode::BIG_STRING_TYPE:
             return value.getString();
         default:
             throw decaf::lang::exceptions::UnsupportedOperationException(
-                __FILE__, __LINE__, "Unsupported Type Conversion" );
+                __FILE__,
+                __LINE__,
+                "Unsupported Type Conversion");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-template<>
-std::vector<unsigned char> PrimitiveValueConverter::convert<std::vector<unsigned char> >( const PrimitiveValueNode& value ) const {
-
-    switch( value.getType() ) {
+template <>
+std::vector<unsigned char>
+PrimitiveValueConverter::convert<std::vector<unsigned char>>(
+    const PrimitiveValueNode& value) const
+{
+    switch (value.getType())
+    {
         case PrimitiveValueNode::BYTE_ARRAY_TYPE:
             return value.getByteArray();
         default:
             throw decaf::lang::exceptions::UnsupportedOperationException(
-                 __FILE__, __LINE__, "Unsupported Type Conversion" );
+                __FILE__,
+                __LINE__,
+                "Unsupported Type Conversion");
     }
 }
-

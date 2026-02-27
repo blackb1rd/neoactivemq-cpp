@@ -16,70 +16,78 @@
  */
 
 #include <benchmark/PerformanceTimer.h>
-#include <decaf/util/Properties.h>
 #include <decaf/lang/Integer.h>
+#include <decaf/util/Properties.h>
 
 #include <gtest/gtest.h>
-#include <string>
 #include <iostream>
+#include <string>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::lang;
 
-namespace decaf {
-namespace util {
+namespace decaf
+{
+namespace util
+{
 
-    class PropertiesBenchmark : public ::testing::Test {
+    class PropertiesBenchmark : public ::testing::Test
+    {
     protected:
-
         Properties properties;
     };
 
-}}
+}  // namespace util
+}  // namespace decaf
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(PropertiesBenchmark, runBenchmark) {
-
+TEST_F(PropertiesBenchmark, runBenchmark)
+{
     benchmark::PerformanceTimer timer;
-    int iterations = 100;
+    int                         iterations = 100;
 
-    for( int iter = 0; iter < iterations; ++iter ) {
+    for (int iter = 0; iter < iterations; ++iter)
+    {
         timer.start();
 
-        int numRuns = 250;
-        std::string result = "";
-        Properties copy;
+        int         numRuns = 250;
+        std::string result  = "";
+        Properties  copy;
 
-        for( int i = 0; i < numRuns; ++i ) {
-            properties.setProperty( "test", "value" );
-            properties.hasProperty( "test" );
-            result = properties.getProperty( "test" );
-            properties.remove( "test" );
+        for (int i = 0; i < numRuns; ++i)
+        {
+            properties.setProperty("test", "value");
+            properties.hasProperty("test");
+            result = properties.getProperty("test");
+            properties.remove("test");
         }
 
-        std::vector< std::pair< std::string, std::string > > array;
+        std::vector<std::pair<std::string, std::string>> array;
 
         std::string prefix = "test";
-        for( int i = 0; i < numRuns; ++i ) {
-            properties.setProperty(
-                prefix + Integer::toString(i), prefix + Integer::toString(i) );
+        for (int i = 0; i < numRuns; ++i)
+        {
+            properties.setProperty(prefix + Integer::toString(i),
+                                   prefix + Integer::toString(i));
         }
 
-        for( int i = 0; i < numRuns; ++i ) {
+        for (int i = 0; i < numRuns; ++i)
+        {
             array = properties.toArray();
         }
 
-        for( int i = 0; i < numRuns; ++i ) {
-            copy.copy( properties );
+        for (int i = 0; i < numRuns; ++i)
+        {
+            copy.copy(properties);
             copy.clear();
         }
 
         timer.stop();
     }
 
-    std::cout << typeid( Properties ).name() << " Benchmark Time = "
-              << timer.getAverageTime() << " Millisecs"
+    std::cout << typeid(Properties).name()
+              << " Benchmark Time = " << timer.getAverageTime() << " Millisecs"
               << std::endl;
 }

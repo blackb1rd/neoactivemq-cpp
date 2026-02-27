@@ -20,30 +20,43 @@
 
 #include <decaf/internal/util/concurrent/Transferer.h>
 
-#include <decaf/util/concurrent/TimeoutException.h>
 #include <decaf/lang/exceptions/InterruptedException.h>
+#include <decaf/util/concurrent/TimeoutException.h>
 
-namespace decaf {
-namespace internal {
-namespace util {
-namespace concurrent {
+namespace decaf
+{
+namespace internal
+{
+    namespace util
+    {
+        namespace concurrent
+        {
 
-    template<typename E>
-    class TransferStack : public Transferer<E> {
-    public:
+            template <typename E>
+            class TransferStack : public Transferer<E>
+            {
+            public:
+                TransferStack()
+                {
+                }
 
-        TransferStack() {}
-        virtual ~TransferStack() {}
+                virtual ~TransferStack()
+                {
+                }
 
-        virtual void transfer( E* e, bool timed, long long nanos ) {
-        }
+                virtual void transfer(E* e, bool timed, long long nanos)
+                {
+                }
 
-        virtual E* transfer( bool timed, long long nanos ) {
-            return NULL;
-        }
+                virtual E* transfer(bool timed, long long nanos)
+                {
+                    return NULL;
+                }
+            };
 
-    };
-
-}}}}
+        }  // namespace concurrent
+    }  // namespace util
+}  // namespace internal
+}  // namespace decaf
 
 #endif /* _DECAF_INTERNAL_UTIL_CONCURRENT_TRANSFERSTACK_H_ */

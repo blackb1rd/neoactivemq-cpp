@@ -21,18 +21,19 @@
 #include <activemq/test/CMSTestFixture.h>
 #include <activemq/util/IntegrationCommon.h>
 
-namespace activemq {
-namespace test {
+namespace activemq
+{
+namespace test
+{
 
-    class VirtualTopicTest : public CMSTestFixture {
+    class VirtualTopicTest : public CMSTestFixture
+    {
     private:
-
         static const std::string PRODUCER_DESTINATION_NAME;
         static const std::string CONSUMER_A_DESTINATION_NAME;
         static const std::string CONSUMER_B_DESTINATION_NAME;
 
     public:
-
         VirtualTopicTest();
         virtual ~VirtualTopicTest();
 
@@ -41,11 +42,10 @@ namespace test {
         void testVirtualTopicSyncReceiveTransacted();
 
     private:
-
         void testRunnerSync(cms::Session::AcknowledgeMode mode);
-
     };
 
-}}
+}  // namespace test
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_TEST_VIRTUALTOPICTEST_H_ */

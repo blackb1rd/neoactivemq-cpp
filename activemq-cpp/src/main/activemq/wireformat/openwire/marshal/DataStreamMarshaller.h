@@ -18,106 +18,113 @@
 #ifndef _ACTIVEMQ_WIREFORMAT_OPENWIRE_MARSHAL_DATASTREAMMARSHALLER_H_
 #define _ACTIVEMQ_WIREFORMAT_OPENWIRE_MARSHAL_DATASTREAMMARSHALLER_H_
 
+#include <activemq/commands/DataStructure.h>
+#include <activemq/util/Config.h>
+#include <activemq/wireformat/openwire/OpenWireFormat.h>
+#include <activemq/wireformat/openwire/utils/BooleanStream.h>
 #include <decaf/io/DataInputStream.h>
 #include <decaf/io/DataOutputStream.h>
 #include <decaf/io/IOException.h>
-#include <activemq/commands/DataStructure.h>
-#include <activemq/wireformat/openwire/utils/BooleanStream.h>
-#include <activemq/wireformat/openwire/OpenWireFormat.h>
-#include <activemq/util/Config.h>
 
-namespace activemq {
-namespace wireformat {
-namespace openwire {
-namespace marshal {
+namespace activemq
+{
+namespace wireformat
+{
+    namespace openwire
+    {
+        namespace marshal
+        {
 
-    /**
-     * Base class for all classes that marshal commands for Openwire
-     */
-    class AMQCPP_API DataStreamMarshaller {
-    public:
+            /**
+             * Base class for all classes that marshal commands for Openwire
+             */
+            class AMQCPP_API DataStreamMarshaller
+            {
+            public:
+                virtual ~DataStreamMarshaller();
 
-        virtual ~DataStreamMarshaller();
+                /**
+                 * Gets the DataStructureType that this class
+                 * marshals/unmarshals
+                 * @return byte Id of this classes DataStructureType
+                 */
+                virtual unsigned char getDataStructureType() const = 0;
 
-        /**
-         * Gets the DataStructureType that this class marshals/unmarshals
-         * @return byte Id of this classes DataStructureType
-         */
-        virtual unsigned char getDataStructureType() const = 0;
+                /**
+                 * Creates a new instance of the class that this class is a
+                 * marshaling director for.
+                 * @return newly allocated Command
+                 */
+                virtual commands::DataStructure* createObject() const = 0;
 
-        /**
-         * Creates a new instance of the class that this class is a marshaling
-         * director for.
-         * @return newly allocated Command
-         */
-        virtual commands::DataStructure* createObject() const = 0;
+                /**
+                 * Tight Marhsal to the given stream
+                 *
+                 * @param format
+                 *      The OpenwireFormat properties
+                 * @param command
+                 *      The object to Marshal
+                 * @param bs
+                 *      The boolean stream to marshal to.
+                 *
+                 * @throws IOException if an error occurs.
+                 */
+                virtual int tightMarshal1(OpenWireFormat*          format,
+                                          commands::DataStructure* command,
+                                          utils::BooleanStream*    bs) = 0;
 
-        /**
-         * Tight Marhsal to the given stream
-         *
-         * @param format
-         *      The OpenwireFormat properties
-         * @param command
-         *      The object to Marshal
-         * @param bs
-         *      The boolean stream to marshal to.
-         *
-         * @throws IOException if an error occurs.
-         */
-        virtual int tightMarshal1(OpenWireFormat* format,
-                                  commands::DataStructure* command,
-                                  utils::BooleanStream* bs) = 0;
+                /**
+                 * Tight Marhsal to the given stream
+                 * @param format - The OpenwireFormat properties
+                 * @param command -  the object to Marshal
+                 * @param ds - the DataOutputStream to Marshal to
+                 * @param bs - boolean stream to marshal to.
+                 * @throws IOException if an error occurs.
+                 */
+                virtual void tightMarshal2(OpenWireFormat*              format,
+                                           commands::DataStructure*     command,
+                                           decaf::io::DataOutputStream* ds,
+                                           utils::BooleanStream*        bs) = 0;
 
-        /**
-         * Tight Marhsal to the given stream
-         * @param format - The OpenwireFormat properties
-         * @param command -  the object to Marshal
-         * @param ds - the DataOutputStream to Marshal to
-         * @param bs - boolean stream to marshal to.
-         * @throws IOException if an error occurs.
-         */
-        virtual void tightMarshal2(OpenWireFormat* format,
-                                   commands::DataStructure* command,
-                                   decaf::io::DataOutputStream* ds,
-                                   utils::BooleanStream* bs) = 0;
+                /**
+                 * Tight Un-marhsal to the given stream
+                 * @param format - The OpenwireFormat properties
+                 * @param command -  the object to Un-Marshal
+                 * @param dis - the DataInputStream to Un-Marshal from
+                 * @param bs - boolean stream to unmarshal from.
+                 * @throws IOException if an error occurs.
+                 */
+                virtual void tightUnmarshal(OpenWireFormat*             format,
+                                            commands::DataStructure*    command,
+                                            decaf::io::DataInputStream* dis,
+                                            utils::BooleanStream*       bs) = 0;
 
-        /**
-         * Tight Un-marhsal to the given stream
-         * @param format - The OpenwireFormat properties
-         * @param command -  the object to Un-Marshal
-         * @param dis - the DataInputStream to Un-Marshal from
-         * @param bs - boolean stream to unmarshal from.
-         * @throws IOException if an error occurs.
-         */
-        virtual void tightUnmarshal(OpenWireFormat* format,
-                                    commands::DataStructure* command,
-                                    decaf::io::DataInputStream* dis,
-                                    utils::BooleanStream* bs) = 0;
+                /**
+                 * Tight Marhsal to the given stream
+                 * @param format - The OpenwireFormat properties
+                 * @param command -  the object to Marshal
+                 * @param ds - DataOutputStream to marshal to
+                 * @throws IOException if an error occurs.
+                 */
+                virtual void looseMarshal(OpenWireFormat*              format,
+                                          commands::DataStructure*     command,
+                                          decaf::io::DataOutputStream* ds) = 0;
 
-        /**
-         * Tight Marhsal to the given stream
-         * @param format - The OpenwireFormat properties
-         * @param command -  the object to Marshal
-         * @param ds - DataOutputStream to marshal to
-         * @throws IOException if an error occurs.
-         */
-        virtual void looseMarshal(OpenWireFormat* format,
-                                  commands::DataStructure* command,
-                                  decaf::io::DataOutputStream* ds) = 0;
+                /**
+                 * Loose Un-marhsal to the given stream
+                 * @param format - The OpenwireFormat properties
+                 * @param command -  the object to Un-Marshal
+                 * @param dis - the DataInputStream to Un-Marshal from
+                 * @throws IOException if an error occurs.
+                 */
+                virtual void looseUnmarshal(OpenWireFormat*          format,
+                                            commands::DataStructure* command,
+                                            decaf::io::DataInputStream* dis) = 0;
+            };
 
-        /**
-         * Loose Un-marhsal to the given stream
-         * @param format - The OpenwireFormat properties
-         * @param command -  the object to Un-Marshal
-         * @param dis - the DataInputStream to Un-Marshal from
-         * @throws IOException if an error occurs.
-         */
-        virtual void looseUnmarshal(OpenWireFormat* format,
-                                    commands::DataStructure* command,
-                                    decaf::io::DataInputStream* dis) = 0;
-
-    };
-
-}}}}
+        }  // namespace marshal
+    }  // namespace openwire
+}  // namespace wireformat
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_WIREFORMAT_OPENWIRE_MARSHAL_DATASTREAMMARSHALLER_H_*/

@@ -17,10 +17,10 @@
 
 #include "MessagePropertyInterceptor.h"
 
-#include <decaf/lang/Integer.h>
-#include <decaf/lang/Boolean.h>
 #include <activemq/exceptions/ActiveMQException.h>
 #include <cms/DeliveryMode.h>
+#include <decaf/lang/Boolean.h>
+#include <decaf/lang/Integer.h>
 
 using namespace std;
 using namespace activemq;
@@ -34,38 +34,61 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-MessagePropertyInterceptor::MessagePropertyInterceptor(commands::Message* message, PrimitiveMap* properties) :
-    message(message), properties(properties) {
-
-    if (message == NULL) {
-        throw NullPointerException(__FILE__, __LINE__, "Message passed was NULL");
+MessagePropertyInterceptor::MessagePropertyInterceptor(
+    commands::Message* message,
+    PrimitiveMap*      properties)
+    : message(message),
+      properties(properties)
+{
+    if (message == NULL)
+    {
+        throw NullPointerException(__FILE__,
+                                   __LINE__,
+                                   "Message passed was NULL");
     }
 
-    if (properties == NULL) {
-        throw NullPointerException(__FILE__, __LINE__, "PrimitiveMap passed was NULL");
+    if (properties == NULL)
+    {
+        throw NullPointerException(__FILE__,
+                                   __LINE__,
+                                   "PrimitiveMap passed was NULL");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-MessagePropertyInterceptor::MessagePropertyInterceptor(const MessagePropertyInterceptor&) :
-    message(NULL), properties(NULL) {
+MessagePropertyInterceptor::MessagePropertyInterceptor(
+    const MessagePropertyInterceptor&)
+    : message(NULL),
+      properties(NULL)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-MessagePropertyInterceptor& MessagePropertyInterceptor::operator=(const MessagePropertyInterceptor&) {
+MessagePropertyInterceptor& MessagePropertyInterceptor::operator=(
+    const MessagePropertyInterceptor&)
+{
     return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-MessagePropertyInterceptor::~MessagePropertyInterceptor() {}
+MessagePropertyInterceptor::~MessagePropertyInterceptor()
+{
+}
 
 ////////////////////////////////////////////////////////////////////////////////
-bool MessagePropertyInterceptor::getBooleanProperty(const std::string& name) const {
-
+bool MessagePropertyInterceptor::getBooleanProperty(
+    const std::string& name) const
+{
     if (name == "JMSXDeliveryCount" || name == "JMSXGroupID" ||
-        name == "JMSXGroupSeq") {
-        throw ActiveMQException(__FILE__, __LINE__, "Cannot Convert Reserved Property to this Type.");
-    } else if (name == "JMSXGroupFirstForConsumer") {
+        name == "JMSXGroupSeq")
+    {
+        throw ActiveMQException(
+            __FILE__,
+            __LINE__,
+            "Cannot Convert Reserved Property to this Type.");
+    }
+    else if (name == "JMSXGroupFirstForConsumer")
+    {
         return message->isJMSXGroupFirstForConsumer();
     }
 
@@ -73,47 +96,68 @@ bool MessagePropertyInterceptor::getBooleanProperty(const std::string& name) con
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-unsigned char MessagePropertyInterceptor::getByteProperty(const std::string& name) const {
-
+unsigned char MessagePropertyInterceptor::getByteProperty(
+    const std::string& name) const
+{
     if (name == "JMSXDeliveryCount" || name == "JMSXGroupID" ||
-        name == "JMSXGroupSeq" || name == "JMSXGroupFirstForConsumer") {
-        throw ActiveMQException(__FILE__, __LINE__, "Cannot Convert Reserved Property to this Type.");
+        name == "JMSXGroupSeq" || name == "JMSXGroupFirstForConsumer")
+    {
+        throw ActiveMQException(
+            __FILE__,
+            __LINE__,
+            "Cannot Convert Reserved Property to this Type.");
     }
 
     return this->properties->getByte(name);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-double MessagePropertyInterceptor::getDoubleProperty(const std::string& name) const {
-
+double MessagePropertyInterceptor::getDoubleProperty(
+    const std::string& name) const
+{
     if (name == "JMSXDeliveryCount" || name == "JMSXGroupID" ||
-        name == "JMSXGroupSeq" || name == "JMSXGroupFirstForConsumer") {
-        throw ActiveMQException(__FILE__, __LINE__, "Cannot Convert Reserved Property to this Type.");
+        name == "JMSXGroupSeq" || name == "JMSXGroupFirstForConsumer")
+    {
+        throw ActiveMQException(
+            __FILE__,
+            __LINE__,
+            "Cannot Convert Reserved Property to this Type.");
     }
 
     return this->properties->getDouble(name);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-float MessagePropertyInterceptor::getFloatProperty(const std::string& name) const {
-
+float MessagePropertyInterceptor::getFloatProperty(const std::string& name) const
+{
     if (name == "JMSXDeliveryCount" || name == "JMSXGroupID" ||
-        name == "JMSXGroupSeq" || name == "JMSXGroupFirstForConsumer") {
-
-        throw ActiveMQException(__FILE__, __LINE__, "Cannot Convert Reserved Property to this Type.");
+        name == "JMSXGroupSeq" || name == "JMSXGroupFirstForConsumer")
+    {
+        throw ActiveMQException(
+            __FILE__,
+            __LINE__,
+            "Cannot Convert Reserved Property to this Type.");
     }
 
     return this->properties->getFloat(name);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int MessagePropertyInterceptor::getIntProperty(const std::string& name) const {
-
-    if (name == "JMSXGroupID" || name == "JMSXGroupFirstForConsumer") {
-        throw ActiveMQException(__FILE__, __LINE__, "Cannot Convert Reserved Property to this Type.");
-    } else if (name == "JMSXDeliveryCount") {
+int MessagePropertyInterceptor::getIntProperty(const std::string& name) const
+{
+    if (name == "JMSXGroupID" || name == "JMSXGroupFirstForConsumer")
+    {
+        throw ActiveMQException(
+            __FILE__,
+            __LINE__,
+            "Cannot Convert Reserved Property to this Type.");
+    }
+    else if (name == "JMSXDeliveryCount")
+    {
         return this->message->getRedeliveryCounter();
-    } else if (name == "JMSXGroupSeq") {
+    }
+    else if (name == "JMSXGroupSeq")
+    {
         return this->message->getGroupSequence();
     }
 
@@ -121,41 +165,61 @@ int MessagePropertyInterceptor::getIntProperty(const std::string& name) const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-long long MessagePropertyInterceptor::getLongProperty(const std::string& name) const {
-
-    if (name == "JMSXGroupID" || name == "JMSXGroupFirstForConsumer") {
-        throw ActiveMQException(__FILE__, __LINE__, "Cannot Convert Reserved Property to this Type.");
-    } else if (name == "JMSXDeliveryCount") {
-        return (long long) this->message->getRedeliveryCounter();
-    } else if (name == "JMSXGroupSeq") {
-        return (long long) this->message->getGroupSequence();
+long long MessagePropertyInterceptor::getLongProperty(
+    const std::string& name) const
+{
+    if (name == "JMSXGroupID" || name == "JMSXGroupFirstForConsumer")
+    {
+        throw ActiveMQException(
+            __FILE__,
+            __LINE__,
+            "Cannot Convert Reserved Property to this Type.");
+    }
+    else if (name == "JMSXDeliveryCount")
+    {
+        return (long long)this->message->getRedeliveryCounter();
+    }
+    else if (name == "JMSXGroupSeq")
+    {
+        return (long long)this->message->getGroupSequence();
     }
 
     return this->properties->getLong(name);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-short MessagePropertyInterceptor::getShortProperty(const std::string& name) const {
-
+short MessagePropertyInterceptor::getShortProperty(const std::string& name) const
+{
     if (name == "JMSXDeliveryCount" || name == "JMSXGroupID" ||
-        name == "JMSXGroupSeq" || name == "JMSXGroupFirstForConsumer") {
-
-        throw ActiveMQException(__FILE__, __LINE__, "Cannot Convert Reserved Property to this Type.");
+        name == "JMSXGroupSeq" || name == "JMSXGroupFirstForConsumer")
+    {
+        throw ActiveMQException(
+            __FILE__,
+            __LINE__,
+            "Cannot Convert Reserved Property to this Type.");
     }
 
     return this->properties->getShort(name);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string MessagePropertyInterceptor::getStringProperty(const std::string& name) const {
-
-    if (name == "JMSXGroupID") {
+std::string MessagePropertyInterceptor::getStringProperty(
+    const std::string& name) const
+{
+    if (name == "JMSXGroupID")
+    {
         return this->message->getGroupID();
-    } else if (name == "JMSXDeliveryCount") {
+    }
+    else if (name == "JMSXDeliveryCount")
+    {
         return Integer::toString(this->message->getRedeliveryCounter());
-    } else if (name == "JMSXGroupSeq") {
+    }
+    else if (name == "JMSXGroupSeq")
+    {
         return Integer::toString(this->message->getGroupSequence());
-    } else if (name == "JMSXGroupFirstForConsumer") {
+    }
+    else if (name == "JMSXGroupFirstForConsumer")
+    {
         return Boolean::toString(message->isJMSXGroupFirstForConsumer());
     }
 
@@ -163,11 +227,19 @@ std::string MessagePropertyInterceptor::getStringProperty(const std::string& nam
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MessagePropertyInterceptor::setBooleanProperty(const std::string& name, bool value) {
-
-    if (name == "JMSXDeliveryCount" || name == "JMSXGroupID" || name == "JMSXGroupSeq") {
-        throw ActiveMQException(__FILE__, __LINE__, "Cannot Convert Reserved Property to this Type.");
-    } else if(name == "JMSXGroupFirstForConsumer") {
+void MessagePropertyInterceptor::setBooleanProperty(const std::string& name,
+                                                    bool               value)
+{
+    if (name == "JMSXDeliveryCount" || name == "JMSXGroupID" ||
+        name == "JMSXGroupSeq")
+    {
+        throw ActiveMQException(
+            __FILE__,
+            __LINE__,
+            "Cannot Convert Reserved Property to this Type.");
+    }
+    else if (name == "JMSXGroupFirstForConsumer")
+    {
         return message->setJMSXGroupFirstForConsumer(value);
     }
 
@@ -175,45 +247,70 @@ void MessagePropertyInterceptor::setBooleanProperty(const std::string& name, boo
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MessagePropertyInterceptor::setByteProperty(const std::string& name, unsigned char value) {
-
-    if (name == "JMSXDeliveryCount" || name == "JMSXGroupID" || name == "JMSXGroupSeq") {
-        throw ActiveMQException(__FILE__, __LINE__, "Cannot Convert Reserved Property to this Type.");
+void MessagePropertyInterceptor::setByteProperty(const std::string& name,
+                                                 unsigned char      value)
+{
+    if (name == "JMSXDeliveryCount" || name == "JMSXGroupID" ||
+        name == "JMSXGroupSeq")
+    {
+        throw ActiveMQException(
+            __FILE__,
+            __LINE__,
+            "Cannot Convert Reserved Property to this Type.");
     }
 
     this->properties->setByte(name, value);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MessagePropertyInterceptor::setDoubleProperty(const std::string& name, double value) {
-
-    if (name == "JMSXDeliveryCount" || name == "JMSXGroupID" || name == "JMSXGroupSeq") {
-        throw ActiveMQException(__FILE__, __LINE__, "Cannot Convert Reserved Property to this Type.");
+void MessagePropertyInterceptor::setDoubleProperty(const std::string& name,
+                                                   double             value)
+{
+    if (name == "JMSXDeliveryCount" || name == "JMSXGroupID" ||
+        name == "JMSXGroupSeq")
+    {
+        throw ActiveMQException(
+            __FILE__,
+            __LINE__,
+            "Cannot Convert Reserved Property to this Type.");
     }
 
     this->properties->setDouble(name, value);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MessagePropertyInterceptor::setFloatProperty(const std::string& name, float value) {
-
+void MessagePropertyInterceptor::setFloatProperty(const std::string& name,
+                                                  float              value)
+{
     if (name == "JMSXDeliveryCount" || name == "JMSXGroupID" ||
-        name == "JMSXGroupSeq" || name == "JMSXGroupFirstForConsumer") {
-
-        throw ActiveMQException(__FILE__, __LINE__, "Cannot Convert Reserved Property to this Type.");
+        name == "JMSXGroupSeq" || name == "JMSXGroupFirstForConsumer")
+    {
+        throw ActiveMQException(
+            __FILE__,
+            __LINE__,
+            "Cannot Convert Reserved Property to this Type.");
     }
 
     this->properties->setFloat(name, value);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MessagePropertyInterceptor::setIntProperty(const std::string& name, int value) {
-
-    if (name == "JMSXGroupID" || name == "JMSXGroupFirstForConsumer") {
-        throw ActiveMQException(__FILE__, __LINE__, "Cannot Convert Reserved Property to this Type.");
-    } else if (name == "JMSXDeliveryCount") {
+void MessagePropertyInterceptor::setIntProperty(const std::string& name,
+                                                int                value)
+{
+    if (name == "JMSXGroupID" || name == "JMSXGroupFirstForConsumer")
+    {
+        throw ActiveMQException(
+            __FILE__,
+            __LINE__,
+            "Cannot Convert Reserved Property to this Type.");
+    }
+    else if (name == "JMSXDeliveryCount")
+    {
         this->message->setRedeliveryCounter(value);
-    } else if (name == "JMSXGroupSeq") {
+    }
+    else if (name == "JMSXGroupSeq")
+    {
         this->message->setGroupSequence(value);
     }
 
@@ -221,39 +318,63 @@ void MessagePropertyInterceptor::setIntProperty(const std::string& name, int val
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MessagePropertyInterceptor::setLongProperty(const std::string& name, long long value) {
-    if (name == "JMSXGroupFirstForConsumer") {
-        throw ActiveMQException(__FILE__, __LINE__, "Cannot Convert Reserved Property to this Type.");
+void MessagePropertyInterceptor::setLongProperty(const std::string& name,
+                                                 long long          value)
+{
+    if (name == "JMSXGroupFirstForConsumer")
+    {
+        throw ActiveMQException(
+            __FILE__,
+            __LINE__,
+            "Cannot Convert Reserved Property to this Type.");
     }
 
     this->properties->setLong(name, value);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MessagePropertyInterceptor::setShortProperty(const std::string& name, short value) {
-
-    if (name == "JMSXGroupID" || name == "JMSXGroupFirstForConsumer") {
-        throw ActiveMQException(__FILE__, __LINE__, "Cannot Convert Reserved Property to this Type.");
-    } else if (name == "JMSXDeliveryCount") {
-        this->message->setRedeliveryCounter((int) value);
-    } else if (name == "JMSXGroupSeq") {
-        this->message->setGroupSequence((int) value);
+void MessagePropertyInterceptor::setShortProperty(const std::string& name,
+                                                  short              value)
+{
+    if (name == "JMSXGroupID" || name == "JMSXGroupFirstForConsumer")
+    {
+        throw ActiveMQException(
+            __FILE__,
+            __LINE__,
+            "Cannot Convert Reserved Property to this Type.");
+    }
+    else if (name == "JMSXDeliveryCount")
+    {
+        this->message->setRedeliveryCounter((int)value);
+    }
+    else if (name == "JMSXGroupSeq")
+    {
+        this->message->setGroupSequence((int)value);
     }
 
     this->properties->setShort(name, value);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MessagePropertyInterceptor::setStringProperty(const std::string& name, const std::string& value) {
-
-    if (name == "JMSXGroupID") {
+void MessagePropertyInterceptor::setStringProperty(const std::string& name,
+                                                   const std::string& value)
+{
+    if (name == "JMSXGroupID")
+    {
         this->message->setGroupID(value);
-    } else if (name == "JMSXDeliveryCount") {
+    }
+    else if (name == "JMSXDeliveryCount")
+    {
         this->message->setRedeliveryCounter(Integer::parseInt(value));
-    } else if (name == "JMSXGroupSeq") {
+    }
+    else if (name == "JMSXGroupSeq")
+    {
         this->message->setGroupSequence(Integer::parseInt(value));
-    } else if (name == "JMSXGroupFirstForConsumer") {
-        this->message->setJMSXGroupFirstForConsumer(Boolean::parseBoolean(value));
+    }
+    else if (name == "JMSXGroupFirstForConsumer")
+    {
+        this->message->setJMSXGroupFirstForConsumer(
+            Boolean::parseBoolean(value));
     }
 
     this->properties->setString(name, value);

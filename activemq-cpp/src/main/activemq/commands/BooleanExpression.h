@@ -21,21 +21,34 @@
 #include <activemq/commands/BaseDataStructure.h>
 #include <activemq/util/Config.h>
 
-namespace activemq{
-namespace commands{
+namespace activemq
+{
+namespace commands
+{
 
-    class AMQCPP_API BooleanExpression : public BaseDataStructure {
+    class AMQCPP_API BooleanExpression : public BaseDataStructure
+    {
     public:
+        BooleanExpression()
+            : BaseDataStructure()
+        {
+        }
 
-        BooleanExpression() : BaseDataStructure() {}
+        virtual ~BooleanExpression() throw()
+        {
+        }
 
-        virtual ~BooleanExpression() throw() {}
+        virtual DataStructure* cloneDataStructure() const
+        {
+            return NULL;
+        }
 
-        virtual DataStructure* cloneDataStructure() const { return NULL; }
+        virtual void copyDataStructure(const DataStructure* src AMQCPP_UNUSED)
+        {
+        }
 
-        virtual void copyDataStructure( const DataStructure* src AMQCPP_UNUSED) {}
-
-        virtual std::string toString() const {
+        virtual std::string toString() const
+        {
             std::ostringstream stream;
 
             stream << "Begin Class = BooleanExpression" << std::endl;
@@ -45,12 +58,13 @@ namespace commands{
             return stream.str();
         }
 
-        virtual bool equals( const DataStructure* value ) const {
-            return BaseDataStructure::equals( value );
+        virtual bool equals(const DataStructure* value) const
+        {
+            return BaseDataStructure::equals(value);
         }
-
     };
 
-}}
+}  // namespace commands
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_COMMANDS_BOOLEANEXPRESSION_H_*/

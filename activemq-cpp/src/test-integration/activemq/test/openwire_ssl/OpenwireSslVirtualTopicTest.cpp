@@ -21,10 +21,10 @@
 #include <memory>
 #include <string>
 
-#include <cms/Topic.h>
-#include <cms/TextMessage.h>
 #include <cms/MessageConsumer.h>
 #include <cms/MessageProducer.h>
+#include <cms/TextMessage.h>
+#include <cms/Topic.h>
 
 using namespace std;
 using namespace activemq;
@@ -32,87 +32,116 @@ using namespace activemq::util;
 using namespace activemq::test;
 using namespace activemq::exceptions;
 
-namespace {
+namespace
+{
 
-    const string PRODUCER_DESTINATION_NAME = "VirtualTopic.TestDestination";
-    const string CONSUMER_A_DESTINATION_NAME = "Consumer.A.VirtualTopic.TestDestination";
-    const string CONSUMER_B_DESTINATION_NAME = "Consumer.B.VirtualTopic.TestDestination";
+const string PRODUCER_DESTINATION_NAME = "VirtualTopic.TestDestination";
+const string CONSUMER_A_DESTINATION_NAME =
+    "Consumer.A.VirtualTopic.TestDestination";
+const string CONSUMER_B_DESTINATION_NAME =
+    "Consumer.B.VirtualTopic.TestDestination";
 
-    void runVirtualTopicSyncTest(activemq::util::CMSProvider* cmsProvider, cms::Session::AcknowledgeMode mode) {
+void runVirtualTopicSyncTest(activemq::util::CMSProvider*  cmsProvider,
+                             cms::Session::AcknowledgeMode mode)
+{
+    cmsProvider->setAckMode(mode);
+    cmsProvider->reconnectSession();
 
-        cmsProvider->setAckMode(mode);
-        cmsProvider->reconnectSession();
+    // Create CMS Object for Comms
+    cms::Session* session(cmsProvider->getSession());
 
-        // Create CMS Object for Comms
-        cms::Session* session(cmsProvider->getSession());
+    std::unique_ptr<cms::Destination> topic(
+        session->createTopic(PRODUCER_DESTINATION_NAME));
+    std::unique_ptr<cms::Destination> queueA(
+        session->createQueue(CONSUMER_A_DESTINATION_NAME));
+    std::unique_ptr<cms::Destination> queueB(
+        session->createQueue(CONSUMER_B_DESTINATION_NAME));
 
-        std::unique_ptr<cms::Destination> topic(session->createTopic(PRODUCER_DESTINATION_NAME));
-        std::unique_ptr<cms::Destination> queueA(session->createQueue(CONSUMER_A_DESTINATION_NAME));
-        std::unique_ptr<cms::Destination> queueB(session->createQueue(CONSUMER_B_DESTINATION_NAME));
+    std::unique_ptr<cms::MessageProducer> producer(
+        session->createProducer(topic.get()));
+    std::unique_ptr<cms::MessageConsumer> consumerA(
+        session->createConsumer(queueA.get()));
+    std::unique_ptr<cms::MessageConsumer> consumerB(
+        session->createConsumer(queueB.get()));
 
-        std::unique_ptr<cms::MessageProducer> producer(session->createProducer(topic.get()));
-        std::unique_ptr<cms::MessageConsumer> consumerA(session->createConsumer(queueA.get()));
-        std::unique_ptr<cms::MessageConsumer> consumerB(session->createConsumer(queueB.get()));
+    producer->setDeliveryMode(cms::DeliveryMode::NON_PERSISTENT);
 
-        producer->setDeliveryMode(cms::DeliveryMode::NON_PERSISTENT);
+    std::unique_ptr<cms::TextMessage> txtMessage(
+        session->createTextMessage("TEST MESSAGE"));
 
-        std::unique_ptr<cms::TextMessage> txtMessage(session->createTextMessage("TEST MESSAGE"));
+    for (std::size_t i = 0; i < IntegrationCommon::defaultMsgCount; ++i)
+    {
+        producer->send(txtMessage.get());
+    }
 
-        for (std::size_t i = 0; i < IntegrationCommon::defaultMsgCount; ++i) {
-            producer->send(txtMessage.get());
+    if (cms::Session::SESSION_TRANSACTED == mode)
+    {
+        session->commit();
+    }
+
+    for (std::size_t i = 0; i < IntegrationCommon::defaultMsgCount; ++i)
+    {
+        std::unique_ptr<cms::Message> messageA(consumerA->receive(2000));
+        ASSERT_TRUE(messageA.get() != NULL);
+        if (cms::Session::CLIENT_ACKNOWLEDGE == mode)
+        {
+            messageA->acknowledge();
         }
 
-        if (cms::Session::SESSION_TRANSACTED == mode) {
-            session->commit();
-        }
-
-        for (std::size_t i = 0; i < IntegrationCommon::defaultMsgCount; ++i) {
-
-            std::unique_ptr<cms::Message> messageA(consumerA->receive(2000));
-            ASSERT_TRUE(messageA.get() != NULL);
-            if (cms::Session::CLIENT_ACKNOWLEDGE == mode) {
-                messageA->acknowledge();
-            }
-
-            std::unique_ptr<cms::Message> messageB(consumerB->receive(2000));
-            ASSERT_TRUE(messageB.get() != NULL);
-            if (cms::Session::CLIENT_ACKNOWLEDGE == mode) {
-                messageB->acknowledge();
-            }
-        }
-
-        if (cms::Session::SESSION_TRANSACTED == mode) {
-            session->commit();
+        std::unique_ptr<cms::Message> messageB(consumerB->receive(2000));
+        ASSERT_TRUE(messageB.get() != NULL);
+        if (cms::Session::CLIENT_ACKNOWLEDGE == mode)
+        {
+            messageB->acknowledge();
         }
     }
+
+    if (cms::Session::SESSION_TRANSACTED == mode)
+    {
+        session->commit();
+    }
 }
+}  // namespace
 
-namespace activemq {
-namespace test {
-namespace openwire_ssl {
+namespace activemq
+{
+namespace test
+{
+    namespace openwire_ssl
+    {
 
-    class OpenwireSslVirtualTopicTest : public VirtualTopicTest {
-    public:
-        std::string getBrokerURL() const override {
-            return activemq::util::IntegrationCommon::getInstance().getSslOpenwireURL();
-        }
-    };
+        class OpenwireSslVirtualTopicTest : public VirtualTopicTest
+        {
+        public:
+            std::string getBrokerURL() const override
+            {
+                return activemq::util::IntegrationCommon::getInstance()
+                    .getSslOpenwireURL();
+            }
+        };
 
-}}}
+    }  // namespace openwire_ssl
+}  // namespace test
+}  // namespace activemq
 
 using activemq::test::openwire_ssl::OpenwireSslVirtualTopicTest;
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(OpenwireSslVirtualTopicTest, testVirtualTopicSyncReceiveAutoAck) {
+TEST_F(OpenwireSslVirtualTopicTest, testVirtualTopicSyncReceiveAutoAck)
+{
     runVirtualTopicSyncTest(cmsProvider.get(), cms::Session::AUTO_ACKNOWLEDGE);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(OpenwireSslVirtualTopicTest, testVirtualTopicSyncReceiveClinetAck) {
-    runVirtualTopicSyncTest(cmsProvider.get(), cms::Session::CLIENT_ACKNOWLEDGE);
+TEST_F(OpenwireSslVirtualTopicTest, testVirtualTopicSyncReceiveClinetAck)
+{
+    runVirtualTopicSyncTest(cmsProvider.get(),
+                            cms::Session::CLIENT_ACKNOWLEDGE);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(OpenwireSslVirtualTopicTest, testVirtualTopicSyncReceiveTransacted) {
-    runVirtualTopicSyncTest(cmsProvider.get(), cms::Session::SESSION_TRANSACTED);
+TEST_F(OpenwireSslVirtualTopicTest, testVirtualTopicSyncReceiveTransacted)
+{
+    runVirtualTopicSyncTest(cmsProvider.get(),
+                            cms::Session::SESSION_TRANSACTED);
 }

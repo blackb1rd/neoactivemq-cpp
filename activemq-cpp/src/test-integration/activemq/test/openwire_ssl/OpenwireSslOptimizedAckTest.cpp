@@ -15,34 +15,49 @@
  * limitations under the License.
  */
 
-#include <activemq/util/IntegrationCommon.h>
 #include <activemq/test/CMSTestFixture.h>
+#include <activemq/util/IntegrationCommon.h>
 
-namespace activemq {
-namespace test {
-namespace openwire_ssl {
-    class OpenwireSslOptimizedAckTest : public CMSTestFixture {
-    public:
-        void SetUp() override {}
-        void TearDown() override {}
-        std::string getBrokerURL() const override {
-            return activemq::util::IntegrationCommon::getInstance().getSslOpenwireURL() +
-                "?connection.optimizeAcknowledge=true&cms.prefetchPolicy.all=100";
-        }
-    };
-}}}
+namespace activemq
+{
+namespace test
+{
+    namespace openwire_ssl
+    {
+        class OpenwireSslOptimizedAckTest : public CMSTestFixture
+        {
+        public:
+            void SetUp() override
+            {
+            }
 
-#include <cms/MessageListener.h>
+            void TearDown() override
+            {
+            }
+
+            std::string getBrokerURL() const override
+            {
+                return activemq::util::IntegrationCommon::getInstance()
+                           .getSslOpenwireURL() +
+                       "?connection.optimizeAcknowledge=true&cms."
+                       "prefetchPolicy.all=100";
+            }
+        };
+    }  // namespace openwire_ssl
+}  // namespace test
+}  // namespace activemq
+
 #include <cms/ExceptionListener.h>
+#include <cms/MessageListener.h>
 
-#include <activemq/core/ActiveMQConnectionFactory.h>
 #include <activemq/core/ActiveMQConnection.h>
+#include <activemq/core/ActiveMQConnectionFactory.h>
 #include <activemq/core/ActiveMQConsumer.h>
 #include <activemq/core/PrefetchPolicy.h>
 #include <activemq/exceptions/ActiveMQException.h>
 
-#include <decaf/lang/Thread.h>
 #include <decaf/lang/Pointer.h>
+#include <decaf/lang/Thread.h>
 #include <decaf/util/concurrent/atomic/AtomicInteger.h>
 
 using namespace std;
@@ -60,30 +75,34 @@ using namespace decaf::util::concurrent;
 using namespace decaf::util::concurrent::atomic;
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class MyMessageListener : public cms::MessageListener {
-    private:
+class MyMessageListener : public cms::MessageListener
+{
+private:
+    AtomicInteger counter;
 
-        AtomicInteger counter;
+public:
+    virtual ~MyMessageListener()
+    {
+    }
 
-    public:
+    virtual void onMessage(const cms::Message* message)
+    {
+        counter.incrementAndGet();
+    }
 
-        virtual ~MyMessageListener() {}
-
-        virtual void onMessage(const cms::Message* message) {
-            counter.incrementAndGet();
-        }
-
-        int getCounter() {
-            return counter.get();
-        }
-    };
-}
+    int getCounter()
+    {
+        return counter.get();
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(OpenwireSslOptimizedAckTest, testOptimizedAckSettings) {
-
+TEST_F(OpenwireSslOptimizedAckTest, testOptimizedAckSettings)
+{
     Pointer<ActiveMQConnectionFactory> connectionFactory(
         new ActiveMQConnectionFactory(getBrokerURL()));
 
@@ -94,19 +113,24 @@ TEST_F(OpenwireSslOptimizedAckTest, testOptimizedAckSettings) {
 
     Pointer<Connection> connection(connectionFactory->createConnection());
     connection->start();
-    Pointer<Session> session(connection->createSession(Session::AUTO_ACKNOWLEDGE));
+    Pointer<Session> session(
+        connection->createSession(Session::AUTO_ACKNOWLEDGE));
     Pointer<Destination> destination(session->createQueue("TEST.FOO"));
 
-    Pointer<MessageConsumer> consumer(session->createConsumer(destination.get()));
+    Pointer<MessageConsumer> consumer(
+        session->createConsumer(destination.get()));
 
-    Pointer<ActiveMQConsumer> amqConsumer = consumer.dynamicCast<ActiveMQConsumer>();
+    Pointer<ActiveMQConsumer> amqConsumer =
+        consumer.dynamicCast<ActiveMQConsumer>();
     ASSERT_TRUE(amqConsumer->isOptimizeAcknowledge());
     ASSERT_TRUE(amqConsumer->getOptimizedAckScheduledAckInterval() == 1000);
 
-    Pointer<MessageProducer> producer(session->createProducer(destination.get()));
+    Pointer<MessageProducer> producer(
+        session->createProducer(destination.get()));
     producer->setDeliveryMode(cms::DeliveryMode::NON_PERSISTENT);
 
-    std::string text = std::string() + "Hello world! From: " + Thread::currentThread()->getName();
+    std::string text = std::string() + "Hello world! From: " +
+                       Thread::currentThread()->getName();
     Pointer<TextMessage> message;
 
     message.reset(session->createTextMessage(text));
@@ -119,31 +143,37 @@ TEST_F(OpenwireSslOptimizedAckTest, testOptimizedAckSettings) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(OpenwireSslOptimizedAckTest, testOptimizedAckWithExpiredMsgs) {
-
+TEST_F(OpenwireSslOptimizedAckTest, testOptimizedAckWithExpiredMsgs)
+{
     Pointer<ActiveMQConnectionFactory> connectionFactory(
         new ActiveMQConnectionFactory(getBrokerURL()));
 
     Pointer<Connection> connection(connectionFactory->createConnection());
-    Pointer<Session> session(connection->createSession(Session::AUTO_ACKNOWLEDGE));
+    Pointer<Session>    session(
+        connection->createSession(Session::AUTO_ACKNOWLEDGE));
     Pointer<Destination> destination(session->createQueue("TEST.FOO"));
 
-    Pointer<MessageConsumer> consumer(session->createConsumer(destination.get()));
-    MyMessageListener listener;
-    Pointer<MessageProducer> producer(session->createProducer(destination.get()));
+    Pointer<MessageConsumer> consumer(
+        session->createConsumer(destination.get()));
+    MyMessageListener        listener;
+    Pointer<MessageProducer> producer(
+        session->createProducer(destination.get()));
     producer->setDeliveryMode(cms::DeliveryMode::NON_PERSISTENT);
 
-    std::string text = std::string() + "Hello world! From: " + Thread::currentThread()->getName();
+    std::string text = std::string() + "Hello world! From: " +
+                       Thread::currentThread()->getName();
     Pointer<TextMessage> message;
 
     // Produce msgs that will expire quickly
-    for (int i=0; i<45; i++) {
+    for (int i = 0; i < 45; i++)
+    {
         message.reset(session->createTextMessage(text));
         producer->send(message.get(), 1, 1, 400);
     }
 
     // Produce msgs that don't expire
-    for (int i=0; i<60; i++) {
+    for (int i = 0; i < 60; i++)
+    {
         message.reset(session->createTextMessage(text));
         producer->send(message.get(), 1, 1, 60000);
     }
@@ -153,14 +183,17 @@ TEST_F(OpenwireSslOptimizedAckTest, testOptimizedAckWithExpiredMsgs) {
     connection->start();
 
     int cycle = 0;
-    while (cycle++ < 20) {
-        if (listener.getCounter() == 60) {
+    while (cycle++ < 20)
+    {
+        if (listener.getCounter() == 60)
+        {
             break;
         }
         Thread::sleep(1000);
     }
 
-    ASSERT_TRUE(listener.getCounter() == 60) << ("Should have received 60 messages.");
+    ASSERT_TRUE(listener.getCounter() == 60)
+        << ("Should have received 60 messages.");
 
     producer->close();
     consumer->close();
@@ -169,38 +202,45 @@ TEST_F(OpenwireSslOptimizedAckTest, testOptimizedAckWithExpiredMsgs) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(OpenwireSslOptimizedAckTest, testOptimizedAckWithExpiredMsgsSync) {
-
+TEST_F(OpenwireSslOptimizedAckTest, testOptimizedAckWithExpiredMsgsSync)
+{
     Pointer<ActiveMQConnectionFactory> connectionFactory(
         new ActiveMQConnectionFactory(getBrokerURL()));
 
     Pointer<Connection> connection(connectionFactory->createConnection());
     connection->start();
-    Pointer<Session> session(connection->createSession(Session::AUTO_ACKNOWLEDGE));
+    Pointer<Session> session(
+        connection->createSession(Session::AUTO_ACKNOWLEDGE));
     Pointer<Destination> destination(session->createQueue("TEST.FOO"));
 
-    Pointer<MessageConsumer> consumer(session->createConsumer(destination.get()));
-    Pointer<MessageProducer> producer(session->createProducer(destination.get()));
+    Pointer<MessageConsumer> consumer(
+        session->createConsumer(destination.get()));
+    Pointer<MessageProducer> producer(
+        session->createProducer(destination.get()));
     producer->setDeliveryMode(cms::DeliveryMode::NON_PERSISTENT);
 
-    std::string text = std::string() + "Hello world! From: " + Thread::currentThread()->getName();
+    std::string text = std::string() + "Hello world! From: " +
+                       Thread::currentThread()->getName();
     Pointer<TextMessage> message;
 
     // Produce msgs that will expire quickly
-    for (int i=0; i<45; i++) {
+    for (int i = 0; i < 45; i++)
+    {
         message.reset(session->createTextMessage(text));
         producer->send(message.get(), 1, 1, 10);
     }
 
     // Produce msgs that don't expire
-    for (int i=0; i<60; i++) {
+    for (int i = 0; i < 60; i++)
+    {
         message.reset(session->createTextMessage(text));
         producer->send(message.get(), 1, 1, 30000);
     }
 
     Thread::sleep(200);
 
-    for (int counter = 1; counter <= 60; ++counter) {
+    for (int counter = 1; counter <= 60; ++counter)
+    {
         Pointer<Message> message(consumer->receive(2000));
         ASSERT_TRUE(message != NULL);
     }
@@ -212,42 +252,50 @@ TEST_F(OpenwireSslOptimizedAckTest, testOptimizedAckWithExpiredMsgsSync) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(OpenwireSslOptimizedAckTest, testOptimizedAckWithExpiredMsgsSync2) {
-
+TEST_F(OpenwireSslOptimizedAckTest, testOptimizedAckWithExpiredMsgsSync2)
+{
     Pointer<ActiveMQConnectionFactory> connectionFactory(
         new ActiveMQConnectionFactory(getBrokerURL()));
 
     Pointer<Connection> connection(connectionFactory->createConnection());
     connection->start();
-    Pointer<Session> session(connection->createSession(Session::AUTO_ACKNOWLEDGE));
+    Pointer<Session> session(
+        connection->createSession(Session::AUTO_ACKNOWLEDGE));
     Pointer<Destination> destination(session->createQueue("TEST.FOO"));
 
-    Pointer<MessageConsumer> consumer(session->createConsumer(destination.get()));
-    Pointer<MessageProducer> producer(session->createProducer(destination.get()));
+    Pointer<MessageConsumer> consumer(
+        session->createConsumer(destination.get()));
+    Pointer<MessageProducer> producer(
+        session->createProducer(destination.get()));
     producer->setDeliveryMode(cms::DeliveryMode::NON_PERSISTENT);
 
-    std::string text = std::string() + "Hello world! From: " + Thread::currentThread()->getName();
+    std::string text = std::string() + "Hello world! From: " +
+                       Thread::currentThread()->getName();
     Pointer<TextMessage> message;
 
     // Produce msgs that don't expire
-    for (int i=0; i<56; i++) {
+    for (int i = 0; i < 56; i++)
+    {
         message.reset(session->createTextMessage(text));
         producer->send(message.get(), 1, 1, 30000);
     }
     // Produce msgs that will expire quickly
-    for (int i=0; i<44; i++) {
+    for (int i = 0; i < 44; i++)
+    {
         message.reset(session->createTextMessage(text));
         producer->send(message.get(), 1, 1, 10);
     }
     // Produce some moremsgs that don't expire
-    for (int i=0; i<4; i++) {
+    for (int i = 0; i < 4; i++)
+    {
         message.reset(session->createTextMessage(text));
         producer->send(message.get(), 1, 1, 30000);
     }
 
     Thread::sleep(200);
 
-    for (int counter = 1; counter <= 60; ++counter) {
+    for (int counter = 1; counter <= 60; ++counter)
+    {
         Pointer<Message> message(consumer->receive(2000));
         ASSERT_TRUE(message != NULL);
     }

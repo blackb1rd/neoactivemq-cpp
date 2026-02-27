@@ -20,7 +20,7 @@
 
 // Turn off warning message for ignored exception specification
 #ifdef _MSC_VER
-#pragma warning( disable : 4290 )
+#pragma warning(disable : 4290)
 #endif
 
 #include <activemq/commands/BaseCommand.h>
@@ -31,8 +31,10 @@
 #include <string>
 #include <vector>
 
-namespace activemq {
-namespace commands {
+namespace activemq
+{
+namespace commands
+{
 
     using decaf::lang::Pointer;
 
@@ -45,27 +47,23 @@ namespace commands {
      *         in the activemq-cpp-openwire-generator module
      *
      */
-    class AMQCPP_API SessionInfo : public BaseCommand {
+    class AMQCPP_API SessionInfo : public BaseCommand
+    {
     protected:
-
         Pointer<SessionId> sessionId;
 
     public:
-
         const static unsigned char ID_SESSIONINFO = 4;
 
     private:
-
         // The ACK mode that the Session was created with
         unsigned int ackMode;
 
     private:
-
         SessionInfo(const SessionInfo&);
-        SessionInfo& operator= (const SessionInfo&);
+        SessionInfo& operator=(const SessionInfo&);
 
     public:
-
         SessionInfo();
 
         virtual ~SessionInfo();
@@ -80,24 +78,26 @@ namespace commands {
 
         virtual bool equals(const DataStructure* value) const;
 
-        unsigned int getAckMode() const {
+        unsigned int getAckMode() const
+        {
             return this->ackMode;
         }
 
-        void setAckMode(unsigned int mode) {
+        void setAckMode(unsigned int mode)
+        {
             this->ackMode = mode;
         }
 
         Pointer<RemoveInfo> createRemoveCommand() const;
 
         virtual const Pointer<SessionId>& getSessionId() const;
-        virtual Pointer<SessionId>& getSessionId();
+        virtual Pointer<SessionId>&       getSessionId();
         virtual void setSessionId(const Pointer<SessionId>& sessionId);
 
         virtual Pointer<Command> visit(activemq::state::CommandVisitor* visitor);
-
     };
 
-}}
+}  // namespace commands
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_COMMANDS_SESSIONINFO_H_*/

@@ -21,49 +21,57 @@
 #include <activemq/threads/CompositeTaskRunner.h>
 #include <decaf/lang/Thread.h>
 
-#include <iostream>
 #include <iomanip>
+#include <iostream>
 
 using namespace std;
 using namespace activemq;
 using namespace activemq::threads;
 using namespace decaf::lang;
 
-    class CompositeTaskRunnerTest : public ::testing::Test {};
-
-
-////////////////////////////////////////////////////////////////////////////////
-namespace {
-
-    class CountingTask : public CompositeTask {
-    private:
-
-        int count;
-        int goal;
-        std::string name;
-
-    public:
-
-        CountingTask(const std::string& name, int goal) : count(0), goal(goal), name(name) {}
-
-        int getCount() const {
-            return count;
-        }
-
-        virtual bool isPending() const {
-            return count != goal;
-        }
-
-        virtual bool iterate() {
-            return !( ++count == goal );
-        }
-
-    };
-}
+class CompositeTaskRunnerTest : public ::testing::Test
+{
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(CompositeTaskRunnerTest, test) {
+namespace
+{
 
+class CountingTask : public CompositeTask
+{
+private:
+    int         count;
+    int         goal;
+    std::string name;
+
+public:
+    CountingTask(const std::string& name, int goal)
+        : count(0),
+          goal(goal),
+          name(name)
+    {
+    }
+
+    int getCount() const
+    {
+        return count;
+    }
+
+    virtual bool isPending() const
+    {
+        return count != goal;
+    }
+
+    virtual bool iterate()
+    {
+        return !(++count == goal);
+    }
+};
+}  // namespace
+
+////////////////////////////////////////////////////////////////////////////////
+TEST_F(CompositeTaskRunnerTest, test)
+{
     int attempts = 0;
 
     CompositeTaskRunner runner;
@@ -77,11 +85,12 @@ TEST_F(CompositeTaskRunnerTest, test) {
     runner.start();
     runner.wakeup();
 
-    while (attempts++ != 10) {
-
+    while (attempts++ != 10)
+    {
         Thread::sleep(1000);
 
-        if (task1.getCount() == 100 && task2.getCount() == 200) {
+        if (task1.getCount() == 100 && task2.getCount() == 200)
+        {
             break;
         }
     }
@@ -94,7 +103,8 @@ TEST_F(CompositeTaskRunnerTest, test) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(CompositeTaskRunnerTest, testCreateButNotStarted) {
+TEST_F(CompositeTaskRunnerTest, testCreateButNotStarted)
+{
     Pointer<CompositeTaskRunner> runner(new CompositeTaskRunner);
     ASSERT_TRUE(!runner->isStarted());
     runner->start();

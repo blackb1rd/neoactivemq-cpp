@@ -18,35 +18,37 @@
 #include <gtest/gtest.h>
 
 #include <decaf/util/ArrayList.h>
-#include <decaf/util/LinkedList.h>
 #include <decaf/util/Collections.h>
+#include <decaf/util/LinkedList.h>
 
 using namespace decaf;
 using namespace decaf::util;
 
-    class CollectionsTest : public ::testing::Test {
+class CollectionsTest : public ::testing::Test
+{
 public:
-
-        CollectionsTest();
-        virtual ~CollectionsTest();
-
-    };
+    CollectionsTest();
+    virtual ~CollectionsTest();
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-CollectionsTest::CollectionsTest() {
+CollectionsTest::CollectionsTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-CollectionsTest::~CollectionsTest() {
+CollectionsTest::~CollectionsTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(CollectionsTest, testReverseList) {
-
+TEST_F(CollectionsTest, testReverseList)
+{
     {
         ArrayList<int> list;
 
-        for (int i = 0; i < 50; ++i) {
+        for (int i = 0; i < 50; ++i)
+        {
             list.add(i);
         }
 
@@ -59,7 +61,8 @@ TEST_F(CollectionsTest, testReverseList) {
     {
         LinkedList<int> list;
 
-        for (int i = 0; i < 50; ++i) {
+        for (int i = 0; i < 50; ++i)
+        {
             list.add(i);
         }
 

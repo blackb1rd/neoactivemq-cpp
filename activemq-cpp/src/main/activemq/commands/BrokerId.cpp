@@ -41,24 +41,28 @@ using namespace decaf::internal::util;
  */
 
 ////////////////////////////////////////////////////////////////////////////////
-BrokerId::BrokerId() :
-    BaseDataStructure(), value("") {
-
+BrokerId::BrokerId()
+    : BaseDataStructure(),
+      value("")
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-BrokerId::BrokerId(const BrokerId& other) :
-    BaseDataStructure(), value("") {
-
+BrokerId::BrokerId(const BrokerId& other)
+    : BaseDataStructure(),
+      value("")
+{
     this->copyDataStructure(&other);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-BrokerId::~BrokerId() {
+BrokerId::~BrokerId()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-BrokerId* BrokerId::cloneDataStructure() const {
+BrokerId* BrokerId::cloneDataStructure() const
+{
     std::unique_ptr<BrokerId> brokerId(new BrokerId());
 
     // Copy the data from the base class or classes
@@ -68,18 +72,21 @@ BrokerId* BrokerId::cloneDataStructure() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BrokerId::copyDataStructure(const DataStructure* src) {
-
+void BrokerId::copyDataStructure(const DataStructure* src)
+{
     // Protect against invalid self assignment.
-    if (this == src) {
+    if (this == src)
+    {
         return;
     }
 
     const BrokerId* srcPtr = dynamic_cast<const BrokerId*>(src);
 
-    if (srcPtr == NULL || src == NULL) {
+    if (srcPtr == NULL || src == NULL)
+    {
         throw decaf::lang::exceptions::NullPointerException(
-            __FILE__, __LINE__,
+            __FILE__,
+            __LINE__,
             "BrokerId::copyDataStructure - src is NULL or invalid");
     }
 
@@ -90,62 +97,73 @@ void BrokerId::copyDataStructure(const DataStructure* src) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-unsigned char BrokerId::getDataStructureType() const {
+unsigned char BrokerId::getDataStructureType() const
+{
     return BrokerId::ID_BROKERID;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string BrokerId::toString() const {
-
+std::string BrokerId::toString() const
+{
     return this->value;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool BrokerId::equals(const DataStructure* value) const {
-
-    if (this == value) {
+bool BrokerId::equals(const DataStructure* value) const
+{
+    if (this == value)
+    {
         return true;
     }
 
     const BrokerId* valuePtr = dynamic_cast<const BrokerId*>(value);
 
-    if (valuePtr == NULL || value == NULL) {
+    if (valuePtr == NULL || value == NULL)
+    {
         return false;
     }
 
-    if (this->getValue() != valuePtr->getValue()) {
+    if (this->getValue() != valuePtr->getValue())
+    {
         return false;
     }
-    if (!BaseDataStructure::equals(value)) {
+    if (!BaseDataStructure::equals(value))
+    {
         return false;
     }
     return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::string& BrokerId::getValue() const {
+const std::string& BrokerId::getValue() const
+{
     return value;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string& BrokerId::getValue() {
+std::string& BrokerId::getValue()
+{
     return value;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BrokerId::setValue(const std::string& value) {
+void BrokerId::setValue(const std::string& value)
+{
     this->value = value;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int BrokerId::compareTo(const BrokerId& value) const {
-
-    if (this == &value) {
+int BrokerId::compareTo(const BrokerId& value) const
+{
+    if (this == &value)
+    {
         return 0;
     }
 
-    int valueComp = StringUtils::compareIgnoreCase(this->value.c_str(), value.value.c_str());
-    if (valueComp != 0) {
+    int valueComp = StringUtils::compareIgnoreCase(this->value.c_str(),
+                                                   value.value.c_str());
+    if (valueComp != 0)
+    {
         return valueComp;
     }
 
@@ -153,28 +171,32 @@ int BrokerId::compareTo(const BrokerId& value) const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool BrokerId::equals(const BrokerId& value) const {
+bool BrokerId::equals(const BrokerId& value) const
+{
     return this->equals((const DataStructure*)&value);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool BrokerId::operator==(const BrokerId& value) const {
+bool BrokerId::operator==(const BrokerId& value) const
+{
     return this->compareTo(value) == 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool BrokerId::operator<(const BrokerId& value) const {
+bool BrokerId::operator<(const BrokerId& value) const
+{
     return this->compareTo(value) < 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-BrokerId& BrokerId::operator= (const BrokerId& other) {
+BrokerId& BrokerId::operator=(const BrokerId& other)
+{
     this->copyDataStructure(&other);
     return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int BrokerId::getHashCode() const {
+int BrokerId::getHashCode() const
+{
     return decaf::util::HashCode<std::string>()(this->toString());
 }
-

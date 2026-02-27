@@ -18,38 +18,40 @@
 #ifndef _ACTIVEMQ_COMMANDS_ACTIVEMQBLOBMESSAGE_H_
 #define _ACTIVEMQ_COMMANDS_ACTIVEMQBLOBMESSAGE_H_
 
-#include <activemq/util/Config.h>
 #include <activemq/commands/ActiveMQMessageTemplate.h>
+#include <activemq/util/Config.h>
 #include <cms/Message.h>
-#include <string>
 #include <memory>
+#include <string>
 
-namespace activemq {
-namespace commands {
+namespace activemq
+{
+namespace commands
+{
 
-    class AMQCPP_API ActiveMQBlobMessage : public ActiveMQMessageTemplate< cms::Message > {
+    class AMQCPP_API ActiveMQBlobMessage
+        : public ActiveMQMessageTemplate<cms::Message>
+    {
     private:
-
         std::string remoteBlobUrl;
         std::string mimeType;
         std::string name;
-        bool deletedByBroker;
+        bool        deletedByBroker;
 
     public:
-
         static const unsigned char ID_ACTIVEMQBLOBMESSAGE;
-        static const std::string BINARY_MIME_TYPE;
+        static const std::string   BINARY_MIME_TYPE;
 
     private:
-
         ActiveMQBlobMessage(const ActiveMQBlobMessage&);
         ActiveMQBlobMessage& operator=(const ActiveMQBlobMessage&);
 
     public:
-
         ActiveMQBlobMessage();
 
-        virtual ~ActiveMQBlobMessage() throw() {}
+        virtual ~ActiveMQBlobMessage() throw()
+        {
+        }
 
         virtual unsigned char getDataStructureType() const;
 
@@ -62,16 +64,15 @@ namespace commands {
         virtual bool equals(const DataStructure* value) const;
 
     public:  // CMS Message
-
         virtual cms::Message* clone() const;
 
-    public: // CMS BlobMessage
-
+    public:  // CMS BlobMessage
         /**
          * Get the Remote URL of the Blob.
          * @return string from of the Remote Blob URL.
          */
-        std::string getRemoteBlobUrl() const {
+        std::string getRemoteBlobUrl() const
+        {
             return this->remoteBlobUrl;
         }
 
@@ -79,7 +80,8 @@ namespace commands {
          * Set the Remote URL of the Blob
          * @param remoteURL - String form of the Remote URL.
          */
-        void setRemoteBlobUrl( const std::string& remoteURL ) {
+        void setRemoteBlobUrl(const std::string& remoteURL)
+        {
             this->remoteBlobUrl = remoteURL;
         }
 
@@ -87,7 +89,8 @@ namespace commands {
          * Get the Mime Type of the Blob.
          * @return string holding the MIME Type.
          */
-        std::string getMimeType() const {
+        std::string getMimeType() const
+        {
             return this->mimeType;
         }
 
@@ -95,7 +98,8 @@ namespace commands {
          * Set the Mime Type of the Blob
          * @param mimeType - String holding the MIME Type.
          */
-        void setMimeType( const std::string& mimeType ) {
+        void setMimeType(const std::string& mimeType)
+        {
             this->mimeType = mimeType;
         }
 
@@ -103,7 +107,8 @@ namespace commands {
          * Gets the Name of the Blob.
          * @return string name of the Blob.
          */
-        std::string getName() const {
+        std::string getName() const
+        {
             return this->name;
         }
 
@@ -111,7 +116,8 @@ namespace commands {
          * Sets the Name of the Blob.
          * @param name - Name of the Blob.
          */
-        void setName( const std::string& name ) {
+        void setName(const std::string& name)
+        {
             this->name = name;
         }
 
@@ -119,7 +125,8 @@ namespace commands {
          * Gets if this Blob is deleted by the Broker.
          * @return true if the Blob is deleted by the Broker.
          */
-        bool isDeletedByBroker() const {
+        bool isDeletedByBroker() const
+        {
             return this->deletedByBroker;
         }
 
@@ -127,12 +134,13 @@ namespace commands {
          * Sets the Deleted By Broker flag.
          * @param value - set the Delete by broker flag to value.
          */
-        void setDeletedByBroker( bool value ) {
+        void setDeletedByBroker(bool value)
+        {
             this->deletedByBroker = value;
         }
-
     };
 
-}}
+}  // namespace commands
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_COMMANDS_ACTIVEMQBLOBMESSAGE_H_*/

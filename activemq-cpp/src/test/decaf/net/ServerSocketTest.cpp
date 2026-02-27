@@ -17,10 +17,10 @@
 
 #include <gtest/gtest.h>
 
-#include <decaf/net/Socket.h>
-#include <decaf/net/ServerSocket.h>
 #include <decaf/lang/System.h>
 #include <decaf/lang/Thread.h>
+#include <decaf/net/ServerSocket.h>
+#include <decaf/net/Socket.h>
 
 using namespace decaf;
 using namespace decaf::net;
@@ -28,68 +28,78 @@ using namespace decaf::io;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
-    class ServerSocketTest  : public ::testing::Test {
+class ServerSocketTest : public ::testing::Test
+{
 protected:
+    Socket* ssconn;
 
-        Socket* ssconn;
+    decaf::lang::Thread* theThread;
 
-        decaf::lang::Thread* theThread;
+public:
+    ServerSocketTest();
+    virtual ~ServerSocketTest();
 
-    public:
+    void SetUp() override;
+    void TearDown() override;
 
-        ServerSocketTest();
-        virtual ~ServerSocketTest();
-
-        void SetUp() override;
-        void TearDown() override;
-
-    protected:
-
-        void startClient( int port );
-
-    };
+protected:
+    void startClient(int port);
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class SocketClient : public Runnable {
-    public:
+class SocketClient : public Runnable
+{
+public:
+    std::unique_ptr<Socket> clientS;
+    int                     port;
 
-        std::unique_ptr<Socket> clientS;
-    int port;
+    SocketClient(int port)
+        : Runnable(),
+          clientS(nullptr),
+          port(port)
+    {
+    }
 
-    SocketClient(int port) : Runnable(), clientS(nullptr), port(port) {
+    virtual void run()
+    {
+        try
+        {
+            Thread::sleep(1000);
+            this->clientS.reset(new Socket("127.0.0.1", port));
+            Thread::sleep(1000);
         }
-
-        virtual void run() {
-
-            try {
-                Thread::sleep(1000);
-                this->clientS.reset(new Socket("127.0.0.1", port));
-                Thread::sleep(1000);
-            } catch (InterruptedException& ex) {
-            } catch (Exception& ex) {
-                ex.printStackTrace();
-            }
+        catch (InterruptedException& ex)
+        {
         }
+        catch (Exception& ex)
+        {
+            ex.printStackTrace();
+        }
+    }
+};
 
-    };
+SocketClient* client = NULL;
+}  // namespace
 
-    SocketClient* client = NULL;
+////////////////////////////////////////////////////////////////////////////////
+ServerSocketTest::ServerSocketTest()
+    : ssconn(),
+      theThread()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ServerSocketTest::ServerSocketTest() : ssconn(), theThread() {
+ServerSocketTest::~ServerSocketTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ServerSocketTest::~ServerSocketTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-void ServerSocketTest::SetUp() {
-
-    this->ssconn = NULL;
+void ServerSocketTest::SetUp()
+{
+    this->ssconn    = NULL;
     this->theThread = NULL;
 
     // Clear global client value
@@ -97,15 +107,17 @@ void ServerSocketTest::SetUp() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ServerSocketTest::TearDown() {
-
-    if( this->theThread != NULL ) {
-        this->theThread->join( 3000 );
+void ServerSocketTest::TearDown()
+{
+    if (this->theThread != NULL)
+    {
+        this->theThread->join(3000);
     }
 
     delete this->theThread;
 
-    if( this->ssconn != NULL ) {
+    if (this->ssconn != NULL)
+    {
         ssconn->close();
         delete ssconn;
     }
@@ -115,44 +127,51 @@ void ServerSocketTest::TearDown() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ServerSocketTest, testConstructor) {
-
-    try {
-
-        ServerSocket s( 0, 10 );
-        //s.setSoTimeout( 20000 );
-        startClient( s.getLocalPort() );
+TEST_F(ServerSocketTest, testConstructor)
+{
+    try
+    {
+        ServerSocket s(0, 10);
+        // s.setSoTimeout( 20000 );
+        startClient(s.getLocalPort());
         this->ssconn = s.accept();
         this->ssconn->close();
-
-    } catch( InterruptedException& ex ) {
-    } catch( Exception& ex ) {
+    }
+    catch (InterruptedException& ex)
+    {
+    }
+    catch (Exception& ex)
+    {
         ex.printStackTrace();
         throw ex;
     }
 
-    try{
+    try
+    {
         ServerSocket s1(0);
 
 // No idea why but windows seems to let two sockets listen on the same port.
 #ifndef WIN32
-        ASSERT_THROW(ServerSocket s2( s1.getLocalPort() ), IOException) << ("Should throw an IOException");
+        ASSERT_THROW(ServerSocket s2(s1.getLocalPort()), IOException)
+            << ("Should throw an IOException");
 #endif
-    } catch( Exception& ex ) {
+    }
+    catch (Exception& ex)
+    {
         ex.printStackTrace();
         throw ex;
     }
 
     ServerSocket s2(0);
-    int port = s2.getLocalPort();
+    int          port = s2.getLocalPort();
     s2.close();
-    ServerSocket s3( port );
+    ServerSocket s3(port);
     s3.close();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ServerSocketTest, testClose) {
-
+TEST_F(ServerSocketTest, testClose)
+{
     ServerSocket s(0);
     s.close();
 
@@ -160,119 +179,131 @@ TEST_F(ServerSocketTest, testClose) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace{
+namespace
+{
 
-    class TestAcceptRunnable : public Runnable {
-    private:
+class TestAcceptRunnable : public Runnable
+{
+private:
+    bool*         interrupted;
+    ServerSocket* ss;
 
-        bool* interrupted;
-        ServerSocket* ss;
+private:
+    TestAcceptRunnable(const TestAcceptRunnable&);
+    TestAcceptRunnable& operator=(const TestAcceptRunnable&);
 
-    private:
+public:
+    TestAcceptRunnable(bool* interrupted, ServerSocket* ss)
+        : interrupted(interrupted),
+          ss(ss)
+    {
+    }
 
-        TestAcceptRunnable(const TestAcceptRunnable&);
-        TestAcceptRunnable& operator= (const TestAcceptRunnable&);
-
-    public:
-
-        TestAcceptRunnable(bool* interrupted, ServerSocket* ss) : interrupted(interrupted), ss(ss) {}
-
-        virtual void run() {
-            try{
-                std::unique_ptr<Socket> socket( ss->accept() );
-            } catch( IOException& ex ) {
-                *interrupted = true;
-            } catch(...) {
-            }
+    virtual void run()
+    {
+        try
+        {
+            std::unique_ptr<Socket> socket(ss->accept());
         }
-
-    };
-}
+        catch (IOException& ex)
+        {
+            *interrupted = true;
+        }
+        catch (...)
+        {
+        }
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ServerSocketTest, testAccept) {
-
+TEST_F(ServerSocketTest, testAccept)
+{
     ServerSocket s(0);
-    try {
-        //s.setSoTimeout( 10000 );
-        startClient( s.getLocalPort() );
-        this->ssconn = s.accept();
+    try
+    {
+        // s.setSoTimeout( 10000 );
+        startClient(s.getLocalPort());
+        this->ssconn   = s.accept();
         int localPort1 = s.getLocalPort();
         int localPort2 = this->ssconn->getLocalPort();
         this->ssconn->close();
         ASSERT_EQ(localPort1, localPort2) << ("Bad local port value");
-    } catch(...) {
+    }
+    catch (...)
+    {
         s.close();
     }
 
-//   try {
-//        bool interrupted = false;
-//        ServerSocket ss(0);
-//        ss.setSoTimeout(12000);
-//        TestAcceptRunnable runnable( &interrupted, &ss );
-//        Thread thread( &runnable );
-//        thread.start();
-//
-//        try {
-//            do {
-//                Thread::sleep( 500 );
-//            } while( !thread.isAlive() );
-//        } catch( InterruptedException& e ) {
-//        }
-//
-//        ss.close();
-//
-//        int c = 0;
-//        do {
-//            try {
-//                Thread::sleep( 500 );
-//            } catch( InterruptedException& e ) {
-//            }
-//
-//            if( interrupted ) {
-//                FAIL() << ("accept interrupted");
-//            }
-//            if( ++c > 4 ) {
-//                FAIL() << ("accept call did not exit");
-//            }
-//        } while( thread.isAlive() );
-//
-//        interrupted = false;
-//
-//        ServerSocket ss2(0);
-//        ss2.setSoTimeout( 500 );
-//        long long start = System::currentTimeMillis();
-//
-//        try {
-//            ss2.accept();
-//        } catch( IOException& e ) {
-//            interrupted = true;
-//        }
-//
-//        ASSERT_TRUE(interrupted) << ("accept not interrupted");
-//        long long finish = System::currentTimeMillis();
-//        int delay = (int)( finish - start );
-//        ASSERT_TRUE(delay >= 490) << ("timeout too soon: ");
-//        ss2.close();
-//
-//    } catch( IOException& e ) {
-//        FAIL() << ("Unexpected IOException : " + e.getMessage());
-//    }
+    //   try {
+    //        bool interrupted = false;
+    //        ServerSocket ss(0);
+    //        ss.setSoTimeout(12000);
+    //        TestAcceptRunnable runnable( &interrupted, &ss );
+    //        Thread thread( &runnable );
+    //        thread.start();
+    //
+    //        try {
+    //            do {
+    //                Thread::sleep( 500 );
+    //            } while( !thread.isAlive() );
+    //        } catch( InterruptedException& e ) {
+    //        }
+    //
+    //        ss.close();
+    //
+    //        int c = 0;
+    //        do {
+    //            try {
+    //                Thread::sleep( 500 );
+    //            } catch( InterruptedException& e ) {
+    //            }
+    //
+    //            if( interrupted ) {
+    //                FAIL() << ("accept interrupted");
+    //            }
+    //            if( ++c > 4 ) {
+    //                FAIL() << ("accept call did not exit");
+    //            }
+    //        } while( thread.isAlive() );
+    //
+    //        interrupted = false;
+    //
+    //        ServerSocket ss2(0);
+    //        ss2.setSoTimeout( 500 );
+    //        long long start = System::currentTimeMillis();
+    //
+    //        try {
+    //            ss2.accept();
+    //        } catch( IOException& e ) {
+    //            interrupted = true;
+    //        }
+    //
+    //        ASSERT_TRUE(interrupted) << ("accept not interrupted");
+    //        long long finish = System::currentTimeMillis();
+    //        int delay = (int)( finish - start );
+    //        ASSERT_TRUE(delay >= 490) << ("timeout too soon: ");
+    //        ss2.close();
+    //
+    //    } catch( IOException& e ) {
+    //        FAIL() << ("Unexpected IOException : " + e.getMessage());
+    //    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ServerSocketTest, testGetLocalPort) {
-
-    int port = 23232;
+TEST_F(ServerSocketTest, testGetLocalPort)
+{
+    int port   = 23232;
     int actual = 0;
 
     // Try the selected port, if it doesn't work don't complain just give up.
-    try{
-
-        ServerSocket s( port );
+    try
+    {
+        ServerSocket s(port);
         actual = s.getLocalPort();
-
-    } catch( IOException& ex ) {
+    }
+    catch (IOException& ex)
+    {
         return;
     }
 
@@ -280,53 +311,68 @@ TEST_F(ServerSocketTest, testGetLocalPort) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ServerSocketTest, testGetSoTimeout) {
-
+TEST_F(ServerSocketTest, testGetSoTimeout)
+{
     ServerSocket s(0);
-    s.setSoTimeout( 100 );
+    s.setSoTimeout(100);
 
-    ASSERT_EQ(100, s.getSoTimeout()) << ("SO_TIMEOUT doesnt match what was set.");
+    ASSERT_EQ(100, s.getSoTimeout())
+        << ("SO_TIMEOUT doesnt match what was set.");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ServerSocketTest, testGetReuseAddress) {
-
-    try{
+TEST_F(ServerSocketTest, testGetReuseAddress)
+{
+    try
+    {
         ServerSocket s;
-        s.setReuseAddress( true );
-        ASSERT_EQ(true, s.getReuseAddress()) << ("Reuse Address doesnt match what was set.");
-        s.setReuseAddress( false );
-        ASSERT_EQ(false, s.getReuseAddress()) << ("Reuse Address doesnt match what was set.");
-    } catch( Exception& ex ) {
+        s.setReuseAddress(true);
+        ASSERT_EQ(true, s.getReuseAddress())
+            << ("Reuse Address doesnt match what was set.");
+        s.setReuseAddress(false);
+        ASSERT_EQ(false, s.getReuseAddress())
+            << ("Reuse Address doesnt match what was set.");
+    }
+    catch (Exception& ex)
+    {
         ex.printStackTrace();
         throw ex;
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ServerSocketTest, testGetReceiveBufferSize) {
-
-    try{
+TEST_F(ServerSocketTest, testGetReceiveBufferSize)
+{
+    try
+    {
         ServerSocket s;
-//        ASSERT_TRUE(0 != s.getReceiveBufferSize()) << ("Receive Buffer should never be zero.");
-//        ASSERT_TRUE(0 < s.getReceiveBufferSize()) << ("Receive Buffer should never be negative.");
-    } catch( Exception& ex ) {
+        //        ASSERT_TRUE(0 != s.getReceiveBufferSize()) << ("Receive Buffer
+        //        should never be zero."); ASSERT_TRUE(0 <
+        //        s.getReceiveBufferSize()) << ("Receive Buffer should never be
+        //        negative.");
+    }
+    catch (Exception& ex)
+    {
         ex.printStackTrace();
         throw ex;
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ServerSocketTest::startClient( int port ) {
+void ServerSocketTest::startClient(int port)
+{
+    client = new SocketClient(port);
 
-    client = new SocketClient( port );
-
-    theThread = new Thread( client );
+    theThread = new Thread(client);
     theThread->start();
 
-    try {
-        Thread::sleep( 1000 );
-    } catch( InterruptedException& e ) {
-        FAIL() << (std::string( "Exception during startClinet()" ) + e.getMessage());
+    try
+    {
+        Thread::sleep(1000);
+    }
+    catch (InterruptedException& e)
+    {
+        FAIL() << (std::string("Exception during startClinet()") +
+                   e.getMessage());
     }
 }

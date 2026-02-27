@@ -22,77 +22,87 @@
 
 #include <activemq/core/PrefetchPolicy.h>
 
-namespace activemq {
-namespace core {
-namespace policies {
+namespace activemq
+{
+namespace core
+{
+    namespace policies
+    {
 
-    class AMQCPP_API DefaultPrefetchPolicy : public PrefetchPolicy {
-    private:
+        class AMQCPP_API DefaultPrefetchPolicy : public PrefetchPolicy
+        {
+        private:
+            int durableTopicPrefetch;
+            int queuePrefetch;
+            int queueBrowserPrefetch;
+            int topicPrefetch;
 
-        int durableTopicPrefetch;
-        int queuePrefetch;
-        int queueBrowserPrefetch;
-        int topicPrefetch;
+        public:
+            static int MAX_PREFETCH_SIZE;
+            static int DEFAULT_DURABLE_TOPIC_PREFETCH;
+            static int DEFAULT_QUEUE_PREFETCH;
+            static int DEFAULT_QUEUE_BROWSER_PREFETCH;
+            static int DEFAULT_TOPIC_PREFETCH;
 
-    public:
+        private:
+            DefaultPrefetchPolicy(const DefaultPrefetchPolicy&);
+            DefaultPrefetchPolicy& operator=(DefaultPrefetchPolicy&);
 
-        static int MAX_PREFETCH_SIZE;
-        static int DEFAULT_DURABLE_TOPIC_PREFETCH;
-        static int DEFAULT_QUEUE_PREFETCH;
-        static int DEFAULT_QUEUE_BROWSER_PREFETCH;
-        static int DEFAULT_TOPIC_PREFETCH;
+        public:
+            DefaultPrefetchPolicy();
 
-    private:
+            virtual ~DefaultPrefetchPolicy();
 
-        DefaultPrefetchPolicy(const DefaultPrefetchPolicy&);
-        DefaultPrefetchPolicy& operator=(DefaultPrefetchPolicy&);
+            virtual void setDurableTopicPrefetch(int value)
+            {
+                this->durableTopicPrefetch = getMaxPrefetchLimit(value);
+            }
 
-    public:
+            virtual int getDurableTopicPrefetch() const
+            {
+                return this->durableTopicPrefetch;
+            }
 
-        DefaultPrefetchPolicy();
+            virtual void setQueuePrefetch(int value)
+            {
+                this->queuePrefetch = getMaxPrefetchLimit(value);
+            }
 
-        virtual ~DefaultPrefetchPolicy();
+            virtual int getQueuePrefetch() const
+            {
+                return this->queuePrefetch;
+            }
 
-        virtual void setDurableTopicPrefetch(int value) {
-            this->durableTopicPrefetch = getMaxPrefetchLimit(value);
-        }
+            virtual void setQueueBrowserPrefetch(int value)
+            {
+                this->queueBrowserPrefetch = getMaxPrefetchLimit(value);
+            }
 
-        virtual int getDurableTopicPrefetch() const {
-            return this->durableTopicPrefetch;
-        }
+            virtual int getQueueBrowserPrefetch() const
+            {
+                return this->queueBrowserPrefetch;
+            }
 
-        virtual void setQueuePrefetch(int value) {
-            this->queuePrefetch = getMaxPrefetchLimit(value);
-        }
+            virtual void setTopicPrefetch(int value)
+            {
+                this->topicPrefetch = getMaxPrefetchLimit(value);
+            }
 
-        virtual int getQueuePrefetch() const {
-            return this->queuePrefetch;
-        }
+            virtual int getTopicPrefetch() const
+            {
+                return this->topicPrefetch;
+            }
 
-        virtual void setQueueBrowserPrefetch(int value) {
-            this->queueBrowserPrefetch = getMaxPrefetchLimit(value);
-        }
+            virtual int getMaxPrefetchLimit(int value) const
+            {
+                return value < MAX_PREFETCH_SIZE ? value : MAX_PREFETCH_SIZE;
+            }
 
-        virtual int getQueueBrowserPrefetch() const {
-            return this->queueBrowserPrefetch;
-        }
+            virtual PrefetchPolicy* clone() const;
+        };
 
-        virtual void setTopicPrefetch(int value) {
-            this->topicPrefetch = getMaxPrefetchLimit(value);
-        }
-
-        virtual int getTopicPrefetch() const {
-            return this->topicPrefetch;
-        }
-
-        virtual int getMaxPrefetchLimit(int value) const {
-            return value < MAX_PREFETCH_SIZE ? value : MAX_PREFETCH_SIZE;
-        }
-
-        virtual PrefetchPolicy* clone() const;
-
-    };
-
-}}}
+    }  // namespace policies
+}  // namespace core
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_CORE_POLICIES_DEFAULTPREFETCHPOLICY_H_ */

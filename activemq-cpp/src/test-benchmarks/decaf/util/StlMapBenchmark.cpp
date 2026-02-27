@@ -16,8 +16,8 @@
  */
 
 #include <benchmark/PerformanceTimer.h>
-#include <decaf/util/StlMap.h>
 #include <decaf/lang/Integer.h>
+#include <decaf/util/StlMap.h>
 
 #include <gtest/gtest.h>
 #include <iostream>
@@ -26,55 +26,65 @@ using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::lang;
 
-namespace decaf {
-namespace util {
+namespace decaf
+{
+namespace util
+{
 
-    class StlMapBenchmark : public ::testing::Test {
+    class StlMapBenchmark : public ::testing::Test
+    {
     protected:
-
         StlMap<std::string, std::string> stringMap;
-        StlMap<int, int> intMap;
+        StlMap<int, int>                 intMap;
     };
 
-}}
+}  // namespace util
+}  // namespace decaf
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(StlMapBenchmark, runBenchmark) {
-
+TEST_F(StlMapBenchmark, runBenchmark)
+{
     benchmark::PerformanceTimer timer;
-    int iterations = 100;
+    int                         iterations = 100;
 
-    for( int iter = 0; iter < iterations; ++iter ) {
+    for (int iter = 0; iter < iterations; ++iter)
+    {
         timer.start();
 
-        int numRuns = 500;
-        std::string test = "test";
-        std::string resultStr = "";
+        int                              numRuns   = 500;
+        std::string                      test      = "test";
+        std::string                      resultStr = "";
         StlMap<std::string, std::string> stringCopy;
-        StlMap<int, int> intCopy;
+        StlMap<int, int>                 intCopy;
 
-        for( int i = 0; i < numRuns; ++i ) {
-            stringMap.put( test + Integer::toString(i), test + Integer::toString(i) );
-            intMap.put( 100 + i, 100 + i );
-            stringMap.containsKey( test + Integer::toString(i) );
-            intMap.containsKey( 100 + i );
-            stringMap.containsValue( test + Integer::toString(i) );
-            intMap.containsValue( 100 + i );
+        for (int i = 0; i < numRuns; ++i)
+        {
+            stringMap.put(test + Integer::toString(i),
+                          test + Integer::toString(i));
+            intMap.put(100 + i, 100 + i);
+            stringMap.containsKey(test + Integer::toString(i));
+            intMap.containsKey(100 + i);
+            stringMap.containsValue(test + Integer::toString(i));
+            intMap.containsValue(100 + i);
         }
 
-        for( int i = 0; i < numRuns; ++i ) {
-            stringMap.remove( test + Integer::toString(i) );
-            intMap.remove( 100 + i );
-            stringMap.containsKey( test + Integer::toString(i) );
-            intMap.containsKey( 100 + i );
+        for (int i = 0; i < numRuns; ++i)
+        {
+            stringMap.remove(test + Integer::toString(i));
+            intMap.remove(100 + i);
+            stringMap.containsKey(test + Integer::toString(i));
+            intMap.containsKey(100 + i);
         }
 
-        for( int i = 0; i < numRuns; ++i ) {
-            stringMap.put( test + Integer::toString(i), test + Integer::toString(i) );
-            intMap.put( 100 + i, 100 + i );
+        for (int i = 0; i < numRuns; ++i)
+        {
+            stringMap.put(test + Integer::toString(i),
+                          test + Integer::toString(i));
+            intMap.put(100 + i, 100 + i);
         }
 
-        for( int i = 0; i < numRuns / 2; ++i ) {
+        for (int i = 0; i < numRuns / 2; ++i)
+        {
             Set<std::string>& stringSet = stringMap.keySet();
             stringSet.size();
             Collection<std::string>& stringCol = stringMap.values();
@@ -85,17 +95,18 @@ TEST_F(StlMapBenchmark, runBenchmark) {
             intCol.size();
         }
 
-        for( int i = 0; i < numRuns / 2; ++i ) {
-            stringCopy.copy( stringMap );
+        for (int i = 0; i < numRuns / 2; ++i)
+        {
+            stringCopy.copy(stringMap);
             stringCopy.clear();
-            intCopy.copy( intMap );
+            intCopy.copy(intMap);
             intCopy.clear();
         }
 
         timer.stop();
     }
 
-    std::cout << typeid( StlMap<int, int> ).name() << " Benchmark Time = "
-              << timer.getAverageTime() << " Millisecs"
+    std::cout << typeid(StlMap<int, int>).name()
+              << " Benchmark Time = " << timer.getAverageTime() << " Millisecs"
               << std::endl;
 }

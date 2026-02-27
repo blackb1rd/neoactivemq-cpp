@@ -18,15 +18,15 @@
 #include "OpenwireFailoverIntegrationTest.h"
 
 #include <activemq/core/ActiveMQConnectionFactory.h>
-#include <activemq/util/CMSListener.h>
 #include <activemq/exceptions/ActiveMQException.h>
+#include <activemq/util/CMSListener.h>
 
 #include <decaf/lang/Thread.h>
 #include <decaf/util/UUID.h>
 
-#include <cms/TextMessage.h>
-#include <cms/Queue.h>
 #include <cms/ExceptionListener.h>
+#include <cms/Queue.h>
+#include <cms/TextMessage.h>
 
 using namespace std;
 using namespace cms;
@@ -40,72 +40,121 @@ using namespace decaf::lang;
 using namespace decaf::util;
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
-    class TestExceptionListener : public cms::ExceptionListener {
-    private:
-        bool exceptionReceived;
-        std::string lastMessage;
+namespace
+{
+class TestExceptionListener : public cms::ExceptionListener
+{
+private:
+    bool        exceptionReceived;
+    std::string lastMessage;
 
-    public:
-        TestExceptionListener() : exceptionReceived(false), lastMessage() {}
+public:
+    TestExceptionListener()
+        : exceptionReceived(false),
+          lastMessage()
+    {
+    }
 
-        void onException(const cms::CMSException& ex) override {
-            exceptionReceived = true;
-            lastMessage = ex.getMessage();
+    void onException(const cms::CMSException& ex) override
+    {
+        exceptionReceived = true;
+        lastMessage       = ex.getMessage();
+    }
+
+    bool wasExceptionReceived() const
+    {
+        return exceptionReceived;
+    }
+
+    std::string getLastMessage() const
+    {
+        return lastMessage;
+    }
+
+    void reset()
+    {
+        exceptionReceived = false;
+        lastMessage.clear();
+    }
+};
+
+class AsyncMessageListener : public cms::MessageListener
+{
+private:
+    int         messagesReceived;
+    std::string lastMessage;
+
+public:
+    AsyncMessageListener()
+        : messagesReceived(0),
+          lastMessage()
+    {
+    }
+
+    void onMessage(const cms::Message* message) override
+    {
+        messagesReceived++;
+        const cms::TextMessage* textMsg =
+            dynamic_cast<const cms::TextMessage*>(message);
+        if (textMsg != nullptr)
+        {
+            lastMessage = textMsg->getText();
         }
+    }
 
-        bool wasExceptionReceived() const { return exceptionReceived; }
-        std::string getLastMessage() const { return lastMessage; }
-        void reset() { exceptionReceived = false; lastMessage.clear(); }
-    };
+    int getMessagesReceived() const
+    {
+        return messagesReceived;
+    }
 
-    class AsyncMessageListener : public cms::MessageListener {
-    private:
-        int messagesReceived;
-        std::string lastMessage;
+    std::string getLastMessage() const
+    {
+        return lastMessage;
+    }
 
-    public:
-        AsyncMessageListener() : messagesReceived(0), lastMessage() {}
-
-        void onMessage(const cms::Message* message) override {
-            messagesReceived++;
-            const cms::TextMessage* textMsg = dynamic_cast<const cms::TextMessage*>(message);
-            if (textMsg != nullptr) {
-                lastMessage = textMsg->getText();
-            }
-        }
-
-        int getMessagesReceived() const { return messagesReceived; }
-        std::string getLastMessage() const { return lastMessage; }
-        void reset() { messagesReceived = 0; lastMessage.clear(); }
-    };
-}
+    void reset()
+    {
+        messagesReceived = 0;
+        lastMessage.clear();
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
 OpenwireFailoverIntegrationTest::OpenwireFailoverIntegrationTest()
-    : connection(), session() {
+    : connection(),
+      session()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-OpenwireFailoverIntegrationTest::~OpenwireFailoverIntegrationTest() {
+OpenwireFailoverIntegrationTest::~OpenwireFailoverIntegrationTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenwireFailoverIntegrationTest::SetUp() {
+void OpenwireFailoverIntegrationTest::SetUp()
+{
     // Connection setup is done in individual tests since they may need
     // different configurations
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenwireFailoverIntegrationTest::TearDown() {
-    try {
-        if (session.get() != nullptr) {
+void OpenwireFailoverIntegrationTest::TearDown()
+{
+    try
+    {
+        if (session.get() != nullptr)
+        {
             session->close();
         }
-        if (connection.get() != nullptr) {
+        if (connection.get() != nullptr)
+        {
             connection->close();
         }
-    } catch (...) {
+    }
+    catch (...)
+    {
         // Ignore cleanup errors
     }
     session.reset();
@@ -116,7 +165,8 @@ void OpenwireFailoverIntegrationTest::TearDown() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenwireFailoverIntegrationTest::testFailoverConnection() {
+void OpenwireFailoverIntegrationTest::testFailoverConnection()
+{
     // Test that we can establish a connection using failover URL
     std::unique_ptr<ActiveMQConnectionFactory> factory(
         new ActiveMQConnectionFactory(getFailoverURL()));
@@ -130,12 +180,14 @@ void OpenwireFailoverIntegrationTest::testFailoverConnection() {
     ASSERT_TRUE(session.get() != nullptr);
 
     // Verify we can create a destination
-    std::unique_ptr<Queue> queue(session->createQueue("failover.test.queue." + UUID::randomUUID().toString()));
+    std::unique_ptr<Queue> queue(session->createQueue(
+        "failover.test.queue." + UUID::randomUUID().toString()));
     ASSERT_TRUE(queue.get() != nullptr);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenwireFailoverIntegrationTest::testSendReceiveWithFailover() {
+void OpenwireFailoverIntegrationTest::testSendReceiveWithFailover()
+{
     std::unique_ptr<ActiveMQConnectionFactory> factory(
         new ActiveMQConnectionFactory(getFailoverURL()));
 
@@ -144,27 +196,33 @@ void OpenwireFailoverIntegrationTest::testSendReceiveWithFailover() {
 
     session.reset(connection->createSession(Session::AUTO_ACKNOWLEDGE));
 
-    std::string queueName = "failover.test.sendrecv." + UUID::randomUUID().toString();
+    std::string queueName = "failover.test.sendrecv." +
+                            UUID::randomUUID().toString();
     std::unique_ptr<Queue> queue(session->createQueue(queueName));
 
-    std::unique_ptr<MessageProducer> producer(session->createProducer(queue.get()));
+    std::unique_ptr<MessageProducer> producer(
+        session->createProducer(queue.get()));
     producer->setDeliveryMode(DeliveryMode::NON_PERSISTENT);
 
-    std::unique_ptr<MessageConsumer> consumer(session->createConsumer(queue.get()));
+    std::unique_ptr<MessageConsumer> consumer(
+        session->createConsumer(queue.get()));
 
     // Send messages
     const int numMessages = 10;
-    for (int i = 0; i < numMessages; i++) {
-        std::unique_ptr<TextMessage> message(
-            session->createTextMessage("Failover test message " + std::to_string(i)));
+    for (int i = 0; i < numMessages; i++)
+    {
+        std::unique_ptr<TextMessage> message(session->createTextMessage(
+            "Failover test message " + std::to_string(i)));
         producer->send(message.get());
     }
 
     // Receive messages
     int received = 0;
-    for (int i = 0; i < numMessages; i++) {
+    for (int i = 0; i < numMessages; i++)
+    {
         std::unique_ptr<Message> message(consumer->receive(5000));
-        if (message.get() != nullptr) {
+        if (message.get() != nullptr)
+        {
             received++;
             TextMessage* textMsg = dynamic_cast<TextMessage*>(message.get());
             ASSERT_TRUE(textMsg != nullptr);
@@ -178,7 +236,8 @@ void OpenwireFailoverIntegrationTest::testSendReceiveWithFailover() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenwireFailoverIntegrationTest::testFailoverReconnectOnBrokerDown() {
+void OpenwireFailoverIntegrationTest::testFailoverReconnectOnBrokerDown()
+{
     // This test verifies that failover transport attempts reconnection
     // when a connection issue is detected.
 
@@ -193,10 +252,12 @@ void OpenwireFailoverIntegrationTest::testFailoverReconnectOnBrokerDown() {
 
     session.reset(connection->createSession(Session::AUTO_ACKNOWLEDGE));
 
-    std::string queueName = "failover.reconnect.test." + UUID::randomUUID().toString();
+    std::string queueName = "failover.reconnect.test." +
+                            UUID::randomUUID().toString();
     std::unique_ptr<Queue> queue(session->createQueue(queueName));
 
-    std::unique_ptr<MessageProducer> producer(session->createProducer(queue.get()));
+    std::unique_ptr<MessageProducer> producer(
+        session->createProducer(queue.get()));
     producer->setDeliveryMode(DeliveryMode::NON_PERSISTENT);
 
     // Send initial message to verify connection works
@@ -226,7 +287,8 @@ void OpenwireFailoverIntegrationTest::testFailoverReconnectOnBrokerDown() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenwireFailoverIntegrationTest::testMessageDeliveryDuringFailover() {
+void OpenwireFailoverIntegrationTest::testMessageDeliveryDuringFailover()
+{
     std::unique_ptr<ActiveMQConnectionFactory> factory(
         new ActiveMQConnectionFactory(getFailoverURL()));
 
@@ -235,23 +297,28 @@ void OpenwireFailoverIntegrationTest::testMessageDeliveryDuringFailover() {
 
     session.reset(connection->createSession(Session::AUTO_ACKNOWLEDGE));
 
-    std::string queueName = "failover.delivery.test." + UUID::randomUUID().toString();
+    std::string queueName = "failover.delivery.test." +
+                            UUID::randomUUID().toString();
     std::unique_ptr<Queue> queue(session->createQueue(queueName));
 
-    std::unique_ptr<MessageProducer> producer(session->createProducer(queue.get()));
+    std::unique_ptr<MessageProducer> producer(
+        session->createProducer(queue.get()));
     producer->setDeliveryMode(DeliveryMode::PERSISTENT);
 
-    std::unique_ptr<MessageConsumer> consumer(session->createConsumer(queue.get()));
+    std::unique_ptr<MessageConsumer> consumer(
+        session->createConsumer(queue.get()));
 
     // Send messages in batches
-    const int batchSize = 5;
+    const int batchSize  = 5;
     const int numBatches = 3;
 
-    for (int batch = 0; batch < numBatches; batch++) {
-        for (int i = 0; i < batchSize; i++) {
+    for (int batch = 0; batch < numBatches; batch++)
+    {
+        for (int i = 0; i < batchSize; i++)
+        {
             std::unique_ptr<TextMessage> message(
                 session->createTextMessage("Batch " + std::to_string(batch) +
-                                          " Message " + std::to_string(i)));
+                                           " Message " + std::to_string(i)));
             producer->send(message.get());
         }
 
@@ -260,11 +327,13 @@ void OpenwireFailoverIntegrationTest::testMessageDeliveryDuringFailover() {
     }
 
     // Receive all messages
-    int received = 0;
+    int       received      = 0;
     const int totalMessages = batchSize * numBatches;
-    while (received < totalMessages) {
+    while (received < totalMessages)
+    {
         std::unique_ptr<Message> message(consumer->receive(5000));
-        if (message.get() == nullptr) {
+        if (message.get() == nullptr)
+        {
             break;
         }
         received++;
@@ -277,7 +346,8 @@ void OpenwireFailoverIntegrationTest::testMessageDeliveryDuringFailover() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenwireFailoverIntegrationTest::testFailoverWithAsyncConsumer() {
+void OpenwireFailoverIntegrationTest::testFailoverWithAsyncConsumer()
+{
     std::unique_ptr<ActiveMQConnectionFactory> factory(
         new ActiveMQConnectionFactory(getFailoverURL()));
 
@@ -286,28 +356,33 @@ void OpenwireFailoverIntegrationTest::testFailoverWithAsyncConsumer() {
 
     session.reset(connection->createSession(Session::AUTO_ACKNOWLEDGE));
 
-    std::string queueName = "failover.async.test." + UUID::randomUUID().toString();
+    std::string queueName = "failover.async.test." +
+                            UUID::randomUUID().toString();
     std::unique_ptr<Queue> queue(session->createQueue(queueName));
 
-    std::unique_ptr<MessageProducer> producer(session->createProducer(queue.get()));
+    std::unique_ptr<MessageProducer> producer(
+        session->createProducer(queue.get()));
     producer->setDeliveryMode(DeliveryMode::NON_PERSISTENT);
 
-    std::unique_ptr<MessageConsumer> consumer(session->createConsumer(queue.get()));
+    std::unique_ptr<MessageConsumer> consumer(
+        session->createConsumer(queue.get()));
 
     AsyncMessageListener listener;
     consumer->setMessageListener(&listener);
 
     // Send messages
     const int numMessages = 10;
-    for (int i = 0; i < numMessages; i++) {
-        std::unique_ptr<TextMessage> message(
-            session->createTextMessage("Async failover test " + std::to_string(i)));
+    for (int i = 0; i < numMessages; i++)
+    {
+        std::unique_ptr<TextMessage> message(session->createTextMessage(
+            "Async failover test " + std::to_string(i)));
         producer->send(message.get());
     }
 
     // Wait for async delivery
     int waitTime = 0;
-    while (listener.getMessagesReceived() < numMessages && waitTime < 10000) {
+    while (listener.getMessagesReceived() < numMessages && waitTime < 10000)
+    {
         Thread::sleep(100);
         waitTime += 100;
     }
@@ -321,10 +396,38 @@ void OpenwireFailoverIntegrationTest::testFailoverWithAsyncConsumer() {
 
 ////////////////////////////////////////////////////////////////////////////////
 // Register the test suite
-namespace activemq { namespace test { namespace openwire {
-TEST_F(OpenwireFailoverIntegrationTest, testFailoverConnection) { testFailoverConnection(); }
-TEST_F(OpenwireFailoverIntegrationTest, testSendReceiveWithFailover) { testSendReceiveWithFailover(); }
-TEST_F(OpenwireFailoverIntegrationTest, testFailoverReconnectOnBrokerDown) { testFailoverReconnectOnBrokerDown(); }
-TEST_F(OpenwireFailoverIntegrationTest, testMessageDeliveryDuringFailover) { testMessageDeliveryDuringFailover(); }
-TEST_F(OpenwireFailoverIntegrationTest, testFailoverWithAsyncConsumer) { testFailoverWithAsyncConsumer(); }
-}}}
+namespace activemq
+{
+namespace test
+{
+    namespace openwire
+    {
+        TEST_F(OpenwireFailoverIntegrationTest, testFailoverConnection)
+        {
+            testFailoverConnection();
+        }
+
+        TEST_F(OpenwireFailoverIntegrationTest, testSendReceiveWithFailover)
+        {
+            testSendReceiveWithFailover();
+        }
+
+        TEST_F(OpenwireFailoverIntegrationTest,
+               testFailoverReconnectOnBrokerDown)
+        {
+            testFailoverReconnectOnBrokerDown();
+        }
+
+        TEST_F(OpenwireFailoverIntegrationTest,
+               testMessageDeliveryDuringFailover)
+        {
+            testMessageDeliveryDuringFailover();
+        }
+
+        TEST_F(OpenwireFailoverIntegrationTest, testFailoverWithAsyncConsumer)
+        {
+            testFailoverWithAsyncConsumer();
+        }
+    }  // namespace openwire
+}  // namespace test
+}  // namespace activemq

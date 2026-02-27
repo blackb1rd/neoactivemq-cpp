@@ -26,40 +26,41 @@ using namespace decaf;
 using namespace decaf::net;
 using namespace decaf::lang;
 
-    class InetAddressTest : public ::testing::Test {
+class InetAddressTest : public ::testing::Test
+{
 public:
-
-        InetAddressTest();
-        virtual ~InetAddressTest();
-
-    };
+    InetAddressTest();
+    virtual ~InetAddressTest();
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-InetAddressTest::InetAddressTest() {
+InetAddressTest::InetAddressTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-InetAddressTest::~InetAddressTest() {
+InetAddressTest::~InetAddressTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(InetAddressTest, testClone) {
-
+TEST_F(InetAddressTest, testClone)
+{
     InetAddress address = InetAddress::getLocalHost();
     ASSERT_TRUE(address.getHostName() != "");
     ASSERT_TRUE(address.getHostAddress() != "");
 
-    std::unique_ptr<InetAddress> copy( address.clone() );
+    std::unique_ptr<InetAddress> copy(address.clone());
 
     ASSERT_TRUE(address.getHostName() == copy->getHostName());
     ASSERT_TRUE(address.getHostAddress() == copy->getHostAddress());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(InetAddressTest, testGetByAddress) {
-
-    const unsigned char bytes[] = { 127, 0, 0, 1 };
-    InetAddress address = InetAddress::getByAddress( bytes, 4 );
+TEST_F(InetAddressTest, testGetByAddress)
+{
+    const unsigned char bytes[] = {127, 0, 0, 1};
+    InetAddress         address = InetAddress::getByAddress(bytes, 4);
 
     ArrayPointer<unsigned char> value = address.getAddress();
 
@@ -69,22 +70,23 @@ TEST_F(InetAddressTest, testGetByAddress) {
     ASSERT_EQ(bytes[2], value[2]);
     ASSERT_EQ(bytes[3], value[3]);
 
-    const unsigned char invalid[] = { 1 };
+    const unsigned char invalid[] = {1};
 
-    ASSERT_THROW(InetAddress::getByAddress( invalid, 1 ), UnknownHostException) << ("Should throw an UnknownHostException");
+    ASSERT_THROW(InetAddress::getByAddress(invalid, 1), UnknownHostException)
+        << ("Should throw an UnknownHostException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(InetAddressTest, testGetHostAddress) {
-
-    const unsigned char bytes[] = { 127, 0, 0, 1 };
-    InetAddress address = InetAddress::getByAddress( bytes, 4 );
-    ASSERT_EQ(std::string( "127.0.0.1" ), address.getHostAddress());
+TEST_F(InetAddressTest, testGetHostAddress)
+{
+    const unsigned char bytes[] = {127, 0, 0, 1};
+    InetAddress         address = InetAddress::getByAddress(bytes, 4);
+    ASSERT_EQ(std::string("127.0.0.1"), address.getHostAddress());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(InetAddressTest, testGetLocalHost) {
-
+TEST_F(InetAddressTest, testGetLocalHost)
+{
     InetAddress address = InetAddress::getLocalHost();
     ASSERT_TRUE(address.getHostName() != "");
     ASSERT_TRUE(address.getHostAddress() != "");

@@ -21,19 +21,21 @@
 #include <activemq/test/CMSTestFixture.h>
 #include <activemq/util/IntegrationCommon.h>
 
-namespace activemq {
-namespace test {
+namespace activemq
+{
+namespace test
+{
 
-    class BulkMessageTest : public CMSTestFixture {
+    class BulkMessageTest : public CMSTestFixture
+    {
     public:
-
         BulkMessageTest();
         virtual ~BulkMessageTest();
 
         void testBulkMessageSendReceive();
-
     };
 
-}}
+}  // namespace test
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_TEST_BULKMESSAGETEST_H_ */

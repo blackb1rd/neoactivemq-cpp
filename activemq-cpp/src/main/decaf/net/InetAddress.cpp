@@ -17,12 +17,12 @@
 
 #include "InetAddress.h"
 
-#include <decaf/lang/System.h>
 #include <decaf/lang/Byte.h>
+#include <decaf/lang/System.h>
+#include <decaf/lang/exceptions/RuntimeException.h>
 #include <decaf/net/Inet4Address.h>
 #include <decaf/net/Inet6Address.h>
 #include <decaf/net/UnknownHostException.h>
-#include <decaf/lang/exceptions/RuntimeException.h>
 
 #include <asio.hpp>
 
@@ -33,40 +33,37 @@ using namespace decaf::lang::exceptions;
 using namespace decaf::internal;
 
 ////////////////////////////////////////////////////////////////////////////////
-const unsigned char InetAddress::loopbackBytes[4] = { 127, 0, 0, 1 };
-const unsigned char InetAddress::anyBytes[4] = { 0, 0, 0, 0 };
+const unsigned char InetAddress::loopbackBytes[4] = {127, 0, 0, 1};
+const unsigned char InetAddress::anyBytes[4]      = {0, 0, 0, 0};
 
 ////////////////////////////////////////////////////////////////////////////////
-InetAddress::InetAddress() : hostname(), reached(false), addressBytes() {
+InetAddress::InetAddress()
+    : hostname(),
+      reached(false),
+      addressBytes()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-InetAddress::InetAddress(const unsigned char* ipAddress, int numBytes) :
-        hostname(), reached(false), addressBytes() {
-
-    if (ipAddress == NULL) {
-        throw NullPointerException(__FILE__, __LINE__, "InetAddress constructor called with null address array.");
+InetAddress::InetAddress(const unsigned char* ipAddress, int numBytes)
+    : hostname(),
+      reached(false),
+      addressBytes()
+{
+    if (ipAddress == NULL)
+    {
+        throw NullPointerException(
+            __FILE__,
+            __LINE__,
+            "InetAddress constructor called with null address array.");
     }
 
-    if (numBytes < 0) {
-        throw IllegalArgumentException(__FILE__, __LINE__, "Number of bytes value is invalid: %d", numBytes);
-    }
-
-    unsigned char* copy = new unsigned char[numBytes];
-    System::arraycopy(ipAddress, 0, copy, 0, numBytes);
-    this->addressBytes.reset(copy, numBytes);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-InetAddress::InetAddress(const std::string& hostname, const unsigned char* ipAddress, int numBytes) :
-        hostname(hostname), reached(false), addressBytes() {
-
-    if (ipAddress == NULL) {
-        throw NullPointerException(__FILE__, __LINE__, "InetAddress constructor called with null address array.");
-    }
-
-    if (numBytes < 0) {
-        throw IllegalArgumentException(__FILE__, __LINE__, "Number of bytes value is invalid: %d", numBytes);
+    if (numBytes < 0)
+    {
+        throw IllegalArgumentException(__FILE__,
+                                       __LINE__,
+                                       "Number of bytes value is invalid: %d",
+                                       numBytes);
     }
 
     unsigned char* copy = new unsigned char[numBytes];
@@ -75,28 +72,62 @@ InetAddress::InetAddress(const std::string& hostname, const unsigned char* ipAdd
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-InetAddress::~InetAddress() {
+InetAddress::InetAddress(const std::string&   hostname,
+                         const unsigned char* ipAddress,
+                         int                  numBytes)
+    : hostname(hostname),
+      reached(false),
+      addressBytes()
+{
+    if (ipAddress == NULL)
+    {
+        throw NullPointerException(
+            __FILE__,
+            __LINE__,
+            "InetAddress constructor called with null address array.");
+    }
+
+    if (numBytes < 0)
+    {
+        throw IllegalArgumentException(__FILE__,
+                                       __LINE__,
+                                       "Number of bytes value is invalid: %d",
+                                       numBytes);
+    }
+
+    unsigned char* copy = new unsigned char[numBytes];
+    System::arraycopy(ipAddress, 0, copy, 0, numBytes);
+    this->addressBytes.reset(copy, numBytes);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-InetAddress* InetAddress::clone() const {
+InetAddress::~InetAddress()
+{
+}
+
+////////////////////////////////////////////////////////////////////////////////
+InetAddress* InetAddress::clone() const
+{
     return new InetAddress(*this);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ArrayPointer<unsigned char> InetAddress::getAddress() const {
+ArrayPointer<unsigned char> InetAddress::getAddress() const
+{
     return this->addressBytes.clone();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string InetAddress::getHostAddress() const {
-
+std::string InetAddress::getHostAddress() const
+{
     std::string address;
 
-    for (int ix = 0; ix < this->addressBytes.length(); ix++) {
+    for (int ix = 0; ix < this->addressBytes.length(); ix++)
+    {
         address.append(Byte::toString(addressBytes[ix]));
 
-        if (ix < this->addressBytes.length() - 1) {
+        if (ix < this->addressBytes.length() - 1)
+        {
             address.append(".");
         }
     }
@@ -104,9 +135,10 @@ std::string InetAddress::getHostAddress() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string InetAddress::getHostName() const {
-
-    if (!this->hostname.empty()) {
+std::string InetAddress::getHostName() const
+{
+    if (!this->hostname.empty())
+    {
         return this->hostname;
     }
 
@@ -114,68 +146,96 @@ std::string InetAddress::getHostName() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string InetAddress::toString() const {
+std::string InetAddress::toString() const
+{
     return getHostName() + " / " + getHostAddress();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-InetAddress InetAddress::getByAddress(const std::string& hostname, const unsigned char* bytes, int numBytes) {
-
-    if (numBytes == 4) {
+InetAddress InetAddress::getByAddress(const std::string&   hostname,
+                                      const unsigned char* bytes,
+                                      int                  numBytes)
+{
+    if (numBytes == 4)
+    {
         return Inet4Address(hostname, bytes, numBytes);
-    } else if (numBytes == 16) {
+    }
+    else if (numBytes == 16)
+    {
         return Inet6Address(hostname, bytes, numBytes);
-    } else {
-        throw UnknownHostException(__FILE__, __LINE__, "Number of Bytes passed was invalid: %d", numBytes);
+    }
+    else
+    {
+        throw UnknownHostException(__FILE__,
+                                   __LINE__,
+                                   "Number of Bytes passed was invalid: %d",
+                                   numBytes);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-InetAddress InetAddress::getByAddress(const unsigned char* bytes, int numBytes) {
-
-    if (numBytes == 4) {
+InetAddress InetAddress::getByAddress(const unsigned char* bytes, int numBytes)
+{
+    if (numBytes == 4)
+    {
         return Inet4Address(bytes, numBytes);
-    } else if (numBytes == 16) {
+    }
+    else if (numBytes == 16)
+    {
         return Inet6Address(bytes, numBytes);
-    } else {
-        throw UnknownHostException(__FILE__, __LINE__, "Number of Bytes passed was invalid: %d", numBytes);
+    }
+    else
+    {
+        throw UnknownHostException(__FILE__,
+                                   __LINE__,
+                                   "Number of Bytes passed was invalid: %d",
+                                   numBytes);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-InetAddress InetAddress::getLocalHost() {
-
-    try {
+InetAddress InetAddress::getLocalHost()
+{
+    try
+    {
         asio::io_context ioContext;
 
         // Get the local hostname
         std::string hostname = asio::ip::host_name();
 
-        if (hostname.empty()) {
+        if (hostname.empty())
+        {
             return getLoopbackAddress();
         }
 
         // Resolve the hostname to get the IP address
         asio::ip::tcp::resolver resolver(ioContext);
-        asio::error_code ec;
+        asio::error_code        ec;
 
         auto results = resolver.resolve(hostname, "", ec);
 
-        if (ec || results.empty()) {
-            throw UnknownHostException(__FILE__, __LINE__, "Could not resolve the IP Address of this host.");
+        if (ec || results.empty())
+        {
+            throw UnknownHostException(
+                __FILE__,
+                __LINE__,
+                "Could not resolve the IP Address of this host.");
         }
 
         // Get the first result
         auto endpoint = results.begin()->endpoint();
-        auto address = endpoint.address();
+        auto address  = endpoint.address();
 
-        if (address.is_v4()) {
+        if (address.is_v4())
+        {
             auto v4addr = address.to_v4();
-            auto bytes = v4addr.to_bytes();
+            auto bytes  = v4addr.to_bytes();
             return Inet4Address(hostname, bytes.data(), 4);
-        } else {
+        }
+        else
+        {
             auto v6addr = address.to_v6();
-            auto bytes = v6addr.to_bytes();
+            auto bytes  = v6addr.to_bytes();
             return Inet6Address(hostname, bytes.data(), 16);
         }
     }
@@ -185,25 +245,28 @@ InetAddress InetAddress::getLocalHost() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-unsigned int InetAddress::bytesToInt(const unsigned char* bytes, int start) {
-
+unsigned int InetAddress::bytesToInt(const unsigned char* bytes, int start)
+{
     // First mask the byte with 255, as when a negative
     // signed byte converts to an integer, it has bits
     // on in the first 3 bytes, we are only concerned
     // about the right-most 8 bits.
     // Then shift the rightmost byte to align with its
     // position in the integer.
-    int value = ((bytes[start + 3] & 255)) | ((bytes[start + 2] & 255) << 8) | ((bytes[start + 1] & 255) << 16) | ((bytes[start] & 255) << 24);
+    int value = ((bytes[start + 3] & 255)) | ((bytes[start + 2] & 255) << 8) |
+                ((bytes[start + 1] & 255) << 16) | ((bytes[start] & 255) << 24);
 
     return value;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-InetAddress InetAddress::getAnyAddress() {
+InetAddress InetAddress::getAnyAddress()
+{
     return Inet4Address(anyBytes, 4);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-InetAddress InetAddress::getLoopbackAddress() {
+InetAddress InetAddress::getLoopbackAddress()
+{
     return Inet4Address("localhost", loopbackBytes, 4);
 }

@@ -17,11 +17,11 @@
 
 #include <gtest/gtest.h>
 
-#include <decaf/util/concurrent/Mutex.h>
 #include <decaf/lang/System.h>
 #include <decaf/lang/ThreadLocal.h>
 #include <decaf/lang/exceptions/InterruptedException.h>
 #include <decaf/lang/exceptions/RuntimeException.h>
+#include <decaf/util/concurrent/Mutex.h>
 
 #include <memory>
 
@@ -32,49 +32,58 @@ using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 
-    class ThreadLocalTest : public ::testing::Test {
+class ThreadLocalTest : public ::testing::Test
+{
 public:
-
-        ThreadLocalTest();
-        virtual ~ThreadLocalTest();
-
-    };
+    ThreadLocalTest();
+    virtual ~ThreadLocalTest();
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-ThreadLocalTest::ThreadLocalTest() {
+ThreadLocalTest::ThreadLocalTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ThreadLocalTest::~ThreadLocalTest() {
+ThreadLocalTest::~ThreadLocalTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ThreadLocalTest, testConstructor) {
+TEST_F(ThreadLocalTest, testConstructor)
+{
     ThreadLocal<int> local;
     ASSERT_TRUE(local.get() == 0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class StringThreadLocal : public ThreadLocal<std::string> {
-    public:
+class StringThreadLocal : public ThreadLocal<std::string>
+{
+public:
+    StringThreadLocal()
+        : ThreadLocal<std::string>()
+    {
+    }
 
-        StringThreadLocal() : ThreadLocal<std::string>() {}
-        virtual ~StringThreadLocal() {}
+    virtual ~StringThreadLocal()
+    {
+    }
 
-    protected:
+protected:
+    virtual std::string initialValue() const
+    {
+        return "initial";
+    }
+};
 
-        virtual std::string initialValue() const {
-            return "initial";
-        }
-    };
-
-}
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ThreadLocalTest, testRemove) {
-
+TEST_F(ThreadLocalTest, testRemove)
+{
     StringThreadLocal tl;
 
     ASSERT_EQ(std::string("initial"), tl.get());
@@ -85,33 +94,41 @@ TEST_F(ThreadLocalTest, testRemove) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class TestGetRunnable : public Runnable {
-    private:
+class TestGetRunnable : public Runnable
+{
+private:
+    std::string*       result;
+    StringThreadLocal* local;
 
-        std::string* result;
-        StringThreadLocal* local;
+private:
+    TestGetRunnable(const TestGetRunnable&);
+    TestGetRunnable& operator=(const TestGetRunnable&);
 
-    private:
+public:
+    TestGetRunnable(StringThreadLocal* local, std::string* result)
+        : Runnable(),
+          result(result),
+          local(local)
+    {
+    }
 
-        TestGetRunnable(const TestGetRunnable&);
-        TestGetRunnable& operator= (const TestGetRunnable&);
+    virtual ~TestGetRunnable()
+    {
+    }
 
-    public:
-
-        TestGetRunnable(StringThreadLocal* local, std::string* result) : Runnable(), result(result), local(local) {}
-        virtual ~TestGetRunnable() {}
-
-        virtual void run() {
-            *result = local->get();
-        }
-    };
-}
+    virtual void run()
+    {
+        *result = local->get();
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ThreadLocalTest, testGet) {
-
+TEST_F(ThreadLocalTest, testGet)
+{
     ThreadLocal<long long> l;
     ASSERT_TRUE(l.get() == 0) << ("ThreadLocal's initial value is 0");
 
@@ -119,71 +136,88 @@ TEST_F(ThreadLocalTest, testGet) {
     // ThreadLocal
     StringThreadLocal local;
 
-    ASSERT_TRUE(local.get() == "initial") << (std::string("ThreadLocal's initial value should be 'initial'")
-                           + " but is " + local.get());
+    ASSERT_TRUE(local.get() == "initial")
+        << (std::string("ThreadLocal's initial value should be 'initial'") +
+            " but is " + local.get());
 
-    std::string result;
+    std::string     result;
     TestGetRunnable runnable(&local, &result);
-    Thread t(&runnable);
+    Thread          t(&runnable);
 
-    // Alter the ThreadLocal here and then check that another thread still gets the default
-    // initial value when it calls get.
+    // Alter the ThreadLocal here and then check that another thread still gets
+    // the default initial value when it calls get.
     local.set("updated");
 
     t.start();
-    try {
+    try
+    {
         t.join();
-    } catch (InterruptedException& ie) {
+    }
+    catch (InterruptedException& ie)
+    {
         FAIL() << ("Interrupted!!");
     }
 
-    ASSERT_TRUE(result == "initial") << ("ThreadLocal's initial value in other Thread should be 'initial'");
+    ASSERT_TRUE(result == "initial")
+        << ("ThreadLocal's initial value in other Thread should be 'initial'");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class TestSetRunnable : public Runnable {
-    private:
+class TestSetRunnable : public Runnable
+{
+private:
+    StringThreadLocal* local;
 
-        StringThreadLocal* local;
+private:
+    TestSetRunnable(const TestSetRunnable&);
+    TestSetRunnable& operator=(const TestSetRunnable&);
 
-    private:
+public:
+    TestSetRunnable(StringThreadLocal* local)
+        : Runnable(),
+          local(local)
+    {
+    }
 
-        TestSetRunnable(const TestSetRunnable&);
-        TestSetRunnable& operator= (const TestSetRunnable&);
+    virtual ~TestSetRunnable()
+    {
+    }
 
-    public:
-
-        TestSetRunnable(StringThreadLocal* local) : Runnable(), local(local) {}
-        virtual ~TestSetRunnable() {}
-
-        virtual void run() {
-            local->set("some other value");
-        }
-    };
-}
+    virtual void run()
+    {
+        local->set("some other value");
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ThreadLocalTest, testSet) {
-
+TEST_F(ThreadLocalTest, testSet)
+{
     StringThreadLocal local;
-    ASSERT_TRUE(local.get() == "initial") << (std::string("ThreadLocal's initial value should be 'initial'")
-                           + " but is " + local.get());
+    ASSERT_TRUE(local.get() == "initial")
+        << (std::string("ThreadLocal's initial value should be 'initial'") +
+            " but is " + local.get());
 
     TestSetRunnable runnable(&local);
-    Thread t(&runnable);
+    Thread          t(&runnable);
 
-    // Alter the ThreadLocal here and then check that another thread still gets the default
-    // initial value when it calls get.
+    // Alter the ThreadLocal here and then check that another thread still gets
+    // the default initial value when it calls get.
     local.set("updated");
 
     t.start();
-    try {
+    try
+    {
         t.join();
-    } catch (InterruptedException& ie) {
+    }
+    catch (InterruptedException& ie)
+    {
         FAIL() << ("Interrupted!!");
     }
 
-    ASSERT_TRUE(local.get() == "updated") << ("ThreadLocal's value in this Thread should be 'updated'");
+    ASSERT_TRUE(local.get() == "updated")
+        << ("ThreadLocal's value in this Thread should be 'updated'");
 }

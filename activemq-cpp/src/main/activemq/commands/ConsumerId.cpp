@@ -42,33 +42,47 @@ using namespace decaf::internal::util;
  */
 
 ////////////////////////////////////////////////////////////////////////////////
-ConsumerId::ConsumerId() :
-    BaseDataStructure(), connectionId(""), sessionId(0), value(0), parentId() {
-
+ConsumerId::ConsumerId()
+    : BaseDataStructure(),
+      connectionId(""),
+      sessionId(0),
+      value(0),
+      parentId()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ConsumerId::ConsumerId(const ConsumerId& other) :
-    BaseDataStructure(), connectionId(""), sessionId(0), value(0), parentId() {
-
+ConsumerId::ConsumerId(const ConsumerId& other)
+    : BaseDataStructure(),
+      connectionId(""),
+      sessionId(0),
+      value(0),
+      parentId()
+{
     this->copyDataStructure(&other);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ConsumerId::ConsumerId(const SessionId& sessionId, long long consumerId) :
-    BaseDataStructure(), connectionId(""), sessionId(0), value(0), parentId() {
-
+ConsumerId::ConsumerId(const SessionId& sessionId, long long consumerId)
+    : BaseDataStructure(),
+      connectionId(""),
+      sessionId(0),
+      value(0),
+      parentId()
+{
     this->connectionId = sessionId.getConnectionId();
-    this->sessionId = sessionId.getValue();
-    this->value = consumerId;
+    this->sessionId    = sessionId.getValue();
+    this->value        = consumerId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ConsumerId::~ConsumerId() {
+ConsumerId::~ConsumerId()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ConsumerId* ConsumerId::cloneDataStructure() const {
+ConsumerId* ConsumerId::cloneDataStructure() const
+{
     std::unique_ptr<ConsumerId> consumerId(new ConsumerId());
 
     // Copy the data from the base class or classes
@@ -78,18 +92,21 @@ ConsumerId* ConsumerId::cloneDataStructure() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConsumerId::copyDataStructure(const DataStructure* src) {
-
+void ConsumerId::copyDataStructure(const DataStructure* src)
+{
     // Protect against invalid self assignment.
-    if (this == src) {
+    if (this == src)
+    {
         return;
     }
 
     const ConsumerId* srcPtr = dynamic_cast<const ConsumerId*>(src);
 
-    if (srcPtr == NULL || src == NULL) {
+    if (srcPtr == NULL || src == NULL)
+    {
         throw decaf::lang::exceptions::NullPointerException(
-            __FILE__, __LINE__,
+            __FILE__,
+            __LINE__,
             "ConsumerId::copyDataStructure - src is NULL or invalid");
     }
 
@@ -102,106 +119,129 @@ void ConsumerId::copyDataStructure(const DataStructure* src) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-unsigned char ConsumerId::getDataStructureType() const {
+unsigned char ConsumerId::getDataStructureType() const
+{
     return ConsumerId::ID_CONSUMERID;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string ConsumerId::toString() const {
-
+std::string ConsumerId::toString() const
+{
     ostringstream stream;
 
-    stream << this->connectionId << ":"
-           << this->sessionId << ":"
+    stream << this->connectionId << ":" << this->sessionId << ":"
            << this->value;
 
     return stream.str();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool ConsumerId::equals(const DataStructure* value) const {
-
-    if (this == value) {
+bool ConsumerId::equals(const DataStructure* value) const
+{
+    if (this == value)
+    {
         return true;
     }
 
     const ConsumerId* valuePtr = dynamic_cast<const ConsumerId*>(value);
 
-    if (valuePtr == NULL || value == NULL) {
+    if (valuePtr == NULL || value == NULL)
+    {
         return false;
     }
 
-    if (this->getConnectionId() != valuePtr->getConnectionId()) {
+    if (this->getConnectionId() != valuePtr->getConnectionId())
+    {
         return false;
     }
-    if (this->getSessionId() != valuePtr->getSessionId()) {
+    if (this->getSessionId() != valuePtr->getSessionId())
+    {
         return false;
     }
-    if (this->getValue() != valuePtr->getValue()) {
+    if (this->getValue() != valuePtr->getValue())
+    {
         return false;
     }
-    if (!BaseDataStructure::equals(value)) {
+    if (!BaseDataStructure::equals(value))
+    {
         return false;
     }
     return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::string& ConsumerId::getConnectionId() const {
+const std::string& ConsumerId::getConnectionId() const
+{
     return connectionId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string& ConsumerId::getConnectionId() {
+std::string& ConsumerId::getConnectionId()
+{
     return connectionId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConsumerId::setConnectionId(const std::string& connectionId) {
+void ConsumerId::setConnectionId(const std::string& connectionId)
+{
     this->connectionId = connectionId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-long long ConsumerId::getSessionId() const {
+long long ConsumerId::getSessionId() const
+{
     return sessionId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConsumerId::setSessionId(long long sessionId) {
+void ConsumerId::setSessionId(long long sessionId)
+{
     this->sessionId = sessionId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-long long ConsumerId::getValue() const {
+long long ConsumerId::getValue() const
+{
     return value;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConsumerId::setValue(long long value) {
+void ConsumerId::setValue(long long value)
+{
     this->value = value;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int ConsumerId::compareTo(const ConsumerId& value) const {
-
-    if (this == &value) {
+int ConsumerId::compareTo(const ConsumerId& value) const
+{
+    if (this == &value)
+    {
         return 0;
     }
 
-    int connectionIdComp = StringUtils::compareIgnoreCase(this->connectionId.c_str(), value.connectionId.c_str());
-    if (connectionIdComp != 0) {
+    int connectionIdComp =
+        StringUtils::compareIgnoreCase(this->connectionId.c_str(),
+                                       value.connectionId.c_str());
+    if (connectionIdComp != 0)
+    {
         return connectionIdComp;
     }
 
-    if (this->sessionId > value.sessionId) {
+    if (this->sessionId > value.sessionId)
+    {
         return 1;
-    } else if(this->sessionId < value.sessionId) {
+    }
+    else if (this->sessionId < value.sessionId)
+    {
         return -1;
     }
 
-    if (this->value > value.value) {
+    if (this->value > value.value)
+    {
         return 1;
-    } else if(this->value < value.value) {
+    }
+    else if (this->value < value.value)
+    {
         return -1;
     }
 
@@ -209,36 +249,42 @@ int ConsumerId::compareTo(const ConsumerId& value) const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool ConsumerId::equals(const ConsumerId& value) const {
+bool ConsumerId::equals(const ConsumerId& value) const
+{
     return this->equals((const DataStructure*)&value);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool ConsumerId::operator==(const ConsumerId& value) const {
+bool ConsumerId::operator==(const ConsumerId& value) const
+{
     return this->compareTo(value) == 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool ConsumerId::operator<(const ConsumerId& value) const {
+bool ConsumerId::operator<(const ConsumerId& value) const
+{
     return this->compareTo(value) < 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ConsumerId& ConsumerId::operator= (const ConsumerId& other) {
+ConsumerId& ConsumerId::operator=(const ConsumerId& other)
+{
     this->copyDataStructure(&other);
     return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int ConsumerId::getHashCode() const {
+int ConsumerId::getHashCode() const
+{
     return decaf::util::HashCode<std::string>()(this->toString());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const Pointer<SessionId>& ConsumerId::getParentId() const {
-    if (this->parentId == NULL) {
+const Pointer<SessionId>& ConsumerId::getParentId() const
+{
+    if (this->parentId == NULL)
+    {
         this->parentId.reset(new SessionId(this));
     }
     return this->parentId;
 }
-

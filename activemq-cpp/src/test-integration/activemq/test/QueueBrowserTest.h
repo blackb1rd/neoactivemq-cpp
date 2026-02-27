@@ -21,12 +21,14 @@
 #include <activemq/test/CMSTestFixture.h>
 #include <activemq/util/IntegrationCommon.h>
 
-namespace activemq {
-namespace test {
+namespace activemq
+{
+namespace test
+{
 
-    class QueueBrowserTest : public CMSTestFixture {
+    class QueueBrowserTest : public CMSTestFixture
+    {
     public:
-
         QueueBrowserTest();
         virtual ~QueueBrowserTest();
 
@@ -36,9 +38,9 @@ namespace test {
         void testRepeatedQueueBrowserCreateDestroy();
         void testRepeatedQueueBrowserCreateDestroyWithMessageInQueue();
         void testBrowsingExpirationIsIgnored();
-
     };
 
-}}
+}  // namespace test
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_TEST_QUEUEBROWSERTEST_H_ */

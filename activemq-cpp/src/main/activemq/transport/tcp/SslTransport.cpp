@@ -17,12 +17,12 @@
 
 #include "SslTransport.h"
 
-#include <decaf/lang/Integer.h>
 #include <decaf/lang/Boolean.h>
+#include <decaf/lang/Integer.h>
+#include <decaf/lang/exceptions/IllegalArgumentException.h>
+#include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/net/ssl/SSLSocket.h>
 #include <decaf/net/ssl/SSLSocketFactory.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
 
 using namespace activemq;
 using namespace activemq::io;
@@ -38,24 +38,34 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-SslTransport::SslTransport(const Pointer<Transport> next, const decaf::net::URI& location) :
-    TcpTransport(next, location), sslSocket(NULL), properties() {
+SslTransport::SslTransport(const Pointer<Transport> next,
+                           const decaf::net::URI&   location)
+    : TcpTransport(next, location),
+      sslSocket(NULL),
+      properties()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SslTransport::SslTransport(const Pointer<Transport> next, const decaf::net::URI& location,
-                         const decaf::util::Properties& properties) :
-    TcpTransport(next, location), sslSocket(NULL), properties(properties) {
+SslTransport::SslTransport(const Pointer<Transport>       next,
+                           const decaf::net::URI&         location,
+                           const decaf::util::Properties& properties)
+    : TcpTransport(next, location),
+      sslSocket(NULL),
+      properties(properties)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SslTransport::~SslTransport() {
+SslTransport::~SslTransport()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Socket* SslTransport::createSocket() {
-
-    try {
+Socket* SslTransport::createSocket()
+{
+    try
+    {
         // The pointer returned from getDefault is owned by the SSLSocketFactory
         SocketFactory* factory = SSLSocketFactory::getDefault();
         return factory->createSocket();
@@ -66,17 +76,23 @@ Socket* SslTransport::createSocket() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SslTransport::configureSocket(Socket* socket) {
-
-    try {
-
-        if (socket == NULL) {
-            throw NullPointerException(__FILE__, __LINE__, "Socket instance passed was NULL");
+void SslTransport::configureSocket(Socket* socket)
+{
+    try
+    {
+        if (socket == NULL)
+        {
+            throw NullPointerException(__FILE__,
+                                       __LINE__,
+                                       "Socket instance passed was NULL");
         }
 
         SSLSocket* sslSocket = dynamic_cast<SSLSocket*>(socket);
-        if (sslSocket == NULL) {
-            throw IllegalArgumentException(__FILE__, __LINE__,
+        if (sslSocket == NULL)
+        {
+            throw IllegalArgumentException(
+                __FILE__,
+                __LINE__,
                 "Socket passed was not an SSLSocket instance.");
         }
 
@@ -90,9 +106,11 @@ void SslTransport::configureSocket(Socket* socket) {
         params.setServerNames(serverNames);
 
         // Apply peer verification setting from URI properties if specified
-        if (this->properties.hasProperty("socket.disablePeerVerification")) {
+        if (this->properties.hasProperty("socket.disablePeerVerification"))
+        {
             bool disablePeerVerification = Boolean::parseBoolean(
-                this->properties.getProperty("socket.disablePeerVerification", "false"));
+                this->properties.getProperty("socket.disablePeerVerification",
+                                             "false"));
             params.setPeerVerificationEnabled(!disablePeerVerification);
         }
 
@@ -108,15 +126,19 @@ void SslTransport::configureSocket(Socket* socket) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SslTransport::beforeNextIsStarted() {
-
-    try {
+void SslTransport::beforeNextIsStarted()
+{
+    try
+    {
         // First, let the parent TcpTransport complete its connection logic
         TcpTransport::beforeNextIsStarted();
 
-        // Now that the socket is connected and fully configured, perform the SSL handshake
-        // This ensures the SSL connection is fully established before any I/O operations begin
-        if (this->sslSocket != NULL && this->sslSocket->isConnected() && !this->sslSocket->isClosed()) {
+        // Now that the socket is connected and fully configured, perform the
+        // SSL handshake This ensures the SSL connection is fully established
+        // before any I/O operations begin
+        if (this->sslSocket != NULL && this->sslSocket->isConnected() &&
+            !this->sslSocket->isClosed())
+        {
             this->sslSocket->startHandshake();
         }
     }

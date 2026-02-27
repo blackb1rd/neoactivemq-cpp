@@ -18,58 +18,68 @@
 #ifndef _ACTIVEMQ_WIREFORMAT_OPENWIRE_MARSHAL_HEXTABLE_H_
 #define _ACTIVEMQ_WIREFORMAT_OPENWIRE_MARSHAL_HEXTABLE_H_
 
-#include <vector>
 #include <string>
+#include <vector>
 
 #include <activemq/util/Config.h>
 #include <decaf/lang/exceptions/IndexOutOfBoundsException.h>
 
-namespace activemq{
-namespace wireformat{
-namespace openwire{
-namespace utils{
+namespace activemq
+{
+namespace wireformat
+{
+    namespace openwire
+    {
+        namespace utils
+        {
 
-    /**
-     * The HexTable class maps hexidecimal strings to the value of an index
-     * into the table, i.e. the class will return "FF" for the index 255 in
-     * the table.
-     */
-    class AMQCPP_API HexTable {
-    private:
+            /**
+             * The HexTable class maps hexidecimal strings to the value of an
+             * index into the table, i.e. the class will return "FF" for the
+             * index 255 in the table.
+             */
+            class AMQCPP_API HexTable
+            {
+            private:
+                // Vector of Strings mapping hex to the value of the index.
+                std::vector<std::string> table;
 
-        // Vector of Strings mapping hex to the value of the index.
-        std::vector<std::string> table;
+            public:
+                HexTable();
 
-    public:
+                virtual ~HexTable()
+                {
+                }
 
-        HexTable();
-        virtual ~HexTable() {}
+                /**
+                 * Index operator for this Table, will throw an exception if the
+                 * index requested is out of bounds for this table.
+                 *
+                 * @param index
+                 *      The index of the value in the table to fetch.
+                 *
+                 * @return string containing the hex value if the index
+                 *
+                 * @throws IndexOutOfBoundsException if the index exceeds the
+                 * table size.
+                 */
+                virtual const std::string& operator[](std::size_t index);
+                virtual const std::string& operator[](std::size_t index) const;
 
-        /**
-         * Index operator for this Table, will throw an exception if the
-         * index requested is out of bounds for this table.
-         *
-         * @param index
-         *      The index of the value in the table to fetch.
-         *
-         * @return string containing the hex value if the index
-         *
-         * @throws IndexOutOfBoundsException if the index exceeds the table size.
-         */
-        virtual const std::string& operator[]( std::size_t index );
-        virtual const std::string& operator[]( std::size_t index ) const;
+                /**
+                 * Returns the max size of this Table.
+                 *
+                 * @return an integer size value for the table.
+                 */
+                virtual std::size_t size() const
+                {
+                    return table.size();
+                }
+            };
 
-        /**
-         * Returns the max size of this Table.
-         *
-         * @return an integer size value for the table.
-         */
-        virtual std::size_t size() const{
-            return table.size();
-        }
-
-    };
-
-}}}}
+        }  // namespace utils
+    }  // namespace openwire
+}  // namespace wireformat
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_WIREFORMAT_OPENWIRE_MARSHAL_HEXTABLE_H_*/

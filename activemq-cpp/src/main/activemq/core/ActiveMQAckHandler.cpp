@@ -21,4 +21,6 @@ using namespace activemq;
 using namespace activemq::core;
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQAckHandler::~ActiveMQAckHandler() {}
+ActiveMQAckHandler::~ActiveMQAckHandler()
+{
+}

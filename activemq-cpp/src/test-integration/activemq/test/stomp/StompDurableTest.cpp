@@ -17,35 +17,54 @@
 
 #include <activemq/test/DurableTest.h>
 
-namespace activemq{
-namespace test{
-namespace stomp{
-    class StompDurableTest : public DurableTest {
-std::string subscriptionName;
-    public:
-        StompDurableTest();
-        virtual ~StompDurableTest();
-        std::string getBrokerURL() const override {
-            return activemq::util::IntegrationCommon::getInstance().getStompURL();
-        }
-        std::string getSubscriptionName() const override {
-            return cmsProvider->getConnection()->getClientID();
-        }
-    };
-}}}
+namespace activemq
+{
+namespace test
+{
+    namespace stomp
+    {
+        class StompDurableTest : public DurableTest
+        {
+            std::string subscriptionName;
+
+        public:
+            StompDurableTest();
+            virtual ~StompDurableTest();
+
+            std::string getBrokerURL() const override
+            {
+                return activemq::util::IntegrationCommon::getInstance()
+                    .getStompURL();
+            }
+
+            std::string getSubscriptionName() const override
+            {
+                return cmsProvider->getConnection()->getClientID();
+            }
+        };
+    }  // namespace stomp
+}  // namespace test
+}  // namespace activemq
 
 using namespace activemq;
 using namespace activemq::test;
 using namespace activemq::test::stomp;
 
 ////////////////////////////////////////////////////////////////////////////////
-StompDurableTest::StompDurableTest() : DurableTest(), subscriptionName() {
+StompDurableTest::StompDurableTest()
+    : DurableTest(),
+      subscriptionName()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-StompDurableTest::~StompDurableTest() {
+StompDurableTest::~StompDurableTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Test registration
-TEST_F(StompDurableTest, DISABLED_testDurableConsumer) { testDurableConsumer(); }
+TEST_F(StompDurableTest, DISABLED_testDurableConsumer)
+{
+    testDurableConsumer();
+}

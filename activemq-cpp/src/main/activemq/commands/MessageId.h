@@ -20,7 +20,7 @@
 
 // Turn off warning message for ignored exception specification
 #ifdef _MSC_VER
-#pragma warning( disable : 4290 )
+#pragma warning(disable : 4290)
 #endif
 
 #include <activemq/commands/BaseDataStructure.h>
@@ -32,8 +32,10 @@
 #include <string>
 #include <vector>
 
-namespace activemq {
-namespace commands {
+namespace activemq
+{
+namespace commands
+{
 
     using decaf::lang::Pointer;
 
@@ -46,35 +48,35 @@ namespace commands {
      *         in the activemq-cpp-openwire-generator module
      *
      */
-    class AMQCPP_API MessageId : public BaseDataStructure, public decaf::lang::Comparable<MessageId> {
+    class AMQCPP_API MessageId : public BaseDataStructure,
+                                 public decaf::lang::Comparable<MessageId>
+    {
     protected:
-
-        std::string textView;
+        std::string         textView;
         Pointer<ProducerId> producerId;
-        long long producerSequenceId;
-        long long brokerSequenceId;
+        long long           producerSequenceId;
+        long long           brokerSequenceId;
 
     public:
-
         const static unsigned char ID_MESSAGEID = 110;
 
         typedef decaf::lang::PointerComparator<MessageId> COMPARATOR;
 
     private:
-
         mutable std::string key;
 
     public:
-
         MessageId();
 
         MessageId(const MessageId& other);
 
         MessageId(const std::string& messageKey);
 
-        MessageId(const Pointer<ProducerInfo>& producerInfo, long long producerSequenceId);
+        MessageId(const Pointer<ProducerInfo>& producerInfo,
+                  long long                    producerSequenceId);
 
-        MessageId(const Pointer<ProducerId>& producerId, long long producerSequenceId);
+        MessageId(const Pointer<ProducerId>& producerId,
+                  long long                  producerSequenceId);
 
         MessageId(const std::string& producerId, long long producerSequenceId);
 
@@ -93,18 +95,18 @@ namespace commands {
         void setValue(const std::string& key);
 
         virtual const std::string& getTextView() const;
-        virtual std::string& getTextView();
-        virtual void setTextView(const std::string& textView);
+        virtual std::string&       getTextView();
+        virtual void               setTextView(const std::string& textView);
 
         virtual const Pointer<ProducerId>& getProducerId() const;
-        virtual Pointer<ProducerId>& getProducerId();
+        virtual Pointer<ProducerId>&       getProducerId();
         virtual void setProducerId(const Pointer<ProducerId>& producerId);
 
         virtual long long getProducerSequenceId() const;
-        virtual void setProducerSequenceId(long long producerSequenceId);
+        virtual void      setProducerSequenceId(long long producerSequenceId);
 
         virtual long long getBrokerSequenceId() const;
-        virtual void setBrokerSequenceId(long long brokerSequenceId);
+        virtual void      setBrokerSequenceId(long long brokerSequenceId);
 
         virtual int compareTo(const MessageId& value) const;
 
@@ -114,12 +116,12 @@ namespace commands {
 
         virtual bool operator<(const MessageId& value) const;
 
-        MessageId& operator= (const MessageId& other);
+        MessageId& operator=(const MessageId& other);
 
         int getHashCode() const;
-
     };
 
-}}
+}  // namespace commands
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_COMMANDS_MESSAGEID_H_*/

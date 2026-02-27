@@ -20,19 +20,25 @@
 
 #include <string>
 
-namespace activemq{
-namespace util{
+namespace activemq
+{
+namespace util
+{
 
-    class IntegrationCommon {
+    class IntegrationCommon
+    {
     public:
+        virtual ~IntegrationCommon()
+        {
+        }
 
-        virtual ~IntegrationCommon() {}
-
-        virtual std::string getStompURL() const {
+        virtual std::string getStompURL() const
+        {
             return this->stompURL;
         }
 
-        virtual std::string getOpenwireURL() const {
+        virtual std::string getOpenwireURL() const
+        {
             return this->openwireURL;
         }
 
@@ -41,9 +47,11 @@ namespace util{
 
         /**
          * Returns the SSL OpenWire URL (port 61617).
-         * Requires: docker compose --profile ssl up (certificates generated automatically)
+         * Requires: docker compose --profile ssl up (certificates generated
+         * automatically)
          */
-        virtual std::string getSslOpenwireURL() const {
+        virtual std::string getSslOpenwireURL() const
+        {
             return this->sslOpenwireURL;
         }
 
@@ -53,21 +61,24 @@ namespace util{
         /**
          * Returns the URL for broker 1 (port 61617)
          */
-        virtual std::string getOpenwireURL1() const {
+        virtual std::string getOpenwireURL1() const
+        {
             return this->openwireURL1;
         }
 
         /**
          * Returns the URL for broker 2 (port 61618)
          */
-        virtual std::string getOpenwireURL2() const {
+        virtual std::string getOpenwireURL2() const
+        {
             return this->openwireURL2;
         }
 
         /**
          * Returns the URL for broker 3 (port 61619) - independent broker
          */
-        virtual std::string getOpenwireURL3() const {
+        virtual std::string getOpenwireURL3() const
+        {
             return this->openwireURL3;
         }
 
@@ -75,24 +86,22 @@ namespace util{
          * Returns a failover URL connecting to broker 1 and broker 2
          * Format: failover:(tcp://localhost:61617,tcp://localhost:61618)?...
          */
-        virtual std::string getFailoverURL() const {
+        virtual std::string getFailoverURL() const
+        {
             return this->failoverURL;
         }
 
     public:  // Statics
-
-        static const int defaultDelay;
+        static const int          defaultDelay;
         static const unsigned int defaultMsgCount;
-        static bool debug;
+        static bool               debug;
 
         static IntegrationCommon& getInstance();
 
     protected:
-
         IntegrationCommon();
 
     private:
-
         std::string urlCommon;
         std::string stompURL;
         std::string openwireURL;
@@ -103,9 +112,9 @@ namespace util{
         std::string openwireURL2;
         std::string openwireURL3;
         std::string failoverURL;
-
     };
 
-}}
+}  // namespace util
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_UTIL_INTEGRATIONCOMMON_H_*/

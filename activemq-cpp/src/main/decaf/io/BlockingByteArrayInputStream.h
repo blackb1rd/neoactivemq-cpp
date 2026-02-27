@@ -21,17 +21,19 @@
 #include <decaf/io/InputStream.h>
 #include <vector>
 
-namespace decaf{
-namespace io{
+namespace decaf
+{
+namespace io
+{
 
     /**
      * This is a blocking version of a byte buffer stream.  Read operations
      * block until the requested data becomes available in the internal
      * buffer via a call to setByteArray.
      */
-    class DECAF_API BlockingByteArrayInputStream : public InputStream {
+    class DECAF_API BlockingByteArrayInputStream : public InputStream
+    {
     private:
-
         /**
          * Default buffer to use, if none provided.
          */
@@ -49,12 +51,11 @@ namespace io{
         bool closing;
 
     private:
-
         BlockingByteArrayInputStream(const BlockingByteArrayInputStream&);
-        BlockingByteArrayInputStream& operator=(const BlockingByteArrayInputStream&);
+        BlockingByteArrayInputStream& operator=(
+            const BlockingByteArrayInputStream&);
 
     public:
-
         /**
          * Default Constructor - uses a default internal buffer
          */
@@ -64,7 +65,8 @@ namespace io{
          * Constructor that initializes the internal buffer.
          * @see setByteArray.
          */
-        BlockingByteArrayInputStream(const unsigned char* buffer, int bufferSize);
+        BlockingByteArrayInputStream(const unsigned char* buffer,
+                                     int                  bufferSize);
 
         virtual ~BlockingByteArrayInputStream();
 
@@ -89,13 +91,15 @@ namespace io{
         virtual long long skip(long long num);
 
     protected:
-
         virtual int doReadByte();
 
-        virtual int doReadArrayBounded(unsigned char* buffer, int size, int offset, int length);
-
+        virtual int doReadArrayBounded(unsigned char* buffer,
+                                       int            size,
+                                       int            offset,
+                                       int            length);
     };
 
-}}
+}  // namespace io
+}  // namespace decaf
 
 #endif /*_DECAF_IO_BLOCKINGBYTEARRAYINPUTSTREAM_H_*/

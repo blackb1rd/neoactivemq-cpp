@@ -18,25 +18,25 @@
 #ifndef _DECAF_UTIL_ARRAYS_H_
 #define _DECAF_UTIL_ARRAYS_H_
 
-#include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/lang/exceptions/IllegalArgumentException.h>
 #include <decaf/lang/exceptions/IndexOutOfBoundsException.h>
+#include <decaf/lang/exceptions/NullPointerException.h>
 
-namespace decaf {
-namespace util {
+namespace decaf
+{
+namespace util
+{
 
-    class Arrays {
+    class Arrays
+    {
     private:
-
         Arrays(const Arrays& source);
         Arrays& operator=(const Arrays& source);
 
     private:
-
         Arrays();
 
     public:
-
         virtual ~Arrays();
 
         /**
@@ -50,23 +50,30 @@ namespace util {
          *      The value to fill the array with.
          *
          * @throws NullPointerException if array is Null.
-         * @throws IllegalArgumentException if the size parameter is negative, or the start
-         *         index is greater than the end index.
+         * @throws IllegalArgumentException if the size parameter is negative,
+         * or the start index is greater than the end index.
          */
-        template<typename E>
-        static void fill(E* array, int size, const E& value) {
-
-            if (array == NULL) {
+        template <typename E>
+        static void fill(E* array, int size, const E& value)
+        {
+            if (array == NULL)
+            {
                 throw decaf::lang::exceptions::NullPointerException(
-                    __FILE__, __LINE__, "Array pointer given was NULL.");
+                    __FILE__,
+                    __LINE__,
+                    "Array pointer given was NULL.");
             }
 
-            if (size < 0) {
+            if (size < 0)
+            {
                 throw decaf::lang::exceptions::IllegalArgumentException(
-                    __FILE__, __LINE__, "Array size value given was negative.");
+                    __FILE__,
+                    __LINE__,
+                    "Array size value given was negative.");
             }
 
-            for (int i = 0; i < size; ++i) {
+            for (int i = 0; i < size; ++i)
+            {
                 array[i] = value;
             }
         }
@@ -86,41 +93,56 @@ namespace util {
          *      The value to fill the array with.
          *
          * @throws NullPointerException if array is Null.
-         * @throws IllegalArgumentException if the size parameter is negative, or the start
-         *         index is greater than the end index.
-         * @throws IndexOutOfBoundsException if the start index is negative or the end index
-         *         is greater than the size parameter.
+         * @throws IllegalArgumentException if the size parameter is negative,
+         * or the start index is greater than the end index.
+         * @throws IndexOutOfBoundsException if the start index is negative or
+         * the end index is greater than the size parameter.
          */
-        template< typename E>
-        static void fill(E* array, int size, int start, int end, const E& value) {
-
-            if (array == NULL) {
+        template <typename E>
+        static void fill(E* array, int size, int start, int end, const E& value)
+        {
+            if (array == NULL)
+            {
                 throw decaf::lang::exceptions::NullPointerException(
-                    __FILE__, __LINE__, "Array pointer given was NULL." );
+                    __FILE__,
+                    __LINE__,
+                    "Array pointer given was NULL.");
             }
 
-            if (size < 0) {
+            if (size < 0)
+            {
                 throw decaf::lang::exceptions::IllegalArgumentException(
-                    __FILE__, __LINE__, "Array size value given was negative." );
+                    __FILE__,
+                    __LINE__,
+                    "Array size value given was negative.");
             }
 
-            if (start > end) {
+            if (start > end)
+            {
                 throw decaf::lang::exceptions::IllegalArgumentException(
-                    __FILE__, __LINE__, "The start index was greater than the end index." );
+                    __FILE__,
+                    __LINE__,
+                    "The start index was greater than the end index.");
             }
 
-            if (start < 0 || end > size) {
+            if (start < 0 || end > size)
+            {
                 throw decaf::lang::exceptions::IndexOutOfBoundsException(
-                    __FILE__, __LINE__, "The start index {%d} end index {%d} range is invalid.", start, end );
+                    __FILE__,
+                    __LINE__,
+                    "The start index {%d} end index {%d} range is invalid.",
+                    start,
+                    end);
             }
 
-            for (int i = start; i < end; ++i) {
+            for (int i = start; i < end; ++i)
+            {
                 array[i] = value;
             }
         }
-
     };
 
-}}
+}  // namespace util
+}  // namespace decaf
 
 #endif /* _DECAF_UTIL_ARRAYS_H_ */

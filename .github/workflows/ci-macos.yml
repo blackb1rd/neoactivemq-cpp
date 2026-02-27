@@ -17,6 +17,10 @@ on:
       - 'LICENSE'
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   # macOS build job (builds and uploads artifacts for test jobs)
   macos-build-test:
@@ -39,8 +43,6 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v6
 
-    - name: Install system dependencies
-      run: brew install ninja
 
     - name: Set VCPKG_ROOT environment variable
       run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
@@ -48,15 +50,20 @@ jobs:
     - name: Setup sccache
       uses: mozilla-actions/sccache-action@v0.0.9
 
-    - name: Create vcpkg binary cache directory
-      run: mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
+    - name: Create vcpkg cache directories
+      run: |
+        mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
+        mkdir -p "${{ github.workspace }}/.cache/vcpkg/downloads"
 
     - name: Cache vcpkg binary packages
       uses: actions/cache@v5
       with:
-        path: ${{ github.workspace }}/.cache/vcpkg/archives
-        key: vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-${{ hashFiles('vcpkg.json') }}
+        path: |
+          ${{ github.workspace }}/.cache/vcpkg/archives
+          ${{ github.workspace }}/.cache/vcpkg/downloads
+        key: vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-${{ matrix.config.ssl && 'ssl' || 'no-ssl' }}-${{ hashFiles('vcpkg.json') }}
         restore-keys: |
+          vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-${{ matrix.config.ssl && 'ssl' || 'no-ssl' }}-
           vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-
 
     - name: Configure CMake
@@ -79,6 +86,8 @@ jobs:
         path: |
           output/build/${{ matrix.config.preset }}/bin/
           output/build/${{ matrix.config.preset }}/lib/
+          output/build/${{ matrix.config.preset }}/CTestTestfile.cmake
+          output/build/${{ matrix.config.preset }}/**/CTestTestfile.cmake
         retention-days: 1
 
   # macOS unit test jobs (run in parallel after build)
@@ -103,21 +112,24 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v6
 
-    - name: Install system dependencies
-      run: brew install ninja
 
     - name: Set VCPKG_ROOT environment variable
       run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
 
-    - name: Create vcpkg binary cache directory
-      run: mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
+    - name: Create vcpkg cache directories
+      run: |
+        mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
+        mkdir -p "${{ github.workspace }}/.cache/vcpkg/downloads"
 
     - name: Cache vcpkg binary packages
       uses: actions/cache@v5
       with:
-        path: ${{ github.workspace }}/.cache/vcpkg/archives
-        key: vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-${{ hashFiles('vcpkg.json') }}
+        path: |
+          ${{ github.workspace }}/.cache/vcpkg/archives
+          ${{ github.workspace }}/.cache/vcpkg/downloads
+        key: vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-${{ matrix.config.ssl && 'ssl' || 'no-ssl' }}-${{ hashFiles('vcpkg.json') }}
         restore-keys: |
+          vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-${{ matrix.config.ssl && 'ssl' || 'no-ssl' }}-
           vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-
 
     - name: Configure CMake (for CTest)
@@ -159,30 +171,31 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - { runner: macos-latest, preset: arm64-osx-debug-test, arch: arm64, build_type: Debug, ssl: true }
           - { runner: macos-latest, preset: arm64-osx-release-test, arch: arm64, build_type: Release, ssl: true }
-          - { runner: macos-latest, preset: arm64-osx-debug-no-ssl-test, arch: arm64, build_type: Debug, ssl: false }
           - { runner: macos-latest, preset: arm64-osx-release-no-ssl-test, arch: arm64, build_type: Release, ssl: false }
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v6
 
-    - name: Install system dependencies
-      run: brew install ninja
 
     - name: Set VCPKG_ROOT environment variable
       run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
 
-    - name: Create vcpkg binary cache directory
-      run: mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
+    - name: Create vcpkg cache directories
+      run: |
+        mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
+        mkdir -p "${{ github.workspace }}/.cache/vcpkg/downloads"
 
     - name: Cache vcpkg binary packages
       uses: actions/cache@v5
       with:
-        path: ${{ github.workspace }}/.cache/vcpkg/archives
-        key: vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-${{ hashFiles('vcpkg.json') }}
+        path: |
+          ${{ github.workspace }}/.cache/vcpkg/archives
+          ${{ github.workspace }}/.cache/vcpkg/downloads
+        key: vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-${{ matrix.config.ssl && 'ssl' || 'no-ssl' }}-${{ hashFiles('vcpkg.json') }}
         restore-keys: |
+          vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-${{ matrix.config.ssl && 'ssl' || 'no-ssl' }}-
           vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-
 
     - name: Configure CMake (for CTest)
@@ -233,8 +246,6 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v6
 
-    - name: Install system dependencies
-      run: brew install ninja
 
     - name: Set VCPKG_ROOT environment variable
       run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
@@ -242,15 +253,20 @@ jobs:
     - name: Setup sccache
       uses: mozilla-actions/sccache-action@v0.0.9
 
-    - name: Create vcpkg binary cache directory
-      run: mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
+    - name: Create vcpkg cache directories
+      run: |
+        mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
+        mkdir -p "${{ github.workspace }}/.cache/vcpkg/downloads"
 
     - name: Cache vcpkg binary packages
       uses: actions/cache@v5
       with:
-        path: ${{ github.workspace }}/.cache/vcpkg/archives
-        key: vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-${{ hashFiles('vcpkg.json') }}
+        path: |
+          ${{ github.workspace }}/.cache/vcpkg/archives
+          ${{ github.workspace }}/.cache/vcpkg/downloads
+        key: vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-${{ contains(matrix.config.preset, 'no-ssl') && 'no-ssl' || 'ssl' }}-${{ hashFiles('vcpkg.json') }}
         restore-keys: |
+          vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-${{ contains(matrix.config.preset, 'no-ssl') && 'no-ssl' || 'ssl' }}-
           vcpkg-binary-${{ runner.os }}-${{ matrix.config.arch }}-
 
     - name: Configure CMake

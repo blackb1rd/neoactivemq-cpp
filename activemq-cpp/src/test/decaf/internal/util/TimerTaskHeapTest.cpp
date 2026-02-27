@@ -18,8 +18,8 @@
 #include <gtest/gtest.h>
 
 #include <decaf/internal/util/TimerTaskHeap.h>
-#include <decaf/util/TimerTask.h>
 #include <decaf/lang/Pointer.h>
+#include <decaf/util/TimerTask.h>
 
 using namespace decaf;
 using namespace decaf::internal;
@@ -27,18 +27,22 @@ using namespace decaf::internal::util;
 using namespace decaf::util;
 using namespace decaf::lang;
 
-    class TimerTaskHeapTest : public ::testing::Test {};
-
-////////////////////////////////////////////////////////////////////////////////
-class TestTimerTask : public TimerTask {
-public:
-
-    virtual void run() {}
+class TimerTaskHeapTest : public ::testing::Test
+{
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(TimerTaskHeapTest, testCreate) {
+class TestTimerTask : public TimerTask
+{
+public:
+    virtual void run()
+    {
+    }
+};
 
+////////////////////////////////////////////////////////////////////////////////
+TEST_F(TimerTaskHeapTest, testCreate)
+{
     TimerTaskHeap heap;
 
     ASSERT_TRUE(heap.isEmpty() == true);
@@ -46,77 +50,77 @@ TEST_F(TimerTaskHeapTest, testCreate) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(TimerTaskHeapTest, testInsert) {
-
+TEST_F(TimerTaskHeapTest, testInsert)
+{
     TimerTaskHeap heap;
 
-    Pointer<TestTimerTask> task1( new TestTimerTask() );
-    Pointer<TestTimerTask> task2( new TestTimerTask() );
-    Pointer<TestTimerTask> task3( new TestTimerTask() );
+    Pointer<TestTimerTask> task1(new TestTimerTask());
+    Pointer<TestTimerTask> task2(new TestTimerTask());
+    Pointer<TestTimerTask> task3(new TestTimerTask());
 
     ASSERT_TRUE(heap.isEmpty() == true);
 
-    heap.insert( task1 );
-    heap.insert( task2 );
-    heap.insert( task3 );
+    heap.insert(task1);
+    heap.insert(task2);
+    heap.insert(task3);
 
     ASSERT_TRUE(heap.isEmpty() == false);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(TimerTaskHeapTest, testRemove) {
-
+TEST_F(TimerTaskHeapTest, testRemove)
+{
     TimerTaskHeap heap;
 
-    Pointer<TestTimerTask> task1( new TestTimerTask() );
-    Pointer<TestTimerTask> task2( new TestTimerTask() );
-    Pointer<TestTimerTask> task3( new TestTimerTask() );
+    Pointer<TestTimerTask> task1(new TestTimerTask());
+    Pointer<TestTimerTask> task2(new TestTimerTask());
+    Pointer<TestTimerTask> task3(new TestTimerTask());
 
     ASSERT_TRUE(heap.isEmpty() == true);
 
-    heap.insert( task1 );
-    heap.insert( task2 );
-    heap.insert( task3 );
+    heap.insert(task1);
+    heap.insert(task2);
+    heap.insert(task3);
 
     ASSERT_TRUE(heap.isEmpty() == false);
 
     std::size_t pos;
 
-    pos = heap.find( task1 );
+    pos = heap.find(task1);
     ASSERT_TRUE(pos != (std::size_t)-1);
-    heap.remove( pos );
+    heap.remove(pos);
     ASSERT_TRUE(heap.isEmpty() == false);
 
-    pos = heap.find( task2 );
+    pos = heap.find(task2);
     ASSERT_TRUE(pos != (std::size_t)-1);
-    heap.remove( pos );
+    heap.remove(pos);
     ASSERT_TRUE(heap.isEmpty() == false);
 
-    pos = heap.find( task3 );
+    pos = heap.find(task3);
     ASSERT_TRUE(pos != (std::size_t)-1);
-    heap.remove( pos );
+    heap.remove(pos);
     ASSERT_TRUE(heap.isEmpty() == true);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(TimerTaskHeapTest, testFind) {
-
+TEST_F(TimerTaskHeapTest, testFind)
+{
     TimerTaskHeap heap;
 
-    Pointer<TestTimerTask> task1( new TestTimerTask() );
+    Pointer<TestTimerTask> task1(new TestTimerTask());
 
     ASSERT_TRUE(heap.isEmpty() == true);
 
-    heap.insert( task1 );
+    heap.insert(task1);
 
     ASSERT_TRUE(heap.isEmpty() == false);
 
     std::size_t pos;
 
-    pos = heap.find( task1 );
+    pos = heap.find(task1);
     ASSERT_TRUE(pos != (std::size_t)-1);
-    heap.remove( pos );
+    heap.remove(pos);
     ASSERT_TRUE(heap.isEmpty() == true);
-    pos = heap.find( task1 );
+    pos = heap.find(task1);
     ASSERT_TRUE(pos == (std::size_t)-1);
 }

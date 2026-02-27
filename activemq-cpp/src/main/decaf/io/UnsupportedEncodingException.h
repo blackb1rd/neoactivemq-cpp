@@ -20,17 +20,19 @@
 
 #include <decaf/io/IOException.h>
 
-namespace decaf {
-namespace io {
+namespace decaf
+{
+namespace io
+{
 
     /**
      * Thrown when the the Character Encoding is not supported.
      *
      * @since 1.0
      */
-    class DECAF_API UnsupportedEncodingException : public decaf::io::IOException {
+    class DECAF_API UnsupportedEncodingException : public decaf::io::IOException
+    {
     public:
-
         /**
          * Default Constructor
          */
@@ -54,11 +56,16 @@ namespace io {
          * optional list of arguments to parse into the message
          * @param file The file name where exception occurs
          * @param lineNumber The line number where the exception occurred.
-         * @param cause The exception that was the cause for this one to be thrown.
+         * @param cause The exception that was the cause for this one to be
+         * thrown.
          * @param msg The message to report
          * @param ... list of primitives that are formatted into the message
          */
-        UnsupportedEncodingException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...);
+        UnsupportedEncodingException(const char*           file,
+                                     const int             lineNumber,
+                                     const std::exception* cause,
+                                     const char*           msg,
+                                     ...);
 
         /**
          * Constructor
@@ -74,23 +81,28 @@ namespace io {
          * @param msg The message to report
          * @param ... list of primitives that are formatted into the message
          */
-        UnsupportedEncodingException(const char* file, const int lineNumber, const char* msg, ...);
+        UnsupportedEncodingException(const char* file,
+                                     const int   lineNumber,
+                                     const char* msg,
+                                     ...);
 
         /**
          * Clones this exception.  This is useful for cases where you need
-         * to preserve the type of the original exception as well as the message.
-         * All subclasses should override.
+         * to preserve the type of the original exception as well as the
+         * message. All subclasses should override.
          *
-         * @return A new instance of an Exception object that is a copy of this instance.
+         * @return A new instance of an Exception object that is a copy of this
+         * instance.
          */
-        virtual UnsupportedEncodingException* clone() const {
+        virtual UnsupportedEncodingException* clone() const
+        {
             return new UnsupportedEncodingException(*this);
         }
 
         virtual ~UnsupportedEncodingException() throw();
-
     };
 
-}}
+}  // namespace io
+}  // namespace decaf
 
 #endif /* _DECAF_IO_UNSUPPORTEDENCODINGEXCEPTION_H_ */

@@ -22,26 +22,38 @@ using namespace decaf::net;
 using namespace decaf::lang;
 
 ////////////////////////////////////////////////////////////////////////////////
-ConnectException::ConnectException() : SocketException() {
+ConnectException::ConnectException()
+    : SocketException()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ConnectException::~ConnectException() throw() {
+ConnectException::~ConnectException() throw()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ConnectException::ConnectException(const Exception& ex) : SocketException() {
-    *(Exception*) this = ex;
+ConnectException::ConnectException(const Exception& ex)
+    : SocketException()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ConnectException::ConnectException(const ConnectException& ex) : SocketException() {
-    *(Exception*) this = ex;
+ConnectException::ConnectException(const ConnectException& ex)
+    : SocketException()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ConnectException::ConnectException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...) : SocketException(cause) {
-
+ConnectException::ConnectException(const char*           file,
+                                   const int             lineNumber,
+                                   const std::exception* cause,
+                                   const char*           msg,
+                                   ...)
+    : SocketException(cause)
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -51,12 +63,18 @@ ConnectException::ConnectException(const char* file, const int lineNumber, const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ConnectException::ConnectException(const std::exception* cause) : SocketException(cause) {
+ConnectException::ConnectException(const std::exception* cause)
+    : SocketException(cause)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ConnectException::ConnectException(const char* file, const int lineNumber, const char* msg, ...) : SocketException() {
-
+ConnectException::ConnectException(const char* file,
+                                   const int   lineNumber,
+                                   const char* msg,
+                                   ...)
+    : SocketException()
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);

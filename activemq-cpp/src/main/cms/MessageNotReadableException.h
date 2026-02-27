@@ -18,36 +18,40 @@
 #ifndef _CMS_MESSAGENOTREADABLEEXCEPTION_H_
 #define _CMS_MESSAGENOTREADABLEEXCEPTION_H_
 
-#include <cms/Config.h>
 #include <cms/CMSException.h>
+#include <cms/Config.h>
 
-namespace cms {
+namespace cms
+{
 
-    /**
-     * This exception must be thrown when a CMS client attempts to read a write-only message.
-     *
-     * @since 1.3
-     */
-    class CMS_API MessageNotReadableException : public CMSException {
-    public:
+/**
+ * This exception must be thrown when a CMS client attempts to read a write-only
+ * message.
+ *
+ * @since 1.3
+ */
+class CMS_API MessageNotReadableException : public CMSException
+{
+public:
+    MessageNotReadableException();
 
-        MessageNotReadableException();
+    MessageNotReadableException(const MessageNotReadableException& ex);
 
-        MessageNotReadableException(const MessageNotReadableException& ex);
+    MessageNotReadableException(const std::string& message);
 
-        MessageNotReadableException(const std::string& message);
+    MessageNotReadableException(const std::string&    message,
+                                const std::exception* cause);
 
-        MessageNotReadableException(const std::string& message, const std::exception* cause);
+    MessageNotReadableException(
+        const std::string&                              message,
+        const std::exception*                           cause,
+        const std::vector<std::pair<std::string, int>>& stackTrace);
 
-        MessageNotReadableException(const std::string& message, const std::exception* cause,
-                                    const std::vector<std::pair<std::string, int> >& stackTrace);
+    virtual ~MessageNotReadableException() throw();
 
-        virtual ~MessageNotReadableException() throw();
+    virtual MessageNotReadableException* clone();
+};
 
-        virtual MessageNotReadableException* clone();
-
-    };
-
-}
+}  // namespace cms
 
 #endif /*_CMS_MESSAGENOTREADABLEEXCEPTION_H_*/

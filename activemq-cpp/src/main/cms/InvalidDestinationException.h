@@ -18,37 +18,40 @@
 #ifndef _CMS_INVALIDDESTINATIONEXCEPTION_H_
 #define _CMS_INVALIDDESTINATIONEXCEPTION_H_
 
-#include <cms/Config.h>
 #include <cms/CMSException.h>
+#include <cms/Config.h>
 
-namespace cms {
+namespace cms
+{
 
-    /**
-     * This exception must be thrown when a destination either is not understood by a provider
-     * or is no longer valid.
-     *
-     * @since 1.3
-     */
-    class CMS_API InvalidDestinationException : public CMSException {
-    public:
+/**
+ * This exception must be thrown when a destination either is not understood by
+ * a provider or is no longer valid.
+ *
+ * @since 1.3
+ */
+class CMS_API InvalidDestinationException : public CMSException
+{
+public:
+    InvalidDestinationException();
 
-        InvalidDestinationException();
+    InvalidDestinationException(const InvalidDestinationException& ex);
 
-        InvalidDestinationException(const InvalidDestinationException& ex);
+    InvalidDestinationException(const std::string& message);
 
-        InvalidDestinationException(const std::string& message);
+    InvalidDestinationException(const std::string&    message,
+                                const std::exception* cause);
 
-        InvalidDestinationException(const std::string& message, const std::exception* cause);
+    InvalidDestinationException(
+        const std::string&                              message,
+        const std::exception*                           cause,
+        const std::vector<std::pair<std::string, int>>& stackTrace);
 
-        InvalidDestinationException(const std::string& message, const std::exception* cause,
-                                    const std::vector<std::pair<std::string, int> >& stackTrace);
+    virtual ~InvalidDestinationException() throw();
 
-        virtual ~InvalidDestinationException() throw();
+    virtual InvalidDestinationException* clone();
+};
 
-        virtual InvalidDestinationException* clone();
-
-    };
-
-}
+}  // namespace cms
 
 #endif /*_CMS_INVALIDDESTINATIONEXCEPTION_H_*/

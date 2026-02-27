@@ -24,66 +24,123 @@ using namespace decaf::lang::exceptions;
 using namespace decaf::util::concurrent;
 
 ////////////////////////////////////////////////////////////////////////////////
-DatagramPacket::DatagramPacket( unsigned char* bytes, int size, int length ) :
-    buffer(NULL), size(0), offset(0), length(0), address(NULL), port(-1), mutex() {
-
-    this->setData( bytes, size, 0, length );
+DatagramPacket::DatagramPacket(unsigned char* bytes, int size, int length)
+    : buffer(NULL),
+      size(0),
+      offset(0),
+      length(0),
+      address(NULL),
+      port(-1),
+      mutex()
+{
+    this->setData(bytes, size, 0, length);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DatagramPacket::DatagramPacket( unsigned char* bytes, int size, int offset, int length ) :
-    buffer(NULL), size(0), offset(0), length(0), address(NULL), port(-1), mutex() {
-
-    this->setData( bytes, size, offset, length );
+DatagramPacket::DatagramPacket(unsigned char* bytes,
+                               int            size,
+                               int            offset,
+                               int            length)
+    : buffer(NULL),
+      size(0),
+      offset(0),
+      length(0),
+      address(NULL),
+      port(-1),
+      mutex()
+{
+    this->setData(bytes, size, offset, length);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DatagramPacket::DatagramPacket( unsigned char* bytes, int size, int offset, int length, const InetAddress& address DECAF_UNUSED, int port ) :
-    buffer(NULL), size(0), offset(0), length(0), address(NULL), port(port), mutex() {
-
-    this->setData( bytes, size, offset, length );
+DatagramPacket::DatagramPacket(unsigned char*             bytes,
+                               int                        size,
+                               int                        offset,
+                               int                        length,
+                               const InetAddress& address DECAF_UNUSED,
+                               int                        port)
+    : buffer(NULL),
+      size(0),
+      offset(0),
+      length(0),
+      address(NULL),
+      port(port),
+      mutex()
+{
+    this->setData(bytes, size, offset, length);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DatagramPacket::DatagramPacket( unsigned char* bytes, int size, int length, const InetAddress& address DECAF_UNUSED, int port ) :
-    buffer(NULL), size(0), offset(0), length(0), address(NULL), port(port), mutex() {
-
-    this->setData( bytes, size, 0, length );
+DatagramPacket::DatagramPacket(unsigned char*             bytes,
+                               int                        size,
+                               int                        length,
+                               const InetAddress& address DECAF_UNUSED,
+                               int                        port)
+    : buffer(NULL),
+      size(0),
+      offset(0),
+      length(0),
+      address(NULL),
+      port(port),
+      mutex()
+{
+    this->setData(bytes, size, 0, length);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DatagramPacket::DatagramPacket( unsigned char* bytes, int size, int length, const SocketAddress& address DECAF_UNUSED) :
-    buffer(NULL), size(0), offset(0), length(0), address(NULL), port(-1), mutex() {
-
-    this->setData( bytes, size, 0, length );
+DatagramPacket::DatagramPacket(unsigned char*               bytes,
+                               int                          size,
+                               int                          length,
+                               const SocketAddress& address DECAF_UNUSED)
+    : buffer(NULL),
+      size(0),
+      offset(0),
+      length(0),
+      address(NULL),
+      port(-1),
+      mutex()
+{
+    this->setData(bytes, size, 0, length);
 
     // TODO
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DatagramPacket::DatagramPacket( unsigned char* bytes, int size, int offset, int length, const SocketAddress& address DECAF_UNUSED ) :
-    buffer(NULL), size(0), offset(0), length(0), address(NULL), port(-1), mutex() {
-
-    this->setData( bytes, size, offset, length );
+DatagramPacket::DatagramPacket(unsigned char*               bytes,
+                               int                          size,
+                               int                          offset,
+                               int                          length,
+                               const SocketAddress& address DECAF_UNUSED)
+    : buffer(NULL),
+      size(0),
+      offset(0),
+      length(0),
+      address(NULL),
+      port(-1),
+      mutex()
+{
+    this->setData(bytes, size, offset, length);
 
     // TODO
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DatagramPacket::~DatagramPacket() {
-
-    try{
+DatagramPacket::~DatagramPacket()
+{
+    try
+    {
         delete this->address;
     }
-    DECAF_CATCH_NOTHROW( Exception )
+    DECAF_CATCH_NOTHROW(Exception)
     DECAF_CATCHALL_NOTHROW()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-InetAddress* DatagramPacket::getAddress() const {
-
+InetAddress* DatagramPacket::getAddress() const
+{
     InetAddress* result = 0;
-    synchronized( &mutex ) {
+    synchronized(&mutex)
+    {
         result = this->address;
     }
 
@@ -91,29 +148,30 @@ InetAddress* DatagramPacket::getAddress() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DatagramPacket::setAddress( const InetAddress& address DECAF_UNUSED ) {
-
+void DatagramPacket::setAddress(const InetAddress& address DECAF_UNUSED)
+{
     // TODO
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SocketAddress* DatagramPacket::getSocketAddress() const {
-
+SocketAddress* DatagramPacket::getSocketAddress() const
+{
     // TODO
     return NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DatagramPacket::setSocketAddress( const SocketAddress& address DECAF_UNUSED ) {
-
+void DatagramPacket::setSocketAddress(const SocketAddress& address DECAF_UNUSED)
+{
     // TODO
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int DatagramPacket::getPort() const {
-
+int DatagramPacket::getPort() const
+{
     int result = 0;
-    synchronized( &mutex ) {
+    synchronized(&mutex)
+    {
         result = this->port;
     }
 
@@ -121,23 +179,28 @@ int DatagramPacket::getPort() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DatagramPacket::setPort( int port ) {
-
-    if( port < 0 || port > 65535 ) {
-        throw IllegalArgumentException(
-            __FILE__, __LINE__, "Given port value is out of range, %d", port );
+void DatagramPacket::setPort(int port)
+{
+    if (port < 0 || port > 65535)
+    {
+        throw IllegalArgumentException(__FILE__,
+                                       __LINE__,
+                                       "Given port value is out of range, %d",
+                                       port);
     }
 
-    synchronized( &mutex ) {
+    synchronized(&mutex)
+    {
         this->port = port;
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int DatagramPacket::getOffset() const {
-
+int DatagramPacket::getOffset() const
+{
     int result = 0;
-    synchronized( &mutex ) {
+    synchronized(&mutex)
+    {
         result = this->offset;
     }
 
@@ -145,11 +208,16 @@ int DatagramPacket::getOffset() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DatagramPacket::setOffset( int offset ) {
-
-    synchronized( &mutex ) {
-        if( offset < 0 || offset > size ) {
-            throw IllegalArgumentException( __FILE__, __LINE__, "Offset value is invalid: %d", offset );
+void DatagramPacket::setOffset(int offset)
+{
+    synchronized(&mutex)
+    {
+        if (offset < 0 || offset > size)
+        {
+            throw IllegalArgumentException(__FILE__,
+                                           __LINE__,
+                                           "Offset value is invalid: %d",
+                                           offset);
         }
 
         this->offset = offset;
@@ -157,10 +225,11 @@ void DatagramPacket::setOffset( int offset ) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int DatagramPacket::getLength() const {
-
+int DatagramPacket::getLength() const
+{
     int result = 0;
-    synchronized( &mutex ) {
+    synchronized(&mutex)
+    {
         result = this->length;
     }
 
@@ -168,11 +237,16 @@ int DatagramPacket::getLength() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DatagramPacket::setLength( int length ) {
-
-    synchronized( &mutex ) {
-        if( length < 0 || ( size - offset ) > length ) {
-            throw IllegalArgumentException( __FILE__, __LINE__, "Length value is invalid: %d", length );
+void DatagramPacket::setLength(int length)
+{
+    synchronized(&mutex)
+    {
+        if (length < 0 || (size - offset) > length)
+        {
+            throw IllegalArgumentException(__FILE__,
+                                           __LINE__,
+                                           "Length value is invalid: %d",
+                                           length);
         }
 
         this->length = length;
@@ -180,10 +254,11 @@ void DatagramPacket::setLength( int length ) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-unsigned char* DatagramPacket::getData() const {
-
+unsigned char* DatagramPacket::getData() const
+{
     unsigned char* result = 0;
-    synchronized( &mutex ) {
+    synchronized(&mutex)
+    {
         result = this->buffer;
     }
 
@@ -191,10 +266,11 @@ unsigned char* DatagramPacket::getData() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int DatagramPacket::getSize() const {
-
+int DatagramPacket::getSize() const
+{
     int result = 0;
-    synchronized( &mutex ) {
+    synchronized(&mutex)
+    {
         result = this->size;
     }
 
@@ -202,46 +278,73 @@ int DatagramPacket::getSize() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DatagramPacket::setData( unsigned char* buffer, int size ) {
-
-    if( buffer == NULL ) {
-        throw NullPointerException( __FILE__, __LINE__, "Provided Buffer pointer was NULL." );
+void DatagramPacket::setData(unsigned char* buffer, int size)
+{
+    if (buffer == NULL)
+    {
+        throw NullPointerException(__FILE__,
+                                   __LINE__,
+                                   "Provided Buffer pointer was NULL.");
     }
 
-    if( size <= 0 ) {
-        throw IllegalArgumentException( __FILE__, __LINE__, "Size value is invalid: %d", size );
+    if (size <= 0)
+    {
+        throw IllegalArgumentException(__FILE__,
+                                       __LINE__,
+                                       "Size value is invalid: %d",
+                                       size);
     }
 
-    synchronized( &mutex ) {
+    synchronized(&mutex)
+    {
         this->buffer = buffer;
-        this->size = size;
+        this->size   = size;
         this->length = size;
         this->offset = 0;
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DatagramPacket::setData( unsigned char* buffer, int size, int offset, int length ) {
-
-    if( buffer == NULL ) {
-        throw NullPointerException( __FILE__, __LINE__, "Provided Buffer pointer was NULL." );
+void DatagramPacket::setData(unsigned char* buffer,
+                             int            size,
+                             int            offset,
+                             int            length)
+{
+    if (buffer == NULL)
+    {
+        throw NullPointerException(__FILE__,
+                                   __LINE__,
+                                   "Provided Buffer pointer was NULL.");
     }
 
-    if( size <= 0 ) {
-        throw IllegalArgumentException( __FILE__, __LINE__, "Size value is invalid: %d", size );
+    if (size <= 0)
+    {
+        throw IllegalArgumentException(__FILE__,
+                                       __LINE__,
+                                       "Size value is invalid: %d",
+                                       size);
     }
 
-    if( offset < 0 || offset > size ) {
-        throw IllegalArgumentException( __FILE__, __LINE__, "Offset value is invalid: %d", offset );
+    if (offset < 0 || offset > size)
+    {
+        throw IllegalArgumentException(__FILE__,
+                                       __LINE__,
+                                       "Offset value is invalid: %d",
+                                       offset);
     }
 
-    if( length < 0 || ( size - offset ) > length ) {
-        throw IllegalArgumentException( __FILE__, __LINE__, "Length value is invalid: %d", length );
+    if (length < 0 || (size - offset) > length)
+    {
+        throw IllegalArgumentException(__FILE__,
+                                       __LINE__,
+                                       "Length value is invalid: %d",
+                                       length);
     }
 
-    synchronized( &mutex ) {
+    synchronized(&mutex)
+    {
         this->buffer = buffer;
-        this->size = size;
+        this->size   = size;
         this->length = length;
         this->offset = offset;
     }

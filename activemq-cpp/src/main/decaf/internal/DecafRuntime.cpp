@@ -17,11 +17,11 @@
 
 #include "DecafRuntime.h"
 
-#include <decaf/lang/System.h>
-#include <decaf/lang/Thread.h>
 #include <decaf/internal/net/Network.h>
 #include <decaf/internal/security/SecurityRuntime.h>
 #include <decaf/internal/util/concurrent/Threading.h>
+#include <decaf/lang/System.h>
+#include <decaf/lang/Thread.h>
 
 using namespace decaf;
 using namespace decaf::internal;
@@ -32,32 +32,38 @@ using namespace decaf::lang;
 using namespace decaf::util::concurrent;
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
-    Mutex* globalLock;
+namespace
+{
+Mutex* globalLock;
+}  // namespace
+
+////////////////////////////////////////////////////////////////////////////////
+DecafRuntime::DecafRuntime()
+    : decaf::lang::Runtime()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DecafRuntime::DecafRuntime() : decaf::lang::Runtime() {
+DecafRuntime::~DecafRuntime()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DecafRuntime::~DecafRuntime() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-Mutex* DecafRuntime::getGlobalLock() {
+Mutex* DecafRuntime::getGlobalLock()
+{
     return globalLock;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Runtime* Runtime::getRuntime() {
+Runtime* Runtime::getRuntime()
+{
     static DecafRuntime runtime;
     return &runtime;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Runtime::initializeRuntime(int argc, char **argv) {
-
+void Runtime::initializeRuntime(int argc, char** argv)
+{
     Runtime::getRuntime();
     Threading::initialize();
 
@@ -69,17 +75,18 @@ void Runtime::initializeRuntime(int argc, char **argv) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Runtime::initializeRuntime() {
+void Runtime::initializeRuntime()
+{
     Runtime::initializeRuntime(0, NULL);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Runtime::shutdownRuntime() {
-
+void Runtime::shutdownRuntime()
+{
     SecurityRuntime::shutdownSecurity();
 
-    // Shutdown the networking layer before Threading, many network routines need
-    // to be thread safe and require Threading primitives.
+    // Shutdown the networking layer before Threading, many network routines
+    // need to be thread safe and require Threading primitives.
     Network::shutdownNetworking();
 
     System::shutdownSystem();
@@ -87,7 +94,7 @@ void Runtime::shutdownRuntime() {
     // This must go away before Threading is shutdown.
     delete globalLock;
 
-    // Threading is the last to by shutdown since most other parts of the Runtime
-    // need to make use of Thread primitives.
+    // Threading is the last to by shutdown since most other parts of the
+    // Runtime need to make use of Thread primitives.
     Threading::shutdown();
 }

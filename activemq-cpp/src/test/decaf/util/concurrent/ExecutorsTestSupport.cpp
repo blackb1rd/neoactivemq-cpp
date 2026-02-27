@@ -25,125 +25,155 @@ using namespace decaf::util;
 using namespace decaf::util::concurrent;
 
 ///////////////////////////////////////////////////////////////////////////////
-const int ExecutorsTestSupport::SHORT_DELAY_MS = 50;
-const int ExecutorsTestSupport::SMALL_DELAY_MS = 50 * 5;
+const int ExecutorsTestSupport::SHORT_DELAY_MS  = 50;
+const int ExecutorsTestSupport::SMALL_DELAY_MS  = 50 * 5;
 const int ExecutorsTestSupport::MEDIUM_DELAY_MS = 50 * 10;
-const int ExecutorsTestSupport::LONG_DELAY_MS = 50 * 50;
+const int ExecutorsTestSupport::LONG_DELAY_MS   = 50 * 50;
 
 const std::string ExecutorsTestSupport::TEST_STRING = "a test string";
 
 ///////////////////////////////////////////////////////////////////////////////
-ExecutorsTestSupport::ExecutorsTestSupport() : threadFailed(false) {
+ExecutorsTestSupport::ExecutorsTestSupport()
+    : threadFailed(false)
+{
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-ExecutorsTestSupport::~ExecutorsTestSupport() {
+ExecutorsTestSupport::~ExecutorsTestSupport()
+{
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ExecutorsTestSupport::SetUp() {
+void ExecutorsTestSupport::SetUp()
+{
     threadFailed = false;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ExecutorsTestSupport::TearDown() {
+void ExecutorsTestSupport::TearDown()
+{
     ASSERT_TRUE(!threadFailed);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ExecutorsTestSupport::unexpectedException() {
+void ExecutorsTestSupport::unexpectedException()
+{
     FAIL() << ("Unexpected exception");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ExecutorsTestSupport::unexpectedException(Throwable& ex) {
+void ExecutorsTestSupport::unexpectedException(Throwable& ex)
+{
     FAIL() << (std::string("Unexpected exception: ") + ex.getMessage());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ExecutorsTestSupport::threadFail(const std::string& reason) {
+void ExecutorsTestSupport::threadFail(const std::string& reason)
+{
     threadFailed = true;
     FAIL() << (reason);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ExecutorsTestSupport::threadShouldThrow() {
-   threadFailed = true;
-   FAIL() << ("should throw exception");
+void ExecutorsTestSupport::threadShouldThrow()
+{
+    threadFailed = true;
+    FAIL() << ("should throw exception");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ExecutorsTestSupport::threadUnexpectedException() {
+void ExecutorsTestSupport::threadUnexpectedException()
+{
     threadFailed = true;
     FAIL() << ("Unexpected exception");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ExecutorsTestSupport::threadUnexpectedException(Throwable& ex) {
+void ExecutorsTestSupport::threadUnexpectedException(Throwable& ex)
+{
     threadFailed = true;
     FAIL() << (std::string("Unexpected exception: ") + ex.getMessage());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ExecutorsTestSupport::threadAssertFalse(bool b) {
-    if (b) {
+void ExecutorsTestSupport::threadAssertFalse(bool b)
+{
+    if (b)
+    {
         threadFailed = true;
         ASSERT_TRUE(!b);
     }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ExecutorsTestSupport::threadAssertTrue(bool b) {
-    if (!b) {
+void ExecutorsTestSupport::threadAssertTrue(bool b)
+{
+    if (!b)
+    {
         threadFailed = true;
         ASSERT_TRUE(b);
     }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ExecutorsTestSupport::threadAssertEquals(long long x, long long y) {
-    if (x != y) {
+void ExecutorsTestSupport::threadAssertEquals(long long x, long long y)
+{
+    if (x != y)
+    {
         threadFailed = true;
         ASSERT_EQ(x, y);
     }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ExecutorsTestSupport::shouldThrow() {
+void ExecutorsTestSupport::shouldThrow()
+{
     FAIL() << ("Should throw exception");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ExecutorsTestSupport::joinPool(ExecutorService& exec) {
-
-    try {
+void ExecutorsTestSupport::joinPool(ExecutorService& exec)
+{
+    try
+    {
         exec.shutdown();
-        ASSERT_TRUE(exec.awaitTermination(LONG_DELAY_MS * 2, TimeUnit::MILLISECONDS));
-    } catch(InterruptedException& ie) {
+        ASSERT_TRUE(
+            exec.awaitTermination(LONG_DELAY_MS * 2, TimeUnit::MILLISECONDS));
+    }
+    catch (InterruptedException& ie)
+    {
         FAIL() << ("Unexpected exception");
     }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ExecutorsTestSupport::joinPool(ExecutorService* exec) {
-
-    try {
+void ExecutorsTestSupport::joinPool(ExecutorService* exec)
+{
+    try
+    {
         exec->shutdown();
-        ASSERT_TRUE(exec->awaitTermination(LONG_DELAY_MS, TimeUnit::MILLISECONDS));
-    } catch(InterruptedException& ie) {
+        ASSERT_TRUE(
+            exec->awaitTermination(LONG_DELAY_MS, TimeUnit::MILLISECONDS));
+    }
+    catch (InterruptedException& ie)
+    {
         FAIL() << ("Unexpected exception");
     }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ExecutorsTestSupport::destroyRemaining(ArrayList<Runnable*> leftovers) {
-
-    try {
-        Pointer< Iterator<Runnable*> > iter( leftovers.iterator() );
-        while(iter->hasNext()) {
+void ExecutorsTestSupport::destroyRemaining(ArrayList<Runnable*> leftovers)
+{
+    try
+    {
+        Pointer<Iterator<Runnable*>> iter(leftovers.iterator());
+        while (iter->hasNext())
+        {
             delete iter->next();
         }
-    } catch(Exception& e) {
+    }
+    catch (Exception& e)
+    {
         FAIL() << ("Unexpected exception");
     }
 }

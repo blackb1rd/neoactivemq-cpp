@@ -22,30 +22,43 @@ using namespace decaf::io;
 using namespace decaf::lang;
 
 ////////////////////////////////////////////////////////////////////////////////
-IOException::IOException() : Exception() {
+IOException::IOException()
+    : Exception()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-IOException::~IOException() throw () {
+IOException::~IOException() throw()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-IOException::IOException(const Exception& ex) : Exception() {
-    *(Exception*) this = ex;
+IOException::IOException(const Exception& ex)
+    : Exception()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-IOException::IOException(const IOException& ex) : Exception() {
-    *(Exception*) this = ex;
+IOException::IOException(const IOException& ex)
+    : Exception()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-IOException::IOException(const std::exception* cause) : Exception(cause) {
+IOException::IOException(const std::exception* cause)
+    : Exception(cause)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-IOException::IOException(const char* file, const int lineNumber, const char* msg, ...) : Exception() {
-
+IOException::IOException(const char* file,
+                         const int   lineNumber,
+                         const char* msg,
+                         ...)
+    : Exception()
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -55,8 +68,13 @@ IOException::IOException(const char* file, const int lineNumber, const char* msg
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-IOException::IOException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...) : Exception(cause) {
-
+IOException::IOException(const char*           file,
+                         const int             lineNumber,
+                         const std::exception* cause,
+                         const char*           msg,
+                         ...)
+    : Exception(cause)
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);

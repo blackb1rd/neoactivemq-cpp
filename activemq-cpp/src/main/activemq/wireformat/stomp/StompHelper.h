@@ -18,155 +18,163 @@
 #ifndef _ACTIVEMQ_WIREFORMAT_STOMP_MARSHAL_STOMPHELPER_H_
 #define _ACTIVEMQ_WIREFORMAT_STOMP_MARSHAL_STOMPHELPER_H_
 
-#include <activemq/util/Config.h>
-#include <activemq/util/LongSequenceGenerator.h>
-#include <activemq/wireformat/stomp/StompFrame.h>
+#include <activemq/commands/ActiveMQDestination.h>
+#include <activemq/commands/ConsumerId.h>
 #include <activemq/commands/Message.h>
 #include <activemq/commands/MessageId.h>
 #include <activemq/commands/ProducerId.h>
-#include <activemq/commands/ConsumerId.h>
 #include <activemq/commands/TransactionId.h>
-#include <activemq/commands/ActiveMQDestination.h>
+#include <activemq/util/Config.h>
+#include <activemq/util/LongSequenceGenerator.h>
+#include <activemq/wireformat/stomp/StompFrame.h>
 #include <decaf/lang/Pointer.h>
 
-namespace activemq {
-namespace wireformat {
-namespace stomp {
+namespace activemq
+{
+namespace wireformat
+{
+    namespace stomp
+    {
 
-    class StompWireFormat;
+        class StompWireFormat;
 
-    using decaf::lang::Pointer;
-    using activemq::commands::Message;
-    using activemq::commands::MessageId;
-    using activemq::commands::ProducerId;
-    using activemq::commands::ConsumerId;
-    using activemq::commands::TransactionId;
-    using activemq::commands::ActiveMQDestination;
-
-    /**
-     * Utility Methods used when marshaling to and from StompFrame's.
-     *
-     * @since 3.0
-     */
-    class StompHelper {
-    private:
-
-        activemq::util::LongSequenceGenerator messageIdGenerator;
-        StompWireFormat* wireFormat;
-
-    private:
-
-        StompHelper(const StompHelper&);
-        StompHelper& operator=(const StompHelper&);
-
-    public:
-
-        StompHelper(StompWireFormat* wireFormat);
-
-        virtual ~StompHelper();
-
-    public:
+        using activemq::commands::ActiveMQDestination;
+        using activemq::commands::ConsumerId;
+        using activemq::commands::Message;
+        using activemq::commands::MessageId;
+        using activemq::commands::ProducerId;
+        using activemq::commands::TransactionId;
+        using decaf::lang::Pointer;
 
         /**
-         * Converts the Headers in a Stomp Frame into Headers in the given Message
-         * Command.
+         * Utility Methods used when marshaling to and from StompFrame's.
          *
-         * @param frame - The frame to extract headers from.
-         * @param message - The message to move the Headers to.
+         * @since 3.0
          */
-        void convertProperties(const Pointer<StompFrame>& frame, const Pointer<Message>& message);
+        class StompHelper
+        {
+        private:
+            activemq::util::LongSequenceGenerator messageIdGenerator;
+            StompWireFormat*                      wireFormat;
 
-        /**
-         * Converts the Properties in a Message Command to Valid Headers and Properties
-         * in the StompFrame.
-         *
-         * @param message - The message to move the Headers to.
-         * @param frame - The frame to extract headers from.
-         */
-        void convertProperties(const Pointer<Message>& message, const Pointer<StompFrame>& frame);
+        private:
+            StompHelper(const StompHelper&);
+            StompHelper& operator=(const StompHelper&);
 
-        /**
-         * Converts from a Stomp Destination to an ActiveMQDestination
-         *
-         * @param destination - The Stomp Destination name string.
-         * @return Pointer to a new ActiveMQDestination.
-         */
-        Pointer<ActiveMQDestination> convertDestination(const std::string& destination);
+        public:
+            StompHelper(StompWireFormat* wireFormat);
 
-        /**
-         * Converts from a ActiveMQDestination to a Stomp Destination Name
-         *
-         * @param destination - The ActiveMQDestination to Convert
-         * @return the Stomp String name that defines the destination.
-         */
-        std::string convertDestination(const Pointer<ActiveMQDestination>& destination);
+            virtual ~StompHelper();
 
-        /**
-         * Converts a MessageId instance to a Stomp MessageId String.
-         *
-         * @param messageId - the MessageId instance to convert.
-         * @return a Stomp Message Id String.
-         */
-        std::string convertMessageId(const Pointer<MessageId>& messageId);
+        public:
+            /**
+             * Converts the Headers in a Stomp Frame into Headers in the given
+             * Message Command.
+             *
+             * @param frame - The frame to extract headers from.
+             * @param message - The message to move the Headers to.
+             */
+            void convertProperties(const Pointer<StompFrame>& frame,
+                                   const Pointer<Message>&    message);
 
-        /**
-         * Converts a Stomp MessageId string to a MessageId
-         *
-         * @param messageId - the String message Id to convert.
-         * @return Pointer to a new MessageId.
-         */
-        Pointer<MessageId> convertMessageId(const std::string& messageId);
+            /**
+             * Converts the Properties in a Message Command to Valid Headers and
+             * Properties in the StompFrame.
+             *
+             * @param message - The message to move the Headers to.
+             * @param frame - The frame to extract headers from.
+             */
+            void convertProperties(const Pointer<Message>&    message,
+                                   const Pointer<StompFrame>& frame);
 
-        /**
-         * Converts a ConsumerId instance to a Stomp ConsumerId String.
-         *
-         * @param consumerId - the Consumer instance to convert.
-         * @return a Stomp Consumer Id String.
-         */
-        std::string convertConsumerId(const Pointer<ConsumerId>& consumerId);
+            /**
+             * Converts from a Stomp Destination to an ActiveMQDestination
+             *
+             * @param destination - The Stomp Destination name string.
+             * @return Pointer to a new ActiveMQDestination.
+             */
+            Pointer<ActiveMQDestination> convertDestination(
+                const std::string& destination);
 
-        /**
-         * Converts a Stomp ConsumerId string to a ConsumerId
-         *
-         * @param consumerId - the String Consumer Id to convert.
-         * @return Pointer to a new ConsumerId.
-         */
-        Pointer<ConsumerId> convertConsumerId(const std::string& consumerId);
+            /**
+             * Converts from a ActiveMQDestination to a Stomp Destination Name
+             *
+             * @param destination - The ActiveMQDestination to Convert
+             * @return the Stomp String name that defines the destination.
+             */
+            std::string convertDestination(
+                const Pointer<ActiveMQDestination>& destination);
 
-        /**
-         * Converts a ProducerId instance to a Stomp ProducerId String.
-         *
-         * @param producerId - the Producer instance to convert.
-         * @return a Stomp Producer Id String.
-         */
-        std::string convertProducerId(const Pointer<ProducerId>& producerId);
+            /**
+             * Converts a MessageId instance to a Stomp MessageId String.
+             *
+             * @param messageId - the MessageId instance to convert.
+             * @return a Stomp Message Id String.
+             */
+            std::string convertMessageId(const Pointer<MessageId>& messageId);
 
-        /**
-         * Converts a Stomp ProducerId string to a ProducerId
-         *
-         * @param producerId - the String Producer Id to convert.
-         * @return Pointer to a new ProducerId.
-         */
-        Pointer<ProducerId> convertProducerId(const std::string& producerId);
+            /**
+             * Converts a Stomp MessageId string to a MessageId
+             *
+             * @param messageId - the String message Id to convert.
+             * @return Pointer to a new MessageId.
+             */
+            Pointer<MessageId> convertMessageId(const std::string& messageId);
 
-        /**
-         * Converts a TransactionId instance to a Stomp TransactionId String.
-         *
-         * @param transactionId - the Transaction instance to convert.
-         * @return a Stomp Transaction Id String.
-         */
-        std::string convertTransactionId(const Pointer<TransactionId>& transactionId);
+            /**
+             * Converts a ConsumerId instance to a Stomp ConsumerId String.
+             *
+             * @param consumerId - the Consumer instance to convert.
+             * @return a Stomp Consumer Id String.
+             */
+            std::string convertConsumerId(const Pointer<ConsumerId>& consumerId);
 
-        /**
-         * Converts a Stomp TransactionId string to a TransactionId
-         *
-         * @param transactionId - the String Transaction Id to convert.
-         * @return Pointer to a new TransactionId.
-         */
-        Pointer<TransactionId> convertTransactionId(const std::string& transactionId);
+            /**
+             * Converts a Stomp ConsumerId string to a ConsumerId
+             *
+             * @param consumerId - the String Consumer Id to convert.
+             * @return Pointer to a new ConsumerId.
+             */
+            Pointer<ConsumerId> convertConsumerId(const std::string& consumerId);
 
-    };
+            /**
+             * Converts a ProducerId instance to a Stomp ProducerId String.
+             *
+             * @param producerId - the Producer instance to convert.
+             * @return a Stomp Producer Id String.
+             */
+            std::string convertProducerId(const Pointer<ProducerId>& producerId);
 
-}}}
+            /**
+             * Converts a Stomp ProducerId string to a ProducerId
+             *
+             * @param producerId - the String Producer Id to convert.
+             * @return Pointer to a new ProducerId.
+             */
+            Pointer<ProducerId> convertProducerId(const std::string& producerId);
+
+            /**
+             * Converts a TransactionId instance to a Stomp TransactionId
+             * String.
+             *
+             * @param transactionId - the Transaction instance to convert.
+             * @return a Stomp Transaction Id String.
+             */
+            std::string convertTransactionId(
+                const Pointer<TransactionId>& transactionId);
+
+            /**
+             * Converts a Stomp TransactionId string to a TransactionId
+             *
+             * @param transactionId - the String Transaction Id to convert.
+             * @return Pointer to a new TransactionId.
+             */
+            Pointer<TransactionId> convertTransactionId(
+                const std::string& transactionId);
+        };
+
+    }  // namespace stomp
+}  // namespace wireformat
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_WIREFORMAT_STOMP_MARSHAL_STOMPHELPER_H_ */

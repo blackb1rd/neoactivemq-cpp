@@ -15,165 +15,215 @@
  * limitations under the License.
  */
 
-#include <gtest/gtest.h>
-#include <activemq/cmsutil/DynamicDestinationResolver.h>
-#include <activemq/cmsutil/ResourceLifecycleManager.h>
 #include "DummyConnectionFactory.h"
 #include "DummyMessageCreator.h"
 #include <activemq/cmsutil/CmsTemplate.h>
-#include <activemq/cmsutil/SessionCallback.h>
-#include <activemq/cmsutil/ProducerCallback.h>
 #include <activemq/cmsutil/DummyMessageCreator.h>
+#include <activemq/cmsutil/DynamicDestinationResolver.h>
 #include <activemq/cmsutil/MessageContext.h>
+#include <activemq/cmsutil/ProducerCallback.h>
+#include <activemq/cmsutil/ResourceLifecycleManager.h>
+#include <activemq/cmsutil/SessionCallback.h>
 #include <activemq/exceptions/ActiveMQException.h>
+#include <gtest/gtest.h>
 
 using namespace activemq;
 using namespace activemq::cmsutil;
 
-class CmsTemplateTest : public ::testing::Test {
+class CmsTemplateTest : public ::testing::Test
+{
 protected:
-
-    CmsTemplate* cmsTemplate;
+    CmsTemplate*            cmsTemplate;
     DummyConnectionFactory* cf;
 
-    class MySendListener : public MessageContext::SendListener {
+    class MySendListener : public MessageContext::SendListener
+    {
     private:
-
         MySendListener(const MySendListener&);
-        MySendListener& operator= (const MySendListener&);
+        MySendListener& operator=(const MySendListener&);
 
     public:
-
         const cms::Destination* dest;
-        cms::Message* message;
-        int deliveryMode;
-        int priority;
-        long long ttl;
-        std::string selector;
-        bool noLocal;
-        long long timeout;
+        cms::Message*           message;
+        int                     deliveryMode;
+        int                     priority;
+        long long               ttl;
+        std::string             selector;
+        bool                    noLocal;
+        long long               timeout;
 
-        MySendListener() : dest(), message(), deliveryMode(0), priority(), ttl(), selector(), noLocal(), timeout() {}
-        virtual ~MySendListener() {}
+        MySendListener()
+            : dest(),
+              message(),
+              deliveryMode(0),
+              priority(),
+              ttl(),
+              selector(),
+              noLocal(),
+              timeout()
+        {
+        }
+
+        virtual ~MySendListener()
+        {
+        }
 
         virtual void onSend(const cms::Destination* destination,
-            cms::Message* message, int deliveryMode, int priority,
-            long long timeToLive) {
-            this->dest = destination;
-            this->message = message;
+                            cms::Message*           message,
+                            int                     deliveryMode,
+                            int                     priority,
+                            long long               timeToLive)
+        {
+            this->dest         = destination;
+            this->message      = message;
             this->deliveryMode = deliveryMode;
-            this->priority = priority;
-            this->ttl = timeToLive;
+            this->priority     = priority;
+            this->ttl          = timeToLive;
         }
 
         virtual cms::Message* doReceive(const cms::Destination* dest,
-                const std::string& selector,
-                bool noLocal,
-                long long timeout) {
-            this->dest = dest;
+                                        const std::string&      selector,
+                                        bool                    noLocal,
+                                        long long               timeout)
+        {
+            this->dest     = dest;
             this->selector = selector;
-            this->noLocal = noLocal;
-            this->timeout = timeout;
+            this->noLocal  = noLocal;
+            this->timeout  = timeout;
             return new DummyMessage();
         }
     };
 
-    class FailSendListener : public MessageContext::SendListener {
+    class FailSendListener : public MessageContext::SendListener
+    {
     public:
+        FailSendListener()
+        {
+        }
 
-        FailSendListener() {}
-        virtual ~FailSendListener() {}
+        virtual ~FailSendListener()
+        {
+        }
 
         virtual void onSend(const cms::Destination* destination,
-                cms::Message* message, int deliveryMode, int priority,
-                long long timeToLive) {
+                            cms::Message*           message,
+                            int                     deliveryMode,
+                            int                     priority,
+                            long long               timeToLive)
+        {
             throw cms::CMSException();
         }
 
         virtual cms::Message* doReceive(const cms::Destination* dest,
-                const std::string& selector, bool noLocal, long long timeout) {
+                                        const std::string&      selector,
+                                        bool                    noLocal,
+                                        long long               timeout)
+        {
             throw cms::CMSException();
         }
     };
 
-    class MySessionCallback : public SessionCallback {
+    class MySessionCallback : public SessionCallback
+    {
     private:
-
         MySessionCallback(const MySessionCallback&);
-        MySessionCallback& operator= (const MySessionCallback&);
+        MySessionCallback& operator=(const MySessionCallback&);
 
     public:
-
-        cms::Session* session;
+        cms::Session*                 session;
         cms::Session::AcknowledgeMode ackMode;
 
-        MySessionCallback() :session(), ackMode() {}
-        virtual ~MySessionCallback() {}
+        MySessionCallback()
+            : session(),
+              ackMode()
+        {
+        }
 
-        virtual void doInCms(cms::Session* session) {
+        virtual ~MySessionCallback()
+        {
+        }
+
+        virtual void doInCms(cms::Session* session)
+        {
             this->session = session;
             this->ackMode = session->getAcknowledgeMode();
         }
     };
 
-    class MyProducerCallback : public ProducerCallback {
+    class MyProducerCallback : public ProducerCallback
+    {
     private:
-
         MyProducerCallback(const MyProducerCallback&);
-        MyProducerCallback& operator= (const MyProducerCallback&);
+        MyProducerCallback& operator=(const MyProducerCallback&);
 
     public:
-
-        cms::Session* session;
+        cms::Session*         session;
         cms::MessageProducer* producer;
 
-        MyProducerCallback() : session(), producer() {}
-        virtual ~MyProducerCallback() {}
+        MyProducerCallback()
+            : session(),
+              producer()
+        {
+        }
 
-        virtual void doInCms(cms::Session* session, cms::MessageProducer* producer) {
-            this->session = session;
+        virtual ~MyProducerCallback()
+        {
+        }
+
+        virtual void doInCms(cms::Session*         session,
+                             cms::MessageProducer* producer)
+        {
+            this->session  = session;
             this->producer = producer;
         }
     };
 
 private:
-
     CmsTemplateTest(const CmsTemplateTest&);
-    CmsTemplateTest& operator= (const CmsTemplateTest&);
+    CmsTemplateTest& operator=(const CmsTemplateTest&);
 
 public:
+    CmsTemplateTest()
+        : cmsTemplate(),
+          cf()
+    {
+    }
 
-    CmsTemplateTest() : cmsTemplate(), cf() {}
-
-    void SetUp() override {
-        cf = new DummyConnectionFactory();
+    void SetUp() override
+    {
+        cf          = new DummyConnectionFactory();
         cmsTemplate = new CmsTemplate(cf);
         cmsTemplate->setDefaultDestinationName("test");
     }
 
-    void TearDown() override {
+    void TearDown() override
+    {
         delete cmsTemplate;
         delete cf;
     }
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(CmsTemplateTest, testExecuteSession) {
-
-    try {
-        cmsTemplate->setSessionAcknowledgeMode(cms::Session::CLIENT_ACKNOWLEDGE);
+TEST_F(CmsTemplateTest, testExecuteSession)
+{
+    try
+    {
+        cmsTemplate->setSessionAcknowledgeMode(
+            cms::Session::CLIENT_ACKNOWLEDGE);
 
         // Test basics.
         MySessionCallback sessionCallback;
         cmsTemplate->execute(&sessionCallback);
         ASSERT_TRUE(sessionCallback.session != NULL);
-        ASSERT_TRUE(sessionCallback.ackMode == cms::Session::CLIENT_ACKNOWLEDGE);
+        ASSERT_TRUE(sessionCallback.ackMode ==
+                    cms::Session::CLIENT_ACKNOWLEDGE);
 
         // Try again and make sure we get the same session
         MySessionCallback sessionCallback2;
         cmsTemplate->execute(&sessionCallback2);
         ASSERT_TRUE(sessionCallback2.session == sessionCallback.session);
-        ASSERT_TRUE(sessionCallback2.ackMode == cms::Session::CLIENT_ACKNOWLEDGE);
+        ASSERT_TRUE(sessionCallback2.ackMode ==
+                    cms::Session::CLIENT_ACKNOWLEDGE);
 
         // Now try different ack mode and make sure we have a different session.
         cmsTemplate->setSessionAcknowledgeMode(cms::Session::AUTO_ACKNOWLEDGE);
@@ -182,17 +232,18 @@ TEST_F(CmsTemplateTest, testExecuteSession) {
         ASSERT_TRUE(sessionCallback3.session != NULL);
         ASSERT_TRUE(sessionCallback3.session != sessionCallback.session);
         ASSERT_TRUE(sessionCallback3.ackMode == cms::Session::AUTO_ACKNOWLEDGE);
-
-    } catch( cms::CMSException& e) {
+    }
+    catch (cms::CMSException& e)
+    {
         e.printStackTrace();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(CmsTemplateTest, testExecuteProducer) {
-
-    try {
-
+TEST_F(CmsTemplateTest, testExecuteProducer)
+{
+    try
+    {
         cmsTemplate->setPubSubDomain(false);
 
         // Test basics.
@@ -223,17 +274,20 @@ TEST_F(CmsTemplateTest, testExecuteProducer) {
 
         // Now try without a valid default destination and make sure
         // we get an exception.
-        try {
+        try
+        {
             cmsTemplate->setDefaultDestinationName("");
             MyProducerCallback callback5;
             cmsTemplate->execute(&callback5);
             FAIL() << ("failed to throw expected exception");
-        } catch( cms::CMSException& ex) {
+        }
+        catch (cms::CMSException& ex)
+        {
             // expected.
         }
 
         // Now try an explicit destination
-        MyProducerCallback callback6;
+        MyProducerCallback                callback6;
         activemq::commands::ActiveMQTopic myTopic("anothertopic");
         cmsTemplate->execute(&myTopic, &callback6);
         ASSERT_TRUE(callback6.session != NULL);
@@ -243,17 +297,18 @@ TEST_F(CmsTemplateTest, testExecuteProducer) {
         cmsTemplate->execute("fred", &callback7);
         ASSERT_TRUE(callback7.session == callback6.session);
         ASSERT_TRUE(callback7.producer != callback6.producer);
-
-    } catch( cms::CMSException& e) {
+    }
+    catch (cms::CMSException& e)
+    {
         e.printStackTrace();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(CmsTemplateTest, testSend) {
-
-    try {
-
+TEST_F(CmsTemplateTest, testSend)
+{
+    try
+    {
         MessageContext* messageContext = cf->getMessageContext();
 
         MySendListener listener;
@@ -265,7 +320,7 @@ TEST_F(CmsTemplateTest, testSend) {
         cmsTemplate->send(&msgCreator);
         const cms::Queue* q = dynamic_cast<const cms::Queue*>(listener.dest);
         ASSERT_TRUE(q != NULL);
-        ASSERT_EQ((std::string)"test", q->getQueueName());
+        ASSERT_EQ((std::string) "test", q->getQueueName());
         ASSERT_TRUE(listener.message != NULL);
         ASSERT_EQ(4, listener.priority);
         ASSERT_EQ(0LL, listener.ttl);
@@ -282,19 +337,19 @@ TEST_F(CmsTemplateTest, testSend) {
         cmsTemplate->send(&msgCreator);
         const cms::Topic* t = dynamic_cast<const cms::Topic*>(listener.dest);
         ASSERT_TRUE(t != NULL);
-        ASSERT_EQ((std::string)"bob", t->getTopicName());
+        ASSERT_EQ((std::string) "bob", t->getTopicName());
         ASSERT_TRUE(listener.message != NULL);
         ASSERT_EQ(4, listener.priority);
         ASSERT_EQ(0LL, listener.ttl);
         ASSERT_EQ(1, listener.deliveryMode);
 
-        // Now enable explicit quality of service and verify that the new default
-        // values are used.
+        // Now enable explicit quality of service and verify that the new
+        // default values are used.
         cmsTemplate->setExplicitQosEnabled(true);
         cmsTemplate->send(&msgCreator);
         t = dynamic_cast<const cms::Topic*>(listener.dest);
         ASSERT_TRUE(t != NULL);
-        ASSERT_EQ((std::string)"bob", t->getTopicName());
+        ASSERT_EQ((std::string) "bob", t->getTopicName());
         ASSERT_TRUE(listener.message != NULL);
         ASSERT_EQ(5, listener.priority);
         ASSERT_EQ(10LL, listener.ttl);
@@ -310,18 +365,19 @@ TEST_F(CmsTemplateTest, testSend) {
         cmsTemplate->send("yetanothertopic", &msgCreator);
         t = dynamic_cast<const cms::Topic*>(listener.dest);
         ASSERT_TRUE(t != NULL);
-        ASSERT_EQ((std::string)"yetanothertopic", t->getTopicName());
-
-    } catch( cms::CMSException& e) {
+        ASSERT_EQ((std::string) "yetanothertopic", t->getTopicName());
+    }
+    catch (cms::CMSException& e)
+    {
         e.printStackTrace();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(CmsTemplateTest, testReceive) {
-
-    try {
-
+TEST_F(CmsTemplateTest, testReceive)
+{
+    try
+    {
         MessageContext* messageContext = cf->getMessageContext();
 
         MySendListener listener;
@@ -332,7 +388,7 @@ TEST_F(CmsTemplateTest, testReceive) {
         ASSERT_TRUE(message != NULL);
         const cms::Queue* q = dynamic_cast<const cms::Queue*>(listener.dest);
         ASSERT_TRUE(q != NULL);
-        ASSERT_EQ((std::string)"test", q->getQueueName());
+        ASSERT_EQ((std::string) "test", q->getQueueName());
         ASSERT_TRUE(listener.selector == "");
         ASSERT_EQ(cmsTemplate->isNoLocal(), listener.noLocal);
         ASSERT_EQ(cmsTemplate->getReceiveTimeout(), listener.timeout);
@@ -344,7 +400,7 @@ TEST_F(CmsTemplateTest, testReceive) {
         ASSERT_TRUE(message != NULL);
         const cms::Topic* t = dynamic_cast<const cms::Topic*>(listener.dest);
         ASSERT_TRUE(t != NULL);
-        ASSERT_EQ((std::string)"test", t->getTopicName());
+        ASSERT_EQ((std::string) "test", t->getTopicName());
         delete message;
 
         // Now change the destination name and verify that it changes.
@@ -353,7 +409,7 @@ TEST_F(CmsTemplateTest, testReceive) {
         ASSERT_TRUE(message != NULL);
         t = dynamic_cast<const cms::Topic*>(listener.dest);
         ASSERT_TRUE(t != NULL);
-        ASSERT_EQ((std::string)"bob", t->getTopicName());
+        ASSERT_EQ((std::string) "bob", t->getTopicName());
         delete message;
 
         // Now change the timeout and verify that it changes.
@@ -371,29 +427,31 @@ TEST_F(CmsTemplateTest, testReceive) {
         delete message;
 
         // Now try a failure.
-        try {
-
+        try
+        {
             FailSendListener failListener;
             messageContext->setSendListener(&failListener);
 
             // First, test basics.
             cmsTemplate->receive();
             FAIL() << ("failed to throw expected exception");
-
-        } catch( cms::CMSException& e) {
+        }
+        catch (cms::CMSException& e)
+        {
             // Expected
         }
-
-    } catch( cms::CMSException& e) {
+    }
+    catch (cms::CMSException& e)
+    {
         e.printStackTrace();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(CmsTemplateTest, testReceive_Destination) {
-
-    try {
-
+TEST_F(CmsTemplateTest, testReceive_Destination)
+{
+    try
+    {
         MessageContext* messageContext = cf->getMessageContext();
 
         MySendListener listener;
@@ -407,79 +465,83 @@ TEST_F(CmsTemplateTest, testReceive_Destination) {
         delete message;
 
         // Now try a failure.
-        try {
-
+        try
+        {
             FailSendListener failListener;
             messageContext->setSendListener(&failListener);
 
             // First, test basics.
             cmsTemplate->receive(&myTopic);
             FAIL() << ("failed to throw expected exception");
-
-        } catch( cms::CMSException& e) {
+        }
+        catch (cms::CMSException& e)
+        {
             // Expected
         }
-
-    } catch( cms::CMSException& e) {
+    }
+    catch (cms::CMSException& e)
+    {
         e.printStackTrace();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(CmsTemplateTest, testReceive_DestinationName) {
-
-    try {
-
+TEST_F(CmsTemplateTest, testReceive_DestinationName)
+{
+    try
+    {
         MessageContext* messageContext = cf->getMessageContext();
 
         MySendListener listener;
         messageContext->setSendListener(&listener);
 
         // First, test basics.
-        std::string destName = "bob";
-        cms::Message* message = cmsTemplate->receive(destName);
+        std::string   destName = "bob";
+        cms::Message* message  = cmsTemplate->receive(destName);
         ASSERT_TRUE(message != NULL);
         const cms::Queue* q = dynamic_cast<const cms::Queue*>(listener.dest);
         ASSERT_TRUE(q != NULL);
-        ASSERT_EQ((std::string)"bob", q->getQueueName());
+        ASSERT_EQ((std::string) "bob", q->getQueueName());
         delete message;
 
         // Now try a failure.
-        try {
-
+        try
+        {
             FailSendListener failListener;
             messageContext->setSendListener(&failListener);
 
             // First, test basics.
             cmsTemplate->receive(destName);
             FAIL() << ("failed to throw expected exception");
-
-        } catch( cms::CMSException& e) {
+        }
+        catch (cms::CMSException& e)
+        {
             // Expected
         }
-
-    } catch( cms::CMSException& e) {
+    }
+    catch (cms::CMSException& e)
+    {
         e.printStackTrace();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(CmsTemplateTest, testReceiveSelected) {
-
-    try {
-
+TEST_F(CmsTemplateTest, testReceiveSelected)
+{
+    try
+    {
         MessageContext* messageContext = cf->getMessageContext();
 
         MySendListener listener;
         messageContext->setSendListener(&listener);
 
         // First, test basics.
-        std::string selector = "yadda";
-        cms::Message* message = cmsTemplate->receiveSelected(selector);
+        std::string   selector = "yadda";
+        cms::Message* message  = cmsTemplate->receiveSelected(selector);
         ASSERT_TRUE(message != NULL);
         const cms::Queue* q = dynamic_cast<const cms::Queue*>(listener.dest);
         ASSERT_TRUE(q != NULL);
-        ASSERT_EQ((std::string)"test", q->getQueueName());
+        ASSERT_EQ((std::string) "test", q->getQueueName());
         ASSERT_EQ(cmsTemplate->isNoLocal(), listener.noLocal);
         ASSERT_EQ(cmsTemplate->getReceiveTimeout(), listener.timeout);
         ASSERT_EQ(selector, listener.selector);
@@ -492,7 +554,7 @@ TEST_F(CmsTemplateTest, testReceiveSelected) {
         ASSERT_TRUE(message != NULL);
         const cms::Topic* t = dynamic_cast<const cms::Topic*>(listener.dest);
         ASSERT_TRUE(t != NULL);
-        ASSERT_EQ((std::string)"test", t->getTopicName());
+        ASSERT_EQ((std::string) "test", t->getTopicName());
         ASSERT_EQ(selector, listener.selector);
         delete message;
 
@@ -502,7 +564,7 @@ TEST_F(CmsTemplateTest, testReceiveSelected) {
         ASSERT_TRUE(message != NULL);
         t = dynamic_cast<const cms::Topic*>(listener.dest);
         ASSERT_TRUE(t != NULL);
-        ASSERT_EQ((std::string)"bob", t->getTopicName());
+        ASSERT_EQ((std::string) "bob", t->getTopicName());
         ASSERT_EQ(selector, listener.selector);
         delete message;
 
@@ -523,98 +585,106 @@ TEST_F(CmsTemplateTest, testReceiveSelected) {
         delete message;
 
         // Now try a failure.
-        try {
-
+        try
+        {
             FailSendListener failListener;
             messageContext->setSendListener(&failListener);
 
             // First, test basics.
             cmsTemplate->receiveSelected(selector);
             FAIL() << ("failed to throw expected exception");
-
-        } catch( cms::CMSException& e) {
+        }
+        catch (cms::CMSException& e)
+        {
             // Expected
         }
-
-    } catch( cms::CMSException& e) {
+    }
+    catch (cms::CMSException& e)
+    {
         e.printStackTrace();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(CmsTemplateTest, testReceiveSelected_Destination) {
-
-    try {
-
+TEST_F(CmsTemplateTest, testReceiveSelected_Destination)
+{
+    try
+    {
         MessageContext* messageContext = cf->getMessageContext();
 
         MySendListener listener;
         messageContext->setSendListener(&listener);
 
         // First, test basics.
-        std::string selector = "yadda";
+        std::string                       selector = "yadda";
         activemq::commands::ActiveMQTopic myTopic("anothertopic");
-        cms::Message* message = cmsTemplate->receiveSelected(&myTopic, selector);
+        cms::Message*                     message =
+            cmsTemplate->receiveSelected(&myTopic, selector);
         ASSERT_TRUE(message != NULL);
         ASSERT_TRUE(&myTopic == listener.dest);
         ASSERT_EQ(selector, listener.selector);
         delete message;
 
         // Now try a failure.
-        try {
-
+        try
+        {
             FailSendListener failListener;
             messageContext->setSendListener(&failListener);
 
             // First, test basics.
             cmsTemplate->receiveSelected(&myTopic, selector);
             FAIL() << ("failed to throw expected exception");
-
-        } catch( cms::CMSException& e) {
+        }
+        catch (cms::CMSException& e)
+        {
             // Expected
         }
-
-    } catch( cms::CMSException& e) {
+    }
+    catch (cms::CMSException& e)
+    {
         e.printStackTrace();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(CmsTemplateTest, testReceiveSelected_DestinationName) {
-
-    try {
-
+TEST_F(CmsTemplateTest, testReceiveSelected_DestinationName)
+{
+    try
+    {
         MessageContext* messageContext = cf->getMessageContext();
 
         MySendListener listener;
         messageContext->setSendListener(&listener);
 
         // First, test basics.
-        std::string selector = "yadda";
-        std::string destName = "bob";
-        cms::Message* message = cmsTemplate->receiveSelected(destName, selector);
+        std::string   selector = "yadda";
+        std::string   destName = "bob";
+        cms::Message* message =
+            cmsTemplate->receiveSelected(destName, selector);
         ASSERT_TRUE(message != NULL);
         const cms::Queue* q = dynamic_cast<const cms::Queue*>(listener.dest);
         ASSERT_TRUE(q != NULL);
-        ASSERT_EQ((std::string)"bob", q->getQueueName());
+        ASSERT_EQ((std::string) "bob", q->getQueueName());
         ASSERT_EQ(selector, listener.selector);
         delete message;
 
         // Now try a failure.
-        try {
-
+        try
+        {
             FailSendListener failListener;
             messageContext->setSendListener(&failListener);
 
             // First, test basics.
             cmsTemplate->receiveSelected(destName, selector);
             FAIL() << ("failed to throw expected exception");
-
-        } catch( cms::CMSException& e) {
+        }
+        catch (cms::CMSException& e)
+        {
             // Expected
         }
-
-    } catch( cms::CMSException& e) {
+    }
+    catch (cms::CMSException& e)
+    {
         e.printStackTrace();
     }
 }

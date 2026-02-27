@@ -20,7 +20,7 @@
 
 // Turn off warning message for ignored exception specification
 #ifdef _MSC_VER
-#pragma warning( disable : 4290 )
+#pragma warning(disable : 4290)
 #endif
 
 #include <activemq/commands/BaseDataStructure.h>
@@ -29,8 +29,10 @@
 #include <string>
 #include <vector>
 
-namespace activemq {
-namespace commands {
+namespace activemq
+{
+namespace commands
+{
 
     using decaf::lang::Pointer;
 
@@ -43,23 +45,20 @@ namespace commands {
      *         in the activemq-cpp-openwire-generator module
      *
      */
-    class AMQCPP_API DiscoveryEvent : public BaseDataStructure {
+    class AMQCPP_API DiscoveryEvent : public BaseDataStructure
+    {
     protected:
-
         std::string serviceName;
         std::string brokerName;
 
     public:
-
         const static unsigned char ID_DISCOVERYEVENT = 40;
 
     private:
-
         DiscoveryEvent(const DiscoveryEvent&);
-        DiscoveryEvent& operator= (const DiscoveryEvent&);
+        DiscoveryEvent& operator=(const DiscoveryEvent&);
 
     public:
-
         DiscoveryEvent();
 
         virtual ~DiscoveryEvent();
@@ -75,15 +74,15 @@ namespace commands {
         virtual bool equals(const DataStructure* value) const;
 
         virtual const std::string& getServiceName() const;
-        virtual std::string& getServiceName();
+        virtual std::string&       getServiceName();
         virtual void setServiceName(const std::string& serviceName);
 
         virtual const std::string& getBrokerName() const;
-        virtual std::string& getBrokerName();
-        virtual void setBrokerName(const std::string& brokerName);
-
+        virtual std::string&       getBrokerName();
+        virtual void               setBrokerName(const std::string& brokerName);
     };
 
-}}
+}  // namespace commands
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_COMMANDS_DISCOVERYEVENT_H_*/

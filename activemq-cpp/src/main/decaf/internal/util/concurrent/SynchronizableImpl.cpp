@@ -23,47 +23,60 @@ using namespace decaf::internal::util;
 using namespace decaf::internal::util::concurrent;
 
 ////////////////////////////////////////////////////////////////////////////////
-SynchronizableImpl::SynchronizableImpl() : mutex() {}
+SynchronizableImpl::SynchronizableImpl()
+    : mutex()
+{
+}
 
 ////////////////////////////////////////////////////////////////////////////////
-SynchronizableImpl::~SynchronizableImpl() {}
+SynchronizableImpl::~SynchronizableImpl()
+{
+}
 
 ////////////////////////////////////////////////////////////////////////////////
-void SynchronizableImpl::lock() {
+void SynchronizableImpl::lock()
+{
     mutex.lock();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool SynchronizableImpl::tryLock() {
+bool SynchronizableImpl::tryLock()
+{
     return mutex.tryLock();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SynchronizableImpl::unlock() {
+void SynchronizableImpl::unlock()
+{
     mutex.unlock();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SynchronizableImpl::wait() {
+void SynchronizableImpl::wait()
+{
     mutex.wait();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SynchronizableImpl::wait( long long millisecs ) {
-    mutex.wait( millisecs );
+void SynchronizableImpl::wait(long long millisecs)
+{
+    mutex.wait(millisecs);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SynchronizableImpl::wait( long long millisecs, int nanos ) {
-    mutex.wait( millisecs, nanos );
+void SynchronizableImpl::wait(long long millisecs, int nanos)
+{
+    mutex.wait(millisecs, nanos);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SynchronizableImpl::notify() {
+void SynchronizableImpl::notify()
+{
     mutex.notify();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SynchronizableImpl::notifyAll() {
+void SynchronizableImpl::notifyAll()
+{
     mutex.notifyAll();
 }

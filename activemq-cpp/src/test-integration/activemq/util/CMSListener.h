@@ -18,34 +18,35 @@
 #ifndef _ACTIVEMQ_UTIL_CMSLISTENER_H_
 #define _ACTIVEMQ_UTIL_CMSLISTENER_H_
 
-#include <cms/Session.h>
-#include <cms/MessageListener.h>
 #include <cms/ExceptionListener.h>
+#include <cms/MessageListener.h>
+#include <cms/Session.h>
 
 #include <decaf/util/concurrent/Mutex.h>
 
-namespace activemq {
-namespace util {
+namespace activemq
+{
+namespace util
+{
 
     class CMSListener : public cms::MessageListener,
-                        public cms::ExceptionListener {
+                        public cms::ExceptionListener
+    {
     private:
-
-        unsigned int numReceived;
+        unsigned int                   numReceived;
         decaf::util::concurrent::Mutex mutex;
-        cms::Session* session;
+        cms::Session*                  session;
 
     private:
-
         CMSListener(const CMSListener&);
-        CMSListener& operator= (const CMSListener&);
+        CMSListener& operator=(const CMSListener&);
 
     public:
-
         CMSListener(cms::Session* session);
         virtual ~CMSListener();
 
-        unsigned int getNumReceived() const {
+        unsigned int getNumReceived() const
+        {
             return this->numReceived;
         }
 
@@ -55,9 +56,9 @@ namespace util {
 
         virtual void onException(const cms::CMSException& error);
         virtual void onMessage(const cms::Message* message);
-
     };
 
-}}
+}  // namespace util
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_UTIL_CMSLISTENER_H_ */

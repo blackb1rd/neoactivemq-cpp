@@ -25,22 +25,24 @@
 #include <decaf/net/URL.h>
 #include <decaf/net/UnknownServiceException.h>
 
-namespace decaf {
-namespace net {
+namespace decaf
+{
+namespace net
+{
 
     class URLConnectionImpl;
 
     /**
-     * Concrete implementations of the abstract {@code URLConnection} class provide
-     * a communication link to a URL for exchanging data with a specific protocol
-     * type. A {@code URLConnection} can only be set up after the instantiation but
-     * before connecting to the remote resource.
+     * Concrete implementations of the abstract {@code URLConnection} class
+     * provide a communication link to a URL for exchanging data with a specific
+     * protocol type. A {@code URLConnection} can only be set up after the
+     * instantiation but before connecting to the remote resource.
      *
      * @since 1.0
      */
-    class DECAF_API URLConnection {
+    class DECAF_API URLConnection
+    {
     private:
-
         URLConnectionImpl* impl;
 
         static bool defaultAllowUserInteraction;
@@ -48,25 +50,24 @@ namespace net {
         static bool defaultUseCaches;
 
     protected:
-
         URL url;
 
         /**
-         * The data must be modified more recently than this time in milliseconds
-         * since January 1, 1970, GMT to be transmitted.
+         * The data must be modified more recently than this time in
+         * milliseconds since January 1, 1970, GMT to be transmitted.
          */
         long long ifModifiedSince;
 
         /**
-         * Specifies whether the using of caches is enabled or the data has to be
-         * recent for every request.
+         * Specifies whether the using of caches is enabled or the data has to
+         * be recent for every request.
          */
         bool useCaches;
 
         /**
-         * Specifies whether this {@code URLConnection} is already connected to the
-         * remote resource. If this field is set to {@code true} the flags for
-         * setting up the connection are not changeable anymore.
+         * Specifies whether this {@code URLConnection} is already connected to
+         * the remote resource. If this field is set to {@code true} the flags
+         * for setting up the connection are not changeable anymore.
          */
         bool connected;
 
@@ -81,53 +82,52 @@ namespace net {
         bool doInput;
 
         /**
-         * Specifies whether this {@code URLConnection} allows user interaction as
-         * it is needed for authentication purposes.
+         * Specifies whether this {@code URLConnection} allows user interaction
+         * as it is needed for authentication purposes.
          */
         bool allowUserInteraction;
 
     private:
-
         URLConnection(const URLConnection&);
-        URLConnection& operator= (const URLConnection&);
+        URLConnection& operator=(const URLConnection&);
 
     protected:
-
         URLConnection(const URL& url);
 
     public:
-
         virtual ~URLConnection();
 
         /**
          * Establishes the connection to the earlier configured resource. The
          * connection can only be set up before this method has been called.
          *
-         * @throws IOException if an error occurs while connecting to the resource.
+         * @throws IOException if an error occurs while connecting to the
+         * resource.
          */
         virtual void connect() = 0;
 
     public:
-
         /**
-         * Gets the option value which indicates whether user interaction is allowed
-         * on this URLConnection.
+         * Gets the option value which indicates whether user interaction is
+         * allowed on this URLConnection.
          *
          * @return the value of the option allowUserInteraction.
          */
-        bool getAllowUserInteraction() const {
+        bool getAllowUserInteraction() const
+        {
             return allowUserInteraction;
         }
 
         /**
-         * Sets the flag indicating whether this connection allows user interaction
-         * or not. This method can only be called prior to the connection
-         * establishment.
+         * Sets the flag indicating whether this connection allows user
+         * interaction or not. This method can only be called prior to the
+         * connection establishment.
          *
          * @param newValue
          *      the value of the flag to be set.
          * @throws IllegalStateException
-         *      if this method attempts to change the flag after the connection has been established.
+         *      if this method attempts to change the flag after the connection
+         * has been established.
          */
         void setAllowUserInteraction(bool newValue);
 
@@ -137,27 +137,30 @@ namespace net {
          *
          * @return the value of the response header field 'content-encoding'.
          */
-        std::string getContentEncoding() const {
+        std::string getContentEncoding() const
+        {
             return getHeaderField("Content-Encoding");
         }
 
         /**
-         * Gets the content length in bytes specified by the response header field
-         * 'content-length' or '-1' if this field is not set.
+         * Gets the content length in bytes specified by the response header
+         * field 'content-length' or '-1' if this field is not set.
          *
          * @return the value of the response header field 'content-length'.
          */
-        int getContentLength() const {
+        int getContentLength() const
+        {
             return getHeaderFieldInt("Content-Length", -1);
         }
 
         /**
-         * Gets the MIME-type of the content specified by the response header field
-         * 'content-type' or empty string if type is unknown.
+         * Gets the MIME-type of the content specified by the response header
+         * field 'content-type' or empty string if type is unknown.
          *
          * @return the value of the response header field 'content-type'.
          */
-        std::string getContentType() const {
+        std::string getContentType() const
+        {
             return getHeaderField("Content-Type");
         }
 
@@ -168,7 +171,8 @@ namespace net {
          *
          * @return the sending timestamp of the current response.
          */
-        long long getDate() const {
+        long long getDate() const
+        {
             return getHeaderFieldDate("Date", 0);
         }
 
@@ -177,13 +181,15 @@ namespace net {
          *
          * @return the value of the default setting defaultUseCaches.
          */
-        bool getDefaultUseCaches() const {
+        bool getDefaultUseCaches() const
+        {
             return defaultUseCaches;
         }
 
         /**
-         * Sets the default value for the flag indicating whether this connection
-         * allows to use caches. Existing URLConnections are unaffected.
+         * Sets the default value for the flag indicating whether this
+         * connection allows to use caches. Existing URLConnections are
+         * unaffected.
          *
          * @param newValue
          *      the default value of the flag to be used for new connections.
@@ -191,12 +197,13 @@ namespace net {
         void setDefaultUseCaches(bool newValue);
 
         /**
-         * Gets the value of the option {@code doInput} which specifies whether this
-         * connection allows to receive data.
+         * Gets the value of the option {@code doInput} which specifies whether
+         * this connection allows to receive data.
          *
          * @return true if this connection allows input, false otherwise.
          */
-        bool getDoInput() const {
+        bool getDoInput() const
+        {
             return doInput;
         }
 
@@ -218,7 +225,8 @@ namespace net {
          *
          * @return true if this connection allows output, false otherwise.
          */
-        bool getDoOutput() const {
+        bool getDoOutput() const
+        {
             return doOutput;
         }
 
@@ -240,7 +248,8 @@ namespace net {
          *
          * @return the value of the response header field expires.
          */
-        long getExpiration() const {
+        long getExpiration() const
+        {
             return getHeaderFieldDate("Expires", 0);
         }
 
@@ -249,7 +258,8 @@ namespace net {
          *
          * @return the URL of this connection.
          */
-        URL getURL() const {
+        URL getURL() const
+        {
             return url;
         }
 
@@ -259,19 +269,21 @@ namespace net {
          *
          * @return true if using caches is allowed, false otherwise.
          */
-        bool getUseCaches() const {
+        bool getUseCaches() const
+        {
             return useCaches;
         }
 
         /**
-         * Sets the flag indicating whether this connection allows to use caches or
-         * not. This method can only be called prior to the connection
+         * Sets the flag indicating whether this connection allows to use caches
+         * or not. This method can only be called prior to the connection
          * establishment.
          *
          * @param newValue
          *      the value of the flag to be set.
          * @throws IllegalStateException
-         *      if this method attempts to change the flag after the connection has been established.
+         *      if this method attempts to change the flag after the connection
+         * has been established.
          */
         void setUseCaches(bool newValue);
 
@@ -283,10 +295,11 @@ namespace net {
         int getConnectTimeout() const;
 
         /**
-         * Sets the timeout value in milliseconds for establishing the connection to
-         * the resource pointed by this URLConnection instance. A  SocketTimeoutException
-         * is thrown if the connection could not be established in this time. Default is
-         * 0 which stands for an infinite timeout.
+         * Sets the timeout value in milliseconds for establishing the
+         * connection to the resource pointed by this URLConnection instance. A
+         * SocketTimeoutException is thrown if the connection could not be
+         * established in this time. Default is 0 which stands for an infinite
+         * timeout.
          *
          * @param timeout
          *      the connecting timeout in milliseconds.
@@ -304,10 +317,11 @@ namespace net {
         int getReadTimeout() const;
 
         /**
-         * Sets the timeout value in milliseconds for reading from the input stream
-         * of an established connection to the resource. A SocketTimeoutException
-         * is thrown if the connection could not be established in this time. Default
-         * is code 0 which stands for an infinite timeout.
+         * Sets the timeout value in milliseconds for reading from the input
+         * stream of an established connection to the resource. A
+         * SocketTimeoutException is thrown if the connection could not be
+         * established in this time. Default is code 0 which stands for an
+         * infinite timeout.
          *
          * @param timeout
          *      the reading timeout in milliseconds.
@@ -317,12 +331,13 @@ namespace net {
         void setReadTimeout(int timeout);
 
         /**
-         * Returns the string representation containing the name of this class and
-         * the URL.
+         * Returns the string representation containing the name of this class
+         * and the URL.
          *
          * @return the string representation of this URLConnection instance.
          */
-        virtual std::string toString() const {
+        virtual std::string toString() const
+        {
             return std::string("URLConnection:") + url.toString();
         }
 
@@ -336,7 +351,8 @@ namespace net {
          *
          * @return the value of the field at position pos.
          */
-        virtual std::string getHeaderField(int pos DECAF_UNUSED) const {
+        virtual std::string getHeaderField(int pos DECAF_UNUSED) const
+        {
             return "";
         }
 
@@ -350,26 +366,32 @@ namespace net {
          *
          * @return the value of the header field.
          */
-        virtual std::string getHeaderField(const std::string& key DECAF_UNUSED) const {
+        virtual std::string getHeaderField(
+            const std::string& key DECAF_UNUSED) const
+        {
             return "";
         }
 
         /**
-         * Gets the specified header value as a date in milliseconds since January
-         * 1, 1970 GMT. Returns the defaultValue if no such header field could be found.
+         * Gets the specified header value as a date in milliseconds since
+         * January 1, 1970 GMT. Returns the defaultValue if no such header field
+         * could be found.
          *
          * @param field
          *      the header field name whose value is needed.
          * @param defaultValue
          *      the default value if no field has been found.
          *
-         * @return the value of the specified header field as a date in milliseconds.
+         * @return the value of the specified header field as a date in
+         * milliseconds.
          */
-        long long getHeaderFieldDate(const std::string& field, long long defaultValue) const;
+        long long getHeaderFieldDate(const std::string& field,
+                                     long long          defaultValue) const;
 
         /**
-         * Gets the specified header value as a number. Returns the defaultValue} if no
-         * such header field could be found or the value could not be parsed as an Integer.
+         * Gets the specified header value as a number. Returns the
+         * defaultValue} if no such header field could be found or the value
+         * could not be parsed as an Integer.
          *
          * @param field
          *      the header field name whose value is needed.
@@ -381,57 +403,64 @@ namespace net {
         int getHeaderFieldInt(const std::string& field, int defaultValue) const;
 
         /**
-         * Gets the value of the response header field 'last-modified' or zero if
-         * this value is not set.
+         * Gets the value of the response header field 'last-modified' or zero
+         * if this value is not set.
          *
          * @return the value of the 'last-modified' header field.
          */
         long long getLastModified() const;
 
         /**
-         * Gets an InputStream for reading data from the resource pointed by this
-         * URLConnection.  It throws an UnknownServiceException by default. This method
-         * must be overridden by its subclasses.
+         * Gets an InputStream for reading data from the resource pointed by
+         * this URLConnection.  It throws an UnknownServiceException by default.
+         * This method must be overridden by its subclasses.
          *
          * @return the InputStream to read data from.
          *
          * @throws IOException if no InputStream could be created.
          */
-        virtual decaf::io::InputStream* getInputStream() {
+        virtual decaf::io::InputStream* getInputStream()
+        {
             throw UnknownServiceException(
-                __FILE__, __LINE__, "Does not support writing to the input stream");
+                __FILE__,
+                __LINE__,
+                "Does not support writing to the input stream");
         }
 
         /**
-         * Gets an OutputStream for writing data to this URLConnection. It throws an
-         * UnknownServiceException by default. This method must be overridden by its
-         * subclasses.
+         * Gets an OutputStream for writing data to this URLConnection. It
+         * throws an UnknownServiceException by default. This method must be
+         * overridden by its subclasses.
          *
          * @return the OutputStream to write data.
          *
          * @throws IOException if no OutputStream could be created.
          */
-        virtual decaf::io::OutputStream* getOutputStream() {
+        virtual decaf::io::OutputStream* getOutputStream()
+        {
             throw UnknownServiceException(
-                __FILE__, __LINE__, "Does not support writing to the output stream");
+                __FILE__,
+                __LINE__,
+                "Does not support writing to the output stream");
         }
 
         /**
          * Gets the point of time since when the data must be modified to be
-         * transmitted. Some protocols transmit data only if it has been modified
-         * more recently than a particular time.
+         * transmitted. Some protocols transmit data only if it has been
+         * modified more recently than a particular time.
          *
          * @return the time in milliseconds since January 1, 1970 GMT.
          */
-        long long getIfModifiedSince() const {
+        long long getIfModifiedSince() const
+        {
             return ifModifiedSince;
         }
 
         /**
          * Sets the point of time since when the data must be modified to be
-         * transmitted. Some protocols transmit data only if it has been modified
-         * more recently than a particular time. The data will be transmitted
-         * regardless of its timestamp if this option is set to 0.
+         * transmitted. Some protocols transmit data only if it has been
+         * modified more recently than a particular time. The data will be
+         * transmitted regardless of its timestamp if this option is set to 0.
          *
          * @param newValue
          *      the time in milliseconds since January 1, 1970 GMT.
@@ -441,29 +470,32 @@ namespace net {
         void setIfModifiedSince(long long newValue);
 
     public:
-
         /**
-         * Gets the default setting whether this connection allows user interaction.
+         * Gets the default setting whether this connection allows user
+         * interaction.
          *
          * @return the value of the default setting defaultAllowUserInteraction.
          */
-        static bool getDefaultAllowUserInteraction() {
+        static bool getDefaultAllowUserInteraction()
+        {
             return defaultAllowUserInteraction;
         }
 
         /**
-         * Sets the default value for the flag indicating whether this connection
-         * allows user interaction or not. Existing URLConnections are unaffected.
+         * Sets the default value for the flag indicating whether this
+         * connection allows user interaction or not. Existing URLConnections
+         * are unaffected.
          *
          * @param allows
          *      the default value of the flag to be used for new connections.
          */
-        static void setDefaultAllowUserInteraction(bool allows) {
+        static void setDefaultAllowUserInteraction(bool allows)
+        {
             defaultAllowUserInteraction = allows;
         }
-
     };
 
-}}
+}  // namespace net
+}  // namespace decaf
 
 #endif /* _DECAF_NET_URLCONNECTION_H_ */

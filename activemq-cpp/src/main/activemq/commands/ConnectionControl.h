@@ -20,7 +20,7 @@
 
 // Turn off warning message for ignored exception specification
 #ifdef _MSC_VER
-#pragma warning( disable : 4290 )
+#pragma warning(disable : 4290)
 #endif
 
 #include <activemq/commands/BaseCommand.h>
@@ -29,8 +29,10 @@
 #include <string>
 #include <vector>
 
-namespace activemq {
-namespace commands {
+namespace activemq
+{
+namespace commands
+{
 
     using decaf::lang::Pointer;
 
@@ -43,30 +45,27 @@ namespace commands {
      *         in the activemq-cpp-openwire-generator module
      *
      */
-    class AMQCPP_API ConnectionControl : public BaseCommand {
+    class AMQCPP_API ConnectionControl : public BaseCommand
+    {
     protected:
-
-        bool close;
-        bool exit;
-        bool faultTolerant;
-        bool resume;
-        bool suspend;
-        std::string connectedBrokers;
-        std::string reconnectTo;
-        bool rebalanceConnection;
+        bool                       close;
+        bool                       exit;
+        bool                       faultTolerant;
+        bool                       resume;
+        bool                       suspend;
+        std::string                connectedBrokers;
+        std::string                reconnectTo;
+        bool                       rebalanceConnection;
         std::vector<unsigned char> token;
 
     public:
-
         const static unsigned char ID_CONNECTIONCONTROL = 18;
 
     private:
-
         ConnectionControl(const ConnectionControl&);
-        ConnectionControl& operator= (const ConnectionControl&);
+        ConnectionControl& operator=(const ConnectionControl&);
 
     public:
-
         ConnectionControl();
 
         virtual ~ConnectionControl();
@@ -97,31 +96,32 @@ namespace commands {
         virtual void setSuspend(bool suspend);
 
         virtual const std::string& getConnectedBrokers() const;
-        virtual std::string& getConnectedBrokers();
+        virtual std::string&       getConnectedBrokers();
         virtual void setConnectedBrokers(const std::string& connectedBrokers);
 
         virtual const std::string& getReconnectTo() const;
-        virtual std::string& getReconnectTo();
+        virtual std::string&       getReconnectTo();
         virtual void setReconnectTo(const std::string& reconnectTo);
 
         virtual bool isRebalanceConnection() const;
         virtual void setRebalanceConnection(bool rebalanceConnection);
 
         virtual const std::vector<unsigned char>& getToken() const;
-        virtual std::vector<unsigned char>& getToken();
+        virtual std::vector<unsigned char>&       getToken();
         virtual void setToken(const std::vector<unsigned char>& token);
 
         /**
          * @return an answer of true to the isConnectionControl() query.
          */
-        virtual bool isConnectionControl() const {
+        virtual bool isConnectionControl() const
+        {
             return true;
         }
 
         virtual Pointer<Command> visit(activemq::state::CommandVisitor* visitor);
-
     };
 
-}}
+}  // namespace commands
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_COMMANDS_CONNECTIONCONTROL_H_*/

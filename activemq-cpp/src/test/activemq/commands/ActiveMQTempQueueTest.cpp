@@ -17,35 +17,42 @@
 
 #include <gtest/gtest.h>
 
-#include <decaf/util/UUID.h>
-#include <activemq/commands/ActiveMQTempQueue.h>
 #include <activemq/commands/ActiveMQDestination.h>
+#include <activemq/commands/ActiveMQTempQueue.h>
+#include <decaf/util/UUID.h>
 
 using namespace std;
 using namespace activemq;
 using namespace activemq::util;
 using namespace activemq::commands;
 
-class ActiveMQTempQueueTest : public ::testing::Test {};
+class ActiveMQTempQueueTest : public ::testing::Test
+{
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ActiveMQTempQueueTest, test) {
+TEST_F(ActiveMQTempQueueTest, test)
+{
     ActiveMQTempQueue myQueue;
 
-    ASSERT_TRUE(myQueue.getDestinationType() == cms::Destination::TEMPORARY_QUEUE);
+    ASSERT_TRUE(myQueue.getDestinationType() ==
+                cms::Destination::TEMPORARY_QUEUE);
 
     myQueue.setPhysicalName("ID:SomeValue:0:1");
     std::string connectionId = myQueue.getConnectionId();
 
-    ASSERT_EQ(std::string("ID:SomeValue:0"), myQueue.getConnectionId()) << ("ConnectionId did not parse correctly");
+    ASSERT_EQ(std::string("ID:SomeValue:0"), myQueue.getConnectionId())
+        << ("ConnectionId did not parse correctly");
 
     myQueue.setPhysicalName("");
     myQueue.setPhysicalName("ID:SomeValue:0:A");
     connectionId = myQueue.getConnectionId();
-    ASSERT_EQ(std::string("ID:SomeValue:0"), myQueue.getConnectionId()) << ("ConnectionId should not have parsed");
+    ASSERT_EQ(std::string("ID:SomeValue:0"), myQueue.getConnectionId())
+        << ("ConnectionId should not have parsed");
 
     myQueue.setPhysicalName("");
     myQueue.setPhysicalName("SomeValueThatWillNotParse");
     connectionId = myQueue.getConnectionId();
-    ASSERT_EQ(std::string(""), myQueue.getConnectionId()) << ("ConnectionId should not have parsed");
+    ASSERT_EQ(std::string(""), myQueue.getConnectionId())
+        << ("ConnectionId should not have parsed");
 }

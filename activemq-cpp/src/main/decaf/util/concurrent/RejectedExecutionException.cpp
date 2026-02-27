@@ -23,38 +23,41 @@ using namespace decaf::util::concurrent;
 using namespace decaf::lang;
 
 ////////////////////////////////////////////////////////////////////////////////
-RejectedExecutionException::RejectedExecutionException() : decaf::lang::Exception() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-RejectedExecutionException::RejectedExecutionException(const decaf::lang::Exception& ex) : decaf::lang::Exception() {
-    *(Exception*) this = ex;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-RejectedExecutionException::RejectedExecutionException(const RejectedExecutionException& ex) : decaf::lang::Exception() {
-    *(Exception*) this = ex;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-RejectedExecutionException::RejectedExecutionException(const std::exception* cause) : decaf::lang::Exception(cause) {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-RejectedExecutionException::RejectedExecutionException(const char* file, const int lineNumber, const char* msg, ...) : decaf::lang::Exception() {
-
-    va_list vargs;
-    va_start( vargs, msg);
-    buildMessage(msg, vargs);
-
-    // Set the first mark for this exception.
-    setMark(file, lineNumber);
+RejectedExecutionException::RejectedExecutionException()
+    : decaf::lang::Exception()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 RejectedExecutionException::RejectedExecutionException(
-    const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...) : decaf::lang::Exception(cause) {
+    const decaf::lang::Exception& ex)
+    : decaf::lang::Exception()
+{
+    *(Exception*)this = ex;
+}
 
+////////////////////////////////////////////////////////////////////////////////
+RejectedExecutionException::RejectedExecutionException(
+    const RejectedExecutionException& ex)
+    : decaf::lang::Exception()
+{
+    *(Exception*)this = ex;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+RejectedExecutionException::RejectedExecutionException(
+    const std::exception* cause)
+    : decaf::lang::Exception(cause)
+{
+}
+
+////////////////////////////////////////////////////////////////////////////////
+RejectedExecutionException::RejectedExecutionException(const char* file,
+                                                       const int   lineNumber,
+                                                       const char* msg,
+                                                       ...)
+    : decaf::lang::Exception()
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -64,10 +67,29 @@ RejectedExecutionException::RejectedExecutionException(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-RejectedExecutionException::~RejectedExecutionException() throw () {
+RejectedExecutionException::RejectedExecutionException(
+    const char*           file,
+    const int             lineNumber,
+    const std::exception* cause,
+    const char*           msg,
+    ...)
+    : decaf::lang::Exception(cause)
+{
+    va_list vargs;
+    va_start(vargs, msg);
+    buildMessage(msg, vargs);
+
+    // Set the first mark for this exception.
+    setMark(file, lineNumber);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-RejectedExecutionException* RejectedExecutionException::clone() const {
+RejectedExecutionException::~RejectedExecutionException() throw()
+{
+}
+
+////////////////////////////////////////////////////////////////////////////////
+RejectedExecutionException* RejectedExecutionException::clone() const
+{
     return new RejectedExecutionException(*this);
 }

@@ -20,66 +20,77 @@
 
 #include <decaf/util/Config.h>
 
-namespace decaf {
-namespace internal {
-namespace util {
+namespace decaf
+{
+namespace internal
+{
+    namespace util
+    {
 
-    class StringUtils {
-    private:
+        class StringUtils
+        {
+        private:
+            StringUtils(const StringUtils&);
+            StringUtils operator=(const StringUtils&);
 
-        StringUtils(const StringUtils&);
-        StringUtils operator= (const StringUtils&);
+        private:
+            StringUtils()
+            {
+            }
 
-    private:
+        public:
+            virtual ~StringUtils()
+            {
+            }
 
-        StringUtils() {}
+            /**
+             * Returns the length of the given C string.
+             *
+             * @param string
+             *      The C style string to check.
+             *
+             * @return the length of the string if the size is <
+             * Integer::MAX_VALUE.
+             *
+             * @throws RuntimeException if the length becomes larger than
+             *         the max value of an int.
+             */
+            static int stringLength(const char* string);
 
-    public:
+            /**
+             * Perform a comparison between two strings using natural ordering
+             * and ignoring case.
+             *
+             * @param left
+             *      The left-hand string of the comparison.
+             * @param right
+             *      The right-hand string of the comparison.
+             *
+             * @return a negative integer, zero, or a positive integer as the
+             * specified string is greater than, equal to, or less than this
+             * String, ignoring case considerations.
+             */
+            static int compareIgnoreCase(const char* left, const char* right);
 
-        virtual ~StringUtils() {}
+            /**
+             * Perform a comparison between two strings using natural ordering
+             * case is not ignored here, so two otherwise equal string will not
+             * match if case differes.
+             *
+             * @param left
+             *      The left-hand string of the comparison.
+             * @param right
+             *      The right-hand string of the comparison.
+             *
+             * @return a negative integer, zero, or a positive integer as the
+             * specified string is greater than, equal to, or less than this
+             * String, ignoring case considerations.
+             */
+            static int compare(const char* left, const char* right);
+        };
 
-        /**
-         * Returns the length of the given C string.
-         *
-         * @param string
-         *      The C style string to check.
-         *
-         * @return the length of the string if the size is < Integer::MAX_VALUE.
-         *
-         * @throws RuntimeException if the length becomes larger than
-         *         the max value of an int.
-         */
-        static int stringLength(const char* string);
-
-        /**
-         * Perform a comparison between two strings using natural ordering and ignoring case.
-         *
-         * @param left
-         *      The left-hand string of the comparison.
-         * @param right
-         *      The right-hand string of the comparison.
-         *
-         * @return a negative integer, zero, or a positive integer as the specified string
-         *          is greater than, equal to, or less than this String, ignoring case considerations.
-         */
-        static int compareIgnoreCase(const char* left, const char* right);
-
-        /**
-         * Perform a comparison between two strings using natural ordering case is not ignored
-         * here, so two otherwise equal string will not match if case differes.
-         *
-         * @param left
-         *      The left-hand string of the comparison.
-         * @param right
-         *      The right-hand string of the comparison.
-         *
-         * @return a negative integer, zero, or a positive integer as the specified string
-         *          is greater than, equal to, or less than this String, ignoring case considerations.
-         */
-        static int compare(const char* left, const char* right);
-
-    };
-
-}}}
+    }  // namespace util
+}  // namespace internal
+}  // namespace decaf
 
 #endif /* _DECAF_INTERNAL_UTIL_STRINGUTILS_H_ */

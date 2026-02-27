@@ -22,30 +22,46 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-UnsupportedOperationException::UnsupportedOperationException() : Exception() {
+UnsupportedOperationException::UnsupportedOperationException()
+    : Exception()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-UnsupportedOperationException::~UnsupportedOperationException() throw () {
+UnsupportedOperationException::~UnsupportedOperationException() throw()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-UnsupportedOperationException::UnsupportedOperationException(const Exception& ex) : Exception() {
-    *(Exception*) this = ex;
+UnsupportedOperationException::UnsupportedOperationException(const Exception& ex)
+    : Exception()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-UnsupportedOperationException::UnsupportedOperationException(const UnsupportedOperationException& ex) : Exception() {
-    *(Exception*) this = ex;
+UnsupportedOperationException::UnsupportedOperationException(
+    const UnsupportedOperationException& ex)
+    : Exception()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-UnsupportedOperationException::UnsupportedOperationException(const std::exception* cause) : Exception(cause) {
+UnsupportedOperationException::UnsupportedOperationException(
+    const std::exception* cause)
+    : Exception(cause)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-UnsupportedOperationException::UnsupportedOperationException(const char* file, const int lineNumber, const char* msg, ...) : Exception() {
-
+UnsupportedOperationException::UnsupportedOperationException(
+    const char* file,
+    const int   lineNumber,
+    const char* msg,
+    ...)
+    : Exception()
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -55,8 +71,14 @@ UnsupportedOperationException::UnsupportedOperationException(const char* file, c
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-UnsupportedOperationException::UnsupportedOperationException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...) : Exception(cause) {
-
+UnsupportedOperationException::UnsupportedOperationException(
+    const char*           file,
+    const int             lineNumber,
+    const std::exception* cause,
+    const char*           msg,
+    ...)
+    : Exception(cause)
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);

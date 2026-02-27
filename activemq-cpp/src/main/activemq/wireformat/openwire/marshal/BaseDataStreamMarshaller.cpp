@@ -15,19 +15,19 @@
  * limitations under the License.
  */
 
-#include <activemq/wireformat/openwire/marshal/BaseDataStreamMarshaller.h>
-#include <activemq/wireformat/openwire/utils/HexTable.h>
+#include <activemq/commands/BrokerError.h>
+#include <activemq/commands/LocalTransactionId.h>
 #include <activemq/commands/MessageId.h>
 #include <activemq/commands/ProducerId.h>
 #include <activemq/commands/TransactionId.h>
-#include <activemq/commands/LocalTransactionId.h>
 #include <activemq/commands/XATransactionId.h>
-#include <activemq/commands/BrokerError.h>
 #include <activemq/exceptions/ActiveMQException.h>
-#include <decaf/lang/Long.h>
-#include <decaf/lang/Integer.h>
-#include <decaf/lang/Pointer.h>
 #include <activemq/util/Config.h>
+#include <activemq/wireformat/openwire/marshal/BaseDataStreamMarshaller.h>
+#include <activemq/wireformat/openwire/utils/HexTable.h>
+#include <decaf/lang/Integer.h>
+#include <decaf/lang/Long.h>
+#include <decaf/lang/Pointer.h>
 
 using namespace std;
 using namespace activemq;
@@ -46,8 +46,13 @@ using namespace decaf::lang;
 utils::HexTable BaseDataStreamMarshaller::hexTable;
 
 ////////////////////////////////////////////////////////////////////////////////
-commands::DataStructure* BaseDataStreamMarshaller::tightUnmarshalCachedObject(OpenWireFormat* wireFormat, decaf::io::DataInputStream* dataIn,utils::BooleanStream* bs) {
-    try {
+commands::DataStructure* BaseDataStreamMarshaller::tightUnmarshalCachedObject(
+    OpenWireFormat*             wireFormat,
+    decaf::io::DataInputStream* dataIn,
+    utils::BooleanStream*       bs)
+{
+    try
+    {
         return wireFormat->tightUnmarshalNestedObject(dataIn, bs);
     }
     AMQ_CATCH_RETHROW(IOException)
@@ -56,8 +61,13 @@ commands::DataStructure* BaseDataStreamMarshaller::tightUnmarshalCachedObject(Op
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int BaseDataStreamMarshaller::tightMarshalCachedObject1(OpenWireFormat* wireFormat, commands::DataStructure* data, utils::BooleanStream* bs) {
-    try {
+int BaseDataStreamMarshaller::tightMarshalCachedObject1(
+    OpenWireFormat*          wireFormat,
+    commands::DataStructure* data,
+    utils::BooleanStream*    bs)
+{
+    try
+    {
         return wireFormat->tightMarshalNestedObject1(data, bs);
     }
     AMQ_CATCH_RETHROW(IOException)
@@ -66,8 +76,14 @@ int BaseDataStreamMarshaller::tightMarshalCachedObject1(OpenWireFormat* wireForm
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BaseDataStreamMarshaller::tightMarshalCachedObject2(OpenWireFormat* wireFormat, commands::DataStructure* data, decaf::io::DataOutputStream* dataOut,utils::BooleanStream* bs) {
-    try {
+void BaseDataStreamMarshaller::tightMarshalCachedObject2(
+    OpenWireFormat*              wireFormat,
+    commands::DataStructure*     data,
+    decaf::io::DataOutputStream* dataOut,
+    utils::BooleanStream*        bs)
+{
+    try
+    {
         wireFormat->tightMarshalNestedObject2(data, dataOut, bs);
     }
     AMQ_CATCH_RETHROW(IOException)
@@ -76,8 +92,13 @@ void BaseDataStreamMarshaller::tightMarshalCachedObject2(OpenWireFormat* wireFor
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BaseDataStreamMarshaller::looseMarshalCachedObject(OpenWireFormat* wireFormat, commands::DataStructure* data, decaf::io::DataOutputStream* dataOut) {
-    try {
+void BaseDataStreamMarshaller::looseMarshalCachedObject(
+    OpenWireFormat*              wireFormat,
+    commands::DataStructure*     data,
+    decaf::io::DataOutputStream* dataOut)
+{
+    try
+    {
         wireFormat->looseMarshalNestedObject(data, dataOut);
     }
     AMQ_CATCH_RETHROW(IOException)
@@ -86,8 +107,12 @@ void BaseDataStreamMarshaller::looseMarshalCachedObject(OpenWireFormat* wireForm
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-commands::DataStructure* BaseDataStreamMarshaller::looseUnmarshalCachedObject(OpenWireFormat* wireFormat, decaf::io::DataInputStream* dataIn) {
-    try {
+commands::DataStructure* BaseDataStreamMarshaller::looseUnmarshalCachedObject(
+    OpenWireFormat*             wireFormat,
+    decaf::io::DataInputStream* dataIn)
+{
+    try
+    {
         return wireFormat->looseUnmarshalNestedObject(dataIn);
     }
     AMQ_CATCH_RETHROW(IOException)
@@ -96,8 +121,13 @@ commands::DataStructure* BaseDataStreamMarshaller::looseUnmarshalCachedObject(Op
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int BaseDataStreamMarshaller::tightMarshalNestedObject1(OpenWireFormat* wireFormat, commands::DataStructure* object, utils::BooleanStream* bs) {
-    try {
+int BaseDataStreamMarshaller::tightMarshalNestedObject1(
+    OpenWireFormat*          wireFormat,
+    commands::DataStructure* object,
+    utils::BooleanStream*    bs)
+{
+    try
+    {
         return wireFormat->tightMarshalNestedObject1(object, bs);
     }
     AMQ_CATCH_RETHROW(IOException)
@@ -106,8 +136,14 @@ int BaseDataStreamMarshaller::tightMarshalNestedObject1(OpenWireFormat* wireForm
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BaseDataStreamMarshaller::tightMarshalNestedObject2(OpenWireFormat* wireFormat, commands::DataStructure* object, decaf::io::DataOutputStream* dataOut, utils::BooleanStream* bs) {
-    try {
+void BaseDataStreamMarshaller::tightMarshalNestedObject2(
+    OpenWireFormat*              wireFormat,
+    commands::DataStructure*     object,
+    decaf::io::DataOutputStream* dataOut,
+    utils::BooleanStream*        bs)
+{
+    try
+    {
         wireFormat->tightMarshalNestedObject2(object, dataOut, bs);
     }
     AMQ_CATCH_RETHROW(IOException)
@@ -116,8 +152,13 @@ void BaseDataStreamMarshaller::tightMarshalNestedObject2(OpenWireFormat* wireFor
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-commands::DataStructure* BaseDataStreamMarshaller::tightUnmarshalNestedObject(OpenWireFormat* wireFormat, decaf::io::DataInputStream* dataIn,utils::BooleanStream* bs) {
-    try {
+commands::DataStructure* BaseDataStreamMarshaller::tightUnmarshalNestedObject(
+    OpenWireFormat*             wireFormat,
+    decaf::io::DataInputStream* dataIn,
+    utils::BooleanStream*       bs)
+{
+    try
+    {
         return wireFormat->tightUnmarshalNestedObject(dataIn, bs);
     }
     AMQ_CATCH_RETHROW(IOException)
@@ -126,9 +167,12 @@ commands::DataStructure* BaseDataStreamMarshaller::tightUnmarshalNestedObject(Op
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-commands::DataStructure* BaseDataStreamMarshaller::looseUnmarshalNestedObject(OpenWireFormat* wireFormat, decaf::io::DataInputStream* dataIn) {
-
-    try {
+commands::DataStructure* BaseDataStreamMarshaller::looseUnmarshalNestedObject(
+    OpenWireFormat*             wireFormat,
+    decaf::io::DataInputStream* dataIn)
+{
+    try
+    {
         return wireFormat->looseUnmarshalNestedObject(dataIn);
     }
     AMQ_CATCH_RETHROW(IOException)
@@ -137,9 +181,13 @@ commands::DataStructure* BaseDataStreamMarshaller::looseUnmarshalNestedObject(Op
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BaseDataStreamMarshaller::looseMarshalNestedObject(OpenWireFormat* wireFormat, commands::DataStructure* object, decaf::io::DataOutputStream* dataOut) {
-
-    try {
+void BaseDataStreamMarshaller::looseMarshalNestedObject(
+    OpenWireFormat*              wireFormat,
+    commands::DataStructure*     object,
+    decaf::io::DataOutputStream* dataOut)
+{
+    try
+    {
         wireFormat->looseMarshalNestedObject(object, dataOut);
     }
     AMQ_CATCH_RETHROW(IOException)
@@ -148,17 +196,25 @@ void BaseDataStreamMarshaller::looseMarshalNestedObject(OpenWireFormat* wireForm
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string BaseDataStreamMarshaller::tightUnmarshalString(decaf::io::DataInputStream* dataIn, utils::BooleanStream* bs) {
-
-    try {
-
-        if (bs->readBoolean()) {
-            if (bs->readBoolean()) {
+std::string BaseDataStreamMarshaller::tightUnmarshalString(
+    decaf::io::DataInputStream* dataIn,
+    utils::BooleanStream*       bs)
+{
+    try
+    {
+        if (bs->readBoolean())
+        {
+            if (bs->readBoolean())
+            {
                 return this->readAsciiString(dataIn);
-            } else {
+            }
+            else
+            {
                 return dataIn->readUTF();
             }
-        } else {
+        }
+        else
+        {
             return "";
         }
     }
@@ -168,40 +224,54 @@ std::string BaseDataStreamMarshaller::tightUnmarshalString(decaf::io::DataInputS
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int BaseDataStreamMarshaller::tightMarshalString1(const std::string& value, utils::BooleanStream* bs) {
-    try {
-
+int BaseDataStreamMarshaller::tightMarshalString1(const std::string&    value,
+                                                  utils::BooleanStream* bs)
+{
+    try
+    {
         bs->writeBoolean(value != "");
-        if (value != "") {
+        if (value != "")
+        {
             size_t strlen = value.length();
 
-            int utflen = 0;
-            int c = 0;
+            int  utflen      = 0;
+            int  c           = 0;
             bool isOnlyAscii = true;
 
-            for (size_t i = 0; i < strlen; ++i) {
-
+            for (size_t i = 0; i < strlen; ++i)
+            {
                 c = value[i];
-                if ((c >= 0x0001) && (c <= 0x007F)) { // ASCII char
+                if ((c >= 0x0001) && (c <= 0x007F))
+                {  // ASCII char
                     utflen++;
-                } else if (c > 0x07FF) {
+                }
+                else if (c > 0x07FF)
+                {
                     utflen += 3;
                     isOnlyAscii = false;
-                } else {
+                }
+                else
+                {
                     isOnlyAscii = false;
                     utflen += 2;
                 }
             }
 
-            if (utflen >= 0x10000) {
-                throw IOException(__FILE__, __LINE__, "BaseDataStreamMarshaller::tightMarshalString1 - "
-                        "Encountered a String value that is too long to encode.");
+            if (utflen >= 0x10000)
+            {
+                throw IOException(
+                    __FILE__,
+                    __LINE__,
+                    "BaseDataStreamMarshaller::tightMarshalString1 - "
+                    "Encountered a String value that is too long to encode.");
             }
 
             bs->writeBoolean(isOnlyAscii);
 
             return utflen + 2;
-        } else {
+        }
+        else
+        {
             return 0;
         }
     }
@@ -211,16 +281,23 @@ int BaseDataStreamMarshaller::tightMarshalString1(const std::string& value, util
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BaseDataStreamMarshaller::tightMarshalString2(const std::string& value, decaf::io::DataOutputStream* dataOut, utils::BooleanStream* bs) {
-
-    try {
-
-        if (bs->readBoolean()) {
+void BaseDataStreamMarshaller::tightMarshalString2(
+    const std::string&           value,
+    decaf::io::DataOutputStream* dataOut,
+    utils::BooleanStream*        bs)
+{
+    try
+    {
+        if (bs->readBoolean())
+        {
             // If we verified it only holds ascii values
-            if (bs->readBoolean()) {
-                dataOut->writeShort((short) value.length());
+            if (bs->readBoolean())
+            {
+                dataOut->writeShort((short)value.length());
                 dataOut->writeBytes(value);
-            } else {
+            }
+            else
+            {
                 dataOut->writeUTF(value);
             }
         }
@@ -231,11 +308,15 @@ void BaseDataStreamMarshaller::tightMarshalString2(const std::string& value, dec
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BaseDataStreamMarshaller::looseMarshalString(const std::string value, decaf::io::DataOutputStream* dataOut) {
-
-    try {
+void BaseDataStreamMarshaller::looseMarshalString(
+    const std::string            value,
+    decaf::io::DataOutputStream* dataOut)
+{
+    try
+    {
         dataOut->writeBoolean(value != "");
-        if (value != "") {
+        if (value != "")
+        {
             dataOut->writeUTF(value);
         }
     }
@@ -245,12 +326,17 @@ void BaseDataStreamMarshaller::looseMarshalString(const std::string value, decaf
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string BaseDataStreamMarshaller::looseUnmarshalString(decaf::io::DataInputStream* dataIn) {
-
-    try {
-        if (dataIn->readBoolean()) {
+std::string BaseDataStreamMarshaller::looseUnmarshalString(
+    decaf::io::DataInputStream* dataIn)
+{
+    try
+    {
+        if (dataIn->readBoolean())
+        {
             return dataIn->readUTF();
-        } else {
+        }
+        else
+        {
             return "";
         }
     }
@@ -260,28 +346,36 @@ std::string BaseDataStreamMarshaller::looseUnmarshalString(decaf::io::DataInputS
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int BaseDataStreamMarshaller::tightMarshalLong1(OpenWireFormat* wireFormat AMQCPP_UNUSED, long long value, utils::BooleanStream* bs) {
-
-    try {
-
-        if (value == 0L) {
-
+int BaseDataStreamMarshaller::tightMarshalLong1(OpenWireFormat* wireFormat
+                                                          AMQCPP_UNUSED,
+                                                long long value,
+                                                utils::BooleanStream* bs)
+{
+    try
+    {
+        if (value == 0L)
+        {
             bs->writeBoolean(false);
             bs->writeBoolean(false);
             return 0;
-
-        } else {
-
-            unsigned long long ul = (unsigned long long) value;
-            if ((ul & 0xFFFFFFFFFFFF0000ULL) == 0ULL) {
+        }
+        else
+        {
+            unsigned long long ul = (unsigned long long)value;
+            if ((ul & 0xFFFFFFFFFFFF0000ULL) == 0ULL)
+            {
                 bs->writeBoolean(false);
                 bs->writeBoolean(true);
                 return 2;
-            } else if ((ul & 0xFFFFFFFF00000000ULL) == 0ULL) {
+            }
+            else if ((ul & 0xFFFFFFFF00000000ULL) == 0ULL)
+            {
                 bs->writeBoolean(true);
                 bs->writeBoolean(false);
                 return 4;
-            } else {
+            }
+            else
+            {
                 bs->writeBoolean(true);
                 bs->writeBoolean(true);
                 return 8;
@@ -294,22 +388,30 @@ int BaseDataStreamMarshaller::tightMarshalLong1(OpenWireFormat* wireFormat AMQCP
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BaseDataStreamMarshaller::tightMarshalLong2(OpenWireFormat* wireFormat AMQCPP_UNUSED, long long value, decaf::io::DataOutputStream* dataOut,
-        utils::BooleanStream* bs) {
-    try {
-
-        if (bs->readBoolean()) {
-
-            if (bs->readBoolean()) {
+void BaseDataStreamMarshaller::tightMarshalLong2(
+    OpenWireFormat* wireFormat   AMQCPP_UNUSED,
+    long long                    value,
+    decaf::io::DataOutputStream* dataOut,
+    utils::BooleanStream*        bs)
+{
+    try
+    {
+        if (bs->readBoolean())
+        {
+            if (bs->readBoolean())
+            {
                 dataOut->writeLong(value);
-            } else {
-                dataOut->writeInt((int) value);
             }
-
-        } else {
-
-            if (bs->readBoolean()) {
-                dataOut->writeShort((short) value);
+            else
+            {
+                dataOut->writeInt((int)value);
+            }
+        }
+        else
+        {
+            if (bs->readBoolean())
+            {
+                dataOut->writeShort((short)value);
             }
         }
     }
@@ -319,22 +421,32 @@ void BaseDataStreamMarshaller::tightMarshalLong2(OpenWireFormat* wireFormat AMQC
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-long long BaseDataStreamMarshaller::tightUnmarshalLong(OpenWireFormat* wireFormat AMQCPP_UNUSED, decaf::io::DataInputStream* dataIn, utils::BooleanStream* bs) {
-
-    try {
-        if (bs->readBoolean()) {
-
-            if (bs->readBoolean()) {
+long long BaseDataStreamMarshaller::tightUnmarshalLong(
+    OpenWireFormat* wireFormat  AMQCPP_UNUSED,
+    decaf::io::DataInputStream* dataIn,
+    utils::BooleanStream*       bs)
+{
+    try
+    {
+        if (bs->readBoolean())
+        {
+            if (bs->readBoolean())
+            {
                 return dataIn->readLong();
-            } else {
-                return (unsigned int) dataIn->readInt();
             }
-
-        } else {
-
-            if (bs->readBoolean()) {
+            else
+            {
+                return (unsigned int)dataIn->readInt();
+            }
+        }
+        else
+        {
+            if (bs->readBoolean())
+            {
                 return dataIn->readUnsignedShort();
-            } else {
+            }
+            else
+            {
                 return 0;
             }
         }
@@ -345,9 +457,13 @@ long long BaseDataStreamMarshaller::tightUnmarshalLong(OpenWireFormat* wireForma
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BaseDataStreamMarshaller::looseMarshalLong(OpenWireFormat* wireFormat AMQCPP_UNUSED, long long value, decaf::io::DataOutputStream* dataOut) {
-
-    try {
+void BaseDataStreamMarshaller::looseMarshalLong(
+    OpenWireFormat* wireFormat   AMQCPP_UNUSED,
+    long long                    value,
+    decaf::io::DataOutputStream* dataOut)
+{
+    try
+    {
         dataOut->writeLong(value);
     }
     AMQ_CATCH_RETHROW(IOException)
@@ -356,9 +472,12 @@ void BaseDataStreamMarshaller::looseMarshalLong(OpenWireFormat* wireFormat AMQCP
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-long long BaseDataStreamMarshaller::looseUnmarshalLong(OpenWireFormat* wireFormat AMQCPP_UNUSED, decaf::io::DataInputStream* dataIn) {
-
-    try {
+long long BaseDataStreamMarshaller::looseUnmarshalLong(
+    OpenWireFormat* wireFormat  AMQCPP_UNUSED,
+    decaf::io::DataInputStream* dataIn)
+{
+    try
+    {
         return dataIn->readLong();
     }
     AMQ_CATCH_RETHROW(IOException)
@@ -367,39 +486,47 @@ long long BaseDataStreamMarshaller::looseUnmarshalLong(OpenWireFormat* wireForma
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-commands::DataStructure* BaseDataStreamMarshaller::tightUnmarshalBrokerError(OpenWireFormat* wireFormat, decaf::io::DataInputStream* dataIn,utils::BooleanStream* bs) {
-
-    try {
-
-        if (bs->readBoolean()) {
-
+commands::DataStructure* BaseDataStreamMarshaller::tightUnmarshalBrokerError(
+    OpenWireFormat*             wireFormat,
+    decaf::io::DataInputStream* dataIn,
+    utils::BooleanStream*       bs)
+{
+    try
+    {
+        if (bs->readBoolean())
+        {
             std::unique_ptr<BrokerError> answer(new BrokerError());
 
             answer->setExceptionClass(tightUnmarshalString(dataIn, bs));
             answer->setMessage(tightUnmarshalString(dataIn, bs));
 
-            if (wireFormat->isStackTraceEnabled()) {
+            if (wireFormat->isStackTraceEnabled())
+            {
                 short length = dataIn->readShort();
-                std::vector<Pointer<BrokerError::StackTraceElement> > stackTrace;
+                std::vector<Pointer<BrokerError::StackTraceElement>> stackTrace;
 
-                for (int i = 0; i < length; ++i) {
+                for (int i = 0; i < length; ++i)
+                {
+                    Pointer<BrokerError::StackTraceElement> element(
+                        new BrokerError::StackTraceElement);
 
-                    Pointer<BrokerError::StackTraceElement> element(new BrokerError::StackTraceElement);
-
-                    element->ClassName = tightUnmarshalString(dataIn, bs);
+                    element->ClassName  = tightUnmarshalString(dataIn, bs);
                     element->MethodName = tightUnmarshalString(dataIn, bs);
-                    element->FileName = tightUnmarshalString(dataIn, bs);
+                    element->FileName   = tightUnmarshalString(dataIn, bs);
                     element->LineNumber = dataIn->readInt();
                     stackTrace.push_back(element);
                 }
 
                 answer->setStackTraceElements(stackTrace);
-                answer->setCause(Pointer<BrokerError>(dynamic_cast<BrokerError*>(tightUnmarshalBrokerError(wireFormat, dataIn, bs))));
+                answer->setCause(
+                    Pointer<BrokerError>(dynamic_cast<BrokerError*>(
+                        tightUnmarshalBrokerError(wireFormat, dataIn, bs))));
             }
 
             return answer.release();
-
-        } else {
+        }
+        else
+        {
             return NULL;
         }
     }
@@ -409,37 +536,45 @@ commands::DataStructure* BaseDataStreamMarshaller::tightUnmarshalBrokerError(Ope
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int BaseDataStreamMarshaller::tightMarshalBrokerError1(OpenWireFormat* wireFormat, commands::DataStructure* data, utils::BooleanStream* bs) {
-
-    try {
-
+int BaseDataStreamMarshaller::tightMarshalBrokerError1(
+    OpenWireFormat*          wireFormat,
+    commands::DataStructure* data,
+    utils::BooleanStream*    bs)
+{
+    try
+    {
         BrokerError* error = dynamic_cast<BrokerError*>(data);
 
-        if (error == NULL) {
-
+        if (error == NULL)
+        {
             bs->writeBoolean(false);
             return 0;
-
-        } else {
-
+        }
+        else
+        {
             int rc = 0;
             bs->writeBoolean(true);
             rc += tightMarshalString1(error->getExceptionClass(), bs);
             rc += tightMarshalString1(error->getMessage(), bs);
 
-            if (wireFormat->isStackTraceEnabled()) {
-
+            if (wireFormat->isStackTraceEnabled())
+            {
                 rc += 2;
 
-                for (unsigned int i = 0; i < error->getStackTraceElements().size(); ++i) {
-
-                    const Pointer<BrokerError::StackTraceElement> element = error->getStackTraceElements()[i];
+                for (unsigned int i = 0;
+                     i < error->getStackTraceElements().size();
+                     ++i)
+                {
+                    const Pointer<BrokerError::StackTraceElement> element =
+                        error->getStackTraceElements()[i];
                     rc += tightMarshalString1(element->ClassName, bs);
                     rc += tightMarshalString1(element->MethodName, bs);
                     rc += tightMarshalString1(element->FileName, bs);
                     rc += 4;
                 }
-                rc += tightMarshalBrokerError1(wireFormat, error->getCause().get(), bs);
+                rc += tightMarshalBrokerError1(wireFormat,
+                                               error->getCause().get(),
+                                               bs);
             }
 
             return rc;
@@ -451,26 +586,30 @@ int BaseDataStreamMarshaller::tightMarshalBrokerError1(OpenWireFormat* wireForma
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BaseDataStreamMarshaller::tightMarshalBrokerError2(OpenWireFormat* wireFormat, commands::DataStructure* data, decaf::io::DataOutputStream* dataOut,
-        utils::BooleanStream* bs) {
-
-    try {
-
-        if (bs->readBoolean()) {
-
+void BaseDataStreamMarshaller::tightMarshalBrokerError2(
+    OpenWireFormat*              wireFormat,
+    commands::DataStructure*     data,
+    decaf::io::DataOutputStream* dataOut,
+    utils::BooleanStream*        bs)
+{
+    try
+    {
+        if (bs->readBoolean())
+        {
             BrokerError* error = dynamic_cast<BrokerError*>(data);
 
             tightMarshalString2(error->getExceptionClass(), dataOut, bs);
             tightMarshalString2(error->getMessage(), dataOut, bs);
 
-            if (wireFormat->isStackTraceEnabled()) {
+            if (wireFormat->isStackTraceEnabled())
+            {
+                int length = (short)error->getStackTraceElements().size();
+                dataOut->writeShort((short)length);
 
-                int length = (short) error->getStackTraceElements().size();
-                dataOut->writeShort((short) length);
-
-                for (int i = 0; i < length; ++i) {
-
-                    Pointer<BrokerError::StackTraceElement> element = error->getStackTraceElements()[i];
+                for (int i = 0; i < length; ++i)
+                {
+                    Pointer<BrokerError::StackTraceElement> element =
+                        error->getStackTraceElements()[i];
 
                     tightMarshalString2(element->ClassName, dataOut, bs);
                     tightMarshalString2(element->MethodName, dataOut, bs);
@@ -478,7 +617,10 @@ void BaseDataStreamMarshaller::tightMarshalBrokerError2(OpenWireFormat* wireForm
                     dataOut->writeInt(element->LineNumber);
                 }
 
-                tightMarshalBrokerError2(wireFormat, error->getCause().get(), dataOut, bs);
+                tightMarshalBrokerError2(wireFormat,
+                                         error->getCause().get(),
+                                         dataOut,
+                                         bs);
             }
         }
     }
@@ -488,39 +630,46 @@ void BaseDataStreamMarshaller::tightMarshalBrokerError2(OpenWireFormat* wireForm
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-commands::DataStructure* BaseDataStreamMarshaller::looseUnmarshalBrokerError(OpenWireFormat* wireFormat, decaf::io::DataInputStream* dataIn) {
-
-    try {
-
-        if (dataIn->readBoolean()) {
-
+commands::DataStructure* BaseDataStreamMarshaller::looseUnmarshalBrokerError(
+    OpenWireFormat*             wireFormat,
+    decaf::io::DataInputStream* dataIn)
+{
+    try
+    {
+        if (dataIn->readBoolean())
+        {
             std::unique_ptr<BrokerError> answer(new BrokerError());
 
             answer->setExceptionClass(looseUnmarshalString(dataIn));
             answer->setMessage(looseUnmarshalString(dataIn));
 
-            if (wireFormat->isStackTraceEnabled()) {
-
+            if (wireFormat->isStackTraceEnabled())
+            {
                 short length = dataIn->readShort();
-                std::vector<Pointer<BrokerError::StackTraceElement> > stackTrace;
+                std::vector<Pointer<BrokerError::StackTraceElement>> stackTrace;
 
-                for (int i = 0; i < length; ++i) {
+                for (int i = 0; i < length; ++i)
+                {
+                    Pointer<BrokerError::StackTraceElement> element(
+                        new BrokerError::StackTraceElement);
 
-                    Pointer<BrokerError::StackTraceElement> element(new BrokerError::StackTraceElement);
-
-                    element->ClassName = looseUnmarshalString(dataIn);
+                    element->ClassName  = looseUnmarshalString(dataIn);
                     element->MethodName = looseUnmarshalString(dataIn);
-                    element->FileName = looseUnmarshalString(dataIn);
+                    element->FileName   = looseUnmarshalString(dataIn);
                     element->LineNumber = dataIn->readInt();
 
                     stackTrace.push_back(element);
                 }
                 answer->setStackTraceElements(stackTrace);
-                answer->setCause(Pointer<BrokerError>(dynamic_cast<BrokerError*>(looseUnmarshalBrokerError(wireFormat, dataIn))));
+                answer->setCause(
+                    Pointer<BrokerError>(dynamic_cast<BrokerError*>(
+                        looseUnmarshalBrokerError(wireFormat, dataIn))));
             }
 
             return answer.release();
-        } else {
+        }
+        else
+        {
             return NULL;
         }
     }
@@ -530,28 +679,32 @@ commands::DataStructure* BaseDataStreamMarshaller::looseUnmarshalBrokerError(Ope
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BaseDataStreamMarshaller::looseMarshalBrokerError(OpenWireFormat* wireFormat, commands::DataStructure* data, decaf::io::DataOutputStream* dataOut) {
-
-    try {
-
+void BaseDataStreamMarshaller::looseMarshalBrokerError(
+    OpenWireFormat*              wireFormat,
+    commands::DataStructure*     data,
+    decaf::io::DataOutputStream* dataOut)
+{
+    try
+    {
         BrokerError* error = dynamic_cast<BrokerError*>(data);
 
         dataOut->write(error != NULL);
 
-        if (error != NULL) {
-
+        if (error != NULL)
+        {
             looseMarshalString(error->getExceptionClass(), dataOut);
             looseMarshalString(error->getMessage(), dataOut);
 
-            if (wireFormat->isStackTraceEnabled()) {
-
+            if (wireFormat->isStackTraceEnabled())
+            {
                 size_t length = error->getStackTraceElements().size();
 
-                dataOut->writeShort((short) length);
+                dataOut->writeShort((short)length);
 
-                for (size_t i = 0; i < length; ++i) {
-
-                    Pointer<BrokerError::StackTraceElement> element(error->getStackTraceElements()[i]);
+                for (size_t i = 0; i < length; ++i)
+                {
+                    Pointer<BrokerError::StackTraceElement> element(
+                        error->getStackTraceElements()[i]);
 
                     looseMarshalString(element->ClassName, dataOut);
                     looseMarshalString(element->MethodName, dataOut);
@@ -560,7 +713,9 @@ void BaseDataStreamMarshaller::looseMarshalBrokerError(OpenWireFormat* wireForma
                     dataOut->writeInt(element->LineNumber);
                 }
 
-                looseMarshalBrokerError(wireFormat, error->getCause().get(), dataOut);
+                looseMarshalBrokerError(wireFormat,
+                                        error->getCause().get(),
+                                        dataOut);
             }
         }
     }
@@ -570,16 +725,20 @@ void BaseDataStreamMarshaller::looseMarshalBrokerError(OpenWireFormat* wireForma
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::vector<unsigned char> BaseDataStreamMarshaller::tightUnmarshalByteArray(decaf::io::DataInputStream* dataIn, utils::BooleanStream* bs) {
-
-    try {
-
+std::vector<unsigned char> BaseDataStreamMarshaller::tightUnmarshalByteArray(
+    decaf::io::DataInputStream* dataIn,
+    utils::BooleanStream*       bs)
+{
+    try
+    {
         std::vector<unsigned char> data;
-        if (bs->readBoolean()) {
+        if (bs->readBoolean())
+        {
             int size = dataIn->readInt();
-            if (size > 0) {
+            if (size > 0)
+            {
                 data.resize(size);
-                dataIn->readFully(&data[0], (int) data.size());
+                dataIn->readFully(&data[0], (int)data.size());
             }
         }
 
@@ -591,16 +750,19 @@ std::vector<unsigned char> BaseDataStreamMarshaller::tightUnmarshalByteArray(dec
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::vector<unsigned char> BaseDataStreamMarshaller::looseUnmarshalByteArray(decaf::io::DataInputStream* dataIn) {
-
-    try {
-
-        if (dataIn->readBoolean()) {
-            int size = dataIn->readInt();
+std::vector<unsigned char> BaseDataStreamMarshaller::looseUnmarshalByteArray(
+    decaf::io::DataInputStream* dataIn)
+{
+    try
+    {
+        if (dataIn->readBoolean())
+        {
+            int                        size = dataIn->readInt();
             std::vector<unsigned char> data;
-            if (size > 0) {
+            if (size > 0)
+            {
                 data.resize(size);
-                dataIn->readFully(&data[0], (int) data.size());
+                dataIn->readFully(&data[0], (int)data.size());
             }
             return data;
         }
@@ -613,13 +775,19 @@ std::vector<unsigned char> BaseDataStreamMarshaller::looseUnmarshalByteArray(dec
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::vector<unsigned char> BaseDataStreamMarshaller::tightUnmarshalConstByteArray(decaf::io::DataInputStream* dataIn, utils::BooleanStream* bs AMQCPP_UNUSED,int size) {
-
-    try {
+std::vector<unsigned char>
+BaseDataStreamMarshaller::tightUnmarshalConstByteArray(
+    decaf::io::DataInputStream* dataIn,
+    utils::BooleanStream* bs    AMQCPP_UNUSED,
+    int                         size)
+{
+    try
+    {
         std::vector<unsigned char> data;
-        if (size > 0) {
+        if (size > 0)
+        {
             data.resize(size);
-            dataIn->readFully(&data[0], (int) data.size());
+            dataIn->readFully(&data[0], (int)data.size());
         }
         return data;
     }
@@ -629,13 +797,18 @@ std::vector<unsigned char> BaseDataStreamMarshaller::tightUnmarshalConstByteArra
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::vector<unsigned char> BaseDataStreamMarshaller::looseUnmarshalConstByteArray(decaf::io::DataInputStream* dataIn, int size) {
-
-    try {
+std::vector<unsigned char>
+BaseDataStreamMarshaller::looseUnmarshalConstByteArray(
+    decaf::io::DataInputStream* dataIn,
+    int                         size)
+{
+    try
+    {
         std::vector<unsigned char> data;
-        if (size > 0) {
+        if (size > 0)
+        {
             data.resize(size);
-            dataIn->readFully(&data[0], (int) data.size());
+            dataIn->readFully(&data[0], (int)data.size());
         }
         return data;
     }
@@ -645,30 +818,41 @@ std::vector<unsigned char> BaseDataStreamMarshaller::looseUnmarshalConstByteArra
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string BaseDataStreamMarshaller::toString(const commands::MessageId* id) {
-    if (id == NULL) {
+std::string BaseDataStreamMarshaller::toString(const commands::MessageId* id)
+{
+    if (id == NULL)
+    {
         return "";
     }
 
-    return toString(id->getProducerId().get()) + ":" + Long::toString(id->getProducerSequenceId());
+    return toString(id->getProducerId().get()) + ":" +
+           Long::toString(id->getProducerSequenceId());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string BaseDataStreamMarshaller::toString(const commands::ProducerId* id) {
-    return id->getConnectionId() + ":" + Long::toString(id->getSessionId()) + ":" + Long::toString(id->getValue());
+std::string BaseDataStreamMarshaller::toString(const commands::ProducerId* id)
+{
+    return id->getConnectionId() + ":" + Long::toString(id->getSessionId()) +
+           ":" + Long::toString(id->getValue());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string BaseDataStreamMarshaller::toString(const commands::TransactionId* txnId) {
+std::string BaseDataStreamMarshaller::toString(
+    const commands::TransactionId* txnId)
+{
+    const LocalTransactionId* ltxnId =
+        dynamic_cast<const LocalTransactionId*>(txnId);
+    const XATransactionId* xaTxnId =
+        dynamic_cast<const XATransactionId*>(txnId);
 
-    const LocalTransactionId* ltxnId = dynamic_cast<const LocalTransactionId*>(txnId);
-    const XATransactionId* xaTxnId = dynamic_cast<const XATransactionId*>(txnId);
-
-    if (ltxnId != NULL) {
+    if (ltxnId != NULL)
+    {
         return Long::toString(ltxnId->getValue());
-    } else if (xaTxnId != NULL) {
-        return string("XID:") + Integer::toString(xaTxnId->getFormatId()) + ":" +
-               toHexFromBytes(xaTxnId->getGlobalTransactionId()) + ":" +
+    }
+    else if (xaTxnId != NULL)
+    {
+        return string("XID:") + Integer::toString(xaTxnId->getFormatId()) +
+               ":" + toHexFromBytes(xaTxnId->getGlobalTransactionId()) + ":" +
                toHexFromBytes(xaTxnId->getBranchQualifier());
     }
 
@@ -676,11 +860,13 @@ std::string BaseDataStreamMarshaller::toString(const commands::TransactionId* tx
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string BaseDataStreamMarshaller::toHexFromBytes(const std::vector<unsigned char>& data) {
-
+std::string BaseDataStreamMarshaller::toHexFromBytes(
+    const std::vector<unsigned char>& data)
+{
     std::string buffer = "";
 
-    for (unsigned int i = 0; i < data.size(); i++) {
+    for (unsigned int i = 0; i < data.size(); i++)
+    {
         buffer.append(hexTable[data[i]]);
     }
 
@@ -688,17 +874,18 @@ std::string BaseDataStreamMarshaller::toHexFromBytes(const std::vector<unsigned 
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string BaseDataStreamMarshaller::readAsciiString(decaf::io::DataInputStream* dataIn) {
-
-    try {
-
+std::string BaseDataStreamMarshaller::readAsciiString(
+    decaf::io::DataInputStream* dataIn)
+{
+    try
+    {
         std::string text;
-        int size = dataIn->readShort();
+        int         size = dataIn->readShort();
 
-        if (size > 0) {
-
+        if (size > 0)
+        {
             std::vector<char> data(size);
-            dataIn->readFully((unsigned char*) &data[0], size);
+            dataIn->readFully((unsigned char*)&data[0], size);
 
             // Now build a string and copy data into it.
             text.insert(text.begin(), data.begin(), data.end());

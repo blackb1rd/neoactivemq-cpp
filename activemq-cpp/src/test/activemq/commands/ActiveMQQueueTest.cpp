@@ -19,19 +19,21 @@
 
 #include <decaf/util/UUID.h>
 
-#include <activemq/commands/ActiveMQQueue.h>
 #include <activemq/commands/ActiveMQDestination.h>
+#include <activemq/commands/ActiveMQQueue.h>
 
 using namespace std;
 using namespace activemq;
 using namespace activemq::util;
 using namespace activemq::commands;
 
-class ActiveMQQueueTest : public ::testing::Test {};
+class ActiveMQQueueTest : public ::testing::Test
+{
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ActiveMQQueueTest, test) {
-
+TEST_F(ActiveMQQueueTest, test)
+{
     ActiveMQQueue myQueue;
     ASSERT_TRUE(myQueue.getDestinationType() == cms::Destination::QUEUE);
 }

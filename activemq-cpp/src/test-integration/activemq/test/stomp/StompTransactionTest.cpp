@@ -17,18 +17,27 @@
 
 #include <activemq/test/TransactionTest.h>
 
-namespace activemq{
-namespace test{
-namespace stomp{
-    class StompTransactionTest : public TransactionTest {
-public:
-        StompTransactionTest();
-        virtual ~StompTransactionTest();
-        std::string getBrokerURL() const override {
-            return activemq::util::IntegrationCommon::getInstance().getStompURL();
-        }
-    };
-}}}
+namespace activemq
+{
+namespace test
+{
+    namespace stomp
+    {
+        class StompTransactionTest : public TransactionTest
+        {
+        public:
+            StompTransactionTest();
+            virtual ~StompTransactionTest();
+
+            std::string getBrokerURL() const override
+            {
+                return activemq::util::IntegrationCommon::getInstance()
+                    .getStompURL();
+            }
+        };
+    }  // namespace stomp
+}  // namespace test
+}  // namespace activemq
 
 using namespace std;
 using namespace cms;
@@ -37,18 +46,43 @@ using namespace activemq::test;
 using namespace activemq::test::stomp;
 
 ////////////////////////////////////////////////////////////////////////////////
-StompTransactionTest::StompTransactionTest() {
+StompTransactionTest::StompTransactionTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-StompTransactionTest::~StompTransactionTest() {
+StompTransactionTest::~StompTransactionTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Test registration
-TEST_F(StompTransactionTest, DISABLED_testSendReceiveTransactedBatches) { testSendReceiveTransactedBatches(); }
-TEST_F(StompTransactionTest, DISABLED_testSendRollback) { testSendRollback(); }
-TEST_F(StompTransactionTest, DISABLED_testSendSessionClose) { testSendSessionClose(); }
-TEST_F(StompTransactionTest, DISABLED_testWithTTLSet) { testWithTTLSet(); }
-TEST_F(StompTransactionTest, DISABLED_testSendRollbackCommitRollback) { testSendRollbackCommitRollback(); }
-TEST_F(StompTransactionTest, DISABLED_testSessionCommitAfterConsumerClosed) { testSessionCommitAfterConsumerClosed(); }
+TEST_F(StompTransactionTest, DISABLED_testSendReceiveTransactedBatches)
+{
+    testSendReceiveTransactedBatches();
+}
+
+TEST_F(StompTransactionTest, DISABLED_testSendRollback)
+{
+    testSendRollback();
+}
+
+TEST_F(StompTransactionTest, DISABLED_testSendSessionClose)
+{
+    testSendSessionClose();
+}
+
+TEST_F(StompTransactionTest, DISABLED_testWithTTLSet)
+{
+    testWithTTLSet();
+}
+
+TEST_F(StompTransactionTest, DISABLED_testSendRollbackCommitRollback)
+{
+    testSendRollbackCommitRollback();
+}
+
+TEST_F(StompTransactionTest, DISABLED_testSessionCommitAfterConsumerClosed)
+{
+    testSessionCommitAfterConsumerClosed();
+}

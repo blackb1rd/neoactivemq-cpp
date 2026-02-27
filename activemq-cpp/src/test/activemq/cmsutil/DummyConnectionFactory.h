@@ -18,66 +18,85 @@
 #ifndef ACTIVEMQ_CMSUTIL_DUMMYCONNECTIONFACTORY_H_
 #define ACTIVEMQ_CMSUTIL_DUMMYCONNECTIONFACTORY_H_
 
-#include <cms/ConnectionFactory.h>
 #include <activemq/cmsutil/DummyConnection.h>
 #include <activemq/cmsutil/MessageContext.h>
+#include <cms/ConnectionFactory.h>
 
-namespace activemq {
-namespace cmsutil {
+namespace activemq
+{
+namespace cmsutil
+{
 
-    class DummyConnectionFactory : public cms::ConnectionFactory {
+    class DummyConnectionFactory : public cms::ConnectionFactory
+    {
     private:
-
-        MessageContext messageContext;
-        cms::ExceptionListener* listener;
+        MessageContext           messageContext;
+        cms::ExceptionListener*  listener;
         cms::MessageTransformer* transformer;
 
     private:
-
         DummyConnectionFactory(const DummyConnectionFactory&);
-        DummyConnectionFactory& operator= (const DummyConnectionFactory&);
+        DummyConnectionFactory& operator=(const DummyConnectionFactory&);
 
     public:
+        DummyConnectionFactory()
+            : messageContext(),
+              listener(),
+              transformer()
+        {
+        }
 
-        DummyConnectionFactory() : messageContext(), listener(), transformer() {}
+        virtual ~DummyConnectionFactory()
+        {
+        }
 
-        virtual ~DummyConnectionFactory() {}
-
-        virtual cms::Connection* createConnection() {
+        virtual cms::Connection* createConnection()
+        {
             return new DummyConnection(&messageContext);
         }
 
-        virtual cms::Connection* createConnection(const std::string& username, const std::string& password) {
+        virtual cms::Connection* createConnection(const std::string& username,
+                                                  const std::string& password)
+        {
             return new DummyConnection(&messageContext);
         }
 
-        virtual cms::Connection* createConnection(const std::string& username, const std::string& password, const std::string& clientId) {
+        virtual cms::Connection* createConnection(const std::string& username,
+                                                  const std::string& password,
+                                                  const std::string& clientId)
+        {
             DummyConnection* c = new DummyConnection(&messageContext);
             c->setClientID(clientId);
             return c;
         }
 
-        MessageContext* getMessageContext() {
+        MessageContext* getMessageContext()
+        {
             return &messageContext;
         }
 
-        virtual cms::ExceptionListener* getExceptionListener() const {
+        virtual cms::ExceptionListener* getExceptionListener() const
+        {
             return listener;
         }
 
-        virtual void setExceptionListener(cms::ExceptionListener* listener) {
+        virtual void setExceptionListener(cms::ExceptionListener* listener)
+        {
             this->listener = listener;
         }
 
-        virtual cms::MessageTransformer* getMessageTransformer() const {
+        virtual cms::MessageTransformer* getMessageTransformer() const
+        {
             return transformer;
         }
 
-        virtual void setMessageTransformer(cms::MessageTransformer* transformer) {
+        virtual void setMessageTransformer(cms::MessageTransformer* transformer)
+        {
             this->transformer = transformer;
         }
     };
 
-}}
+}  // namespace cmsutil
+}  // namespace activemq
 
 #endif /*ACTIVEMQ_CMSUTIL_DUMMYCONNECTIONFACTORY_H_*/

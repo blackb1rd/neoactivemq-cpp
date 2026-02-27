@@ -20,35 +20,49 @@
 using namespace cms;
 
 ////////////////////////////////////////////////////////////////////////////////
-UnsupportedOperationException::UnsupportedOperationException() : CMSException() {
+UnsupportedOperationException::UnsupportedOperationException()
+    : CMSException()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-UnsupportedOperationException::UnsupportedOperationException(const UnsupportedOperationException& ex) :
-    CMSException(ex) {
+UnsupportedOperationException::UnsupportedOperationException(
+    const UnsupportedOperationException& ex)
+    : CMSException(ex)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-UnsupportedOperationException::UnsupportedOperationException(const std::string& message) :
-    CMSException(message, NULL) {
+UnsupportedOperationException::UnsupportedOperationException(
+    const std::string& message)
+    : CMSException(message, NULL)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-UnsupportedOperationException::UnsupportedOperationException(const std::string& message, const std::exception* cause) :
-    CMSException(message, cause) {
+UnsupportedOperationException::UnsupportedOperationException(
+    const std::string&    message,
+    const std::exception* cause)
+    : CMSException(message, cause)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-UnsupportedOperationException::UnsupportedOperationException(const std::string& message, const std::exception* cause,
-                                                             const std::vector<std::pair<std::string, int> >& stackTrace) :
-    CMSException(message, cause, stackTrace) {
+UnsupportedOperationException::UnsupportedOperationException(
+    const std::string&                              message,
+    const std::exception*                           cause,
+    const std::vector<std::pair<std::string, int>>& stackTrace)
+    : CMSException(message, cause, stackTrace)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-UnsupportedOperationException::~UnsupportedOperationException() throw() {
+UnsupportedOperationException::~UnsupportedOperationException() throw()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-UnsupportedOperationException* UnsupportedOperationException::clone() {
+UnsupportedOperationException* UnsupportedOperationException::clone()
+{
     return new UnsupportedOperationException(*this);
 }

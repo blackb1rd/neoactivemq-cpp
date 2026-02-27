@@ -35,17 +35,26 @@ using namespace decaf::util::concurrent;
 const int SimplePriorityMessageDispatchChannel::MAX_PRIORITIES = 10;
 
 ////////////////////////////////////////////////////////////////////////////////
-SimplePriorityMessageDispatchChannel::SimplePriorityMessageDispatchChannel() :
-    closed(false), running(false), mutex(), channels((std::size_t) MAX_PRIORITIES), enqueued(0) {
+SimplePriorityMessageDispatchChannel::SimplePriorityMessageDispatchChannel()
+    : closed(false),
+      running(false),
+      mutex(),
+      channels((std::size_t)MAX_PRIORITIES),
+      enqueued(0)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SimplePriorityMessageDispatchChannel::~SimplePriorityMessageDispatchChannel() {
+SimplePriorityMessageDispatchChannel::~SimplePriorityMessageDispatchChannel()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SimplePriorityMessageDispatchChannel::enqueue(const Pointer<MessageDispatch>& message) {
-    synchronized(&mutex) {
+void SimplePriorityMessageDispatchChannel::enqueue(
+    const Pointer<MessageDispatch>& message)
+{
+    synchronized(&mutex)
+    {
         this->getChannel(message).addLast(message);
         this->enqueued++;
         mutex.notify();
@@ -53,8 +62,11 @@ void SimplePriorityMessageDispatchChannel::enqueue(const Pointer<MessageDispatch
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SimplePriorityMessageDispatchChannel::enqueueFirst(const Pointer<MessageDispatch>& message) {
-    synchronized(&mutex) {
+void SimplePriorityMessageDispatchChannel::enqueueFirst(
+    const Pointer<MessageDispatch>& message)
+{
+    synchronized(&mutex)
+    {
         this->getChannel(message).addFirst(message);
         this->enqueued++;
         mutex.notify();
@@ -62,25 +74,33 @@ void SimplePriorityMessageDispatchChannel::enqueueFirst(const Pointer<MessageDis
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool SimplePriorityMessageDispatchChannel::isEmpty() const {
+bool SimplePriorityMessageDispatchChannel::isEmpty() const
+{
     return this->enqueued == 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<MessageDispatch> SimplePriorityMessageDispatchChannel::dequeue(long long timeout) {
-
-    synchronized(&mutex) {
+Pointer<MessageDispatch> SimplePriorityMessageDispatchChannel::dequeue(
+    long long timeout)
+{
+    synchronized(&mutex)
+    {
         // Wait until the channel is ready to deliver messages.
-        while (timeout != 0 && !closed && (isEmpty() || !running)) {
-            if (timeout == -1) {
+        while (timeout != 0 && !closed && (isEmpty() || !running))
+        {
+            if (timeout == -1)
+            {
                 mutex.wait();
-            } else {
-                mutex.wait((unsigned long) timeout);
+            }
+            else
+            {
+                mutex.wait((unsigned long)timeout);
                 break;
             }
         }
 
-        if (closed || !running || isEmpty()) {
+        if (closed || !running || isEmpty())
+        {
             return Pointer<MessageDispatch>();
         }
 
@@ -91,9 +111,12 @@ Pointer<MessageDispatch> SimplePriorityMessageDispatchChannel::dequeue(long long
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<MessageDispatch> SimplePriorityMessageDispatchChannel::dequeueNoWait() {
-    synchronized(&mutex) {
-        if (closed || !running || isEmpty()) {
+Pointer<MessageDispatch> SimplePriorityMessageDispatchChannel::dequeueNoWait()
+{
+    synchronized(&mutex)
+    {
+        if (closed || !running || isEmpty())
+        {
             return Pointer<MessageDispatch>();
         }
         return removeFirst();
@@ -103,9 +126,12 @@ Pointer<MessageDispatch> SimplePriorityMessageDispatchChannel::dequeueNoWait() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<MessageDispatch> SimplePriorityMessageDispatchChannel::peek() const {
-    synchronized(&mutex) {
-        if (closed || !running || isEmpty()) {
+Pointer<MessageDispatch> SimplePriorityMessageDispatchChannel::peek() const
+{
+    synchronized(&mutex)
+    {
+        if (closed || !running || isEmpty())
+        {
             return Pointer<MessageDispatch>();
         }
         return getFirst();
@@ -115,9 +141,12 @@ Pointer<MessageDispatch> SimplePriorityMessageDispatchChannel::peek() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SimplePriorityMessageDispatchChannel::start() {
-    synchronized(&mutex) {
-        if (!closed) {
+void SimplePriorityMessageDispatchChannel::start()
+{
+    synchronized(&mutex)
+    {
+        if (!closed)
+        {
             running = true;
             mutex.notifyAll();
         }
@@ -125,36 +154,46 @@ void SimplePriorityMessageDispatchChannel::start() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SimplePriorityMessageDispatchChannel::stop() {
-    synchronized(&mutex) {
+void SimplePriorityMessageDispatchChannel::stop()
+{
+    synchronized(&mutex)
+    {
         running = false;
         mutex.notifyAll();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SimplePriorityMessageDispatchChannel::close() {
-    synchronized(&mutex) {
-        if (!closed) {
+void SimplePriorityMessageDispatchChannel::close()
+{
+    synchronized(&mutex)
+    {
+        if (!closed)
+        {
             running = false;
-            closed = true;
+            closed  = true;
         }
         mutex.notifyAll();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SimplePriorityMessageDispatchChannel::clear() {
-    synchronized(&mutex) {
-        for (int i = 0; i < MAX_PRIORITIES; i++) {
+void SimplePriorityMessageDispatchChannel::clear()
+{
+    synchronized(&mutex)
+    {
+        for (int i = 0; i < MAX_PRIORITIES; i++)
+        {
             this->channels[i].clear();
         }
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int SimplePriorityMessageDispatchChannel::size() const {
-    synchronized(&mutex) {
+int SimplePriorityMessageDispatchChannel::size() const
+{
+    synchronized(&mutex)
+    {
         return this->enqueued;
     }
 
@@ -162,14 +201,18 @@ int SimplePriorityMessageDispatchChannel::size() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::vector<Pointer<MessageDispatch> > SimplePriorityMessageDispatchChannel::removeAll() {
-    std::vector<Pointer<MessageDispatch> > result;
+std::vector<Pointer<MessageDispatch>>
+SimplePriorityMessageDispatchChannel::removeAll()
+{
+    std::vector<Pointer<MessageDispatch>> result;
 
-    synchronized(&mutex) {
-        for (int i = MAX_PRIORITIES - 1; i >= 0; --i) {
-            std::vector<Pointer<MessageDispatch> > temp(channels[i].toArray());
+    synchronized(&mutex)
+    {
+        for (int i = MAX_PRIORITIES - 1; i >= 0; --i)
+        {
+            std::vector<Pointer<MessageDispatch>> temp(channels[i].toArray());
             result.insert(result.end(), temp.begin(), temp.end());
-            this->enqueued -= (int) temp.size();
+            this->enqueued -= (int)temp.size();
             channels[i].clear();
         }
     }
@@ -178,11 +221,14 @@ std::vector<Pointer<MessageDispatch> > SimplePriorityMessageDispatchChannel::rem
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-LinkedList<Pointer<MessageDispatch> >& SimplePriorityMessageDispatchChannel::getChannel(const Pointer<MessageDispatch>& dispatch) {
-
+LinkedList<Pointer<MessageDispatch>>&
+SimplePriorityMessageDispatchChannel::getChannel(
+    const Pointer<MessageDispatch>& dispatch)
+{
     int priority = cms::Message::DEFAULT_MSG_PRIORITY;
 
-    if (dispatch->getMessage() != NULL) {
+    if (dispatch->getMessage() != NULL)
+    {
         priority = Math::max(dispatch->getMessage()->getPriority(), 0);
         priority = Math::min(dispatch->getMessage()->getPriority(), 9);
     }
@@ -191,12 +237,15 @@ LinkedList<Pointer<MessageDispatch> >& SimplePriorityMessageDispatchChannel::get
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<MessageDispatch> SimplePriorityMessageDispatchChannel::removeFirst() {
-
-    if (this->enqueued > 0) {
-        for (int i = MAX_PRIORITIES - 1; i >= 0; i--) {
-            LinkedList<Pointer<MessageDispatch> >& channel = channels[i];
-            if (!channel.isEmpty()) {
+Pointer<MessageDispatch> SimplePriorityMessageDispatchChannel::removeFirst()
+{
+    if (this->enqueued > 0)
+    {
+        for (int i = MAX_PRIORITIES - 1; i >= 0; i--)
+        {
+            LinkedList<Pointer<MessageDispatch>>& channel = channels[i];
+            if (!channel.isEmpty())
+            {
                 this->enqueued--;
                 return channel.pop();
             }
@@ -207,12 +256,15 @@ Pointer<MessageDispatch> SimplePriorityMessageDispatchChannel::removeFirst() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<MessageDispatch> SimplePriorityMessageDispatchChannel::getFirst() const {
-
-    if (this->enqueued > 0) {
-        for (int i = MAX_PRIORITIES - 1; i >= 0; i--) {
-            LinkedList<Pointer<MessageDispatch> >& channel = channels[i];
-            if (!channel.isEmpty()) {
+Pointer<MessageDispatch> SimplePriorityMessageDispatchChannel::getFirst() const
+{
+    if (this->enqueued > 0)
+    {
+        for (int i = MAX_PRIORITIES - 1; i >= 0; i--)
+        {
+            LinkedList<Pointer<MessageDispatch>>& channel = channels[i];
+            if (!channel.isEmpty())
+            {
                 return channel.getFirst();
             }
         }

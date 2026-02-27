@@ -23,29 +23,31 @@ using namespace std;
 using namespace decaf;
 using namespace decaf::util;
 
-   class QueueTest : public ::testing::Test {};
+class QueueTest : public ::testing::Test
+{
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(QueueTest, test)
 {
-   StlQueue<char> q;
+    StlQueue<char> q;
 
-   ASSERT_TRUE(q.empty() == true);
-   ASSERT_TRUE(q.size() == 0);
+    ASSERT_TRUE(q.empty() == true);
+    ASSERT_TRUE(q.size() == 0);
 
-   q.push('a');
+    q.push('a');
 
-   ASSERT_TRUE(q.front() == 'a');
+    ASSERT_TRUE(q.front() == 'a');
 
-   q.pop();
+    q.pop();
 
-   ASSERT_TRUE(q.empty() == true);
+    ASSERT_TRUE(q.empty() == true);
 
-   q.push('b');
-   q.push('c');
+    q.push('b');
+    q.push('c');
 
-   ASSERT_TRUE(q.size() == 2);
+    ASSERT_TRUE(q.size() == 2);
 
-   ASSERT_TRUE(q.front() == 'b');
-   ASSERT_TRUE(q.back() == 'c');
+    ASSERT_TRUE(q.front() == 'b');
+    ASSERT_TRUE(q.back() == 'c');
 }

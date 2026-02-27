@@ -18,94 +18,99 @@
 #include <gtest/gtest.h>
 
 #include <decaf/lang/System.h>
-#include <decaf/util/StlMap.h>
 #include <decaf/lang/Thread.h>
+#include <decaf/util/StlMap.h>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::lang;
 
-    class SystemTest : public ::testing::Test {
+class SystemTest : public ::testing::Test
+{
 public:
-
-        SystemTest();
-
-    };
+    SystemTest();
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-SystemTest::SystemTest() {
+SystemTest::SystemTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(SystemTest, test_availableProcessors) {
-
+TEST_F(SystemTest, test_availableProcessors)
+{
     ASSERT_TRUE(System::availableProcessors() >= 1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(SystemTest, test_getenv) {
+TEST_F(SystemTest, test_getenv)
+{
+    ASSERT_TRUE(System::getenv("PATH") != "");
 
-    ASSERT_TRUE(System::getenv( "PATH" ) != "");
-
-    try {
-        System::getenv( "PATH_ASDFGHJKL" );
+    try
+    {
+        System::getenv("PATH_ASDFGHJKL");
         ASSERT_TRUE(false);
-    } catch (...) {
+    }
+    catch (...)
+    {
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(SystemTest, test_getenv2) {
-
+TEST_F(SystemTest, test_getenv2)
+{
     StlMap<std::string, std::string> values = System::getenv();
 
     ASSERT_TRUE(values.size() != 0);
-    ASSERT_TRUE(values.containsKey( "PATH" ) || values.containsKey( "Path" ));
-    ASSERT_TRUE(!values.containsKey( "PATH_ASDFGHJKL" ));
+    ASSERT_TRUE(values.containsKey("PATH") || values.containsKey("Path"));
+    ASSERT_TRUE(!values.containsKey("PATH_ASDFGHJKL"));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(SystemTest, test_setenv) {
-
+TEST_F(SystemTest, test_setenv)
+{
     StlMap<std::string, std::string> values1 = System::getenv();
-    ASSERT_TRUE(!values1.containsKey( "PATH_ASDFGHJKL" ));
-    System::setenv( "PATH_ASDFGHJKL", "test" );
+    ASSERT_TRUE(!values1.containsKey("PATH_ASDFGHJKL"));
+    System::setenv("PATH_ASDFGHJKL", "test");
     StlMap<std::string, std::string> values2 = System::getenv();
-    ASSERT_TRUE(values2.containsKey( "PATH_ASDFGHJKL" ));
-    System::unsetenv( "PATH_ASDFGHJKL" );
+    ASSERT_TRUE(values2.containsKey("PATH_ASDFGHJKL"));
+    System::unsetenv("PATH_ASDFGHJKL");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(SystemTest, test_unsetenv) {
-
+TEST_F(SystemTest, test_unsetenv)
+{
     StlMap<std::string, std::string> values1 = System::getenv();
-    ASSERT_TRUE(!values1.containsKey( "PATH_ASDFGHJKL" ));
-    System::setenv( "PATH_ASDFGHJKL", "test" );
+    ASSERT_TRUE(!values1.containsKey("PATH_ASDFGHJKL"));
+    System::setenv("PATH_ASDFGHJKL", "test");
     StlMap<std::string, std::string> values2 = System::getenv();
-    ASSERT_TRUE(values2.containsKey( "PATH_ASDFGHJKL" ));
-    System::unsetenv( "PATH_ASDFGHJKL" );
+    ASSERT_TRUE(values2.containsKey("PATH_ASDFGHJKL"));
+    System::unsetenv("PATH_ASDFGHJKL");
     StlMap<std::string, std::string> values3 = System::getenv();
-    ASSERT_TRUE(!values3.containsKey( "PATH_ASDFGHJKL" ));
+    ASSERT_TRUE(!values3.containsKey("PATH_ASDFGHJKL"));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(SystemTest, test_currentTimeMillis) {
+TEST_F(SystemTest, test_currentTimeMillis)
+{
     ASSERT_TRUE(System::currentTimeMillis() != 0);
 
     long long start = System::currentTimeMillis();
-    Thread::sleep( 150 );
+    Thread::sleep(150);
     long long end = System::currentTimeMillis();
 
     ASSERT_TRUE(start < end) << ("First Read isn't less than the second.");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(SystemTest, test_nanoTime) {
+TEST_F(SystemTest, test_nanoTime)
+{
     ASSERT_TRUE(System::nanoTime() != 0);
 
     long long start = System::nanoTime();
-    Thread::sleep( 150 );
+    Thread::sleep(150);
     long long end = System::nanoTime();
 
     ASSERT_TRUE(start < end) << ("First Read isn't less than the second.");

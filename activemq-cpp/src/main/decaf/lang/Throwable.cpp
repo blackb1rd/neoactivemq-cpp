@@ -21,9 +21,12 @@ using namespace decaf;
 using namespace decaf::lang;
 
 ////////////////////////////////////////////////////////////////////////////////
-Throwable::Throwable() : std::exception() {
+Throwable::Throwable()
+    : std::exception()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Throwable::~Throwable() throw() {
+Throwable::~Throwable() throw()
+{
 }

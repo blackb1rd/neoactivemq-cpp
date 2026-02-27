@@ -20,19 +20,21 @@
 
 #include <decaf/util/Config.h>
 
-namespace decaf {
-namespace net {
+namespace decaf
+{
+namespace net
+{
 
     /**
      * @since 1.0
      */
-    class Proxy {
+    class Proxy
+    {
     public:
-
         virtual ~Proxy();
-
     };
 
-}}
+}  // namespace net
+}  // namespace decaf
 
 #endif /* _DECAF_NET_PROXY_H_ */

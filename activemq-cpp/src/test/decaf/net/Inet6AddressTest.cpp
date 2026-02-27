@@ -22,26 +22,26 @@
 using namespace decaf;
 using namespace decaf::net;
 
-    class Inet6AddressTest : public ::testing::Test {
+class Inet6AddressTest : public ::testing::Test
+{
 public:
+    Inet6AddressTest();
+    virtual ~Inet6AddressTest();
 
-        Inet6AddressTest();
-        virtual ~Inet6AddressTest();
-
-        void testGetByAddress();
-
-    };
-
+    void testGetByAddress();
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-Inet6AddressTest::Inet6AddressTest() {
+Inet6AddressTest::Inet6AddressTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Inet6AddressTest::~Inet6AddressTest() {
+Inet6AddressTest::~Inet6AddressTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Inet6AddressTest::testGetByAddress() {
-
+void Inet6AddressTest::testGetByAddress()
+{
 }

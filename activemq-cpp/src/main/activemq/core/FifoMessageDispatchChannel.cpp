@@ -28,32 +28,44 @@ using namespace decaf::util;
 using namespace decaf::util::concurrent;
 
 ////////////////////////////////////////////////////////////////////////////////
-FifoMessageDispatchChannel::FifoMessageDispatchChannel() : closed(false), running(false), channel() {
+FifoMessageDispatchChannel::FifoMessageDispatchChannel()
+    : closed(false),
+      running(false),
+      channel()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-FifoMessageDispatchChannel::~FifoMessageDispatchChannel() {
+FifoMessageDispatchChannel::~FifoMessageDispatchChannel()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FifoMessageDispatchChannel::enqueue(const Pointer<MessageDispatch>& message) {
-    synchronized(&channel) {
+void FifoMessageDispatchChannel::enqueue(const Pointer<MessageDispatch>& message)
+{
+    synchronized(&channel)
+    {
         channel.addLast(message);
         channel.notify();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FifoMessageDispatchChannel::enqueueFirst(const Pointer<MessageDispatch>& message) {
-    synchronized(&channel) {
+void FifoMessageDispatchChannel::enqueueFirst(
+    const Pointer<MessageDispatch>& message)
+{
+    synchronized(&channel)
+    {
         channel.addFirst(message);
         channel.notify();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool FifoMessageDispatchChannel::isEmpty() const {
-    synchronized(&channel) {
+bool FifoMessageDispatchChannel::isEmpty() const
+{
+    synchronized(&channel)
+    {
         return channel.isEmpty();
     }
 
@@ -61,26 +73,33 @@ bool FifoMessageDispatchChannel::isEmpty() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<MessageDispatch> FifoMessageDispatchChannel::dequeue(long long timeout) {
-
-    synchronized(&channel) {
+Pointer<MessageDispatch> FifoMessageDispatchChannel::dequeue(long long timeout)
+{
+    synchronized(&channel)
+    {
         // Wait until the channel is ready to deliver messages.
-        while (timeout != 0 && !closed && (channel.isEmpty() || !running)) {
-            if (timeout == -1) {
+        while (timeout != 0 && !closed && (channel.isEmpty() || !running))
+        {
+            if (timeout == -1)
+            {
                 channel.wait();
-            } else {
+            }
+            else
+            {
                 channel.wait(timeout);
                 break;
             }
         }
 
-        if (closed || !running || channel.isEmpty()) {
+        if (closed || !running || channel.isEmpty())
+        {
             return Pointer<MessageDispatch>();
         }
 
         // Use pollFirst instead of pop to avoid NoSuchElementException
         Pointer<MessageDispatch> result;
-        if (channel.pollFirst(result)) {
+        if (channel.pollFirst(result))
+        {
             return result;
         }
     }
@@ -89,15 +108,19 @@ Pointer<MessageDispatch> FifoMessageDispatchChannel::dequeue(long long timeout) 
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<MessageDispatch> FifoMessageDispatchChannel::dequeueNoWait() {
-    synchronized(&channel) {
-        if (closed || !running || channel.isEmpty()) {
+Pointer<MessageDispatch> FifoMessageDispatchChannel::dequeueNoWait()
+{
+    synchronized(&channel)
+    {
+        if (closed || !running || channel.isEmpty())
+        {
             return Pointer<MessageDispatch>();
         }
 
         // Use pollFirst instead of pop to avoid NoSuchElementException
         Pointer<MessageDispatch> result;
-        if (channel.pollFirst(result)) {
+        if (channel.pollFirst(result))
+        {
             return result;
         }
     }
@@ -106,15 +129,19 @@ Pointer<MessageDispatch> FifoMessageDispatchChannel::dequeueNoWait() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<MessageDispatch> FifoMessageDispatchChannel::peek() const {
-    synchronized(&channel) {
-        if (closed || !running || channel.isEmpty()) {
+Pointer<MessageDispatch> FifoMessageDispatchChannel::peek() const
+{
+    synchronized(&channel)
+    {
+        if (closed || !running || channel.isEmpty())
+        {
             return Pointer<MessageDispatch>();
         }
 
         // Use peekFirst instead of getFirst to avoid NoSuchElementException
         Pointer<MessageDispatch> result;
-        if (channel.peekFirst(result)) {
+        if (channel.peekFirst(result))
+        {
             return result;
         }
     }
@@ -123,9 +150,12 @@ Pointer<MessageDispatch> FifoMessageDispatchChannel::peek() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FifoMessageDispatchChannel::start() {
-    synchronized(&channel) {
-        if (!closed) {
+void FifoMessageDispatchChannel::start()
+{
+    synchronized(&channel)
+    {
+        if (!closed)
+        {
             running = true;
             channel.notifyAll();
         }
@@ -133,45 +163,56 @@ void FifoMessageDispatchChannel::start() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FifoMessageDispatchChannel::stop() {
-    synchronized(&channel) {
+void FifoMessageDispatchChannel::stop()
+{
+    synchronized(&channel)
+    {
         running = false;
         channel.notifyAll();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FifoMessageDispatchChannel::close() {
-    synchronized(&channel) {
-        if (!closed) {
+void FifoMessageDispatchChannel::close()
+{
+    synchronized(&channel)
+    {
+        if (!closed)
+        {
             running = false;
-            closed = true;
+            closed  = true;
         }
         channel.notifyAll();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FifoMessageDispatchChannel::clear() {
-    synchronized(&channel) {
+void FifoMessageDispatchChannel::clear()
+{
+    synchronized(&channel)
+    {
         channel.clear();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int FifoMessageDispatchChannel::size() const {
-    synchronized(&channel) {
-        return (int) channel.size();
+int FifoMessageDispatchChannel::size() const
+{
+    synchronized(&channel)
+    {
+        return (int)channel.size();
     }
 
     return 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::vector<Pointer<MessageDispatch> > FifoMessageDispatchChannel::removeAll() {
-    std::vector<Pointer<MessageDispatch> > result;
+std::vector<Pointer<MessageDispatch>> FifoMessageDispatchChannel::removeAll()
+{
+    std::vector<Pointer<MessageDispatch>> result;
 
-    synchronized(&channel) {
+    synchronized(&channel)
+    {
         result = channel.toArray();
         channel.clear();
     }

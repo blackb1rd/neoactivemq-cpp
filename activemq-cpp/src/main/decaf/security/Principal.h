@@ -22,16 +22,18 @@
 
 #include <string>
 
-namespace decaf {
-namespace security {
+namespace decaf
+{
+namespace security
+{
 
     /**
      * Base interface for a principal, which can represent an individual or
      * organization.
      */
-    class DECAF_API Principal {
+    class DECAF_API Principal
+    {
     public:
-
         virtual ~Principal();
 
         /**
@@ -49,8 +51,8 @@ namespace security {
          * @return the name of this principal.
          */
         virtual std::string getName() const = 0;
-
     };
-}}
+}  // namespace security
+}  // namespace decaf
 
 #endif /*_DECAF_SECURITY_PRINCIPAL_H_*/

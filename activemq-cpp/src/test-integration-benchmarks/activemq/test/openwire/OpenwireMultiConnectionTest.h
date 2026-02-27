@@ -18,112 +18,127 @@
 #ifndef _ACTIVEMQ_TEST_OPENWIRE_OPENWIREMULTICONNECTIONTEST_H_
 #define _ACTIVEMQ_TEST_OPENWIRE_OPENWIREMULTICONNECTIONTEST_H_
 
-#include <gtest/gtest.h>
 #include <activemq/util/IntegrationCommon.h>
+#include <gtest/gtest.h>
 
 #include <cms/Connection.h>
-#include <cms/Session.h>
-#include <cms/MessageProducer.h>
 #include <cms/MessageConsumer.h>
+#include <cms/MessageProducer.h>
+#include <cms/Session.h>
 
 #include <memory>
 #include <string>
 
-namespace activemq {
-namespace test {
-namespace openwire {
-
-    /**
-     * Integration tests for multiple simultaneous connections to different brokers.
-     *
-     * REQUIRES: docker compose --profile failover up
-     *
-     * Test scenarios:
-     * - Connection 1: failover(broker1, broker2) on ports 61617, 61618
-     * - Connection 2: broker3 on port 61619
-     *
-     * These tests verify:
-     * - Multiple independent connections work simultaneously
-     * - Failover connection doesn't interfere with direct connection
-     * - Messages can be routed to specific brokers
-     * - Connection isolation is maintained
-     */
-    class OpenwireMultiConnectionTest : public ::testing::Test {
-public:
-
-        OpenwireMultiConnectionTest();
-        virtual ~OpenwireMultiConnectionTest();
-
-        void SetUp() override;
-        void TearDown() override;
+namespace activemq
+{
+namespace test
+{
+    namespace openwire
+    {
 
         /**
-         * Test that multiple connections to different brokers can be established
+         * Integration tests for multiple simultaneous connections to different
+         * brokers.
+         *
+         * REQUIRES: docker compose --profile failover up
+         *
+         * Test scenarios:
+         * - Connection 1: failover(broker1, broker2) on ports 61617, 61618
+         * - Connection 2: broker3 on port 61619
+         *
+         * These tests verify:
+         * - Multiple independent connections work simultaneously
+         * - Failover connection doesn't interfere with direct connection
+         * - Messages can be routed to specific brokers
+         * - Connection isolation is maintained
          */
-        void testMultipleConnectionsEstablish();
+        class OpenwireMultiConnectionTest : public ::testing::Test
+        {
+        public:
+            OpenwireMultiConnectionTest();
+            virtual ~OpenwireMultiConnectionTest();
 
-        /**
-         * Test send/receive works on both failover and direct connections
-         */
-        void testSendReceiveOnBothConnections();
+            void SetUp() override;
+            void TearDown() override;
 
-        /**
-         * Test that failover connection and direct connection work independently
-         */
-        void testFailoverAndDirectConnectionIndependent();
+            /**
+             * Test that multiple connections to different brokers can be
+             * established
+             */
+            void testMultipleConnectionsEstablish();
 
-        /**
-         * Test concurrent messaging on multiple connections
-         */
-        void testConcurrentMessagingOnMultipleConnections();
+            /**
+             * Test send/receive works on both failover and direct connections
+             */
+            void testSendReceiveOnBothConnections();
 
-        /**
-         * Test that messages on one connection don't appear on another
-         */
-        void testConnectionIsolation();
+            /**
+             * Test that failover connection and direct connection work
+             * independently
+             */
+            void testFailoverAndDirectConnectionIndependent();
 
-        /**
-         * Test failover connection behavior while independent broker connection is active
-         */
-        void testFailoverConnectionWithIndependentBroker();
+            /**
+             * Test concurrent messaging on multiple connections
+             */
+            void testConcurrentMessagingOnMultipleConnections();
 
-        /**
-         * Test durable topic consumer with SESSION_TRANSACTED (commit per message),
-         * PERSISTENT delivery mode, message selector, concurrent consumption from
-         * 2 servers with different topics (~5k messages per server)
-         */
-        void testDurableTopicWithSelectorConcurrentServers();
+            /**
+             * Test that messages on one connection don't appear on another
+             */
+            void testConnectionIsolation();
 
-    protected:
+            /**
+             * Test failover connection behavior while independent broker
+             * connection is active
+             */
+            void testFailoverConnectionWithIndependentBroker();
 
-        std::string getFailoverURL() const {
-            return activemq::util::IntegrationCommon::getInstance().getFailoverURL();
-        }
+            /**
+             * Test durable topic consumer with SESSION_TRANSACTED (commit per
+             * message), PERSISTENT delivery mode, message selector, concurrent
+             * consumption from 2 servers with different topics (~5k messages
+             * per server)
+             */
+            void testDurableTopicWithSelectorConcurrentServers();
 
-        std::string getBroker1URL() const {
-            return activemq::util::IntegrationCommon::getInstance().getOpenwireURL1();
-        }
+        protected:
+            std::string getFailoverURL() const
+            {
+                return activemq::util::IntegrationCommon::getInstance()
+                    .getFailoverURL();
+            }
 
-        std::string getBroker2URL() const {
-            return activemq::util::IntegrationCommon::getInstance().getOpenwireURL2();
-        }
+            std::string getBroker1URL() const
+            {
+                return activemq::util::IntegrationCommon::getInstance()
+                    .getOpenwireURL1();
+            }
 
-        std::string getBroker3URL() const {
-            return activemq::util::IntegrationCommon::getInstance().getOpenwireURL3();
-        }
+            std::string getBroker2URL() const
+            {
+                return activemq::util::IntegrationCommon::getInstance()
+                    .getOpenwireURL2();
+            }
 
-    private:
+            std::string getBroker3URL() const
+            {
+                return activemq::util::IntegrationCommon::getInstance()
+                    .getOpenwireURL3();
+            }
 
-        // Connection 1: Failover connection to broker1 and broker2
-        std::unique_ptr<cms::Connection> failoverConnection;
-        std::unique_ptr<cms::Session> failoverSession;
+        private:
+            // Connection 1: Failover connection to broker1 and broker2
+            std::unique_ptr<cms::Connection> failoverConnection;
+            std::unique_ptr<cms::Session>    failoverSession;
 
-        // Connection 2: Direct connection to broker3
-        std::unique_ptr<cms::Connection> directConnection;
-        std::unique_ptr<cms::Session> directSession;
+            // Connection 2: Direct connection to broker3
+            std::unique_ptr<cms::Connection> directConnection;
+            std::unique_ptr<cms::Session>    directSession;
+        };
 
-    };
-
-}}}
+    }  // namespace openwire
+}  // namespace test
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_TEST_OPENWIRE_OPENWIREMULTICONNECTIONTEST_H_ */

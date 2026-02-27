@@ -15,17 +15,17 @@
  * limitations under the License.
  */
 
-#include <activemq/util/IntegrationCommon.h>
 #include <activemq/test/CMSTestFixture.h>
+#include <activemq/util/IntegrationCommon.h>
 
 #include <activemq/core/ActiveMQConnectionFactory.h>
 #include <activemq/exceptions/ActiveMQException.h>
 
 #include <decaf/lang/Thread.h>
 
+#include <cms/Queue.h>
 #include <cms/Session.h>
 #include <cms/TextMessage.h>
-#include <cms/Queue.h>
 
 #include <memory>
 
@@ -37,49 +37,62 @@ using namespace activemq;
 using namespace activemq::core;
 using namespace activemq::test;
 
-namespace activemq {
-namespace test {
-namespace openwire_ssl {
-    /**
-     * Tests the OpenwireSsl message selector feature.
-     * Message selectors use SQL92-like syntax to filter messages
-     * based on message properties and headers.
-     */
-    class OpenwireSslMessageSelectorTest : public CMSTestFixture {
-    public:
-        std::string getBrokerURL() const override {
-            return activemq::util::IntegrationCommon::getInstance().getSslOpenwireURL();
-        }
-    };
-}}}
+namespace activemq
+{
+namespace test
+{
+    namespace openwire_ssl
+    {
+        /**
+         * Tests the OpenwireSsl message selector feature.
+         * Message selectors use SQL92-like syntax to filter messages
+         * based on message properties and headers.
+         */
+        class OpenwireSslMessageSelectorTest : public CMSTestFixture
+        {
+        public:
+            std::string getBrokerURL() const override
+            {
+                return activemq::util::IntegrationCommon::getInstance()
+                    .getSslOpenwireURL();
+            }
+        };
+    }  // namespace openwire_ssl
+}  // namespace test
+}  // namespace activemq
 
 using namespace activemq::test::openwire_ssl;
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(OpenwireSslMessageSelectorTest, testStringPropertySelector) {
-
+TEST_F(OpenwireSslMessageSelectorTest, testStringPropertySelector)
+{
     Connection* connection = this->cmsProvider->getConnection();
     connection->start();
 
-    std::unique_ptr<Session> session(connection->createSession(Session::AUTO_ACKNOWLEDGE));
+    std::unique_ptr<Session> session(
+        connection->createSession(Session::AUTO_ACKNOWLEDGE));
     std::unique_ptr<Queue> queue(session->createTemporaryQueue());
 
-    std::unique_ptr<MessageProducer> producer(session->createProducer(queue.get()));
+    std::unique_ptr<MessageProducer> producer(
+        session->createProducer(queue.get()));
 
     // Create consumer with string selector
     std::unique_ptr<MessageConsumer> consumer(
         session->createConsumer(queue.get(), "color = 'red'"));
 
     // Send messages with different property values
-    std::unique_ptr<TextMessage> redMsg(session->createTextMessage("Red message"));
+    std::unique_ptr<TextMessage> redMsg(
+        session->createTextMessage("Red message"));
     redMsg->setStringProperty("color", "red");
     producer->send(redMsg.get());
 
-    std::unique_ptr<TextMessage> blueMsg(session->createTextMessage("Blue message"));
+    std::unique_ptr<TextMessage> blueMsg(
+        session->createTextMessage("Blue message"));
     blueMsg->setStringProperty("color", "blue");
     producer->send(blueMsg.get());
 
-    std::unique_ptr<TextMessage> redMsg2(session->createTextMessage("Red message 2"));
+    std::unique_ptr<TextMessage> redMsg2(
+        session->createTextMessage("Red message 2"));
     redMsg2->setStringProperty("color", "red");
     producer->send(redMsg2.get());
 
@@ -100,23 +113,27 @@ TEST_F(OpenwireSslMessageSelectorTest, testStringPropertySelector) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(OpenwireSslMessageSelectorTest, testIntPropertySelector) {
-
+TEST_F(OpenwireSslMessageSelectorTest, testIntPropertySelector)
+{
     Connection* connection = this->cmsProvider->getConnection();
     connection->start();
 
-    std::unique_ptr<Session> session(connection->createSession(Session::AUTO_ACKNOWLEDGE));
+    std::unique_ptr<Session> session(
+        connection->createSession(Session::AUTO_ACKNOWLEDGE));
     std::unique_ptr<Queue> queue(session->createTemporaryQueue());
 
-    std::unique_ptr<MessageProducer> producer(session->createProducer(queue.get()));
+    std::unique_ptr<MessageProducer> producer(
+        session->createProducer(queue.get()));
 
     // Create consumer with numeric selector
     std::unique_ptr<MessageConsumer> consumer(
         session->createConsumer(queue.get(), "quantity > 10"));
 
     // Send messages with different quantities
-    for (int i = 5; i <= 20; i += 5) {
-        std::unique_ptr<TextMessage> msg(session->createTextMessage("Quantity: " + std::to_string(i)));
+    for (int i = 5; i <= 20; i += 5)
+    {
+        std::unique_ptr<TextMessage> msg(
+            session->createTextMessage("Quantity: " + std::to_string(i)));
         msg->setIntProperty("quantity", i);
         producer->send(msg.get());
     }
@@ -137,26 +154,30 @@ TEST_F(OpenwireSslMessageSelectorTest, testIntPropertySelector) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(OpenwireSslMessageSelectorTest, testBooleanPropertySelector) {
-
+TEST_F(OpenwireSslMessageSelectorTest, testBooleanPropertySelector)
+{
     Connection* connection = this->cmsProvider->getConnection();
     connection->start();
 
-    std::unique_ptr<Session> session(connection->createSession(Session::AUTO_ACKNOWLEDGE));
+    std::unique_ptr<Session> session(
+        connection->createSession(Session::AUTO_ACKNOWLEDGE));
     std::unique_ptr<Queue> queue(session->createTemporaryQueue());
 
-    std::unique_ptr<MessageProducer> producer(session->createProducer(queue.get()));
+    std::unique_ptr<MessageProducer> producer(
+        session->createProducer(queue.get()));
 
     // Create consumer that only accepts urgent messages
     std::unique_ptr<MessageConsumer> consumer(
         session->createConsumer(queue.get(), "urgent = TRUE"));
 
     // Send mix of urgent and non-urgent messages
-    std::unique_ptr<TextMessage> urgentMsg(session->createTextMessage("Urgent!"));
+    std::unique_ptr<TextMessage> urgentMsg(
+        session->createTextMessage("Urgent!"));
     urgentMsg->setBooleanProperty("urgent", true);
     producer->send(urgentMsg.get());
 
-    std::unique_ptr<TextMessage> normalMsg(session->createTextMessage("Normal"));
+    std::unique_ptr<TextMessage> normalMsg(
+        session->createTextMessage("Normal"));
     normalMsg->setBooleanProperty("urgent", false);
     producer->send(normalMsg.get());
 
@@ -172,15 +193,17 @@ TEST_F(OpenwireSslMessageSelectorTest, testBooleanPropertySelector) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(OpenwireSslMessageSelectorTest, testCompoundSelector) {
-
+TEST_F(OpenwireSslMessageSelectorTest, testCompoundSelector)
+{
     Connection* connection = this->cmsProvider->getConnection();
     connection->start();
 
-    std::unique_ptr<Session> session(connection->createSession(Session::AUTO_ACKNOWLEDGE));
+    std::unique_ptr<Session> session(
+        connection->createSession(Session::AUTO_ACKNOWLEDGE));
     std::unique_ptr<Queue> queue(session->createTemporaryQueue());
 
-    std::unique_ptr<MessageProducer> producer(session->createProducer(queue.get()));
+    std::unique_ptr<MessageProducer> producer(
+        session->createProducer(queue.get()));
 
     // Create consumer with compound selector
     std::unique_ptr<MessageConsumer> consumer(
@@ -215,15 +238,17 @@ TEST_F(OpenwireSslMessageSelectorTest, testCompoundSelector) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(OpenwireSslMessageSelectorTest, testSelectorWithLike) {
-
+TEST_F(OpenwireSslMessageSelectorTest, testSelectorWithLike)
+{
     Connection* connection = this->cmsProvider->getConnection();
     connection->start();
 
-    std::unique_ptr<Session> session(connection->createSession(Session::AUTO_ACKNOWLEDGE));
+    std::unique_ptr<Session> session(
+        connection->createSession(Session::AUTO_ACKNOWLEDGE));
     std::unique_ptr<Queue> queue(session->createTemporaryQueue());
 
-    std::unique_ptr<MessageProducer> producer(session->createProducer(queue.get()));
+    std::unique_ptr<MessageProducer> producer(
+        session->createProducer(queue.get()));
 
     // Create consumer with LIKE selector
     std::unique_ptr<MessageConsumer> consumer(
@@ -256,19 +281,22 @@ TEST_F(OpenwireSslMessageSelectorTest, testSelectorWithLike) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(OpenwireSslMessageSelectorTest, testSelectorWithIn) {
-
+TEST_F(OpenwireSslMessageSelectorTest, testSelectorWithIn)
+{
     Connection* connection = this->cmsProvider->getConnection();
     connection->start();
 
-    std::unique_ptr<Session> session(connection->createSession(Session::AUTO_ACKNOWLEDGE));
+    std::unique_ptr<Session> session(
+        connection->createSession(Session::AUTO_ACKNOWLEDGE));
     std::unique_ptr<Queue> queue(session->createTemporaryQueue());
 
-    std::unique_ptr<MessageProducer> producer(session->createProducer(queue.get()));
+    std::unique_ptr<MessageProducer> producer(
+        session->createProducer(queue.get()));
 
     // Create consumer with IN selector
     std::unique_ptr<MessageConsumer> consumer(
-        session->createConsumer(queue.get(), "status IN ('pending', 'active')"));
+        session->createConsumer(queue.get(),
+                                "status IN ('pending', 'active')"));
 
     // Send messages with different statuses
     std::unique_ptr<TextMessage> msg1(session->createTextMessage("Pending"));
@@ -284,9 +312,10 @@ TEST_F(OpenwireSslMessageSelectorTest, testSelectorWithIn) {
     producer->send(msg3.get());
 
     // Should receive pending and active messages
-    int count = 0;
+    int                      count = 0;
     std::unique_ptr<Message> received;
-    while ((received.reset(consumer->receive(500)), received.get() != NULL)) {
+    while ((received.reset(consumer->receive(500)), received.get() != NULL))
+    {
         count++;
         string status = received->getStringProperty("status");
         ASSERT_TRUE(status == "pending" || status == "active");
@@ -297,31 +326,36 @@ TEST_F(OpenwireSslMessageSelectorTest, testSelectorWithIn) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(OpenwireSslMessageSelectorTest, testSelectorWithBetween) {
-
+TEST_F(OpenwireSslMessageSelectorTest, testSelectorWithBetween)
+{
     Connection* connection = this->cmsProvider->getConnection();
     connection->start();
 
-    std::unique_ptr<Session> session(connection->createSession(Session::AUTO_ACKNOWLEDGE));
+    std::unique_ptr<Session> session(
+        connection->createSession(Session::AUTO_ACKNOWLEDGE));
     std::unique_ptr<Queue> queue(session->createTemporaryQueue());
 
-    std::unique_ptr<MessageProducer> producer(session->createProducer(queue.get()));
+    std::unique_ptr<MessageProducer> producer(
+        session->createProducer(queue.get()));
 
     // Create consumer with BETWEEN selector
     std::unique_ptr<MessageConsumer> consumer(
         session->createConsumer(queue.get(), "price BETWEEN 10 AND 20"));
 
     // Send messages with different prices
-    for (int price = 5; price <= 25; price += 5) {
-        std::unique_ptr<TextMessage> msg(session->createTextMessage("Price: " + std::to_string(price)));
+    for (int price = 5; price <= 25; price += 5)
+    {
+        std::unique_ptr<TextMessage> msg(
+            session->createTextMessage("Price: " + std::to_string(price)));
         msg->setIntProperty("price", price);
         producer->send(msg.get());
     }
 
     // Should receive messages with price 10, 15, 20
-    int count = 0;
+    int                      count = 0;
     std::unique_ptr<Message> received;
-    while ((received.reset(consumer->receive(500)), received.get() != NULL)) {
+    while ((received.reset(consumer->receive(500)), received.get() != NULL))
+    {
         count++;
         int price = received->getIntProperty("price");
         ASSERT_TRUE(price >= 10 && price <= 20);
@@ -332,26 +366,30 @@ TEST_F(OpenwireSslMessageSelectorTest, testSelectorWithBetween) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(OpenwireSslMessageSelectorTest, testSelectorWithIsNull) {
-
+TEST_F(OpenwireSslMessageSelectorTest, testSelectorWithIsNull)
+{
     Connection* connection = this->cmsProvider->getConnection();
     connection->start();
 
-    std::unique_ptr<Session> session(connection->createSession(Session::AUTO_ACKNOWLEDGE));
+    std::unique_ptr<Session> session(
+        connection->createSession(Session::AUTO_ACKNOWLEDGE));
     std::unique_ptr<Queue> queue(session->createTemporaryQueue());
 
-    std::unique_ptr<MessageProducer> producer(session->createProducer(queue.get()));
+    std::unique_ptr<MessageProducer> producer(
+        session->createProducer(queue.get()));
 
     // Create consumer that selects messages where optional property is null
     std::unique_ptr<MessageConsumer> consumer(
         session->createConsumer(queue.get(), "optional IS NULL"));
 
     // Send message without the property
-    std::unique_ptr<TextMessage> msg1(session->createTextMessage("No optional"));
+    std::unique_ptr<TextMessage> msg1(
+        session->createTextMessage("No optional"));
     producer->send(msg1.get());
 
     // Send message with the property
-    std::unique_ptr<TextMessage> msg2(session->createTextMessage("Has optional"));
+    std::unique_ptr<TextMessage> msg2(
+        session->createTextMessage("Has optional"));
     msg2->setStringProperty("optional", "value");
     producer->send(msg2.get());
 
@@ -367,26 +405,30 @@ TEST_F(OpenwireSslMessageSelectorTest, testSelectorWithIsNull) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(OpenwireSslMessageSelectorTest, testJMSTypeSelector) {
-
+TEST_F(OpenwireSslMessageSelectorTest, testJMSTypeSelector)
+{
     Connection* connection = this->cmsProvider->getConnection();
     connection->start();
 
-    std::unique_ptr<Session> session(connection->createSession(Session::AUTO_ACKNOWLEDGE));
+    std::unique_ptr<Session> session(
+        connection->createSession(Session::AUTO_ACKNOWLEDGE));
     std::unique_ptr<Queue> queue(session->createTemporaryQueue());
 
-    std::unique_ptr<MessageProducer> producer(session->createProducer(queue.get()));
+    std::unique_ptr<MessageProducer> producer(
+        session->createProducer(queue.get()));
 
     // Create consumer that selects by JMSType
     std::unique_ptr<MessageConsumer> consumer(
         session->createConsumer(queue.get(), "JMSType = 'order'"));
 
     // Send messages with different types
-    std::unique_ptr<TextMessage> orderMsg(session->createTextMessage("Order message"));
+    std::unique_ptr<TextMessage> orderMsg(
+        session->createTextMessage("Order message"));
     orderMsg->setCMSType("order");
     producer->send(orderMsg.get());
 
-    std::unique_ptr<TextMessage> invoiceMsg(session->createTextMessage("Invoice message"));
+    std::unique_ptr<TextMessage> invoiceMsg(
+        session->createTextMessage("Invoice message"));
     invoiceMsg->setCMSType("invoice");
     producer->send(invoiceMsg.get());
 
@@ -402,34 +444,40 @@ TEST_F(OpenwireSslMessageSelectorTest, testJMSTypeSelector) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(OpenwireSslMessageSelectorTest, testJMSPrioritySelector) {
-
+TEST_F(OpenwireSslMessageSelectorTest, testJMSPrioritySelector)
+{
     Connection* connection = this->cmsProvider->getConnection();
     connection->start();
 
-    std::unique_ptr<Session> session(connection->createSession(Session::AUTO_ACKNOWLEDGE));
+    std::unique_ptr<Session> session(
+        connection->createSession(Session::AUTO_ACKNOWLEDGE));
     std::unique_ptr<Queue> queue(session->createTemporaryQueue());
 
-    std::unique_ptr<MessageProducer> producer(session->createProducer(queue.get()));
+    std::unique_ptr<MessageProducer> producer(
+        session->createProducer(queue.get()));
 
     // Create consumer that selects high priority messages
     std::unique_ptr<MessageConsumer> consumer(
         session->createConsumer(queue.get(), "JMSPriority >= 7"));
 
     // Send messages with different priorities
-    std::unique_ptr<TextMessage> highPriority(session->createTextMessage("High priority"));
+    std::unique_ptr<TextMessage> highPriority(
+        session->createTextMessage("High priority"));
     producer->send(highPriority.get(), DeliveryMode::PERSISTENT, 9, 0);
 
-    std::unique_ptr<TextMessage> normalPriority(session->createTextMessage("Normal priority"));
+    std::unique_ptr<TextMessage> normalPriority(
+        session->createTextMessage("Normal priority"));
     producer->send(normalPriority.get(), DeliveryMode::PERSISTENT, 4, 0);
 
-    std::unique_ptr<TextMessage> mediumPriority(session->createTextMessage("Medium priority"));
+    std::unique_ptr<TextMessage> mediumPriority(
+        session->createTextMessage("Medium priority"));
     producer->send(mediumPriority.get(), DeliveryMode::PERSISTENT, 7, 0);
 
     // Should receive high and medium priority messages (priority >= 7)
-    int count = 0;
+    int                      count = 0;
     std::unique_ptr<Message> received;
-    while ((received.reset(consumer->receive(500)), received.get() != NULL)) {
+    while ((received.reset(consumer->receive(500)), received.get() != NULL))
+    {
         count++;
         ASSERT_TRUE(received->getCMSPriority() >= 7);
     }

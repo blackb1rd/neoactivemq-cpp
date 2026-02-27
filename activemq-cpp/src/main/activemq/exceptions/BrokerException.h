@@ -18,38 +18,46 @@
 #ifndef _ACTIVEMQ_EXCEPTIONS_BROKEREXCEPTION_H_
 #define _ACTIVEMQ_EXCEPTIONS_BROKEREXCEPTION_H_
 
-#include <activemq/util/Config.h>
-#include <activemq/exceptions/ActiveMQException.h>
 #include <activemq/commands/BrokerError.h>
+#include <activemq/exceptions/ActiveMQException.h>
+#include <activemq/util/Config.h>
 
-namespace activemq {
-namespace exceptions {
+namespace activemq
+{
+namespace exceptions
+{
 
-    class AMQCPP_API BrokerException: public exceptions::ActiveMQException {
+    class AMQCPP_API BrokerException : public exceptions::ActiveMQException
+    {
     public:
-
         BrokerException();
 
         BrokerException(const exceptions::ActiveMQException& ex);
 
         BrokerException(const BrokerException& ex);
 
-        BrokerException(const char* file, const int lineNumber, const char* msg, ...);
+        BrokerException(const char* file,
+                        const int   lineNumber,
+                        const char* msg,
+                        ...);
 
-        BrokerException(const char* file, const int lineNumber, const commands::BrokerError* error);
+        BrokerException(const char*                  file,
+                        const int                    lineNumber,
+                        const commands::BrokerError* error);
 
         /**
          * Clones this exception.  This is useful for cases where you need
-         * to preserve the type of the original exception as well as the message.
-         * All subclasses should override.
+         * to preserve the type of the original exception as well as the
+         * message. All subclasses should override.
          *
          * @return new BrokerException instance that is a clone of this one.
          */
         virtual BrokerException* clone() const;
 
-        virtual ~BrokerException() throw ();
+        virtual ~BrokerException() throw();
     };
 
-}}
+}  // namespace exceptions
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_EXCEPTIONS_BROKEREXCEPTION_H_*/

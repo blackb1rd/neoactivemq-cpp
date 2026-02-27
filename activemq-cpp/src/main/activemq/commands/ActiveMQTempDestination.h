@@ -18,31 +18,35 @@
 #ifndef _ACTIVEMQ_COMMANDS_ACTIVEMQTEMPDESTINATION_H_
 #define _ACTIVEMQ_COMMANDS_ACTIVEMQTEMPDESTINATION_H_
 
-#include <activemq/util/Config.h>
 #include <activemq/commands/ActiveMQDestination.h>
 #include <activemq/exceptions/ActiveMQException.h>
+#include <activemq/util/Config.h>
 #include <cms/Closeable.h>
-#include <vector>
 #include <string>
+#include <vector>
 
-namespace activemq{
-namespace core{
+namespace activemq
+{
+namespace core
+{
     class ActiveMQConnection;
-}
-namespace commands{
+}  // namespace core
 
-    class AMQCPP_API ActiveMQTempDestination : public ActiveMQDestination,
-                                               public cms::Closeable,
-                                               public decaf::lang::Comparable<ActiveMQTempDestination> {
+namespace commands
+{
+
+    class AMQCPP_API ActiveMQTempDestination
+        : public ActiveMQDestination,
+          public cms::Closeable,
+          public decaf::lang::Comparable<ActiveMQTempDestination>
+    {
     public:
-
         using ActiveMQDestination::compareTo;
         using ActiveMQDestination::equals;
         using ActiveMQDestination::operator<;
         using ActiveMQDestination::operator==;
 
     protected:
-
         /**
          * Connection that we call back on close to allow this resource to
          * be cleaned up correctly at this end and at the Broker End.
@@ -50,56 +54,61 @@ namespace commands{
         core::ActiveMQConnection* connection;
 
         /**
-         * The Connection Id of the Connection that created this Temporary Destination.
+         * The Connection Id of the Connection that created this Temporary
+         * Destination.
          */
         std::string connectionId;
 
         int sequenceId;
 
     public:
-
         const static unsigned char ID_ACTIVEMQTEMPDESTINATION = 0;
 
     private:
-
         ActiveMQTempDestination(const ActiveMQTempDestination&);
         ActiveMQTempDestination& operator=(const ActiveMQTempDestination&);
 
     public:
-
         ActiveMQTempDestination();
         ActiveMQTempDestination(const std::string& name);
         virtual ~ActiveMQTempDestination() throw();
 
         virtual unsigned char getDataStructureType() const;
 
-        virtual ActiveMQTempDestination* cloneDataStructure() const {
+        virtual ActiveMQTempDestination* cloneDataStructure() const
+        {
             return NULL;
         }
 
-        virtual void copyDataStructure(const DataStructure* src) {
+        virtual void copyDataStructure(const DataStructure* src)
+        {
             ActiveMQDestination::copyDataStructure(src);
         }
 
         virtual std::string toString() const;
 
-        virtual bool equals(const DataStructure* value) const {
+        virtual bool equals(const DataStructure* value) const
+        {
             return ActiveMQDestination::equals(value);
         }
 
-        virtual int compareTo(const ActiveMQTempDestination& value) const {
+        virtual int compareTo(const ActiveMQTempDestination& value) const
+        {
             return ActiveMQDestination::compareTo(value);
         }
 
-        virtual bool equals(const ActiveMQTempDestination& value) const {
+        virtual bool equals(const ActiveMQTempDestination& value) const
+        {
             return ActiveMQDestination::equals(&value);
         }
 
-        virtual bool operator==(const ActiveMQTempDestination& value) const {
+        virtual bool operator==(const ActiveMQTempDestination& value) const
+        {
             return ActiveMQDestination::equals(&value);
         }
 
-        virtual bool operator<(const ActiveMQTempDestination& value) const {
+        virtual bool operator<(const ActiveMQTempDestination& value) const
+        {
             return ActiveMQDestination::compareTo(value) < 0;
         }
 
@@ -112,9 +121,11 @@ namespace commands{
          * destroyed.
          *
          * @param connection
-         *      The parent connection to be used to destroy this destination if closed..
+         *      The parent connection to be used to destroy this destination if
+         * closed..
          */
-        void setConnection(core::ActiveMQConnection* connection) {
+        void setConnection(core::ActiveMQConnection* connection)
+        {
             this->connection = connection;
         }
 
@@ -123,18 +134,22 @@ namespace commands{
          *
          * @return pointer to a Connection if one was set, false otherwise.
          */
-        core::ActiveMQConnection* getConnection() const {
+        core::ActiveMQConnection* getConnection() const
+        {
             return this->connection;
         }
 
         /**
-         * @return the connection Id of the Connection that created this temporary destination.
+         * @return the connection Id of the Connection that created this
+         * temporary destination.
          */
-        std::string getConnectionId() const {
+        std::string getConnectionId() const
+        {
             return this->connectionId;
         }
     };
 
-}}
+}  // namespace commands
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_COMMANDS_ACTIVEMQTEMPDESTINATION_H_*/

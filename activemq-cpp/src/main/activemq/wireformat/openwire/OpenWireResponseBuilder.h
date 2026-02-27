@@ -18,33 +18,46 @@
 #ifndef ACTIVEMQ_WIREFORMAT_OPENWIRE_OPENWIRERESPONSEBUILDER_H_
 #define ACTIVEMQ_WIREFORMAT_OPENWIRE_OPENWIRERESPONSEBUILDER_H_
 
-#include <activemq/util/Config.h>
 #include <activemq/transport/mock/ResponseBuilder.h>
-#include <decaf/util/LinkedList.h>
+#include <activemq/util/Config.h>
 #include <decaf/lang/Pointer.h>
+#include <decaf/util/LinkedList.h>
 
-namespace activemq{
-namespace wireformat{
-namespace openwire{
+namespace activemq
+{
+namespace wireformat
+{
+    namespace openwire
+    {
 
-    using decaf::lang::Pointer;
+        using decaf::lang::Pointer;
 
-    /**
-     * Used to allow a MockTransport to generate response commands to OpenWire Commands.
-     */
-    class AMQCPP_API OpenWireResponseBuilder: public transport::mock::ResponseBuilder {
-    public:
+        /**
+         * Used to allow a MockTransport to generate response commands to
+         * OpenWire Commands.
+         */
+        class AMQCPP_API OpenWireResponseBuilder
+            : public transport::mock::ResponseBuilder
+        {
+        public:
+            OpenWireResponseBuilder()
+            {
+            }
 
-        OpenWireResponseBuilder() {}
-        virtual ~OpenWireResponseBuilder() {}
+            virtual ~OpenWireResponseBuilder()
+            {
+            }
 
-        virtual Pointer<commands::Response> buildResponse(const Pointer<commands::Command> command);
+            virtual Pointer<commands::Response> buildResponse(
+                const Pointer<commands::Command> command);
 
-        virtual void buildIncomingCommands(const Pointer<commands::Command> command,
-                                           decaf::util::LinkedList<Pointer<commands::Command> >& queue);
+            virtual void buildIncomingCommands(
+                const Pointer<commands::Command>                     command,
+                decaf::util::LinkedList<Pointer<commands::Command>>& queue);
+        };
 
-    };
-
-}}}
+    }  // namespace openwire
+}  // namespace wireformat
+}  // namespace activemq
 
 #endif /*ACTIVEMQ_WIREFORMAT_OPENWIRE_OPENWIRERESPONSEBUILDER_H_*/

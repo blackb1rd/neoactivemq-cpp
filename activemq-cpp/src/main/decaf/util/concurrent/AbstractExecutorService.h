@@ -23,29 +23,32 @@
 #include <decaf/util/concurrent/Executor.h>
 #include <decaf/util/concurrent/ExecutorService.h>
 
-namespace decaf {
-namespace util {
-namespace concurrent {
+namespace decaf
+{
+namespace util
+{
+    namespace concurrent
+    {
 
-    /**
-     * Provides a default implementation for the methods of the ExecutorService
-     * interface.  Use this class as a starting point for implementations of custom
-     * executor service implementations.
-     *
-     * @since 1.0
-     */
-    class DECAF_API AbstractExecutorService : public ExecutorService {
-    public:
+        /**
+         * Provides a default implementation for the methods of the
+         * ExecutorService interface.  Use this class as a starting point for
+         * implementations of custom executor service implementations.
+         *
+         * @since 1.0
+         */
+        class DECAF_API AbstractExecutorService : public ExecutorService
+        {
+        public:
+            AbstractExecutorService();
+            virtual ~AbstractExecutorService();
 
-        AbstractExecutorService();
-        virtual ~AbstractExecutorService();
+        protected:
+            virtual void doSubmit(FutureType* future);
+        };
 
-    protected:
-
-        virtual void doSubmit(FutureType* future);
-
-    };
-
-}}}
+    }  // namespace concurrent
+}  // namespace util
+}  // namespace decaf
 
 #endif /* _DECAF_UTIL_CONCURRENT_ABSTRACTEXECUTORSERVICE_H_ */

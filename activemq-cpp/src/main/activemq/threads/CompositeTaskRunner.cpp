@@ -17,8 +17,8 @@
 
 #include "CompositeTaskRunner.h"
 
-#include <memory>
 #include <atomic>
+#include <memory>
 
 #include <activemq/exceptions/ActiveMQException.h>
 
@@ -32,81 +32,97 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace activemq {
-namespace threads {
+namespace activemq
+{
+namespace threads
+{
 
-    enum class TaskRunnerState : int {
-        RUNNING = 0,
+    enum class TaskRunnerState : int
+    {
+        RUNNING  = 0,
         STOPPING = 1,
-        STOPPED = 2
+        STOPPED  = 2
     };
 
-    class CompositeTaskRunnerImpl {
+    class CompositeTaskRunnerImpl
+    {
     private:
-
         CompositeTaskRunnerImpl(const CompositeTaskRunnerImpl&);
-        CompositeTaskRunnerImpl& operator= (const CompositeTaskRunnerImpl&);
+        CompositeTaskRunnerImpl& operator=(const CompositeTaskRunnerImpl&);
 
     public:
-
         decaf::util::LinkedList<CompositeTask*> tasks;
-        mutable decaf::util::concurrent::Mutex mutex;
+        mutable decaf::util::concurrent::Mutex  mutex;
 
         decaf::lang::Pointer<decaf::lang::Thread> thread;
 
         std::atomic<TaskRunnerState> state;
-        std::atomic<bool> pending;
+        std::atomic<bool>            pending;
 
     public:
-
-        CompositeTaskRunnerImpl() : tasks(),
-                                    mutex(),
-                                    thread(),
-                                    state(TaskRunnerState::RUNNING),
-                                    pending(false) {
+        CompositeTaskRunnerImpl()
+            : tasks(),
+              mutex(),
+              thread(),
+              state(TaskRunnerState::RUNNING),
+              pending(false)
+        {
         }
-
     };
 
-}}
+}  // namespace threads
+}  // namespace activemq
 
 ////////////////////////////////////////////////////////////////////////////////
-CompositeTaskRunner::CompositeTaskRunner() : impl(std::make_shared<CompositeTaskRunnerImpl>()) {
-    this->impl->thread.reset(new Thread(this, "ActiveMQ CompositeTaskRunner Thread"));
+CompositeTaskRunner::CompositeTaskRunner()
+    : impl(std::make_shared<CompositeTaskRunnerImpl>())
+{
+    this->impl->thread.reset(
+        new Thread(this, "ActiveMQ CompositeTaskRunner Thread"));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-CompositeTaskRunner::~CompositeTaskRunner() {
-    try {
-        // Keep a local reference so impl stays alive while we access it, even if
-        // this destructor is invoked from within the runner thread itself (via a
-        // task callback that triggers transport teardown).
+CompositeTaskRunner::~CompositeTaskRunner()
+{
+    try
+    {
+        // Keep a local reference so impl stays alive while we access it, even
+        // if this destructor is invoked from within the runner thread itself
+        // (via a task callback that triggers transport teardown).
         std::shared_ptr<CompositeTaskRunnerImpl> localImpl = this->impl;
-        if (localImpl) {
+        if (localImpl)
+        {
             shutdown();
-            // Only join from an external thread; a self-join would deadlock or be
-            // a no-op depending on the platform, and the thread is still running
-            // up the call-stack when the destructor is called re-entrantly.
+            // Only join from an external thread; a self-join would deadlock or
+            // be a no-op depending on the platform, and the thread is still
+            // running up the call-stack when the destructor is called
+            // re-entrantly.
             if (localImpl->thread != NULL &&
-                Thread::currentThread() != localImpl->thread.get()) {
+                Thread::currentThread() != localImpl->thread.get())
+            {
                 localImpl->thread->join();
             }
-            if (localImpl->thread != NULL) {
+            if (localImpl->thread != NULL)
+            {
                 localImpl->thread.reset(NULL);
             }
         }
     }
     AMQ_CATCHALL_NOTHROW()
-    // impl shared_ptr released here; the CompositeTaskRunnerImpl memory is freed
-    // only once every local copy (including those held by run()/iterate()) is gone.
+    // impl shared_ptr released here; the CompositeTaskRunnerImpl memory is
+    // freed only once every local copy (including those held by
+    // run()/iterate()) is gone.
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CompositeTaskRunner::start() {
-
-    synchronized(&impl->mutex) {
-        if (impl->state.load(std::memory_order_acquire) == TaskRunnerState::RUNNING &&
-            !this->impl->thread->isAlive()) {
+void CompositeTaskRunner::start()
+{
+    synchronized(&impl->mutex)
+    {
+        if (impl->state.load(std::memory_order_acquire) ==
+                TaskRunnerState::RUNNING &&
+            !this->impl->thread->isAlive())
+        {
             this->impl->thread->start();
             this->wakeup();
         }
@@ -114,12 +130,14 @@ void CompositeTaskRunner::start() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool CompositeTaskRunner::isStarted() const {
-
+bool CompositeTaskRunner::isStarted() const
+{
     bool result = false;
 
-    synchronized(&impl->mutex) {
-        if (this->impl->thread != NULL && this->impl->thread->isAlive()) {
+    synchronized(&impl->mutex)
+    {
+        if (this->impl->thread != NULL && this->impl->thread->isAlive())
+        {
             result = true;
         }
     }
@@ -128,11 +146,13 @@ bool CompositeTaskRunner::isStarted() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CompositeTaskRunner::shutdown(long long timeout) {
-
+void CompositeTaskRunner::shutdown(long long timeout)
+{
     // Phase 1: Signal shutdown
     TaskRunnerState expected = TaskRunnerState::RUNNING;
-    if (!impl->state.compare_exchange_strong(expected, TaskRunnerState::STOPPING)) {
+    if (!impl->state.compare_exchange_strong(expected,
+                                             TaskRunnerState::STOPPING))
+    {
         // Already stopping or stopped
         return;
     }
@@ -141,27 +161,33 @@ void CompositeTaskRunner::shutdown(long long timeout) {
     std::atomic_thread_fence(std::memory_order_release);
 
     // Wake up the thread
-    synchronized(&impl->mutex) {
+    synchronized(&impl->mutex)
+    {
         impl->pending.store(true, std::memory_order_release);
         impl->mutex.notifyAll();
     }
 
     // Phase 2: Wait for thread to terminate
     // (no need to wait if shutdown is called from thread that is shutting down)
-    if (Thread::currentThread() != this->impl->thread.get()) {
-        TaskRunnerState currentState = impl->state.load(std::memory_order_acquire);
-        if (currentState != TaskRunnerState::STOPPED) {
+    if (Thread::currentThread() != this->impl->thread.get())
+    {
+        TaskRunnerState currentState =
+            impl->state.load(std::memory_order_acquire);
+        if (currentState != TaskRunnerState::STOPPED)
+        {
             this->impl->thread->join(timeout);
         }
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CompositeTaskRunner::shutdown() {
-
+void CompositeTaskRunner::shutdown()
+{
     // Phase 1: Signal shutdown
     TaskRunnerState expected = TaskRunnerState::RUNNING;
-    if (!impl->state.compare_exchange_strong(expected, TaskRunnerState::STOPPING)) {
+    if (!impl->state.compare_exchange_strong(expected,
+                                             TaskRunnerState::STOPPING))
+    {
         // Already stopping or stopped
         return;
     }
@@ -170,67 +196,84 @@ void CompositeTaskRunner::shutdown() {
     std::atomic_thread_fence(std::memory_order_release);
 
     // Wake up the thread
-    synchronized(&impl->mutex) {
+    synchronized(&impl->mutex)
+    {
         impl->pending.store(true, std::memory_order_release);
         impl->mutex.notifyAll();
     }
 
     // Phase 2: Wait for thread to terminate
     // (no need to wait if shutdown is called from thread that is shutting down)
-    if (Thread::currentThread() != this->impl->thread.get()) {
-        TaskRunnerState currentState = impl->state.load(std::memory_order_acquire);
-        if (currentState != TaskRunnerState::STOPPED) {
+    if (Thread::currentThread() != this->impl->thread.get())
+    {
+        TaskRunnerState currentState =
+            impl->state.load(std::memory_order_acquire);
+        if (currentState != TaskRunnerState::STOPPED)
+        {
             impl->thread->join();
         }
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CompositeTaskRunner::wakeup() {
-
+void CompositeTaskRunner::wakeup()
+{
     // Check if we're shutting down
-    if (impl->state.load(std::memory_order_acquire) != TaskRunnerState::RUNNING) {
+    if (impl->state.load(std::memory_order_acquire) != TaskRunnerState::RUNNING)
+    {
         return;
     }
 
-    synchronized(&impl->mutex) {
+    synchronized(&impl->mutex)
+    {
         impl->pending.store(true, std::memory_order_release);
         impl->mutex.notifyAll();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CompositeTaskRunner::run() {
-
+void CompositeTaskRunner::run()
+{
     // Capture a local shared_ptr so impl stays alive for the entire lifetime of
-    // this thread function, even if ~CompositeTaskRunner() releases its reference
-    // re-entrantly from within a task callback.
+    // this thread function, even if ~CompositeTaskRunner() releases its
+    // reference re-entrantly from within a task callback.
     std::shared_ptr<CompositeTaskRunnerImpl> localImpl = this->impl;
 
-    try {
-
-        while (true) {
+    try
+    {
+        while (true)
+        {
             // Check state with memory barrier
-            if (localImpl->state.load(std::memory_order_acquire) != TaskRunnerState::RUNNING) {
+            if (localImpl->state.load(std::memory_order_acquire) !=
+                TaskRunnerState::RUNNING)
+            {
                 break;
             }
 
-            synchronized(&localImpl->mutex) {
+            synchronized(&localImpl->mutex)
+            {
                 localImpl->pending.store(false, std::memory_order_release);
             }
 
-            if (!this->iterate()) {
+            if (!this->iterate())
+            {
                 // wait to be notified.
-                synchronized(&localImpl->mutex) {
+                synchronized(&localImpl->mutex)
+                {
                     // Double-check state before waiting
-                    if (localImpl->state.load(std::memory_order_acquire) != TaskRunnerState::RUNNING) {
+                    if (localImpl->state.load(std::memory_order_acquire) !=
+                        TaskRunnerState::RUNNING)
+                    {
                         break;
                     }
 
                     // Use timed wait to periodically check state
-                    while (!localImpl->pending.load(std::memory_order_acquire) &&
-                           localImpl->state.load(std::memory_order_acquire) == TaskRunnerState::RUNNING) {
-                        localImpl->mutex.wait(100); // 100ms timeout
+                    while (
+                        !localImpl->pending.load(std::memory_order_acquire) &&
+                        localImpl->state.load(std::memory_order_acquire) ==
+                            TaskRunnerState::RUNNING)
+                    {
+                        localImpl->mutex.wait(100);  // 100ms timeout
                     }
                 }
             }
@@ -243,16 +286,19 @@ void CompositeTaskRunner::run() {
     std::atomic_thread_fence(std::memory_order_seq_cst);
 
     // Notify any waiting threads
-    synchronized(&localImpl->mutex) {
+    synchronized(&localImpl->mutex)
+    {
         localImpl->mutex.notifyAll();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CompositeTaskRunner::addTask(CompositeTask* task) {
-
-    if (task != NULL) {
-        synchronized(&impl->tasks) {
+void CompositeTaskRunner::addTask(CompositeTask* task)
+{
+    if (task != NULL)
+    {
+        synchronized(&impl->tasks)
+        {
             impl->tasks.add(task);
             wakeup();
         }
@@ -260,10 +306,12 @@ void CompositeTaskRunner::addTask(CompositeTask* task) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CompositeTaskRunner::removeTask(CompositeTask* task) {
-
-    if (task != NULL) {
-        synchronized(&impl->tasks) {
+void CompositeTaskRunner::removeTask(CompositeTask* task)
+{
+    if (task != NULL)
+    {
+        synchronized(&impl->tasks)
+        {
             impl->tasks.remove(task);
             wakeup();
         }
@@ -271,26 +319,32 @@ void CompositeTaskRunner::removeTask(CompositeTask* task) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool CompositeTaskRunner::iterate() {
-
+bool CompositeTaskRunner::iterate()
+{
     // Capture a local shared_ptr so impl remains valid even if task->iterate()
     // triggers a re-entrant call to ~CompositeTaskRunner() on this same thread
     // (e.g. via InactivityMonitor::onException() → transport teardown chain).
     std::shared_ptr<CompositeTaskRunnerImpl> localImpl = this->impl;
 
-    synchronized(&localImpl->tasks) {
-
-        for (int i = 0; i < localImpl->tasks.size(); ++i) {
+    synchronized(&localImpl->tasks)
+    {
+        for (int i = 0; i < localImpl->tasks.size(); ++i)
+        {
             CompositeTask* task = localImpl->tasks.pop();
 
-            if (task != NULL) {
-                if (task->isPending()) {
+            if (task != NULL)
+            {
+                if (task->isPending())
+                {
                     task->iterate();
 
-                    // task->iterate() may have caused ~CompositeTaskRunner() to run
-                    // on this thread.  localImpl keeps impl alive, but if we are
-                    // shutting down we must not touch the task list further.
-                    if (localImpl->state.load(std::memory_order_acquire) != TaskRunnerState::RUNNING) {
+                    // task->iterate() may have caused ~CompositeTaskRunner() to
+                    // run on this thread.  localImpl keeps impl alive, but if
+                    // we are shutting down we must not touch the task list
+                    // further.
+                    if (localImpl->state.load(std::memory_order_acquire) !=
+                        TaskRunnerState::RUNNING)
+                    {
                         return false;
                     }
 
@@ -299,7 +353,9 @@ bool CompositeTaskRunner::iterate() {
                     // Always return true, so that we check again for any of
                     // the other tasks that might now be pending.
                     return true;
-                } else {
+                }
+                else
+                {
                     localImpl->tasks.addLast(task);
                 }
             }

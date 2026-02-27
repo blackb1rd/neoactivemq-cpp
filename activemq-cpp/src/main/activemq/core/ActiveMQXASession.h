@@ -20,33 +20,34 @@
 
 #include <activemq/util/Config.h>
 
-#include <cms/XASession.h>
 #include <activemq/core/ActiveMQSession.h>
 #include <activemq/core/kernels/ActiveMQXASessionKernel.h>
+#include <cms/XASession.h>
 
-namespace activemq {
-namespace core {
+namespace activemq
+{
+namespace core
+{
 
     using decaf::lang::Pointer;
 
-    class AMQCPP_API ActiveMQXASession : public cms::XASession, public ActiveMQSession {
+    class AMQCPP_API ActiveMQXASession : public cms::XASession,
+                                         public ActiveMQSession
+    {
     private:
-
         Pointer<activemq::core::kernels::ActiveMQXASessionKernel> xaKernel;
 
     private:
-
         ActiveMQXASession(const ActiveMQXASession&);
-        ActiveMQXASession& operator= (const ActiveMQXASession&);
+        ActiveMQXASession& operator=(const ActiveMQXASession&);
 
     public:
-
-        ActiveMQXASession(Pointer<activemq::core::kernels::ActiveMQXASessionKernel> kernel);
+        ActiveMQXASession(
+            Pointer<activemq::core::kernels::ActiveMQXASessionKernel> kernel);
 
         virtual ~ActiveMQXASession();
 
     public:  // Override ActiveMQSession methods to make them XA Aware
-
         virtual bool isTransacted() const;
 
         virtual bool isAutoAcknowledge() const;
@@ -58,11 +59,10 @@ namespace core {
         virtual void rollback();
 
     public:  // XASession overrides
-
         virtual cms::XAResource* getXAResource() const;
-
     };
 
-}}
+}  // namespace core
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_CORE_ACTIVEMQXASESSION_H_ */

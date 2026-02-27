@@ -22,45 +22,54 @@ using namespace activemq::cmsutil;
 using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
-SessionPool::SessionPool(cms::Connection* connection,
+SessionPool::SessionPool(cms::Connection*              connection,
                          cms::Session::AcknowledgeMode ackMode,
-                         ResourceLifecycleManager* resourceLifecycleManager)
+                         ResourceLifecycleManager*     resourceLifecycleManager)
     : connection(connection),
       resourceLifecycleManager(resourceLifecycleManager),
       mutex(),
       available(),
       sessions(),
-      acknowledgeMode(ackMode) {
+      acknowledgeMode(ackMode)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SessionPool::~SessionPool() {
-
-    try {
+SessionPool::~SessionPool()
+{
+    try
+    {
         // Destroy all of the pooled session objects.
         list<PooledSession*>::iterator iter = sessions.begin();
-        for (; iter != sessions.end(); ++iter) {
-            try {
+        for (; iter != sessions.end(); ++iter)
+        {
+            try
+            {
                 delete *iter;
-            } catch (...) {}
+            }
+            catch (...)
+            {
+            }
         }
 
         sessions.clear();
         available.clear();
-    } catch(...) {
+    }
+    catch (...)
+    {
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-PooledSession* SessionPool::takeSession() {
-
-    synchronized(&mutex) {
-
+PooledSession* SessionPool::takeSession()
+{
+    synchronized(&mutex)
+    {
         PooledSession* pooledSession = NULL;
 
         // If there are no sessions available, create a new one and return it.
-        if (available.size() == 0) {
-
+        if (available.size() == 0)
+        {
             // No sessions were available - create a new one.
             cms::Session* session = connection->createSession(acknowledgeMode);
 
@@ -73,9 +82,9 @@ PooledSession* SessionPool::takeSession() {
 
             // Add to the sessions list.
             sessions.push_back(pooledSession);
-
-        } else {
-
+        }
+        else
+        {
             // There are sessions available - use the one at the head of the
             // list, and remove it from the available list.
             pooledSession = available.front();
@@ -91,9 +100,10 @@ PooledSession* SessionPool::takeSession() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SessionPool::returnSession(PooledSession* session) {
-
-    synchronized(&mutex) {
+void SessionPool::returnSession(PooledSession* session)
+{
+    synchronized(&mutex)
+    {
         // Add to the available list.
         available.push_back(session);
     }

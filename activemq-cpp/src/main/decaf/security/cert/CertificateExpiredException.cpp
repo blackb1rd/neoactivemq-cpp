@@ -22,22 +22,35 @@ using namespace decaf::security;
 using namespace decaf::security::cert;
 
 ////////////////////////////////////////////////////////////////////////////////
-CertificateExpiredException::CertificateExpiredException() : CertificateException() {
+CertificateExpiredException::CertificateExpiredException()
+    : CertificateException()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-CertificateExpiredException::CertificateExpiredException(const Exception& ex) : CertificateException() {
-    *(Exception*) this = ex;
+CertificateExpiredException::CertificateExpiredException(const Exception& ex)
+    : CertificateException()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-CertificateExpiredException::CertificateExpiredException(const CertificateExpiredException& ex) : CertificateException() {
-    *(Exception*) this = ex;
+CertificateExpiredException::CertificateExpiredException(
+    const CertificateExpiredException& ex)
+    : CertificateException()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-CertificateExpiredException::CertificateExpiredException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...) : CertificateException(cause) {
-
+CertificateExpiredException::CertificateExpiredException(
+    const char*           file,
+    const int             lineNumber,
+    const std::exception* cause,
+    const char*           msg,
+    ...)
+    : CertificateException(cause)
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -47,12 +60,19 @@ CertificateExpiredException::CertificateExpiredException(const char* file, const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-CertificateExpiredException::CertificateExpiredException(const std::exception* cause) : CertificateException(cause) {
+CertificateExpiredException::CertificateExpiredException(
+    const std::exception* cause)
+    : CertificateException(cause)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-CertificateExpiredException::CertificateExpiredException(const char* file, const int lineNumber, const char* msg, ...) : CertificateException() {
-
+CertificateExpiredException::CertificateExpiredException(const char* file,
+                                                         const int   lineNumber,
+                                                         const char* msg,
+                                                         ...)
+    : CertificateException()
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -62,5 +82,6 @@ CertificateExpiredException::CertificateExpiredException(const char* file, const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-CertificateExpiredException::~CertificateExpiredException() throw () {
+CertificateExpiredException::~CertificateExpiredException() throw()
+{
 }

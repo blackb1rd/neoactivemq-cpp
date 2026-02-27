@@ -26,29 +26,33 @@
 #include <activemq/cmsutil/CmsTemplate.h>
 #include <activemq/cmsutil/MessageCreator.h>
 
-namespace cms {
-    class Session;
-namespace stress {
+namespace cms
+{
+class Session;
+
+namespace stress
+{
 
     class Client;
 
-    class BrokerMonitor: public decaf::lang::Runnable, activemq::cmsutil::MessageCreator {
+    class BrokerMonitor : public decaf::lang::Runnable,
+                          activemq::cmsutil::MessageCreator
+    {
     private:
-
-        bool closing;
-        bool brokerOk;
-        std::string url;
-        int interval;
-        decaf::lang::Thread* brokerMonitorThread;
+        bool                                     closing;
+        bool                                     brokerOk;
+        std::string                              url;
+        int                                      interval;
+        decaf::lang::Thread*                     brokerMonitorThread;
         decaf::util::concurrent::CountDownLatch* quit;
 
     private:
-
-        activemq::cmsutil::CmsTemplate* createCmsTemplate(cms::ConnectionFactory* connectionFactory);
+        activemq::cmsutil::CmsTemplate* createCmsTemplate(
+            cms::ConnectionFactory* connectionFactory);
 
     public:
-
-        BrokerMonitor(const std::string& url, int interval,
+        BrokerMonitor(const std::string&                       url,
+                      int                                      interval,
                       decaf::util::concurrent::CountDownLatch* quit);
 
         virtual ~BrokerMonitor();
@@ -62,9 +66,9 @@ namespace stress {
         void close();
 
         bool isBrokerOk();
-
     };
 
-}}
+}  // namespace stress
+}  // namespace cms
 
 #endif /** _CMS_STRESS_BROKERMONITOR_H_ */

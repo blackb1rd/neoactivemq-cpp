@@ -24,18 +24,20 @@
 
 #include <string>
 
-namespace decaf {
-namespace net {
+namespace decaf
+{
+namespace net
+{
 
-    class DECAF_API InetSocketAddress : public SocketAddress {
+    class DECAF_API InetSocketAddress : public SocketAddress
+    {
     public:
-
         InetSocketAddress();
 
         virtual ~InetSocketAddress();
-
     };
 
-}}
+}  // namespace net
+}  // namespace decaf
 
 #endif /* _DECAF_NET_INETSOCKETADDRESS_H_ */

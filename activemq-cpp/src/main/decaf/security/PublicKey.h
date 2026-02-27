@@ -22,19 +22,22 @@
 
 #include <decaf/security/Key.h>
 
-namespace decaf {
-namespace security {
+namespace decaf
+{
+namespace security
+{
 
     /**
      * A public key. This interface contains no methods or constants. It merely
      * serves to group (and provide type safety for) all public key interfaces.
      */
-    class DECAF_API PublicKey : public Key {
+    class DECAF_API PublicKey : public Key
+    {
     public:
-
         virtual ~PublicKey();
     };
 
-}}
+}  // namespace security
+}  // namespace decaf
 
 #endif /*_DECAF_SECURITY_PUBLICKEY_H_*/

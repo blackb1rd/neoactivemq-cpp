@@ -19,28 +19,30 @@
 #define _ACTIVEMQ_COMMANDS_ACTIVEMQOBJECTMESSAGE_H_
 
 #include <activemq/commands/ActiveMQMessageTemplate.h>
-#include <cms/ObjectMessage.h>
 #include <activemq/util/Config.h>
+#include <cms/ObjectMessage.h>
 #include <memory>
 
-namespace activemq {
-namespace commands {
+namespace activemq
+{
+namespace commands
+{
 
-    class AMQCPP_API ActiveMQObjectMessage : public ActiveMQMessageTemplate<cms::ObjectMessage> {
+    class AMQCPP_API ActiveMQObjectMessage
+        : public ActiveMQMessageTemplate<cms::ObjectMessage>
+    {
     public:
-
         const static unsigned char ID_ACTIVEMQOBJECTMESSAGE;
 
     private:
-
         ActiveMQObjectMessage(const ActiveMQObjectMessage&);
         ActiveMQObjectMessage& operator=(const ActiveMQObjectMessage&);
 
     public:
-
         ActiveMQObjectMessage();
 
-        virtual ~ActiveMQObjectMessage() throw () {
+        virtual ~ActiveMQObjectMessage() throw()
+        {
         }
 
         virtual unsigned char getDataStructureType() const;
@@ -53,18 +55,16 @@ namespace commands {
 
         virtual bool equals(const DataStructure* value) const;
 
-    public: // CMS Message
-
+    public:  // CMS Message
         virtual cms::Message* clone() const;
 
-    public: // CMS ObjectMessage
-
+    public:  // CMS ObjectMessage
         virtual void setObjectBytes(const std::vector<unsigned char>& bytes);
 
         virtual std::vector<unsigned char> getObjectBytes() const;
-
     };
 
-}}
+}  // namespace commands
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_COMMANDS_ACTIVEMQOBJECTMESSAGE_H_*/

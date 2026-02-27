@@ -16,8 +16,8 @@
  */
 
 #include <benchmark/PerformanceTimer.h>
-#include <decaf/lang/Thread.h>
 #include <decaf/lang/Runnable.h>
+#include <decaf/lang/Thread.h>
 
 #include <gtest/gtest.h>
 #include <iostream>
@@ -25,36 +25,42 @@
 using namespace decaf;
 using namespace decaf::lang;
 
-namespace decaf {
-namespace lang {
+namespace decaf
+{
+namespace lang
+{
 
-    class ThreadBenchmark : public ::testing::Test {
+    class ThreadBenchmark : public ::testing::Test
+    {
     };
 
-    class BenchmarkRunnable : public decaf::lang::Runnable {
+    class BenchmarkRunnable : public decaf::lang::Runnable
+    {
     public:
-
-        virtual void run() {
-            Thread::sleep( 10 );
+        virtual void run()
+        {
+            Thread::sleep(10);
         }
-
     };
 
-}}
+}  // namespace lang
+}  // namespace decaf
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ThreadBenchmark, runBenchmark) {
-
+TEST_F(ThreadBenchmark, runBenchmark)
+{
     benchmark::PerformanceTimer timer;
-    int iterations = 100;
+    int                         iterations = 100;
 
-    for( int iter = 0; iter < iterations; ++iter ) {
+    for (int iter = 0; iter < iterations; ++iter)
+    {
         timer.start();
 
         BenchmarkRunnable runnable;
 
-        for( int i = 0; i < 10; ++i ) {
-            Thread theThread( &runnable );
+        for (int i = 0; i < 10; ++i)
+        {
+            Thread theThread(&runnable);
             theThread.start();
             theThread.join();
         }
@@ -62,7 +68,7 @@ TEST_F(ThreadBenchmark, runBenchmark) {
         timer.stop();
     }
 
-    std::cout << typeid( Thread ).name() << " Benchmark Time = "
-              << timer.getAverageTime() << " Millisecs"
+    std::cout << typeid(Thread).name()
+              << " Benchmark Time = " << timer.getAverageTime() << " Millisecs"
               << std::endl;
 }

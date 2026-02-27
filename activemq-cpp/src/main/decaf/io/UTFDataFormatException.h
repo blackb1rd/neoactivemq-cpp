@@ -20,8 +20,10 @@
 
 #include <decaf/io/IOException.h>
 
-namespace decaf {
-namespace io {
+namespace decaf
+{
+namespace io
+{
 
     /**
      * Thrown from classes that attempt to read or write a UTF-8 encoded string
@@ -29,9 +31,9 @@ namespace io {
      *
      * @since 1.0
      */
-    class DECAF_API UTFDataFormatException : public decaf::io::IOException {
+    class DECAF_API UTFDataFormatException : public decaf::io::IOException
+    {
     public:
-
         /**
          * Default Constructor
          */
@@ -58,11 +60,16 @@ namespace io {
          *
          * @param file The file name where exception occurs
          * @param lineNumber The line number where the exception occurred.
-         * @param cause The exception that was the cause for this one to be thrown.
+         * @param cause The exception that was the cause for this one to be
+         * thrown.
          * @param msg The message to report
          * @param ... list of primitives that are formatted into the message
          */
-        UTFDataFormatException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...);
+        UTFDataFormatException(const char*           file,
+                               const int             lineNumber,
+                               const std::exception* cause,
+                               const char*           msg,
+                               ...);
 
         /**
          * Constructor
@@ -80,23 +87,28 @@ namespace io {
          * @param msg The message to report
          * @param ... list of primitives that are formatted into the message
          */
-        UTFDataFormatException(const char* file, const int lineNumber, const char* msg, ...);
+        UTFDataFormatException(const char* file,
+                               const int   lineNumber,
+                               const char* msg,
+                               ...);
 
         /**
          * Clones this exception.  This is useful for cases where you need
-         * to preserve the type of the original exception as well as the message.
-         * All subclasses should override.
+         * to preserve the type of the original exception as well as the
+         * message. All subclasses should override.
          *
-         * @return A new instance of an Exception object that is a copy of this instance.
+         * @return A new instance of an Exception object that is a copy of this
+         * instance.
          */
-        virtual UTFDataFormatException* clone() const {
+        virtual UTFDataFormatException* clone() const
+        {
             return new UTFDataFormatException(*this);
         }
 
         virtual ~UTFDataFormatException() throw();
-
     };
 
-}}
+}  // namespace io
+}  // namespace decaf
 
 #endif /* _DECAF_IO_UTFDATAFORMATEXCEPTION_H_ */

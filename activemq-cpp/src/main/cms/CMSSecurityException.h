@@ -18,38 +18,41 @@
 #ifndef _CMS_CMSSECURITYEXCEPTION_H_
 #define _CMS_CMSSECURITYEXCEPTION_H_
 
-#include <cms/Config.h>
 #include <cms/CMSException.h>
+#include <cms/Config.h>
 
-namespace cms {
+namespace cms
+{
 
-    /**
-     * This exception must be thrown when a provider rejects a user name/password submitted
-     * by a client. It may also be thrown for any case where a security restriction prevents
-     * a method from completing.
-     *
-     * @since 1.3
-     */
-    class CMS_API CMSSecurityException : public CMSException {
-    public:
+/**
+ * This exception must be thrown when a provider rejects a user name/password
+ * submitted by a client. It may also be thrown for any case where a security
+ * restriction prevents a method from completing.
+ *
+ * @since 1.3
+ */
+class CMS_API CMSSecurityException : public CMSException
+{
+public:
+    CMSSecurityException();
 
-        CMSSecurityException();
+    CMSSecurityException(const CMSSecurityException& ex);
 
-        CMSSecurityException(const CMSSecurityException& ex);
+    CMSSecurityException(const std::string& message);
 
-        CMSSecurityException(const std::string& message);
+    CMSSecurityException(const std::string&    message,
+                         const std::exception* cause);
 
-        CMSSecurityException(const std::string& message, const std::exception* cause);
+    CMSSecurityException(
+        const std::string&                              message,
+        const std::exception*                           cause,
+        const std::vector<std::pair<std::string, int>>& stackTrace);
 
-        CMSSecurityException(const std::string& message, const std::exception* cause,
-                             const std::vector<std::pair<std::string, int> >& stackTrace);
+    virtual ~CMSSecurityException() throw();
 
-        virtual ~CMSSecurityException() throw();
+    virtual CMSSecurityException* clone();
+};
 
-        virtual CMSSecurityException* clone();
-
-    };
-
-}
+}  // namespace cms
 
 #endif /*_CMS_CMSSECURITYEXCEPTION_H_*/

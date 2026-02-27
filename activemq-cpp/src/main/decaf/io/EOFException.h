@@ -20,15 +20,17 @@
 
 #include <decaf/io/IOException.h>
 
-namespace decaf {
-namespace io {
+namespace decaf
+{
+namespace io
+{
 
     /*
      * Signals that an End of File exception has occurred.
      */
-    class DECAF_API EOFException: public io::IOException {
+    class DECAF_API EOFException : public io::IOException
+    {
     public:
-
         /**
          * Default Constructor
          */
@@ -55,11 +57,16 @@ namespace io {
          *
          * @param file The file name where exception occurs
          * @param lineNumber The line number where the exception occurred.
-         * @param cause The exception that was the cause for this one to be thrown.
+         * @param cause The exception that was the cause for this one to be
+         * thrown.
          * @param msg The message to report
          * @param ... list of primitives that are formatted into the message
          */
-        EOFException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...);
+        EOFException(const char*           file,
+                     const int             lineNumber,
+                     const std::exception* cause,
+                     const char*           msg,
+                     ...);
 
         /**
          * Constructor
@@ -76,23 +83,27 @@ namespace io {
          * @param msg The message to report
          * @param ... list of primitives that are formatted into the message
          */
-        EOFException(const char* file, const int lineNumber, const char* msg, ...);
+        EOFException(const char* file,
+                     const int   lineNumber,
+                     const char* msg,
+                     ...);
 
         /**
          * Clones this exception.  This is useful for cases where you need
-         * to preserve the type of the original exception as well as the message.
-         * All subclasses should override.
+         * to preserve the type of the original exception as well as the
+         * message. All subclasses should override.
          *
          * @return a new instance of an Exception that is a copy of this one.
          */
-        virtual EOFException* clone() const {
+        virtual EOFException* clone() const
+        {
             return new EOFException(*this);
         }
 
-        virtual ~EOFException() throw ();
-
+        virtual ~EOFException() throw();
     };
 
-}}
+}  // namespace io
+}  // namespace decaf
 
 #endif /*_DECAF_IO_EOFEXCEPTION_H_*/

@@ -22,61 +22,69 @@
 
 #include <decaf/net/ssl/SSLContextSpi.h>
 
-namespace decaf {
-namespace internal {
-namespace net {
-namespace ssl {
-namespace openssl {
+namespace decaf
+{
+namespace internal
+{
+    namespace net
+    {
+        namespace ssl
+        {
+            namespace openssl
+            {
 
-    class ContextData;
+                class ContextData;
 
-    /**
-     * Provides an SSLContext that wraps the OpenSSL API.
-     *
-     * @since 1.0
-     */
-    class DECAF_API OpenSSLContextSpi : public decaf::net::ssl::SSLContextSpi {
-    private:
+                /**
+                 * Provides an SSLContext that wraps the OpenSSL API.
+                 *
+                 * @since 1.0
+                 */
+                class DECAF_API OpenSSLContextSpi
+                    : public decaf::net::ssl::SSLContextSpi
+                {
+                private:
+                    ContextData* data;
 
-        ContextData* data;
+                private:
+                    OpenSSLContextSpi(const OpenSSLContextSpi&);
+                    OpenSSLContextSpi& operator=(const OpenSSLContextSpi&);
 
-    private:
+                public:
+                    OpenSSLContextSpi();
 
-        OpenSSLContextSpi( const OpenSSLContextSpi& );
-        OpenSSLContextSpi& operator= ( const OpenSSLContextSpi& );
+                    virtual ~OpenSSLContextSpi();
 
-    public:
+                    /**
+                     * {@inheritDoc}
+                     */
+                    virtual void providerInit(security::SecureRandom* random);
 
-        OpenSSLContextSpi();
+                    /**
+                     * {@inheritDoc}
+                     */
+                    virtual decaf::net::SocketFactory*
+                    providerGetSocketFactory();
 
-        virtual ~OpenSSLContextSpi();
+                    /**
+                     * {@inheritDoc}
+                     */
+                    virtual decaf::net::ServerSocketFactory*
+                    providerGetServerSocketFactory();
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual void providerInit( security::SecureRandom* random );
+                private:
+                    friend class OpenSSLSocket;
+                    friend class OpenSSLSocketFactory;
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual decaf::net::SocketFactory* providerGetSocketFactory();
+                    std::vector<std::string> getDefaultCipherSuites();
+                    std::vector<std::string> getSupportedCipherSuites();
+                    void*                    getOpenSSLCtx();
+                };
 
-        /**
-         * {@inheritDoc}
-         */
-        virtual decaf::net::ServerSocketFactory* providerGetServerSocketFactory();
-
-    private:
-
-        friend class OpenSSLSocket;
-        friend class OpenSSLSocketFactory;
-
-        std::vector<std::string> getDefaultCipherSuites();
-        std::vector<std::string> getSupportedCipherSuites();
-        void* getOpenSSLCtx();
-
-    };
-
-}}}}}
+            }  // namespace openssl
+        }  // namespace ssl
+    }  // namespace net
+}  // namespace internal
+}  // namespace decaf
 
 #endif /* _DECAF_INTERNAL_NET_SSL_OPENSSL_OPENSSLCONTEXTSPI_H_ */

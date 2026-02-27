@@ -21,26 +21,38 @@ using namespace decaf;
 using namespace decaf::io;
 
 ////////////////////////////////////////////////////////////////////////////////
-EOFException::EOFException() : io::IOException() {
+EOFException::EOFException()
+    : io::IOException()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-EOFException::~EOFException() throw() {
+EOFException::~EOFException() throw()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-EOFException::EOFException(const Exception& ex) : io::IOException() {
-    *(Exception*) this = ex;
+EOFException::EOFException(const Exception& ex)
+    : io::IOException()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-EOFException::EOFException(const EOFException& ex) : io::IOException() {
-    *(Exception*) this = ex;
+EOFException::EOFException(const EOFException& ex)
+    : io::IOException()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-EOFException::EOFException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...) : io::IOException(cause) {
-
+EOFException::EOFException(const char*           file,
+                           const int             lineNumber,
+                           const std::exception* cause,
+                           const char*           msg,
+                           ...)
+    : io::IOException(cause)
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -50,12 +62,18 @@ EOFException::EOFException(const char* file, const int lineNumber, const std::ex
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-EOFException::EOFException(const std::exception* cause) : io::IOException(cause) {
+EOFException::EOFException(const std::exception* cause)
+    : io::IOException(cause)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-EOFException::EOFException(const char* file, const int lineNumber, const char* msg, ...) : io::IOException() {
-
+EOFException::EOFException(const char* file,
+                           const int   lineNumber,
+                           const char* msg,
+                           ...)
+    : io::IOException()
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);

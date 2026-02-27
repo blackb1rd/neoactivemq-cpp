@@ -20,8 +20,10 @@
 
 #include <decaf/util/Config.h>
 
-namespace decaf {
-namespace security {
+namespace decaf
+{
+namespace security
+{
 
     /**
      * Base class used as a Marker for all Security Provider Interface classes
@@ -29,19 +31,18 @@ namespace security {
      *
      * @since 1.0
      */
-    class DECAF_API SecuritySpi {
+    class DECAF_API SecuritySpi
+    {
     private:
-
         SecuritySpi(const SecuritySpi&);
-        SecuritySpi& operator= (const SecuritySpi&);
+        SecuritySpi& operator=(const SecuritySpi&);
 
     public:
-
         SecuritySpi();
         virtual ~SecuritySpi();
-
     };
 
-}}
+}  // namespace security
+}  // namespace decaf
 
 #endif /* _DECAF_SECURITY_SECURITYSPI_H_ */

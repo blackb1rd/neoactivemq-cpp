@@ -20,22 +20,25 @@
 
 #include <decaf/util/Config.h>
 
-namespace decaf {
-namespace lang {
+namespace decaf
+{
+namespace lang
+{
 
-    class DECAF_API Types {
+    class DECAF_API Types
+    {
     public:
-
         Types();
         virtual ~Types();
 
-        template<typename T>
-        bool isPointer() const {
+        template <typename T>
+        bool isPointer() const
+        {
             return false;
         }
-
     };
 
-}}
+}  // namespace lang
+}  // namespace decaf
 
 #endif /* _DECAF_LANG_TYPES_H_ */

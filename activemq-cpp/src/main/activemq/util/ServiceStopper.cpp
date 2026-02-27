@@ -17,8 +17,8 @@
 
 #include "ServiceStopper.h"
 
-#include <activemq/util/Service.h>
 #include <activemq/exceptions/ActiveMQException.h>
+#include <activemq/util/Service.h>
 
 using namespace activemq;
 using namespace activemq::util;
@@ -27,42 +27,62 @@ using namespace decaf;
 using namespace decaf::lang;
 
 ////////////////////////////////////////////////////////////////////////////////
-ServiceStopper::ServiceStopper() : firstException(), hasException(false) {}
+ServiceStopper::ServiceStopper()
+    : firstException(),
+      hasException(false)
+{
+}
 
 ////////////////////////////////////////////////////////////////////////////////
-ServiceStopper::~ServiceStopper() {}
+ServiceStopper::~ServiceStopper()
+{
+}
 
 ////////////////////////////////////////////////////////////////////////////////
-void ServiceStopper::stop(Service* service) {
-
-    if (service == NULL) {
+void ServiceStopper::stop(Service* service)
+{
+    if (service == NULL)
+    {
         return;
     }
 
-    try {
+    try
+    {
         service->stop();
-    } catch (Exception& ex) {
+    }
+    catch (Exception& ex)
+    {
         this->onException(service, ex);
-    } catch (std::exception& stdex) {
+    }
+    catch (std::exception& stdex)
+    {
         ActiveMQException wrapper(__FILE__, __LINE__, stdex.what());
         this->onException(service, wrapper);
-    } catch (...) {
-        ActiveMQException wrapper(__FILE__, __LINE__, "Caught Unknown Exception");
+    }
+    catch (...)
+    {
+        ActiveMQException wrapper(__FILE__,
+                                  __LINE__,
+                                  "Caught Unknown Exception");
         this->onException(service, wrapper);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ServiceStopper::throwFirstException() {
-    if (this->hasException) {
+void ServiceStopper::throwFirstException()
+{
+    if (this->hasException)
+    {
         throw this->firstException;
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ServiceStopper::onException(Service* service AMQCPP_UNUSED, Exception& ex) {
-    if (!this->hasException) {
+void ServiceStopper::onException(Service* service AMQCPP_UNUSED, Exception& ex)
+{
+    if (!this->hasException)
+    {
         this->firstException = ex;
-        this->hasException = true;
+        this->hasException   = true;
     }
 }

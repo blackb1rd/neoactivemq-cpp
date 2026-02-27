@@ -18,36 +18,38 @@
 #ifndef _DECAF_LANG_ABSTRACTSTRINGBUILDER_H_
 #define _DECAF_LANG_ABSTRACTSTRINGBUILDER_H_
 
-#include <decaf/util/Config.h>
 #include <decaf/lang/String.h>
+#include <decaf/util/Config.h>
 
 #include <decaf/internal/util/concurrent/SynchronizableImpl.h>
 
-namespace decaf {
-namespace lang {
+namespace decaf
+{
+namespace lang
+{
 
     class AbstractStringBuilderImpl;
 
     /**
-     * A modifiable sequence of characters for use in creating and modifying Strings.
-     * This class is intended as a base class for StringBuffer and StringBuilder.
+     * A modifiable sequence of characters for use in creating and modifying
+     * Strings. This class is intended as a base class for StringBuffer and
+     * StringBuilder.
      *
      * @see StringBuffer
      * @see StringBuilder
      *
      * @since 1.0
      */
-    class DECAF_API AbstractStringBuilder : public decaf::internal::util::concurrent::SynchronizableImpl {
+    class DECAF_API AbstractStringBuilder
+        : public decaf::internal::util::concurrent::SynchronizableImpl
+    {
     protected:
-
         static const int INITIAL_CAPACITY;
 
     private:
-
         AbstractStringBuilderImpl* impl;
 
     public:
-
         AbstractStringBuilder();
 
         AbstractStringBuilder(int capacity);
@@ -61,11 +63,11 @@ namespace lang {
         virtual ~AbstractStringBuilder();
 
     public:
-
         /**
-         * Returns the current capacity. The capacity indicates the amount of space available in
-         * the internal character buffer, when the number of characters inserted exceeds the current
-         * capacity the internal buffer is reallocated and old contents copied to the new buffer.
+         * Returns the current capacity. The capacity indicates the amount of
+         * space available in the internal character buffer, when the number of
+         * characters inserted exceeds the current capacity the internal buffer
+         * is reallocated and old contents copied to the new buffer.
          *
          * @return the current capacity value.
          */
@@ -75,18 +77,20 @@ namespace lang {
          * Returns the character at the given index.
          *
          * @param index
-         *      The index in this buffer where the character to return is located.
+         *      The index in this buffer where the character to return is
+         * located.
          *
          * @throws IndexOutOfBoundsException if index < 0 or index >= length().
          */
         virtual char charAt(int index) const;
 
         /**
-         * Ensures that the capacity is at least equal to the specified min value. If
-         * the current capacity is less than the given value, then this buffer backing this
-         * instance will be reallocated and the old contents copied into the new buffer. The
-         * new capacity is set to either the given value or twice the old capacity + 2
-         * depending on which is larger.
+         * Ensures that the capacity is at least equal to the specified min
+         * value. If the current capacity is less than the given value, then
+         * this buffer backing this instance will be reallocated and the old
+         * contents copied into the new buffer. The new capacity is set to
+         * either the given value or twice the old capacity + 2 depending on
+         * which is larger.
          *
          * If the minimumCapacity argument is negative this method does nothing.
          *
@@ -96,7 +100,8 @@ namespace lang {
         virtual void ensureCapacity(int minCapacity);
 
         /**
-         * Copies characters from this character buffer into the given character array.
+         * Copies characters from this character buffer into the given character
+         * array.
          *
          * @param start
          *      The index in this buffer to start the copy from
@@ -117,53 +122,63 @@ namespace lang {
          *      dstStart is greater than dstSize
          *      dstStart + (end - start) is greater than the dstSize
          */
-        virtual void getChars(int start, int end, char* dst, int dstSize, int dstStart) const;
+        virtual void getChars(int   start,
+                              int   end,
+                              char* dst,
+                              int   dstSize,
+                              int   dstStart) const;
 
         /**
-         * Search for the index within this string of the first occurrence of the specified substring.
+         * Search for the index within this string of the first occurrence of
+         * the specified substring.
          *
          * @param value
          *      The String to locate within this string buffer.
          *
-         * @return the index of the specified substring within this string buffer or -1 if not found.
+         * @return the index of the specified substring within this string
+         * buffer or -1 if not found.
          */
         virtual int indexOf(const String& value) const;
 
         /**
-         * Search for the index within this string of the first occurrence of the specified substring
-         * starting at the given position and moving towards the end of this String.
+         * Search for the index within this string of the first occurrence of
+         * the specified substring starting at the given position and moving
+         * towards the end of this String.
          *
          * @param value
          *      The String to locate within this string buffer.
          * @param start
          *      The index to start the search from.
          *
-         * @return the index of the specified substring within this string buffer or -1 if not found.
+         * @return the index of the specified substring within this string
+         * buffer or -1 if not found.
          */
         virtual int indexOf(const String& value, int start) const;
 
         /**
-         * Search for the last index within this string where the given substring can be found.
+         * Search for the last index within this string where the given
+         * substring can be found.
          *
          * @param value
          *      The String to locate within this string buffer.
          *
-         * @return the last index of the specified substring within this string buffer or -1
-         *          if not found.
+         * @return the last index of the specified substring within this string
+         * buffer or -1 if not found.
          */
         virtual int lastIndexOf(const String& value) const;
 
         /**
-         * Search for the last index within this string where the given substring can be found
-         * starting from the specified index and moving towards the beginning of the string.
+         * Search for the last index within this string where the given
+         * substring can be found starting from the specified index and moving
+         * towards the beginning of the string.
          *
          * @param value
          *      The String to locate within this string buffer.
          * @param start
          *      The index to start the search from.
          *
-         * @return the last index of the specified substring within this string buffer or -1
-         *          if not found.
+         * @return the last index of the specified substring within this string
+         * buffer or -1 if not found.
          */
         virtual int lastIndexOf(const String& value, int start) const;
 
@@ -175,11 +190,12 @@ namespace lang {
         virtual int length() const;
 
         /**
-         * Sets the length of this character buffer. The backing buffer is changed to a new
-         * character buffer whose length is specified by the argument.  Each character in the
-         * old buffer is copied into the new buffer up to the given length value.  If the new
-         * length is greater than the old buffer length then the additional character are all
-         * set to '\0'.
+         * Sets the length of this character buffer. The backing buffer is
+         * changed to a new character buffer whose length is specified by the
+         * argument.  Each character in the old buffer is copied into the new
+         * buffer up to the given length value.  If the new length is greater
+         * than the old buffer length then the additional character are all set
+         * to '\0'.
          *
          * @param length
          *      The new length to give this character buffer
@@ -189,21 +205,23 @@ namespace lang {
         virtual void setLength(int length);
 
         /**
-         * Sets the character at the specified index to the new char value given.
+         * Sets the character at the specified index to the new char value
+         * given.
          *
          * @param index
          *      The index of the character to modify.
          * @param value
          *      The new char value to assign at the given index.
          *
-         * @throws IndexOutOfBoundsException if index is negative or greater than length().
+         * @throws IndexOutOfBoundsException if index is negative or greater
+         * than length().
          */
         virtual void setCharAt(int index, char value);
 
         /**
-         * Returns a new String that contains a subset of the characters currently contained
-         * in this character buffer. The substring starts at the specified index and extends
-         * to the end of this character buffer.
+         * Returns a new String that contains a subset of the characters
+         * currently contained in this character buffer. The substring starts at
+         * the specified index and extends to the end of this character buffer.
          *
          * @param start
          *      The starting index of the substring to create.
@@ -211,14 +229,15 @@ namespace lang {
          * @return a new String that is a subset of this character buffer.
          *
          * @throws StringIndexOutOfBoundsException
-         *      if start is less than zero, or greater than the length of this buffer.
+         *      if start is less than zero, or greater than the length of this
+         * buffer.
          */
         virtual String substring(int start) const;
 
         /**
-         * Returns a new String that contains a subset of the characters currently contained
-         * in this character buffer. The substring starts at the specified index and extends
-         * to the given end index.
+         * Returns a new String that contains a subset of the characters
+         * currently contained in this character buffer. The substring starts at
+         * the specified index and extends to the given end index.
          *
          * @param start
          *      The starting index of the substring to create. (inclusive)
@@ -228,48 +247,49 @@ namespace lang {
          * @return a new String that is a subset of this character buffer.
          *
          * @throws StringIndexOutOfBoundsException
-         *      if start or end is less than zero, or end is greater than the length of this buffer
-         *      or start is greater than end.
+         *      if start or end is less than zero, or end is greater than the
+         * length of this buffer or start is greater than end.
          */
         virtual String substring(int start, int end) const;
 
         /**
-         * Creates and returns a new CharSequence object that is a subset of the characters
-         * contained in this character buffer.  This method behaves the same as the two parameter
-         * substring method except that it returns a pointer value instead of a String, this
-         * allows for subclasses to implement CharSequence.
+         * Creates and returns a new CharSequence object that is a subset of the
+         * characters contained in this character buffer.  This method behaves
+         * the same as the two parameter substring method except that it returns
+         * a pointer value instead of a String, this allows for subclasses to
+         * implement CharSequence.
          *
          * @param start
          *      The starting index of the substring to create. (inclusive)
          * @param end
          *      The ending index of the substring to create. (exclusive)
          *
-         * @return a new CharSequence pointer that is a subset of this character buffer.
+         * @return a new CharSequence pointer that is a subset of this character
+         * buffer.
          *
          * @throws StringIndexOutOfBoundsException
-         *      if start or end is less than zero, or end is greater than the length of this buffer
-         *      or start is greater than end.
+         *      if start or end is less than zero, or end is greater than the
+         * length of this buffer or start is greater than end.
          */
         virtual CharSequence* subSequence(int start, int end) const;
 
         /**
-         * Returns a String that represents the contents of this buffer.  Any changes
-         * made to this buffer after calling this method will not be reflected in the
-         * String value that is returned.
+         * Returns a String that represents the contents of this buffer.  Any
+         * changes made to this buffer after calling this method will not be
+         * reflected in the String value that is returned.
          */
         virtual String toString() const;
 
         /**
-         * Attempts to reduce storage used for the character sequence. If the buffer
-         * is larger than necessary to hold its current sequence of characters, then
-         * it may be resized to become more space efficient. Calling this method may,
-         * but is not required to, affect the value returned by a subsequent call to
-         * the capacity() method.
+         * Attempts to reduce storage used for the character sequence. If the
+         * buffer is larger than necessary to hold its current sequence of
+         * characters, then it may be resized to become more space efficient.
+         * Calling this method may, but is not required to, affect the value
+         * returned by a subsequent call to the capacity() method.
          */
         virtual void trimToSize();
 
     protected:
-
         /**
          * Appends the string "null" to the current character buffer.
          */
@@ -294,8 +314,9 @@ namespace lang {
         void doAppend(const char* value);
 
         /**
-         * Appends the given C string to this buffer starting at the given offset and
-         * ending after the length number of characters has been appended.
+         * Appends the given C string to this buffer starting at the given
+         * offset and ending after the length number of characters has been
+         * appended.
          *
          * @param value
          *      The C string value to be appended into this buffer.
@@ -305,8 +326,8 @@ namespace lang {
          *      The number of characters to copy from the given array.
          *
          * @throws NullPointerException if the pointer is NULL.
-         * @throws IndexOutOfBoundsException if offset or length is negative or the value of
-         *         offset + length is greater than the strings length.
+         * @throws IndexOutOfBoundsException if offset or length is negative or
+         * the value of offset + length is greater than the strings length.
          */
         void doAppend(const char* value, int offset, int length);
 
@@ -321,8 +342,9 @@ namespace lang {
         void doAppend(const CharSequence* value);
 
         /**
-         * Appends the given CharSequence to this buffer starting at the given offset and
-         * ending after the length number of characters has been appended.
+         * Appends the given CharSequence to this buffer starting at the given
+         * offset and ending after the length number of characters has been
+         * appended.
          *
          * @param value
          *      The CharSequence value to be appended into this buffer.
@@ -332,8 +354,8 @@ namespace lang {
          *      The number of characters to copy from the given CharSequence.
          *
          * @throws NullPointerException if the pointer is NULL.
-         * @throws IndexOutOfBoundsException if offset or length is negative or the value of
-         *         offset + length is greater than the strings length.
+         * @throws IndexOutOfBoundsException if offset or length is negative or
+         * the value of offset + length is greater than the strings length.
          */
         void doAppend(const CharSequence* value, int offset, int length);
 
@@ -420,8 +442,9 @@ namespace lang {
         void doInsert(int index, const std::string& value);
 
         /**
-         * Inserts the given C string at the given index in this buffer starting at the
-         * given offset and ending after the length number of characters has been appended.
+         * Inserts the given C string at the given index in this buffer starting
+         * at the given offset and ending after the length number of characters
+         * has been appended.
          *
          * @param index
          *      The index in this buffer to start inserting the C string.
@@ -433,8 +456,9 @@ namespace lang {
          *      The number of characters to copy from the given array.
          *
          * @throws NullPointerException if the pointer is NULL.
-         * @throws IndexOutOfBoundsException if index, offset or length is negative or the value
-         *         of offset + length is greater than the strings length.
+         * @throws IndexOutOfBoundsException if index, offset or length is
+         * negative or the value of offset + length is greater than the strings
+         * length.
          */
         void doInsert(int index, const char* value, int offset, int length);
 
@@ -447,13 +471,14 @@ namespace lang {
          *      The CharSequence value to be appended into this buffer.
          *
          * @throws NullPointerException if the pointer is NULL.
-         * @throws IndexOutOfBoundsException if index is negative or greater than length().
+         * @throws IndexOutOfBoundsException if index is negative or greater
+         * than length().
          */
         void doInsert(int index, const CharSequence* value);
 
         /**
-         * Inserts the given CharSequence at the given index in this buffer starting at the
-         * given index and ending at the specified end index.
+         * Inserts the given CharSequence at the given index in this buffer
+         * starting at the given index and ending at the specified end index.
          *
          * If the CharSequence pointer is NULL the string "null" is inserted.
          *
@@ -464,19 +489,22 @@ namespace lang {
          * @param start
          *      The starting index into the CharSequence.
          * @param end
-         *      The end index in the CharSequence to be inserted into this Buffer.
+         *      The end index in the CharSequence to be inserted into this
+         * Buffer.
          *
-         * @throws IndexOutOfBoundsException if index, start or end is negative or the value
-         *         of start < end or the end index is greater than the sequence length.
+         * @throws IndexOutOfBoundsException if index, start or end is negative
+         * or the value of start < end or the end index is greater than the
+         * sequence length.
          */
         void doInsert(int index, const CharSequence* value, int start, int end);
 
         /**
-         * Replace some number of characters in this Buffer with the value given.
+         * Replace some number of characters in this Buffer with the value
+         * given.
          *
-         * The characters replaced start at the given index and end at the given end value
-         * (exclusive).  If the replacement string value is longer the internal buffer is
-         * lengthened to accommodate the new value.
+         * The characters replaced start at the given index and end at the given
+         * end value (exclusive).  If the replacement string value is longer the
+         * internal buffer is lengthened to accommodate the new value.
          *
          * @param start
          *      The starting index to replace in the buffer (inclusive).
@@ -485,7 +513,8 @@ namespace lang {
          * @param value
          *      The new string value to replace the older value.
          *
-         * @throws IndexOutOfBoundsException if start is negative, greater than end or greater than length().
+         * @throws IndexOutOfBoundsException if start is negative, greater than
+         * end or greater than length().
          */
         void doReplace(int start, int end, const String& value);
 
@@ -493,9 +522,9 @@ namespace lang {
          * Reverses the characters contained in this character buffer.
          */
         void doReverse();
-
     };
 
-}}
+}  // namespace lang
+}  // namespace decaf
 
 #endif /* _DECAF_LANG_ABSTRACTSTRINGBUILDER_H_ */

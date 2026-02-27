@@ -22,5 +22,6 @@ using namespace activemq::transport;
 using namespace activemq::transport::discovery;
 
 ////////////////////////////////////////////////////////////////////////////////
-DiscoveryAgent::~DiscoveryAgent() {
+DiscoveryAgent::~DiscoveryAgent()
+{
 }

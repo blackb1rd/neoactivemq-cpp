@@ -22,29 +22,50 @@ using namespace decaf::net;
 using namespace decaf::lang;
 
 ////////////////////////////////////////////////////////////////////////////////
-URISyntaxException::URISyntaxException() : decaf::lang::Exception(), reason(), input(), index(-1) {
+URISyntaxException::URISyntaxException()
+    : decaf::lang::Exception(),
+      reason(),
+      input(),
+      index(-1)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-URISyntaxException::~URISyntaxException() throw () {
+URISyntaxException::~URISyntaxException() throw()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-URISyntaxException::URISyntaxException(const Exception& ex) : Exception(), reason(), input(), index(-1) {
-    *(Exception*) this = ex;
+URISyntaxException::URISyntaxException(const Exception& ex)
+    : Exception(),
+      reason(),
+      input(),
+      index(-1)
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-URISyntaxException::URISyntaxException(const URISyntaxException& ex) :
-    Exception(), reason(ex.getReason()), input(ex.getInput()), index(ex.getIndex()) {
-
-    *(Exception*) this = ex;
+URISyntaxException::URISyntaxException(const URISyntaxException& ex)
+    : Exception(),
+      reason(ex.getReason()),
+      input(ex.getInput()),
+      index(ex.getIndex())
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-URISyntaxException::URISyntaxException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...) :
-    lang::Exception(cause), reason(), input(), index(-1) {
-
+URISyntaxException::URISyntaxException(const char*           file,
+                                       const int             lineNumber,
+                                       const std::exception* cause,
+                                       const char*           msg,
+                                       ...)
+    : lang::Exception(cause),
+      reason(),
+      input(),
+      index(-1)
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -54,15 +75,24 @@ URISyntaxException::URISyntaxException(const char* file, const int lineNumber, c
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-URISyntaxException::URISyntaxException(const std::exception* cause) :
-    lang::Exception(cause), reason(), input(), index(-1) {
+URISyntaxException::URISyntaxException(const std::exception* cause)
+    : lang::Exception(cause),
+      reason(),
+      input(),
+      index(-1)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-URISyntaxException::URISyntaxException(const char* file, const int lineNumber, const char* msg DECAF_UNUSED) :
-    Exception(), reason("<Unknown Reason>"), input("<No Address Given>"), index(-1) {
-
-    const char * message = "Input: %s, Reason it failed: %s";
+URISyntaxException::URISyntaxException(const char*     file,
+                                       const int       lineNumber,
+                                       const char* msg DECAF_UNUSED)
+    : Exception(),
+      reason("<Unknown Reason>"),
+      input("<No Address Given>"),
+      index(-1)
+{
+    const char* message = "Input: %s, Reason it failed: %s";
     this->setMessage(message, input.c_str(), reason.c_str());
 
     // Set the first mark for this exception.
@@ -70,10 +100,16 @@ URISyntaxException::URISyntaxException(const char* file, const int lineNumber, c
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-URISyntaxException::URISyntaxException(const char* file, const int lineNumber, const std::string& input, const std::string& reason) :
-    Exception(), reason(reason), input(input), index(-1) {
-
-    const char * message = "Input: %s, Reason it failed: %s";
+URISyntaxException::URISyntaxException(const char*        file,
+                                       const int          lineNumber,
+                                       const std::string& input,
+                                       const std::string& reason)
+    : Exception(),
+      reason(reason),
+      input(input),
+      index(-1)
+{
+    const char* message = "Input: %s, Reason it failed: %s";
     this->setMessage(message, input.c_str(), reason.c_str());
 
     // Set the first mark for this exception.
@@ -81,10 +117,17 @@ URISyntaxException::URISyntaxException(const char* file, const int lineNumber, c
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-URISyntaxException::URISyntaxException(const char* file, const int lineNumber, const std::string& input, const std::string& reason, int index) :
-    Exception(), reason(reason), input(input), index(index) {
-
-    const char * message = "Input: %s, Index %d resulted in this error: %s";
+URISyntaxException::URISyntaxException(const char*        file,
+                                       const int          lineNumber,
+                                       const std::string& input,
+                                       const std::string& reason,
+                                       int                index)
+    : Exception(),
+      reason(reason),
+      input(input),
+      index(index)
+{
+    const char* message = "Input: %s, Index %d resulted in this error: %s";
     this->setMessage(message, input.c_str(), index, reason.c_str());
 
     // Set the first mark for this exception.

@@ -22,26 +22,26 @@
 using namespace decaf;
 using namespace decaf::net;
 
-    class URISyntaxExceptionTest : public ::testing::Test {
+class URISyntaxExceptionTest : public ::testing::Test
+{
 public:
-
-        URISyntaxExceptionTest();
-
-    };
+    URISyntaxExceptionTest();
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-URISyntaxExceptionTest::URISyntaxExceptionTest() {
+URISyntaxExceptionTest::URISyntaxExceptionTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(URISyntaxExceptionTest, test) {
-
-    URISyntaxException e1( __FILE__, __LINE__, "str", "problem", 2);
+TEST_F(URISyntaxExceptionTest, test)
+{
+    URISyntaxException e1(__FILE__, __LINE__, "str", "problem", 2);
     ASSERT_TRUE(e1.getReason() == "problem") << ("returned incorrect reason");
     ASSERT_TRUE(e1.getInput() == "str") << ("returned incorrect input");
     ASSERT_TRUE(2 == e1.getIndex()) << ("returned incorrect index");
 
-    URISyntaxException e2( __FILE__, __LINE__, "str", "problem");
+    URISyntaxException e2(__FILE__, __LINE__, "str", "problem");
     ASSERT_TRUE(e2.getReason() == "problem") << ("returned incorrect reason");
     ASSERT_TRUE(e2.getInput() == "str") << ("returned incorrect input");
     ASSERT_TRUE(-1 == (int)e2.getIndex()) << ("returned incorrect index");

@@ -29,77 +29,102 @@ const Boolean Boolean::_FALSE(false);
 const Boolean Boolean::_TRUE(true);
 
 ////////////////////////////////////////////////////////////////////////////////
-Boolean::Boolean(bool value) : value(value) {
+Boolean::Boolean(bool value)
+    : value(value)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Boolean::Boolean(const String& value) : value(false) {
+Boolean::Boolean(const String& value)
+    : value(false)
+{
     this->value = parseBoolean(value);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int Boolean::compareTo(const Boolean& b) const {
-    if (this->value == b.value) {
+int Boolean::compareTo(const Boolean& b) const
+{
+    if (this->value == b.value)
+    {
         return 0;
-    } else if (this->value && !b.value) {
+    }
+    else if (this->value && !b.value)
+    {
         return 1;
-    } else {
+    }
+    else
+    {
         return -1;
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool Boolean::operator==(const Boolean& b) const {
+bool Boolean::operator==(const Boolean& b) const
+{
     return this->value == b.value;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool Boolean::operator<(const Boolean& b) const {
+bool Boolean::operator<(const Boolean& b) const
+{
     return this->value < b.value;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int Boolean::compareTo(const bool& b) const {
-    if (this->value == b) {
+int Boolean::compareTo(const bool& b) const
+{
+    if (this->value == b)
+    {
         return 0;
-    } else if (this->value && !b) {
+    }
+    else if (this->value && !b)
+    {
         return 1;
-    } else {
+    }
+    else
+    {
         return -1;
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool Boolean::operator==(const bool& b) const {
+bool Boolean::operator==(const bool& b) const
+{
     return this->value == b;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool Boolean::operator<(const bool& b) const {
+bool Boolean::operator<(const bool& b) const
+{
     return this->value < b;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string Boolean::toString() const {
+std::string Boolean::toString() const
+{
     return this->value ? "true" : "false";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Boolean Boolean::valueOf(const String& value) {
+Boolean Boolean::valueOf(const String& value)
+{
     return Boolean(value);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Boolean Boolean::valueOf(bool value) {
+Boolean Boolean::valueOf(bool value)
+{
     return Boolean(value);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool Boolean::parseBoolean(const String& value) {
+bool Boolean::parseBoolean(const String& value)
+{
     return StringUtils::compareIgnoreCase(value.c_str(), "true") == 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string Boolean::toString(bool value) {
+std::string Boolean::toString(bool value)
+{
     return value ? "true" : "false";
 }

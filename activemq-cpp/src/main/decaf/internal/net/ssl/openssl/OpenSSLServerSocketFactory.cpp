@@ -20,9 +20,9 @@
 #include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/lang/exceptions/UnsupportedOperationException.h>
 
+#include <decaf/internal/net/ssl/openssl/OpenSSLContextSpi.h>
 #include <decaf/internal/net/ssl/openssl/OpenSSLParameters.h>
 #include <decaf/internal/net/ssl/openssl/OpenSSLSocket.h>
-#include <decaf/internal/net/ssl/openssl/OpenSSLContextSpi.h>
 
 #include <memory>
 
@@ -40,45 +40,61 @@ using namespace decaf::internal::net::ssl;
 using namespace decaf::internal::net::ssl::openssl;
 
 ////////////////////////////////////////////////////////////////////////////////
-OpenSSLServerSocketFactory::OpenSSLServerSocketFactory( OpenSSLContextSpi* parent ) :
-    SSLServerSocketFactory(), parent( parent ) {
-
-    if( parent == NULL ) {
-        throw NullPointerException(
-            __FILE__, __LINE__, "Parent Pointer was NULL." );
+OpenSSLServerSocketFactory::OpenSSLServerSocketFactory(OpenSSLContextSpi* parent)
+    : SSLServerSocketFactory(),
+      parent(parent)
+{
+    if (parent == NULL)
+    {
+        throw NullPointerException(__FILE__,
+                                   __LINE__,
+                                   "Parent Pointer was NULL.");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-OpenSSLServerSocketFactory::~OpenSSLServerSocketFactory() {
+OpenSSLServerSocketFactory::~OpenSSLServerSocketFactory()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ServerSocket* OpenSSLServerSocketFactory::createServerSocket() {
+ServerSocket* OpenSSLServerSocketFactory::createServerSocket()
+{
     return NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ServerSocket* OpenSSLServerSocketFactory::createServerSocket( int port DECAF_UNUSED ) {
+ServerSocket* OpenSSLServerSocketFactory::createServerSocket(
+    int port DECAF_UNUSED)
+{
     return NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ServerSocket* OpenSSLServerSocketFactory::createServerSocket( int port DECAF_UNUSED, int backlog DECAF_UNUSED ) {
+ServerSocket* OpenSSLServerSocketFactory::createServerSocket(
+    int port    DECAF_UNUSED,
+    int backlog DECAF_UNUSED)
+{
     return NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ServerSocket* OpenSSLServerSocketFactory::createServerSocket( int port DECAF_UNUSED, int backlog DECAF_UNUSED, const InetAddress* address DECAF_UNUSED ) {
+ServerSocket* OpenSSLServerSocketFactory::createServerSocket(
+    int port                   DECAF_UNUSED,
+    int backlog                DECAF_UNUSED,
+    const InetAddress* address DECAF_UNUSED)
+{
     return NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::vector<std::string> OpenSSLServerSocketFactory::getDefaultCipherSuites() {
+std::vector<std::string> OpenSSLServerSocketFactory::getDefaultCipherSuites()
+{
     return std::vector<std::string>();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::vector<std::string> OpenSSLServerSocketFactory::getSupportedCipherSuites() {
+std::vector<std::string> OpenSSLServerSocketFactory::getSupportedCipherSuites()
+{
     return std::vector<std::string>();
 }

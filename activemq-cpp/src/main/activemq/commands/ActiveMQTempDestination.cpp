@@ -16,8 +16,8 @@
  */
 #include <activemq/commands/ActiveMQTempDestination.h>
 
-#include <activemq/exceptions/ActiveMQException.h>
 #include <activemq/core/ActiveMQConnection.h>
+#include <activemq/exceptions/ActiveMQException.h>
 #include <activemq/util/CMSExceptionSupport.h>
 
 #include <decaf/lang/Integer.h>
@@ -29,39 +29,55 @@ using namespace activemq::commands;
 using namespace decaf::lang;
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQTempDestination::ActiveMQTempDestination() :
-    ActiveMQDestination(), Closeable(), connection(NULL), connectionId(), sequenceId(0) {
+ActiveMQTempDestination::ActiveMQTempDestination()
+    : ActiveMQDestination(),
+      Closeable(),
+      connection(NULL),
+      connectionId(),
+      sequenceId(0)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQTempDestination::ActiveMQTempDestination(const std::string& name) :
-    ActiveMQDestination(name), Closeable(), connection(NULL), connectionId(), sequenceId(0) {
+ActiveMQTempDestination::ActiveMQTempDestination(const std::string& name)
+    : ActiveMQDestination(name),
+      Closeable(),
+      connection(NULL),
+      connectionId(),
+      sequenceId(0)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQTempDestination::~ActiveMQTempDestination() throw() {
+ActiveMQTempDestination::~ActiveMQTempDestination() throw()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-unsigned char ActiveMQTempDestination::getDataStructureType() const {
+unsigned char ActiveMQTempDestination::getDataStructureType() const
+{
     return ActiveMQTempDestination::ID_ACTIVEMQTEMPDESTINATION;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQTempDestination::setPhysicalName(const std::string& physicalName) {
-
+void ActiveMQTempDestination::setPhysicalName(const std::string& physicalName)
+{
     ActiveMQDestination::setPhysicalName(physicalName);
     this->connectionId = "";
-    this->sequenceId = 0;
+    this->sequenceId   = 0;
 
     size_t pos = physicalName.find_last_of(":");
-    if (pos != std::string::npos) {
+    if (pos != std::string::npos)
+    {
         std::string seqStr = physicalName.substr(pos + 1);
-        if (!seqStr.empty()) {
-
-            try {
+        if (!seqStr.empty())
+        {
+            try
+            {
                 this->sequenceId = Integer::parseInt(seqStr);
-            } catch (decaf::lang::exceptions::NumberFormatException& e) {
+            }
+            catch (decaf::lang::exceptions::NumberFormatException& e)
+            {
                 // Not the expected format so ignore.
             }
 
@@ -72,19 +88,26 @@ void ActiveMQTempDestination::setPhysicalName(const std::string& physicalName) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string ActiveMQTempDestination::toString() const {
+std::string ActiveMQTempDestination::toString() const
+{
     return ActiveMQDestination::toString();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQTempDestination::close() {
-    try {
-        if (this->connection != NULL) {
+void ActiveMQTempDestination::close()
+{
+    try
+    {
+        if (this->connection != NULL)
+        {
             Pointer<ActiveMQTempDestination> thisPtr(this);
-            try {
+            try
+            {
                 this->connection->deleteTempDestination(thisPtr);
                 thisPtr.release();
-            } catch(ActiveMQException& ex) {
+            }
+            catch (ActiveMQException& ex)
+            {
                 thisPtr.release();
                 throw;
             }

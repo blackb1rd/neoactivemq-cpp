@@ -18,15 +18,17 @@
 #ifndef _ACTIVEMQ_UTIL_ACTIVEMQPROPERTIES_H_
 #define _ACTIVEMQ_UTIL_ACTIVEMQPROPERTIES_H_
 
-#include <map>
-#include <string>
-#include <sstream>
 #include <activemq/util/Config.h>
 #include <cms/CMSProperties.h>
 #include <decaf/util/Properties.h>
+#include <map>
+#include <sstream>
+#include <string>
 
-namespace activemq {
-namespace util {
+namespace activemq
+{
+namespace util
+{
 
     /**
      * Implementation of the CMSProperties interface that
@@ -34,62 +36,75 @@ namespace util {
      *
      * @since 2.0
      */
-    class AMQCPP_API ActiveMQProperties: public cms::CMSProperties {
+    class AMQCPP_API ActiveMQProperties : public cms::CMSProperties
+    {
     private:
-
         decaf::util::Properties properties;
 
     public:
-
         ActiveMQProperties();
 
         virtual ~ActiveMQProperties();
 
-        virtual decaf::util::Properties& getProperties() {
+        virtual decaf::util::Properties& getProperties()
+        {
             return this->properties;
         }
 
-        virtual const decaf::util::Properties& getProperties() const {
+        virtual const decaf::util::Properties& getProperties() const
+        {
             return this->properties;
         }
 
-        virtual void setProperties(decaf::util::Properties& props) {
+        virtual void setProperties(decaf::util::Properties& props)
+        {
             this->properties = props;
         }
 
-        virtual int size() const {
+        virtual int size() const
+        {
             return properties.size();
         }
 
-        virtual bool isEmpty() const {
+        virtual bool isEmpty() const
+        {
             return properties.isEmpty();
         }
 
-        virtual const char* getProperty(const std::string& name) const {
+        virtual const char* getProperty(const std::string& name) const
+        {
             return properties.getProperty(name);
         }
 
-        virtual std::string getProperty(const std::string& name, const std::string& defaultValue) const {
+        virtual std::string getProperty(const std::string& name,
+                                        const std::string& defaultValue) const
+        {
             return properties.getProperty(name, defaultValue);
         }
 
-        virtual void setProperty(const std::string& name, const std::string& value) {
+        virtual void setProperty(const std::string& name,
+                                 const std::string& value)
+        {
             properties.setProperty(name, value);
         }
 
-        virtual bool hasProperty(const std::string& name) const {
+        virtual bool hasProperty(const std::string& name) const
+        {
             return properties.hasProperty(name);
         }
 
-        virtual std::string remove(const std::string& name) {
+        virtual std::string remove(const std::string& name)
+        {
             return properties.remove(name);
         }
 
-        virtual std::vector<std::string> propertyNames() const {
+        virtual std::vector<std::string> propertyNames() const
+        {
             return properties.propertyNames();
         }
 
-        virtual std::vector<std::pair<std::string, std::string> > toArray() const {
+        virtual std::vector<std::pair<std::string, std::string>> toArray() const
+        {
             return properties.toArray();
         }
 
@@ -97,16 +112,18 @@ namespace util {
 
         virtual CMSProperties* clone() const;
 
-        virtual void clear() {
+        virtual void clear()
+        {
             properties.clear();
         }
 
-        virtual std::string toString() const {
+        virtual std::string toString() const
+        {
             return properties.toString();
         }
-
     };
 
-}}
+}  // namespace util
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_UTIL_ACTIVEMQPROPERTIES_H_*/

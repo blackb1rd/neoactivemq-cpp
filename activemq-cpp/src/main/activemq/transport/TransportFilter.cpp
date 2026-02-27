@@ -20,8 +20,8 @@
 
 #include <decaf/util/concurrent/atomic/AtomicBoolean.h>
 
-#include <activemq/wireformat/WireFormat.h>
 #include <activemq/util/AMQLog.h>
+#include <activemq/wireformat/WireFormat.h>
 
 using namespace activemq;
 using namespace activemq::transport;
@@ -32,41 +32,51 @@ using namespace decaf::util::concurrent::atomic;
 using namespace decaf::io;
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace activemq {
-namespace transport {
+namespace activemq
+{
+namespace transport
+{
 
-    class TransportFilterImpl {
-
+    class TransportFilterImpl
+    {
         TransportFilterImpl(const TransportFilterImpl&);
-        TransportFilterImpl& operator= (const TransportFilterImpl&);
+        TransportFilterImpl& operator=(const TransportFilterImpl&);
 
     public:
-
         AtomicBoolean closed;
         AtomicBoolean started;
 
-        TransportFilterImpl() : closed(), started() {
+        TransportFilterImpl()
+            : closed(),
+              started()
+        {
         }
     };
 
-}}
+}  // namespace transport
+}  // namespace activemq
 
 ////////////////////////////////////////////////////////////////////////////////
-TransportFilter::TransportFilter(const Pointer<Transport> next) :
-    impl(new TransportFilterImpl()), next(next), listener(NULL) {
-
+TransportFilter::TransportFilter(const Pointer<Transport> next)
+    : impl(new TransportFilterImpl()),
+      next(next),
+      listener(NULL)
+{
     // Observe the nested transport for events.
     next->setTransportListener(this);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TransportFilter::~TransportFilter() {
-    try {
+TransportFilter::~TransportFilter()
+{
+    try
+    {
         close();
     }
     AMQ_CATCHALL_NOTHROW()
 
-    try {
+    try
+    {
         // Force next out here so we can ensure we catch any stray
         // exceptions.  Since we hold the only reference to next it
         // should get deleted.
@@ -74,96 +84,125 @@ TransportFilter::~TransportFilter() {
     }
     AMQ_CATCHALL_NOTHROW()
 
-    try {
+    try
+    {
         delete this->impl;
     }
     AMQ_CATCHALL_NOTHROW()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TransportFilter::onCommand(const Pointer<Command> command) {
-
-    if (!this->impl->started.get() || this->impl->closed.get()) {
+void TransportFilter::onCommand(const Pointer<Command> command)
+{
+    if (!this->impl->started.get() || this->impl->closed.get())
+    {
         return;
     }
 
-    try {
-        if (this->listener != NULL) {
+    try
+    {
+        if (this->listener != NULL)
+        {
             this->listener->onCommand(command);
         }
-    } catch (...) {
+    }
+    catch (...)
+    {
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TransportFilter::onException(const decaf::lang::Exception& ex) {
-
-    if (!this->impl->started.get() || this->impl->closed.get()) {
+void TransportFilter::onException(const decaf::lang::Exception& ex)
+{
+    if (!this->impl->started.get() || this->impl->closed.get())
+    {
         return;
     }
 
     AMQ_LOG_ERROR("TransportFilter", "Exception received: " << ex.getMessage());
 
-    if (this->listener != NULL) {
-        try {
+    if (this->listener != NULL)
+    {
+        try
+        {
             this->listener->onException(ex);
-        } catch (...) {
+        }
+        catch (...)
+        {
         }
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TransportFilter::transportInterrupted() {
-
-    if (!this->impl->started.get() || this->impl->closed.get()) {
+void TransportFilter::transportInterrupted()
+{
+    if (!this->impl->started.get() || this->impl->closed.get())
+    {
         return;
     }
 
     AMQ_LOG_INFO("TransportFilter", "Transport interrupted");
 
-    try {
-        if (this->listener != NULL) {
+    try
+    {
+        if (this->listener != NULL)
+        {
             this->listener->transportInterrupted();
         }
-    } catch (...) {
+    }
+    catch (...)
+    {
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TransportFilter::transportResumed() {
-
-    if (!this->impl->started.get() || this->impl->closed.get()) {
+void TransportFilter::transportResumed()
+{
+    if (!this->impl->started.get() || this->impl->closed.get())
+    {
         return;
     }
 
     AMQ_LOG_INFO("TransportFilter", "Transport resumed");
 
-    try {
-        if (this->listener != NULL) {
+    try
+    {
+        if (this->listener != NULL)
+        {
             this->listener->transportResumed();
         }
-    } catch (...) {
+    }
+    catch (...)
+    {
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TransportFilter::start() {
-
-    if (this->impl->closed.get()) {
+void TransportFilter::start()
+{
+    if (this->impl->closed.get())
+    {
         return;
     }
 
-    if (this->listener == NULL) {
-        throw decaf::io::IOException(__FILE__, __LINE__, "exceptionListener is invalid");
+    if (this->listener == NULL)
+    {
+        throw decaf::io::IOException(__FILE__,
+                                     __LINE__,
+                                     "exceptionListener is invalid");
     }
 
-    if (this->next == NULL) {
-        throw decaf::io::IOException(__FILE__, __LINE__, "Transport chain is invalid");
+    if (this->next == NULL)
+    {
+        throw decaf::io::IOException(__FILE__,
+                                     __LINE__,
+                                     "Transport chain is invalid");
     }
 
-    try {
-
-        if (this->impl->started.compareAndSet(false, true)) {
+    try
+    {
+        if (this->impl->started.compareAndSet(false, true))
+        {
             beforeNextIsStarted();
             next->start();
             afterNextIsStarted();
@@ -175,48 +214,62 @@ void TransportFilter::start() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TransportFilter::stop() {
-
-    if (this->impl->closed.get()) {
+void TransportFilter::stop()
+{
+    if (this->impl->closed.get())
+    {
         return;
     }
 
-    try {
-
-        if (this->impl->started.compareAndSet(true, false)) {
-
-            if (this->next == NULL) {
-                throw decaf::io::IOException(__FILE__, __LINE__, "Transport chain is invalid");
+    try
+    {
+        if (this->impl->started.compareAndSet(true, false))
+        {
+            if (this->next == NULL)
+            {
+                throw decaf::io::IOException(__FILE__,
+                                             __LINE__,
+                                             "Transport chain is invalid");
             }
 
             IOException error;
-            bool hasException = false;
+            bool        hasException = false;
 
-            try {
+            try
+            {
                 beforeNextIsStopped();
-            } catch (IOException& ex) {
+            }
+            catch (IOException& ex)
+            {
                 error = ex;
                 error.setMark(__FILE__, __LINE__);
                 hasException = true;
             }
 
-            try {
+            try
+            {
                 next->stop();
-            } catch (IOException& ex) {
+            }
+            catch (IOException& ex)
+            {
                 error = ex;
                 error.setMark(__FILE__, __LINE__);
                 hasException = true;
             }
 
-            try {
+            try
+            {
                 afterNextIsStopped();
-            } catch (IOException& ex) {
+            }
+            catch (IOException& ex)
+            {
                 error = ex;
                 error.setMark(__FILE__, __LINE__);
                 hasException = true;
             }
 
-            if (hasException) {
+            if (hasException)
+            {
                 throw error;
             }
         }
@@ -227,51 +280,65 @@ void TransportFilter::stop() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TransportFilter::close() {
-
-    if (this->impl->closed.get()) {
+void TransportFilter::close()
+{
+    if (this->impl->closed.get())
+    {
         return;
     }
 
-    try {
-
+    try
+    {
         IOException error;
-        bool hasException = false;
+        bool        hasException = false;
 
-        try {
+        try
+        {
             stop();
-        } catch (IOException& ex) {
+        }
+        catch (IOException& ex)
+        {
             error = ex;
             error.setMark(__FILE__, __LINE__);
             hasException = true;
         }
 
-        if (this->impl->closed.compareAndSet(false, true)) {
-
-            if (this->next == NULL) {
-                throw decaf::io::IOException(__FILE__, __LINE__, "Transport chain is invalid");
+        if (this->impl->closed.compareAndSet(false, true))
+        {
+            if (this->next == NULL)
+            {
+                throw decaf::io::IOException(__FILE__,
+                                             __LINE__,
+                                             "Transport chain is invalid");
             }
 
             next->setTransportListener(NULL);
 
-            try {
+            try
+            {
                 next->close();
-            } catch (IOException& ex) {
+            }
+            catch (IOException& ex)
+            {
                 error = ex;
                 error.setMark(__FILE__, __LINE__);
                 hasException = true;
             }
 
-            try {
+            try
+            {
                 doClose();
-            } catch (IOException& ex) {
+            }
+            catch (IOException& ex)
+            {
                 error = ex;
                 error.setMark(__FILE__, __LINE__);
                 hasException = true;
             }
         }
 
-        if (hasException) {
+        if (hasException)
+        {
             throw error;
         }
     }
@@ -281,10 +348,14 @@ void TransportFilter::close() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Transport* TransportFilter::narrow(const std::type_info& typeId) {
-    if (typeid(*this) == typeId) {
+Transport* TransportFilter::narrow(const std::type_info& typeId)
+{
+    if (typeid(*this) == typeId)
+    {
         return this;
-    } else if (this->next != NULL) {
+    }
+    else if (this->next != NULL)
+    {
         return this->next->narrow(typeId);
     }
 
@@ -292,11 +363,12 @@ Transport* TransportFilter::narrow(const std::type_info& typeId) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TransportFilter::reconnect(const decaf::net::URI& uri) {
-
+void TransportFilter::reconnect(const decaf::net::URI& uri)
+{
     checkClosed();
 
-    try {
+    try
+    {
         next->reconnect(uri);
     }
     AMQ_CATCH_RETHROW(IOException)
@@ -305,25 +377,31 @@ void TransportFilter::reconnect(const decaf::net::URI& uri) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<wireformat::WireFormat> TransportFilter::getWireFormat() const {
+Pointer<wireformat::WireFormat> TransportFilter::getWireFormat() const
+{
     checkClosed();
     return next->getWireFormat();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TransportFilter::setWireFormat(const Pointer<wireformat::WireFormat> wireFormat) {
+void TransportFilter::setWireFormat(
+    const Pointer<wireformat::WireFormat> wireFormat)
+{
     checkClosed();
     next->setWireFormat(wireFormat);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool TransportFilter::isClosed() const {
+bool TransportFilter::isClosed() const
+{
     return this->impl->closed.get();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TransportFilter::checkClosed() const {
-    if (this->impl->closed.get()) {
+void TransportFilter::checkClosed() const
+{
+    if (this->impl->closed.get())
+    {
         throw IOException(__FILE__, __LINE__, "Transport is closed");
     }
 }

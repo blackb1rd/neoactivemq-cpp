@@ -18,18 +18,20 @@
 #ifndef _ACTIVEMQ_WIREFORMAT_MARSHALAWARE_H_
 #define _ACTIVEMQ_WIREFORMAT_MARSHALAWARE_H_
 
-#include <vector>
-#include <decaf/io/IOException.h>
 #include <activemq/util/Config.h>
+#include <decaf/io/IOException.h>
+#include <vector>
 
-namespace activemq {
-namespace wireformat {
+namespace activemq
+{
+namespace wireformat
+{
 
     class WireFormat;
 
-    class AMQCPP_API MarshalAware {
+    class AMQCPP_API MarshalAware
+    {
     public:
-
         virtual ~MarshalAware();
 
         /**
@@ -100,7 +102,8 @@ namespace wireformat {
          *
          * @throws IOException if an I/O error occurs.
          */
-        virtual void setMarshaledForm(WireFormat* wireFormat, const std::vector<char>& data) = 0;
+        virtual void setMarshaledForm(WireFormat*              wireFormat,
+                                      const std::vector<char>& data) = 0;
 
         /**
          * Called to get the data to this object that will contain the objects
@@ -111,10 +114,11 @@ namespace wireformat {
          *
          * @return buffer that holds the objects data.
          */
-        virtual std::vector<unsigned char> getMarshaledForm(WireFormat* wireFormat) = 0;
-
+        virtual std::vector<unsigned char> getMarshaledForm(
+            WireFormat* wireFormat) = 0;
     };
 
-}}
+}  // namespace wireformat
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_WIREFORMAT_MARSHALAWARE_H_*/

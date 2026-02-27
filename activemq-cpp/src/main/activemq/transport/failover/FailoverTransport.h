@@ -18,282 +18,302 @@
 #ifndef _ACTIVE_TRANSPORT_FAILOVER_FAILOVERTRANSPORT_H_
 #define _ACTIVE_TRANSPORT_FAILOVER_FAILOVERTRANSPORT_H_
 
-#include <activemq/util/Config.h>
-#include <activemq/transport/failover/BrokerStateInfo.h>
 #include <activemq/commands/Command.h>
 #include <activemq/commands/ConnectionId.h>
-#include <activemq/threads/TaskRunner.h>
-#include <activemq/threads/CompositeTaskRunner.h>
 #include <activemq/state/ConnectionStateTracker.h>
+#include <activemq/threads/CompositeTaskRunner.h>
+#include <activemq/threads/TaskRunner.h>
 #include <activemq/transport/CompositeTransport.h>
+#include <activemq/transport/failover/BrokerStateInfo.h>
+#include <activemq/util/Config.h>
 #include <activemq/wireformat/WireFormat.h>
 
+#include <decaf/io/IOException.h>
+#include <decaf/net/URI.h>
 #include <decaf/util/List.h>
 #include <decaf/util/Properties.h>
-#include <decaf/net/URI.h>
-#include <decaf/io/IOException.h>
 
-namespace activemq {
-namespace transport {
-namespace failover {
+namespace activemq
+{
+namespace transport
+{
+    namespace failover
+    {
 
-    using namespace decaf::lang;
-    using activemq::commands::Command;
-    using activemq::commands::Response;
+        using namespace decaf::lang;
+        using activemq::commands::Command;
+        using activemq::commands::Response;
 
-    class FailoverTransportListener;
-    class BackupTransportPool;
-    class FailoverTransportImpl;
+        class FailoverTransportListener;
+        class BackupTransportPool;
+        class FailoverTransportImpl;
 
-    class AMQCPP_API FailoverTransport : public CompositeTransport,
-                                         public activemq::threads::CompositeTask {
-    private:
+        class AMQCPP_API FailoverTransport
+            : public CompositeTransport,
+              public activemq::threads::CompositeTask
+        {
+        private:
+            friend class FailoverTransportListener;
+            friend class BackupTransportPool;
 
-        friend class FailoverTransportListener;
-        friend class BackupTransportPool;
+            state::ConnectionStateTracker stateTracker;
 
-        state::ConnectionStateTracker stateTracker;
+            FailoverTransportImpl* impl;
 
-        FailoverTransportImpl* impl;
+        private:
+            FailoverTransport(const FailoverTransport&);
+            FailoverTransport& operator=(const FailoverTransport&);
 
-    private:
+        public:
+            FailoverTransport();
 
-        FailoverTransport(const FailoverTransport&);
-        FailoverTransport& operator=(const FailoverTransport&);
+            virtual ~FailoverTransport();
 
-    public:
+            /**
+             * Indicates that the Transport needs to reconnect to another URI in
+             * its list.
+             *
+             * @param rebalance
+             *      Indicates if the current connection should be broken and
+             * reconnected.
+             */
+            void reconnect(bool rebalance);
 
-        FailoverTransport();
+            /**
+             * Adds a New URI to the List of URIs this transport can Connect to.
+             *
+             * @param rebalance
+             *      Should the transport reconnect to a different broker to
+             * balance load.
+             * @param uri
+             *      A String version of a URI to add to the URIs to failover to.
+             */
+            void add(bool rebalance, const std::string& uri);
 
-        virtual ~FailoverTransport();
+        public:  // CompositeTransport methods
+            virtual void addURI(bool                         rebalance,
+                                const List<decaf::net::URI>& uris);
 
-        /**
-         * Indicates that the Transport needs to reconnect to another URI in its
-         * list.
-         *
-         * @param rebalance
-         *      Indicates if the current connection should be broken and reconnected.
-         */
-        void reconnect(bool rebalance);
+            virtual void removeURI(bool                         rebalance,
+                                   const List<decaf::net::URI>& uris);
 
-        /**
-         * Adds a New URI to the List of URIs this transport can Connect to.
-         *
-         * @param rebalance
-         *      Should the transport reconnect to a different broker to balance load.
-         * @param uri
-         *      A String version of a URI to add to the URIs to failover to.
-         */
-        void add(bool rebalance, const std::string& uri);
+        public:
+            virtual void start();
 
-    public: // CompositeTransport methods
+            virtual void stop();
 
-        virtual void addURI(bool rebalance, const List<decaf::net::URI>& uris);
+            virtual void close();
 
-        virtual void removeURI(bool rebalance, const List<decaf::net::URI>& uris);
+            virtual void oneway(const Pointer<Command> command);
 
-    public:
+            virtual Pointer<FutureResponse> asyncRequest(
+                const Pointer<Command>          command,
+                const Pointer<ResponseCallback> responseCallback);
 
-        virtual void start();
+            virtual Pointer<Response> request(const Pointer<Command> command);
 
-        virtual void stop();
+            virtual Pointer<Response> request(const Pointer<Command> command,
+                                              unsigned int           timeout);
 
-        virtual void close();
+            virtual Pointer<wireformat::WireFormat> getWireFormat() const;
 
-        virtual void oneway(const Pointer<Command> command);
+            virtual void setWireFormat(
+                const Pointer<wireformat::WireFormat> wireFormat AMQCPP_UNUSED)
+            {
+            }
 
-        virtual Pointer<FutureResponse> asyncRequest(const Pointer<Command> command,
-                                                     const Pointer<ResponseCallback> responseCallback);
+            virtual void setTransportListener(TransportListener* listener);
 
-        virtual Pointer<Response> request(const Pointer<Command> command);
+            virtual TransportListener* getTransportListener() const;
 
-        virtual Pointer<Response> request(const Pointer<Command> command, unsigned int timeout);
+            virtual bool isFaultTolerant() const
+            {
+                return true;
+            }
 
-        virtual Pointer<wireformat::WireFormat> getWireFormat() const;
+            virtual bool isConnected() const;
 
-        virtual void setWireFormat(const Pointer<wireformat::WireFormat> wireFormat AMQCPP_UNUSED) {}
+            virtual bool isClosed() const;
 
-        virtual void setTransportListener(TransportListener* listener);
+            bool isInitialized() const;
 
-        virtual TransportListener* getTransportListener() const;
+            void setInitialized(bool value);
 
-        virtual bool isFaultTolerant() const {
-            return true;
-        }
+            virtual Transport* narrow(const std::type_info& typeId);
 
-        virtual bool isConnected() const;
+            virtual std::string getRemoteAddress() const;
 
-        virtual bool isClosed() const;
+            virtual void reconnect(const decaf::net::URI& uri);
 
-        bool isInitialized() const;
+            virtual void updateURIs(
+                bool                                      rebalance,
+                const decaf::util::List<decaf::net::URI>& uris);
 
-        void setInitialized(bool value);
+        public:
+            /**
+             * @return true if there is a need for the iterate method to be
+             * called by this classes task runner.
+             */
+            virtual bool isPending() const;
 
-        virtual Transport* narrow(const std::type_info& typeId);
+            /**
+             * Performs the actual Reconnect operation for the
+             * FailoverTransport, when a connection is made this method returns
+             * false to indicate it doesn't need to run again, otherwise it
+             * returns true to indicate its still trying to connect.
+             *
+             * @return false to indicate a connection, true to indicate it needs
+             * to try again.
+             */
+            virtual bool iterate();
 
-        virtual std::string getRemoteAddress() const;
+        public:
+            long long getTimeout() const;
 
-        virtual void reconnect(const decaf::net::URI& uri);
+            void setTimeout(long long value);
 
-        virtual void updateURIs(bool rebalance, const decaf::util::List<decaf::net::URI>& uris);
+            long long getInitialReconnectDelay() const;
 
-    public:
+            void setInitialReconnectDelay(long long value);
 
-        /**
-         * @return true if there is a need for the iterate method to be called by this
-         *          classes task runner.
-         */
-        virtual bool isPending() const;
+            long long getMaxReconnectDelay() const;
 
-        /**
-         * Performs the actual Reconnect operation for the FailoverTransport, when a
-         * connection is made this method returns false to indicate it doesn't need to
-         * run again, otherwise it returns true to indicate its still trying to connect.
-         *
-         * @return false to indicate a connection, true to indicate it needs to try again.
-         */
-        virtual bool iterate();
+            void setMaxReconnectDelay(long long value);
 
-    public:
+            long long getBackOffMultiplier() const;
 
-        long long getTimeout() const;
+            void setBackOffMultiplier(long long value);
 
-        void setTimeout(long long value);
+            bool isUseExponentialBackOff() const;
 
-        long long getInitialReconnectDelay() const;
+            void setUseExponentialBackOff(bool value);
 
-        void setInitialReconnectDelay(long long value);
+            bool isRandomize() const;
 
-        long long getMaxReconnectDelay() const;
+            void setRandomize(bool value);
 
-        void setMaxReconnectDelay(long long value);
+            int getMaxReconnectAttempts() const;
 
-        long long getBackOffMultiplier() const;
+            void setMaxReconnectAttempts(int value);
 
-        void setBackOffMultiplier(long long value);
+            int getStartupMaxReconnectAttempts() const;
 
-        bool isUseExponentialBackOff() const;
+            void setStartupMaxReconnectAttempts(int value);
 
-        void setUseExponentialBackOff(bool value);
+            long long getReconnectDelay() const;
 
-        bool isRandomize() const;
+            void setReconnectDelay(long long value);
 
-        void setRandomize(bool value);
+            bool isBackup() const;
 
-        int getMaxReconnectAttempts() const;
+            void setBackup(bool value);
 
-        void setMaxReconnectAttempts(int value);
+            int getBackupPoolSize() const;
 
-        int getStartupMaxReconnectAttempts() const;
+            void setBackupPoolSize(int value);
 
-        void setStartupMaxReconnectAttempts(int value);
+            bool isTrackMessages() const;
 
-        long long getReconnectDelay() const;
+            void setTrackMessages(bool value);
 
-        void setReconnectDelay(long long value);
+            bool isTrackTransactionProducers() const;
 
-        bool isBackup() const;
+            void setTrackTransactionProducers(bool value);
 
-        void setBackup(bool value);
+            int getMaxCacheSize() const;
 
-        int getBackupPoolSize() const;
+            void setMaxCacheSize(int value);
 
-        void setBackupPoolSize(int value);
+            int getMaxPullCacheSize() const;
 
-        bool isTrackMessages() const;
+            void setMaxPullCacheSize(int value);
 
-        void setTrackMessages(bool value);
+            bool isReconnectSupported() const;
 
-        bool isTrackTransactionProducers() const;
+            void setReconnectSupported(bool value);
 
-        void setTrackTransactionProducers(bool value);
+            bool isUpdateURIsSupported() const;
 
-        int getMaxCacheSize() const;
+            void setUpdateURIsSupported(bool value);
 
-        void setMaxCacheSize(int value);
+            bool isRebalanceUpdateURIs() const;
 
-        int getMaxPullCacheSize() const;
+            void setRebalanceUpdateURIs(bool rebalanceUpdateURIs);
 
-        void setMaxPullCacheSize(int value);
+            bool isPriorityBackup() const;
 
-        bool isReconnectSupported() const;
+            void setPriorityBackup(bool priorityBackup);
 
-        void setReconnectSupported(bool value);
+            void setPriorityURIs(const std::string& priorityURIs);
 
-        bool isUpdateURIsSupported() const;
+            const decaf::util::List<decaf::net::URI>& getPriorityURIs() const;
 
-        void setUpdateURIsSupported(bool value);
+            void setConnectionInterruptProcessingComplete(
+                const Pointer<commands::ConnectionId> connectionId);
 
-        bool isRebalanceUpdateURIs() const;
+            bool isConnectedToPriority() const;
 
-        void setRebalanceUpdateURIs(bool rebalanceUpdateURIs);
+            /**
+             * Get current state of all brokers.
+             * @return vector of BrokerStateInfo objects with current state of
+             * each broker
+             */
+            std::vector<BrokerStateInfo> getBrokerStates() const;
 
-        bool isPriorityBackup() const;
+        protected:
+            /**
+             * Given a Transport restore the state of the Client's connection to
+             * the Broker using the data accumulated in the State Tracker.
+             *
+             * @param transport
+             *        The new Transport connected to the Broker.
+             *
+             * @throw IOException if an errors occurs while restoring the old
+             * state.
+             */
+            void restoreTransport(const Pointer<Transport> transport,
+                                  bool alreadyStarted = false);
 
-        void setPriorityBackup(bool priorityBackup);
+            /**
+             * Called when this class' TransportListener is notified of a
+             * Failure.
+             * @param error - The CMS Exception that was thrown.
+             * @throw Exception if an error occurs.
+             */
+            void handleTransportFailure(const decaf::lang::Exception& error);
 
-        void setPriorityURIs(const std::string& priorityURIs);
+            /**
+             * Called when the Broker sends a ConnectionControl command which
+             * could signal that this Client needs to reconnect in order to
+             * rebalance the connections on a Broker or the set of Known brokers
+             * has changed.
+             *
+             * @param control
+             *      The ConnectionControl command sent from the Broker.
+             */
+            void handleConnectionControl(const Pointer<Command> control);
 
-        const decaf::util::List<decaf::net::URI>& getPriorityURIs() const;
+        private:
+            /**
+             * Looks up the correct Factory and create a new Composite version
+             * of the Transport requested.
+             *
+             * @param uri - The URI to connect to
+             *
+             * @throw IOException if an I/O error occurs while creating the new
+             * Transport.
+             */
+            Pointer<Transport> createTransport(
+                const decaf::net::URI& location) const;
 
-        void setConnectionInterruptProcessingComplete(const Pointer<commands::ConnectionId> connectionId);
+            void processNewTransports(bool        rebalance,
+                                      std::string newTransports);
 
-        bool isConnectedToPriority() const;
+            void processResponse(const Pointer<Response> response);
+        };
 
-        /**
-         * Get current state of all brokers.
-         * @return vector of BrokerStateInfo objects with current state of each broker
-         */
-        std::vector<BrokerStateInfo> getBrokerStates() const;
-
-    protected:
-
-        /**
-         * Given a Transport restore the state of the Client's connection to the Broker
-         * using the data accumulated in the State Tracker.
-         *
-         * @param transport
-         *        The new Transport connected to the Broker.
-         *
-         * @throw IOException if an errors occurs while restoring the old state.
-         */
-        void restoreTransport(const Pointer<Transport> transport, bool alreadyStarted = false);
-
-        /**
-         * Called when this class' TransportListener is notified of a Failure.
-         * @param error - The CMS Exception that was thrown.
-         * @throw Exception if an error occurs.
-         */
-        void handleTransportFailure(const decaf::lang::Exception& error);
-
-        /**
-         * Called when the Broker sends a ConnectionControl command which could
-         * signal that this Client needs to reconnect in order to rebalance the
-         * connections on a Broker or the set of Known brokers has changed.
-         *
-         * @param control
-         *      The ConnectionControl command sent from the Broker.
-         */
-        void handleConnectionControl(const Pointer<Command> control);
-
-    private:
-
-        /**
-         * Looks up the correct Factory and create a new Composite version of the
-         * Transport requested.
-         *
-         * @param uri - The URI to connect to
-         *
-         * @throw IOException if an I/O error occurs while creating the new Transport.
-         */
-        Pointer<Transport> createTransport(const decaf::net::URI& location) const;
-
-        void processNewTransports(bool rebalance, std::string newTransports);
-
-        void processResponse(const Pointer<Response> response);
-
-    };
-
-}}}
+    }  // namespace failover
+}  // namespace transport
+}  // namespace activemq
 
 #endif /* _ACTIVE_TRANSPORT_FAILOVER_FAILOVERTRANSPORT_H_ */

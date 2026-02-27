@@ -15,63 +15,82 @@
  * limitations under the License.
  */
 
+#include <activemq/core/ActiveMQConnection.h>
+#include <activemq/core/ActiveMQConnectionFactory.h>
+#include <activemq/exceptions/ActiveMQException.h>
 #include <activemq/test/MessagePriorityTest.h>
 #include <activemq/util/CMSListener.h>
-#include <activemq/exceptions/ActiveMQException.h>
-#include <activemq/core/ActiveMQConnectionFactory.h>
-#include <activemq/core/ActiveMQConnection.h>
 
+#include <decaf/lang/Pointer.h>
 #include <decaf/lang/Thread.h>
 #include <decaf/util/UUID.h>
-#include <decaf/lang/Pointer.h>
 
-namespace {
+namespace
+{
 
-    class ProducerThread : public decaf::lang::Thread {
-    private:
+class ProducerThread : public decaf::lang::Thread
+{
+private:
+    cms::Session*     session;
+    cms::Destination* destination;
+    int               num;
+    int               priority;
 
-        cms::Session* session;
-        cms::Destination* destination;
-        int num;
-        int priority;
+private:
+    ProducerThread(const ProducerThread&);
+    ProducerThread& operator=(const ProducerThread&);
 
-    private:
-
-        ProducerThread(const ProducerThread&);
-        ProducerThread& operator= (const ProducerThread&);
-
-    public:
-
-        ProducerThread(cms::Session* session, cms::Destination* destination, int num, int priority) :
-            session(session), destination(destination), num(num), priority(priority) {
-        }
-
-        virtual ~ProducerThread() {}
-
-        virtual void run() {
-
-            decaf::lang::Pointer<cms::MessageProducer> producer(session->createProducer(destination));
-            producer->setDeliveryMode(cms::DeliveryMode::NON_PERSISTENT);
-            producer->setPriority(priority);
-
-            for (int i = 0; i < num; ++i) {
-                decaf::lang::Pointer<cms::TextMessage> message(session->createTextMessage("Test Message"));
-                producer->send(message.get());
-            }
-        }
-    };
-}
-
-namespace activemq {
-namespace test {
-namespace openwire {
-    class OpenwireMessagePriorityTest : public MessagePriorityTest {
 public:
-        std::string getBrokerURL() const override {
-            return activemq::util::IntegrationCommon::getInstance().getOpenwireURL();
+    ProducerThread(cms::Session*     session,
+                   cms::Destination* destination,
+                   int               num,
+                   int               priority)
+        : session(session),
+          destination(destination),
+          num(num),
+          priority(priority)
+    {
+    }
+
+    virtual ~ProducerThread()
+    {
+    }
+
+    virtual void run()
+    {
+        decaf::lang::Pointer<cms::MessageProducer> producer(
+            session->createProducer(destination));
+        producer->setDeliveryMode(cms::DeliveryMode::NON_PERSISTENT);
+        producer->setPriority(priority);
+
+        for (int i = 0; i < num; ++i)
+        {
+            decaf::lang::Pointer<cms::TextMessage> message(
+                session->createTextMessage("Test Message"));
+            producer->send(message.get());
         }
-    };
-}}}
+    }
+};
+}  // namespace
+
+namespace activemq
+{
+namespace test
+{
+    namespace openwire
+    {
+        class OpenwireMessagePriorityTest : public MessagePriorityTest
+        {
+        public:
+            std::string getBrokerURL() const override
+            {
+                return activemq::util::IntegrationCommon::getInstance()
+                    .getOpenwireURL();
+            }
+        };
+    }  // namespace openwire
+}  // namespace test
+}  // namespace activemq
 
 using namespace activemq;
 using namespace activemq::test;
@@ -84,8 +103,8 @@ using namespace decaf::lang;
 using namespace decaf::util;
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(OpenwireMessagePriorityTest, testMessagePrioritySendReceive) {
-
+TEST_F(OpenwireMessagePriorityTest, testMessagePrioritySendReceive)
+{
     const int MSG_COUNT = 25;
 
     Pointer<ActiveMQConnectionFactory> connectionFactory(
@@ -94,10 +113,13 @@ TEST_F(OpenwireMessagePriorityTest, testMessagePrioritySendReceive) {
     connectionFactory->setMessagePrioritySupported(true);
 
     Pointer<Connection> connection(connectionFactory->createConnection());
-    Pointer<Session> session(connection->createSession(Session::AUTO_ACKNOWLEDGE));
-    Pointer<Queue> destination(session->createTemporaryQueue());
-    Pointer<MessageProducer> producer(session->createProducer(destination.get()));
-    Pointer<MessageConsumer> consumer(session->createConsumer(destination.get()));
+    Pointer<Session>    session(
+        connection->createSession(Session::AUTO_ACKNOWLEDGE));
+    Pointer<Queue>           destination(session->createTemporaryQueue());
+    Pointer<MessageProducer> producer(
+        session->createProducer(destination.get()));
+    Pointer<MessageConsumer> consumer(
+        session->createConsumer(destination.get()));
 
     connection->start();
 
@@ -112,7 +134,8 @@ TEST_F(OpenwireMessagePriorityTest, testMessagePrioritySendReceive) {
 
     Thread::sleep(3000);
 
-    for (int i = 0; i < MSG_COUNT * 2; ++i) {
+    for (int i = 0; i < MSG_COUNT * 2; ++i)
+    {
         Pointer<cms::Message> message(consumer->receive(2000));
         ASSERT_TRUE(message != NULL);
         ASSERT_TRUE(message->getCMSPriority() == (i < MSG_COUNT ? 9 : 1));

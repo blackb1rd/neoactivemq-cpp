@@ -21,4 +21,6 @@ using namespace activemq;
 using namespace activemq::threads;
 
 ////////////////////////////////////////////////////////////////////////////////
-Task::~Task() {}
+Task::~Task()
+{
+}

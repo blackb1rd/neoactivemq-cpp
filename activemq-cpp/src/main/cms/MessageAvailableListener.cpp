@@ -20,6 +20,6 @@
 using namespace cms;
 
 ////////////////////////////////////////////////////////////////////////////////
-MessageAvailableListener::~MessageAvailableListener() {
+MessageAvailableListener::~MessageAvailableListener()
+{
 }
-

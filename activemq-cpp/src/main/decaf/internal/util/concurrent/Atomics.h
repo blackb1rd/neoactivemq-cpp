@@ -20,53 +20,63 @@
 
 #include <decaf/util/Config.h>
 
-namespace decaf {
-namespace internal {
-namespace util {
-namespace concurrent {
+namespace decaf
+{
+namespace internal
+{
+    namespace util
+    {
+        namespace concurrent
+        {
 
-    class Threading;
+            class Threading;
 
-    class DECAF_API Atomics {
-    private:
+            class DECAF_API Atomics
+            {
+            private:
+                Atomics();
+                Atomics(const Atomics&);
+                Atomics& operator=(const Atomics&);
 
-        Atomics();
-        Atomics(const Atomics&);
-        Atomics& operator= (const Atomics&);
+            public:
+                template <typename T>
+                static bool compareAndSwap(T*& target, T* expect, T* update)
+                {
+                    return Atomics::compareAndSet((volatile void**)&target,
+                                                  (void*)expect,
+                                                  (void*)update);
+                }
 
-    public:
+            public:
+                static bool compareAndSet32(volatile int* target,
+                                            int           expect,
+                                            int           update);
+                static bool compareAndSet(volatile void** target,
+                                          void*           expect,
+                                          void*           update);
 
-        template<typename T>
-        static bool compareAndSwap(T*& target, T* expect, T* update) {
+                static void* getAndSet(volatile void** target, void* value);
+                static int   getAndSet(volatile int* target, int value);
 
-            return Atomics::compareAndSet((volatile void**)&target, (void*)expect, (void*)update);
-        }
+                static int getAndIncrement(volatile int* target);
+                static int getAndDecrement(volatile int* target);
 
-    public:
+                static int getAndAdd(volatile int* target, int delta);
+                static int addAndGet(volatile int* target, int delta);
 
-        static bool compareAndSet32(volatile int* target, int expect, int update);
-        static bool compareAndSet(volatile void** target, void* expect, void* update);
+                static int incrementAndGet(volatile int* target);
+                static int decrementAndGet(volatile int* target);
 
-        static void* getAndSet(volatile void** target, void* value);
-        static int getAndSet(volatile int* target, int value);
+            private:
+                static void initialize();
+                static void shutdown();
 
-        static int getAndIncrement(volatile int* target);
-        static int getAndDecrement(volatile int* target);
+                friend class Threading;
+            };
 
-        static int getAndAdd(volatile int* target, int delta);
-        static int addAndGet(volatile int* target, int delta);
-
-        static int incrementAndGet(volatile int* target);
-        static int decrementAndGet(volatile int* target);
-
-    private:
-
-        static void initialize();
-        static void shutdown();
-
-        friend class Threading;
-    };
-
-}}}}
+        }  // namespace concurrent
+    }  // namespace util
+}  // namespace internal
+}  // namespace decaf
 
 #endif /* _DECAF_INTERNAL_UTIL_CONCURRENT_ATOMICS_H_ */

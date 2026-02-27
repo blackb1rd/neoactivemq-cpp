@@ -19,114 +19,132 @@
 
 #include <decaf/lang/Exception.h>
 
-namespace decaf{
-namespace util{
-namespace concurrent{
+namespace decaf
+{
+namespace util
+{
+    namespace concurrent
+    {
 
-    /*
-     * Exception thrown when a thread tries to wait upon a barrier that is in a broken
-     * state, or which enters the broken state while the thread is waiting.
-     */
-    class DECAF_API BrokenBarrierException : public decaf::lang::Exception {
-    public:
-
-        /**
-         * Default Constructor.
+        /*
+         * Exception thrown when a thread tries to wait upon a barrier that is
+         * in a broken state, or which enters the broken state while the thread
+         * is waiting.
          */
-        BrokenBarrierException() : decaf::lang::Exception() {}
-
-        /**
-         * Conversion Constructor from some other Exception.
-         *
-         * @param ex
-         *      An exception that should become this type of Exception
-         */
-        BrokenBarrierException( const decaf::lang::Exception& ex )
-        : decaf::lang::Exception()
+        class DECAF_API BrokenBarrierException : public decaf::lang::Exception
         {
-            *(Exception*)this = ex;
-        }
+        public:
+            /**
+             * Default Constructor.
+             */
+            BrokenBarrierException()
+                : decaf::lang::Exception()
+            {
+            }
 
-        /**
-         * Copy Constructor.
-         *
-         * @param ex
-         *      The Exception to copy in this new instance.
-         */
-        BrokenBarrierException( const BrokenBarrierException& ex )
-        : decaf::lang::Exception()
-        {
-            *(Exception*)this = ex;
-        }
+            /**
+             * Conversion Constructor from some other Exception.
+             *
+             * @param ex
+             *      An exception that should become this type of Exception
+             */
+            BrokenBarrierException(const decaf::lang::Exception& ex)
+                : decaf::lang::Exception()
+            {
+                *(Exception*)this = ex;
+            }
 
-        /**
-         * Constructor
-         * @param cause Pointer to the exception that caused this one to
-         * be thrown, the object is cloned caller retains ownership.
-         */
-        BrokenBarrierException( const std::exception* cause )
-            : decaf::lang::Exception( cause ) {}
+            /**
+             * Copy Constructor.
+             *
+             * @param ex
+             *      The Exception to copy in this new instance.
+             */
+            BrokenBarrierException(const BrokenBarrierException& ex)
+                : decaf::lang::Exception()
+            {
+                *(Exception*)this = ex;
+            }
 
-        /**
-         * Constructor - Initializes the file name and line number where
-         * this message occurred.  Sets the message to report, using an
-         * optional list of arguments to parse into the message
-         * @param file - The file name where exception occurs
-         * @param lineNumber - The line number where the exception occurred.
-         * @param msg - The message to report
-         * @param ... - list of primitives that are formatted into the message
-         */
-        BrokenBarrierException( const char* file, const int lineNumber,
-                                const char* msg, ... )
-            : decaf::lang::Exception()
-        {
+            /**
+             * Constructor
+             * @param cause Pointer to the exception that caused this one to
+             * be thrown, the object is cloned caller retains ownership.
+             */
+            BrokenBarrierException(const std::exception* cause)
+                : decaf::lang::Exception(cause)
+            {
+            }
 
-            va_list vargs;
-            va_start( vargs, msg );
-            buildMessage( msg, vargs );
+            /**
+             * Constructor - Initializes the file name and line number where
+             * this message occurred.  Sets the message to report, using an
+             * optional list of arguments to parse into the message
+             * @param file - The file name where exception occurs
+             * @param lineNumber - The line number where the exception occurred.
+             * @param msg - The message to report
+             * @param ... - list of primitives that are formatted into the
+             * message
+             */
+            BrokenBarrierException(const char* file,
+                                   const int   lineNumber,
+                                   const char* msg,
+                                   ...)
+                : decaf::lang::Exception()
+            {
+                va_list vargs;
+                va_start(vargs, msg);
+                buildMessage(msg, vargs);
 
-            // Set the first mark for this exception.
-            setMark( file, lineNumber );
-        }
+                // Set the first mark for this exception.
+                setMark(file, lineNumber);
+            }
 
-        /**
-         * Constructor - Initializes the file name and line number where
-         * this message occurred.  Sets the message to report, using an
-         * optional list of arguments to parse into the message
-         * @param file - The file name where exception occurs
-         * @param lineNumber - The line number where the exception occurred.
-         * @param cause - The exception that was the cause for this one to be thrown.
-         * @param msg - The message to report
-         * @param ... - list of primitives that are formatted into the message
-         */
-        BrokenBarrierException( const char* file, const int lineNumber,
-                                const std::exception* cause,
-                                const char* msg, ... )
-            : decaf::lang::Exception( cause )
-        {
-            va_list vargs ;
-            va_start( vargs, msg );
-            buildMessage( msg, vargs );
+            /**
+             * Constructor - Initializes the file name and line number where
+             * this message occurred.  Sets the message to report, using an
+             * optional list of arguments to parse into the message
+             * @param file - The file name where exception occurs
+             * @param lineNumber - The line number where the exception occurred.
+             * @param cause - The exception that was the cause for this one to
+             * be thrown.
+             * @param msg - The message to report
+             * @param ... - list of primitives that are formatted into the
+             * message
+             */
+            BrokenBarrierException(const char*           file,
+                                   const int             lineNumber,
+                                   const std::exception* cause,
+                                   const char*           msg,
+                                   ...)
+                : decaf::lang::Exception(cause)
+            {
+                va_list vargs;
+                va_start(vargs, msg);
+                buildMessage(msg, vargs);
 
-            // Set the first mark for this exception.
-            setMark( file, lineNumber );
-        }
+                // Set the first mark for this exception.
+                setMark(file, lineNumber);
+            }
 
-        /**
-         * Clones this exception.  This is useful for cases where you need
-         * to preserve the type of the original exception as well as the message.
-         * All subclasses should override.
-         *
-         * @return a new instance of an exception that is a clone of this one.
-         */
-        virtual BrokenBarrierException* clone() const{
-            return new BrokenBarrierException( *this );
-        }
+            /**
+             * Clones this exception.  This is useful for cases where you need
+             * to preserve the type of the original exception as well as the
+             * message. All subclasses should override.
+             *
+             * @return a new instance of an exception that is a clone of this
+             * one.
+             */
+            virtual BrokenBarrierException* clone() const
+            {
+                return new BrokenBarrierException(*this);
+            }
 
-        virtual ~BrokenBarrierException() throw();
+            virtual ~BrokenBarrierException() throw();
+        };
 
-    };
-
-}}}
+    }  // namespace concurrent
+}  // namespace util
+}  // namespace decaf
 
 #endif /*_DECAF_UTIL_CONCURRENT_BROKENBARRIEREXCEPTION_H_*/

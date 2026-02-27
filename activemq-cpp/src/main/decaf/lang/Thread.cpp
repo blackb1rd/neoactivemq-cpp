@@ -18,21 +18,21 @@
 #include "Thread.h"
 
 #ifdef _WIN32
-#pragma warning( disable: 4311 )
+#pragma warning(disable : 4311)
 #endif
 
 #include <decaf/internal/DecafRuntime.h>
 #include <decaf/internal/util/concurrent/Threading.h>
+#include <decaf/lang/Exception.h>
 #include <decaf/lang/Integer.h>
 #include <decaf/lang/Long.h>
 #include <decaf/lang/Math.h>
-#include <decaf/lang/Exception.h>
-#include <decaf/lang/exceptions/RuntimeException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/lang/exceptions/IllegalThreadStateException.h>
-#include <decaf/util/concurrent/TimeUnit.h>
-#include <decaf/util/concurrent/Mutex.h>
+#include <decaf/lang/exceptions/NullPointerException.h>
+#include <decaf/lang/exceptions/RuntimeException.h>
 #include <decaf/util/concurrent/Executors.h>
+#include <decaf/util/concurrent/Mutex.h>
+#include <decaf/util/concurrent/TimeUnit.h>
 
 #include <vector>
 
@@ -46,75 +46,103 @@ using namespace decaf::util;
 using namespace decaf::util::concurrent;
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace decaf {
-namespace lang {
+namespace decaf
+{
+namespace lang
+{
 
-    class ThreadProperties {
+    class ThreadProperties
+    {
     private:
-
-        ThreadProperties( const ThreadProperties& );
-        ThreadProperties& operator= ( const ThreadProperties& );
+        ThreadProperties(const ThreadProperties&);
+        ThreadProperties& operator=(const ThreadProperties&);
 
     public:
-
-        Runnable* task;
-        ThreadHandle* handle;
-        Thread::UncaughtExceptionHandler* exHandler;
-        static unsigned int id;
+        Runnable*                                task;
+        ThreadHandle*                            handle;
+        Thread::UncaughtExceptionHandler*        exHandler;
+        static unsigned int                      id;
         static Thread::UncaughtExceptionHandler* defaultHandler;
 
     public:
-
-        ThreadProperties() : task(NULL), handle(NULL), exHandler(NULL) {}
-
+        ThreadProperties()
+            : task(NULL),
+              handle(NULL),
+              exHandler(NULL)
+        {
+        }
     };
 
-}}
+}  // namespace lang
+}  // namespace decaf
 
 ////////////////////////////////////////////////////////////////////////////////
-unsigned int ThreadProperties::id = 0;
+unsigned int                      ThreadProperties::id             = 0;
 Thread::UncaughtExceptionHandler* ThreadProperties::defaultHandler = NULL;
 
 ////////////////////////////////////////////////////////////////////////////////
-Thread::Thread(ThreadHandle* handle) : Runnable(), properties(NULL) {
-
-    this->properties = new ThreadProperties();
+Thread::Thread(ThreadHandle* handle)
+    : Runnable(),
+      properties(NULL)
+{
+    this->properties         = new ThreadProperties();
     this->properties->handle = handle;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Thread::Thread() : Runnable(), properties(NULL) {
+Thread::Thread()
+    : Runnable(),
+      properties(NULL)
+{
     this->initializeSelf(NULL, "", -1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Thread::Thread(Runnable* task) : Runnable(), properties(NULL) {
+Thread::Thread(Runnable* task)
+    : Runnable(),
+      properties(NULL)
+{
     this->initializeSelf(task, "", -1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Thread::Thread(const std::string& name) : Runnable(), properties(NULL) {
+Thread::Thread(const std::string& name)
+    : Runnable(),
+      properties(NULL)
+{
     this->initializeSelf(NULL, name, -1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Thread::Thread(Runnable* task, const std::string& name) : Runnable(), properties( NULL ) {
+Thread::Thread(Runnable* task, const std::string& name)
+    : Runnable(),
+      properties(NULL)
+{
     this->initializeSelf(task, name, -1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Thread::Thread(Runnable* task, const std::string& name, long long stackSize) : Runnable(), properties( NULL ) {
+Thread::Thread(Runnable* task, const std::string& name, long long stackSize)
+    : Runnable(),
+      properties(NULL)
+{
     this->initializeSelf(task, name, stackSize);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Thread::initializeSelf(Runnable* task, const std::string& name, long long stackSize) {
-
+void Thread::initializeSelf(Runnable*          task,
+                            const std::string& name,
+                            long long          stackSize)
+{
     std::string threadName = name;
 
-    if (threadName.empty()) {
-        threadName = std::string("Thread-") + Integer::toString(++ThreadProperties::id);
-    } else {
+    if (threadName.empty())
+    {
+        threadName = std::string("Thread-") +
+                     Integer::toString(++ThreadProperties::id);
+    }
+    else
+    {
         threadName = name;
     }
 
@@ -125,8 +153,10 @@ void Thread::initializeSelf(Runnable* task, const std::string& name, long long s
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Thread::~Thread() {
-    try {
+Thread::~Thread()
+{
+    try
+    {
         Threading::destroyThread(this->properties->handle);
         delete this->properties;
     }
@@ -135,30 +165,37 @@ Thread::~Thread() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Thread::run() {
-
-    if (this->properties->task != NULL) {
+void Thread::run()
+{
+    if (this->properties->task != NULL)
+    {
         this->properties->task->run();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Thread::start() {
+void Thread::start()
+{
+    try
+    {
+        Thread::State currentState =
+            Threading::getThreadState(this->properties->handle);
 
-    try {
-
-        Thread::State currentState = Threading::getThreadState(this->properties->handle);
-
-        // If thread has terminated, allow it to be restarted by recreating the thread handle
-        if (currentState == Thread::TERMINATED) {
+        // If thread has terminated, allow it to be restarted by recreating the
+        // thread handle
+        if (currentState == Thread::TERMINATED)
+        {
             // Join the old thread to ensure it's fully cleaned up
             Threading::join(this->properties->handle, 0, 0);
 
             // Reinitialize the thread handle for a new run
             Threading::reinitialize(this->properties->handle);
-        } else if (currentState > Thread::NEW) {
+        }
+        else if (currentState > Thread::NEW)
+        {
             throw IllegalThreadStateException(
-                __FILE__, __LINE__,
+                __FILE__,
+                __LINE__,
                 "Thread::start - Thread already started");
         }
 
@@ -171,11 +208,14 @@ void Thread::start() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Thread::join() {
+void Thread::join()
+{
     // Check if we're joining ourselves - this is a no-op to avoid deadlock
-    // The underlying Threading::join will also detect this and return immediately
+    // The underlying Threading::join will also detect this and return
+    // immediately
     Thread* currentThread = Thread::currentThread();
-    if (currentThread == this) {
+    if (currentThread == this)
+    {
         // Self-join detected - just return without actually joining
         // Add a memory fence to try to ensure visibility of volatile variables
         std::atomic_thread_fence(std::memory_order_seq_cst);
@@ -186,156 +226,192 @@ void Thread::join() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Thread::join(long long millisecs) {
-
-    if (millisecs < 0) {
+void Thread::join(long long millisecs)
+{
+    if (millisecs < 0)
+    {
         throw IllegalArgumentException(
-            __FILE__, __LINE__,
-            "Thread::join( millisecs ) - Value given {%d} is less than 0", millisecs );
+            __FILE__,
+            __LINE__,
+            "Thread::join( millisecs ) - Value given {%d} is less than 0",
+            millisecs);
     }
 
     Threading::join(this->properties->handle, millisecs, 0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Thread::join(long long millisecs, int nanos) {
-
-    if (millisecs < 0) {
-        throw IllegalArgumentException(
-            __FILE__, __LINE__,
-            "Thread::join( millisecs, nanos ) - Value given {%d} is less than 0", millisecs );
+void Thread::join(long long millisecs, int nanos)
+{
+    if (millisecs < 0)
+    {
+        throw IllegalArgumentException(__FILE__,
+                                       __LINE__,
+                                       "Thread::join( millisecs, nanos ) - "
+                                       "Value given {%d} is less than 0",
+                                       millisecs);
     }
 
-    if (nanos < 0 || nanos > 999999) {
+    if (nanos < 0 || nanos > 999999)
+    {
         throw IllegalArgumentException(
-            __FILE__, __LINE__,
-            "Thread::join( millisecs, nanos ) - Nanoseconds must be in range [0...999999]" );
+            __FILE__,
+            __LINE__,
+            "Thread::join( millisecs, nanos ) - Nanoseconds must be in range "
+            "[0...999999]");
     }
 
     Threading::join(this->properties->handle, millisecs, nanos);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Thread::sleep(long long millisecs) {
+void Thread::sleep(long long millisecs)
+{
     Threading::sleep(millisecs, 0);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Thread::sleep(long long millisecs, int nanos) {
-
-    if (millisecs < 0) {
-        throw IllegalArgumentException(
-            __FILE__, __LINE__,
-            "Thread::sleep( millisecs, nanos ) - Value given {%d} is less than 0", millisecs );
+void Thread::sleep(long long millisecs, int nanos)
+{
+    if (millisecs < 0)
+    {
+        throw IllegalArgumentException(__FILE__,
+                                       __LINE__,
+                                       "Thread::sleep( millisecs, nanos ) - "
+                                       "Value given {%d} is less than 0",
+                                       millisecs);
     }
 
-    if (nanos < 0 || nanos > 999999) {
+    if (nanos < 0 || nanos > 999999)
+    {
         throw IllegalArgumentException(
-            __FILE__, __LINE__,
-            "Thread::sleep( millisecs, nanos ) - Nanoseconds must be in range [0...999999]" );
+            __FILE__,
+            __LINE__,
+            "Thread::sleep( millisecs, nanos ) - Nanoseconds must be in range "
+            "[0...999999]");
     }
-
 
     Threading::sleep(millisecs, nanos);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Thread::yield() {
+void Thread::yield()
+{
     Threading::yeild();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::thread::id Thread::getId() const {
+std::thread::id Thread::getId() const
+{
     return Threading::getThreadId(this->properties->handle);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Thread::setName(const std::string& name) {
+void Thread::setName(const std::string& name)
+{
     Threading::setThreadName(this->properties->handle, name.c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string Thread::getName() const {
+std::string Thread::getName() const
+{
     return Threading::getThreadName(this->properties->handle);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Thread::setPriority(int value) {
-
-    if (value < Thread::MIN_PRIORITY || value > Thread::MAX_PRIORITY) {
+void Thread::setPriority(int value)
+{
+    if (value < Thread::MIN_PRIORITY || value > Thread::MAX_PRIORITY)
+    {
         throw IllegalArgumentException(
-            __FILE__, __LINE__,
-            "Thread::setPriority - Specified value {%d} is out of range", value );
+            __FILE__,
+            __LINE__,
+            "Thread::setPriority - Specified value {%d} is out of range",
+            value);
     }
 
     Threading::setThreadPriority(this->properties->handle, value);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int Thread::getPriority() const {
+int Thread::getPriority() const
+{
     return Threading::getThreadPriority(this->properties->handle);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Thread::setUncaughtExceptionHandler(UncaughtExceptionHandler* handler) {
+void Thread::setUncaughtExceptionHandler(UncaughtExceptionHandler* handler)
+{
     this->properties->exHandler = handler;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Thread::UncaughtExceptionHandler* Thread::getUncaughtExceptionHandler() const {
+Thread::UncaughtExceptionHandler* Thread::getUncaughtExceptionHandler() const
+{
     return this->properties->exHandler;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Thread::UncaughtExceptionHandler* Thread::getDefaultUncaughtExceptionHandler() {
+Thread::UncaughtExceptionHandler* Thread::getDefaultUncaughtExceptionHandler()
+{
     return ThreadProperties::defaultHandler;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Thread::setDefaultUncaughtExceptionHandler(Thread::UncaughtExceptionHandler* handler) {
+void Thread::setDefaultUncaughtExceptionHandler(
+    Thread::UncaughtExceptionHandler* handler)
+{
     ThreadProperties::defaultHandler = handler;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string Thread::toString() const {
+std::string Thread::toString() const
+{
     std::ostringstream oss;
-    oss << Threading::getThreadName(this->properties->handle)
-        << ": Priority=" << Threading::getThreadPriority(this->properties->handle)
+    oss << Threading::getThreadName(this->properties->handle) << ": Priority="
+        << Threading::getThreadPriority(this->properties->handle)
         << ", ThreadID=" << Threading::getThreadId(this->properties->handle);
     return oss.str();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool Thread::isAlive() const {
+bool Thread::isAlive() const
+{
     return Threading::isThreadAlive(this->properties->handle);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Thread::State Thread::getState() const {
+Thread::State Thread::getState() const
+{
     return Threading::getThreadState(this->properties->handle);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Thread* Thread::currentThread() {
+Thread* Thread::currentThread()
+{
     return Threading::getCurrentThread();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Thread::interrupt() {
+void Thread::interrupt()
+{
     Threading::interrupt(this->properties->handle);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool Thread::interrupted() {
+bool Thread::interrupted()
+{
     return Threading::interrupted();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool Thread::isInterrupted() const {
+bool Thread::isInterrupted() const
+{
     return Threading::isInterrupted(this->properties->handle, false);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ThreadHandle* Thread::getHandle() const {
+ThreadHandle* Thread::getHandle() const
+{
     return this->properties->handle;
 }

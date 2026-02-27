@@ -17,9 +17,9 @@
 
 #include <gtest/gtest.h>
 
-#include <decaf/util/UUID.h>
-#include <decaf/lang/Exception.h>
 #include <activemq/commands/ActiveMQBytesMessage.h>
+#include <decaf/lang/Exception.h>
+#include <decaf/util/UUID.h>
 
 using namespace std;
 using namespace cms;
@@ -29,273 +29,332 @@ using namespace activemq::commands;
 using namespace decaf;
 using namespace decaf::lang;
 
-    class ActiveMQBytesMessageTest : public ::testing::Test {
-    };
-
+class ActiveMQBytesMessageTest : public ::testing::Test
+{
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ActiveMQBytesMessageTest, testGetBodyLength) {
+TEST_F(ActiveMQBytesMessageTest, testGetBodyLength)
+{
     ActiveMQBytesMessage msg;
-    int len = 10;
+    int                  len = 10;
 
-    try {
-
-        for( int i = 0; i < len; i++ ) {
-            msg.writeLong( 5LL );
+    try
+    {
+        for (int i = 0; i < len; i++)
+        {
+            msg.writeLong(5LL);
         }
-
-    } catch( CMSException& ex ) {
+    }
+    catch (CMSException& ex)
+    {
         ex.printStackTrace();
     }
 
-    try {
-
+    try
+    {
         msg.reset();
-        ASSERT_TRUE(msg.getBodyLength() == ( len * 8 ));
-
-    } catch( Exception& e ) {
+        ASSERT_TRUE(msg.getBodyLength() == (len * 8));
+    }
+    catch (Exception& e)
+    {
         e.printStackTrace();
         ASSERT_TRUE(false);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ActiveMQBytesMessageTest, testReadBoolean) {
-
+TEST_F(ActiveMQBytesMessageTest, testReadBoolean)
+{
     ActiveMQBytesMessage msg;
-    try {
-        msg.writeBoolean( true );
+    try
+    {
+        msg.writeBoolean(true);
         msg.reset();
         ASSERT_TRUE(msg.readBoolean());
-    } catch( CMSException& ex ) {
+    }
+    catch (CMSException& ex)
+    {
         ex.printStackTrace();
         ASSERT_TRUE(false);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ActiveMQBytesMessageTest, testReadByte) {
-
+TEST_F(ActiveMQBytesMessageTest, testReadByte)
+{
     ActiveMQBytesMessage msg;
-    try {
-        msg.writeByte( (unsigned char)2 );
+    try
+    {
+        msg.writeByte((unsigned char)2);
         msg.reset();
         ASSERT_TRUE(msg.readByte() == 2);
-    } catch( CMSException& ex ) {
+    }
+    catch (CMSException& ex)
+    {
         ex.printStackTrace();
         ASSERT_TRUE(false);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ActiveMQBytesMessageTest, testReadShort) {
-
+TEST_F(ActiveMQBytesMessageTest, testReadShort)
+{
     ActiveMQBytesMessage msg;
-    try {
-        msg.writeShort( (short)3000 );
+    try
+    {
+        msg.writeShort((short)3000);
         msg.reset();
         ASSERT_TRUE(msg.readShort() == 3000);
-    } catch( CMSException& ex ) {
+    }
+    catch (CMSException& ex)
+    {
         ex.printStackTrace();
         ASSERT_TRUE(false);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ActiveMQBytesMessageTest, testReadUnsignedShort) {
-
+TEST_F(ActiveMQBytesMessageTest, testReadUnsignedShort)
+{
     ActiveMQBytesMessage msg;
-    try {
-        msg.writeShort( (short)3000 );
+    try
+    {
+        msg.writeShort((short)3000);
         msg.reset();
         ASSERT_TRUE(msg.readUnsignedShort() == 3000);
-    } catch( CMSException& ex ) {
+    }
+    catch (CMSException& ex)
+    {
         ex.printStackTrace();
         ASSERT_TRUE(false);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ActiveMQBytesMessageTest, testReadChar) {
-
+TEST_F(ActiveMQBytesMessageTest, testReadChar)
+{
     ActiveMQBytesMessage msg;
-    try {
-        msg.writeChar( 'a' );
+    try
+    {
+        msg.writeChar('a');
         msg.reset();
         ASSERT_TRUE(msg.readChar() == 'a');
-    } catch( CMSException& ex ) {
+    }
+    catch (CMSException& ex)
+    {
         ex.printStackTrace();
         ASSERT_TRUE(false);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ActiveMQBytesMessageTest, testReadInt) {
-
+TEST_F(ActiveMQBytesMessageTest, testReadInt)
+{
     ActiveMQBytesMessage msg;
-    try {
-        msg.writeInt( 3000 );
+    try
+    {
+        msg.writeInt(3000);
         msg.reset();
         ASSERT_TRUE(msg.readInt() == 3000);
-    } catch( CMSException& ex ) {
+    }
+    catch (CMSException& ex)
+    {
         ex.printStackTrace();
         ASSERT_TRUE(false);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ActiveMQBytesMessageTest, testReadLong) {
-
+TEST_F(ActiveMQBytesMessageTest, testReadLong)
+{
     ActiveMQBytesMessage msg;
-    try {
-        msg.writeLong( 3000 );
+    try
+    {
+        msg.writeLong(3000);
         msg.reset();
         ASSERT_TRUE(msg.readLong() == 3000);
-    } catch( CMSException& ex ) {
+    }
+    catch (CMSException& ex)
+    {
         ex.printStackTrace();
         ASSERT_TRUE(false);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ActiveMQBytesMessageTest, testReadFloat) {
-
+TEST_F(ActiveMQBytesMessageTest, testReadFloat)
+{
     ActiveMQBytesMessage msg;
-    try {
-        msg.writeFloat( 3.3f );
+    try
+    {
+        msg.writeFloat(3.3f);
         msg.reset();
         ASSERT_TRUE(msg.readFloat() == 3.3f);
-    } catch( CMSException& ex ) {
+    }
+    catch (CMSException& ex)
+    {
         ex.printStackTrace();
         ASSERT_TRUE(false);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ActiveMQBytesMessageTest, testReadDouble) {
-
+TEST_F(ActiveMQBytesMessageTest, testReadDouble)
+{
     ActiveMQBytesMessage msg;
-    try {
-        msg.writeDouble( 3.3 );
+    try
+    {
+        msg.writeDouble(3.3);
         msg.reset();
         ASSERT_TRUE(msg.readDouble() == 3.3);
-    } catch( CMSException& ex ) {
+    }
+    catch (CMSException& ex)
+    {
         ex.printStackTrace();
         ASSERT_TRUE(false);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ActiveMQBytesMessageTest, testReadUTF) {
-
+TEST_F(ActiveMQBytesMessageTest, testReadUTF)
+{
     ActiveMQBytesMessage msg;
-    try {
+    try
+    {
         std::string str = "this is a test";
-        msg.writeUTF( str );
+        msg.writeUTF(str);
         msg.reset();
         ASSERT_TRUE(msg.readUTF() == str);
-    } catch( CMSException& ex ) {
+    }
+    catch (CMSException& ex)
+    {
         ex.printStackTrace();
         ASSERT_TRUE(false);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ActiveMQBytesMessageTest, testReadBytesbyteArray) {
-
+TEST_F(ActiveMQBytesMessageTest, testReadBytesbyteArray)
+{
     ActiveMQBytesMessage msg;
-    try {
+    try
+    {
         unsigned char data[50];
-        for( int i = 0; i < 50; i++ ) {
+        for (int i = 0; i < 50; i++)
+        {
             data[i] = (unsigned char)i;
         }
-        msg.writeBytes( &data[0], 0, 50 );
+        msg.writeBytes(&data[0], 0, 50);
         msg.reset();
         unsigned char test[50];
-        msg.readBytes( test, 50 );
-        for( int i = 0; i < 50; i++ ) {
+        msg.readBytes(test, 50);
+        for (int i = 0; i < 50; i++)
+        {
             ASSERT_TRUE(test[i] == i);
         }
 
-        ASSERT_THROW(msg.readBytes( test, -1 ), CMSException) << ("Should have thrown a CMSException");
-
-    } catch( CMSException& ex ) {
+        ASSERT_THROW(msg.readBytes(test, -1), CMSException)
+            << ("Should have thrown a CMSException");
+    }
+    catch (CMSException& ex)
+    {
         ex.printStackTrace();
         ASSERT_TRUE(false);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ActiveMQBytesMessageTest, testClearBody) {
+TEST_F(ActiveMQBytesMessageTest, testClearBody)
+{
     ActiveMQBytesMessage bytesMessage;
-    try {
-        bytesMessage.writeInt( 1 );
+    try
+    {
+        bytesMessage.writeInt(1);
         bytesMessage.clearBody();
         ASSERT_TRUE(!bytesMessage.isReadOnlyBody());
-        bytesMessage.writeInt( 1 );
+        bytesMessage.writeInt(1);
         bytesMessage.readInt();
-    } catch( MessageNotReadableException& mnwe ) {
-    } catch( MessageNotWriteableException& mnwe ) {
+    }
+    catch (MessageNotReadableException& mnwe)
+    {
+    }
+    catch (MessageNotWriteableException& mnwe)
+    {
         ASSERT_TRUE(false);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ActiveMQBytesMessageTest, testReset) {
+TEST_F(ActiveMQBytesMessageTest, testReset)
+{
     ActiveMQBytesMessage message;
-    try {
-        message.writeDouble( 24.5 );
-        message.writeLong( 311 );
-    } catch( MessageNotWriteableException& mnwe ) {
+    try
+    {
+        message.writeDouble(24.5);
+        message.writeLong(311);
+    }
+    catch (MessageNotWriteableException& mnwe)
+    {
         FAIL() << ("should be writeable");
     }
     message.reset();
-    try {
+    try
+    {
         ASSERT_TRUE(message.isReadOnlyBody());
         ASSERT_NEAR(message.readDouble(), 24.5, 0);
         ASSERT_EQ(message.readLong(), 311LL);
-    } catch( MessageNotReadableException& mnre ) {
+    }
+    catch (MessageNotReadableException& mnre)
+    {
         FAIL() << ("should be readable");
     }
-    try {
-        message.writeInt( 33 );
+    try
+    {
+        message.writeInt(33);
         FAIL() << ("should throw exception");
-    } catch( MessageNotWriteableException& mnwe ) {
+    }
+    catch (MessageNotWriteableException& mnwe)
+    {
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ActiveMQBytesMessageTest, testReadOnlyBody) {
-
-    ActiveMQBytesMessage message;
+TEST_F(ActiveMQBytesMessageTest, testReadOnlyBody)
+{
+    ActiveMQBytesMessage       message;
     std::vector<unsigned char> buffer(3);
-    unsigned char array[2];
+    unsigned char              array[2];
 
-    try {
-        message.writeBoolean( true );
-        message.writeByte( (unsigned char)1 );
-        message.writeByte( (unsigned char)1 );
-        message.writeBytes( buffer );
-        message.writeBytes( &array[0], 0, 2 );
-        message.writeChar( 'a' );
-        message.writeDouble( 1.5 );
-        message.writeFloat( (float)1.5 );
-        message.writeInt( 1 );
-        message.writeLong( 1 );
-        message.writeString( "stringobj" );
-        message.writeShort( (short)1 );
-        message.writeShort( (short)1 );
-        message.writeUTF( "utfstring" );
-    } catch( MessageNotWriteableException& mnwe ) {
+    try
+    {
+        message.writeBoolean(true);
+        message.writeByte((unsigned char)1);
+        message.writeByte((unsigned char)1);
+        message.writeBytes(buffer);
+        message.writeBytes(&array[0], 0, 2);
+        message.writeChar('a');
+        message.writeDouble(1.5);
+        message.writeFloat((float)1.5);
+        message.writeInt(1);
+        message.writeLong(1);
+        message.writeString("stringobj");
+        message.writeShort((short)1);
+        message.writeShort((short)1);
+        message.writeUTF("utfstring");
+    }
+    catch (MessageNotWriteableException& mnwe)
+    {
         FAIL() << ("Should be writeable");
     }
     message.reset();
-    try {
+    try
+    {
         message.readBoolean();
         message.readByte();
         message.readByte();
-        message.readBytes( buffer );
-        message.readBytes( &array[0], 2 );
+        message.readBytes(buffer);
+        message.readBytes(&array[0], 2);
         message.readChar();
         message.readDouble();
         message.readFloat();
@@ -305,158 +364,239 @@ TEST_F(ActiveMQBytesMessageTest, testReadOnlyBody) {
         message.readShort();
         message.readUnsignedShort();
         message.readUTF();
-    } catch( MessageNotReadableException& mnwe ) {
+    }
+    catch (MessageNotReadableException& mnwe)
+    {
         FAIL() << ("Should be readable");
     }
-    try {
-        message.writeBoolean( true );
+    try
+    {
+        message.writeBoolean(true);
         FAIL() << ("Should have thrown exception");
-    } catch( MessageNotWriteableException& mnwe ) {
     }
-    try {
-        message.writeByte( (unsigned char)1 );
-        FAIL() << ("Should have thrown exception");
-    } catch( MessageNotWriteableException& mnwe ) {
+    catch (MessageNotWriteableException& mnwe)
+    {
     }
-    try {
-        message.writeBytes( buffer );
+    try
+    {
+        message.writeByte((unsigned char)1);
         FAIL() << ("Should have thrown exception");
-    } catch( MessageNotWriteableException& mnwe ) {
     }
-    try {
-        message.writeBytes( &array[0], 0, 2 );
-        FAIL() << ("Should have thrown exception");
-    } catch( MessageNotWriteableException& mnwe ) {
+    catch (MessageNotWriteableException& mnwe)
+    {
     }
-    try {
-        message.writeChar( 'a' );
+    try
+    {
+        message.writeBytes(buffer);
         FAIL() << ("Should have thrown exception");
-    } catch( MessageNotWriteableException& mnwe ) {
     }
-    try {
-        message.writeDouble( 1.5 );
-        FAIL() << ("Should have thrown exception");
-    } catch( MessageNotWriteableException& mnwe ) {
+    catch (MessageNotWriteableException& mnwe)
+    {
     }
-    try {
-        message.writeFloat( (float)1.5 );
+    try
+    {
+        message.writeBytes(&array[0], 0, 2);
         FAIL() << ("Should have thrown exception");
-    } catch( MessageNotWriteableException& mnwe ) {
     }
-    try {
-        message.writeInt( 1 );
-        FAIL() << ("Should have thrown exception");
-    } catch( MessageNotWriteableException& mnwe ) {
+    catch (MessageNotWriteableException& mnwe)
+    {
     }
-    try {
-        message.writeLong( 1 );
+    try
+    {
+        message.writeChar('a');
         FAIL() << ("Should have thrown exception");
-    } catch( MessageNotWriteableException& mnwe ) {
     }
-    try {
-        message.writeString( "stringobj" );
-        FAIL() << ("Should have thrown exception");
-    } catch( MessageNotWriteableException& mnwe ) {
+    catch (MessageNotWriteableException& mnwe)
+    {
     }
-    try {
-        message.writeShort( (short)1 );
+    try
+    {
+        message.writeDouble(1.5);
         FAIL() << ("Should have thrown exception");
-    } catch( MessageNotWriteableException& mnwe ) {
     }
-    try {
-        message.writeUTF( "utfstring" );
+    catch (MessageNotWriteableException& mnwe)
+    {
+    }
+    try
+    {
+        message.writeFloat((float)1.5);
         FAIL() << ("Should have thrown exception");
-    } catch( MessageNotWriteableException& mnwe ) {
+    }
+    catch (MessageNotWriteableException& mnwe)
+    {
+    }
+    try
+    {
+        message.writeInt(1);
+        FAIL() << ("Should have thrown exception");
+    }
+    catch (MessageNotWriteableException& mnwe)
+    {
+    }
+    try
+    {
+        message.writeLong(1);
+        FAIL() << ("Should have thrown exception");
+    }
+    catch (MessageNotWriteableException& mnwe)
+    {
+    }
+    try
+    {
+        message.writeString("stringobj");
+        FAIL() << ("Should have thrown exception");
+    }
+    catch (MessageNotWriteableException& mnwe)
+    {
+    }
+    try
+    {
+        message.writeShort((short)1);
+        FAIL() << ("Should have thrown exception");
+    }
+    catch (MessageNotWriteableException& mnwe)
+    {
+    }
+    try
+    {
+        message.writeUTF("utfstring");
+        FAIL() << ("Should have thrown exception");
+    }
+    catch (MessageNotWriteableException& mnwe)
+    {
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ActiveMQBytesMessageTest, testWriteOnlyBody) {
+TEST_F(ActiveMQBytesMessageTest, testWriteOnlyBody)
+{
     ActiveMQBytesMessage message;
     message.clearBody();
     std::vector<unsigned char> buffer(3);
-    unsigned char array[2];
-    try {
-        message.writeBoolean( true );
-        message.writeByte( (unsigned char)1 );
-        message.writeByte( (unsigned char)1 );
-        message.writeBytes( buffer );
-        message.writeBytes( &array[0], 0, 2 );
-        message.writeChar( 'a' );
-        message.writeDouble( 1.5 );
-        message.writeFloat( (float)1.5 );
-        message.writeInt( 1 );
-        message.writeLong( 1LL );
-        message.writeString( "stringobj" );
-        message.writeShort( (short)1 );
-        message.writeShort( (short)1 );
-        message.writeUTF( "utfstring" );
-    } catch( MessageNotWriteableException& mnwe ) {
+    unsigned char              array[2];
+    try
+    {
+        message.writeBoolean(true);
+        message.writeByte((unsigned char)1);
+        message.writeByte((unsigned char)1);
+        message.writeBytes(buffer);
+        message.writeBytes(&array[0], 0, 2);
+        message.writeChar('a');
+        message.writeDouble(1.5);
+        message.writeFloat((float)1.5);
+        message.writeInt(1);
+        message.writeLong(1LL);
+        message.writeString("stringobj");
+        message.writeShort((short)1);
+        message.writeShort((short)1);
+        message.writeUTF("utfstring");
+    }
+    catch (MessageNotWriteableException& mnwe)
+    {
         FAIL() << ("Should be writeable");
     }
-    try {
+    try
+    {
         message.readBoolean();
         FAIL() << ("Should have thrown exception");
-    } catch( MessageNotReadableException& mnwe ) {
     }
-    try {
+    catch (MessageNotReadableException& mnwe)
+    {
+    }
+    try
+    {
         message.readByte();
         FAIL() << ("Should have thrown exception");
-    } catch( MessageNotReadableException& e ) {
     }
-    try {
-        message.readBytes( buffer );
+    catch (MessageNotReadableException& e)
+    {
+    }
+    try
+    {
+        message.readBytes(buffer);
         FAIL() << ("Should have thrown exception");
-    } catch( MessageNotReadableException& e ) {
     }
-    try {
-        message.readBytes( &array[0], 2 );
+    catch (MessageNotReadableException& e)
+    {
+    }
+    try
+    {
+        message.readBytes(&array[0], 2);
         FAIL() << ("Should have thrown exception");
-    } catch( MessageNotReadableException& e ) {
     }
-    try {
+    catch (MessageNotReadableException& e)
+    {
+    }
+    try
+    {
         message.readChar();
         FAIL() << ("Should have thrown exception");
-    } catch( MessageNotReadableException& e ) {
     }
-    try {
+    catch (MessageNotReadableException& e)
+    {
+    }
+    try
+    {
         message.readDouble();
         FAIL() << ("Should have thrown exception");
-    } catch( MessageNotReadableException& e ) {
     }
-    try {
+    catch (MessageNotReadableException& e)
+    {
+    }
+    try
+    {
         message.readFloat();
         FAIL() << ("Should have thrown exception");
-    } catch( MessageNotReadableException& e ) {
     }
-    try {
+    catch (MessageNotReadableException& e)
+    {
+    }
+    try
+    {
         message.readInt();
         FAIL() << ("Should have thrown exception");
-    } catch( MessageNotReadableException& e ) {
     }
-    try {
+    catch (MessageNotReadableException& e)
+    {
+    }
+    try
+    {
         message.readLong();
         FAIL() << ("Should have thrown exception");
-    } catch( MessageNotReadableException& e ) {
     }
-    try {
+    catch (MessageNotReadableException& e)
+    {
+    }
+    try
+    {
         message.readString();
         FAIL() << ("Should have thrown exception");
-    } catch( MessageNotReadableException& e ) {
     }
-    try {
+    catch (MessageNotReadableException& e)
+    {
+    }
+    try
+    {
         message.readShort();
         FAIL() << ("Should have thrown exception");
-    } catch( MessageNotReadableException& e ) {
     }
-    try {
+    catch (MessageNotReadableException& e)
+    {
+    }
+    try
+    {
         message.readUnsignedShort();
         FAIL() << ("Should have thrown exception");
-    } catch( MessageNotReadableException& e ) {
     }
-    try {
+    catch (MessageNotReadableException& e)
+    {
+    }
+    try
+    {
         message.readUTF();
         FAIL() << ("Should have thrown exception");
-    } catch( MessageNotReadableException& e ) {
+    }
+    catch (MessageNotReadableException& e)
+    {
     }
 }

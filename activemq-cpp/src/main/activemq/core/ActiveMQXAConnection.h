@@ -20,22 +20,24 @@
 
 #include <activemq/util/Config.h>
 
-#include <cms/XAConnection.h>
 #include <activemq/core/ActiveMQConnection.h>
+#include <cms/XAConnection.h>
 
-namespace activemq {
-namespace core {
+namespace activemq
+{
+namespace core
+{
 
     using decaf::lang::Pointer;
 
-    class AMQCPP_API ActiveMQXAConnection : public cms::XAConnection, public ActiveMQConnection {
+    class AMQCPP_API ActiveMQXAConnection : public cms::XAConnection,
+                                            public ActiveMQConnection
+    {
     private:
-
         ActiveMQXAConnection(const ActiveMQXAConnection&);
-        ActiveMQXAConnection& operator= (const ActiveMQXAConnection&);
+        ActiveMQXAConnection& operator=(const ActiveMQXAConnection&);
 
     public:
-
         ActiveMQXAConnection(const Pointer<transport::Transport>& transport,
                              const Pointer<decaf::util::Properties>& properties);
 
@@ -43,14 +45,14 @@ namespace core {
 
         virtual cms::XASession* createXASession();
 
-        virtual cms::Session* createSession(cms::Session::AcknowledgeMode ackMode);
+        virtual cms::Session* createSession(
+            cms::Session::AcknowledgeMode ackMode);
 
     public:
-
         using ActiveMQConnection::createSession;
-
     };
 
-}}
+}  // namespace core
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_CORE_ACTIVEMQXACONNECTION_H_ */

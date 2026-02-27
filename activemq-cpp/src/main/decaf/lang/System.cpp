@@ -17,14 +17,14 @@
 
 #include "System.h"
 
-#include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/lang/exceptions/IllegalArgumentException.h>
+#include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/lang/exceptions/RuntimeException.h>
 #include <decaf/util/Date.h>
-#include <decaf/util/StringTokenizer.h>
-#include <decaf/util/StlMap.h>
-#include <decaf/util/concurrent/TimeUnit.h>
 #include <decaf/util/Properties.h>
+#include <decaf/util/StlMap.h>
+#include <decaf/util/StringTokenizer.h>
+#include <decaf/util/concurrent/TimeUnit.h>
 #include <chrono>
 #include <cstdlib>
 
@@ -34,7 +34,8 @@
 
 #ifdef _WIN32
 // Windows-specific includes
-#elif defined(__unix__) || defined(__unix) || defined(__APPLE__) && defined(__MACH__)
+#elif defined(__unix__) || defined(__unix) || \
+    defined(__APPLE__) && defined(__MACH__)
 // Unix-like systems (Linux, macOS, BSD, etc.)
 #include <unistd.h>
 #endif
@@ -75,34 +76,43 @@ using namespace decaf::internal;
 using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace decaf {
-namespace lang {
+namespace decaf
+{
+namespace lang
+{
 
-    class SystemData {
+    class SystemData
+    {
     public:
-
         StlMap<string, string> cachedEnvValues;
-        Properties systemProperties;
+        Properties             systemProperties;
 
     public:
+        SystemData()
+            : cachedEnvValues(),
+              systemProperties()
+        {
+        }
 
-        SystemData() : cachedEnvValues(), systemProperties() {}
-
-        ~SystemData() {}
+        ~SystemData()
+        {
+        }
     };
 
-}}
+}  // namespace lang
+}  // namespace decaf
 
 ////////////////////////////////////////////////////////////////////////////////
 SystemData* System::sys = NULL;
 
 ////////////////////////////////////////////////////////////////////////////////
-System::System() {
+System::System()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void System::initSystem(int argc DECAF_UNUSED, char **argv DECAF_UNUSED) {
-
+void System::initSystem(int argc DECAF_UNUSED, char** argv DECAF_UNUSED)
+{
     // TODO - Parse out properties specified at the Command Line level.
 
     // Create the System Data class.
@@ -110,271 +120,368 @@ void System::initSystem(int argc DECAF_UNUSED, char **argv DECAF_UNUSED) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void System::shutdownSystem() {
-
+void System::shutdownSystem()
+{
     // Destroy the System Data class.
     delete System::sys;
 }
 
-
-
 ////////////////////////////////////////////////////////////////////////////////
-void System::arraycopy(const char* src, std::size_t srcPos, char* dest,
-                       std::size_t destPos, std::size_t length) {
-
-    if (src == NULL) {
-        throw NullPointerException(
-            __FILE__, __LINE__, "Given Source Pointer was null.");
+void System::arraycopy(const char* src,
+                       std::size_t srcPos,
+                       char*       dest,
+                       std::size_t destPos,
+                       std::size_t length)
+{
+    if (src == NULL)
+    {
+        throw NullPointerException(__FILE__,
+                                   __LINE__,
+                                   "Given Source Pointer was null.");
     }
 
-    if (src == NULL) {
-        throw NullPointerException(
-            __FILE__, __LINE__, "Given Source Pointer was null.");
+    if (src == NULL)
+    {
+        throw NullPointerException(__FILE__,
+                                   __LINE__,
+                                   "Given Source Pointer was null.");
     }
 
     // Now we try and copy, could still segfault.
-    if (src != dest) {
+    if (src != dest)
+    {
         ::memcpy(dest + destPos, src + srcPos, length);
-    } else {
+    }
+    else
+    {
         ::memmove(dest + destPos, src + srcPos, length);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void System::arraycopy(const unsigned char* src, std::size_t srcPos,
-                       unsigned char* dest, std::size_t destPos, std::size_t length) {
-
-    if (src == NULL) {
-        throw NullPointerException(
-            __FILE__, __LINE__, "Given Source Pointer was null.");
+void System::arraycopy(const unsigned char* src,
+                       std::size_t          srcPos,
+                       unsigned char*       dest,
+                       std::size_t          destPos,
+                       std::size_t          length)
+{
+    if (src == NULL)
+    {
+        throw NullPointerException(__FILE__,
+                                   __LINE__,
+                                   "Given Source Pointer was null.");
     }
 
-    if (src == NULL) {
-        throw NullPointerException(
-            __FILE__, __LINE__, "Given Source Pointer was null.");
+    if (src == NULL)
+    {
+        throw NullPointerException(__FILE__,
+                                   __LINE__,
+                                   "Given Source Pointer was null.");
     }
 
     // Now we try and copy, could still segfault.
-    if (src != dest) {
+    if (src != dest)
+    {
         ::memcpy(dest + destPos, src + srcPos, length);
-    } else {
+    }
+    else
+    {
         ::memmove(dest + destPos, src + srcPos, length);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void System::arraycopy(const short* src, std::size_t srcPos,
-                       short* dest, std::size_t destPos, std::size_t length) {
-
-    if (src == NULL) {
-        throw NullPointerException(
-            __FILE__, __LINE__, "Given Source Pointer was null.");
+void System::arraycopy(const short* src,
+                       std::size_t  srcPos,
+                       short*       dest,
+                       std::size_t  destPos,
+                       std::size_t  length)
+{
+    if (src == NULL)
+    {
+        throw NullPointerException(__FILE__,
+                                   __LINE__,
+                                   "Given Source Pointer was null.");
     }
 
-    if (src == NULL) {
-        throw NullPointerException(
-            __FILE__, __LINE__, "Given Source Pointer was null.");
+    if (src == NULL)
+    {
+        throw NullPointerException(__FILE__,
+                                   __LINE__,
+                                   "Given Source Pointer was null.");
     }
 
     // Now we try and copy, could still segfault.
-    if (src != dest) {
+    if (src != dest)
+    {
         ::memcpy(dest + destPos, src + srcPos, length * sizeof(short));
-    } else {
+    }
+    else
+    {
         ::memmove(dest + destPos, src + srcPos, length * sizeof(short));
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void System::arraycopy(const int* src, std::size_t srcPos,
-                       int* dest, std::size_t destPos, std::size_t length) {
-
-    if (src == NULL) {
-        throw NullPointerException(
-            __FILE__, __LINE__, "Given Source Pointer was null.");
+void System::arraycopy(const int*  src,
+                       std::size_t srcPos,
+                       int*        dest,
+                       std::size_t destPos,
+                       std::size_t length)
+{
+    if (src == NULL)
+    {
+        throw NullPointerException(__FILE__,
+                                   __LINE__,
+                                   "Given Source Pointer was null.");
     }
 
-    if (src == NULL) {
-        throw NullPointerException(
-            __FILE__, __LINE__, "Given Source Pointer was null.");
+    if (src == NULL)
+    {
+        throw NullPointerException(__FILE__,
+                                   __LINE__,
+                                   "Given Source Pointer was null.");
     }
 
     // Now we try and copy, could still segfault.
-    if (src != dest) {
+    if (src != dest)
+    {
         ::memcpy(dest + destPos, src + srcPos, length * sizeof(int));
-    } else {
+    }
+    else
+    {
         ::memmove(dest + destPos, src + srcPos, length * sizeof(int));
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void System::arraycopy(const long long* src, std::size_t srcPos,
-                       long long* dest, std::size_t destPos, std::size_t length) {
-
-    if (src == NULL) {
-        throw NullPointerException(
-            __FILE__, __LINE__, "Given Source Pointer was null.");
+void System::arraycopy(const long long* src,
+                       std::size_t      srcPos,
+                       long long*       dest,
+                       std::size_t      destPos,
+                       std::size_t      length)
+{
+    if (src == NULL)
+    {
+        throw NullPointerException(__FILE__,
+                                   __LINE__,
+                                   "Given Source Pointer was null.");
     }
 
-    if (src == NULL) {
-        throw NullPointerException(
-            __FILE__, __LINE__, "Given Source Pointer was null.");
+    if (src == NULL)
+    {
+        throw NullPointerException(__FILE__,
+                                   __LINE__,
+                                   "Given Source Pointer was null.");
     }
 
     // Now we try and copy, could still segfault.
-    if (src != dest) {
+    if (src != dest)
+    {
         ::memcpy(dest + destPos, src + srcPos, length * sizeof(long long));
-    } else {
+    }
+    else
+    {
         ::memmove(dest + destPos, src + srcPos, length * sizeof(long long));
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void System::arraycopy(const float* src, std::size_t srcPos,
-                       float* dest, std::size_t destPos, std::size_t length) {
-
-    if (src == NULL) {
-        throw NullPointerException(
-            __FILE__, __LINE__, "Given Source Pointer was null.");
+void System::arraycopy(const float* src,
+                       std::size_t  srcPos,
+                       float*       dest,
+                       std::size_t  destPos,
+                       std::size_t  length)
+{
+    if (src == NULL)
+    {
+        throw NullPointerException(__FILE__,
+                                   __LINE__,
+                                   "Given Source Pointer was null.");
     }
 
-    if (src == NULL) {
-        throw NullPointerException(
-            __FILE__, __LINE__, "Given Source Pointer was null.");
+    if (src == NULL)
+    {
+        throw NullPointerException(__FILE__,
+                                   __LINE__,
+                                   "Given Source Pointer was null.");
     }
 
     // Now we try and copy, could still segfault.
-    if (src != dest) {
+    if (src != dest)
+    {
         ::memcpy(dest + destPos, src + srcPos, length * sizeof(float));
-    } else {
+    }
+    else
+    {
         ::memmove(dest + destPos, src + srcPos, length * sizeof(float));
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void System::arraycopy(const double* src, std::size_t srcPos,
-                       double* dest, std::size_t destPos, std::size_t length) {
-
-    if( src == NULL ) {
-        throw NullPointerException(
-            __FILE__, __LINE__, "Given Source Pointer was null." );
+void System::arraycopy(const double* src,
+                       std::size_t   srcPos,
+                       double*       dest,
+                       std::size_t   destPos,
+                       std::size_t   length)
+{
+    if (src == NULL)
+    {
+        throw NullPointerException(__FILE__,
+                                   __LINE__,
+                                   "Given Source Pointer was null.");
     }
 
-    if( src == NULL ) {
-        throw NullPointerException(
-            __FILE__, __LINE__, "Given Source Pointer was null." );
+    if (src == NULL)
+    {
+        throw NullPointerException(__FILE__,
+                                   __LINE__,
+                                   "Given Source Pointer was null.");
     }
 
     // Now we try and copy, could still segfault.
-    if( src != dest ) {
-        ::memcpy( dest + destPos, src + srcPos, length * sizeof( double ) );
-    } else {
-        ::memmove( dest + destPos, src + srcPos, length * sizeof( double ) );
+    if (src != dest)
+    {
+        ::memcpy(dest + destPos, src + srcPos, length * sizeof(double));
+    }
+    else
+    {
+        ::memmove(dest + destPos, src + srcPos, length * sizeof(double));
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void System::unsetenv(const std::string& name) {
+void System::unsetenv(const std::string& name)
+{
 #ifdef _WIN32
     // On Windows, setting to empty string effectively unsets the variable
-    if (_putenv_s(name.c_str(), "") != 0) {
+    if (_putenv_s(name.c_str(), "") != 0)
+    {
         throw RuntimeException(
-            __FILE__, __LINE__,
-            "System::unsetenv - Failed to unset environment variable: %s", name.c_str());
+            __FILE__,
+            __LINE__,
+            "System::unsetenv - Failed to unset environment variable: %s",
+            name.c_str());
     }
 #else
     // POSIX systems have unsetenv
-    if (::unsetenv(name.c_str()) != 0) {
+    if (::unsetenv(name.c_str()) != 0)
+    {
         throw RuntimeException(
-            __FILE__, __LINE__,
-            "System::unsetenv - Failed to unset environment variable: %s", name.c_str());
+            __FILE__,
+            __LINE__,
+            "System::unsetenv - Failed to unset environment variable: %s",
+            name.c_str());
     }
 #endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string System::getenv(const std::string& name) {
+std::string System::getenv(const std::string& name)
+{
     const char* value = std::getenv(name.c_str());
 
-    if (value == nullptr) {
+    if (value == nullptr)
+    {
         throw NullPointerException(
-            __FILE__, __LINE__,
-            "System::getenv - Environment variable not found: %s", name.c_str());
+            __FILE__,
+            __LINE__,
+            "System::getenv - Environment variable not found: %s",
+            name.c_str());
     }
 
     return std::string(value);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void System::setenv(const std::string& name, const std::string& value) {
+void System::setenv(const std::string& name, const std::string& value)
+{
 #ifdef _WIN32
-    if (_putenv_s(name.c_str(), value.c_str()) != 0) {
+    if (_putenv_s(name.c_str(), value.c_str()) != 0)
+    {
         throw RuntimeException(
-            __FILE__, __LINE__,
-            "System::setenv - Failed to set environment variable: %s", name.c_str());
+            __FILE__,
+            __LINE__,
+            "System::setenv - Failed to set environment variable: %s",
+            name.c_str());
     }
 #else
     // POSIX setenv: 1 means overwrite existing value
-    if (::setenv(name.c_str(), value.c_str(), 1) != 0) {
+    if (::setenv(name.c_str(), value.c_str(), 1) != 0)
+    {
         throw RuntimeException(
-            __FILE__, __LINE__,
-            "System::setenv - Failed to set environment variable: %s", name.c_str());
+            __FILE__,
+            __LINE__,
+            "System::setenv - Failed to set environment variable: %s",
+            name.c_str());
     }
 #endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-long long System::currentTimeMillis() {
+long long System::currentTimeMillis()
+{
     using namespace std::chrono;
-    auto now = system_clock::now();
+    auto now      = system_clock::now();
     auto duration = now.time_since_epoch();
-    auto millis = duration_cast<milliseconds>(duration).count();
+    auto millis   = duration_cast<milliseconds>(duration).count();
     return static_cast<long long>(millis);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-long long System::nanoTime() {
+long long System::nanoTime()
+{
     using namespace std::chrono;
-    auto now = steady_clock::now();
+    auto now      = steady_clock::now();
     auto duration = now.time_since_epoch();
-    auto nanos = duration_cast<nanoseconds>(duration).count();
+    auto nanos    = duration_cast<nanoseconds>(duration).count();
     return static_cast<long long>(nanos);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const Map<string, string>& System::getenv() {
-
+const Map<string, string>& System::getenv()
+{
     System::sys->cachedEnvValues.clear();
 
-    StringTokenizer tokenizer("");
-    string key = "";
-    string value = "";
-    int tokens = 0;
-    std::vector<std::string> env = getEnvArray();
+    StringTokenizer          tokenizer("");
+    string                   key    = "";
+    string                   value  = "";
+    int                      tokens = 0;
+    std::vector<std::string> env    = getEnvArray();
 
-    for( std::size_t i = 0; i < env.size(); i++ ){
-        tokenizer.reset( env[i], "=" );
+    for (std::size_t i = 0; i < env.size(); i++)
+    {
+        tokenizer.reset(env[i], "=");
 
         tokens = tokenizer.countTokens();
 
-        if( tokens == 1 ) {
+        if (tokens == 1)
+        {
             // special case, no value set, store empty string as value
-            key = tokenizer.nextToken();
+            key   = tokenizer.nextToken();
             value = string("");
-        } else if (tokens > 2) {
+        }
+        else if (tokens > 2)
+        {
             // special case: first equals delimits the key value, the rest are
             // part of the variable
             std::size_t pos = env[i].find("=");
-            key = env[i].substr(0, pos);
-            value = env[i].substr(pos + 1, string::npos);
-        } else if (tokens == 0) {
+            key             = env[i].substr(0, pos);
+            value           = env[i].substr(pos + 1, string::npos);
+        }
+        else if (tokens == 0)
+        {
             // Odd case, got a string with no equals sign.
             throw IllegalArgumentException(
-                __FILE__, __LINE__,
+                __FILE__,
+                __LINE__,
                 "System::getenv - Invalid env string. %s",
                 env[i].c_str());
-        } else {
+        }
+        else
+        {
             // Normal case.
-            key = tokenizer.nextToken();
+            key   = tokenizer.nextToken();
             value = tokenizer.nextToken();
         }
 
@@ -390,29 +497,32 @@ const Map<string, string>& System::getenv() {
 #include <windows.h>
 
 ////////////////////////////////////////////////////////////////////////////////
-std::vector<std::string> System::getEnvArray() {
-
+std::vector<std::string> System::getEnvArray()
+{
     std::vector<std::string> buffer;
-    int count = 0;
-    LPTSTR lpszVars;
-    LPVOID lpvEnv;
+    int                      count = 0;
+    LPTSTR                   lpszVars;
+    LPVOID                   lpvEnv;
 
     lpvEnv = GetEnvironmentStrings();
-    if (NULL == lpvEnv) {
+    if (NULL == lpvEnv)
+    {
         return buffer;
     }
 
     lpszVars = (LPTSTR)lpvEnv;
-    while (*lpszVars != NULL) {
+    while (*lpszVars != NULL)
+    {
         count++;
-        lpszVars += strlen(lpszVars)+1;
+        lpszVars += strlen(lpszVars) + 1;
     }
 
-    lpszVars = (LPTSTR)lpvEnv;
+    lpszVars  = (LPTSTR)lpvEnv;
     int index = 0;
-    while (*lpszVars != NULL) {
+    while (*lpszVars != NULL)
+    {
         buffer.push_back(lpszVars);
-        lpszVars += strlen(lpszVars)+1;
+        lpszVars += strlen(lpszVars) + 1;
     }
 
     FreeEnvironmentStrings((LPTCH)lpvEnv);
@@ -422,18 +532,19 @@ std::vector<std::string> System::getEnvArray() {
 #else
 
 #if defined(__APPLE__)
-   #include <crt_externs.h>
-   #define environ (*_NSGetEnviron())
+#include <crt_externs.h>
+#define environ (*_NSGetEnviron())
 #else
-   extern char** environ;
+extern char** environ;
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////
-std::vector<std::string> System::getEnvArray() {
-
+std::vector<std::string> System::getEnvArray()
+{
     std::vector<std::string> buffer;
 
-    for (int i = 0; *(environ + i); i++) {
+    for (int i = 0; *(environ + i); i++)
+    {
         buffer.push_back(environ[i]);
     }
 
@@ -443,8 +554,8 @@ std::vector<std::string> System::getEnvArray() {
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////
-int System::availableProcessors() {
-
+int System::availableProcessors()
+{
     int numCpus = 1;
 
 #if defined(_WIN32)
@@ -456,25 +567,26 @@ int System::availableProcessors() {
 #elif defined(__APPLE__)
 
     // derived from examples in the sysctl(3) man page from FreeBSD
-    int mib[2];
+    int         mib[2];
     std::size_t len;
 
     mib[0] = CTL_HW;
     mib[1] = HW_NCPU;
-    len = sizeof(numCpus);
+    len    = sizeof(numCpus);
     sysctl(mib, 2, &numCpus, &len, NULL, 0);
 
 #elif defined(_HP_NAMESPACE_STD)
     numCpus = (int)mpctl(MPC_GETNUMSPUS, NULL, NULL);
 #else
 
-    // returns number of online(_SC_NPROCESSORS_ONLN) processors, number configured(_SC_NPROCESSORS_CONF)
-    // may be more than online
-    numCpus = (int)sysconf( _SC_NPROCESSORS_ONLN );
+    // returns number of online(_SC_NPROCESSORS_ONLN) processors, number
+    // configured(_SC_NPROCESSORS_CONF) may be more than online
+    numCpus = (int)sysconf(_SC_NPROCESSORS_ONLN);
 
 #endif
 
-    if( numCpus < 1 ) {
+    if (numCpus < 1)
+    {
         numCpus = 1;
     }
 
@@ -482,53 +594,69 @@ int System::availableProcessors() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::util::Properties& System::getProperties() {
+decaf::util::Properties& System::getProperties()
+{
     return System::sys->systemProperties;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string System::getProperty(const std::string& key) {
-
-    if (key.empty()) {
+std::string System::getProperty(const std::string& key)
+{
+    if (key.empty())
+    {
         throw IllegalArgumentException(
-            __FILE__, __LINE__, "Cannot pass an empty key to getProperty.");
+            __FILE__,
+            __LINE__,
+            "Cannot pass an empty key to getProperty.");
     }
 
     return System::sys->systemProperties.getProperty(key, "");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string System::getProperty(const std::string& key, const std::string& defaultValue) {
-
-    if (key.empty()) {
+std::string System::getProperty(const std::string& key,
+                                const std::string& defaultValue)
+{
+    if (key.empty())
+    {
         throw IllegalArgumentException(
-            __FILE__, __LINE__, "Cannot pass an empty key to getProperty.");
+            __FILE__,
+            __LINE__,
+            "Cannot pass an empty key to getProperty.");
     }
 
     return System::sys->systemProperties.getProperty(key, defaultValue);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string System::setProperty(const std::string& key, const std::string& value) {
-
-    if (key.empty()) {
+std::string System::setProperty(const std::string& key,
+                                const std::string& value)
+{
+    if (key.empty())
+    {
         throw IllegalArgumentException(
-            __FILE__, __LINE__, "Cannot pass an empty key to setProperty.");
+            __FILE__,
+            __LINE__,
+            "Cannot pass an empty key to setProperty.");
     }
 
-    if (value == "") {
+    if (value == "")
+    {
         return System::clearProperty(key);
     }
 
-    return System::sys->systemProperties.setProperty( key, value );
+    return System::sys->systemProperties.setProperty(key, value);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string System::clearProperty(const std::string& key) {
-
-    if (key.empty()) {
+std::string System::clearProperty(const std::string& key)
+{
+    if (key.empty())
+    {
         throw IllegalArgumentException(
-            __FILE__, __LINE__, "Cannot pass an empty key to clearProperty.");
+            __FILE__,
+            __LINE__,
+            "Cannot pass an empty key to clearProperty.");
     }
 
     std::string oldValue = System::sys->systemProperties.getProperty(key, "");

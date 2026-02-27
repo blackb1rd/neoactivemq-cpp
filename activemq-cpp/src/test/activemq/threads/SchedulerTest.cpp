@@ -30,40 +30,44 @@ using namespace decaf::util;
 using namespace activemq;
 using namespace activemq::threads;
 
-    class SchedulerTest : public ::testing::Test {
-    };
-
-
-////////////////////////////////////////////////////////////////////////////////
-namespace {
-
-    class CounterTask : public Runnable {
-    private:
-
-        int count;
-
-    public:
-
-        CounterTask() : count(0) {
-
-        }
-
-        virtual ~CounterTask() {}
-
-        int getCount() const {
-            return count;
-        }
-
-        virtual void run() {
-            count++;
-        }
-
-    };
-}
+class SchedulerTest : public ::testing::Test
+{
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(SchedulerTest, testConstructor) {
+namespace
+{
 
+class CounterTask : public Runnable
+{
+private:
+    int count;
+
+public:
+    CounterTask()
+        : count(0)
+    {
+    }
+
+    virtual ~CounterTask()
+    {
+    }
+
+    int getCount() const
+    {
+        return count;
+    }
+
+    virtual void run()
+    {
+        count++;
+    }
+};
+}  // namespace
+
+////////////////////////////////////////////////////////////////////////////////
+TEST_F(SchedulerTest, testConstructor)
+{
     Scheduler scheduler("testExecutePeriodically");
     ASSERT_EQ(false, scheduler.isStarted());
     ASSERT_EQ(false, scheduler.isStopping());
@@ -83,20 +87,22 @@ TEST_F(SchedulerTest, testConstructor) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(SchedulerTest, testScheduleNullRunnableThrows) {
-
+TEST_F(SchedulerTest, testScheduleNullRunnableThrows)
+{
     Scheduler scheduler("testSchedualPeriodically");
     scheduler.start();
 
-    ASSERT_THROW(scheduler.schedualPeriodically(NULL, 400), NullPointerException) << ("Should have thrown a NullPointerException");
-    ASSERT_THROW(scheduler.executePeriodically(NULL, 400), NullPointerException) << ("Should have thrown a NullPointerException");
-    ASSERT_THROW(scheduler.executeAfterDelay(NULL, 400), NullPointerException) << ("Should have thrown a NullPointerException");
-
+    ASSERT_THROW(scheduler.schedualPeriodically(NULL, 400), NullPointerException)
+        << ("Should have thrown a NullPointerException");
+    ASSERT_THROW(scheduler.executePeriodically(NULL, 400), NullPointerException)
+        << ("Should have thrown a NullPointerException");
+    ASSERT_THROW(scheduler.executeAfterDelay(NULL, 400), NullPointerException)
+        << ("Should have thrown a NullPointerException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(SchedulerTest, testExecutePeriodically) {
-
+TEST_F(SchedulerTest, testExecutePeriodically)
+{
     {
         Scheduler scheduler("testExecutePeriodically");
         scheduler.start();
@@ -118,10 +124,13 @@ TEST_F(SchedulerTest, testExecutePeriodically) {
         ASSERT_TRUE(task->getCount() == 0);
         scheduler.cancel(task);
 
-        try{
+        try
+        {
             scheduler.cancel(task);
             FAIL() << ("Should have thrown an exception");
-        } catch(...) {
+        }
+        catch (...)
+        {
         }
 
         scheduler.shutdown();
@@ -129,8 +138,8 @@ TEST_F(SchedulerTest, testExecutePeriodically) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(SchedulerTest, testSchedualPeriodically) {
-
+TEST_F(SchedulerTest, testSchedualPeriodically)
+{
     {
         Scheduler scheduler("testSchedualPeriodically");
         scheduler.start();
@@ -152,10 +161,13 @@ TEST_F(SchedulerTest, testSchedualPeriodically) {
         ASSERT_TRUE(task->getCount() == 0);
         scheduler.cancel(task);
 
-        try{
+        try
+        {
             scheduler.cancel(task);
             FAIL() << ("Should have thrown an exception");
-        } catch(...) {
+        }
+        catch (...)
+        {
         }
 
         scheduler.shutdown();
@@ -163,8 +175,8 @@ TEST_F(SchedulerTest, testSchedualPeriodically) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(SchedulerTest, testExecuteAfterDelay) {
-
+TEST_F(SchedulerTest, testExecuteAfterDelay)
+{
     {
         Scheduler scheduler("testExecuteAfterDelay");
         scheduler.start();
@@ -185,10 +197,13 @@ TEST_F(SchedulerTest, testExecuteAfterDelay) {
         scheduler.executeAfterDelay(task, 1000);
         ASSERT_TRUE(task->getCount() == 0);
 
-        try{
+        try
+        {
             scheduler.cancel(task);
             FAIL() << ("Should have thrown an exception");
-        } catch(...) {
+        }
+        catch (...)
+        {
         }
 
         scheduler.shutdown();
@@ -206,8 +221,8 @@ TEST_F(SchedulerTest, testExecuteAfterDelay) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(SchedulerTest, testCancel) {
-
+TEST_F(SchedulerTest, testCancel)
+{
     Scheduler scheduler("testCancel");
     scheduler.start();
     CounterTask task;
@@ -222,8 +237,8 @@ TEST_F(SchedulerTest, testCancel) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(SchedulerTest, testShutdown) {
-
+TEST_F(SchedulerTest, testShutdown)
+{
     {
         Scheduler scheduler("testShutdown");
         scheduler.start();

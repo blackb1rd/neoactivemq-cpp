@@ -22,29 +22,41 @@ using namespace decaf::nio;
 using namespace decaf::lang;
 
 ////////////////////////////////////////////////////////////////////////////////
-BufferUnderflowException::BufferUnderflowException() : lang::Exception() {
+BufferUnderflowException::BufferUnderflowException()
+    : lang::Exception()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-BufferUnderflowException::~BufferUnderflowException() throw () {
+BufferUnderflowException::~BufferUnderflowException() throw()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-BufferUnderflowException::BufferUnderflowException(const lang::Exception& ex) : lang::Exception() {
-    *(lang::Exception*) this = ex;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-BufferUnderflowException::BufferUnderflowException(const BufferUnderflowException& ex) : lang::Exception() {
-    *(lang::Exception*) this = ex;
+BufferUnderflowException::BufferUnderflowException(const lang::Exception& ex)
+    : lang::Exception()
+{
+    *(lang::Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 BufferUnderflowException::BufferUnderflowException(
-    const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...) : lang::Exception(cause) {
+    const BufferUnderflowException& ex)
+    : lang::Exception()
+{
+    *(lang::Exception*)this = ex;
+}
 
+////////////////////////////////////////////////////////////////////////////////
+BufferUnderflowException::BufferUnderflowException(const char* file,
+                                                   const int   lineNumber,
+                                                   const std::exception* cause,
+                                                   const char*           msg,
+                                                   ...)
+    : lang::Exception(cause)
+{
     va_list vargs;
-    va_start( vargs, msg);
+    va_start(vargs, msg);
     buildMessage(msg, vargs);
 
     // Set the first mark for this exception.
@@ -52,13 +64,18 @@ BufferUnderflowException::BufferUnderflowException(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-BufferUnderflowException::BufferUnderflowException(const std::exception* cause) : lang::Exception(cause) {
+BufferUnderflowException::BufferUnderflowException(const std::exception* cause)
+    : lang::Exception(cause)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-BufferUnderflowException::BufferUnderflowException(
-    const char* file, const int lineNumber, const char* msg, ...) : lang::Exception() {
-
+BufferUnderflowException::BufferUnderflowException(const char* file,
+                                                   const int   lineNumber,
+                                                   const char* msg,
+                                                   ...)
+    : lang::Exception()
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);

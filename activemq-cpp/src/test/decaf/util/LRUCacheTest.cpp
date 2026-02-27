@@ -17,8 +17,8 @@
 
 #include <gtest/gtest.h>
 
-#include <decaf/util/LRUCache.h>
 #include <decaf/lang/System.h>
+#include <decaf/util/LRUCache.h>
 
 #include <string>
 
@@ -28,29 +28,32 @@ using namespace decaf::util;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
-    class LRUCacheTest : public ::testing::Test {
+class LRUCacheTest : public ::testing::Test
+{
 public:
-
-        LRUCacheTest();
-        virtual ~LRUCacheTest();
-
-    };
+    LRUCacheTest();
+    virtual ~LRUCacheTest();
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-LRUCacheTest::LRUCacheTest() {
+LRUCacheTest::LRUCacheTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-LRUCacheTest::~LRUCacheTest() {
+LRUCacheTest::~LRUCacheTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LRUCacheTest, testConstructor) {
-
+TEST_F(LRUCacheTest, testConstructor)
+{
     LRUCache<int, int> underTest(1000);
 
-    for (int count = 0; count < 5000; count++) {
-        if (!underTest.containsKey(count)) {
+    for (int count = 0; count < 5000; count++)
+    {
+        if (!underTest.containsKey(count))
+        {
             underTest.put(count, count);
         }
     }
@@ -58,25 +61,32 @@ TEST_F(LRUCacheTest, testConstructor) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LRUCacheTest, testExceptions) {
-
-    try {
+TEST_F(LRUCacheTest, testExceptions)
+{
+    try
+    {
         LRUCache<int, int> underTest(-1);
         FAIL() << ("Should have thrown an IllegalArgumentException");
-    } catch(IllegalArgumentException& ex) {}
+    }
+    catch (IllegalArgumentException& ex)
+    {
+    }
 
     LRUCache<int, int> underTest(1000);
 
-    ASSERT_THROW(underTest.setMaxCacheSize(-1), IllegalArgumentException) << ("Should throw an IllegalArgumentException");
+    ASSERT_THROW(underTest.setMaxCacheSize(-1), IllegalArgumentException)
+        << ("Should throw an IllegalArgumentException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(LRUCacheTest, testChangeMaxCacheSize) {
-
+TEST_F(LRUCacheTest, testChangeMaxCacheSize)
+{
     LRUCache<int, int> underTest(1000);
 
-    for (int count = 0; count < 5000; count++) {
-        if (!underTest.containsKey(count)) {
+    for (int count = 0; count < 5000; count++)
+    {
+        if (!underTest.containsKey(count))
+        {
             underTest.put(count, count);
         }
     }
@@ -84,8 +94,10 @@ TEST_F(LRUCacheTest, testChangeMaxCacheSize) {
     ASSERT_EQ(1000, underTest.size()) << ("size is still in order");
     underTest.setMaxCacheSize(2000);
 
-    for (int count = 0; count < 5000; count++) {
-        if (!underTest.containsKey(count)) {
+    for (int count = 0; count < 5000; count++)
+    {
+        if (!underTest.containsKey(count))
+        {
             underTest.put(count, count);
         }
     }

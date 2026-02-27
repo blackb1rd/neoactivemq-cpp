@@ -17,13 +17,13 @@
 
 #include <gtest/gtest.h>
 
-#include <decaf/util/zip/Deflater.h>
-#include <decaf/util/zip/CheckedOutputStream.h>
-#include <decaf/util/zip/CheckedInputStream.h>
+#include <decaf/io/ByteArrayInputStream.h>
+#include <decaf/io/ByteArrayOutputStream.h>
 #include <decaf/util/zip/Adler32.h>
 #include <decaf/util/zip/CRC32.h>
-#include <decaf/io/ByteArrayOutputStream.h>
-#include <decaf/io/ByteArrayInputStream.h>
+#include <decaf/util/zip/CheckedInputStream.h>
+#include <decaf/util/zip/CheckedOutputStream.h>
+#include <decaf/util/zip/Deflater.h>
 
 #include <vector>
 
@@ -35,144 +35,161 @@ using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::zip;
 
-    class CheckedInputStreamTest : public ::testing::Test {
+class CheckedInputStreamTest : public ::testing::Test
+{
 public:
-
-        CheckedInputStreamTest();
-        virtual ~CheckedInputStreamTest();
-
-    };
+    CheckedInputStreamTest();
+    virtual ~CheckedInputStreamTest();
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-CheckedInputStreamTest::CheckedInputStreamTest() {
+CheckedInputStreamTest::CheckedInputStreamTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-CheckedInputStreamTest::~CheckedInputStreamTest() {
+CheckedInputStreamTest::~CheckedInputStreamTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(CheckedInputStreamTest, testConstructor) {
-
+TEST_F(CheckedInputStreamTest, testConstructor)
+{
     std::vector<unsigned char> outPutBuf;
-    ByteArrayInputStream baos( outPutBuf );
-    CRC32 check;
-    CheckedInputStream chkIn( &baos, &check );
-    ASSERT_EQ(0LL, chkIn.getChecksum()->getValue()) << ("the checkSum value of the constructor is not 0");
+    ByteArrayInputStream       baos(outPutBuf);
+    CRC32                      check;
+    CheckedInputStream         chkIn(&baos, &check);
+    ASSERT_EQ(0LL, chkIn.getChecksum()->getValue())
+        << ("the checkSum value of the constructor is not 0");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(CheckedInputStreamTest, testGetChecksum) {
-
+TEST_F(CheckedInputStreamTest, testGetChecksum)
+{
     std::vector<unsigned char> emptyBuf;
-    ByteArrayInputStream baos( emptyBuf );
-    CRC32 check;
-    CheckedInputStream checkEmpty( &baos, &check );
+    ByteArrayInputStream       baos(emptyBuf);
+    CRC32                      check;
+    CheckedInputStream         checkEmpty(&baos, &check);
 
-    while( checkEmpty.read() >= 0 ) {
+    while (checkEmpty.read() >= 0)
+    {
     }
-    ASSERT_EQ(0LL, checkEmpty.getChecksum()->getValue()) << ("the checkSum value of an empty file is not zero");
+    ASSERT_EQ(0LL, checkEmpty.getChecksum()->getValue())
+        << ("the checkSum value of an empty file is not zero");
 
-    static const int SIZE = 10;
-    unsigned char byteArray[] = { 1, 3, 4, 7, 8, 'e', 'r', 't', 'y', '5' };
+    static const int SIZE        = 10;
+    unsigned char    byteArray[] = {1, 3, 4, 7, 8, 'e', 'r', 't', 'y', '5'};
 
-    std::vector<unsigned char> outPutBuf( 500 );
+    std::vector<unsigned char> outPutBuf(500);
 
     Deflater deflater;
-    deflater.setInput( byteArray, SIZE, 0, SIZE );
+    deflater.setInput(byteArray, SIZE, 0, SIZE);
     deflater.finish();
-    while( !deflater.finished() ) {
-        deflater.deflate( outPutBuf );
+    while (!deflater.finished())
+    {
+        deflater.deflate(outPutBuf);
     }
 
-    ByteArrayInputStream bais( outPutBuf );
-    Adler32 adler;
-    CheckedInputStream checkIn( &bais, &adler );
-    while( checkIn.read() >= 0 ) {
+    ByteArrayInputStream bais(outPutBuf);
+    Adler32              adler;
+    CheckedInputStream   checkIn(&bais, &adler);
+    while (checkIn.read() >= 0)
+    {
     }
 
-    ASSERT_TRUE(checkIn.getChecksum()->getValue() > 0) << ("the checksum value is incorrect");
+    ASSERT_TRUE(checkIn.getChecksum()->getValue() > 0)
+        << ("the checksum value is incorrect");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(CheckedInputStreamTest, testSkip) {
-
-    static const int SIZE = 256;
-    std::vector<unsigned char> byteArray( SIZE );
-    for( int i = 0; i < SIZE; ++i ) {
+TEST_F(CheckedInputStreamTest, testSkip)
+{
+    static const int           SIZE = 256;
+    std::vector<unsigned char> byteArray(SIZE);
+    for (int i = 0; i < SIZE; ++i)
+    {
         byteArray[i] = (unsigned char)i;
     }
-    std::vector<unsigned char> outPutBuf( 500 );
+    std::vector<unsigned char> outPutBuf(500);
 
     Deflater deflater;
-    deflater.setInput( &byteArray[0], SIZE, 0, SIZE );
+    deflater.setInput(&byteArray[0], SIZE, 0, SIZE);
     deflater.finish();
-    while( !deflater.finished() ) {
-        deflater.deflate( outPutBuf );
+    while (!deflater.finished())
+    {
+        deflater.deflate(outPutBuf);
     }
 
-    ByteArrayInputStream bais( outPutBuf );
-    Adler32 adler;
-    CheckedInputStream checkIn( &bais, &adler );
+    ByteArrayInputStream bais(outPutBuf);
+    Adler32              adler;
+    CheckedInputStream   checkIn(&bais, &adler);
 
     long long skipValue = 5;
-    ASSERT_EQ(skipValue, checkIn.skip( skipValue )) << ("the value returned by skip(n) is not the same as its parameter");
-    checkIn.skip( skipValue );
+    ASSERT_EQ(skipValue, checkIn.skip(skipValue))
+        << ("the value returned by skip(n) is not the same as its parameter");
+    checkIn.skip(skipValue);
 
-    ASSERT_TRUE(checkIn.getChecksum()->getValue() > 0) << ("checkSum value is not correct");
+    ASSERT_TRUE(checkIn.getChecksum()->getValue() > 0)
+        << ("checkSum value is not correct");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(CheckedInputStreamTest, testRead) {
-
-    static const int SIZE = 256;
-    std::vector<unsigned char> byteArray( SIZE );
-    for( int i = 0; i < SIZE; ++i ) {
+TEST_F(CheckedInputStreamTest, testRead)
+{
+    static const int           SIZE = 256;
+    std::vector<unsigned char> byteArray(SIZE);
+    for (int i = 0; i < SIZE; ++i)
+    {
         byteArray[i] = (unsigned char)i;
     }
-    std::vector<unsigned char> outPutBuf( 500 );
+    std::vector<unsigned char> outPutBuf(500);
 
     Deflater deflater;
-    deflater.setInput( &byteArray[0], SIZE, 0, SIZE );
+    deflater.setInput(&byteArray[0], SIZE, 0, SIZE);
     deflater.finish();
-    while( !deflater.finished() ) {
-        deflater.deflate( outPutBuf );
+    while (!deflater.finished())
+    {
+        deflater.deflate(outPutBuf);
     }
 
-    ByteArrayInputStream bais( outPutBuf );
-    Adler32 adler;
-    CheckedInputStream checkIn( &bais, &adler );
+    ByteArrayInputStream bais(outPutBuf);
+    Adler32              adler;
+    CheckedInputStream   checkIn(&bais, &adler);
 
     checkIn.read();
     checkIn.close();
 
-    ASSERT_THROW(checkIn.read(), IOException) << ("Should have thrown an IOException");
+    ASSERT_THROW(checkIn.read(), IOException)
+        << ("Should have thrown an IOException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(CheckedInputStreamTest, testReadBIII) {
-
-    static const int SIZE = 256;
-    std::vector<unsigned char> byteArray( SIZE );
-    for( int i = 0; i < SIZE; ++i ) {
+TEST_F(CheckedInputStreamTest, testReadBIII)
+{
+    static const int           SIZE = 256;
+    std::vector<unsigned char> byteArray(SIZE);
+    for (int i = 0; i < SIZE; ++i)
+    {
         byteArray[i] = (unsigned char)i;
     }
-    std::vector<unsigned char> outPutBuf( 500 );
+    std::vector<unsigned char> outPutBuf(500);
 
     Deflater deflater;
-    deflater.setInput( &byteArray[0], SIZE, 0, SIZE );
+    deflater.setInput(&byteArray[0], SIZE, 0, SIZE);
     deflater.finish();
-    while( !deflater.finished() ) {
-        deflater.deflate( outPutBuf );
+    while (!deflater.finished())
+    {
+        deflater.deflate(outPutBuf);
     }
 
-    ByteArrayInputStream bais( outPutBuf );
-    Adler32 adler;
-    CheckedInputStream checkIn( &bais, &adler );
+    ByteArrayInputStream bais(outPutBuf);
+    Adler32              adler;
+    CheckedInputStream   checkIn(&bais, &adler);
 
     unsigned char buff[50];
-    checkIn.read( buff, 50, 10, 5 );
+    checkIn.read(buff, 50, 10, 5);
     checkIn.close();
 
-    ASSERT_THROW(checkIn.read( buff, 50, 10, 5 ), IOException) << ("Should have thrown an IOException");
+    ASSERT_THROW(checkIn.read(buff, 50, 10, 5), IOException)
+        << ("Should have thrown an IOException");
 }

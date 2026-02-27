@@ -18,38 +18,48 @@
 #ifndef _DECAF_INTERNAL_SECURITY_PROVIDER_DEFAULTMESSAGEDIGESTPROVIDERSERVICE_H_
 #define _DECAF_INTERNAL_SECURITY_PROVIDER_DEFAULTMESSAGEDIGESTPROVIDERSERVICE_H_
 
-#include <decaf/util/Config.h>
 #include <decaf/security/ProviderService.h>
+#include <decaf/util/Config.h>
 #include <string>
 
-namespace decaf {
-namespace internal {
-namespace security {
-namespace provider {
+namespace decaf
+{
+namespace internal
+{
+    namespace security
+    {
+        namespace provider
+        {
 
-    /**
-     * Decaf's Default Message Digest Security provider used to create instances of the
-     * built-in Message Digest algorithm SPI classes.
-     *
-     * @since 1.0
-     */
-    class DECAF_API DefaultMessageDigestProviderService : public decaf::security::ProviderService {
-    private:
+            /**
+             * Decaf's Default Message Digest Security provider used to create
+             * instances of the built-in Message Digest algorithm SPI classes.
+             *
+             * @since 1.0
+             */
+            class DECAF_API DefaultMessageDigestProviderService
+                : public decaf::security::ProviderService
+            {
+            private:
+                DefaultMessageDigestProviderService(
+                    const DefaultMessageDigestProviderService&);
+                DefaultMessageDigestProviderService& operator=(
+                    const DefaultMessageDigestProviderService&);
 
-        DefaultMessageDigestProviderService(const DefaultMessageDigestProviderService&);
-        DefaultMessageDigestProviderService& operator= (const DefaultMessageDigestProviderService&);
+            public:
+                DefaultMessageDigestProviderService(
+                    const decaf::security::Provider* provider,
+                    const std::string&               algorithmName);
 
-    public:
+                virtual ~DefaultMessageDigestProviderService();
 
-        DefaultMessageDigestProviderService(const decaf::security::Provider* provider,
-                                            const std::string& algorithmName);
+                virtual decaf::security::SecuritySpi* newInstance();
+            };
 
-        virtual ~DefaultMessageDigestProviderService();
+        }  // namespace provider
+    }  // namespace security
+}  // namespace internal
+}  // namespace decaf
 
-        virtual decaf::security::SecuritySpi* newInstance();
-
-    };
-
-}}}}
-
-#endif /* _DECAF_INTERNAL_SECURITY_PROVIDER_DEFAULTMESSAGEDIGESTPROVIDERSERVICE_H_ */
+#endif /* _DECAF_INTERNAL_SECURITY_PROVIDER_DEFAULTMESSAGEDIGESTPROVIDERSERVICE_H_ \
+        */

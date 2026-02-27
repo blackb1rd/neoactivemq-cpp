@@ -26,53 +26,65 @@ using namespace decaf::lang::exceptions;
 ////////////////////////////////////////////////////////////////////////////////
 const unsigned char Byte::MIN_VALUE = 0x7F;
 const unsigned char Byte::MAX_VALUE = 0x80;
-const int Byte::SIZE = 8;
+const int           Byte::SIZE      = 8;
 
 ////////////////////////////////////////////////////////////////////////////////
-Byte::Byte(unsigned char value) : value(value) {
+Byte::Byte(unsigned char value)
+    : value(value)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Byte::Byte(const String& value) : value(0) {
+Byte::Byte(const String& value)
+    : value(0)
+{
     this->value = parseByte(value);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string Byte::toString() const {
+std::string Byte::toString() const
+{
     return Integer::toString(value);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string Byte::toString(unsigned char value) {
+std::string Byte::toString(unsigned char value)
+{
     return Integer::toString(value);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-unsigned char Byte::parseByte(const String& s, int radix) {
-
-    int intValue = Integer::parseInt(s, radix);
-    unsigned char result = (unsigned char) intValue;
-    if (result != intValue) {
+unsigned char Byte::parseByte(const String& s, int radix)
+{
+    int           intValue = Integer::parseInt(s, radix);
+    unsigned char result   = (unsigned char)intValue;
+    if (result != intValue)
+    {
         throw NumberFormatException(
-            __FILE__, __LINE__, "Byte::parseByte - Not a valid unsigned char encoded string.");
+            __FILE__,
+            __LINE__,
+            "Byte::parseByte - Not a valid unsigned char encoded string.");
     }
 
     return result;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-unsigned char Byte::parseByte(const String& s) {
+unsigned char Byte::parseByte(const String& s)
+{
     return parseByte(s, 10);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Byte Byte::decode(const String& value) {
-
-    int intValue = Integer::decode(value).intValue();
-    unsigned char result = (unsigned char) intValue;
-    if (result != intValue) {
+Byte Byte::decode(const String& value)
+{
+    int           intValue = Integer::decode(value).intValue();
+    unsigned char result   = (unsigned char)intValue;
+    if (result != intValue)
+    {
         throw NumberFormatException(
-            __FILE__, __LINE__,
+            __FILE__,
+            __LINE__,
             "Byte::decode - Not a valid unsigned char encoded string.");
     }
 
@@ -80,11 +92,13 @@ Byte Byte::decode(const String& value) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Byte Byte::valueOf(const String& value) {
+Byte Byte::valueOf(const String& value)
+{
     return Byte(parseByte(value, 10));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Byte Byte::valueOf(const String& value, int radix) {
+Byte Byte::valueOf(const String& value, int radix)
+{
     return Byte(parseByte(value, radix));
 }

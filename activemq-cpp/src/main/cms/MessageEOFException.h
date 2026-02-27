@@ -18,37 +18,40 @@
 #ifndef _CMS_MESSAGEEOFEXCEPTION_H_
 #define _CMS_MESSAGEEOFEXCEPTION_H_
 
-#include <cms/Config.h>
 #include <cms/CMSException.h>
+#include <cms/Config.h>
 
-namespace cms {
+namespace cms
+{
 
-    /**
-     * This exception must be thrown when an unexpected end of stream has been
-     * reached when a StreamMessage or BytesMessage is being read.
-     *
-     * @since 1.3
-     */
-    class CMS_API MessageEOFException : public CMSException {
-    public:
+/**
+ * This exception must be thrown when an unexpected end of stream has been
+ * reached when a StreamMessage or BytesMessage is being read.
+ *
+ * @since 1.3
+ */
+class CMS_API MessageEOFException : public CMSException
+{
+public:
+    MessageEOFException();
 
-        MessageEOFException();
+    MessageEOFException(const MessageEOFException& ex);
 
-        MessageEOFException(const MessageEOFException& ex);
+    MessageEOFException(const std::string& message);
 
-        MessageEOFException(const std::string& message);
+    MessageEOFException(const std::string&    message,
+                        const std::exception* cause);
 
-        MessageEOFException(const std::string& message, const std::exception* cause);
+    MessageEOFException(
+        const std::string&                              message,
+        const std::exception*                           cause,
+        const std::vector<std::pair<std::string, int>>& stackTrace);
 
-        MessageEOFException(const std::string& message, const std::exception* cause,
-                            const std::vector<std::pair<std::string, int> >& stackTrace);
+    virtual ~MessageEOFException() throw();
 
-        virtual ~MessageEOFException() throw();
+    virtual MessageEOFException* clone();
+};
 
-        virtual MessageEOFException* clone();
-
-    };
-
-}
+}  // namespace cms
 
 #endif /*_CMS_MESSAGEEOFEXCEPTION_H_*/

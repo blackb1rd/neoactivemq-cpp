@@ -24,56 +24,70 @@ using namespace activemq;
 using namespace activemq::commands;
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQTempQueue::ActiveMQTempQueue() : ActiveMQTempDestination() {
+ActiveMQTempQueue::ActiveMQTempQueue()
+    : ActiveMQTempDestination()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQTempQueue::ActiveMQTempQueue(const std::string& name) : ActiveMQTempDestination( name )
-{}
-
-////////////////////////////////////////////////////////////////////////////////
-ActiveMQTempQueue::~ActiveMQTempQueue() throw() {
+ActiveMQTempQueue::ActiveMQTempQueue(const std::string& name)
+    : ActiveMQTempDestination(name)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-unsigned char ActiveMQTempQueue::getDataStructureType() const {
+ActiveMQTempQueue::~ActiveMQTempQueue() throw()
+{
+}
+
+////////////////////////////////////////////////////////////////////////////////
+unsigned char ActiveMQTempQueue::getDataStructureType() const
+{
     return ActiveMQTempQueue::ID_ACTIVEMQTEMPQUEUE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQTempQueue* ActiveMQTempQueue::cloneDataStructure() const {
+ActiveMQTempQueue* ActiveMQTempQueue::cloneDataStructure() const
+{
     std::unique_ptr<ActiveMQTempQueue> copy(new ActiveMQTempQueue());
     copy->copyDataStructure(this);
-    copy->connection = this->connection;
+    copy->connection   = this->connection;
     copy->connectionId = this->connectionId;
-    copy->sequenceId = this->sequenceId;
+    copy->sequenceId   = this->sequenceId;
     return copy.release();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQTempQueue::copyDataStructure(const DataStructure* src) {
+void ActiveMQTempQueue::copyDataStructure(const DataStructure* src)
+{
     ActiveMQTempDestination::copyDataStructure(src);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string ActiveMQTempQueue::toString() const {
+std::string ActiveMQTempQueue::toString() const
+{
     return ActiveMQDestination::toString();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool ActiveMQTempQueue::equals(const DataStructure* value) const {
+bool ActiveMQTempQueue::equals(const DataStructure* value) const
+{
     return ActiveMQDestination::equals(value);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool ActiveMQTempQueue::equals(const cms::Destination& value) const {
-    const ActiveMQDestination* dest = dynamic_cast<const ActiveMQDestination*> (&value);
+bool ActiveMQTempQueue::equals(const cms::Destination& value) const
+{
+    const ActiveMQDestination* dest =
+        dynamic_cast<const ActiveMQDestination*>(&value);
     return ActiveMQDestination::equals(dest);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQTempQueue::destroy() {
-    try{
+void ActiveMQTempQueue::destroy()
+{
+    try
+    {
         close();
     }
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()

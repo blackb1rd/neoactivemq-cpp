@@ -24,25 +24,33 @@ using namespace decaf::net;
 using namespace decaf::lang;
 
 ////////////////////////////////////////////////////////////////////////////////
-SocketImpl::SocketImpl() : port(0), localPort(0), address(), fd(NULL) {
+SocketImpl::SocketImpl()
+    : port(0),
+      localPort(0),
+      address(),
+      fd(NULL)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SocketImpl::~SocketImpl() {
+SocketImpl::~SocketImpl()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string SocketImpl::toString() const {
-
-    std::string result = std::string( "Socket[addr=" ) + this->address +
-                         ",port=" + Integer::toString( this->port ) + "]";
+std::string SocketImpl::toString() const
+{
+    std::string result = std::string("Socket[addr=") + this->address +
+                         ",port=" + Integer::toString(this->port) + "]";
 
     return result;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SocketImpl::sendUrgentData( int data DECAF_UNUSED ) {
-
+void SocketImpl::sendUrgentData(int data DECAF_UNUSED)
+{
     throw decaf::io::IOException(
-        __FILE__, __LINE__, "Urgent Data not supported by this implementation." );
+        __FILE__,
+        __LINE__,
+        "Urgent Data not supported by this implementation.");
 }

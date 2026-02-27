@@ -21,5 +21,6 @@ using namespace decaf;
 using namespace decaf::lang;
 
 ////////////////////////////////////////////////////////////////////////////////
-Appendable::~Appendable() {
+Appendable::~Appendable()
+{
 }

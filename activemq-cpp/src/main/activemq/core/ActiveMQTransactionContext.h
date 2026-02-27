@@ -19,27 +19,30 @@
 
 #include <memory>
 
-#include <cms/Message.h>
-#include <cms/XAResource.h>
 #include <cms/CMSException.h>
+#include <cms/Message.h>
 #include <cms/XAException.h>
+#include <cms/XAResource.h>
 
-#include <activemq/util/Config.h>
-#include <activemq/exceptions/ActiveMQException.h>
 #include <activemq/commands/LocalTransactionId.h>
 #include <activemq/core/Synchronization.h>
+#include <activemq/exceptions/ActiveMQException.h>
+#include <activemq/util/Config.h>
 #include <activemq/util/LongSequenceGenerator.h>
 
 #include <decaf/lang/exceptions/InvalidStateException.h>
-#include <decaf/util/StlSet.h>
 #include <decaf/util/Properties.h>
+#include <decaf/util/StlSet.h>
 #include <decaf/util/concurrent/Mutex.h>
 
-namespace activemq {
-namespace core {
-namespace kernels {
-    class ActiveMQSessionKernel;
-}
+namespace activemq
+{
+namespace core
+{
+    namespace kernels
+    {
+        class ActiveMQSessionKernel;
+    }  // namespace kernels
 
     using decaf::lang::Pointer;
 
@@ -56,9 +59,9 @@ namespace kernels {
      *
      * @since 2.0
      */
-    class AMQCPP_API ActiveMQTransactionContext : public cms::XAResource {
+    class AMQCPP_API ActiveMQTransactionContext : public cms::XAResource
+    {
     private:
-
         // Internal structure to hold all class TX data.
         TxContextData* context;
 
@@ -69,15 +72,13 @@ namespace kernels {
         ActiveMQConnection* connection;
 
         // List of Registered Synchronizations
-        decaf::util::StlSet< Pointer<Synchronization> > synchronizations;
+        decaf::util::StlSet<Pointer<Synchronization>> synchronizations;
 
     private:
-
         ActiveMQTransactionContext(const ActiveMQTransactionContext&);
         ActiveMQTransactionContext& operator=(const ActiveMQTransactionContext&);
 
     public:
-
         /**
          * Constructor
          *
@@ -86,8 +87,9 @@ namespace kernels {
          * @param properties
          *      Configuration parameters for this object
          */
-        ActiveMQTransactionContext(activemq::core::kernels::ActiveMQSessionKernel* session,
-                                   const decaf::util::Properties& properties);
+        ActiveMQTransactionContext(
+            activemq::core::kernels::ActiveMQSessionKernel* session,
+            const decaf::util::Properties&                  properties);
 
         virtual ~ActiveMQTransactionContext();
 
@@ -127,7 +129,8 @@ namespace kernels {
          * @return TransactionInfo
          * @throw InvalidStateException if a Transaction is not in progress.
          */
-        virtual const decaf::lang::Pointer<commands::TransactionId>& getTransactionId() const;
+        virtual const decaf::lang::Pointer<commands::TransactionId>&
+        getTransactionId() const;
 
         /**
          * Checks to see if there is currently a Transaction in progress returns
@@ -138,23 +141,22 @@ namespace kernels {
         virtual bool isInTransaction() const;
 
         /**
-         * Checks to see if there is currently an Local Transaction in progess, returns
-         * false if not, true otherwise.
+         * Checks to see if there is currently an Local Transaction in progess,
+         * returns false if not, true otherwise.
          *
          * @return true if an Local Transaction is in progress.
          */
         virtual bool isInLocalTransaction() const;
 
         /**
-         * Checks to see if there is currently an XA Transaction in progress, returns
-         * false if not, true otherwise.
+         * Checks to see if there is currently an XA Transaction in progress,
+         * returns false if not, true otherwise.
          *
          * @return true if an XA Transaction is in progress.
          */
         virtual bool isInXATransaction() const;
 
     public:  // XAResource implementation.
-
         virtual void commit(const cms::Xid* xid, bool onePhase);
 
         virtual void end(const cms::Xid* xid, int flags);
@@ -176,19 +178,18 @@ namespace kernels {
         virtual void start(const cms::Xid* xid, int flags);
 
     private:
-
-        std::string getResourceManagerId() const;
-        void setXid(const cms::Xid* xid);
-        bool equals(const cms::Xid* local, const cms::Xid* remote);
+        std::string      getResourceManagerId() const;
+        void             setXid(const cms::Xid* xid);
+        bool             equals(const cms::Xid* local, const cms::Xid* remote);
         cms::XAException toXAException(cms::CMSException& ex);
         cms::XAException toXAException(decaf::lang::Exception& ex);
 
         void beforeEnd();
         void afterCommit();
         void afterRollback();
-
     };
 
-}}
+}  // namespace core
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_CORE_ACTIVEMQTRANSACTIONCONTEXT_H_*/

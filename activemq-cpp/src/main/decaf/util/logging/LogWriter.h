@@ -21,54 +21,57 @@
 
 #include <string>
 
-namespace decaf{
-namespace util{
-namespace logging{
+namespace decaf
+{
+namespace util
+{
+    namespace logging
+    {
 
-    class DECAF_API LogWriter {
-    public:
+        class DECAF_API LogWriter
+        {
+        public:
+            LogWriter();
+            virtual ~LogWriter();
 
-        LogWriter();
-        virtual ~LogWriter();
+            /**
+             * Writes a message to the output destination
+             * @param file
+             * @param line
+             * @param prefix
+             * @param message
+             */
+            virtual void log(const std::string& file,
+                             const int          line,
+                             const std::string& prefix,
+                             const std::string& message);
 
-        /**
-         * Writes a message to the output destination
-         * @param file
-         * @param line
-         * @param prefix
-         * @param message
-         */
-        virtual void log( const std::string& file,
-                          const int          line,
-                          const std::string& prefix,
-                          const std::string& message );
+            /**
+             * Writes a message to the output destination
+             * @param message
+             */
+            virtual void log(const std::string& message);
 
-        /**
-         * Writes a message to the output destination
-         * @param message
-         */
-        virtual void log(const std::string& message);
+        public:  // Static methods
+            /**
+             * Get the singleton instance
+             */
+            static LogWriter& getInstance();
 
-    public:    // Static methods
+            /**
+             * Returns a Checked out instance of this Writer
+             */
+            static void returnInstance();
 
-        /**
-         * Get the singleton instance
-         */
-        static LogWriter& getInstance();
+            /**
+             * Forcefully Delete the Instance of this LogWriter
+             * even if there are outstanding references.
+             */
+            static void destroy();
+        };
 
-        /**
-         * Returns a Checked out instance of this Writer
-         */
-        static void returnInstance();
-
-        /**
-         * Forcefully Delete the Instance of this LogWriter
-         * even if there are outstanding references.
-         */
-        static void destroy();
-
-    };
-
-}}}
+    }  // namespace logging
+}  // namespace util
+}  // namespace decaf
 
 #endif /*_DECAF_UTIL_LOGGING_LOGWRITER_H_*/

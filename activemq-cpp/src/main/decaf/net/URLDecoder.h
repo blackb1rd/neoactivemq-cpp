@@ -21,17 +21,20 @@
 #include <decaf/util/Config.h>
 #include <string>
 
-namespace decaf{
-namespace net{
+namespace decaf
+{
+namespace net
+{
 
-    class DECAF_API URLDecoder {
+    class DECAF_API URLDecoder
+    {
     private:
-
         URLDecoder();
 
     public:
-
-        virtual ~URLDecoder() {}
+        virtual ~URLDecoder()
+        {
+        }
 
         /**
          * Decodes the string argument which is assumed to be encoded in the
@@ -46,10 +49,10 @@ namespace net{
          * @param value - string The encoded string.
          * @return The decoded version as a string.
          */
-        static std::string decode( const std::string& value );
-
+        static std::string decode(const std::string& value);
     };
 
-}}
+}  // namespace net
+}  // namespace decaf
 
 #endif /*_DECAF_NET_URLDECODER_H_*/

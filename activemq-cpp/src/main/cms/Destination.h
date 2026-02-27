@@ -23,77 +23,76 @@
 
 #include <string>
 
-namespace cms {
+namespace cms
+{
+
+/**
+ * A Destination object encapsulates a provider-specific address.
+ * <p>
+ * There is no standard definition of a Destination address, each provider can
+ * provide its own definition and there can be configuration data attached to
+ * the Destination address. <p> All CMS Destination objects support concurrent
+ * use.
+ *
+ * @since 1.0
+ */
+class CMS_API Destination
+{
+public:
+    enum DestinationType
+    {
+        TOPIC,
+        QUEUE,
+        TEMPORARY_TOPIC,
+        TEMPORARY_QUEUE
+    };
+
+public:
+    virtual ~Destination();
 
     /**
-     * A Destination object encapsulates a provider-specific address.
-     * <p>
-     * There is no standard definition of a Destination address, each provider can
-     * provide its own definition and there can be configuration data attached to the
-     * Destination address.
-     * <p>
-     * All CMS Destination objects support concurrent use.
+     * Retrieve the Destination Type for this Destination
      *
-     * @since 1.0
+     * @return The Destination Type
      */
-    class CMS_API Destination {
-    public:
+    virtual DestinationType getDestinationType() const = 0;
 
-        enum DestinationType {
-            TOPIC,
-            QUEUE,
-            TEMPORARY_TOPIC,
-            TEMPORARY_QUEUE
-        };
+    /**
+     * Creates a new instance of this destination type that is a
+     * copy of this one, and returns it.
+     *
+     * @return cloned copy of this object
+     */
+    virtual cms::Destination* clone() const = 0;
 
-    public:
+    /**
+     * Copies the contents of the given Destination object to this one.
+     *
+     * @param source
+     *      The source Destination object.
+     */
+    virtual void copy(const cms::Destination& source) = 0;
 
-        virtual ~Destination();
+    /**
+     * Compares two Destination instances to determine if they represent the
+     * same logic Destination.
+     *
+     * @param other
+     *      The other destination to compare this one to.
+     *
+     * @return true if the two destinations are the same.
+     */
+    virtual bool equals(const cms::Destination& other) const = 0;
 
-        /**
-         * Retrieve the Destination Type for this Destination
-         *
-         * @return The Destination Type
-         */
-        virtual DestinationType getDestinationType() const = 0;
-
-        /**
-         * Creates a new instance of this destination type that is a
-         * copy of this one, and returns it.
-         *
-         * @return cloned copy of this object
-         */
-        virtual cms::Destination* clone() const = 0;
-
-        /**
-         * Copies the contents of the given Destination object to this one.
-         *
-         * @param source
-         *      The source Destination object.
-         */
-        virtual void copy(const cms::Destination& source) = 0;
-
-        /**
-         * Compares two Destination instances to determine if they represent the same
-         * logic Destination.
-         *
-         * @param other
-         *      The other destination to compare this one to.
-         *
-         * @return true if the two destinations are the same.
-         */
-        virtual bool equals(const cms::Destination& other) const = 0;
-
-        /**
-         * Retrieve any properties that might be part of the destination
-         * that was specified.  This is a deviation from the JMS spec
-         * but necessary due to C++ restrictions.
-         *
-         * @return A {const} reference to a CMSProperties object.
-         */
-        virtual const CMSProperties& getCMSProperties() const = 0;
-
-    };
-}
+    /**
+     * Retrieve any properties that might be part of the destination
+     * that was specified.  This is a deviation from the JMS spec
+     * but necessary due to C++ restrictions.
+     *
+     * @return A {const} reference to a CMSProperties object.
+     */
+    virtual const CMSProperties& getCMSProperties() const = 0;
+};
+}  // namespace cms
 
 #endif /*_CMS_DESTINATION_H_*/

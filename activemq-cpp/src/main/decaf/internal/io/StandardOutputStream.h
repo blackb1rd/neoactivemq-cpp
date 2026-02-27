@@ -18,32 +18,38 @@
 #ifndef _DECAF_INTERNAL_IO_STANDARDOUTPUTSTREAM_H_
 #define _DECAF_INTERNAL_IO_STANDARDOUTPUTSTREAM_H_
 
-#include <decaf/util/Config.h>
 #include <decaf/io/OutputStream.h>
+#include <decaf/util/Config.h>
 
-namespace decaf {
-namespace internal {
-namespace io {
+namespace decaf
+{
+namespace internal
+{
+    namespace io
+    {
 
-    class DECAF_API StandardOutputStream : public decaf::io::OutputStream {
-    public:
+        class DECAF_API StandardOutputStream : public decaf::io::OutputStream
+        {
+        public:
+            StandardOutputStream();
 
-        StandardOutputStream();
+            virtual ~StandardOutputStream();
 
-        virtual ~StandardOutputStream();
+            virtual void flush();
 
-        virtual void flush();
+            virtual void close();
 
-        virtual void close();
+        protected:
+            virtual void doWriteByte(unsigned char value);
 
-    protected:
+            virtual void doWriteArrayBounded(const unsigned char* buffer,
+                                             int                  size,
+                                             int                  offset,
+                                             int                  length);
+        };
 
-        virtual void doWriteByte( unsigned char value );
-
-        virtual void doWriteArrayBounded( const unsigned char* buffer, int size, int offset, int length );
-
-    };
-
-}}}
+    }  // namespace io
+}  // namespace internal
+}  // namespace decaf
 
 #endif /* _DECAF_INTERNAL_IO_STANDARDOUTPUTSTREAM_H_ */

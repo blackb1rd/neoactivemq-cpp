@@ -1,0 +1,184 @@
+---
+# C++17 formatting for neoactivemq-cpp
+# Optimized for: AI readability, safety, short lines
+#
+# Key principles:
+#   - 80-col limit: more code fits in LLM context per token
+#   - Allman braces: every block boundary is unambiguous
+#   - InsertBraces: explicit braces on ALL single-statement bodies
+#   - One param/arg per line: each argument independently parseable
+#   - Aligned assignments/declarations: visual pattern recognition
+
+Language: Cpp
+Standard: c++17
+BasedOnStyle: Google
+
+# ---------------------------------------------------------------------------
+# Line length -- short for AI context efficiency
+# ---------------------------------------------------------------------------
+ColumnLimit: 80
+
+# ---------------------------------------------------------------------------
+# Indentation
+# ---------------------------------------------------------------------------
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+ContinuationIndentWidth: 4
+ConstructorInitializerIndentWidth: 4
+LambdaBodyIndentation: Signature
+NamespaceIndentation: Inner
+AccessModifierOffset: -4
+
+# ---------------------------------------------------------------------------
+# Braces: Allman -- every opening brace on its own line
+# Block boundaries are crystal-clear to both humans and AI
+# ---------------------------------------------------------------------------
+BreakBeforeBraces: Allman
+
+# Always insert braces around single-statement if/for/while/do bodies.
+# Removes ALL ambiguity about what is inside vs outside a branch.
+InsertBraces: true
+
+# ---------------------------------------------------------------------------
+# Short forms: NONE -- every construct fully expanded
+# ---------------------------------------------------------------------------
+AllowShortBlocksOnASingleLine: Never
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortEnumsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: None
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLambdasOnASingleLine: None
+AllowShortLoopsOnASingleLine: false
+
+# ---------------------------------------------------------------------------
+# Parameters and arguments: one per line when they don't fit
+# Each argument independently readable; no "bin packing"
+# ---------------------------------------------------------------------------
+BinPackParameters: false
+BinPackArguments: false
+AllowAllParametersOfDeclarationOnNextLine: false
+AllowAllArgumentsOnNextLine: false
+
+# Constructor initializers: one member per line
+PackConstructorInitializers: Never
+BreakConstructorInitializers: BeforeColon
+
+# ---------------------------------------------------------------------------
+# Line breaks
+# ---------------------------------------------------------------------------
+BreakBeforeTernaryOperators: true
+BreakInheritanceList: BeforeColon
+BreakStringLiterals: true
+AlwaysBreakAfterReturnType: None
+AlwaysBreakBeforeMultilineStrings: false
+AlwaysBreakTemplateDeclarations: Yes
+
+# ---------------------------------------------------------------------------
+# Alignment -- help AI spot patterns visually
+# ---------------------------------------------------------------------------
+AlignAfterOpenBracket: Align
+AlignConsecutiveAssignments: Consecutive
+AlignConsecutiveDeclarations: Consecutive
+AlignConsecutiveMacros: Consecutive
+AlignOperands: Align
+AlignTrailingComments:
+  Kind: Always
+  OverEmptyLines: 0
+
+# ---------------------------------------------------------------------------
+# Spacing
+# ---------------------------------------------------------------------------
+SpaceAfterCStyleCast: false
+SpaceAfterLogicalNot: false
+SpaceAfterTemplateKeyword: true
+SpaceAroundPointerQualifiers: Default
+SpaceBeforeAssignmentOperators: true
+SpaceBeforeCaseColon: false
+SpaceBeforeCpp11BracedList: false
+SpaceBeforeCtorInitializerColon: true
+SpaceBeforeInheritanceColon: true
+SpaceBeforeParens: ControlStatements
+SpaceBeforeRangeBasedForLoopColon: true
+SpaceBeforeSquareBrackets: false
+SpaceInEmptyBlock: false
+SpaceInEmptyParentheses: false
+SpacesBeforeTrailingComments: 2
+SpacesInAngles: Never
+SpacesInCStyleCastParentheses: false
+SpacesInConditionalStatement: false
+SpacesInContainerLiterals: false
+SpacesInParentheses: false
+SpacesInSquareBrackets: false
+
+# Pointer/reference attached to type: int* p (type owns the *)
+PointerAlignment: Left
+ReferenceAlignment: Left
+DerivePointerAlignment: false
+
+# ---------------------------------------------------------------------------
+# Blank lines -- clear visual separation between definitions
+# ---------------------------------------------------------------------------
+SeparateDefinitionBlocks: Always
+MaxEmptyLinesToKeep: 1
+
+# ---------------------------------------------------------------------------
+# Includes
+# ---------------------------------------------------------------------------
+# Preserve existing blank-line groups; sort only within each group.
+# Regroup is intentionally OFF -- Windows SDK headers (winsock2.h,
+# mswsock.h) and asio have strict ordering requirements that Regroup
+# breaks by merging and re-separating include blocks.
+SortIncludes: CaseSensitive
+IncludeBlocks: Preserve
+
+# Categories follow Google C++ Style Guide include order:
+#   1. Companion header  "Foo.h"         (same-dir .h for a .cpp)
+#   2. C system          <stdlib.h>  <string.h>  ...
+#   3. C++ stdlib        <iostream>  <string>  <memory>  ...
+#   4. Third-party       <gtest/...>  <asio/...>  <zlib/...>
+#   5. Project headers   <activemq/...>  <cms/...>  <decaf/...>
+IncludeCategories:
+  # 1. Companion header (double-quote, same directory)
+  - Regex: '^"'
+    Priority: 1
+  # 2. C system headers (.h extension)
+  - Regex: '^<[a-zA-Z0-9_/]+\.h>$'
+    Priority: 2
+  # 3. C++ standard library (no slash, no .h extension)
+  - Regex: '^<[a-z_]+>$'
+    Priority: 3
+  # 4. Third-party libraries (gtest, asio, zlib, openssl, etc.)
+  - Regex: '^<(gtest|gmock|asio|openssl|zlib)/'
+    Priority: 4
+  # 5. Project headers
+  - Regex: '^<(activemq|cms|decaf)/'
+    Priority: 5
+  # Catch-all
+  - Regex: '^<'
+    Priority: 6
+
+# ---------------------------------------------------------------------------
+# Misc
+# ---------------------------------------------------------------------------
+Cpp11BracedListStyle: true
+FixNamespaceComments: true
+ReflowComments: true
+RemoveBracesLLVM: false
+ShortNamespaceLines: 0
+CompactNamespaces: false
+
+# ---------------------------------------------------------------------------
+# Penalties -- aggressively break long lines
+# ---------------------------------------------------------------------------
+PenaltyBreakAssignment: 20
+PenaltyBreakBeforeFirstCallParameter: 10
+PenaltyBreakComment: 100
+PenaltyBreakFirstLessLess: 120
+PenaltyBreakOpenParenthesis: 0
+PenaltyBreakString: 100
+PenaltyBreakTemplateDeclaration: 10
+PenaltyExcessCharacter: 100
+PenaltyIndentedWhitespace: 0
+PenaltyReturnTypeOnItsOwnLine: 200
+...

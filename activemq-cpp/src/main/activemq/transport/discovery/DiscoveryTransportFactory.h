@@ -18,36 +18,42 @@
 #ifndef _ACTIVEMQ_TRANSPORT_DISCOVERY_DISCOVERYTRANSPORTFACTORY_H_
 #define _ACTIVEMQ_TRANSPORT_DISCOVERY_DISCOVERYTRANSPORTFACTORY_H_
 
-#include <activemq/util/Config.h>
 #include <activemq/transport/AbstractTransportFactory.h>
 #include <activemq/transport/Transport.h>
+#include <activemq/util/Config.h>
 #include <decaf/net/URI.h>
 #include <decaf/util/Properties.h>
 
-namespace activemq {
-namespace transport {
-namespace discovery {
+namespace activemq
+{
+namespace transport
+{
+    namespace discovery
+    {
 
-    /**
-     * Creates an instance of a DiscoveryTransport.
-     *
-     * @since 3.9
-     */
-    class AMQCPP_API DiscoveryTransportFactory : public AbstractTransportFactory {
-    public:
+        /**
+         * Creates an instance of a DiscoveryTransport.
+         *
+         * @since 3.9
+         */
+        class AMQCPP_API DiscoveryTransportFactory
+            : public AbstractTransportFactory
+        {
+        public:
+            virtual ~DiscoveryTransportFactory();
 
-        virtual ~DiscoveryTransportFactory();
+            virtual Pointer<Transport> create(const decaf::net::URI& location);
 
-        virtual Pointer<Transport> create(const decaf::net::URI& location);
+            virtual Pointer<Transport> createComposite(
+                const decaf::net::URI& location);
 
-        virtual Pointer<Transport> createComposite(const decaf::net::URI& location);
+        protected:
+            virtual Pointer<Transport> doCreateTransport(
+                const decaf::net::URI& location);
+        };
 
-    protected:
-
-        virtual Pointer<Transport> doCreateTransport(const decaf::net::URI& location);
-
-    };
-
-}}}
+    }  // namespace discovery
+}  // namespace transport
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_TRANSPORT_DISCOVERY_DISCOVERYTRANSPORTFACTORY_H_ */

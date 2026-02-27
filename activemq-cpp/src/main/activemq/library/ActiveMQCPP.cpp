@@ -17,23 +17,23 @@
 
 #include "ActiveMQCPP.h"
 
-#include <decaf/lang/Runtime.h>
-#include <activemq/wireformat/WireFormatRegistry.h>
 #include <activemq/transport/TransportRegistry.h>
 #include <activemq/transport/discovery/DiscoveryAgentRegistry.h>
+#include <activemq/wireformat/WireFormatRegistry.h>
+#include <decaf/lang/Runtime.h>
 
 #include <activemq/util/IdGenerator.h>
 
-#include <activemq/wireformat/stomp/StompWireFormatFactory.h>
 #include <activemq/wireformat/openwire/OpenWireFormatFactory.h>
+#include <activemq/wireformat/stomp/StompWireFormatFactory.h>
 
 #include <activemq/transport/mock/MockTransportFactory.h>
 #include <activemq/transport/tcp/TcpTransportFactory.h>
 #ifdef AMQCPP_USE_SSL
 #include <activemq/transport/tcp/SslTransportFactory.h>
 #endif
-#include <activemq/transport/failover/FailoverTransportFactory.h>
 #include <activemq/transport/discovery/DiscoveryTransportFactory.h>
+#include <activemq/transport/failover/FailoverTransportFactory.h>
 
 #include <activemq/transport/discovery/http/HttpDiscoveryAgentFactory.h>
 
@@ -49,18 +49,18 @@ using namespace activemq::transport::discovery::http;
 using namespace activemq::wireformat;
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQCPP::ActiveMQCPP() {
-
+ActiveMQCPP::ActiveMQCPP()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQCPP::~ActiveMQCPP() {
-
+ActiveMQCPP::~ActiveMQCPP()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQCPP::initializeLibrary(int argc, char** argv) {
-
+void ActiveMQCPP::initializeLibrary(int argc, char** argv)
+{
     // Initialize the Decaf Library by requesting its runtime.
     decaf::lang::Runtime::initializeRuntime(argc, argv);
 
@@ -75,13 +75,14 @@ void ActiveMQCPP::initializeLibrary(int argc, char** argv) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQCPP::initializeLibrary() {
+void ActiveMQCPP::initializeLibrary()
+{
     ActiveMQCPP::initializeLibrary(0, NULL);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQCPP::shutdownLibrary() {
-
+void ActiveMQCPP::shutdownLibrary()
+{
     // Shutdown the IdGenerator Kernel
     IdGenerator::shutdown();
 
@@ -94,36 +95,52 @@ void ActiveMQCPP::shutdownLibrary() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQCPP::registerWireFormats() {
-
+void ActiveMQCPP::registerWireFormats()
+{
     // Each of the internally implemented WireFormat's is registered here
     // with the WireFormat Registry
     WireFormatRegistry::initialize();
 
-    WireFormatRegistry::getInstance().registerFactory("openwire", new wireformat::openwire::OpenWireFormatFactory());
-    WireFormatRegistry::getInstance().registerFactory("stomp", new wireformat::stomp::StompWireFormatFactory());
+    WireFormatRegistry::getInstance().registerFactory(
+        "openwire",
+        new wireformat::openwire::OpenWireFormatFactory());
+    WireFormatRegistry::getInstance().registerFactory(
+        "stomp",
+        new wireformat::stomp::StompWireFormatFactory());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQCPP::registerTransports() {
-
+void ActiveMQCPP::registerTransports()
+{
     // Each of the internally implemented Transports is registered here
     TransportRegistry::initialize();
 
-    TransportRegistry::getInstance().registerFactory("tcp", new TcpTransportFactory());
+    TransportRegistry::getInstance().registerFactory("tcp",
+                                                     new TcpTransportFactory());
 #ifdef AMQCPP_USE_SSL
-    TransportRegistry::getInstance().registerFactory("ssl", new SslTransportFactory());
+    TransportRegistry::getInstance().registerFactory("ssl",
+                                                     new SslTransportFactory());
 #endif
-    TransportRegistry::getInstance().registerFactory("nio", new TcpTransportFactory());
+    TransportRegistry::getInstance().registerFactory("nio",
+                                                     new TcpTransportFactory());
 #ifdef AMQCPP_USE_SSL
-    TransportRegistry::getInstance().registerFactory("nio+ssl", new SslTransportFactory());
+    TransportRegistry::getInstance().registerFactory("nio+ssl",
+                                                     new SslTransportFactory());
 #endif
-    TransportRegistry::getInstance().registerFactory("mock", new MockTransportFactory());
-    TransportRegistry::getInstance().registerFactory("failover", new FailoverTransportFactory());
-    TransportRegistry::getInstance().registerFactory("discovery", new DiscoveryTransportFactory());
+    TransportRegistry::getInstance().registerFactory(
+        "mock",
+        new MockTransportFactory());
+    TransportRegistry::getInstance().registerFactory(
+        "failover",
+        new FailoverTransportFactory());
+    TransportRegistry::getInstance().registerFactory(
+        "discovery",
+        new DiscoveryTransportFactory());
 
     // Each discovery agent implemented in this library must be registered here.
     DiscoveryAgentRegistry::initialize();
 
-    DiscoveryAgentRegistry::getInstance().registerFactory("http", new HttpDiscoveryAgentFactory);
+    DiscoveryAgentRegistry::getInstance().registerFactory(
+        "http",
+        new HttpDiscoveryAgentFactory);
 }

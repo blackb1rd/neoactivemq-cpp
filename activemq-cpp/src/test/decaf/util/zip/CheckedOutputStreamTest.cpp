@@ -17,10 +17,10 @@
 
 #include <gtest/gtest.h>
 
-#include <decaf/util/zip/CheckedOutputStream.h>
+#include <decaf/io/ByteArrayOutputStream.h>
 #include <decaf/util/zip/Adler32.h>
 #include <decaf/util/zip/CRC32.h>
-#include <decaf/io/ByteArrayOutputStream.h>
+#include <decaf/util/zip/CheckedOutputStream.h>
 
 using namespace std;
 using namespace decaf;
@@ -30,81 +30,91 @@ using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::zip;
 
-    class CheckedOutputStreamTest : public ::testing::Test {
+class CheckedOutputStreamTest : public ::testing::Test
+{
 public:
-
-        CheckedOutputStreamTest();
-        virtual ~CheckedOutputStreamTest();
-
-    };
+    CheckedOutputStreamTest();
+    virtual ~CheckedOutputStreamTest();
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-CheckedOutputStreamTest::CheckedOutputStreamTest() {
+CheckedOutputStreamTest::CheckedOutputStreamTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-CheckedOutputStreamTest::~CheckedOutputStreamTest() {
+CheckedOutputStreamTest::~CheckedOutputStreamTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(CheckedOutputStreamTest, testConstructor) {
+TEST_F(CheckedOutputStreamTest, testConstructor)
+{
+    ByteArrayOutputStream baos;
+    CRC32                 check;
+    CheckedOutputStream   chkOut(&baos, &check);
+    ASSERT_EQ(0LL, chkOut.getChecksum()->getValue())
+        << ("the checkSum value of the constructor is not 0");
+}
+
+////////////////////////////////////////////////////////////////////////////////
+TEST_F(CheckedOutputStreamTest, testGetChecksum)
+{
+    unsigned char byteArray[] = {1, 2, 3, 'e', 'r', 't', 'g', 3, 6};
 
     ByteArrayOutputStream baos;
-    CRC32 check;
-    CheckedOutputStream chkOut( &baos, &check );
-    ASSERT_EQ(0LL, chkOut.getChecksum()->getValue()) << ("the checkSum value of the constructor is not 0");
-}
+    Adler32               check;
+    CheckedOutputStream   chkOut(&baos, &check);
 
-////////////////////////////////////////////////////////////////////////////////
-TEST_F(CheckedOutputStreamTest, testGetChecksum) {
-
-    unsigned char byteArray[] = { 1, 2, 3, 'e', 'r', 't', 'g', 3, 6 };
-
-    ByteArrayOutputStream baos;
-    Adler32 check;
-    CheckedOutputStream chkOut( &baos, &check );
-
-    chkOut.write( byteArray[4] );
+    chkOut.write(byteArray[4]);
     // ran JDK and found that checkSum value is 7536755
 
-    ASSERT_EQ(7536755LL, chkOut.getChecksum()->getValue()) << ("the checkSum value for writeI is incorrect");
+    ASSERT_EQ(7536755LL, chkOut.getChecksum()->getValue())
+        << ("the checkSum value for writeI is incorrect");
 
     chkOut.getChecksum()->reset();
-    chkOut.write( byteArray, 9, 5, 4 );
+    chkOut.write(byteArray, 9, 5, 4);
     // ran JDK and found that checkSum value is 51708133
 
-    ASSERT_EQ(51708133LL, chkOut.getChecksum()->getValue()) << ("the checkSum value for writeBII is incorrect ");
+    ASSERT_EQ(51708133LL, chkOut.getChecksum()->getValue())
+        << ("the checkSum value for writeBII is incorrect ");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(CheckedOutputStreamTest, testWriteI) {
-
-    static const int SIZE = 9;
-    unsigned char byteArray[] = { 1, 2, 3, 'e', 'r', 't', 'g', 3, 6 };
+TEST_F(CheckedOutputStreamTest, testWriteI)
+{
+    static const int SIZE        = 9;
+    unsigned char    byteArray[] = {1, 2, 3, 'e', 'r', 't', 'g', 3, 6};
 
     ByteArrayOutputStream baos;
-    CRC32 check;
-    CheckedOutputStream chkOut( &baos, &check );
+    CRC32                 check;
+    CheckedOutputStream   chkOut(&baos, &check);
 
-    for( int ix = 0; ix < SIZE; ++ix ) {
-        chkOut.write( byteArray[ix] );
+    for (int ix = 0; ix < SIZE; ++ix)
+    {
+        chkOut.write(byteArray[ix]);
     }
 
-    ASSERT_TRUE(chkOut.getChecksum()->getValue() != 0) << ("the checkSum value is zero, no bytes are written to the output file");
+    ASSERT_TRUE(chkOut.getChecksum()->getValue() != 0)
+        << ("the checkSum value is zero, no bytes are written to the output "
+            "file");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(CheckedOutputStreamTest, testWriteBIII) {
-
-    static const int SIZE = 9;
-    unsigned char byteArray[] = { 1, 2, 3, 'e', 'r', 't', 'g', 3, 6 };
+TEST_F(CheckedOutputStreamTest, testWriteBIII)
+{
+    static const int SIZE        = 9;
+    unsigned char    byteArray[] = {1, 2, 3, 'e', 'r', 't', 'g', 3, 6};
 
     ByteArrayOutputStream baos;
-    CRC32 check;
-    CheckedOutputStream chkOut( &baos, &check );
+    CRC32                 check;
+    CheckedOutputStream   chkOut(&baos, &check);
 
-    chkOut.write( byteArray, SIZE, 4, 5 );
-    ASSERT_TRUE(chkOut.getChecksum()->getValue() != 0) << ("the checkSum value is zero, no bytes are written to the output file");
+    chkOut.write(byteArray, SIZE, 4, 5);
+    ASSERT_TRUE(chkOut.getChecksum()->getValue() != 0)
+        << ("the checkSum value is zero, no bytes are written to the output "
+            "file");
 
-    ASSERT_THROW(chkOut.write( byteArray, SIZE, 4, 6 ), IndexOutOfBoundsException) << ("Should have thrown an IndexOutOfBoundsException");
+    ASSERT_THROW(chkOut.write(byteArray, SIZE, 4, 6), IndexOutOfBoundsException)
+        << ("Should have thrown an IndexOutOfBoundsException");
 }

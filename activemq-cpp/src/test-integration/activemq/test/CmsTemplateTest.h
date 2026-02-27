@@ -20,21 +20,28 @@
 
 #include <activemq/test/CMSTestFixture.h>
 
-namespace activemq{
-namespace test{
+namespace activemq
+{
+namespace test
+{
 
-    class CmsTemplateTest : public CMSTestFixture {
+    class CmsTemplateTest : public CMSTestFixture
+    {
     public:
+        CmsTemplateTest()
+        {
+        }
 
-        CmsTemplateTest(){}
-        virtual ~CmsTemplateTest(){}
+        virtual ~CmsTemplateTest()
+        {
+        }
 
         virtual void testBasics();
         virtual void testReceiveException();
         virtual void testSendException();
-
     };
 
-}}
+}  // namespace test
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_TEST_CMSTEMPLATETEST_H_*/

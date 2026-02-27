@@ -18,27 +18,31 @@
 #ifndef _ACTIVEMQ_TRANSPORT_TRANSPORTLISTENER_H_
 #define _ACTIVEMQ_TRANSPORT_TRANSPORTLISTENER_H_
 
-#include <activemq/util/Config.h>
 #include <activemq/commands/Command.h>
+#include <activemq/util/Config.h>
 #include <decaf/lang/Exception.h>
 #include <decaf/lang/Pointer.h>
 
-namespace activemq{
-namespace transport{
+namespace activemq
+{
+namespace transport
+{
 
     // Forward declarations.
     class Transport;
 
-    using decaf::lang::Pointer;
     using activemq::commands::Command;
+    using decaf::lang::Pointer;
 
     /**
      * A listener of asynchronous exceptions from a command transport object.
      */
-    class AMQCPP_API TransportListener {
+    class AMQCPP_API TransportListener
+    {
     public:
-
-        virtual ~TransportListener() {}
+        virtual ~TransportListener()
+        {
+        }
 
         /**
          * Event handler for the receipt of a command.  The transport passes
@@ -60,7 +64,8 @@ namespace transport{
         virtual void onException(const decaf::lang::Exception& ex) = 0;
 
         /**
-         * The transport has suffered an interruption from which it hopes to recover
+         * The transport has suffered an interruption from which it hopes to
+         * recover
          */
         virtual void transportInterrupted() = 0;
 
@@ -68,9 +73,9 @@ namespace transport{
          * The transport has resumed after an interruption
          */
         virtual void transportResumed() = 0;
-
     };
 
-}}
+}  // namespace transport
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_TRANSPORT_TRANSPORTLISTENER_H_*/

@@ -33,29 +33,29 @@ using namespace decaf::lang;
 using namespace decaf::util;
 
 ////////////////////////////////////////////////////////////////////////////////
-void JmsMessageGroupsTest::testMessageSend() {
-
-    try {
-
+void JmsMessageGroupsTest::testMessageSend()
+{
+    try
+    {
         std::string GROUPID = "TEST-GROUP-ID";
 
         // Create CMS Object for Comms
-        cms::Session* session( cmsProvider->getSession() );
+        cms::Session*         session(cmsProvider->getSession());
         cms::MessageConsumer* consumer = cmsProvider->getConsumer();
         cms::MessageProducer* producer = cmsProvider->getProducer();
-        producer->setDeliveryMode( DeliveryMode::NON_PERSISTENT );
+        producer->setDeliveryMode(DeliveryMode::NON_PERSISTENT);
 
-        std::unique_ptr<cms::TextMessage> txtMessage( session->createTextMessage( "TEST MESSAGE" ) );
-        txtMessage->setStringProperty( "JMSXGroupID", GROUPID );
+        std::unique_ptr<cms::TextMessage> txtMessage(
+            session->createTextMessage("TEST MESSAGE"));
+        txtMessage->setStringProperty("JMSXGroupID", GROUPID);
 
         // Send some text messages
-        producer->send( txtMessage.get() );
+        producer->send(txtMessage.get());
 
-        std::unique_ptr<cms::Message> message( consumer->receive( 2000 ) );
+        std::unique_ptr<cms::Message> message(consumer->receive(2000));
         ASSERT_TRUE(message.get() != NULL);
-        ASSERT_TRUE(message->getStringProperty( "JMSXGroupID" ) == GROUPID);
+        ASSERT_TRUE(message->getStringProperty("JMSXGroupID") == GROUPID);
     }
-    AMQ_CATCH_RETHROW( ActiveMQException )
-    AMQ_CATCHALL_THROW( ActiveMQException )
+    AMQ_CATCH_RETHROW(ActiveMQException)
+    AMQ_CATCHALL_THROW(ActiveMQException)
 }
-

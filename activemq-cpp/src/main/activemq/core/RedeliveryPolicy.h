@@ -22,31 +22,30 @@
 
 #include <decaf/util/Properties.h>
 
-namespace activemq {
-namespace core {
+namespace activemq
+{
+namespace core
+{
 
     /**
-     * Interface for a RedeliveryPolicy object that controls how message Redelivery is
-     * handled in ActiveMQ-CPP when a transaction is rolled back.
+     * Interface for a RedeliveryPolicy object that controls how message
+     * Redelivery is handled in ActiveMQ-CPP when a transaction is rolled back.
      *
      * @since 3.2.0
      */
-    class AMQCPP_API RedeliveryPolicy {
+    class AMQCPP_API RedeliveryPolicy
+    {
     public:
-
         static const long long NO_MAXIMUM_REDELIVERIES;
 
     private:
-
         RedeliveryPolicy(const RedeliveryPolicy&);
         RedeliveryPolicy& operator=(const RedeliveryPolicy&);
 
     protected:
-
         RedeliveryPolicy();
 
     public:
-
         virtual ~RedeliveryPolicy();
 
         /**
@@ -76,7 +75,8 @@ namespace core {
         /**
          * Gets the initial time that redelivery of messages is delayed.
          *
-         * @return the time in milliseconds that redelivery is delayed initially.
+         * @return the time in milliseconds that redelivery is delayed
+         * initially.
          */
         virtual long long getInitialRedeliveryDelay() const = 0;
 
@@ -104,8 +104,8 @@ namespace core {
         virtual void setRedeliveryDelay(long long value) = 0;
 
         /**
-         * Gets the Maximum number of allowed redeliveries for a message before it will
-         * be discarded by the consumer.
+         * Gets the Maximum number of allowed redeliveries for a message before
+         * it will be discarded by the consumer.
          *
          * @return maximum allowed redeliveries for a message.
          */
@@ -120,8 +120,8 @@ namespace core {
         virtual void setMaximumRedeliveries(int maximumRedeliveries) = 0;
 
         /**
-         * Given the last used redelivery delay calculate the next value of the delay
-         * based on the settings in this Policy instance.
+         * Given the last used redelivery delay calculate the next value of the
+         * delay based on the settings in this Policy instance.
          *
          * @param previousDelay
          *      The last delay that was used between message redeliveries.
@@ -131,7 +131,8 @@ namespace core {
         virtual long long getNextRedeliveryDelay(long long previousDelay) = 0;
 
         /**
-         * @return whether or not collision avoidance is enabled for this Policy.
+         * @return whether or not collision avoidance is enabled for this
+         * Policy.
          */
         virtual bool isUseCollisionAvoidance() const = 0;
 
@@ -153,8 +154,8 @@ namespace core {
         virtual void setUseExponentialBackOff(bool value) = 0;
 
         /**
-         * Returns the maximum amount of time that the redelivery delay is allowed
-         * to increase to before it is capped.
+         * Returns the maximum amount of time that the redelivery delay is
+         * allowed to increase to before it is capped.
          *
          * @return the maximum redelivery delay value.
          */
@@ -178,25 +179,29 @@ namespace core {
         virtual RedeliveryPolicy* clone() const = 0;
 
         /**
-         * Checks the supplied properties object for properties matching the configurable
-         * settings of this class.  The default implementation looks for properties named
-         * with the prefix cms.RedeliveryPolicy.XXX where XXX is the name of a property with
-         * a public setter method.  For instance cms.RedeliveryPolicy.useExponentialBackOff
-         * will be used to set the value of the use exponential back off toggle.
+         * Checks the supplied properties object for properties matching the
+         * configurable settings of this class.  The default implementation
+         * looks for properties named with the prefix cms.RedeliveryPolicy.XXX
+         * where XXX is the name of a property with a public setter method.  For
+         * instance cms.RedeliveryPolicy.useExponentialBackOff will be used to
+         * set the value of the use exponential back off toggle.
          *
-         * Subclasses can override this method to add more configuration options or to exclude
-         * certain parameters from being set via the properties object.
+         * Subclasses can override this method to add more configuration options
+         * or to exclude certain parameters from being set via the properties
+         * object.
          *
          * @param properties
          *      The Properties object used to configure this object.
          *
-         * @throws NumberFormatException if a property that is numeric cannot be converted
-         * @throws IllegalArgumentException if a property can't be converted to the correct type.
+         * @throws NumberFormatException if a property that is numeric cannot be
+         * converted
+         * @throws IllegalArgumentException if a property can't be converted to
+         * the correct type.
          */
         virtual void configure(const decaf::util::Properties& properties);
-
     };
 
-}}
+}  // namespace core
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_CORE_REDELIVERYPOLICY_H_ */

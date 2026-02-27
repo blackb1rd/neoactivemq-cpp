@@ -17,68 +17,73 @@
 #ifndef _DECAF_UTIL_LOGGING_CONSOLEHANDLER_H_
 #define _DECAF_UTIL_LOGGING_CONSOLEHANDLER_H_
 
-#include <decaf/util/Config.h>
-#include <decaf/util/logging/StreamHandler.h>
-#include <decaf/util/logging/SimpleFormatter.h>
-#include <decaf/io/IOException.h>
 #include <decaf/internal/io/StandardErrorOutputStream.h>
+#include <decaf/io/IOException.h>
+#include <decaf/util/Config.h>
+#include <decaf/util/logging/SimpleFormatter.h>
+#include <decaf/util/logging/StreamHandler.h>
 
-namespace decaf{
-namespace util{
-namespace logging{
-
-    /**
-     * This Handler publishes log records to System.err. By default the
-     * SimpleFormatter is used to generate brief summaries.
-     *
-     * Configuration: By default each ConsoleHandler is initialized using
-     * the following LogManager configuration properties. If properties are
-     * not defined (or have invalid values) then the specified default
-     * values are used.
-     *
-     * ConsoleHandler.level specifies the default level for the Handler
-     *  (defaults to Level.INFO).
-     * ConsoleHandler.filter specifies the name of a Filter class to use
-     *  (defaults to no Filter).
-     * ConsoleHandler.formatter specifies the name of a Formatter class to
-     *  use (defaults to SimpleFormatter).
-     *
-     * @since 1.0
-     */
-    class DECAF_API ConsoleHandler : public StreamHandler {
-    private:
-
-        // The Standard Error Stream to log to
-        internal::io::StandardErrorOutputStream stream;
-
-        // The default Simple Formatter
-        SimpleFormatter formatter;
-
-    public:
-
-        ConsoleHandler();
-
-        virtual ~ConsoleHandler() {}
+namespace decaf
+{
+namespace util
+{
+    namespace logging
+    {
 
         /**
-         * Close the current output stream.
-         * <p>
-         * Override the StreamHandler close to flush the Std Err stream
-         * but doesn't close.
-         * @throw IOException
-         */
-        virtual void close();
-
-        /**
-         * Publish the Log Record to this Handler
+         * This Handler publishes log records to System.err. By default the
+         * SimpleFormatter is used to generate brief summaries.
          *
-         * @param record
-         *      The <code>LogRecord</code> to Publish
+         * Configuration: By default each ConsoleHandler is initialized using
+         * the following LogManager configuration properties. If properties are
+         * not defined (or have invalid values) then the specified default
+         * values are used.
+         *
+         * ConsoleHandler.level specifies the default level for the Handler
+         *  (defaults to Level.INFO).
+         * ConsoleHandler.filter specifies the name of a Filter class to use
+         *  (defaults to no Filter).
+         * ConsoleHandler.formatter specifies the name of a Formatter class to
+         *  use (defaults to SimpleFormatter).
+         *
+         * @since 1.0
          */
-        virtual void publish( const LogRecord& record );
+        class DECAF_API ConsoleHandler : public StreamHandler
+        {
+        private:
+            // The Standard Error Stream to log to
+            internal::io::StandardErrorOutputStream stream;
 
-    };
+            // The default Simple Formatter
+            SimpleFormatter formatter;
 
-}}}
+        public:
+            ConsoleHandler();
+
+            virtual ~ConsoleHandler()
+            {
+            }
+
+            /**
+             * Close the current output stream.
+             * <p>
+             * Override the StreamHandler close to flush the Std Err stream
+             * but doesn't close.
+             * @throw IOException
+             */
+            virtual void close();
+
+            /**
+             * Publish the Log Record to this Handler
+             *
+             * @param record
+             *      The <code>LogRecord</code> to Publish
+             */
+            virtual void publish(const LogRecord& record);
+        };
+
+    }  // namespace logging
+}  // namespace util
+}  // namespace decaf
 
 #endif /*_DECAF_UTIL_LOGGING_CONSOLEHANDLER_H_*/

@@ -29,35 +29,44 @@ using namespace decaf::internal::util;
 using namespace decaf::internal::util::concurrent;
 
 ////////////////////////////////////////////////////////////////////////////////
-ThreadLocalImpl::ThreadLocalImpl() : tlsKey(0) {
+ThreadLocalImpl::ThreadLocalImpl()
+    : tlsKey(0)
+{
     tlsKey = Threading::createThreadLocalSlot(this);
 
-    if (tlsKey < 0) {
-        throw RuntimeException(
-            __FILE__, __LINE__, "Thread Local storage limit reached.");
+    if (tlsKey < 0)
+    {
+        throw RuntimeException(__FILE__,
+                               __LINE__,
+                               "Thread Local storage limit reached.");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ThreadLocalImpl::~ThreadLocalImpl() {
+ThreadLocalImpl::~ThreadLocalImpl()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void* ThreadLocalImpl::getRawValue() const {
+void* ThreadLocalImpl::getRawValue() const
+{
     return Threading::getThreadLocalValue(this->tlsKey);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ThreadLocalImpl::setRawValue(void* value) {
+void ThreadLocalImpl::setRawValue(void* value)
+{
     void* oldValue = this->getRawValue();
     Threading::setThreadLocalValue(this->tlsKey, value);
 
-    if (oldValue != NULL) {
+    if (oldValue != NULL)
+    {
         doDelete(oldValue);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ThreadLocalImpl::removeAll() {
+void ThreadLocalImpl::removeAll()
+{
     Threading::destoryThreadLocalSlot(this->tlsKey);
 }

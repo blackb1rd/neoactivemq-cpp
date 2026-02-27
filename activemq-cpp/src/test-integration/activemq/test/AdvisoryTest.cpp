@@ -17,36 +17,34 @@
 
 #include "AdvisoryTest.h"
 
-#include <activemq/core/ActiveMQConnectionFactory.h>
-#include <activemq/core/ActiveMQConnection.h>
-#include <activemq/core/ActiveMQSession.h>
-#include <activemq/commands/ActiveMQTempTopic.h>
-#include <activemq/commands/ActiveMQTempQueue.h>
 #include <activemq/commands/ActiveMQMessage.h>
+#include <activemq/commands/ActiveMQTempQueue.h>
+#include <activemq/commands/ActiveMQTempTopic.h>
 #include <activemq/commands/ConnectionInfo.h>
 #include <activemq/commands/DestinationInfo.h>
+#include <activemq/core/ActiveMQConnection.h>
+#include <activemq/core/ActiveMQConnectionFactory.h>
+#include <activemq/core/ActiveMQSession.h>
 #include <activemq/exceptions/ActiveMQException.h>
+#include <activemq/util/AdvisorySupport.h>
 #include <activemq/util/CMSListener.h>
 #include <activemq/util/IntegrationCommon.h>
-#include <activemq/util/AdvisorySupport.h>
 
-#include <decaf/lang/exceptions/ClassCastException.h>
 #include <decaf/lang/Pointer.h>
-#include <decaf/lang/Thread.h>
 #include <decaf/lang/Runnable.h>
-#include <decaf/util/concurrent/TimeUnit.h>
+#include <decaf/lang/Thread.h>
+#include <decaf/lang/exceptions/ClassCastException.h>
 #include <decaf/util/UUID.h>
+#include <decaf/util/concurrent/TimeUnit.h>
 
-#include <cms/ConnectionFactory.h>
 #include <cms/Connection.h>
-#include <cms/Session.h>
-#include <cms/MessageConsumer.h>
-#include <cms/MessageProducer.h>
-#include <cms/MessageListener.h>
 #include <cms/ConnectionFactory.h>
-#include <cms/Connection.h>
-#include <cms/Message.h>
 #include <cms/Destination.h>
+#include <cms/Message.h>
+#include <cms/MessageConsumer.h>
+#include <cms/MessageListener.h>
+#include <cms/MessageProducer.h>
+#include <cms/Session.h>
 #include <cms/TextMessage.h>
 
 #include <memory>
@@ -66,16 +64,18 @@ using namespace activemq::exceptions;
 using namespace activemq::test;
 
 ////////////////////////////////////////////////////////////////////////////////
-AdvisoryTest::AdvisoryTest() {
+AdvisoryTest::AdvisoryTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-AdvisoryTest::~AdvisoryTest() {
+AdvisoryTest::~AdvisoryTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AdvisoryTest::testTempDestinationCompositeAdvisoryTopic() {
-
+void AdvisoryTest::testTempDestinationCompositeAdvisoryTopic()
+{
     std::unique_ptr<ConnectionFactory> factory(
         ConnectionFactory::createCMSConnectionFactory(getBrokerURL()));
     ASSERT_TRUE(factory.get() != NULL);
@@ -89,7 +89,8 @@ void AdvisoryTest::testTempDestinationCompositeAdvisoryTopic() {
     std::unique_ptr<ActiveMQDestination> composite(
         AdvisorySupport::getTempDestinationCompositeAdvisoryTopic());
 
-    std::unique_ptr<MessageConsumer> consumer(session->createConsumer(dynamic_cast<Topic*>(composite.get())));
+    std::unique_ptr<MessageConsumer> consumer(
+        session->createConsumer(dynamic_cast<Topic*>(composite.get())));
 
     connection->start();
 
@@ -98,8 +99,10 @@ void AdvisoryTest::testTempDestinationCompositeAdvisoryTopic() {
     std::unique_ptr<Queue> tempQueue(session->createTemporaryQueue());
 
     // Create a consumer to ensure destination creation based on protocol.
-    std::unique_ptr<MessageConsumer> tempTopicConsumer(session->createConsumer(tempTopic.get()));
-    std::unique_ptr<MessageConsumer> tempQueueConsumer(session->createConsumer(tempQueue.get()));
+    std::unique_ptr<MessageConsumer> tempTopicConsumer(
+        session->createConsumer(tempTopic.get()));
+    std::unique_ptr<MessageConsumer> tempQueueConsumer(
+        session->createConsumer(tempQueue.get()));
 
     // Should be an advisory for each
     std::unique_ptr<cms::Message> advisory1(consumer->receive(2000));
@@ -107,16 +110,22 @@ void AdvisoryTest::testTempDestinationCompositeAdvisoryTopic() {
     std::unique_ptr<cms::Message> advisory2(consumer->receive(2000));
     ASSERT_TRUE(advisory2.get() != NULL);
 
-    ActiveMQMessage* tempTopicAdvisory = dynamic_cast<ActiveMQMessage*>(advisory1.get());
-    ActiveMQMessage* tempQueueAdvisory = dynamic_cast<ActiveMQMessage*>(advisory2.get());
+    ActiveMQMessage* tempTopicAdvisory =
+        dynamic_cast<ActiveMQMessage*>(advisory1.get());
+    ActiveMQMessage* tempQueueAdvisory =
+        dynamic_cast<ActiveMQMessage*>(advisory2.get());
 
     // Create one of each
-    std::unique_ptr<Topic> topic(session->createTopic(UUID::randomUUID().toString()));
-    std::unique_ptr<Queue> queue(session->createQueue(UUID::randomUUID().toString()));
+    std::unique_ptr<Topic> topic(
+        session->createTopic(UUID::randomUUID().toString()));
+    std::unique_ptr<Queue> queue(
+        session->createQueue(UUID::randomUUID().toString()));
 
     // Create a producer to ensure destination creation based on protocol.
-    std::unique_ptr<MessageProducer> topicProducer(session->createProducer(topic.get()));
-    std::unique_ptr<MessageProducer> queueProducer(session->createProducer(queue.get()));
+    std::unique_ptr<MessageProducer> topicProducer(
+        session->createProducer(topic.get()));
+    std::unique_ptr<MessageProducer> queueProducer(
+        session->createProducer(queue.get()));
 
     // Should not be an advisory for each
     std::unique_ptr<cms::Message> advisory3(consumer->receive(500));

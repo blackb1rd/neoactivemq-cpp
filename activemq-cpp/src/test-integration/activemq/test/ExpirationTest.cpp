@@ -17,9 +17,9 @@
 
 #include "ExpirationTest.h"
 
+#include <decaf/lang/Long.h>
 #include <decaf/lang/Runnable.h>
 #include <decaf/lang/Thread.h>
-#include <decaf/lang/Long.h>
 #include <decaf/util/UUID.h>
 
 #include <sstream>
@@ -34,47 +34,60 @@ using namespace decaf::lang;
 using namespace decaf::util;
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace activemq {
-namespace test {
+namespace activemq
+{
+namespace test
+{
 
-    class Producer: public decaf::lang::Runnable {
+    class Producer : public decaf::lang::Runnable
+    {
     private:
-
         std::unique_ptr<CMSProvider> cmsProvider;
-        int numMessages;
-        long long timeToLive;
-        bool disableTimeStamps;
+        int                          numMessages;
+        long long                    timeToLive;
+        bool                         disableTimeStamps;
 
     public:
-
-        Producer(const std::string& brokerURL, const std::string& destination, int numMessages, long long timeToLive) :
-                Runnable(), cmsProvider(), numMessages(numMessages), timeToLive(timeToLive), disableTimeStamps(false) {
-
+        Producer(const std::string& brokerURL,
+                 const std::string& destination,
+                 int                numMessages,
+                 long long          timeToLive)
+            : Runnable(),
+              cmsProvider(),
+              numMessages(numMessages),
+              timeToLive(timeToLive),
+              disableTimeStamps(false)
+        {
             this->cmsProvider.reset(new CMSProvider(brokerURL));
             this->cmsProvider->setDestinationName(destination);
             this->cmsProvider->setTopic(false);
         }
 
-        virtual ~Producer() {
+        virtual ~Producer()
+        {
         }
 
-        virtual bool getDisableTimeStamps() const {
+        virtual bool getDisableTimeStamps() const
+        {
             return this->disableTimeStamps;
         }
 
-        virtual void setDisableTimeStamps(bool value) {
+        virtual void setDisableTimeStamps(bool value)
+        {
             this->disableTimeStamps = value;
         }
 
-        virtual void run() {
-            try {
-
-                cms::Session* session = cmsProvider->getSession();
+        virtual void run()
+        {
+            try
+            {
+                cms::Session*         session  = cmsProvider->getSession();
                 cms::MessageProducer* producer = cmsProvider->getProducer();
                 producer->setDeliveryMode(DeliveryMode::NON_PERSISTENT);
                 producer->setDisableMessageTimeStamp(disableTimeStamps);
 
-                if (!this->disableTimeStamps) {
+                if (!this->disableTimeStamps)
+                {
                     producer->setTimeToLive(timeToLive);
                 }
 
@@ -84,60 +97,73 @@ namespace test {
                 string threadIdStr = oss.str();
 
                 // Create a messages
-                string text = (string) "Hello world! from thread " + threadIdStr;
+                string text = (string) "Hello world! from thread " +
+                              threadIdStr;
 
-                for (int ix = 0; ix < numMessages; ++ix) {
+                for (int ix = 0; ix < numMessages; ++ix)
+                {
                     TextMessage* message = session->createTextMessage(text);
                     producer->send(message);
                     delete message;
                 }
-
-            } catch (CMSException& e) {
+            }
+            catch (CMSException& e)
+            {
                 e.printStackTrace();
             }
         }
     };
 
-    class Consumer: public cms::MessageListener, public decaf::lang::Runnable {
+    class Consumer : public cms::MessageListener, public decaf::lang::Runnable
+    {
     private:
-
         std::unique_ptr<CMSProvider> cmsProvider;
-        long initialDelay;
-        long waitMillis;
-        int numReceived;
+        long                         initialDelay;
+        long                         waitMillis;
+        int                          numReceived;
 
     public:
-
-        Consumer(const std::string& brokerURL, const std::string& destination, long waitMillis) :
-                Runnable(), cmsProvider(), initialDelay(0), waitMillis(waitMillis), numReceived(0) {
-
+        Consumer(const std::string& brokerURL,
+                 const std::string& destination,
+                 long               waitMillis)
+            : Runnable(),
+              cmsProvider(),
+              initialDelay(0),
+              waitMillis(waitMillis),
+              numReceived(0)
+        {
             this->cmsProvider.reset(new CMSProvider(brokerURL));
             this->cmsProvider->setTopic(false);
             this->cmsProvider->setDestinationName(destination);
         }
 
-        virtual ~Consumer() {
+        virtual ~Consumer()
+        {
         }
 
-        int getNumReceived() const {
+        int getNumReceived() const
+        {
             return numReceived;
         }
 
-        void setInitialDelay(long delay) {
+        void setInitialDelay(long delay)
+        {
             initialDelay = delay;
         }
 
-        long getInitialDelay() {
+        long getInitialDelay()
+        {
             return initialDelay;
         }
 
-        virtual void run() {
-
-            try {
-
+        virtual void run()
+        {
+            try
+            {
                 cms::MessageConsumer* consumer = cmsProvider->getConsumer();
 
-                if (getInitialDelay() > 0) {
+                if (getInitialDelay() > 0)
+                {
                     Thread::sleep(getInitialDelay());
                 }
 
@@ -145,32 +171,38 @@ namespace test {
 
                 // Sleep while asynchronous messages come in.
                 Thread::sleep(waitMillis);
-
-            } catch (CMSException& e) {
+            }
+            catch (CMSException& e)
+            {
                 e.printStackTrace();
             }
         }
 
-        virtual void onMessage(const cms::Message* message) {
-
-            try {
-                const TextMessage* textMessage = dynamic_cast<const TextMessage*>(message);
+        virtual void onMessage(const cms::Message* message)
+        {
+            try
+            {
+                const TextMessage* textMessage =
+                    dynamic_cast<const TextMessage*>(message);
                 textMessage->getText();
                 numReceived++;
-            } catch (CMSException& e) {
+            }
+            catch (CMSException& e)
+            {
                 e.printStackTrace();
             }
         }
     };
 
-}}
+}  // namespace test
+}  // namespace activemq
 
 ////////////////////////////////////////////////////////////////////////////////
-void ExpirationTest::testExpired() {
-
-    string destination = UUID::randomUUID().toString();
+void ExpirationTest::testExpired()
+{
+    string   destination = UUID::randomUUID().toString();
     Producer producer(this->getBrokerURL(), destination, 2, 1000);
-    Thread producerThread(&producer);
+    Thread   producerThread(&producer);
     producerThread.start();
     producerThread.join();
 
@@ -184,17 +216,20 @@ void ExpirationTest::testExpired() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ExpirationTest::testExpiredWithChecksDisabled() {
-
+void ExpirationTest::testExpiredWithChecksDisabled()
+{
     {
         // Try it once enabled to prove the expiration processing works.
-        string destination = UUID::randomUUID().toString();
+        string   destination = UUID::randomUUID().toString();
         Producer producer(this->getBrokerURL(), destination, 2, 1000);
-        Thread producerThread(&producer);
+        Thread   producerThread(&producer);
         producerThread.start();
         producerThread.join();
 
-        Consumer consumer(this->getBrokerURL() + "?connection.consumerExpiryCheckEnabled=true", destination, 2000);
+        Consumer consumer(this->getBrokerURL() +
+                              "?connection.consumerExpiryCheckEnabled=true",
+                          destination,
+                          2000);
         consumer.setInitialDelay(1500);
         Thread consumerThread(&consumer);
         consumerThread.start();
@@ -204,13 +239,16 @@ void ExpirationTest::testExpiredWithChecksDisabled() {
     }
     {
         // Now lets try it disabled.
-        string destination = UUID::randomUUID().toString();
+        string   destination = UUID::randomUUID().toString();
         Producer producer(this->getBrokerURL(), destination, 2, 1000);
-        Thread producerThread(&producer);
+        Thread   producerThread(&producer);
         producerThread.start();
         producerThread.join();
 
-        Consumer consumer(this->getBrokerURL() + "?connection.consumerExpiryCheckEnabled=false", destination, 2000);
+        Consumer consumer(this->getBrokerURL() +
+                              "?connection.consumerExpiryCheckEnabled=false",
+                          destination,
+                          2000);
         consumer.setInitialDelay(1500);
         Thread consumerThread(&consumer);
         consumerThread.start();
@@ -221,9 +259,9 @@ void ExpirationTest::testExpiredWithChecksDisabled() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ExpirationTest::testNotExpired() {
-
-    string destination = UUID::randomUUID().toString();
+void ExpirationTest::testNotExpired()
+{
+    string   destination = UUID::randomUUID().toString();
     Producer producer(this->getBrokerURL(), destination, 2, 2000);
     producer.setDisableTimeStamps(true);
     Thread producerThread(&producer);
@@ -231,10 +269,9 @@ void ExpirationTest::testNotExpired() {
     producerThread.join();
 
     Consumer consumer(this->getBrokerURL(), destination, 3000);
-    Thread consumerThread(&consumer);
+    Thread   consumerThread(&consumer);
     consumerThread.start();
     consumerThread.join();
 
     ASSERT_EQ(2, consumer.getNumReceived());
 }
-

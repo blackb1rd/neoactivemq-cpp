@@ -18,35 +18,35 @@
 #ifndef _ACTIVEMQ_COMMANDS_ACTIVEMQTEMPTOPIC_H_
 #define _ACTIVEMQ_COMMANDS_ACTIVEMQTEMPTOPIC_H_
 
-#include <activemq/util/Config.h>
 #include <activemq/commands/ActiveMQTempDestination.h>
+#include <activemq/util/Config.h>
 #include <cms/TemporaryTopic.h>
-#include <vector>
-#include <string>
 #include <memory>
+#include <string>
+#include <vector>
 
-namespace activemq {
-namespace commands {
+namespace activemq
+{
+namespace commands
+{
 
-    class AMQCPP_API ActiveMQTempTopic: public ActiveMQTempDestination, public cms::TemporaryTopic {
+    class AMQCPP_API ActiveMQTempTopic : public ActiveMQTempDestination,
+                                         public cms::TemporaryTopic
+    {
     public:
-
         const static unsigned char ID_ACTIVEMQTEMPTOPIC = 103;
 
     public:
-
         using ActiveMQTempDestination::equals;
 
     private:
-
         ActiveMQTempTopic(const ActiveMQTempTopic&);
         ActiveMQTempTopic& operator=(const ActiveMQTempTopic&);
 
     public:
-
         ActiveMQTempTopic();
         ActiveMQTempTopic(const std::string& name);
-        virtual ~ActiveMQTempTopic() throw ();
+        virtual ~ActiveMQTempTopic() throw();
 
         virtual unsigned char getDataStructureType() const;
 
@@ -58,40 +58,45 @@ namespace commands {
 
         virtual bool equals(const DataStructure* value) const;
 
-        virtual const cms::TemporaryTopic* getCMSDestination() const {
+        virtual const cms::TemporaryTopic* getCMSDestination() const
+        {
             return this;
         }
 
-    public: // CMS Destination
-
-        virtual cms::Destination::DestinationType getDestinationType() const {
+    public:  // CMS Destination
+        virtual cms::Destination::DestinationType getDestinationType() const
+        {
             return cms::Destination::TEMPORARY_TOPIC;
         }
 
-        virtual cms::Destination* clone() const {
+        virtual cms::Destination* clone() const
+        {
             return dynamic_cast<cms::Destination*>(this->cloneDataStructure());
         }
 
-        virtual void copy(const cms::Destination& source) {
-            this->copyDataStructure(dynamic_cast<const DataStructure*>(&source));
+        virtual void copy(const cms::Destination& source)
+        {
+            this->copyDataStructure(
+                dynamic_cast<const DataStructure*>(&source));
         }
 
-        virtual const cms::CMSProperties& getCMSProperties() const {
+        virtual const cms::CMSProperties& getCMSProperties() const
+        {
             return this->getOptions();
         }
 
         virtual bool equals(const cms::Destination& other) const;
 
-    public: // CMS Temporary Topic
-
-        virtual std::string getTopicName() const {
+    public:  // CMS Temporary Topic
+        virtual std::string getTopicName() const
+        {
             return this->getPhysicalName();
         }
 
         virtual void destroy();
-
     };
 
-}}
+}  // namespace commands
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_COMMANDS_ACTIVEMQTEMPTOPIC_H_*/

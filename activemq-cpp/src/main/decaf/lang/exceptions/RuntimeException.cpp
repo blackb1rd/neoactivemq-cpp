@@ -22,30 +22,43 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-RuntimeException::RuntimeException() : Exception() {
+RuntimeException::RuntimeException()
+    : Exception()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-RuntimeException::~RuntimeException() throw () {
+RuntimeException::~RuntimeException() throw()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-RuntimeException::RuntimeException(const Exception& ex) : Exception() {
-    *(Exception*) this = ex;
+RuntimeException::RuntimeException(const Exception& ex)
+    : Exception()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-RuntimeException::RuntimeException(const RuntimeException& ex) : Exception() {
-    *(Exception*) this = ex;
+RuntimeException::RuntimeException(const RuntimeException& ex)
+    : Exception()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-RuntimeException::RuntimeException(const std::exception* cause) : Exception(cause) {
+RuntimeException::RuntimeException(const std::exception* cause)
+    : Exception(cause)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-RuntimeException::RuntimeException(const char* file, const int lineNumber, const char* msg, ...) : Exception() {
-
+RuntimeException::RuntimeException(const char* file,
+                                   const int   lineNumber,
+                                   const char* msg,
+                                   ...)
+    : Exception()
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -55,8 +68,13 @@ RuntimeException::RuntimeException(const char* file, const int lineNumber, const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-RuntimeException::RuntimeException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...) : Exception(cause) {
-
+RuntimeException::RuntimeException(const char*           file,
+                                   const int             lineNumber,
+                                   const std::exception* cause,
+                                   const char*           msg,
+                                   ...)
+    : Exception(cause)
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);

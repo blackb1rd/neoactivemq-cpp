@@ -24,8 +24,8 @@
 #include <strings.h>
 #endif
 
-#include <cstring>
 #include <decaf/io/ByteArrayInputStream.h>
+#include <cstring>
 
 using namespace std;
 using namespace decaf;
@@ -33,11 +33,13 @@ using namespace decaf::lang;
 using namespace decaf::io;
 using namespace decaf::util;
 
-   class ByteArrayInputStreamTest : public ::testing::Test {};
+class ByteArrayInputStreamTest : public ::testing::Test
+{
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ByteArrayInputStreamTest, testConstructor) {
-
+TEST_F(ByteArrayInputStreamTest, testConstructor)
+{
     std::vector<unsigned char> testBuffer;
 
     testBuffer.push_back('t');
@@ -45,147 +47,175 @@ TEST_F(ByteArrayInputStreamTest, testConstructor) {
     testBuffer.push_back('s');
     testBuffer.push_back('t');
 
-    ByteArrayInputStream stream_a( &testBuffer[0], (int)testBuffer.size() );
-    ByteArrayInputStream stream_b( testBuffer );
+    ByteArrayInputStream stream_a(&testBuffer[0], (int)testBuffer.size());
+    ByteArrayInputStream stream_b(testBuffer);
 
-    ASSERT_TRUE(stream_a.available() == (int)testBuffer.size()) << ("Unable to create ByteArrayInputStream");
-    ASSERT_TRUE(stream_b.available() == (int)testBuffer.size()) << ("Unable to create ByteArrayInputStream");
+    ASSERT_TRUE(stream_a.available() == (int)testBuffer.size())
+        << ("Unable to create ByteArrayInputStream");
+    ASSERT_TRUE(stream_b.available() == (int)testBuffer.size())
+        << ("Unable to create ByteArrayInputStream");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ByteArrayInputStreamTest, testConstructor2) {
-
+TEST_F(ByteArrayInputStreamTest, testConstructor2)
+{
     // Test for method ByteArrayInputStream(byte [], int, int)
     std::vector<unsigned char> testBuffer;
-    for( int i = 0; i < 128; i++ ) {
-        testBuffer.push_back( (char)i );
+    for (int i = 0; i < 128; i++)
+    {
+        testBuffer.push_back((char)i);
     }
 
-    ByteArrayInputStream bis( &testBuffer[0], 100 );
+    ByteArrayInputStream bis(&testBuffer[0], 100);
 
-    ASSERT_TRUE(100 == bis.available()) << ("Unable to create ByteArrayInputStream");
+    ASSERT_TRUE(100 == bis.available())
+        << ("Unable to create ByteArrayInputStream");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ByteArrayInputStreamTest, testAvailable) {
-
+TEST_F(ByteArrayInputStreamTest, testAvailable)
+{
     // Test for method ByteArrayInputStream(byte [], int, int)
     std::vector<unsigned char> testBuffer;
-    for( int i = 0; i < 128; i++ ) {
-        testBuffer.push_back( (char)i );
+    for (int i = 0; i < 128; i++)
+    {
+        testBuffer.push_back((char)i);
     }
 
-    ByteArrayInputStream bis( &testBuffer[0], 128 );
+    ByteArrayInputStream bis(&testBuffer[0], 128);
 
-    ASSERT_TRUE(128 == bis.available()) << ("Unable to create ByteArrayInputStream");
-    for( int j = 0; j < 10; j++ ) {
+    ASSERT_TRUE(128 == bis.available())
+        << ("Unable to create ByteArrayInputStream");
+    for (int j = 0; j < 10; j++)
+    {
         bis.read();
     }
 
     // Test for method int ByteArrayInputStream.available()
-    ASSERT_TRUE(bis.available() == ( (int)testBuffer.size() - 10 )) << ("Returned incorrect number of available bytes");
+    ASSERT_TRUE(bis.available() == ((int)testBuffer.size() - 10))
+        << ("Returned incorrect number of available bytes");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ByteArrayInputStreamTest, testClose) {
-
+TEST_F(ByteArrayInputStreamTest, testClose)
+{
     std::vector<unsigned char> testBuffer;
-    for( int i = 0; i < 128; i++ ) {
-        testBuffer.push_back( (char)i );
+    for (int i = 0; i < 128; i++)
+    {
+        testBuffer.push_back((char)i);
     }
 
-    ByteArrayInputStream is( testBuffer );
+    ByteArrayInputStream is(testBuffer);
 
     // Test for method void ByteArrayInputStream.close()
-    try {
+    try
+    {
         is.read();
-    } catch( IOException& e ) {
+    }
+    catch (IOException& e)
+    {
         FAIL() << ("Failed reading from input stream");
     }
 
-    try {
+    try
+    {
         is.close();
-    } catch( IOException& e ) {
+    }
+    catch (IOException& e)
+    {
         FAIL() << ("Failed closing input stream");
     }
 
-    try {
+    try
+    {
         is.read();
-    } catch( Exception& e ) {
+    }
+    catch (Exception& e)
+    {
         FAIL() << ("Should be able to read from closed stream");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ByteArrayInputStreamTest, testRead) {
-
-    try{
-
+TEST_F(ByteArrayInputStreamTest, testRead)
+{
+    try
+    {
         std::vector<unsigned char> testBuffer;
-        for( int i = 0; i < 128; i++ ) {
-            testBuffer.push_back( (char)i );
+        for (int i = 0; i < 128; i++)
+        {
+            testBuffer.push_back((char)i);
         }
 
-        ByteArrayInputStream is( testBuffer );
+        ByteArrayInputStream is(testBuffer);
 
         // Test for method int ByteArrayInputStream.read()
         int c = is.read();
         is.reset();
         ASSERT_TRUE(c == testBuffer.at(0)) << ("read returned incorrect char");
-    } catch(...) {
+    }
+    catch (...)
+    {
         FAIL() << ("Shouldn't get any exceptions in this test.");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ByteArrayInputStreamTest, testRead2) {
-
+TEST_F(ByteArrayInputStreamTest, testRead2)
+{
     std::vector<unsigned char> testBuffer;
-    for( int i = 0; i < 128; i++ ) {
-        testBuffer.push_back( (char)i );
+    for (int i = 0; i < 128; i++)
+    {
+        testBuffer.push_back((char)i);
     }
 
-    ByteArrayInputStream is( testBuffer );
+    ByteArrayInputStream is(testBuffer);
 
     unsigned char buf1[20];
     is.skip(50);
-    is.read( buf1, 20, 0, 20 );
-    ASSERT_TRUE(string( (const char*)buf1, 20 ) == string( (const char*)&testBuffer[50], 20)) << ("Failed to read correct data");
+    is.read(buf1, 20, 0, 20);
+    ASSERT_TRUE(string((const char*)buf1, 20) ==
+                string((const char*)&testBuffer[50], 20))
+        << ("Failed to read correct data");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ByteArrayInputStreamTest, testRead3) {
-
+TEST_F(ByteArrayInputStreamTest, testRead3)
+{
     std::vector<unsigned char> testBuffer;
-    testBuffer.insert( testBuffer.end(), 10, 'a' );
-    ByteArrayInputStream is( testBuffer );
+    testBuffer.insert(testBuffer.end(), 10, 'a');
+    ByteArrayInputStream is(testBuffer);
 
     unsigned char buf[10];
-    memset( buf, 'b', 10 );
-    is.read( buf, 10, 5, 5 );
+    memset(buf, 'b', 10);
+    is.read(buf, 10, 5, 5);
 
-    ASSERT_TRUE(string( (const char*)buf, 10 ) == "bbbbbaaaaa") << ("Failed to read correct data");
+    ASSERT_TRUE(string((const char*)buf, 10) == "bbbbbaaaaa")
+        << ("Failed to read correct data");
 
     // Try for an EOF
-    is.skip( 5 );
-    ASSERT_TRUE(is.read( buf, 10, 5, 5 ) == -1);
+    is.skip(5);
+    ASSERT_TRUE(is.read(buf, 10, 5, 5) == -1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ByteArrayInputStreamTest, testSkip) {
-
+TEST_F(ByteArrayInputStreamTest, testSkip)
+{
     std::vector<unsigned char> testBuffer;
-    for( int i = 0; i < 128; i++ ) {
-        testBuffer.push_back( (char)i );
+    for (int i = 0; i < 128; i++)
+    {
+        testBuffer.push_back((char)i);
     }
 
-    ByteArrayInputStream is( testBuffer );
+    ByteArrayInputStream is(testBuffer);
 
     unsigned char buf1[10];
     is.skip(100);
-    is.read( buf1, 10, 0, 10 );
+    is.read(buf1, 10, 0, 10);
 
-    ASSERT_TRUE(string( (const char*)buf1, 10 ) == string( (const char*)&testBuffer[100], 10)) << ("Failed to skip to correct position");
+    ASSERT_TRUE(string((const char*)buf1, 10) ==
+                string((const char*)&testBuffer[100], 10))
+        << ("Failed to skip to correct position");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -234,5 +264,5 @@ TEST_F(ByteArrayInputStreamTest, testStream)
 
     stream_a.close();
 
-    delete [] buffer;
+    delete[] buffer;
 }

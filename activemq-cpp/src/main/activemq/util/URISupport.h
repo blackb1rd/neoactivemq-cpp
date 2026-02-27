@@ -18,18 +18,20 @@
 #ifndef _ACTIVEMQ_UTIL_URISUPPORT_H_
 #define _ACTIVEMQ_UTIL_URISUPPORT_H_
 
-#include <activemq/util/Config.h>
 #include <activemq/util/CompositeData.h>
-#include <decaf/util/Properties.h>
-#include <decaf/util/LinkedList.h>
+#include <activemq/util/Config.h>
 #include <decaf/lang/exceptions/IllegalArgumentException.h>
+#include <decaf/util/LinkedList.h>
+#include <decaf/util/Properties.h>
 
-namespace activemq {
-namespace util {
+namespace activemq
+{
+namespace util
+{
 
-    class AMQCPP_API URISupport {
+    class AMQCPP_API URISupport
+    {
     public:
-
         /**
          * Examine a URI and determine if it is a Composite type or not.
          *
@@ -47,12 +49,13 @@ namespace util {
          * @param properties a Properties object to set the parsed values in
          * @throws IllegalArgumentException if the passed URI is invalid
          */
-        static void parseURL(const std::string& URI, decaf::util::Properties& properties);
+        static void parseURL(const std::string&       URI,
+                             decaf::util::Properties& properties);
 
         /**
-         * Parses a Composite URI into a Composite Data instance, the Composite URI
-         * takes the for scheme://(uri1,uri2,...uriN)?param1=value1, each of the composite
-         * URIs is stored in the CompositeData's internal list.
+         * Parses a Composite URI into a Composite Data instance, the Composite
+         * URI takes the for scheme://(uri1,uri2,...uriN)?param1=value1, each of
+         * the composite URIs is stored in the CompositeData's internal list.
          *
          * @param uri - The Composite URI to parse.
          * @return a new CompositeData object with the parsed data
@@ -71,7 +74,8 @@ namespace util {
          *
          * @return Properties object with the parsed output.
          *
-         * @throw IllegalArgumentException if the Query string is not well formed.
+         * @throw IllegalArgumentException if the Query string is not well
+         * formed.
          */
         static decaf::util::Properties parseQuery(std::string query);
 
@@ -82,13 +86,15 @@ namespace util {
          * @param query - the query string to parse.
          * @param properties - object pointer to get the parsed output.
          *
-         * @throw IllegalArgumentException if the Query string is not well formed.
+         * @throw IllegalArgumentException if the Query string is not well
+         * formed.
          */
-        static void parseQuery(std::string query, decaf::util::Properties* properties);
+        static void parseQuery(std::string              query,
+                               decaf::util::Properties* properties);
 
         /**
-         * Given a properties object create a string that can be appended to a URI
-         * as a valid Query string.
+         * Given a properties object create a string that can be appended to a
+         * URI as a valid Query string.
          *
          * @param options
          *        Properties object containing key / value query values.
@@ -101,76 +107,97 @@ namespace util {
         static std::string createQueryString(const Properties& options);
 
         /**
-         * Given a URI parse and extract any URI query options and return them as a Key / Value mapping.
+         * Given a URI parse and extract any URI query options and return them
+         * as a Key / Value mapping.
          *
-         * This method differs from the {@link parseQuery} method in that it handles composite URI
-         * types and will extract the URI options from the outermost composite URI.
+         * This method differs from the {@link parseQuery} method in that it
+         * handles composite URI types and will extract the URI options from the
+         * outermost composite URI.
          *
          * @param uri
          *      The URI whose query should be extracted and processed.
          *
          * @return A Mapping of the URI options.
          *
-         * @throws URISyntaxException if the passed in URI contains invalid elements.
+         * @throws URISyntaxException if the passed in URI contains invalid
+         * elements.
          */
-        static decaf::util::Properties parseParameters(const decaf::net::URI& uri);
+        static decaf::util::Properties parseParameters(
+            const decaf::net::URI& uri);
 
         /**
-         * Given a Key / Value mapping create and append a URI query value that represents the
-         * mapped entries, return the newly updated URI that contains the value of the given URI
-         * and the appended query value.
+         * Given a Key / Value mapping create and append a URI query value that
+         * represents the mapped entries, return the newly updated URI that
+         * contains the value of the given URI and the appended query value.
          *
          * @param uri
-         *      The source URI that will have the Map entries appended as a URI query value.
+         *      The source URI that will have the Map entries appended as a URI
+         * query value.
          * @param queryParameters
-         *      The Key / Value mapping that will be transformed into a URI query string.
+         *      The Key / Value mapping that will be transformed into a URI
+         * query string.
          *
-         * @return A new URI value that combines the given URI and the constructed query string.
+         * @return A new URI value that combines the given URI and the
+         * constructed query string.
          *
-         * @throws URISyntaxException if an invalid URI is created during this operation.
+         * @throws URISyntaxException if an invalid URI is created during this
+         * operation.
          */
-        static decaf::net::URI applyParameters(const decaf::net::URI& uri, const decaf::util::Properties& queryParameters);
+        static decaf::net::URI applyParameters(
+            const decaf::net::URI&         uri,
+            const decaf::util::Properties& queryParameters);
 
         /**
-         * Given a Key / Value mapping create and append a URI query value that represents the mapped
-         * entries, return the newly updated URI that contains the value of the given URI and the
-         * appended query value.  Each entry in the query string is prefixed by the supplied
+         * Given a Key / Value mapping create and append a URI query value that
+         * represents the mapped entries, return the newly updated URI that
+         * contains the value of the given URI and the appended query value.
+         * Each entry in the query string is prefixed by the supplied
          * optionPrefix string.
          *
          * @param uri
-         *      The source URI that will have the Map entries appended as a URI query value.
+         *      The source URI that will have the Map entries appended as a URI
+         * query value.
          * @param queryParameters
-         *      The Key / Value mapping that will be transformed into a URI query string.
+         *      The Key / Value mapping that will be transformed into a URI
+         * query string.
          * @param optionPrefix
-         *      A string value that when not null or empty is used to prefix each query option key.
+         *      A string value that when not null or empty is used to prefix
+         * each query option key.
          *
-         * @return A new URI value that combines the given URI and the constructed query string.
+         * @return A new URI value that combines the given URI and the
+         * constructed query string.
          *
-         * @throws URISyntaxException if an invalid URI is created during this operation.
+         * @throws URISyntaxException if an invalid URI is created during this
+         * operation.
          */
-        static decaf::net::URI applyParameters(const decaf::net::URI& uri,
-                                               const decaf::util::Properties& queryParameters,
-                                               const std::string& optionPrefix);
+        static decaf::net::URI applyParameters(
+            const decaf::net::URI&         uri,
+            const decaf::util::Properties& queryParameters,
+            const std::string&             optionPrefix);
 
         /**
-         * Creates a URI with the given query, removing an previous query value from the given URI.
+         * Creates a URI with the given query, removing an previous query value
+         * from the given URI.
          *
          * @param uri
-         *      The source URI whose existing query is replaced with the newly supplied one.
+         *      The source URI whose existing query is replaced with the newly
+         * supplied one.
          * @param query
-         *      The new URI query string that should be appended to the given URI.
+         *      The new URI query string that should be appended to the given
+         * URI.
          *
-         * @return a new URI that is a combination of the original URI and the given query string.
+         * @return a new URI that is a combination of the original URI and the
+         * given query string.
          *
          * @throws URISyntaxException
          */
-        static decaf::net::URI createURIWithQuery(const decaf::net::URI& uri, const std::string& query);
+        static decaf::net::URI createURIWithQuery(const decaf::net::URI& uri,
+                                                  const std::string&     query);
 
     public:  // Utility methods used by this class.
-
         /**
-         * Perform a parse on the given composite URI, placing the results in the passed
-         * CompositeData
+         * Perform a parse on the given composite URI, placing the results in
+         * the passed CompositeData
          *
          * @param uri - The URI to parse
          * @param rc - The CompositeData object to Populate
@@ -178,15 +205,19 @@ namespace util {
          *
          * @throw URISyntaxException if the URI is not well formed.
          */
-        static void parseComposite(const URI& uri, CompositeData& rc, const std::string& ssp);
+        static void parseComposite(const URI&         uri,
+                                   CompositeData&     rc,
+                                   const std::string& ssp);
 
         /**
-         * Splits all the Component URIs in a Composite URI into individual strings which
-         * can then be parsed separately and stored in a Composite Data object.
+         * Splits all the Component URIs in a Composite URI into individual
+         * strings which can then be parsed separately and stored in a Composite
+         * Data object.
          *
          * @param str - the set of Composite URIs
          */
-        static decaf::util::LinkedList<std::string> splitComponents(const std::string& str);
+        static decaf::util::LinkedList<std::string> splitComponents(
+            const std::string& str);
 
         /**
          * Strip a URI of its scheme element.
@@ -200,16 +231,17 @@ namespace util {
         static decaf::net::URI stripScheme(const decaf::net::URI& uri);
 
         /**
-         * Given a string value and a prefix value, return a new string that has the prefix
-         * removed if it was part of the passed in string, otherwise just return the passed
-         * in string
+         * Given a string value and a prefix value, return a new string that has
+         * the prefix removed if it was part of the passed in string, otherwise
+         * just return the passed in string
          *
          * @param value - String to strip
          * @param prefix - value to strip from the passed in string
          *
          * @return the new string with prefix removed.
          */
-        static std::string stripPrefix(const std::string& value, const std::string& prefix);
+        static std::string stripPrefix(const std::string& value,
+                                       const std::string& prefix);
 
         /**
          * Matches all opening and closing parenthesis in a String
@@ -224,15 +256,17 @@ namespace util {
          * Accepts a string value and checks to see if that value is of the
          * form ${XXX} which is our accepted form for environment variables.
          * If so the we attempt to replace the value with what is stored in that
-         * env var, if the var is not set then we throw an IllegalArgumentException.
+         * env var, if the var is not set then we throw an
+         * IllegalArgumentException.
          * @param value - the value to check for env
          * @return the env var if value points to an env var else returns value
-         * @throws IllegalArgumentException if the var is not set or has bad syntax
+         * @throws IllegalArgumentException if the var is not set or has bad
+         * syntax
          */
         static std::string replaceEnvValues(const std::string& value);
-
     };
 
-}}
+}  // namespace util
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_UTIL_URISUPPORT_H_*/

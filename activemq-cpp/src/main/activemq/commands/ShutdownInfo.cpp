@@ -38,17 +38,19 @@ using namespace decaf::lang::exceptions;
  */
 
 ////////////////////////////////////////////////////////////////////////////////
-ShutdownInfo::ShutdownInfo() :
-    BaseCommand() {
-
+ShutdownInfo::ShutdownInfo()
+    : BaseCommand()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ShutdownInfo::~ShutdownInfo() {
+ShutdownInfo::~ShutdownInfo()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ShutdownInfo* ShutdownInfo::cloneDataStructure() const {
+ShutdownInfo* ShutdownInfo::cloneDataStructure() const
+{
     std::unique_ptr<ShutdownInfo> shutdownInfo(new ShutdownInfo());
 
     // Copy the data from the base class or classes
@@ -58,34 +60,37 @@ ShutdownInfo* ShutdownInfo::cloneDataStructure() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ShutdownInfo::copyDataStructure(const DataStructure* src) {
-
+void ShutdownInfo::copyDataStructure(const DataStructure* src)
+{
     // Protect against invalid self assignment.
-    if (this == src) {
+    if (this == src)
+    {
         return;
     }
 
     const ShutdownInfo* srcPtr = dynamic_cast<const ShutdownInfo*>(src);
 
-    if (srcPtr == NULL || src == NULL) {
+    if (srcPtr == NULL || src == NULL)
+    {
         throw decaf::lang::exceptions::NullPointerException(
-            __FILE__, __LINE__,
+            __FILE__,
+            __LINE__,
             "ShutdownInfo::copyDataStructure - src is NULL or invalid");
     }
 
     // Copy the data of the base class or classes
     BaseCommand::copyDataStructure(src);
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-unsigned char ShutdownInfo::getDataStructureType() const {
+unsigned char ShutdownInfo::getDataStructureType() const
+{
     return ShutdownInfo::ID_SHUTDOWNINFO;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string ShutdownInfo::toString() const {
-
+std::string ShutdownInfo::toString() const
+{
     ostringstream stream;
 
     stream << "ShutdownInfo { "
@@ -97,25 +102,30 @@ std::string ShutdownInfo::toString() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool ShutdownInfo::equals(const DataStructure* value) const {
-
-    if (this == value) {
+bool ShutdownInfo::equals(const DataStructure* value) const
+{
+    if (this == value)
+    {
         return true;
     }
 
     const ShutdownInfo* valuePtr = dynamic_cast<const ShutdownInfo*>(value);
 
-    if (valuePtr == NULL || value == NULL) {
+    if (valuePtr == NULL || value == NULL)
+    {
         return false;
     }
 
-    if (!BaseCommand::equals(value)) {
+    if (!BaseCommand::equals(value))
+    {
         return false;
     }
     return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<commands::Command> ShutdownInfo::visit(activemq::state::CommandVisitor* visitor) {
+decaf::lang::Pointer<commands::Command> ShutdownInfo::visit(
+    activemq::state::CommandVisitor* visitor)
+{
     return visitor->processShutdownInfo(this);
 }

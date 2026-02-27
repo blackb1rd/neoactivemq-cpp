@@ -18,30 +18,33 @@
 #ifndef _DECAF_IO_INPUTSTREAMREADER_H_
 #define _DECAF_IO_INPUTSTREAMREADER_H_
 
-#include <decaf/util/Config.h>
 #include <decaf/io/Reader.h>
+#include <decaf/util/Config.h>
 
-namespace decaf {
-namespace io {
+namespace decaf
+{
+namespace io
+{
 
     class InputStream;
 
     /**
      * An InputStreamReader is a bridge from byte streams to character streams.
      *
-     * For top efficiency, consider wrapping an InputStreamReader within a BufferedReader.
-     * For example:
+     * For top efficiency, consider wrapping an InputStreamReader within a
+     * BufferedReader. For example:
      *
      *   BufferedReader* in
-     *       = new BufferedReader( new InputStreamReader( System.in, false ), true );
+     *       = new BufferedReader( new InputStreamReader( System.in, false ),
+     * true );
      *
      * @see OutputStreamWriter
      *
      * @since 1.0
      */
-    class DECAF_API InputStreamReader: public Reader {
+    class DECAF_API InputStreamReader : public Reader
+    {
     private:
-
         // The target InputStream
         InputStream* stream;
 
@@ -52,12 +55,10 @@ namespace io {
         bool closed;
 
     private:
-
         InputStreamReader(const InputStreamReader&);
         InputStreamReader& operator=(const InputStreamReader&);
 
     public:
-
         /**
          * Create a new InputStreamReader that wraps the given InputStream.
          *
@@ -77,13 +78,15 @@ namespace io {
         virtual bool ready() const;
 
     protected:
-
-        virtual int doReadArrayBounded(char* buffer, int size, int offset, int length);
+        virtual int doReadArrayBounded(char* buffer,
+                                       int   size,
+                                       int   offset,
+                                       int   length);
 
         virtual void checkClosed() const;
-
     };
 
-}}
+}  // namespace io
+}  // namespace decaf
 
 #endif /* _DECAF_IO_INPUTSTREAMREADER_H_ */

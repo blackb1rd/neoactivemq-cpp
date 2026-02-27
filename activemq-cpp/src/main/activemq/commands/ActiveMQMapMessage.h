@@ -18,42 +18,43 @@
 #ifndef _ACTIVEMQ_COMMANDS_ACTIVEMQMAPMESSAGE_H_
 #define _ACTIVEMQ_COMMANDS_ACTIVEMQMAPMESSAGE_H_
 
-#include <activemq/util/Config.h>
 #include <activemq/commands/ActiveMQMessageTemplate.h>
+#include <activemq/util/Config.h>
 #include <activemq/util/PrimitiveMap.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
 #include <cms/MapMessage.h>
-#include <vector>
-#include <string>
+#include <decaf/lang/exceptions/NullPointerException.h>
 #include <memory>
+#include <string>
+#include <vector>
 
-namespace activemq {
-namespace commands {
+namespace activemq
+{
+namespace commands
+{
 
-    class AMQCPP_API ActiveMQMapMessage : public ActiveMQMessageTemplate<cms::MapMessage> {
+    class AMQCPP_API ActiveMQMapMessage
+        : public ActiveMQMessageTemplate<cms::MapMessage>
+    {
     private:
-
         // Map Structure to hold unmarshaled Map Data
         mutable std::unique_ptr<util::PrimitiveMap> map;
 
     public:
-
         const static unsigned char ID_ACTIVEMQMAPMESSAGE;
 
     private:
-
         ActiveMQMapMessage(const ActiveMQMapMessage&);
         ActiveMQMapMessage& operator=(const ActiveMQMapMessage&);
 
     public:
-
         ActiveMQMapMessage();
 
-        virtual ~ActiveMQMapMessage() throw ();
+        virtual ~ActiveMQMapMessage() throw();
 
         virtual unsigned char getDataStructureType() const;
 
-        virtual bool isMarshalAware() const {
+        virtual bool isMarshalAware() const
+        {
             return true;
         }
 
@@ -63,23 +64,24 @@ namespace commands {
 
         virtual void beforeMarshal(wireformat::WireFormat* wireFormat);
 
-    virtual std::string toString() const;
+        virtual std::string toString() const;
 
-    virtual bool equals(const DataStructure* value) const;
+        virtual bool equals(const DataStructure* value) const;
 
-    virtual void clearBody();    public: // CMS Message
+        virtual void clearBody();
 
+    public:  // CMS Message
         virtual cms::MapMessage* clone() const;
 
-    public: // CMS MapMessage
-
+    public:  // CMS MapMessage
         virtual bool isEmpty() const;
 
         virtual std::vector<std::string> getMapNames() const;
 
         virtual bool itemExists(const std::string& name) const;
 
-        virtual cms::Message::ValueType getValueType(const std::string& key) const;
+        virtual cms::Message::ValueType getValueType(
+            const std::string& key) const;
 
         virtual bool getBoolean(const std::string& name) const;
 
@@ -89,9 +91,11 @@ namespace commands {
 
         virtual void setByte(const std::string& name, unsigned char value);
 
-        virtual std::vector<unsigned char> getBytes(const std::string& name) const;
+        virtual std::vector<unsigned char> getBytes(
+            const std::string& name) const;
 
-        virtual void setBytes(const std::string& name, const std::vector<unsigned char>& value);
+        virtual void setBytes(const std::string&                name,
+                              const std::vector<unsigned char>& value);
 
         virtual char getChar(const std::string& name) const;
 
@@ -119,10 +123,10 @@ namespace commands {
 
         virtual std::string getString(const std::string& name) const;
 
-        virtual void setString(const std::string& name, const std::string& value);
+        virtual void setString(const std::string& name,
+                               const std::string& value);
 
     protected:
-
         /**
          * Fetches a reference to this objects PrimitiveMap, if one needs
          * to be created or unmarshaled, this will perform the correct steps.
@@ -131,7 +135,7 @@ namespace commands {
          *
          * @throws NullPointerException if the internal Map is Null.
          */
-        util::PrimitiveMap& getMap();
+        util::PrimitiveMap&       getMap();
         const util::PrimitiveMap& getMap() const;
 
         /**
@@ -140,9 +144,9 @@ namespace commands {
          * @throws NullPointerException if the internal Map is Null.
          */
         virtual void checkMapIsUnmarshalled() const;
-
     };
 
-}}
+}  // namespace commands
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_COMMANDS_ACTIVEMQMAPMESSAGE_H_*/

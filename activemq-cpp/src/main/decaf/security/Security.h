@@ -20,21 +20,23 @@
 
 #include <decaf/util/Config.h>
 
-namespace decaf {
-namespace security {
+namespace decaf
+{
+namespace security
+{
 
     /**
      * @since 1.0
      */
-    class DECAF_API Security {
+    class DECAF_API Security
+    {
     public:
-
         Security();
 
         virtual ~Security();
-
     };
 
-}}
+}  // namespace security
+}  // namespace decaf
 
 #endif /* _DECAF_SECURITY_SECURITY_H_ */

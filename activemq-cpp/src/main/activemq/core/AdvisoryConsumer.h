@@ -18,39 +18,39 @@
 #ifndef _ACTIVEMQ_CORE_ADVISORYCONSUMER_H_
 #define _ACTIVEMQ_CORE_ADVISORYCONSUMER_H_
 
-#include <activemq/util/Config.h>
-#include <activemq/core/Dispatcher.h>
-#include <activemq/core/ActiveMQConnection.h>
 #include <activemq/commands/ConsumerId.h>
 #include <activemq/commands/DestinationInfo.h>
+#include <activemq/core/ActiveMQConnection.h>
+#include <activemq/core/Dispatcher.h>
+#include <activemq/util/Config.h>
 
 #include <decaf/lang/Pointer.h>
 
-namespace activemq {
-namespace core {
+namespace activemq
+{
+namespace core
+{
 
     class AdvisoryConsumerConfig;
 
     using decaf::lang::Pointer;
 
-    class AMQCPP_API AdvisoryConsumer : Dispatcher {
+    class AMQCPP_API AdvisoryConsumer : Dispatcher
+    {
     private:
-
         AdvisoryConsumerConfig* config;
-        ActiveMQConnection* connection;
+        ActiveMQConnection*     connection;
 
     private:
-
         AdvisoryConsumer(const AdvisoryConsumer&);
-        AdvisoryConsumer& operator= (const AdvisoryConsumer&);
+        AdvisoryConsumer& operator=(const AdvisoryConsumer&);
 
     public:
-
-        AdvisoryConsumer(ActiveMQConnection* connection, Pointer<commands::ConsumerId> consumerId);
+        AdvisoryConsumer(ActiveMQConnection*           connection,
+                         Pointer<commands::ConsumerId> consumerId);
         virtual ~AdvisoryConsumer();
 
     public:
-
         void dispose();
 
         virtual void dispatch(const Pointer<MessageDispatch>& message);
@@ -58,11 +58,11 @@ namespace core {
         virtual int getHashCode() const;
 
     private:
-
-        void processDestinationInfo(Pointer<commands::DestinationInfo> destination);
-
+        void processDestinationInfo(
+            Pointer<commands::DestinationInfo> destination);
     };
 
-}}
+}  // namespace core
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_CORE_ADVISORYCONSUMER_H_ */

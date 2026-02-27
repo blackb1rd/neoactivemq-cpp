@@ -21,6 +21,6 @@ using namespace activemq;
 using namespace activemq::transport;
 
 ////////////////////////////////////////////////////////////////////////////////
-CompositeTransport::~CompositeTransport() {
-
+CompositeTransport::~CompositeTransport()
+{
 }

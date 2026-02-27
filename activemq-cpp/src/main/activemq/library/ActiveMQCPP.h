@@ -20,18 +20,19 @@
 
 #include <activemq/util/Config.h>
 
-namespace activemq {
-namespace library {
+namespace activemq
+{
+namespace library
+{
 
-    class AMQCPP_API ActiveMQCPP {
+    class AMQCPP_API ActiveMQCPP
+    {
     protected:
-
-    ActiveMQCPP();
-    ActiveMQCPP(const ActiveMQCPP&);
-    ActiveMQCPP& operator=(const ActiveMQCPP&);
+        ActiveMQCPP();
+        ActiveMQCPP(const ActiveMQCPP&);
+        ActiveMQCPP& operator=(const ActiveMQCPP&);
 
     public:
-
         virtual ~ActiveMQCPP();
 
         /**
@@ -39,7 +40,8 @@ namespace library {
          * init all the internal Registry objects and initialize the Decaf
          * library.
          *
-         * @throws runtime_error if an error occurs while initializing this library.
+         * @throws runtime_error if an error occurs while initializing this
+         * library.
          */
         static void initializeLibrary();
 
@@ -53,7 +55,8 @@ namespace library {
          * @param argc - the count of arguments passed to this Process.
          * @param argv - the array of string arguments passed to this process.
          *
-         * @throws runtime_error if an error occurs while initializing this library.
+         * @throws runtime_error if an error occurs while initializing this
+         * library.
          */
         static void initializeLibrary(int argc, char** argv);
 
@@ -66,12 +69,11 @@ namespace library {
         static void shutdownLibrary();
 
     private:
-
         static void registerWireFormats();
         static void registerTransports();
-
     };
 
-}}
+}  // namespace library
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_LIBRARY_ACTIVEMQCPP_H_ */

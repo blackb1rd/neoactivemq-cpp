@@ -19,16 +19,18 @@
 
 #include <activemq/util/Config.h>
 
-#include <cms/ConnectionFactory.h>
 #include <cms/Connection.h>
+#include <cms/ConnectionFactory.h>
 
 #include <activemq/transport/Transport.h>
 
 #include <decaf/net/URI.h>
 #include <decaf/util/Properties.h>
 
-namespace activemq {
-namespace core {
+namespace activemq
+{
+namespace core
+{
 
     using decaf::lang::Pointer;
 
@@ -37,23 +39,20 @@ namespace core {
     class PrefetchPolicy;
     class RedeliveryPolicy;
 
-    class AMQCPP_API ActiveMQConnectionFactory : public cms::ConnectionFactory {
+    class AMQCPP_API ActiveMQConnectionFactory : public cms::ConnectionFactory
+    {
     public:
-
         // Default Broker URI if none specified 'failover:tcp://localhost:61616'
         static const std::string DEFAULT_URI;
 
     private:
-
         FactorySettings* settings;
 
     private:
-
         ActiveMQConnectionFactory(const ActiveMQConnectionFactory&);
         ActiveMQConnectionFactory& operator=(const ActiveMQConnectionFactory&);
 
     public:
-
         ActiveMQConnectionFactory();
 
         /**
@@ -81,8 +80,8 @@ namespace core {
          *      The password to authenticate with this connection.
          */
         ActiveMQConnectionFactory(const decaf::net::URI& uri,
-                                  const std::string& username = "",
-                                  const std::string& password = "");
+                                  const std::string&     username = "",
+                                  const std::string&     password = "");
 
         virtual ~ActiveMQConnectionFactory();
 
@@ -146,8 +145,7 @@ namespace core {
                                                   const std::string& password,
                                                   const std::string& clientId);
 
-    public:   // Configuration Options
-
+    public:  // Configuration Options
         /**
          * Sets the username that should be used when creating a new connection
          * @param username string
@@ -187,15 +185,18 @@ namespace core {
         void setClientId(const std::string& clientId);
 
         /**
-         * Sets the Broker URI that should be used when creating a new connection instance.
+         * Sets the Broker URI that should be used when creating a new
+         * connection instance.
          *
          * @param uri
-         *      The string form of the Broker URI, this will be converted to a URI object.
+         *      The string form of the Broker URI, this will be converted to a
+         * URI object.
          */
         void setBrokerURI(const std::string& uri);
 
         /**
-         * Sets the Broker URI that should be used when creating a new connection instance.
+         * Sets the Broker URI that should be used when creating a new
+         * connection instance.
          *
          * @param uri
          *      The URI of the broker that this client will connect to.
@@ -210,9 +211,10 @@ namespace core {
         const decaf::net::URI& getBrokerURI() const;
 
         /**
-         * Set an CMS ExceptionListener that will be set on eat connection once it has been
-         * created.  The factory does not take ownership of this pointer, the client must ensure
-         * that its lifetime is scoped to the connection that it is applied to.
+         * Set an CMS ExceptionListener that will be set on eat connection once
+         * it has been created.  The factory does not take ownership of this
+         * pointer, the client must ensure that its lifetime is scoped to the
+         * connection that it is applied to.
          *
          * @param listener
          * 		The listener to set on the connection or NULL for no listener.
@@ -220,75 +222,87 @@ namespace core {
         virtual void setExceptionListener(cms::ExceptionListener* listener);
 
         /**
-         * Returns the currently set ExceptionListener that will be set on any new Connection
-         * instance that is created by this factory.
+         * Returns the currently set ExceptionListener that will be set on any
+         * new Connection instance that is created by this factory.
          *
-         * @return a pointer to a CMS ExceptionListener instance or NULL if not set.
+         * @return a pointer to a CMS ExceptionListener instance or NULL if not
+         * set.
          */
         virtual cms::ExceptionListener* getExceptionListener() const;
 
         /**
-         * Set an MessageTransformer instance that is passed on to all Connection objects created from
-         * this ConnectionFactory
+         * Set an MessageTransformer instance that is passed on to all
+         * Connection objects created from this ConnectionFactory
          *
          * @param transformer
-         *      Pointer to the cms::MessageTransformer to set on all newly created Connection objects.
+         *      Pointer to the cms::MessageTransformer to set on all newly
+         * created Connection objects.
          */
         virtual void setMessageTransformer(cms::MessageTransformer* transformer);
 
         /**
-         * Gets the currently configured MessageTransformer for this ConnectionFactory.
+         * Gets the currently configured MessageTransformer for this
+         * ConnectionFactory.
          *
          * @return the pointer to the currently set cms::MessageTransformer.
          */
         virtual cms::MessageTransformer* getMessageTransformer() const;
 
         /**
-         * Sets the PrefetchPolicy instance that this factory should use when it creates
-         * new Connection instances.  The PrefetchPolicy passed becomes the property of the
-         * factory and will be deleted when the factory is destroyed.
+         * Sets the PrefetchPolicy instance that this factory should use when it
+         * creates new Connection instances.  The PrefetchPolicy passed becomes
+         * the property of the factory and will be deleted when the factory is
+         * destroyed.
          *
          * @param policy
-         *      The new PrefetchPolicy that the ConnectionFactory should clone for Connections.
+         *      The new PrefetchPolicy that the ConnectionFactory should clone
+         * for Connections.
          */
         void setPrefetchPolicy(PrefetchPolicy* policy);
 
         /**
-         * Gets the pointer to the current PrefetchPolicy that is in use by this ConnectionFactory.
+         * Gets the pointer to the current PrefetchPolicy that is in use by this
+         * ConnectionFactory.
          *
          * @return a pointer to this objects PrefetchPolicy.
          */
         PrefetchPolicy* getPrefetchPolicy() const;
 
         /**
-         * Sets the RedeliveryPolicy instance that this factory should use when it creates
-         * new Connection instances.  The RedeliveryPolicy passed becomes the property of the
-         * factory and will be deleted when the factory is destroyed.
+         * Sets the RedeliveryPolicy instance that this factory should use when
+         * it creates new Connection instances.  The RedeliveryPolicy passed
+         * becomes the property of the factory and will be deleted when the
+         * factory is destroyed.
          *
          * @param policy
-         *      The new RedeliveryPolicy that the ConnectionFactory should clone for Connections.
+         *      The new RedeliveryPolicy that the ConnectionFactory should clone
+         * for Connections.
          */
         void setRedeliveryPolicy(RedeliveryPolicy* policy);
 
         /**
-         * Gets the pointer to the current RedeliveryPolicy that is in use by this ConnectionFactory.
+         * Gets the pointer to the current RedeliveryPolicy that is in use by
+         * this ConnectionFactory.
          *
          * @return a pointer to this objects RedeliveryPolicy.
          */
         RedeliveryPolicy* getRedeliveryPolicy() const;
 
         /**
-         * @return The value of the dispatch asynchronously option sent to the broker.
+         * @return The value of the dispatch asynchronously option sent to the
+         * broker.
          */
         bool isDispatchAsync() const;
 
         /**
-         * Should messages be dispatched synchronously or asynchronously from the producer
-         * thread for non-durable topics in the broker? For fast consumers set this to false.
-         * For slow consumers set it to true so that dispatching will not block fast consumers. .
+         * Should messages be dispatched synchronously or asynchronously from
+         * the producer thread for non-durable topics in the broker? For fast
+         * consumers set this to false. For slow consumers set it to true so
+         * that dispatching will not block fast consumers. .
          *
          * @param value
-         *        The value of the dispatch asynchronously option sent to the broker.
+         *        The value of the dispatch asynchronously option sent to the
+         * broker.
          */
         void setDispatchAsync(bool value);
 
@@ -298,8 +312,9 @@ namespace core {
         bool isManageable() const;
 
         /**
-         * Sets whether the connection is manageable by the broker. When true, the broker
-         * can send management commands to the connection. Default is true.
+         * Sets whether the connection is manageable by the broker. When true,
+         * the broker can send management commands to the connection. Default is
+         * true.
          *
          * @param value
          *        true if the connection should be manageable by the broker.
@@ -307,7 +322,8 @@ namespace core {
         void setManageable(bool value);
 
         /**
-         * @return true if the advisory consumer uses async dispatch. Default is true.
+         * @return true if the advisory consumer uses async dispatch. Default is
+         * true.
          */
         bool isAdvisoryConsumerDispatchAsync() const;
 
@@ -347,16 +363,17 @@ namespace core {
         void setUseAsyncSend(bool value);
 
         /**
-         * Returns whether Message acknowledgments are sent asynchronously meaning no
-         * response is required from the broker before the ack completes.
+         * Returns whether Message acknowledgments are sent asynchronously
+         * meaning no response is required from the broker before the ack
+         * completes.
          *
          * @return the sendAcksAsync configured value. (defaults to true)
          */
         bool isSendAcksAsync() const;
 
         /**
-         * Sets whether Message acknowledgments are sent asynchronously meaning no
-         * response is required from the broker before the ack completes.
+         * Sets whether Message acknowledgments are sent asynchronously meaning
+         * no response is required from the broker before the ack completes.
          *
          * @param sendAcksAsync
          *      The sendAcksAsync configuration value to set.
@@ -378,10 +395,11 @@ namespace core {
         void setUseCompression(bool value);
 
         /**
-         * Sets the Compression level used when Message body compression is enabled, a
-         * value of -1 causes the Compression Library to use the default setting which
-         * is a balance of speed and compression.  The range of compression levels is
-         * [0..9] where 0 indicates best speed and 9 indicates best compression.
+         * Sets the Compression level used when Message body compression is
+         * enabled, a value of -1 causes the Compression Library to use the
+         * default setting which is a balance of speed and compression.  The
+         * range of compression levels is [0..9] where 0 indicates best speed
+         * and 9 indicates best compression.
          *
          * @param value
          *      A signed int value that controls the compression level.
@@ -403,7 +421,8 @@ namespace core {
 
         /**
          * Sets the send timeout to use when sending Message objects, this will
-         * cause all messages to be sent using a Synchronous request is non-zero.
+         * cause all messages to be sent using a Synchronous request is
+         * non-zero.
          * @param timeout - The time to wait for a response.
          */
         void setSendTimeout(unsigned int timeout);
@@ -415,9 +434,9 @@ namespace core {
         unsigned int getConnectResponseTimeout() const;
 
         /**
-         * Sets the connect response timeout to use when sending Message objects, this will
-         * protect clients using a Synchronous request in the case of the broker not responding
-         * or missing the brokers response.
+         * Sets the connect response timeout to use when sending Message
+         * objects, this will protect clients using a Synchronous request in the
+         * case of the broker not responding or missing the brokers response.
          * @param timeout - The time to wait for a connect response.
          */
         void setConnectResponseTimeout(unsigned int connectResponseTimeout);
@@ -435,45 +454,49 @@ namespace core {
         void setCloseTimeout(unsigned int timeout);
 
         /**
-         * Gets the assigned request timeout for this Connector. This timeout is used
-         * for synchronous requests including transaction commit, prepare, and rollback.
-         * @return the request timeout configured in the connection uri (default 60000ms)
+         * Gets the assigned request timeout for this Connector. This timeout is
+         * used for synchronous requests including transaction commit, prepare,
+         * and rollback.
+         * @return the request timeout configured in the connection uri (default
+         * 60000ms)
          */
         unsigned int getRequestTimeout() const;
 
         /**
          * Sets the request timeout to use when sending synchronous requests.
-         * This includes transaction operations like commit, prepare, and rollback.
+         * This includes transaction operations like commit, prepare, and
+         * rollback.
          * @param timeout - The time to wait for a response in milliseconds.
          */
         void setRequestTimeout(unsigned int timeout);
 
         /**
-         * Gets the configured producer window size for Producers that are created
-         * from this connector.  This only applies if there is no send timeout and the
-         * producer is able to send asynchronously.
-         * @return size in bytes of messages that this producer can produce before
-         *         it must block and wait for ProducerAck messages to free resources.
+         * Gets the configured producer window size for Producers that are
+         * created from this connector.  This only applies if there is no send
+         * timeout and the producer is able to send asynchronously.
+         * @return size in bytes of messages that this producer can produce
+         * before it must block and wait for ProducerAck messages to free
+         * resources.
          */
         unsigned int getProducerWindowSize() const;
 
         /**
-         * Sets the size in Bytes of messages that a producer can send before it is blocked
-         * to await a ProducerAck from the broker that frees enough memory to allow another
-         * message to be sent.
+         * Sets the size in Bytes of messages that a producer can send before it
+         * is blocked to await a ProducerAck from the broker that frees enough
+         * memory to allow another message to be sent.
          * @param windowSize - The size in bytes of the Producers memory window.
          */
         void setProducerWindowSize(unsigned int windowSize);
 
         /**
-         * @return true if the Connections that this factory creates should support the
-         * message based priority settings.
+         * @return true if the Connections that this factory creates should
+         * support the message based priority settings.
          */
         bool isMessagePrioritySupported() const;
 
         /**
-         * Set whether or not this factory should create Connection objects with the Message
-         * priority support function enabled.
+         * Set whether or not this factory should create Connection objects with
+         * the Message priority support function enabled.
          *
          * @param value
          *      Boolean indicating if Message priority should be enabled.
@@ -483,7 +506,8 @@ namespace core {
         /**
          * Should all created consumers be retroactive.
          *
-         * @return true if consumer will be created with the retroactive flag set.
+         * @return true if consumer will be created with the retroactive flag
+         * set.
          */
         bool isUseRetroactiveConsumer() const;
 
@@ -505,8 +529,9 @@ namespace core {
         bool isExclusiveConsumer() const;
 
         /**
-         * Enables or disables whether or not queue consumers should be exclusive or
-         * not for example to preserve ordering when not using Message Groups.
+         * Enables or disables whether or not queue consumers should be
+         * exclusive or not for example to preserve ordering when not using
+         * Message Groups.
          *
          * @param exclusiveConsumer
          *      The value of this configuration option.
@@ -514,27 +539,31 @@ namespace core {
         void setExclusiveConsumer(bool exclusiveConsumer);
 
         /**
-         * Is the Connection created by this factory configured to watch for advisory messages
-         * that inform the Connection about temporary destination create / destroy.
+         * Is the Connection created by this factory configured to watch for
+         * advisory messages that inform the Connection about temporary
+         * destination create / destroy.
          *
-         * @return true if Connection's will listen for temporary destination advisory messages.
+         * @return true if Connection's will listen for temporary destination
+         * advisory messages.
          */
         bool isWatchTopicAdvisories() const;
 
         /**
-         * Sets whether Connection's created by this factory will listen for advisory messages
-         * regarding temporary destination creation and deletion.
+         * Sets whether Connection's created by this factory will listen for
+         * advisory messages regarding temporary destination creation and
+         * deletion.
          *
          * @param value
-         *      Boolean indicating if advisory message monitoring should be enabled.
+         *      Boolean indicating if advisory message monitoring should be
+         * enabled.
          */
         void setWatchTopicAdvisories(bool value);
 
         /**
          * Get the audit depth for Messages for consumers when using a fault
-         * tolerant transport.  The higher the value the more messages are checked
-         * for duplication, and the larger the performance impact of duplicate
-         * detection will be.
+         * tolerant transport.  The higher the value the more messages are
+         * checked for duplication, and the larger the performance impact of
+         * duplicate detection will be.
          *
          * @return the configured audit depth.
          */
@@ -542,9 +571,9 @@ namespace core {
 
         /**
          * Set the audit depth for Messages for consumers when using a fault
-         * tolerant transport.  The higher the value the more messages are checked
-         * for duplication, and the larger the performance impact of duplicate
-         * detection will be.
+         * tolerant transport.  The higher the value the more messages are
+         * checked for duplication, and the larger the performance impact of
+         * duplicate detection will be.
          *
          * @param auditDepth
          *      The configured audit depth.
@@ -569,12 +598,13 @@ namespace core {
         /**
          * Gets the value of the configured Duplicate Message detection feature.
          *
-         * When enabled and a fault tolerant transport is used (think failover) then
-         * this feature will help to detect and filter duplicate messages that might
-         * otherwise be delivered to a consumer after a connection failure.
+         * When enabled and a fault tolerant transport is used (think failover)
+         * then this feature will help to detect and filter duplicate messages
+         * that might otherwise be delivered to a consumer after a connection
+         * failure.
          *
-         * Disabling this can increase performance since no Message auditing will
-         * occur.
+         * Disabling this can increase performance since no Message auditing
+         * will occur.
          *
          * @return the checkForDuplicates value currently set.
          */
@@ -583,12 +613,13 @@ namespace core {
         /**
          * Gets the value of the configured Duplicate Message detection feature.
          *
-         * When enabled and a fault tolerant transport is used (think failover) then
-         * this feature will help to detect and filter duplicate messages that might
-         * otherwise be delivered to a consumer after a connection failure.
+         * When enabled and a fault tolerant transport is used (think failover)
+         * then this feature will help to detect and filter duplicate messages
+         * that might otherwise be delivered to a consumer after a connection
+         * failure.
          *
-         * Disabling this can increase performance since no Message auditing will
-         * occur.
+         * Disabling this can increase performance since no Message auditing
+         * will occur.
          *
          * @param checkForDuplicates
          *      The checkForDuplicates value to be configured.
@@ -596,18 +627,20 @@ namespace core {
         void setCheckForDuplicates(bool checkForDuplicates);
 
         /**
-         * when true, submit individual transacted acks immediately rather than with transaction
-         * completion.  This allows the acks to represent delivery status which can be persisted on
-         * rollback Used in conjunction with KahaDB set to Rewrite On Redelivery.
+         * when true, submit individual transacted acks immediately rather than
+         * with transaction completion.  This allows the acks to represent
+         * delivery status which can be persisted on rollback Used in
+         * conjunction with KahaDB set to Rewrite On Redelivery.
          *
          * @return true if this option is enabled.
          */
         bool isTransactedIndividualAck() const;
 
         /**
-         * when true, submit individual transacted acks immediately rather than with transaction
-         * completion.  This allows the acks to represent delivery status which can be persisted on
-         * rollback Used in conjunction with KahaDB set to Rewrite On Redelivery.
+         * when true, submit individual transacted acks immediately rather than
+         * with transaction completion.  This allows the acks to represent
+         * delivery status which can be persisted on rollback Used in
+         * conjunction with KahaDB set to Rewrite On Redelivery.
          *
          * @param transactedIndividualAck
          *      The value to set.
@@ -615,17 +648,18 @@ namespace core {
         void setTransactedIndividualAck(bool transactedIndividualAck);
 
         /**
-         * Returns true if non-blocking redelivery of Messages is configured for Consumers
-         * that are rolled back or recovered.
+         * Returns true if non-blocking redelivery of Messages is configured for
+         * Consumers that are rolled back or recovered.
          *
          * @return true if non-blocking redelivery is enabled.
          */
         bool isNonBlockingRedelivery() const;
 
         /**
-         * When true a MessageConsumer will not stop Message delivery before re-delivering Messages
-         * from a rolled back transaction.  This implies that message order will not be preserved and
-         * also will result in the TransactedIndividualAck option to be enabled.
+         * When true a MessageConsumer will not stop Message delivery before
+         * re-delivering Messages from a rolled back transaction.  This implies
+         * that message order will not be preserved and also will result in the
+         * TransactedIndividualAck option to be enabled.
          *
          * @param nonBlockingRedelivery
          *      The value to configure for non-blocking redelivery.
@@ -653,7 +687,8 @@ namespace core {
         bool isOptimizeAcknowledge() const;
 
         /**
-         * Sets if Consumers are configured to use Optimized Acknowledge by default.
+         * Sets if Consumers are configured to use Optimized Acknowledge by
+         * default.
          *
          * @param optimizeAcknowledge
          *      The optimizeAcknowledge mode to set.
@@ -676,9 +711,10 @@ namespace core {
         void setOptimizeAcknowledgeTimeOut(long long optimizeAcknowledgeTimeOut);
 
         /**
-         * Gets the configured time interval that is used to force all MessageConsumers that have
-         * optimizedAcknowledge enabled to send an ack for any outstanding Message Acks.  By default
-         * this value is set to zero meaning that the consumers will not do any background Message
+         * Gets the configured time interval that is used to force all
+         * MessageConsumers that have optimizedAcknowledge enabled to send an
+         * ack for any outstanding Message Acks.  By default this value is set
+         * to zero meaning that the consumers will not do any background Message
          * acknowledgment.
          *
          * @return the scheduledOptimizedAckInterval
@@ -686,15 +722,17 @@ namespace core {
         long long getOptimizedAckScheduledAckInterval() const;
 
         /**
-         * Sets the amount of time between scheduled sends of any outstanding Message Acks for
-         * consumers that have been configured with optimizeAcknowledge enabled.
+         * Sets the amount of time between scheduled sends of any outstanding
+         * Message Acks for consumers that have been configured with
+         * optimizeAcknowledge enabled.
          *
          * Time is given in Milliseconds.
          *
          * @param optimizedAckScheduledAckInterval
          *      The scheduledOptimizedAckInterval to use for new Consumers.
          */
-        void setOptimizedAckScheduledAckInterval(long long optimizedAckScheduledAckInterval);
+        void setOptimizedAckScheduledAckInterval(
+            long long optimizedAckScheduledAckInterval);
 
         /**
          * Returns the current value of the always session async option.
@@ -704,10 +742,12 @@ namespace core {
         bool isAlwaysSessionAsync() const;
 
         /**
-         * If this flag is not set 'true' then a separate thread is not used for dispatching messages
-         * for each Session in the Connection. However, a separate thread is always used if there
-         * is more than one session, or the session isn't in auto acknowledge or duplicates ok mode.
-         * By default this value is set to true and session dispatch happens asynchronously.
+         * If this flag is not set 'true' then a separate thread is not used for
+         * dispatching messages for each Session in the Connection. However, a
+         * separate thread is always used if there is more than one session, or
+         * the session isn't in auto acknowledge or duplicates ok mode. By
+         * default this value is set to true and session dispatch happens
+         * asynchronously.
          *
          * @param alwaysSessionAsync
          * 		The alwaysSessionAsync value to use when creating new sessions.
@@ -715,21 +755,23 @@ namespace core {
         void setAlwaysSessionAsync(bool alwaysSessionAsync);
 
         /**
-         * @return true if the consumer will skip checking messages for expiration.
+         * @return true if the consumer will skip checking messages for
+         * expiration.
          */
         bool isConsumerExpiryCheckEnabled();
 
         /**
-         * Configures whether this consumer will perform message expiration processing
-         * on all incoming messages.  This feature is enabled by default.
+         * Configures whether this consumer will perform message expiration
+         * processing on all incoming messages.  This feature is enabled by
+         * default.
          *
          * @param consumerExpiryCheckEnabled
-         *      False if the default message expiration checks should be disabled.
+         *      False if the default message expiration checks should be
+         * disabled.
          */
         void setConsumerExpiryCheckEnabled(bool consumerExpiryCheckEnabled);
 
     public:
-
         /**
          * Creates a connection with the specified user identity. The
          * connection is created in stopped mode. No messages will be
@@ -746,35 +788,40 @@ namespace core {
          *
          * @throw CMSException.
          */
-        static cms::Connection* createConnection(const std::string& uri, const std::string& username,
-                                                 const std::string& password, const std::string& clientId = "");
+        static cms::Connection* createConnection(
+            const std::string& uri,
+            const std::string& username,
+            const std::string& password,
+            const std::string& clientId = "");
 
     protected:
-
         /**
-         * Create a new ActiveMQConnection instnace using the provided Transport and Properties.
-         * Subclasses can override this to control the actual type of ActiveMQConnection that
-         * is created.
+         * Create a new ActiveMQConnection instnace using the provided Transport
+         * and Properties. Subclasses can override this to control the actual
+         * type of ActiveMQConnection that is created.
          *
          * @param transport
-         *      The Transport that the Connection should use to communicate with the Broker.
+         *      The Transport that the Connection should use to communicate with
+         * the Broker.
          * @param properties
          *      The Properties that are assigned to the new Connection instance.
          *
          * @return a new ActiveMQConnection pointer instance.
          */
-        virtual ActiveMQConnection* createActiveMQConnection(const Pointer<transport::Transport>& transport,
-                                                             const Pointer<decaf::util::Properties>& properties);
+        virtual ActiveMQConnection* createActiveMQConnection(
+            const Pointer<transport::Transport>&    transport,
+            const Pointer<decaf::util::Properties>& properties);
 
     private:
-
-        cms::Connection* doCreateConnection(const decaf::net::URI& uri, const std::string& username,
-                                            const std::string& password, const std::string& clientId);
+        cms::Connection* doCreateConnection(const decaf::net::URI& uri,
+                                            const std::string&     username,
+                                            const std::string&     password,
+                                            const std::string&     clientId);
 
         void configureConnection(ActiveMQConnection* connection);
-
     };
 
-}}
+}  // namespace core
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_CORE_ACTIVEMQCONNECTIONFACTORY_H_*/

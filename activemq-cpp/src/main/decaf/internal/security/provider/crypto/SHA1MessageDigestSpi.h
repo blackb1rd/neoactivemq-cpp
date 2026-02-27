@@ -22,59 +22,74 @@
 
 #include <decaf/security/MessageDigestSpi.h>
 
-namespace decaf {
-namespace internal {
-namespace security {
-namespace provider {
-namespace crypto {
+namespace decaf
+{
+namespace internal
+{
+    namespace security
+    {
+        namespace provider
+        {
+            namespace crypto
+            {
 
-    class SHA1MessageDigestSpiImpl;
+                class SHA1MessageDigestSpiImpl;
 
-    /**
-     * SHA1 MessageDigestSpi
-     *
-     * @since 1.0
-     */
-    class DECAF_API SHA1MessageDigestSpi : public decaf::security::MessageDigestSpi {
-    private:
+                /**
+                 * SHA1 MessageDigestSpi
+                 *
+                 * @since 1.0
+                 */
+                class DECAF_API SHA1MessageDigestSpi
+                    : public decaf::security::MessageDigestSpi
+                {
+                private:
+                    SHA1MessageDigestSpi(const SHA1MessageDigestSpi&);
+                    SHA1MessageDigestSpi& operator=(const SHA1MessageDigestSpi&);
 
-        SHA1MessageDigestSpi(const SHA1MessageDigestSpi&);
-        SHA1MessageDigestSpi& operator= (const SHA1MessageDigestSpi&);
+                    SHA1MessageDigestSpiImpl* impl;
 
-        SHA1MessageDigestSpiImpl* impl;
+                public:
+                    SHA1MessageDigestSpi();
 
-    public:
+                    virtual ~SHA1MessageDigestSpi();
 
-        SHA1MessageDigestSpi();
+                public:
+                    virtual bool isCloneable() const
+                    {
+                        return true;
+                    }
 
-        virtual ~SHA1MessageDigestSpi();
+                    virtual MessageDigestSpi* clone();
 
-    public:
+                    virtual int engineGetDigestLength();
 
-        virtual bool isCloneable() const {
-            return true;
-        }
+                    virtual void engineUpdate(unsigned char input);
 
-        virtual MessageDigestSpi* clone();
+                    virtual void engineUpdate(const unsigned char* input,
+                                              int                  size,
+                                              int                  offset,
+                                              int                  length);
 
-        virtual int engineGetDigestLength();
+                    virtual void engineReset();
 
-        virtual void engineUpdate(unsigned char input);
+                    virtual void engineUpdate(
+                        const std::vector<unsigned char>& input);
 
-        virtual void engineUpdate(const unsigned char* input, int size, int offset, int length);
+                    virtual void engineUpdate(decaf::nio::ByteBuffer& input);
 
-        virtual void engineReset();
+                    virtual std::vector<unsigned char> engineDigest();
 
-        virtual void engineUpdate(const std::vector<unsigned char>& input);
+                    virtual int engineDigest(unsigned char* buffer,
+                                             int            size,
+                                             int            offset,
+                                             int            length);
+                };
 
-        virtual void engineUpdate(decaf::nio::ByteBuffer& input);
-
-        virtual std::vector<unsigned char> engineDigest();
-
-        virtual int engineDigest(unsigned char* buffer, int size, int offset, int length);
-
-    };
-
-}}}}}
+            }  // namespace crypto
+        }  // namespace provider
+    }  // namespace security
+}  // namespace internal
+}  // namespace decaf
 
 #endif /* _DECAF_INTERNAL_SECURITY_PROVIDER_CRYPTO_SHA1MESSAGEDIGESTSPI_H_ */

@@ -17,26 +17,28 @@
 
 #include <gtest/gtest.h>
 
+#include <decaf/internal/nio/BufferFactory.h>
 #include <decaf/nio/ByteBuffer.h>
 #include <decaf/nio/CharBuffer.h>
 #include <decaf/nio/DoubleBuffer.h>
 #include <decaf/nio/FloatBuffer.h>
-#include <decaf/nio/LongBuffer.h>
 #include <decaf/nio/IntBuffer.h>
+#include <decaf/nio/LongBuffer.h>
 #include <decaf/nio/ShortBuffer.h>
-#include <decaf/internal/nio/BufferFactory.h>
 
 using namespace decaf;
 using namespace decaf::internal;
 using namespace decaf::internal::nio;
 using namespace decaf::nio;
 
-    class BufferFactoryTest : public ::testing::Test {};
+class BufferFactoryTest : public ::testing::Test
+{
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(BufferFactoryTest, testCreateByteBuffer1) {
-
-    ByteBuffer* buffer = BufferFactory::createByteBuffer( 500 );
+TEST_F(BufferFactoryTest, testCreateByteBuffer1)
+{
+    ByteBuffer* buffer = BufferFactory::createByteBuffer(500);
     ASSERT_TRUE(buffer != NULL);
     ASSERT_TRUE(buffer->capacity() == 500);
     ASSERT_TRUE(buffer->isReadOnly() == false);
@@ -45,11 +47,11 @@ TEST_F(BufferFactoryTest, testCreateByteBuffer1) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(BufferFactoryTest, testCreateByteBuffer2) {
-
+TEST_F(BufferFactoryTest, testCreateByteBuffer2)
+{
     std::vector<unsigned char> array;
-    array.resize( 500 );
-    ByteBuffer* buffer = BufferFactory::createByteBuffer( array );
+    array.resize(500);
+    ByteBuffer* buffer = BufferFactory::createByteBuffer(array);
     ASSERT_TRUE(buffer != NULL);
     ASSERT_TRUE(buffer->hasArray() == true);
     ASSERT_TRUE(buffer->array() == &array[0]);
@@ -60,11 +62,12 @@ TEST_F(BufferFactoryTest, testCreateByteBuffer2) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(BufferFactoryTest, testCreateByteBuffer3) {
-
+TEST_F(BufferFactoryTest, testCreateByteBuffer3)
+{
     std::vector<unsigned char> array;
-    array.resize( 500 );
-    ByteBuffer* buffer = BufferFactory::createByteBuffer( &array[0], 500, 100, 400 );
+    array.resize(500);
+    ByteBuffer* buffer =
+        BufferFactory::createByteBuffer(&array[0], 500, 100, 400);
     ASSERT_TRUE(buffer != NULL);
     ASSERT_TRUE(buffer->hasArray() == true);
     ASSERT_TRUE(buffer->array() == &array[0]);

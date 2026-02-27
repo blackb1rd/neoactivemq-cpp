@@ -18,29 +18,29 @@
 #ifndef _CMSTEMPLATE_CONNECTIONFACTORYMGR_H_
 #define _CMSTEMPLATE_CONNECTIONFACTORYMGR_H_
 
-#include <decaf/util/StlMap.h>
 #include <cms/ConnectionFactory.h>
+#include <decaf/util/StlMap.h>
 
-namespace cmstemplate {
+namespace cmstemplate
+{
 
-    class ConnectionFactoryMgr {
-    private:
+class ConnectionFactoryMgr
+{
+private:
+    static decaf::util::StlMap<std::string, cms::ConnectionFactory*>*
+        connectionFactories;
 
-        static decaf::util::StlMap <std::string, cms::ConnectionFactory *> *connectionFactories;
+    ConnectionFactoryMgr();
 
-        ConnectionFactoryMgr();
+    virtual ~ConnectionFactoryMgr();
 
-        virtual ~ConnectionFactoryMgr();
+public:
+    static void initialize();
 
-    public:
+    static void unInitialize();
 
-        static void initialize();
-
-        static void unInitialize();
-
-        static cms::ConnectionFactory* getConnectionFactory(const std::string& url);
-
-    };
-}
+    static cms::ConnectionFactory* getConnectionFactory(const std::string& url);
+};
+}  // namespace cmstemplate
 
 #endif /** _CMSTEMPLATE_CONNECTIONFACTORYMGR_H_ */

@@ -17,14 +17,16 @@
 #ifndef _DECAF_UTIL_STLQUEUE_H_
 #define _DECAF_UTIL_STLQUEUE_H_
 
-#include <list>
-#include <vector>
+#include <decaf/lang/Exception.h>
 #include <decaf/util/Iterator.h>
 #include <decaf/util/concurrent/Mutex.h>
-#include <decaf/lang/Exception.h>
+#include <list>
+#include <vector>
 
-namespace decaf{
-namespace util{
+namespace decaf
+{
+namespace util
+{
 
     /**
      * The Queue class accepts messages with an psuh(m) command
@@ -57,9 +59,9 @@ namespace util{
      */
 
     template <typename T>
-    class StlQueue : public concurrent::Synchronizable {
+    class StlQueue : public concurrent::Synchronizable
+    {
     private:
-
         // The real queue
         std::list<T> queue;
 
@@ -67,67 +69,85 @@ namespace util{
         mutable util::concurrent::Mutex mutex;
 
     private:
-
-        class QueueIterator : public Iterator<T> {
+        class QueueIterator : public Iterator<T>
+        {
         private:
-
             typename std::list<T>::iterator current;
             typename std::list<T>::iterator previous;
-            typename std::list<T>* queue;
+            typename std::list<T>*          queue;
 
         public:
-
-            QueueIterator( typename std::list<T>* queue ) :
-                current( queue->begin() ), previous( queue->end() ), queue( queue ) {
+            QueueIterator(typename std::list<T>* queue)
+                : current(queue->begin()),
+                  previous(queue->end()),
+                  queue(queue)
+            {
             }
 
-            virtual ~QueueIterator() {}
+            virtual ~QueueIterator()
+            {
+            }
 
-            virtual T next() {
-                if( this->current == queue->end() ) {
+            virtual T next()
+            {
+                if (this->current == queue->end())
+                {
                     throw NoSuchElementException(
-                        __FILE__, __LINE__,
-                        "Queue::Iterator::next - No more elements to return" );
+                        __FILE__,
+                        __LINE__,
+                        "Queue::Iterator::next - No more elements to return");
                 }
 
                 this->previous = this->current;
-                return *( this->current++ );
+                return *(this->current++);
             }
 
-            virtual bool hasNext() const {
-                return ( this->current != queue->end() );
+            virtual bool hasNext() const
+            {
+                return (this->current != queue->end());
             }
 
-            virtual void remove() {
-                if( this->previous == queue->end() ) {
+            virtual void remove()
+            {
+                if (this->previous == queue->end())
+                {
                     throw lang::exceptions::IllegalStateException(
-                        __FILE__, __LINE__,
-                        "Queue::Iterator::remove - Invalid State to call remove" );
+                        __FILE__,
+                        __LINE__,
+                        "Queue::Iterator::remove - Invalid State to call "
+                        "remove");
                 }
 
-                this->queue->erase( this->previous );
+                this->queue->erase(this->previous);
                 this->previous = this->queue->end();
             }
         };
 
     public:
+        StlQueue()
+            : queue(),
+              mutex()
+        {
+        }
 
-        StlQueue() : queue(), mutex() {}
-
-        virtual ~StlQueue() {}
+        virtual ~StlQueue()
+        {
+        }
 
         /**
          * Gets an Iterator over this Queue.
          * @return new iterator pointer that is owned by the caller.
          */
-        Iterator<T>* iterator() {
-            return new QueueIterator( &queue );
+        Iterator<T>* iterator()
+        {
+            return new QueueIterator(&queue);
         }
 
         /**
          * Empties this queue.
          */
-        void clear() {
+        void clear()
+        {
             queue.clear();
         }
 
@@ -135,8 +155,10 @@ namespace util{
          * Returns a Reference to the element at the head of the queue
          * @return reference to a queue type object or (safe)
          */
-        T& front() {
-            if( queue.empty() ) {
+        T& front()
+        {
+            if (queue.empty())
+            {
                 return getSafeValue();
             }
 
@@ -147,8 +169,10 @@ namespace util{
          * Returns a Reference to the element at the head of the queue
          * @return reference to a queue type object or (safe)
          */
-        const T& front() const {
-            if( queue.empty() ) {
+        const T& front() const
+        {
+            if (queue.empty())
+            {
                 return getSafeValue();
             }
 
@@ -159,8 +183,10 @@ namespace util{
          * Returns a Reference to the element at the tail of the queue
          * @return reference to a queue type object or (safe)
          */
-        T& back() {
-            if( queue.empty() ) {
+        T& back()
+        {
+            if (queue.empty())
+            {
                 return getSafeValue();
             }
 
@@ -171,8 +197,10 @@ namespace util{
          * Returns a Reference to the element at the tail of the queue
          * @return reference to a queue type object or (safe)
          */
-        const T& back() const {
-            if( queue.empty() ) {
+        const T& back() const
+        {
+            if (queue.empty())
+            {
                 return getSafeValue();
             }
 
@@ -183,24 +211,28 @@ namespace util{
          * Places a new Object at the Tail of the queue
          * @param t - Queue Object Type reference.
          */
-        void push( const T &t ) {
-            queue.push_back( t );
+        void push(const T& t)
+        {
+            queue.push_back(t);
         }
 
         /**
          * Places a new Object at the front of the queue
          * @param t - Queue Object Type reference.
          */
-        void enqueueFront( const T &t ) {
-            queue.push_front( t );
+        void enqueueFront(const T& t)
+        {
+            queue.push_front(t);
         }
 
         /**
          * Removes and returns the element that is at the Head of the queue
          * @return reference to a queue type object or (safe)
          */
-        T pop() {
-            if( queue.empty() ) {
+        T pop()
+        {
+            if (queue.empty())
+            {
                 return getSafeValue();
             }
 
@@ -216,7 +248,8 @@ namespace util{
          * Gets the Number of elements currently in the Queue
          * @return Queue Size
          */
-        size_t size() const{
+        size_t size() const
+        {
             return queue.size();
         }
 
@@ -224,15 +257,17 @@ namespace util{
          * Checks if this Queue is currently empty
          * @return boolean indicating queue emptiness
          */
-        bool empty() const {
+        bool empty() const
+        {
             return queue.empty();
         }
 
         /**
          * @return the all values in this queue as a std::vector.
          */
-        virtual std::vector<T> toArray() const {
-            std::vector<T> valueArray( queue.begin(), queue.end() );
+        virtual std::vector<T> toArray() const
+        {
+            std::vector<T> valueArray(queue.begin(), queue.end());
             return valueArray;
         }
 
@@ -242,58 +277,68 @@ namespace util{
          * @param target - The target queue that will receive the contents of
          * this queue in reverse order.
          */
-        void reverse( StlQueue<T>& target ) const {
-            target.queue.insert( target.queue.end(), queue.rbegin(), queue.rend() );
+        void reverse(StlQueue<T>& target) const
+        {
+            target.queue.insert(target.queue.end(),
+                                queue.rbegin(),
+                                queue.rend());
         }
 
     public:  // Synchronizable
-
-        virtual void lock() {
+        virtual void lock()
+        {
             mutex.lock();
         }
 
-        virtual bool tryLock() {
+        virtual bool tryLock()
+        {
             return mutex.tryLock();
         }
 
-        virtual void unlock() {
+        virtual void unlock()
+        {
             mutex.unlock();
         }
 
-        virtual void wait() {
+        virtual void wait()
+        {
             mutex.wait();
         }
 
-        virtual void wait( long long millisecs ) {
-            mutex.wait( millisecs );
+        virtual void wait(long long millisecs)
+        {
+            mutex.wait(millisecs);
         }
 
-        virtual void wait( long long millisecs, int nanos ) {
-            mutex.wait( millisecs, nanos );
+        virtual void wait(long long millisecs, int nanos)
+        {
+            mutex.wait(millisecs, nanos);
         }
 
-        virtual void notify() {
+        virtual void notify()
+        {
             mutex.notify();
         }
 
-        virtual void notifyAll() {
+        virtual void notifyAll()
+        {
             mutex.notifyAll();
         }
 
-    public:   // Statics
-
+    public:  // Statics
         /**
          * Fetch a reference to the safe value this object will return
          * when there is nothing to fetch from the queue.
          * @return Reference to this Queues safe object
          */
-        T& getSafeValue() {
+        T& getSafeValue()
+        {
             static T safe;
             return safe;
         }
-
     };
 
-}}
+}  // namespace util
+}  // namespace decaf
 
 #endif /*_DECAF_UTIL_STLQUEUE_H_*/

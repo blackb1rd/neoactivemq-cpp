@@ -20,7 +20,6 @@
 using namespace cms;
 
 ////////////////////////////////////////////////////////////////////////////////
-StreamMessage::~StreamMessage() {
-
+StreamMessage::~StreamMessage()
+{
 }
-

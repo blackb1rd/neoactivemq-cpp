@@ -25,46 +25,51 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 
-    class HashCodeTest : public ::testing::Test {
+class HashCodeTest : public ::testing::Test
+{
 public:
+    HashCodeTest();
 
-        HashCodeTest();
-
-        virtual ~HashCodeTest();
-
-    };
+    virtual ~HashCodeTest();
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-HashCodeTest::HashCodeTest() {
+HashCodeTest::HashCodeTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-HashCodeTest::~HashCodeTest() {
+HashCodeTest::~HashCodeTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(HashCodeTest, testHashPointerT) {
-
+TEST_F(HashCodeTest, testHashPointerT)
+{
     Pointer<std::string> value1(new std::string("This is value1 and value2"));
     Pointer<std::string> value2(new std::string("This is value1 and value2"));
-    Pointer<std::string> value3(new std::string("This is not value1 or value2"));
+    Pointer<std::string> value3(
+        new std::string("This is not value1 or value2"));
 
-    int hashCode1 = HashCode< Pointer<std::string> >()(value1);
-    int hashCode2 = HashCode< Pointer<std::string> >()(value2);
-    int hashCode3 = HashCode< Pointer<std::string> >()(value3);
+    int hashCode1 = HashCode<Pointer<std::string>>()(value1);
+    int hashCode2 = HashCode<Pointer<std::string>>()(value2);
+    int hashCode3 = HashCode<Pointer<std::string>>()(value3);
 
     ASSERT_TRUE(hashCode1 != 0);
     ASSERT_TRUE(hashCode2 != 0);
     ASSERT_TRUE(hashCode3 != 0);
 
-    ASSERT_TRUE(hashCode1 == hashCode2) << ("Values one and two should have equal hash");
-    ASSERT_TRUE(hashCode1 != hashCode3) << ("Values one and three should have equal hash");
-    ASSERT_TRUE(hashCode2 != hashCode3) << ("Values two and three should have equal hash");
+    ASSERT_TRUE(hashCode1 == hashCode2)
+        << ("Values one and two should have equal hash");
+    ASSERT_TRUE(hashCode1 != hashCode3)
+        << ("Values one and three should have equal hash");
+    ASSERT_TRUE(hashCode2 != hashCode3)
+        << ("Values two and three should have equal hash");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(HashCodeTest, testHashString) {
-
+TEST_F(HashCodeTest, testHashString)
+{
     std::string value1 = "This is value1 and value2";
     std::string value2 = "This is value1 and value2";
     std::string value3 = "This is not value1 or value2";
@@ -77,14 +82,17 @@ TEST_F(HashCodeTest, testHashString) {
     ASSERT_TRUE(hashCode2 != 0);
     ASSERT_TRUE(hashCode3 != 0);
 
-    ASSERT_TRUE(hashCode1 == hashCode2) << ("Values one and two should have equal hash");
-    ASSERT_TRUE(hashCode1 != hashCode3) << ("Values one and three should have equal hash");
-    ASSERT_TRUE(hashCode2 != hashCode3) << ("Values two and three should have equal hash");
+    ASSERT_TRUE(hashCode1 == hashCode2)
+        << ("Values one and two should have equal hash");
+    ASSERT_TRUE(hashCode1 != hashCode3)
+        << ("Values one and three should have equal hash");
+    ASSERT_TRUE(hashCode2 != hashCode3)
+        << ("Values two and three should have equal hash");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(HashCodeTest, testHashBool) {
-
+TEST_F(HashCodeTest, testHashBool)
+{
     bool value1 = true;
     bool value2 = true;
     bool value3 = false;
@@ -100,15 +108,19 @@ TEST_F(HashCodeTest, testHashBool) {
     ASSERT_TRUE(hashCode3 != 0);
     ASSERT_TRUE(hashCode4 != 0);
 
-    ASSERT_TRUE(hashCode1 == hashCode2) << ("Values one and two should have equal hash");
-    ASSERT_TRUE(hashCode1 != hashCode3) << ("Values one and three shouldn't have equal hash");
-    ASSERT_TRUE(hashCode2 != hashCode3) << ("Values two and three shouldn't have equal hash");
-    ASSERT_TRUE(hashCode3 == hashCode4) << ("Values three and four should have equal hash");
+    ASSERT_TRUE(hashCode1 == hashCode2)
+        << ("Values one and two should have equal hash");
+    ASSERT_TRUE(hashCode1 != hashCode3)
+        << ("Values one and three shouldn't have equal hash");
+    ASSERT_TRUE(hashCode2 != hashCode3)
+        << ("Values two and three shouldn't have equal hash");
+    ASSERT_TRUE(hashCode3 == hashCode4)
+        << ("Values three and four should have equal hash");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(HashCodeTest, testHashChar) {
-
+TEST_F(HashCodeTest, testHashChar)
+{
     {
         char value1 = 'a';
         char value2 = 'a';
@@ -122,9 +134,12 @@ TEST_F(HashCodeTest, testHashChar) {
         ASSERT_TRUE(hashCode2 != 0);
         ASSERT_TRUE(hashCode3 != 0);
 
-        ASSERT_TRUE(hashCode1 == hashCode2) << ("Values one and two should have equal hash");
-        ASSERT_TRUE(hashCode1 != hashCode3) << ("Values one and three shouldn't have equal hash");
-        ASSERT_TRUE(hashCode2 != hashCode3) << ("Values two and three shouldn't have equal hash");
+        ASSERT_TRUE(hashCode1 == hashCode2)
+            << ("Values one and two should have equal hash");
+        ASSERT_TRUE(hashCode1 != hashCode3)
+            << ("Values one and three shouldn't have equal hash");
+        ASSERT_TRUE(hashCode2 != hashCode3)
+            << ("Values two and three shouldn't have equal hash");
     }
 
     {
@@ -140,9 +155,12 @@ TEST_F(HashCodeTest, testHashChar) {
         ASSERT_TRUE(hashCode2 != 0);
         ASSERT_TRUE(hashCode3 != 0);
 
-        ASSERT_TRUE(hashCode1 == hashCode2) << ("Values one and two should have equal hash");
-        ASSERT_TRUE(hashCode1 != hashCode3) << ("Values one and three shouldn't have equal hash");
-        ASSERT_TRUE(hashCode2 != hashCode3) << ("Values two and three shouldn't have equal hash");
+        ASSERT_TRUE(hashCode1 == hashCode2)
+            << ("Values one and two should have equal hash");
+        ASSERT_TRUE(hashCode1 != hashCode3)
+            << ("Values one and three shouldn't have equal hash");
+        ASSERT_TRUE(hashCode2 != hashCode3)
+            << ("Values two and three shouldn't have equal hash");
     }
 
     {
@@ -158,15 +176,18 @@ TEST_F(HashCodeTest, testHashChar) {
         ASSERT_TRUE(hashCode2 != 0);
         ASSERT_TRUE(hashCode3 != 0);
 
-        ASSERT_TRUE(hashCode1 == hashCode2) << ("Values one and two should have equal hash");
-        ASSERT_TRUE(hashCode1 != hashCode3) << ("Values one and three shouldn't have equal hash");
-        ASSERT_TRUE(hashCode2 != hashCode3) << ("Values two and three shouldn't have equal hash");
+        ASSERT_TRUE(hashCode1 == hashCode2)
+            << ("Values one and two should have equal hash");
+        ASSERT_TRUE(hashCode1 != hashCode3)
+            << ("Values one and three shouldn't have equal hash");
+        ASSERT_TRUE(hashCode2 != hashCode3)
+            << ("Values two and three shouldn't have equal hash");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(HashCodeTest, testHashShort) {
-
+TEST_F(HashCodeTest, testHashShort)
+{
     {
         short value1 = 1024;
         short value2 = 1024;
@@ -180,9 +201,12 @@ TEST_F(HashCodeTest, testHashShort) {
         ASSERT_TRUE(hashCode2 != 0);
         ASSERT_TRUE(hashCode3 != 0);
 
-        ASSERT_TRUE(hashCode1 == hashCode2) << ("Values one and two should have equal hash");
-        ASSERT_TRUE(hashCode1 != hashCode3) << ("Values one and three shouldn't have equal hash");
-        ASSERT_TRUE(hashCode2 != hashCode3) << ("Values two and three shouldn't have equal hash");
+        ASSERT_TRUE(hashCode1 == hashCode2)
+            << ("Values one and two should have equal hash");
+        ASSERT_TRUE(hashCode1 != hashCode3)
+            << ("Values one and three shouldn't have equal hash");
+        ASSERT_TRUE(hashCode2 != hashCode3)
+            << ("Values two and three shouldn't have equal hash");
     }
 
     {
@@ -198,15 +222,18 @@ TEST_F(HashCodeTest, testHashShort) {
         ASSERT_TRUE(hashCode2 != 0);
         ASSERT_TRUE(hashCode3 != 0);
 
-        ASSERT_TRUE(hashCode1 == hashCode2) << ("Values one and two should have equal hash");
-        ASSERT_TRUE(hashCode1 != hashCode3) << ("Values one and three shouldn't have equal hash");
-        ASSERT_TRUE(hashCode2 != hashCode3) << ("Values two and three shouldn't have equal hash");
+        ASSERT_TRUE(hashCode1 == hashCode2)
+            << ("Values one and two should have equal hash");
+        ASSERT_TRUE(hashCode1 != hashCode3)
+            << ("Values one and three shouldn't have equal hash");
+        ASSERT_TRUE(hashCode2 != hashCode3)
+            << ("Values two and three shouldn't have equal hash");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(HashCodeTest, testHashInteger) {
-
+TEST_F(HashCodeTest, testHashInteger)
+{
     {
         int value1 = 1024;
         int value2 = 1024;
@@ -220,9 +247,12 @@ TEST_F(HashCodeTest, testHashInteger) {
         ASSERT_TRUE(hashCode2 != 0);
         ASSERT_TRUE(hashCode3 != 0);
 
-        ASSERT_TRUE(hashCode1 == hashCode2) << ("Values one and two should have equal hash");
-        ASSERT_TRUE(hashCode1 != hashCode3) << ("Values one and three shouldn't have equal hash");
-        ASSERT_TRUE(hashCode2 != hashCode3) << ("Values two and three shouldn't have equal hash");
+        ASSERT_TRUE(hashCode1 == hashCode2)
+            << ("Values one and two should have equal hash");
+        ASSERT_TRUE(hashCode1 != hashCode3)
+            << ("Values one and three shouldn't have equal hash");
+        ASSERT_TRUE(hashCode2 != hashCode3)
+            << ("Values two and three shouldn't have equal hash");
     }
 
     {
@@ -238,15 +268,18 @@ TEST_F(HashCodeTest, testHashInteger) {
         ASSERT_TRUE(hashCode2 != 0);
         ASSERT_TRUE(hashCode3 != 0);
 
-        ASSERT_TRUE(hashCode1 == hashCode2) << ("Values one and two should have equal hash");
-        ASSERT_TRUE(hashCode1 != hashCode3) << ("Values one and three shouldn't have equal hash");
-        ASSERT_TRUE(hashCode2 != hashCode3) << ("Values two and three shouldn't have equal hash");
+        ASSERT_TRUE(hashCode1 == hashCode2)
+            << ("Values one and two should have equal hash");
+        ASSERT_TRUE(hashCode1 != hashCode3)
+            << ("Values one and three shouldn't have equal hash");
+        ASSERT_TRUE(hashCode2 != hashCode3)
+            << ("Values two and three shouldn't have equal hash");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(HashCodeTest, testHashLong) {
-
+TEST_F(HashCodeTest, testHashLong)
+{
     {
         long long value1 = 1024000LL;
         long long value2 = 1024000LL;
@@ -260,9 +293,12 @@ TEST_F(HashCodeTest, testHashLong) {
         ASSERT_TRUE(hashCode2 != 0);
         ASSERT_TRUE(hashCode3 != 0);
 
-        ASSERT_TRUE(hashCode1 == hashCode2) << ("Values one and two should have equal hash");
-        ASSERT_TRUE(hashCode1 != hashCode3) << ("Values one and three shouldn't have equal hash");
-        ASSERT_TRUE(hashCode2 != hashCode3) << ("Values two and three shouldn't have equal hash");
+        ASSERT_TRUE(hashCode1 == hashCode2)
+            << ("Values one and two should have equal hash");
+        ASSERT_TRUE(hashCode1 != hashCode3)
+            << ("Values one and three shouldn't have equal hash");
+        ASSERT_TRUE(hashCode2 != hashCode3)
+            << ("Values two and three shouldn't have equal hash");
     }
 
     {
@@ -278,15 +314,18 @@ TEST_F(HashCodeTest, testHashLong) {
         ASSERT_TRUE(hashCode2 != 0);
         ASSERT_TRUE(hashCode3 != 0);
 
-        ASSERT_TRUE(hashCode1 == hashCode2) << ("Values one and two should have equal hash");
-        ASSERT_TRUE(hashCode1 != hashCode3) << ("Values one and three shouldn't have equal hash");
-        ASSERT_TRUE(hashCode2 != hashCode3) << ("Values two and three shouldn't have equal hash");
+        ASSERT_TRUE(hashCode1 == hashCode2)
+            << ("Values one and two should have equal hash");
+        ASSERT_TRUE(hashCode1 != hashCode3)
+            << ("Values one and three shouldn't have equal hash");
+        ASSERT_TRUE(hashCode2 != hashCode3)
+            << ("Values two and three shouldn't have equal hash");
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(HashCodeTest, testHashFloat) {
-
+TEST_F(HashCodeTest, testHashFloat)
+{
     float value1 = 4.4f;
     float value2 = 4.4f;
     float value3 = 10.0f;
@@ -299,14 +338,17 @@ TEST_F(HashCodeTest, testHashFloat) {
     ASSERT_TRUE(hashCode2 != 0);
     ASSERT_TRUE(hashCode3 != 0);
 
-    ASSERT_TRUE(hashCode1 == hashCode2) << ("Values one and two should have equal hash");
-    ASSERT_TRUE(hashCode1 != hashCode3) << ("Values one and three shouldn't have equal hash");
-    ASSERT_TRUE(hashCode2 != hashCode3) << ("Values two and three shouldn't have equal hash");
+    ASSERT_TRUE(hashCode1 == hashCode2)
+        << ("Values one and two should have equal hash");
+    ASSERT_TRUE(hashCode1 != hashCode3)
+        << ("Values one and three shouldn't have equal hash");
+    ASSERT_TRUE(hashCode2 != hashCode3)
+        << ("Values two and three shouldn't have equal hash");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(HashCodeTest, testHashDouble) {
-
+TEST_F(HashCodeTest, testHashDouble)
+{
     double value1 = 4.413;
     double value2 = 4.413;
     double value3 = 10.0025;
@@ -319,7 +361,10 @@ TEST_F(HashCodeTest, testHashDouble) {
     ASSERT_TRUE(hashCode2 != 0);
     ASSERT_TRUE(hashCode3 != 0);
 
-    ASSERT_TRUE(hashCode1 == hashCode2) << ("Values one and two should have equal hash");
-    ASSERT_TRUE(hashCode1 != hashCode3) << ("Values one and three shouldn't have equal hash");
-    ASSERT_TRUE(hashCode2 != hashCode3) << ("Values two and three shouldn't have equal hash");
+    ASSERT_TRUE(hashCode1 == hashCode2)
+        << ("Values one and two should have equal hash");
+    ASSERT_TRUE(hashCode1 != hashCode3)
+        << ("Values one and three shouldn't have equal hash");
+    ASSERT_TRUE(hashCode2 != hashCode3)
+        << ("Values two and three shouldn't have equal hash");
 }

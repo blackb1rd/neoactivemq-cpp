@@ -19,8 +19,8 @@
 
 #include <activemq/core/ActiveMQConstants.h>
 #include <activemq/util/AdvisorySupport.h>
-#include <decaf/util/concurrent/atomic/AtomicBoolean.h>
 #include <decaf/lang/exceptions/ClassCastException.h>
+#include <decaf/util/concurrent/atomic/AtomicBoolean.h>
 
 using namespace activemq;
 using namespace activemq::core;
@@ -36,67 +36,91 @@ using namespace decaf::util::concurrent;
 using namespace decaf::util::concurrent::atomic;
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace activemq {
-namespace core {
+namespace activemq
+{
+namespace core
+{
 
-    class AdvisoryConsumerConfig {
+    class AdvisoryConsumerConfig
+    {
     public:
-
-        int deliveredCounter;
+        int                   deliveredCounter;
         Pointer<ConsumerInfo> info;
-        AtomicBoolean closed;
-        int hashCode;
+        AtomicBoolean         closed;
+        int                   hashCode;
 
-        AdvisoryConsumerConfig() : deliveredCounter(0), info(), closed(false), hashCode() {
+        AdvisoryConsumerConfig()
+            : deliveredCounter(0),
+              info(),
+              closed(false),
+              hashCode()
+        {
         }
     };
 
-}}
+}  // namespace core
+}  // namespace activemq
 
 ////////////////////////////////////////////////////////////////////////////////
-AdvisoryConsumer::AdvisoryConsumer(ActiveMQConnection* connection, Pointer<commands::ConsumerId> consumerId) :
-    Dispatcher(), config(new AdvisoryConsumerConfig()), connection(connection) {
-
-    if (connection == NULL) {
-        throw NullPointerException(__FILE__, __LINE__, "Parent Connection pointer was NULL");
+AdvisoryConsumer::AdvisoryConsumer(ActiveMQConnection*           connection,
+                                   Pointer<commands::ConsumerId> consumerId)
+    : Dispatcher(),
+      config(new AdvisoryConsumerConfig()),
+      connection(connection)
+{
+    if (connection == NULL)
+    {
+        throw NullPointerException(__FILE__,
+                                   __LINE__,
+                                   "Parent Connection pointer was NULL");
     }
 
     this->config->info.reset(new ConsumerInfo());
 
     this->config->info->setConsumerId(consumerId);
-    this->config->info->setDestination(
-        Pointer<ActiveMQDestination>(AdvisorySupport::getTempDestinationCompositeAdvisoryTopic()));
+    this->config->info->setDestination(Pointer<ActiveMQDestination>(
+        AdvisorySupport::getTempDestinationCompositeAdvisoryTopic()));
     this->config->info->setPrefetchSize(1000);
     this->config->info->setNoLocal(true);
-    this->config->info->setDispatchAsync(connection->isAdvisoryConsumerDispatchAsync());
+    this->config->info->setDispatchAsync(
+        connection->isAdvisoryConsumerDispatchAsync());
 
     this->config->hashCode = consumerId->getHashCode();
 
-    try {
-        this->connection->addDispatcher(this->config->info->getConsumerId(), this);
+    try
+    {
+        this->connection->addDispatcher(this->config->info->getConsumerId(),
+                                        this);
         this->connection->syncRequest(this->config->info);
-    } catch(...) {
+    }
+    catch (...)
+    {
         delete this->config;
         throw;
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-AdvisoryConsumer::~AdvisoryConsumer() {
-    try {
+AdvisoryConsumer::~AdvisoryConsumer()
+{
+    try
+    {
         delete config;
     }
     AMQ_CATCHALL_NOTHROW()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AdvisoryConsumer::dispose() {
-
-    if (this->config->closed.compareAndSet(false, true)) {
-
-        try {
+void AdvisoryConsumer::dispose()
+{
+    if (this->config->closed.compareAndSet(false, true))
+    {
+        try
+        {
             this->connection->oneway(this->config->info->createRemoveCommand());
-        } catch (cms::CMSException& e) {
+        }
+        catch (cms::CMSException& e)
+        {
         }
 
         this->connection->removeDispatcher(this->config->info->getConsumerId());
@@ -104,13 +128,15 @@ void AdvisoryConsumer::dispose() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AdvisoryConsumer::dispatch(const Pointer<MessageDispatch>& message) {
-
+void AdvisoryConsumer::dispatch(const Pointer<MessageDispatch>& message)
+{
     // Auto ack messages when we reach 75% of the prefetch
     this->config->deliveredCounter++;
-    if (this->config->deliveredCounter > (0.75 * this->config->info->getPrefetchSize())) {
-        try {
-
+    if (this->config->deliveredCounter >
+        (0.75 * this->config->info->getPrefetchSize()))
+    {
+        try
+        {
             Pointer<MessageAck> ack(new MessageAck());
 
             ack->setAckType(ActiveMQConstants::ACK_TYPE_CONSUMED);
@@ -122,38 +148,54 @@ void AdvisoryConsumer::dispatch(const Pointer<MessageDispatch>& message) {
             this->connection->oneway(ack);
 
             this->config->deliveredCounter = 0;
-        } catch (Exception& e) {
+        }
+        catch (Exception& e)
+        {
             this->connection->onClientInternalException(e);
         }
     }
 
     Pointer<DataStructure> object = message->getMessage()->getDataStructure();
-    if (object != NULL) {
-        try {
-            Pointer<DestinationInfo> info = object.dynamicCast<DestinationInfo>();
+    if (object != NULL)
+    {
+        try
+        {
+            Pointer<DestinationInfo> info =
+                object.dynamicCast<DestinationInfo>();
             processDestinationInfo(info);
-        } catch (ClassCastException& ex) {
+        }
+        catch (ClassCastException& ex)
+        {
         }
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AdvisoryConsumer::processDestinationInfo(Pointer<commands::DestinationInfo> info) {
-
+void AdvisoryConsumer::processDestinationInfo(
+    Pointer<commands::DestinationInfo> info)
+{
     Pointer<ActiveMQDestination> dest = info->getDestination();
-    if (!dest->isTemporary()) {
+    if (!dest->isTemporary())
+    {
         return;
     }
 
-    Pointer<ActiveMQTempDestination> tempDest = dest.dynamicCast<ActiveMQTempDestination>();
-    if (info->getOperationType() == ActiveMQConstants::DESTINATION_ADD_OPERATION) {
+    Pointer<ActiveMQTempDestination> tempDest =
+        dest.dynamicCast<ActiveMQTempDestination>();
+    if (info->getOperationType() ==
+        ActiveMQConstants::DESTINATION_ADD_OPERATION)
+    {
         this->connection->addTempDestination(tempDest);
-    } else if (info->getOperationType() == ActiveMQConstants::DESTINATION_REMOVE_OPERATION) {
+    }
+    else if (info->getOperationType() ==
+             ActiveMQConstants::DESTINATION_REMOVE_OPERATION)
+    {
         this->connection->removeTempDestination(tempDest);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int AdvisoryConsumer::getHashCode() const {
-   return this->config->hashCode;
+int AdvisoryConsumer::getHashCode() const
+{
+    return this->config->hashCode;
 }

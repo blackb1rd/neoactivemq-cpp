@@ -17,20 +17,20 @@
 
 #include <gtest/gtest.h>
 
-#include <decaf/util/Properties.h>
 #include <decaf/net/SocketFactory.h>
+#include <decaf/util/Properties.h>
 #include <cstring>
 
 #ifdef HAVE_STRING_H
 #include <string.h>
 #endif
 
-#include <memory>
-#include <decaf/net/Socket.h>
+#include <decaf/lang/Thread.h>
 #include <decaf/net/ServerSocket.h>
+#include <decaf/net/Socket.h>
 #include <decaf/util/concurrent/Concurrent.h>
 #include <decaf/util/concurrent/Mutex.h>
-#include <decaf/lang/Thread.h>
+#include <memory>
 #include <sstream>
 
 using namespace decaf;
@@ -39,138 +39,173 @@ using namespace decaf::util;
 using namespace decaf::lang;
 using namespace decaf::util::concurrent;
 
-    class SocketFactoryTest : public ::testing::Test {
-    };
+class SocketFactoryTest : public ::testing::Test
+{
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace{
+namespace
+{
 
-    class MyServerThread: public lang::Thread {
-    private:
+class MyServerThread : public lang::Thread
+{
+private:
+    bool        done;
+    int         numClients;
+    std::string lastMessage;
+    int         serverPort;
+    bool        serverReady;
 
-        bool done;
-        int numClients;
-        std::string lastMessage;
-        int serverPort;
-        bool serverReady;
+public:
+    util::concurrent::Mutex mutex;
+    util::concurrent::Mutex startMutex;
 
-    public:
+public:
+    MyServerThread()
+        : done(false),
+          numClients(0),
+          lastMessage(),
+          serverPort(0),
+          serverReady(false),
+          mutex(),
+          startMutex()
+    {
+    }
 
-        util::concurrent::Mutex mutex;
-        util::concurrent::Mutex startMutex;
+    virtual ~MyServerThread()
+    {
+        stop();
+    }
 
-    public:
+    std::string getLastMessage()
+    {
+        return lastMessage;
+    }
 
-        MyServerThread() : done(false), numClients(0), lastMessage(), serverPort(0),
-                           serverReady(false), mutex(), startMutex() {
-        }
+    int getNumClients()
+    {
+        return numClients;
+    }
 
-        virtual ~MyServerThread() {
-            stop();
-        }
+    int getPort()
+    {
+        return serverPort;
+    }
 
-        std::string getLastMessage() {
-            return lastMessage;
-        }
-
-        int getNumClients() {
-            return numClients;
-        }
-
-        int getPort() {
-            return serverPort;
-        }
-
-        void waitUntilReady() {
-            synchronized(&startMutex) {
-                while (!serverReady) {
-                    startMutex.wait(10000);
-                }
+    void waitUntilReady()
+    {
+        synchronized(&startMutex)
+        {
+            while (!serverReady)
+            {
+                startMutex.wait(10000);
             }
         }
+    }
 
-        virtual void stop() {
-            done = true;
-        }
+    virtual void stop()
+    {
+        done = true;
+    }
 
-        virtual void run() {
-            try {
-                unsigned char buf[1000];
+    virtual void run()
+    {
+        try
+        {
+            unsigned char buf[1000];
 
-                ServerSocket server;
-                server.bind("127.0.0.1", 0);
-                serverPort = server.getLocalPort();
+            ServerSocket server;
+            server.bind("127.0.0.1", 0);
+            serverPort = server.getLocalPort();
 
-                synchronized(&startMutex) {
-                    serverReady = true;
-                    startMutex.notifyAll();
-                }
+            synchronized(&startMutex)
+            {
+                serverReady = true;
+                startMutex.notifyAll();
+            }
 
-                net::Socket* socket = server.accept();
-                server.close();
+            net::Socket* socket = server.accept();
+            server.close();
 
-                socket->setSoLinger(false, 0);
+            socket->setSoLinger(false, 0);
 
-                synchronized(&mutex) {
-                    numClients++;
-                    mutex.notifyAll();
-                }
+            synchronized(&mutex)
+            {
+                numClients++;
+                mutex.notifyAll();
+            }
 
-                while (!done && socket != NULL) {
-
-                    io::InputStream* stream = socket->getInputStream();
-                    memset(buf, 0, 1000);
-                    try {
-                        if (stream->read(buf, 1000, 0, 1000) == -1) {
-                            done = true;
-                            continue;
-                        }
-
-                        lastMessage = (char*) buf;
-
-                        if (strcmp((char*) buf, "reply") == 0) {
-                            io::OutputStream* output = socket->getOutputStream();
-                            output->write((unsigned char*) "hello", (int) strlen("hello"), 0, (int) strlen("hello"));
-                        }
-
-                    } catch (io::IOException& ex) {
+            while (!done && socket != NULL)
+            {
+                io::InputStream* stream = socket->getInputStream();
+                memset(buf, 0, 1000);
+                try
+                {
+                    if (stream->read(buf, 1000, 0, 1000) == -1)
+                    {
                         done = true;
+                        continue;
+                    }
+
+                    lastMessage = (char*)buf;
+
+                    if (strcmp((char*)buf, "reply") == 0)
+                    {
+                        io::OutputStream* output = socket->getOutputStream();
+                        output->write((unsigned char*)"hello",
+                                      (int)strlen("hello"),
+                                      0,
+                                      (int)strlen("hello"));
                     }
                 }
-
-                socket->close();
-                delete socket;
-
-                numClients--;
-
-                synchronized(&mutex) {
-                    mutex.notifyAll();
+                catch (io::IOException& ex)
+                {
+                    done = true;
                 }
+            }
 
-            } catch (io::IOException& ex) {
-                printf("%s\n", ex.getMessage().c_str());
-                ASSERT_TRUE(false);
-            } catch (...) {
-                ASSERT_TRUE(false);
+            socket->close();
+            delete socket;
+
+            numClients--;
+
+            synchronized(&mutex)
+            {
+                mutex.notifyAll();
             }
         }
-    };
-}
+        catch (io::IOException& ex)
+        {
+            printf("%s\n", ex.getMessage().c_str());
+            ASSERT_TRUE(false);
+        }
+        catch (...)
+        {
+            ASSERT_TRUE(false);
+        }
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(SocketFactoryTest, test) {
-    try {
+TEST_F(SocketFactoryTest, test)
+{
+    try
+    {
         MyServerThread serverThread;
         serverThread.start();
         serverThread.waitUntilReady();
 
-        SocketFactory* factory = SocketFactory::getDefault();
-        std::unique_ptr<Socket> client(factory->createSocket("127.0.0.1", serverThread.getPort()));
+        SocketFactory*          factory = SocketFactory::getDefault();
+        std::unique_ptr<Socket> client(
+            factory->createSocket("127.0.0.1", serverThread.getPort()));
 
         client->setSoLinger(false, 0);
 
-        synchronized(&serverThread.mutex) {
-            if (serverThread.getNumClients() != 1) {
+        synchronized(&serverThread.mutex)
+        {
+            if (serverThread.getNumClients() != 1)
+            {
                 serverThread.mutex.wait(10000);
             }
         }
@@ -181,8 +216,10 @@ TEST_F(SocketFactoryTest, test) {
 
         client->close();
 
-        synchronized(&serverThread.mutex) {
-            if (serverThread.getNumClients() != 0) {
+        synchronized(&serverThread.mutex)
+        {
+            if (serverThread.getNumClients() != 0)
+            {
                 serverThread.mutex.wait(10000);
             }
         }
@@ -191,29 +228,36 @@ TEST_F(SocketFactoryTest, test) {
 
         serverThread.stop();
         serverThread.join();
-    } catch (lang::Exception& ex) {
+    }
+    catch (lang::Exception& ex)
+    {
         ex.printStackTrace();
         ASSERT_TRUE(false);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(SocketFactoryTest, testNoDelay) {
-    try {
+TEST_F(SocketFactoryTest, testNoDelay)
+{
+    try
+    {
         MyServerThread serverThread;
         serverThread.start();
         serverThread.waitUntilReady();
 
-        SocketFactory* factory = SocketFactory::getDefault();
-        std::unique_ptr<Socket> client(factory->createSocket("127.0.0.1", serverThread.getPort()));
+        SocketFactory*          factory = SocketFactory::getDefault();
+        std::unique_ptr<Socket> client(
+            factory->createSocket("127.0.0.1", serverThread.getPort()));
 
         client->setSoLinger(false, 0);
         client->setTcpNoDelay(true);
 
         ASSERT_TRUE(client->getTcpNoDelay() == true);
 
-        synchronized(&serverThread.mutex) {
-            if (serverThread.getNumClients() != 1) {
+        synchronized(&serverThread.mutex)
+        {
+            if (serverThread.getNumClients() != 1)
+            {
                 serverThread.mutex.wait(1000);
             }
         }
@@ -224,8 +268,10 @@ TEST_F(SocketFactoryTest, testNoDelay) {
 
         client->close();
 
-        synchronized(&serverThread.mutex) {
-            if (serverThread.getNumClients() != 0) {
+        synchronized(&serverThread.mutex)
+        {
+            if (serverThread.getNumClients() != 0)
+            {
                 serverThread.mutex.wait(1000);
             }
         }
@@ -234,7 +280,9 @@ TEST_F(SocketFactoryTest, testNoDelay) {
 
         serverThread.stop();
         serverThread.join();
-    } catch (lang::Exception& ex) {
+    }
+    catch (lang::Exception& ex)
+    {
         ASSERT_TRUE(false);
     }
 }

@@ -16,9 +16,9 @@
  */
 #include <decaf/net/SocketFactory.h>
 
-#include <decaf/lang/Runnable.h>
 #include <decaf/internal/net/DefaultSocketFactory.h>
 #include <decaf/internal/net/Network.h>
+#include <decaf/lang/Runnable.h>
 
 using namespace decaf;
 using namespace decaf::io;
@@ -28,58 +28,69 @@ using namespace decaf::util::concurrent;
 using namespace decaf::internal::net;
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class ShutdownTask : public decaf::lang::Runnable {
-    private:
+class ShutdownTask : public decaf::lang::Runnable
+{
+private:
+    SocketFactory** defaultRef;
 
-        SocketFactory** defaultRef;
+private:
+    ShutdownTask(const ShutdownTask&);
+    ShutdownTask& operator=(const ShutdownTask&);
 
-    private:
+public:
+    ShutdownTask(SocketFactory** defaultRef)
+        : defaultRef(defaultRef)
+    {
+    }
 
-        ShutdownTask( const ShutdownTask& );
-        ShutdownTask& operator= ( const ShutdownTask& );
+    virtual ~ShutdownTask()
+    {
+    }
 
-    public:
-
-        ShutdownTask( SocketFactory** defaultRef ) : defaultRef( defaultRef ) {}
-        virtual ~ShutdownTask() {}
-
-        virtual void run() {
-            *defaultRef = NULL;
-        }
-    };
-}
+    virtual void run()
+    {
+        *defaultRef = NULL;
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
 SocketFactory* SocketFactory::defaultFactory = NULL;
 
 ////////////////////////////////////////////////////////////////////////////////
-SocketFactory::SocketFactory() {
+SocketFactory::SocketFactory()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SocketFactory::~SocketFactory() {
+SocketFactory::~SocketFactory()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Socket* SocketFactory::createSocket() {
-
+Socket* SocketFactory::createSocket()
+{
     throw IOException(
-        __FILE__, __LINE__, "Unconnected Sockets not implemented for this Socket Type." );
+        __FILE__,
+        __LINE__,
+        "Unconnected Sockets not implemented for this Socket Type.");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SocketFactory* SocketFactory::getDefault() {
-
+SocketFactory* SocketFactory::getDefault()
+{
     Network* networkRuntime = Network::getNetworkRuntime();
 
-    synchronized( networkRuntime->getRuntimeLock() ) {
-
-        if( defaultFactory == NULL ) {
+    synchronized(networkRuntime->getRuntimeLock())
+    {
+        if (defaultFactory == NULL)
+        {
             defaultFactory = new DefaultSocketFactory();
-            networkRuntime->addAsResource( defaultFactory );
-            networkRuntime->addShutdownTask( new ShutdownTask( &defaultFactory ) );
+            networkRuntime->addAsResource(defaultFactory);
+            networkRuntime->addShutdownTask(new ShutdownTask(&defaultFactory));
         }
     }
 

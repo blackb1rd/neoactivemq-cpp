@@ -20,35 +20,49 @@
 using namespace cms;
 
 ////////////////////////////////////////////////////////////////////////////////
-ResourceAllocationException::ResourceAllocationException() : CMSException() {
+ResourceAllocationException::ResourceAllocationException()
+    : CMSException()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ResourceAllocationException::ResourceAllocationException(const ResourceAllocationException& ex) :
-    CMSException(ex) {
+ResourceAllocationException::ResourceAllocationException(
+    const ResourceAllocationException& ex)
+    : CMSException(ex)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ResourceAllocationException::ResourceAllocationException(const std::string& message) :
-    CMSException(message, NULL) {
+ResourceAllocationException::ResourceAllocationException(
+    const std::string& message)
+    : CMSException(message, NULL)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ResourceAllocationException::ResourceAllocationException(const std::string& message, const std::exception* cause) :
-    CMSException(message, cause) {
+ResourceAllocationException::ResourceAllocationException(
+    const std::string&    message,
+    const std::exception* cause)
+    : CMSException(message, cause)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ResourceAllocationException::ResourceAllocationException(const std::string& message, const std::exception* cause,
-                                                         const std::vector<std::pair<std::string, int> >& stackTrace) :
-    CMSException(message, cause, stackTrace) {
+ResourceAllocationException::ResourceAllocationException(
+    const std::string&                              message,
+    const std::exception*                           cause,
+    const std::vector<std::pair<std::string, int>>& stackTrace)
+    : CMSException(message, cause, stackTrace)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ResourceAllocationException::~ResourceAllocationException() throw() {
+ResourceAllocationException::~ResourceAllocationException() throw()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ResourceAllocationException* ResourceAllocationException::clone() {
+ResourceAllocationException* ResourceAllocationException::clone()
+{
     return new ResourceAllocationException(*this);
 }

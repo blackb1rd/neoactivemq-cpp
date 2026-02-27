@@ -24,35 +24,54 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-StringIndexOutOfBoundsException::StringIndexOutOfBoundsException() : IndexOutOfBoundsException() {
+StringIndexOutOfBoundsException::StringIndexOutOfBoundsException()
+    : IndexOutOfBoundsException()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-StringIndexOutOfBoundsException::StringIndexOutOfBoundsException(int index) : IndexOutOfBoundsException() {
+StringIndexOutOfBoundsException::StringIndexOutOfBoundsException(int index)
+    : IndexOutOfBoundsException()
+{
     this->setMessage("String index out of range: %d", index);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-StringIndexOutOfBoundsException::~StringIndexOutOfBoundsException() throw () {
+StringIndexOutOfBoundsException::~StringIndexOutOfBoundsException() throw()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-StringIndexOutOfBoundsException::StringIndexOutOfBoundsException(const Exception& ex) : IndexOutOfBoundsException() {
-    *(Exception*) this = ex;
+StringIndexOutOfBoundsException::StringIndexOutOfBoundsException(
+    const Exception& ex)
+    : IndexOutOfBoundsException()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-StringIndexOutOfBoundsException::StringIndexOutOfBoundsException(const StringIndexOutOfBoundsException& ex) : IndexOutOfBoundsException() {
-    *(Exception*) this = ex;
+StringIndexOutOfBoundsException::StringIndexOutOfBoundsException(
+    const StringIndexOutOfBoundsException& ex)
+    : IndexOutOfBoundsException()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-StringIndexOutOfBoundsException::StringIndexOutOfBoundsException(const std::exception* cause) : IndexOutOfBoundsException(cause) {
+StringIndexOutOfBoundsException::StringIndexOutOfBoundsException(
+    const std::exception* cause)
+    : IndexOutOfBoundsException(cause)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-StringIndexOutOfBoundsException::StringIndexOutOfBoundsException(const char* file, const int lineNumber, const char* msg, ...) : IndexOutOfBoundsException() {
-
+StringIndexOutOfBoundsException::StringIndexOutOfBoundsException(
+    const char* file,
+    const int   lineNumber,
+    const char* msg,
+    ...)
+    : IndexOutOfBoundsException()
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -62,14 +81,25 @@ StringIndexOutOfBoundsException::StringIndexOutOfBoundsException(const char* fil
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-StringIndexOutOfBoundsException::StringIndexOutOfBoundsException(const char* file, const int lineNumber, int index) : IndexOutOfBoundsException() {
+StringIndexOutOfBoundsException::StringIndexOutOfBoundsException(
+    const char* file,
+    const int   lineNumber,
+    int         index)
+    : IndexOutOfBoundsException()
+{
     setMark(file, lineNumber);
     this->setMessage("String index out of range: %d", index);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-StringIndexOutOfBoundsException::StringIndexOutOfBoundsException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...) : IndexOutOfBoundsException(cause) {
-
+StringIndexOutOfBoundsException::StringIndexOutOfBoundsException(
+    const char*           file,
+    const int             lineNumber,
+    const std::exception* cause,
+    const char*           msg,
+    ...)
+    : IndexOutOfBoundsException(cause)
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);

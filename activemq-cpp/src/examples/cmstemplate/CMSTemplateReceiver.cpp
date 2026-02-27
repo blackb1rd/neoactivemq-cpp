@@ -15,25 +15,25 @@
  * limitations under the License.
  */
 
-#include <decaf/lang/Thread.h>
-#include <decaf/lang/Runnable.h>
-#include <decaf/util/concurrent/CountDownLatch.h>
-#include <decaf/lang/Long.h>
-#include <decaf/util/Date.h>
-#include <activemq/core/ActiveMQConnectionFactory.h>
-#include <activemq/util/Config.h>
-#include <activemq/library/ActiveMQCPP.h>
 #include <activemq/cmsutil/CmsTemplate.h>
 #include <activemq/cmsutil/MessageCreator.h>
+#include <activemq/core/ActiveMQConnectionFactory.h>
+#include <activemq/library/ActiveMQCPP.h>
+#include <activemq/util/Config.h>
+#include <cms/BytesMessage.h>
 #include <cms/Connection.h>
+#include <cms/ExceptionListener.h>
+#include <cms/MapMessage.h>
+#include <cms/MessageListener.h>
 #include <cms/Session.h>
 #include <cms/TextMessage.h>
-#include <cms/BytesMessage.h>
-#include <cms/MapMessage.h>
-#include <cms/ExceptionListener.h>
-#include <cms/MessageListener.h>
-#include <stdlib.h>
+#include <decaf/lang/Long.h>
+#include <decaf/lang/Runnable.h>
+#include <decaf/lang/Thread.h>
+#include <decaf/util/Date.h>
+#include <decaf/util/concurrent/CountDownLatch.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <iostream>
 #include <memory>
 
@@ -47,110 +47,116 @@ using namespace cms;
 using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class Receiver: Runnable {
-    private:
+class Receiver : Runnable
+{
+private:
+    string         name;
+    CountDownLatch ready;
+    bool           isClosing;
+    CmsTemplate*   cmsTemplate;
+    Thread*        asyncReceiverThread;
 
-        string name;
-        CountDownLatch ready;
-        bool isClosing;
-        CmsTemplate* cmsTemplate;
-        Thread* asyncReceiverThread;
+private:
+    Receiver(const Receiver&);
+    Receiver& operator=(const Receiver&);
 
-    private:
+public:
+    Receiver(string name, CmsTemplate* cmsTemplate)
+        : name(name),
+          ready(1),
+          isClosing(false),
+          cmsTemplate(cmsTemplate),
+          asyncReceiverThread(NULL)
+    {
+        asyncReceiverThread = new Thread(this, "AsyncReceiver");
+        asyncReceiverThread->start();
 
-        Receiver( const Receiver& );
-        Receiver& operator= ( const Receiver& );
+        waitUntilReady();
+    }
 
-    public:
+    virtual ~Receiver()
+    {
+        isClosing = true;
 
-        Receiver( string name, CmsTemplate* cmsTemplate ) :
-            name(name), ready(1), isClosing(false), cmsTemplate(cmsTemplate), asyncReceiverThread(NULL) {
-
-            asyncReceiverThread = new Thread( this, "AsyncReceiver" );
-            asyncReceiverThread->start();
-
-            waitUntilReady();
+        // wait for the m_asyncReceiverThread to terminate
+        if (asyncReceiverThread)
+        {
+            asyncReceiverThread->join();
+            delete asyncReceiverThread;
         }
 
-        virtual ~Receiver() {
+        delete cmsTemplate;
+    }
 
-            isClosing = true;
+    virtual void run()
+    {
+        ready.countDown();
+        while (!isClosing)
+        {
+            receiveMessage();
+        }
+    }
 
-            //wait for the m_asyncReceiverThread to terminate
-            if( asyncReceiverThread ) {
-                asyncReceiverThread->join();
-                delete asyncReceiverThread;
+private:
+    /**
+     * to reveive message from a destination synchronously
+     * Note: If parameter retryOnError is true, then this function will retry on
+     * errors as long as the receiver's timeout has not been reached. Otherwise,
+     * this function will not retry on errors.
+     */
+    void receiveMessage()
+    {
+        try
+        {
+            Message* cmsMessage = cmsTemplate->receive();
+            if (cmsMessage)
+            {
+                printf("%s received a message\n", name.c_str());
+                delete cmsMessage;
             }
-
-            delete cmsTemplate;
         }
-
-        virtual void run() {
-
-            ready.countDown();
-            while( !isClosing ) {
-                receiveMessage();
-            }
+        catch (cms::CMSException& ex)
+        {
+            std::cout << "Caught CMSException: ";
+            std::cout << ex.getMessage().c_str() << endl;
+            Thread::sleep(10000);
         }
+    }
 
-    private:
-
-        /**
-         * to reveive message from a destination synchronously
-         * Note: If parameter retryOnError is true, then this function will retry on errors
-         *       as long as the receiver's timeout has not been reached. Otherwise, this function will not retry on errors.
-         */
-        void receiveMessage() {
-
-            try {
-
-                Message* cmsMessage = cmsTemplate->receive();
-                if( cmsMessage ) {
-                    printf( "%s received a message\n", name.c_str() );
-                    delete cmsMessage;
-                }
-
-            } catch( cms::CMSException& ex ) {
-                std::cout << "Caught CMSException: ";
-                std::cout << ex.getMessage().c_str() << endl;
-                Thread::sleep( 10000 );
-            }
-        }
-
-        void waitUntilReady() {
-            ready.await();
-        }
-
-    };
-}
+    void waitUntilReady()
+    {
+        ready.await();
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-int main( int argc AMQCPP_UNUSED, char* argv[] AMQCPP_UNUSED ) {
-
+int main(int argc AMQCPP_UNUSED, char* argv[] AMQCPP_UNUSED)
+{
     std::cout << "=====================================================\n";
     std::cout << "Starting the MessageListener application..." << std::endl;
 
-    //initialize ActiveMQCPP library
+    // initialize ActiveMQCPP library
     activemq::library::ActiveMQCPP::initializeLibrary();
 
     ActiveMQConnectionFactory* connectionFactory =
-        new ActiveMQConnectionFactory( "failover://(tcp://127.0.0.1:61616)" );
+        new ActiveMQConnectionFactory("failover://(tcp://127.0.0.1:61616)");
 
-    CmsTemplate* cmsTemplate = new CmsTemplate( connectionFactory );
-    cmsTemplate->setDefaultDestinationName( "CMSTemplateExamples" );
-    cmsTemplate->setPubSubDomain( true );
-    cmsTemplate->setReceiveTimeout( 2000 );
-    Receiver* receiver = new Receiver( "MessageListener", cmsTemplate );
+    CmsTemplate* cmsTemplate = new CmsTemplate(connectionFactory);
+    cmsTemplate->setDefaultDestinationName("CMSTemplateExamples");
+    cmsTemplate->setPubSubDomain(true);
+    cmsTemplate->setReceiveTimeout(2000);
+    Receiver* receiver = new Receiver("MessageListener", cmsTemplate);
 
     std::cout << "Click any char to terminate the application..." << std::endl;
     getchar();
 
-    //shut down ActiveMQCPP library
+    // shut down ActiveMQCPP library
     delete connectionFactory;
     delete receiver;
 
     activemq::library::ActiveMQCPP::shutdownLibrary();
-
 }

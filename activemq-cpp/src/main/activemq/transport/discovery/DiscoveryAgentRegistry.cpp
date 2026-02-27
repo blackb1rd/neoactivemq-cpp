@@ -31,60 +31,83 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
-    DiscoveryAgentRegistry* theOnlyInstance;
+namespace
+{
+DiscoveryAgentRegistry* theOnlyInstance;
+}  // namespace
+
+////////////////////////////////////////////////////////////////////////////////
+DiscoveryAgentRegistry::DiscoveryAgentRegistry()
+    : registry()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DiscoveryAgentRegistry::DiscoveryAgentRegistry() : registry() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-DiscoveryAgentRegistry::~DiscoveryAgentRegistry() {
-    try {
+DiscoveryAgentRegistry::~DiscoveryAgentRegistry()
+{
+    try
+    {
         this->unregisterAllFactories();
     }
     AMQ_CATCHALL_NOTHROW()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DiscoveryAgentFactory* DiscoveryAgentRegistry::findFactory(const std::string& name) const {
-
-    if (!this->registry.containsKey(name)) {
-        throw NoSuchElementException(__FILE__, __LINE__,
-            "No Matching Factory Registered for format := %s", name.c_str());
+DiscoveryAgentFactory* DiscoveryAgentRegistry::findFactory(
+    const std::string& name) const
+{
+    if (!this->registry.containsKey(name))
+    {
+        throw NoSuchElementException(
+            __FILE__,
+            __LINE__,
+            "No Matching Factory Registered for format := %s",
+            name.c_str());
     }
 
     return this->registry.get(name);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DiscoveryAgentRegistry::registerFactory(const std::string& name, DiscoveryAgentFactory* factory) {
-
-    if (name == "") {
-        throw IllegalArgumentException(__FILE__, __LINE__, "DiscoveryAgentFactory name cannot be the empty string");
+void DiscoveryAgentRegistry::registerFactory(const std::string&     name,
+                                             DiscoveryAgentFactory* factory)
+{
+    if (name == "")
+    {
+        throw IllegalArgumentException(
+            __FILE__,
+            __LINE__,
+            "DiscoveryAgentFactory name cannot be the empty string");
     }
 
-    if (factory == NULL) {
-        throw NullPointerException(__FILE__, __LINE__, "Supplied DiscoveryAgentFactory pointer was NULL");
+    if (factory == NULL)
+    {
+        throw NullPointerException(
+            __FILE__,
+            __LINE__,
+            "Supplied DiscoveryAgentFactory pointer was NULL");
     }
 
     this->registry.put(name, factory);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DiscoveryAgentRegistry::unregisterFactory(const std::string& name) {
-    if (this->registry.containsKey(name)) {
+void DiscoveryAgentRegistry::unregisterFactory(const std::string& name)
+{
+    if (this->registry.containsKey(name))
+    {
         delete this->registry.get(name);
         this->registry.remove(name);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DiscoveryAgentRegistry::unregisterAllFactories() {
-
-    Pointer<Iterator<DiscoveryAgentFactory*> > iterator(this->registry.values().iterator());
-    while (iterator->hasNext()) {
+void DiscoveryAgentRegistry::unregisterAllFactories()
+{
+    Pointer<Iterator<DiscoveryAgentFactory*>> iterator(
+        this->registry.values().iterator());
+    while (iterator->hasNext())
+    {
         delete iterator->next();
     }
 
@@ -92,22 +115,26 @@ void DiscoveryAgentRegistry::unregisterAllFactories() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::vector<std::string> DiscoveryAgentRegistry::getAgentNames() const {
+std::vector<std::string> DiscoveryAgentRegistry::getAgentNames() const
+{
     return this->registry.keySet().toArray();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DiscoveryAgentRegistry& DiscoveryAgentRegistry::getInstance() {
+DiscoveryAgentRegistry& DiscoveryAgentRegistry::getInstance()
+{
     return *theOnlyInstance;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DiscoveryAgentRegistry::initialize() {
+void DiscoveryAgentRegistry::initialize()
+{
     theOnlyInstance = new DiscoveryAgentRegistry();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DiscoveryAgentRegistry::shutdown() {
+void DiscoveryAgentRegistry::shutdown()
+{
     theOnlyInstance->unregisterAllFactories();
     delete theOnlyInstance;
     theOnlyInstance = NULL;

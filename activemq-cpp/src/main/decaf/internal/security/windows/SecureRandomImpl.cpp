@@ -18,12 +18,12 @@
 #include "SecureRandomImpl.h"
 
 #include <decaf/lang/Exception.h>
-#include <decaf/lang/exceptions/RuntimeException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/lang/exceptions/IllegalArgumentException.h>
+#include <decaf/lang/exceptions/NullPointerException.h>
+#include <decaf/lang/exceptions/RuntimeException.h>
 
-#include <windows.h>
 #include <bcrypt.h>
+#include <windows.h>
 
 using namespace decaf;
 using namespace decaf::lang;
@@ -33,53 +33,70 @@ using namespace decaf::internal;
 using namespace decaf::internal::security;
 
 ////////////////////////////////////////////////////////////////////////////////
-SecureRandomImpl::SecureRandomImpl() {
+SecureRandomImpl::SecureRandomImpl()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SecureRandomImpl::~SecureRandomImpl() {
+SecureRandomImpl::~SecureRandomImpl()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SecureRandomImpl::providerSetSeed( const unsigned char* seed, int size ) {
+void SecureRandomImpl::providerSetSeed(const unsigned char* seed, int size)
+{
     // BCryptGenRandom uses the OS CSPRNG and does not require external seeding.
     (void)seed;
     (void)size;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SecureRandomImpl::providerNextBytes( unsigned char* bytes, int numBytes ) {
-
-    if( bytes == NULL ) {
-        throw NullPointerException(
-            __FILE__, __LINE__, "Byte Buffer passed cannot be NULL." );
+void SecureRandomImpl::providerNextBytes(unsigned char* bytes, int numBytes)
+{
+    if (bytes == NULL)
+    {
+        throw NullPointerException(__FILE__,
+                                   __LINE__,
+                                   "Byte Buffer passed cannot be NULL.");
     }
 
-    if( numBytes < 0 ) {
+    if (numBytes < 0)
+    {
         throw IllegalArgumentException(
-            __FILE__, __LINE__, "Number of bytes to read was negative: %d", numBytes );
+            __FILE__,
+            __LINE__,
+            "Number of bytes to read was negative: %d",
+            numBytes);
     }
 
-    if( numBytes == 0 ) {
+    if (numBytes == 0)
+    {
         return;
     }
 
-    NTSTATUS status = BCryptGenRandom( NULL, bytes, (ULONG)numBytes, BCRYPT_USE_SYSTEM_PREFERRED_RNG );
+    NTSTATUS status = BCryptGenRandom(NULL,
+                                      bytes,
+                                      (ULONG)numBytes,
+                                      BCRYPT_USE_SYSTEM_PREFERRED_RNG);
 
-    if( !BCRYPT_SUCCESS( status ) ) {
-        throw RuntimeException(
-            __FILE__, __LINE__, "BCryptGenRandom failed with NTSTATUS: 0x%08X", (unsigned int)status );
+    if (!BCRYPT_SUCCESS(status))
+    {
+        throw RuntimeException(__FILE__,
+                               __LINE__,
+                               "BCryptGenRandom failed with NTSTATUS: 0x%08X",
+                               (unsigned int)status);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-unsigned char* SecureRandomImpl::providerGenerateSeed( int numBytes ) {
-
-    if( numBytes == 0 ) {
+unsigned char* SecureRandomImpl::providerGenerateSeed(int numBytes)
+{
+    if (numBytes == 0)
+    {
         return NULL;
     }
 
     unsigned char* buffer = new unsigned char[numBytes];
-    providerNextBytes( buffer, numBytes );
+    providerNextBytes(buffer, numBytes);
     return buffer;
 }

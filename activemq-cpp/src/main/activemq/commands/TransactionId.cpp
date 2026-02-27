@@ -41,24 +41,26 @@ using namespace decaf::internal::util;
  */
 
 ////////////////////////////////////////////////////////////////////////////////
-TransactionId::TransactionId() :
-    BaseDataStructure() {
-
+TransactionId::TransactionId()
+    : BaseDataStructure()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TransactionId::TransactionId(const TransactionId& other) :
-    BaseDataStructure() {
-
+TransactionId::TransactionId(const TransactionId& other)
+    : BaseDataStructure()
+{
     this->copyDataStructure(&other);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TransactionId::~TransactionId() {
+TransactionId::~TransactionId()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TransactionId* TransactionId::cloneDataStructure() const {
+TransactionId* TransactionId::cloneDataStructure() const
+{
     std::unique_ptr<TransactionId> transactionId(new TransactionId());
 
     // Copy the data from the base class or classes
@@ -68,34 +70,37 @@ TransactionId* TransactionId::cloneDataStructure() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TransactionId::copyDataStructure(const DataStructure* src) {
-
+void TransactionId::copyDataStructure(const DataStructure* src)
+{
     // Protect against invalid self assignment.
-    if (this == src) {
+    if (this == src)
+    {
         return;
     }
 
     const TransactionId* srcPtr = dynamic_cast<const TransactionId*>(src);
 
-    if (srcPtr == NULL || src == NULL) {
+    if (srcPtr == NULL || src == NULL)
+    {
         throw decaf::lang::exceptions::NullPointerException(
-            __FILE__, __LINE__,
+            __FILE__,
+            __LINE__,
             "TransactionId::copyDataStructure - src is NULL or invalid");
     }
 
     // Copy the data of the base class or classes
     BaseDataStructure::copyDataStructure(src);
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-unsigned char TransactionId::getDataStructureType() const {
+unsigned char TransactionId::getDataStructureType() const
+{
     return TransactionId::ID_TRANSACTIONID;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string TransactionId::toString() const {
-
+std::string TransactionId::toString() const
+{
     ostringstream stream;
 
     stream << "TransactionId { ";
@@ -105,28 +110,32 @@ std::string TransactionId::toString() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool TransactionId::equals(const DataStructure* value) const {
-
-    if (this == value) {
+bool TransactionId::equals(const DataStructure* value) const
+{
+    if (this == value)
+    {
         return true;
     }
 
     const TransactionId* valuePtr = dynamic_cast<const TransactionId*>(value);
 
-    if (valuePtr == NULL || value == NULL) {
+    if (valuePtr == NULL || value == NULL)
+    {
         return false;
     }
 
-    if (!BaseDataStructure::equals(value)) {
+    if (!BaseDataStructure::equals(value))
+    {
         return false;
     }
     return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int TransactionId::compareTo(const TransactionId& value) const {
-
-    if (this == &value) {
+int TransactionId::compareTo(const TransactionId& value) const
+{
+    if (this == &value)
+    {
         return 0;
     }
 
@@ -134,28 +143,32 @@ int TransactionId::compareTo(const TransactionId& value) const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool TransactionId::equals(const TransactionId& value) const {
+bool TransactionId::equals(const TransactionId& value) const
+{
     return this->equals((const DataStructure*)&value);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool TransactionId::operator==(const TransactionId& value) const {
+bool TransactionId::operator==(const TransactionId& value) const
+{
     return this->compareTo(value) == 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool TransactionId::operator<(const TransactionId& value) const {
+bool TransactionId::operator<(const TransactionId& value) const
+{
     return this->compareTo(value) < 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TransactionId& TransactionId::operator= (const TransactionId& other) {
+TransactionId& TransactionId::operator=(const TransactionId& other)
+{
     this->copyDataStructure(&other);
     return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int TransactionId::getHashCode() const {
+int TransactionId::getHashCode() const
+{
     return decaf::util::HashCode<std::string>()(this->toString());
 }
-

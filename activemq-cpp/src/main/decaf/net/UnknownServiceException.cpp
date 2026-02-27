@@ -22,26 +22,39 @@ using namespace decaf::net;
 using namespace decaf::lang;
 
 ////////////////////////////////////////////////////////////////////////////////
-UnknownServiceException::UnknownServiceException() : io::IOException() {
+UnknownServiceException::UnknownServiceException()
+    : io::IOException()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-UnknownServiceException::~UnknownServiceException() throw() {
+UnknownServiceException::~UnknownServiceException() throw()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-UnknownServiceException::UnknownServiceException(const Exception& ex) : io::IOException() {
-    *(Exception*) this = ex;
+UnknownServiceException::UnknownServiceException(const Exception& ex)
+    : io::IOException()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-UnknownServiceException::UnknownServiceException(const UnknownServiceException& ex) : io::IOException() {
-    *(Exception*) this = ex;
+UnknownServiceException::UnknownServiceException(
+    const UnknownServiceException& ex)
+    : io::IOException()
+{
+    *(Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-UnknownServiceException::UnknownServiceException(const char* file, const int lineNumber, const std::exception* cause, const char* msg, ...) : io::IOException(cause) {
-
+UnknownServiceException::UnknownServiceException(const char* file,
+                                                 const int   lineNumber,
+                                                 const std::exception* cause,
+                                                 const char*           msg,
+                                                 ...)
+    : io::IOException(cause)
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);
@@ -51,12 +64,18 @@ UnknownServiceException::UnknownServiceException(const char* file, const int lin
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-UnknownServiceException::UnknownServiceException(const std::exception* cause) : io::IOException(cause) {
+UnknownServiceException::UnknownServiceException(const std::exception* cause)
+    : io::IOException(cause)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-UnknownServiceException::UnknownServiceException(const char* file, const int lineNumber, const char* msg, ...) : io::IOException() {
-
+UnknownServiceException::UnknownServiceException(const char* file,
+                                                 const int   lineNumber,
+                                                 const char* msg,
+                                                 ...)
+    : io::IOException()
+{
     va_list vargs;
     va_start(vargs, msg);
     buildMessage(msg, vargs);

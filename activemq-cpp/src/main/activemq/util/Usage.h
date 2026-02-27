@@ -20,12 +20,14 @@
 
 #include <activemq/util/Config.h>
 
-namespace activemq {
-namespace util {
+namespace activemq
+{
+namespace util
+{
 
-    class AMQCPP_API Usage {
+    class AMQCPP_API Usage
+    {
     public:
-
         virtual ~Usage();
 
         /**
@@ -41,8 +43,8 @@ namespace util {
         virtual void waitForSpace(unsigned int timeout) = 0;
 
         /**
-         * Tries to increase the usage by value amount but blocks if this object is
-         * currently full.
+         * Tries to increase the usage by value amount but blocks if this object
+         * is currently full.
          * @param value Amount of usage in bytes to add.
          */
         virtual void enqueueUsage(unsigned long long value) = 0;
@@ -64,9 +66,9 @@ namespace util {
          * @return true if Usage is at the Full point.
          */
         virtual bool isFull() const = 0;
-
     };
 
-}}
+}  // namespace util
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_UTIL_USAGE_H_ */

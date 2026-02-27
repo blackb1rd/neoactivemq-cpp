@@ -22,21 +22,29 @@ using namespace cms;
 using namespace cms::stress;
 
 ////////////////////////////////////////////////////////////////////////////////
-CmsMessageCreator::CmsMessageCreator(const std::string& text, const std::string& name, const std::string& value) :
-    text(text), headerName(name), headerValue(value) {
+CmsMessageCreator::CmsMessageCreator(const std::string& text,
+                                     const std::string& name,
+                                     const std::string& value)
+    : text(text),
+      headerName(name),
+      headerValue(value)
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-CmsMessageCreator::~CmsMessageCreator() {
+CmsMessageCreator::~CmsMessageCreator()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-cms::Message* CmsMessageCreator::createMessage(cms::Session* session) {
-
+cms::Message* CmsMessageCreator::createMessage(cms::Session* session)
+{
     cms::Message* message = NULL;
-    if (session) {
+    if (session)
+    {
         message = session->createTextMessage(text);
-        if (headerName != "") {
+        if (headerName != "")
+        {
             message->setStringProperty(headerName, headerValue);
         }
     }

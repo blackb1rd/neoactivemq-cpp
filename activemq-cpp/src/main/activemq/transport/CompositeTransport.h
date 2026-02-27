@@ -18,46 +18,49 @@
 #ifndef _ACTIVEMQ_TRANSPORT_COMPOSITETRANSPORT_H_
 #define _ACTIVEMQ_TRANSPORT_COMPOSITETRANSPORT_H_
 
-#include <activemq/util/Config.h>
 #include <activemq/transport/Transport.h>
+#include <activemq/util/Config.h>
 #include <decaf/net/URI.h>
 #include <decaf/util/List.h>
 
-namespace activemq {
-namespace transport {
+namespace activemq
+{
+namespace transport
+{
 
-    using decaf::util::List;
     using decaf::net::URI;
+    using decaf::util::List;
 
     /**
-     * A Composite Transport is a Transport implementation that is composed of several
-     * Transports.  The composition could be such that only one Transport exists for
-     * each URI that is composed or there could be many active Transports working at
-     * once.
+     * A Composite Transport is a Transport implementation that is composed of
+     * several Transports.  The composition could be such that only one
+     * Transport exists for each URI that is composed or there could be many
+     * active Transports working at once.
      *
      * @since 3.0
      */
-    class AMQCPP_API CompositeTransport: public activemq::transport::Transport {
+    class AMQCPP_API CompositeTransport : public activemq::transport::Transport
+    {
     public:
-
         virtual ~CompositeTransport();
 
         /**
-         * Add a URI to the list of URI's that will represent the set of Transports
-         * that this Transport is a composite of.
+         * Add a URI to the list of URI's that will represent the set of
+         * Transports that this Transport is a composite of.
          *
          * @param rebalance
-         *      Indicates if the addition should cause a forced reconnect or not.
+         *      Indicates if the addition should cause a forced reconnect or
+         * not.
          * @param uris
          *      The new URI set to add to the set this composite maintains.
          */
         virtual void addURI(bool rebalance, const List<URI>& uris) = 0;
 
         /**
-         * Remove a URI from the set of URI's that represents the set of Transports
-         * that this Transport is composed of, removing a URI for which the composite
-         * has created a connected Transport should result in that Transport being
-         * disposed of.
+         * Remove a URI from the set of URI's that represents the set of
+         * Transports that this Transport is composed of, removing a URI for
+         * which the composite has created a connected Transport should result
+         * in that Transport being disposed of.
          *
          * @param rebalance
          *      Indicates if the removal should cause a forced reconnect or not.
@@ -65,9 +68,9 @@ namespace transport {
          *        The new URI set to remove to the set this composite maintains.
          */
         virtual void removeURI(bool rebalance, const List<URI>& uris) = 0;
-
     };
 
-}}
+}  // namespace transport
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_TRANSPORT_COMPOSITETRANSPORT_H_ */

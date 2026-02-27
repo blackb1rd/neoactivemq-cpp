@@ -22,73 +22,79 @@
 
 #include <decaf/lang/String.h>
 
-namespace decaf {
-namespace net {
+namespace decaf
+{
+namespace net
+{
     class URLStreamHandler;
     class URLStreamHandlerFactory;
-}
-namespace internal {
-namespace net {
+}  // namespace net
 
-    class Network;
-    class URLStreamHandlerManagerImpl;
+namespace internal
+{
+    namespace net
+    {
 
-    class DECAF_API URLStreamHandlerManager {
-    private:
+        class Network;
+        class URLStreamHandlerManagerImpl;
 
-        URLStreamHandlerManagerImpl* impl;
+        class DECAF_API URLStreamHandlerManager
+        {
+        private:
+            URLStreamHandlerManagerImpl* impl;
 
-    private:
+        private:
+            static URLStreamHandlerManager* instance;
 
-        static URLStreamHandlerManager* instance;
+        private:
+            URLStreamHandlerManager();
 
-    private:
+        public:
+            virtual ~URLStreamHandlerManager();
 
-        URLStreamHandlerManager();
+        public:
+            /**
+             * Returns the one and only URLStreamHandlerManager instance for
+             * this application.  The returned pointer should never be deleted
+             * by the application.
+             *
+             * @return a URLStreamHandlerManager instance.
+             */
+            static URLStreamHandlerManager* getInstance();
 
-    public:
+        public:
+            /**
+             * Gets a URLStreamHandler for the specified protocol if one is
+             * available.
+             *
+             * @param protocol
+             *      The protocol to return a URL Stream Handler instance for.
+             *
+             * @return a URLStreamHandler instance for the given protocol.
+             */
+            decaf::net::URLStreamHandler* getURLStreamHandler(
+                const decaf::lang::String& protocol);
 
-        virtual ~URLStreamHandlerManager();
+            /**
+             * Sets an application's URLStreamHandlerFactory. This method can be
+             * called at most once.
+             *
+             * The URLStreamHandlerFactory instance is used to construct a
+             * stream protocol handler from a protocol name.  The provided
+             * factory becomes the property of this runtime and will be deleted
+             * at shutdown.
+             *
+             * @param factory
+             *      the desired factory.
+             *
+             * @throws Exception if there is already a set factory.
+             */
+            void setURLStreamHandlerFactory(
+                decaf::net::URLStreamHandlerFactory* factory);
+        };
 
-    public:
-
-        /**
-         * Returns the one and only URLStreamHandlerManager instance for this
-         * application.  The returned pointer should never be deleted by the
-         * application.
-         *
-         * @return a URLStreamHandlerManager instance.
-         */
-        static URLStreamHandlerManager* getInstance();
-
-    public:
-
-        /**
-         * Gets a URLStreamHandler for the specified protocol if one is available.
-         *
-         * @param protocol
-         *      The protocol to return a URL Stream Handler instance for.
-         *
-         * @return a URLStreamHandler instance for the given protocol.
-         */
-        decaf::net::URLStreamHandler* getURLStreamHandler(const decaf::lang::String& protocol);
-
-        /**
-         * Sets an application's URLStreamHandlerFactory. This method can be called at most once.
-         *
-         * The URLStreamHandlerFactory instance is used to construct a stream protocol handler
-         * from a protocol name.  The provided factory becomes the property of this runtime and
-         * will be deleted at shutdown.
-         *
-         * @param factory
-         *      the desired factory.
-         *
-         * @throws Exception if there is already a set factory.
-         */
-        void setURLStreamHandlerFactory(decaf::net::URLStreamHandlerFactory* factory);
-
-    };
-
-}}}
+    }  // namespace net
+}  // namespace internal
+}  // namespace decaf
 
 #endif /* _DECAF_INTERNAL_NET_URLSTREAMHANDLERMANAGER_H_ */

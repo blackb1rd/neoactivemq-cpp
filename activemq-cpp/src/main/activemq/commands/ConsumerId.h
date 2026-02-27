@@ -20,7 +20,7 @@
 
 // Turn off warning message for ignored exception specification
 #ifdef _MSC_VER
-#pragma warning( disable : 4290 )
+#pragma warning(disable : 4290)
 #endif
 
 #include <activemq/commands/BaseDataStructure.h>
@@ -31,8 +31,10 @@
 #include <string>
 #include <vector>
 
-namespace activemq {
-namespace commands {
+namespace activemq
+{
+namespace commands
+{
 
     using decaf::lang::Pointer;
 
@@ -45,25 +47,23 @@ namespace commands {
      *         in the activemq-cpp-openwire-generator module
      *
      */
-    class AMQCPP_API ConsumerId : public BaseDataStructure, public decaf::lang::Comparable<ConsumerId> {
+    class AMQCPP_API ConsumerId : public BaseDataStructure,
+                                  public decaf::lang::Comparable<ConsumerId>
+    {
     protected:
-
         std::string connectionId;
-        long long sessionId;
-        long long value;
+        long long   sessionId;
+        long long   value;
 
     public:
-
         const static unsigned char ID_CONSUMERID = 122;
 
         typedef decaf::lang::PointerComparator<ConsumerId> COMPARATOR;
 
     private:
-
         mutable Pointer<SessionId> parentId;
 
     public:
-
         ConsumerId();
 
         ConsumerId(const ConsumerId& other);
@@ -85,14 +85,14 @@ namespace commands {
         const Pointer<SessionId>& getParentId() const;
 
         virtual const std::string& getConnectionId() const;
-        virtual std::string& getConnectionId();
+        virtual std::string&       getConnectionId();
         virtual void setConnectionId(const std::string& connectionId);
 
         virtual long long getSessionId() const;
-        virtual void setSessionId(long long sessionId);
+        virtual void      setSessionId(long long sessionId);
 
         virtual long long getValue() const;
-        virtual void setValue(long long value);
+        virtual void      setValue(long long value);
 
         virtual int compareTo(const ConsumerId& value) const;
 
@@ -102,12 +102,12 @@ namespace commands {
 
         virtual bool operator<(const ConsumerId& value) const;
 
-        ConsumerId& operator= (const ConsumerId& other);
+        ConsumerId& operator=(const ConsumerId& other);
 
         int getHashCode() const;
-
     };
 
-}}
+}  // namespace commands
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_COMMANDS_CONSUMERID_H_*/

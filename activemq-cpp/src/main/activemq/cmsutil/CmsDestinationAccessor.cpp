@@ -23,19 +23,23 @@ using namespace cms;
 using namespace activemq::cmsutil;
 
 ////////////////////////////////////////////////////////////////////////////////
-CmsDestinationAccessor::CmsDestinationAccessor() : CmsAccessor(),
-    defaultDestinationResolver(), destinationResolver(&defaultDestinationResolver), pubSubDomain(false) {
-
+CmsDestinationAccessor::CmsDestinationAccessor()
+    : CmsAccessor(),
+      defaultDestinationResolver(),
+      destinationResolver(&defaultDestinationResolver),
+      pubSubDomain(false)
+{
     // Default to using queues, and start with the default destinationResolver.
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-CmsDestinationAccessor::~CmsDestinationAccessor() {
+CmsDestinationAccessor::~CmsDestinationAccessor()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsDestinationAccessor::init() {
-
+void CmsDestinationAccessor::init()
+{
     CmsAccessor::init();
 
     // Make sure we have a destination resolver.
@@ -46,9 +50,10 @@ void CmsDestinationAccessor::init() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsDestinationAccessor::destroy() {
-
-    if (destinationResolver != NULL) {
+void CmsDestinationAccessor::destroy()
+{
+    if (destinationResolver != NULL)
+    {
         destinationResolver->destroy();
     }
 
@@ -56,17 +61,24 @@ void CmsDestinationAccessor::destroy() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-cms::Destination* CmsDestinationAccessor::resolveDestinationName(cms::Session* session, const std::string& destName) {
-
+cms::Destination* CmsDestinationAccessor::resolveDestinationName(
+    cms::Session*      session,
+    const std::string& destName)
+{
     checkDestinationResolver();
 
-    return getDestinationResolver()->resolveDestinationName(session, destName, isPubSubDomain());
+    return getDestinationResolver()->resolveDestinationName(session,
+                                                            destName,
+                                                            isPubSubDomain());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CmsDestinationAccessor::checkDestinationResolver() {
-
-    if (getDestinationResolver() == NULL) {
-        throw IllegalStateException("Property 'destinationResolver' is required", NULL);
+void CmsDestinationAccessor::checkDestinationResolver()
+{
+    if (getDestinationResolver() == NULL)
+    {
+        throw IllegalStateException(
+            "Property 'destinationResolver' is required",
+            NULL);
     }
 }

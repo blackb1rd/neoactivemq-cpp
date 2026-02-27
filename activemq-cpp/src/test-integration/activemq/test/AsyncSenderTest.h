@@ -20,19 +20,21 @@
 
 #include <activemq/test/CMSTestFixture.h>
 
-namespace activemq{
-namespace test{
+namespace activemq
+{
+namespace test
+{
 
-    class AsyncSenderTest : public CMSTestFixture {
+    class AsyncSenderTest : public CMSTestFixture
+    {
     public:
-
         AsyncSenderTest();
         virtual ~AsyncSenderTest();
 
         virtual void testAsyncSends();
-
     };
 
-}}
+}  // namespace test
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_TEST_ASYNCSENDERTEST_H_*/

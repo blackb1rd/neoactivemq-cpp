@@ -18,72 +18,74 @@
 #ifndef _CMS_QUEUEBROWSER_H_
 #define _CMS_QUEUEBROWSER_H_
 
-#include <string>
-#include <cms/Config.h>
-#include <cms/Closeable.h>
-#include <cms/Queue.h>
-#include <cms/Message.h>
 #include <cms/CMSException.h>
+#include <cms/Closeable.h>
+#include <cms/Config.h>
+#include <cms/Message.h>
 #include <cms/MessageEnumeration.h>
+#include <cms/Queue.h>
+#include <string>
 
-namespace cms {
+namespace cms
+{
+
+/**
+ * This class implements in interface for browsing the messages in a Queue
+ * without removing them.
+ *
+ * To browse the contents of the Queue the client calls the
+ * <code>getEnumeration</code> method to retrieve a new instance of a Queue
+ * Enumerator.  The client then calls the hasMoreMessages method of the
+ * Enumeration, if it returns true the client can safely call the nextMessage
+ * method of the Enumeration instance.
+ *
+ *      Enumeration* enumeration = queueBrowser->getEnumeration();
+ *
+ *      while( enumeration->hasMoreMessages() ) {
+ *          cms::Message* message = enumeration->nextMessage();
+ *
+ *          // ... Do something with the Message.
+ *
+ *          delete message;
+ *      }
+ *
+ *
+ * @since 1.1
+ */
+class CMS_API QueueBrowser : public Closeable
+{
+public:
+    virtual ~QueueBrowser();
 
     /**
-     * This class implements in interface for browsing the messages in a Queue
-     * without removing them.
+     * @return the Queue that this browser is listening on.
      *
-     * To browse the contents of the Queue the client calls the <code>getEnumeration</code>
-     * method to retrieve a new instance of a Queue Enumerator.  The client then calls the
-     * hasMoreMessages method of the Enumeration, if it returns true the client can safely
-     * call the nextMessage method of the Enumeration instance.
-     *
-     *      Enumeration* enumeration = queueBrowser->getEnumeration();
-     *
-     *      while( enumeration->hasMoreMessages() ) {
-     *          cms::Message* message = enumeration->nextMessage();
-     *
-     *          // ... Do something with the Message.
-     *
-     *          delete message;
-     *      }
-     *
-     *
-     * @since 1.1
+     * @throws CMSException if an internal error occurs.
      */
-    class CMS_API QueueBrowser : public Closeable {
-    public:
+    virtual const Queue* getQueue() const = 0;
 
-        virtual ~QueueBrowser();
+    /**
+     * @return the MessageSelector that is used on when this browser was
+     * created or empty string if no selector was present.
+     *
+     * @throws CMSException if an internal error occurs.
+     */
+    virtual std::string getMessageSelector() const = 0;
 
-        /**
-         * @return the Queue that this browser is listening on.
-         *
-         * @throws CMSException if an internal error occurs.
-         */
-        virtual const Queue* getQueue() const = 0;
+    /**
+     * Gets a pointer to an Enumeration object for browsing the Messages
+     * currently in the Queue in the order that a client would receive them. The
+     * pointer returned is owned by the browser and should not be deleted by the
+     * client application.
+     *
+     * @return a pointer to a Queue Enumeration, this Pointer is owned by the
+     * QueueBrowser and should not be deleted by the client.
+     *
+     * @throws CMSException if an internal error occurs.
+     */
+    virtual cms::MessageEnumeration* getEnumeration() = 0;
+};
 
-        /**
-         * @return the MessageSelector that is used on when this browser was
-         * created or empty string if no selector was present.
-         *
-         * @throws CMSException if an internal error occurs.
-         */
-        virtual std::string getMessageSelector() const = 0;
-
-        /**
-         * Gets a pointer to an Enumeration object for browsing the Messages currently in
-         * the Queue in the order that a client would receive them.  The pointer returned is
-         * owned by the browser and should not be deleted by the client application.
-         *
-         * @return a pointer to a Queue Enumeration, this Pointer is owned by the QueueBrowser
-         *          and should not be deleted by the client.
-         *
-         * @throws CMSException if an internal error occurs.
-         */
-        virtual cms::MessageEnumeration* getEnumeration() = 0;
-
-    };
-
-}
+}  // namespace cms
 
 #endif /*_CMS_QUEUEBROWSER_H_*/

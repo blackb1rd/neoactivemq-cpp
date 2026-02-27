@@ -17,9 +17,9 @@
 
 #include <gtest/gtest.h>
 
+#include <activemq/commands/SessionInfo.h>
 #include <activemq/state/ConnectionState.h>
 #include <activemq/state/SessionState.h>
-#include <activemq/commands/SessionInfo.h>
 #include <decaf/lang/Pointer.h>
 
 using namespace std;
@@ -28,11 +28,13 @@ using namespace activemq::state;
 using namespace activemq::commands;
 using namespace decaf::lang;
 
-class ConnectionStateTest : public ::testing::Test {};
+class ConnectionStateTest : public ::testing::Test
+{
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ConnectionStateTest, test) {
-
+TEST_F(ConnectionStateTest, test)
+{
     // Create a Session
     Pointer<SessionId> sid(new SessionId);
     sid->setConnectionId("CONNECTION");

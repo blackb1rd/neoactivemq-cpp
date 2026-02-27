@@ -20,6 +20,6 @@
 using namespace cms;
 
 ////////////////////////////////////////////////////////////////////////////////
-DestinationListener::~DestinationListener() {
+DestinationListener::~DestinationListener()
+{
 }
-

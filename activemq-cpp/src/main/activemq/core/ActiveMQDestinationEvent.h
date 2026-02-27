@@ -20,26 +20,27 @@
 
 #include <cms/DestinationEvent.h>
 
-#include <decaf/lang/Pointer.h>
 #include <activemq/commands/DestinationInfo.h>
 #include <activemq/util/Config.h>
+#include <decaf/lang/Pointer.h>
 
-namespace activemq {
-namespace core {
+namespace activemq
+{
+namespace core
+{
 
-    class AMQCPP_API ActiveMQDestinationEvent : public cms::DestinationEvent {
+    class AMQCPP_API ActiveMQDestinationEvent : public cms::DestinationEvent
+    {
     private:
-
         ActiveMQDestinationEvent(const ActiveMQDestinationEvent&);
-        ActiveMQDestinationEvent& operator= (const ActiveMQDestinationEvent&);
+        ActiveMQDestinationEvent& operator=(const ActiveMQDestinationEvent&);
 
     private:
-
         decaf::lang::Pointer<commands::DestinationInfo> destination;
 
     public:
-
-        ActiveMQDestinationEvent(decaf::lang::Pointer<commands::DestinationInfo> destination);
+        ActiveMQDestinationEvent(
+            decaf::lang::Pointer<commands::DestinationInfo> destination);
 
         virtual ~ActiveMQDestinationEvent();
 
@@ -50,18 +51,19 @@ namespace core {
         virtual bool isRemoveOperation() const;
 
     public:
-
         /**
          * Returns the DestinationInfo object that triggered this event.
          *
          * @return the DestinationInfo object that triggered this event.
          */
-        decaf::lang::Pointer<commands::DestinationInfo> getDestinationInfo() const {
+        decaf::lang::Pointer<commands::DestinationInfo> getDestinationInfo()
+            const
+        {
             return this->destination;
         }
-
     };
 
-}}
+}  // namespace core
+}  // namespace activemq
 
 #endif /* _ACTIVEMQ_CORE_ACTIVEMQDESTINATIONEVENT_H_ */

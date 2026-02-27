@@ -21,9 +21,12 @@ using namespace decaf;
 using namespace decaf::security;
 
 ////////////////////////////////////////////////////////////////////////////////
-SecureRandomSpi::SecureRandomSpi() : SecuritySpi() {
+SecureRandomSpi::SecureRandomSpi()
+    : SecuritySpi()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-SecureRandomSpi::~SecureRandomSpi() {
+SecureRandomSpi::~SecureRandomSpi()
+{
 }

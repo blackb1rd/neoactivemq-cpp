@@ -17,24 +17,24 @@
 
 // START SNIPPET: demo
 
-#include <activemq/library/ActiveMQCPP.h>
-#include <decaf/lang/Thread.h>
-#include <decaf/lang/Runnable.h>
-#include <decaf/util/concurrent/CountDownLatch.h>
-#include <decaf/lang/Integer.h>
-#include <decaf/lang/Long.h>
-#include <decaf/lang/System.h>
 #include <activemq/core/ActiveMQConnectionFactory.h>
+#include <activemq/library/ActiveMQCPP.h>
 #include <activemq/util/Config.h>
+#include <cms/BytesMessage.h>
 #include <cms/Connection.h>
+#include <cms/ExceptionListener.h>
+#include <cms/MapMessage.h>
+#include <cms/MessageListener.h>
 #include <cms/Session.h>
 #include <cms/TextMessage.h>
-#include <cms/BytesMessage.h>
-#include <cms/MapMessage.h>
-#include <cms/ExceptionListener.h>
-#include <cms/MessageListener.h>
-#include <stdlib.h>
+#include <decaf/lang/Integer.h>
+#include <decaf/lang/Long.h>
+#include <decaf/lang/Runnable.h>
+#include <decaf/lang/System.h>
+#include <decaf/lang/Thread.h>
+#include <decaf/util/concurrent/CountDownLatch.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <iostream>
 #include <memory>
 
@@ -45,48 +45,52 @@ using namespace decaf::lang;
 using namespace cms;
 using namespace std;
 
-class HelloWorldProducer : public Runnable {
+class HelloWorldProducer : public Runnable
+{
 private:
-
-    Connection* connection;
-    Session* session;
-    Destination* destination;
+    Connection*      connection;
+    Session*         session;
+    Destination*     destination;
     MessageProducer* producer;
-    int numMessages;
-    bool useTopic;
-    bool sessionTransacted;
-    std::string brokerURI;
+    int              numMessages;
+    bool             useTopic;
+    bool             sessionTransacted;
+    std::string      brokerURI;
 
 private:
-
     HelloWorldProducer(const HelloWorldProducer&);
     HelloWorldProducer& operator=(const HelloWorldProducer&);
 
 public:
-
-    HelloWorldProducer(const std::string& brokerURI, int numMessages, bool useTopic = false, bool sessionTransacted = false) :
-        connection(NULL),
-        session(NULL),
-        destination(NULL),
-        producer(NULL),
-        numMessages(numMessages),
-        useTopic(useTopic),
-        sessionTransacted(sessionTransacted),
-        brokerURI(brokerURI) {
+    HelloWorldProducer(const std::string& brokerURI,
+                       int                numMessages,
+                       bool               useTopic          = false,
+                       bool               sessionTransacted = false)
+        : connection(NULL),
+          session(NULL),
+          destination(NULL),
+          producer(NULL),
+          numMessages(numMessages),
+          useTopic(useTopic),
+          sessionTransacted(sessionTransacted),
+          brokerURI(brokerURI)
+    {
     }
 
-    virtual ~HelloWorldProducer(){
+    virtual ~HelloWorldProducer()
+    {
         cleanup();
     }
 
-    void close() {
+    void close()
+    {
         this->cleanup();
     }
 
-    virtual void run() {
-
-        try {
-
+    virtual void run()
+    {
+        try
+        {
             // Create a ConnectionFactory
             std::unique_ptr<ConnectionFactory> connectionFactory(
                 ConnectionFactory::createCMSConnectionFactory(brokerURI));
@@ -96,16 +100,23 @@ public:
             connection->start();
 
             // Create a Session
-            if (this->sessionTransacted) {
-                session = connection->createSession(Session::SESSION_TRANSACTED);
-            } else {
+            if (this->sessionTransacted)
+            {
+                session =
+                    connection->createSession(Session::SESSION_TRANSACTED);
+            }
+            else
+            {
                 session = connection->createSession(Session::AUTO_ACKNOWLEDGE);
             }
 
             // Create the destination (Topic or Queue)
-            if (useTopic) {
+            if (useTopic)
+            {
                 destination = session->createTopic("TEST.FOO");
-            } else {
+            }
+            else
+            {
                 destination = session->createQueue("TEST.FOO");
             }
 
@@ -114,37 +125,47 @@ public:
             producer->setDeliveryMode(DeliveryMode::NON_PERSISTENT);
 
             // Create the Thread Id String
-            string threadIdStr = Long::toString(Thread::currentThread()->getId());
+            string threadIdStr =
+                Long::toString(Thread::currentThread()->getId());
 
             // Create a messages
             string text = (string) "Hello world! from thread " + threadIdStr;
 
-            for (int ix = 0; ix < numMessages; ++ix) {
-                std::unique_ptr<TextMessage> message(session->createTextMessage(text));
+            for (int ix = 0; ix < numMessages; ++ix)
+            {
+                std::unique_ptr<TextMessage> message(
+                    session->createTextMessage(text));
                 message->setIntProperty("Integer", ix);
-                printf("Sent message #%d from thread %s\n", ix + 1, threadIdStr.c_str());
+                printf("Sent message #%d from thread %s\n",
+                       ix + 1,
+                       threadIdStr.c_str());
                 producer->send(message.get());
             }
-
-        } catch (CMSException& e) {
+        }
+        catch (CMSException& e)
+        {
             e.printStackTrace();
         }
     }
 
 private:
-
-    void cleanup() {
-
-        if (connection != NULL) {
-            try {
+    void cleanup()
+    {
+        if (connection != NULL)
+        {
+            try
+            {
                 connection->close();
-            } catch (cms::CMSException& ex) {
+            }
+            catch (cms::CMSException& ex)
+            {
                 ex.printStackTrace();
             }
         }
 
         // Destroy resources.
-        try {
+        try
+        {
             delete destination;
             destination = NULL;
             delete producer;
@@ -153,7 +174,9 @@ private:
             session = NULL;
             delete connection;
             connection = NULL;
-        } catch (CMSException& e) {
+        }
+        catch (CMSException& e)
+        {
             e.printStackTrace();
         }
     }
@@ -161,57 +184,62 @@ private:
 
 class HelloWorldConsumer : public ExceptionListener,
                            public MessageListener,
-                           public Runnable {
-
+                           public Runnable
+{
 private:
-
-    CountDownLatch latch;
-    CountDownLatch doneLatch;
-    Connection* connection;
-    Session* session;
-    Destination* destination;
+    CountDownLatch   latch;
+    CountDownLatch   doneLatch;
+    Connection*      connection;
+    Session*         session;
+    Destination*     destination;
     MessageConsumer* consumer;
-    long waitMillis;
-    bool useTopic;
-    bool sessionTransacted;
-    std::string brokerURI;
+    long             waitMillis;
+    bool             useTopic;
+    bool             sessionTransacted;
+    std::string      brokerURI;
 
 private:
-
     HelloWorldConsumer(const HelloWorldConsumer&);
     HelloWorldConsumer& operator=(const HelloWorldConsumer&);
 
 public:
-
-    HelloWorldConsumer(const std::string& brokerURI, int numMessages, bool useTopic = false, bool sessionTransacted = false, int waitMillis = 30000) :
-        latch(1),
-        doneLatch(numMessages),
-        connection(NULL),
-        session(NULL),
-        destination(NULL),
-        consumer(NULL),
-        waitMillis(waitMillis),
-        useTopic(useTopic),
-        sessionTransacted(sessionTransacted),
-        brokerURI(brokerURI) {
+    HelloWorldConsumer(const std::string& brokerURI,
+                       int                numMessages,
+                       bool               useTopic          = false,
+                       bool               sessionTransacted = false,
+                       int                waitMillis        = 30000)
+        : latch(1),
+          doneLatch(numMessages),
+          connection(NULL),
+          session(NULL),
+          destination(NULL),
+          consumer(NULL),
+          waitMillis(waitMillis),
+          useTopic(useTopic),
+          sessionTransacted(sessionTransacted),
+          brokerURI(brokerURI)
+    {
     }
 
-    virtual ~HelloWorldConsumer() {
+    virtual ~HelloWorldConsumer()
+    {
         cleanup();
     }
 
-    void close() {
+    void close()
+    {
         this->cleanup();
     }
 
-    void waitUntilReady() {
+    void waitUntilReady()
+    {
         latch.await();
     }
 
-    virtual void run() {
-
-        try {
-
+    virtual void run()
+    {
+        try
+        {
             // Create a ConnectionFactory
             std::unique_ptr<ConnectionFactory> connectionFactory(
                 ConnectionFactory::createCMSConnectionFactory(brokerURI));
@@ -222,16 +250,23 @@ public:
             connection->setExceptionListener(this);
 
             // Create a Session
-            if (this->sessionTransacted == true) {
-                session = connection->createSession(Session::SESSION_TRANSACTED);
-            } else {
+            if (this->sessionTransacted == true)
+            {
+                session =
+                    connection->createSession(Session::SESSION_TRANSACTED);
+            }
+            else
+            {
                 session = connection->createSession(Session::AUTO_ACKNOWLEDGE);
             }
 
             // Create the destination (Topic or Queue)
-            if (useTopic) {
+            if (useTopic)
+            {
                 destination = session->createTopic("TEST.FOO");
-            } else {
+            }
+            else
+            {
                 destination = session->createQueue("TEST.FOO");
             }
 
@@ -248,38 +283,47 @@ public:
 
             // Wait while asynchronous messages come in.
             doneLatch.await(waitMillis);
-
-        } catch (CMSException& e) {
+        }
+        catch (CMSException& e)
+        {
             // Indicate we are ready for messages.
             latch.countDown();
             e.printStackTrace();
         }
     }
 
-    // Called from the consumer since this class is a registered MessageListener.
-    virtual void onMessage(const Message* message) {
-
+    // Called from the consumer since this class is a registered
+    // MessageListener.
+    virtual void onMessage(const Message* message)
+    {
         static int count = 0;
 
-        try {
+        try
+        {
             count++;
-            const TextMessage* textMessage = dynamic_cast<const TextMessage*> (message);
+            const TextMessage* textMessage =
+                dynamic_cast<const TextMessage*>(message);
             string text = "";
 
-            if (textMessage != NULL) {
+            if (textMessage != NULL)
+            {
                 text = textMessage->getText();
-            } else {
+            }
+            else
+            {
                 text = "NOT A TEXTMESSAGE!";
             }
 
             printf("Message #%d Received: %s\n", count, text.c_str());
-
-        } catch (CMSException& e) {
+        }
+        catch (CMSException& e)
+        {
             e.printStackTrace();
         }
 
         // Commit all messages.
-        if (this->sessionTransacted) {
+        if (this->sessionTransacted)
+        {
             session->commit();
         }
 
@@ -289,25 +333,31 @@ public:
 
     // If something bad happens you see it here as this class is also been
     // registered as an ExceptionListener with the connection.
-    virtual void onException(const CMSException& ex AMQCPP_UNUSED) {
+    virtual void onException(const CMSException& ex AMQCPP_UNUSED)
+    {
         printf("CMS Exception occurred.  Shutting down client.\n");
         ex.printStackTrace();
         exit(1);
     }
 
 private:
-
-    void cleanup() {
-        if (connection != NULL) {
-            try {
+    void cleanup()
+    {
+        if (connection != NULL)
+        {
+            try
+            {
                 connection->close();
-            } catch (cms::CMSException& ex) {
+            }
+            catch (cms::CMSException& ex)
+            {
                 ex.printStackTrace();
             }
         }
 
         // Destroy resources.
-        try {
+        try
+        {
             delete destination;
             destination = NULL;
             delete consumer;
@@ -316,103 +366,108 @@ private:
             session = NULL;
             delete connection;
             connection = NULL;
-        } catch (CMSException& e) {
+        }
+        catch (CMSException& e)
+        {
             e.printStackTrace();
         }
     }
 };
 
-int main(int argc AMQCPP_UNUSED, char* argv[] AMQCPP_UNUSED) {
-
+int main(int argc AMQCPP_UNUSED, char* argv[] AMQCPP_UNUSED)
+{
     activemq::library::ActiveMQCPP::initializeLibrary();
     {
-    std::cout << "=====================================================\n";
-    std::cout << "Starting the example:" << std::endl;
-    std::cout << "-----------------------------------------------------\n";
+        std::cout << "=====================================================\n";
+        std::cout << "Starting the example:" << std::endl;
+        std::cout << "-----------------------------------------------------\n";
 
+        // Set the URI to point to the IP Address of your broker.
+        // add any optional params to the url to enable things like
+        // tightMarshalling or tcp logging etc.  See the CMS web site for
+        // a full list of configuration options.
+        //
+        //  http://activemq.apache.org/cms/
+        //
+        // Wire Format Options:
+        // =========================
+        // Use either stomp or openwire, the default ports are different for
+        // each
+        //
+        // Examples:
+        //    tcp://127.0.0.1:61616                      default to openwire
+        //    tcp://127.0.0.1:61616?wireFormat=openwire  same as above
+        //    tcp://127.0.0.1:61613?wireFormat=stomp     use stomp instead
+        //
+        // SSL:
+        // =========================
+        // To use SSL you need to specify the location of the trusted Root CA or
+        // the certificate for the broker you want to connect to.  Using the
+        // Root CA allows you to use failover with multiple servers all using
+        // certificates signed by the trusted root.  If using client
+        // authentication you also need to specify the location of the client
+        // Certificate.
+        //
+        // The you just specify the ssl transport in the URI, for example:
+        //
+        //     ssl://localhost:61617
+        //
+        std::string brokerURI =
+            "failover:(tcp://localhost:61616"
+            //        "?wireFormat=openwire"
+            //        "&transport.useInactivityMonitor=false"
+            //        "&connection.alwaysSyncSend=true"
+            //        "&connection.useAsyncSend=true"
+            //        "?transport.commandTracingEnabled=true"
+            //        "&transport.tcpTracingEnabled=true"
+            //        "&wireFormat.tightEncodingEnabled=true"
+            ")";
 
-    // Set the URI to point to the IP Address of your broker.
-    // add any optional params to the url to enable things like
-    // tightMarshalling or tcp logging etc.  See the CMS web site for
-    // a full list of configuration options.
-    //
-    //  http://activemq.apache.org/cms/
-    //
-    // Wire Format Options:
-    // =========================
-    // Use either stomp or openwire, the default ports are different for each
-    //
-    // Examples:
-    //    tcp://127.0.0.1:61616                      default to openwire
-    //    tcp://127.0.0.1:61616?wireFormat=openwire  same as above
-    //    tcp://127.0.0.1:61613?wireFormat=stomp     use stomp instead
-    //
-    // SSL:
-    // =========================
-    // To use SSL you need to specify the location of the trusted Root CA or the
-    // certificate for the broker you want to connect to.  Using the Root CA allows
-    // you to use failover with multiple servers all using certificates signed by
-    // the trusted root.  If using client authentication you also need to specify
-    // the location of the client Certificate.
-    //
-    // The you just specify the ssl transport in the URI, for example:
-    //
-    //     ssl://localhost:61617
-    //
-    std::string brokerURI =
-        "failover:(tcp://localhost:61616"
-//        "?wireFormat=openwire"
-//        "&transport.useInactivityMonitor=false"
-//        "&connection.alwaysSyncSend=true"
-//        "&connection.useAsyncSend=true"
-//        "?transport.commandTracingEnabled=true"
-//        "&transport.tcpTracingEnabled=true"
-//        "&wireFormat.tightEncodingEnabled=true"
-        ")";
+        //============================================================
+        // set to true to use topics instead of queues
+        // Note in the code above that this causes createTopic or
+        // createQueue to be used in both consumer an producer.
+        //============================================================
+        bool useTopics         = true;
+        bool sessionTransacted = false;
+        int  numMessages       = 2000;
 
-    //============================================================
-    // set to true to use topics instead of queues
-    // Note in the code above that this causes createTopic or
-    // createQueue to be used in both consumer an producer.
-    //============================================================
-    bool useTopics = true;
-    bool sessionTransacted = false;
-    int numMessages = 2000;
+        long long startTime = System::currentTimeMillis();
 
-    long long startTime = System::currentTimeMillis();
+        HelloWorldProducer producer(brokerURI, numMessages, useTopics);
+        HelloWorldConsumer consumer(brokerURI,
+                                    numMessages,
+                                    useTopics,
+                                    sessionTransacted);
 
-    HelloWorldProducer producer(brokerURI, numMessages, useTopics);
-        HelloWorldConsumer consumer(brokerURI, numMessages, useTopics, sessionTransacted);
+        // Start the consumer thread.
+        Thread consumerThread(&consumer);
+        consumerThread.start();
 
-    // Start the consumer thread.
-    Thread consumerThread(&consumer);
-    consumerThread.start();
+        // Wait for the consumer to indicate that its ready to go.
+        consumer.waitUntilReady();
 
-    // Wait for the consumer to indicate that its ready to go.
-    consumer.waitUntilReady();
+        // Start the producer thread.
+        Thread producerThread(&producer);
+        producerThread.start();
 
-    // Start the producer thread.
-    Thread producerThread(&producer);
-    producerThread.start();
+        // Wait for the threads to complete.
+        producerThread.join();
+        consumerThread.join();
 
-    // Wait for the threads to complete.
-    producerThread.join();
-    consumerThread.join();
+        long long endTime   = System::currentTimeMillis();
+        double    totalTime = (double)(endTime - startTime) / 1000.0;
 
-    long long endTime = System::currentTimeMillis();
-    double totalTime = (double)(endTime - startTime) / 1000.0;
+        consumer.close();
+        producer.close();
 
-    consumer.close();
-    producer.close();
-
-    std::cout << "Time to completion = " << totalTime << " seconds." << std::endl;
-    std::cout << "-----------------------------------------------------\n";
-    std::cout << "Finished with the example." << std::endl;
-    std::cout << "=====================================================\n";
-
+        std::cout << "Time to completion = " << totalTime << " seconds."
+                  << std::endl;
+        std::cout << "-----------------------------------------------------\n";
+        std::cout << "Finished with the example." << std::endl;
+        std::cout << "=====================================================\n";
     }
     activemq::library::ActiveMQCPP::shutdownLibrary();
 }
 
 // END SNIPPET: demo
-

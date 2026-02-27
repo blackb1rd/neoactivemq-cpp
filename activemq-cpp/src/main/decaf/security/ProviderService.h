@@ -22,22 +22,25 @@
 
 #include <string>
 
-namespace decaf {
-namespace security {
+namespace decaf
+{
+namespace security
+{
 
     class Provider;
     class SecuritySpi;
 
-    class DECAF_API ProviderService {
+    class DECAF_API ProviderService
+    {
     private:
-
         const Provider* provider;
-        std::string type;
-        std::string algorithm;
+        std::string     type;
+        std::string     algorithm;
 
     public:
-
-        ProviderService(const Provider* provider, const std::string& type, const std::string& algorithm);
+        ProviderService(const Provider*    provider,
+                        const std::string& type,
+                        const std::string& algorithm);
 
         virtual ~ProviderService();
 
@@ -46,7 +49,8 @@ namespace security {
          *
          * @return type name of the service this ProviderService supports.
          */
-        std::string getType() const {
+        std::string getType() const
+        {
             return this->type;
         }
 
@@ -56,43 +60,48 @@ namespace security {
          *
          * @return the algorithm this ProviderService supports.
          */
-        std::string getAlgorithm() const {
+        std::string getAlgorithm() const
+        {
             return this->algorithm;
         }
 
         /**
          * Returns a pointer to the Provider that owns this ProviderService.
          *
-         * The returned pointer is owned by the Security framework an should not be
-         * deleted by the caller at any time.
+         * The returned pointer is owned by the Security framework an should not
+         * be deleted by the caller at any time.
          *
          * @return pointer to the security provider that owns this service.
          */
-        const Provider* getProvider() const {
+        const Provider* getProvider() const
+        {
             return provider;
         }
 
         /**
-         * Return a new instance of the implementation described by this service. The
-         * security provider framework uses this method to construct implementations.
-         * Applications will typically not need to call it.
+         * Return a new instance of the implementation described by this
+         * service. The security provider framework uses this method to
+         * construct implementations. Applications will typically not need to
+         * call it.
          *
-         * @return a new instance of the SecuritySpi provided by this ProviderService.
+         * @return a new instance of the SecuritySpi provided by this
+         * ProviderService.
          */
         virtual SecuritySpi* newInstance() = 0;
 
         /**
-         * Return a String representation of this service.  The format of this string is
-         * always, "type.algorithm"
+         * Return a String representation of this service.  The format of this
+         * string is always, "type.algorithm"
          *
          * @return string describing this ProviderService.
          */
-        std::string toString() const {
+        std::string toString() const
+        {
             return getType() + "." + getAlgorithm();
         }
-
     };
 
-}}
+}  // namespace security
+}  // namespace decaf
 
 #endif /* _DECAF_SECURITY_PROVIDERSERVICE_H_ */

@@ -18,11 +18,13 @@
 #ifndef _DECAF_IO_OUTPUTSTREAMWRITER_H_
 #define _DECAF_IO_OUTPUTSTREAMWRITER_H_
 
-#include <decaf/util/Config.h>
 #include <decaf/io/Writer.h>
+#include <decaf/util/Config.h>
 
-namespace decaf {
-namespace io {
+namespace decaf
+{
+namespace io
+{
 
     class OutputStream;
 
@@ -33,9 +35,9 @@ namespace io {
      *
      * @since 1.0
      */
-    class DECAF_API OutputStreamWriter: public Writer {
+    class DECAF_API OutputStreamWriter : public Writer
+    {
     private:
-
         // Pointer to the Stream this Writer writes its data to.
         OutputStream* stream;
 
@@ -46,12 +48,10 @@ namespace io {
         volatile bool closed;
 
     private:
-
         OutputStreamWriter(const OutputStreamWriter&);
         OutputStreamWriter& operator=(const OutputStreamWriter&);
 
     public:
-
         /**
          * Creates a new OutputStreamWriter.
          *
@@ -72,14 +72,16 @@ namespace io {
         virtual void flush();
 
     protected:
-
-        virtual void doWriteArrayBounded(const char* buffer, int size, int offset, int length);
+        virtual void doWriteArrayBounded(const char* buffer,
+                                         int         size,
+                                         int         offset,
+                                         int         length);
 
         // Used to check state and throw error when closed.
         virtual void checkClosed() const;
-
     };
 
-}}
+}  // namespace io
+}  // namespace decaf
 
 #endif /* _DECAF_IO_OUTPUTSTREAMWRITER_H_ */

@@ -17,11 +17,11 @@
 
 #include <gtest/gtest.h>
 
-#include <decaf/util/Date.h>
 #include <decaf/lang/Runnable.h>
+#include <decaf/util/Date.h>
+#include <decaf/util/concurrent/ExecutorsTestSupport.h>
 #include <decaf/util/concurrent/locks/Lock.h>
 #include <decaf/util/concurrent/locks/ReentrantReadWriteLock.h>
-#include <decaf/util/concurrent/ExecutorsTestSupport.h>
 
 using namespace decaf;
 using namespace decaf::lang;
@@ -30,94 +30,123 @@ using namespace decaf::util;
 using namespace decaf::util::concurrent;
 using namespace decaf::util::concurrent::locks;
 
-    class ReentrantReadWriteLockTest : public ExecutorsTestSupport {
+class ReentrantReadWriteLockTest : public ExecutorsTestSupport
+{
 public:
+    ReentrantReadWriteLockTest();
+    virtual ~ReentrantReadWriteLockTest();
 
-        ReentrantReadWriteLockTest();
-        virtual ~ReentrantReadWriteLockTest();
-
-        void testWriteTryLockWhenReadLocked();
-
-    };
+    void testWriteTryLockWhenReadLocked();
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    const int SIZEVAL = 256;
+const int SIZEVAL = 256;
 
-    class InterruptibleLockRunnable : public Runnable {
-    private:
+class InterruptibleLockRunnable : public Runnable
+{
+private:
+    InterruptibleLockRunnable(const InterruptibleLockRunnable&);
+    InterruptibleLockRunnable operator=(const InterruptibleLockRunnable&);
 
-        InterruptibleLockRunnable(const InterruptibleLockRunnable&);
-        InterruptibleLockRunnable operator= (const InterruptibleLockRunnable&);
+public:
+    ReentrantReadWriteLockTest* test;
+    ReentrantReadWriteLock*     lock;
 
-    public:
+    InterruptibleLockRunnable(ReentrantReadWriteLockTest* test,
+                              ReentrantReadWriteLock*     lock)
+        : Runnable(),
+          test(test),
+          lock(lock)
+    {
+    }
 
-        ReentrantReadWriteLockTest* test;
-        ReentrantReadWriteLock* lock;
+    virtual ~InterruptibleLockRunnable()
+    {
+    }
 
-        InterruptibleLockRunnable(ReentrantReadWriteLockTest* test, ReentrantReadWriteLock* lock) :
-            Runnable(), test(test), lock(lock) {}
-        virtual ~InterruptibleLockRunnable() {}
-
-        virtual void run() {
-            try {
-                lock->writeLock().lockInterruptibly();
-            } catch (InterruptedException& success){
-            }
+    virtual void run()
+    {
+        try
+        {
+            lock->writeLock().lockInterruptibly();
         }
-    };
-
-    class InterruptedLockRunnable : public Runnable {
-    private:
-
-        InterruptedLockRunnable(const InterruptedLockRunnable&);
-        InterruptedLockRunnable operator= (const InterruptedLockRunnable&);
-
-    public:
-
-        ReentrantReadWriteLockTest* test;
-        ReentrantReadWriteLock* lock;
-
-        InterruptedLockRunnable(ReentrantReadWriteLockTest* test, ReentrantReadWriteLock* lock) :
-            Runnable(), test(test), lock(lock) {}
-        virtual ~InterruptedLockRunnable() {}
-
-        virtual void run() {
-            try {
-                lock->writeLock().lockInterruptibly();
-                test->threadShouldThrow();
-            } catch (InterruptedException& success){
-            }
+        catch (InterruptedException& success)
+        {
         }
-    };
+    }
+};
 
-    class PublicReentrantReadWriteLock : public ReentrantReadWriteLock {
-    public:
+class InterruptedLockRunnable : public Runnable
+{
+private:
+    InterruptedLockRunnable(const InterruptedLockRunnable&);
+    InterruptedLockRunnable operator=(const InterruptedLockRunnable&);
 
-        PublicReentrantReadWriteLock() : ReentrantReadWriteLock() {}
+public:
+    ReentrantReadWriteLockTest* test;
+    ReentrantReadWriteLock*     lock;
 
-        Collection<Thread*>* getQueuedThreadsPublic() const {
-            return getQueuedThreads();
+    InterruptedLockRunnable(ReentrantReadWriteLockTest* test,
+                            ReentrantReadWriteLock*     lock)
+        : Runnable(),
+          test(test),
+          lock(lock)
+    {
+    }
+
+    virtual ~InterruptedLockRunnable()
+    {
+    }
+
+    virtual void run()
+    {
+        try
+        {
+            lock->writeLock().lockInterruptibly();
+            test->threadShouldThrow();
         }
-
-        Collection<Thread*>* getWaitingThreadsPublic(Condition* c) const {
-            return getWaitingThreads(c);
+        catch (InterruptedException& success)
+        {
         }
-    };
+    }
+};
+
+class PublicReentrantReadWriteLock : public ReentrantReadWriteLock
+{
+public:
+    PublicReentrantReadWriteLock()
+        : ReentrantReadWriteLock()
+    {
+    }
+
+    Collection<Thread*>* getQueuedThreadsPublic() const
+    {
+        return getQueuedThreads();
+    }
+
+    Collection<Thread*>* getWaitingThreadsPublic(Condition* c) const
+    {
+        return getWaitingThreads(c);
+    }
+};
+}  // namespace
+
+////////////////////////////////////////////////////////////////////////////////
+ReentrantReadWriteLockTest::ReentrantReadWriteLockTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ReentrantReadWriteLockTest::ReentrantReadWriteLockTest() {
+ReentrantReadWriteLockTest::~ReentrantReadWriteLockTest()
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ReentrantReadWriteLockTest::~ReentrantReadWriteLockTest() {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-TEST_F(ReentrantReadWriteLockTest, testConstructor) {
-
+TEST_F(ReentrantReadWriteLockTest, testConstructor)
+{
     ReentrantReadWriteLock rl;
     ASSERT_TRUE(!rl.isFair());
     ASSERT_TRUE(!rl.isWriteLocked());
@@ -130,8 +159,8 @@ TEST_F(ReentrantReadWriteLockTest, testConstructor) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ReentrantReadWriteLockTest, testLock) {
-
+TEST_F(ReentrantReadWriteLockTest, testLock)
+{
     ReentrantReadWriteLock rl;
     rl.writeLock().lock();
     ASSERT_TRUE(rl.isWriteLocked());
@@ -152,8 +181,8 @@ TEST_F(ReentrantReadWriteLockTest, testLock) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ReentrantReadWriteLockTest, testFairLock) {
-
+TEST_F(ReentrantReadWriteLockTest, testFairLock)
+{
     ReentrantReadWriteLock rl(true);
     rl.writeLock().lock();
     ASSERT_TRUE(rl.isWriteLocked());
@@ -174,68 +203,90 @@ TEST_F(ReentrantReadWriteLockTest, testFairLock) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ReentrantReadWriteLockTest, testGetWriteHoldCount) {
+TEST_F(ReentrantReadWriteLockTest, testGetWriteHoldCount)
+{
     ReentrantReadWriteLock lock;
-    for (int i = 1; i <= SIZEVAL; i++) {
+    for (int i = 1; i <= SIZEVAL; i++)
+    {
         lock.writeLock().lock();
         ASSERT_EQ(i, lock.getWriteHoldCount());
     }
-    for (int i = SIZEVAL; i > 0; i--) {
+    for (int i = SIZEVAL; i > 0; i--)
+    {
         lock.writeLock().unlock();
-        ASSERT_EQ(i-1, lock.getWriteHoldCount());
+        ASSERT_EQ(i - 1, lock.getWriteHoldCount());
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ReentrantReadWriteLockTest, testUnlockIllegalMonitorStateException) {
-
+TEST_F(ReentrantReadWriteLockTest, testUnlockIllegalMonitorStateException)
+{
     ReentrantReadWriteLock rl;
-    try {
+    try
+    {
         rl.writeLock().unlock();
         shouldThrow();
-    } catch (IllegalMonitorStateException& success) {
+    }
+    catch (IllegalMonitorStateException& success)
+    {
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class TestWriteLockInterruptiblyInterruptedRunnable : public Runnable {
-    private:
+class TestWriteLockInterruptiblyInterruptedRunnable : public Runnable
+{
+private:
+    ReentrantReadWriteLockTest* test;
+    ReentrantReadWriteLock*     lock;
 
-        ReentrantReadWriteLockTest* test;
-        ReentrantReadWriteLock* lock;
+private:
+    TestWriteLockInterruptiblyInterruptedRunnable(
+        const TestWriteLockInterruptiblyInterruptedRunnable&);
+    TestWriteLockInterruptiblyInterruptedRunnable operator=(
+        const TestWriteLockInterruptiblyInterruptedRunnable&);
 
-    private:
+public:
+    TestWriteLockInterruptiblyInterruptedRunnable(
+        ReentrantReadWriteLockTest* test,
+        ReentrantReadWriteLock*     lock)
+        : Runnable(),
+          test(test),
+          lock(lock)
+    {
+    }
 
-        TestWriteLockInterruptiblyInterruptedRunnable(const TestWriteLockInterruptiblyInterruptedRunnable&);
-        TestWriteLockInterruptiblyInterruptedRunnable operator= (const TestWriteLockInterruptiblyInterruptedRunnable&);
+    virtual ~TestWriteLockInterruptiblyInterruptedRunnable()
+    {
+    }
 
-    public:
-
-        TestWriteLockInterruptiblyInterruptedRunnable(ReentrantReadWriteLockTest* test, ReentrantReadWriteLock* lock) :
-            Runnable(), test(test), lock(lock) {}
-        virtual ~TestWriteLockInterruptiblyInterruptedRunnable() {}
-
-        virtual void run() {
-            try {
-                lock->writeLock().lockInterruptibly();
-                lock->writeLock().unlock();
-                lock->writeLock().lockInterruptibly();
-                lock->writeLock().unlock();
-            } catch (InterruptedException& success) {
-            }
+    virtual void run()
+    {
+        try
+        {
+            lock->writeLock().lockInterruptibly();
+            lock->writeLock().unlock();
+            lock->writeLock().lockInterruptibly();
+            lock->writeLock().unlock();
         }
-    };
-}
+        catch (InterruptedException& success)
+        {
+        }
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ReentrantReadWriteLockTest, testWriteLockInterruptiblyInterrupted) {
-    ReentrantReadWriteLock lock;
+TEST_F(ReentrantReadWriteLockTest, testWriteLockInterruptiblyInterrupted)
+{
+    ReentrantReadWriteLock                        lock;
     TestWriteLockInterruptiblyInterruptedRunnable runnable(this, &lock);
-    Thread t(&runnable);
+    Thread                                        t(&runnable);
 
-    try {
+    try
+    {
         lock.writeLock().lock();
         t.start();
         Thread::sleep(SHORT_DELAY_MS);
@@ -243,345 +294,458 @@ TEST_F(ReentrantReadWriteLockTest, testWriteLockInterruptiblyInterrupted) {
         Thread::sleep(SHORT_DELAY_MS);
         lock.writeLock().unlock();
         t.join();
-    } catch(Exception& e){
+    }
+    catch (Exception& e)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class TestWriteTryLockInterruptedRunnable : public Runnable {
-    private:
+class TestWriteTryLockInterruptedRunnable : public Runnable
+{
+private:
+    ReentrantReadWriteLockTest* test;
+    ReentrantReadWriteLock*     lock;
 
-        ReentrantReadWriteLockTest* test;
-        ReentrantReadWriteLock* lock;
+private:
+    TestWriteTryLockInterruptedRunnable(
+        const TestWriteTryLockInterruptedRunnable&);
+    TestWriteTryLockInterruptedRunnable operator=(
+        const TestWriteTryLockInterruptedRunnable&);
 
-    private:
+public:
+    TestWriteTryLockInterruptedRunnable(ReentrantReadWriteLockTest* test,
+                                        ReentrantReadWriteLock*     lock)
+        : Runnable(),
+          test(test),
+          lock(lock)
+    {
+    }
 
-        TestWriteTryLockInterruptedRunnable(const TestWriteTryLockInterruptedRunnable&);
-        TestWriteTryLockInterruptedRunnable operator= (const TestWriteTryLockInterruptedRunnable&);
+    virtual ~TestWriteTryLockInterruptedRunnable()
+    {
+    }
 
-    public:
-
-        TestWriteTryLockInterruptedRunnable(ReentrantReadWriteLockTest* test, ReentrantReadWriteLock* lock) :
-            Runnable(), test(test), lock(lock) {}
-        virtual ~TestWriteTryLockInterruptedRunnable() {}
-
-        virtual void run() {
-            try {
-                lock->writeLock().tryLock(1000, TimeUnit::MILLISECONDS);
-            } catch (InterruptedException& success) {
-            }
+    virtual void run()
+    {
+        try
+        {
+            lock->writeLock().tryLock(1000, TimeUnit::MILLISECONDS);
         }
-    };
-}
+        catch (InterruptedException& success)
+        {
+        }
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ReentrantReadWriteLockTest, testWriteTryLockInterrupted) {
-    ReentrantReadWriteLock lock;
+TEST_F(ReentrantReadWriteLockTest, testWriteTryLockInterrupted)
+{
+    ReentrantReadWriteLock              lock;
     TestWriteTryLockInterruptedRunnable runnable(this, &lock);
-    Thread t(&runnable);
+    Thread                              t(&runnable);
 
     lock.writeLock().lock();
 
-    try {
+    try
+    {
         t.start();
         t.interrupt();
         lock.writeLock().unlock();
         t.join();
-    } catch (Exception& e) {
+    }
+    catch (Exception& e)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class TestReadLockInterruptiblyInterruptedRunnable : public Runnable {
-    private:
+class TestReadLockInterruptiblyInterruptedRunnable : public Runnable
+{
+private:
+    ReentrantReadWriteLockTest* test;
+    ReentrantReadWriteLock*     lock;
 
-        ReentrantReadWriteLockTest* test;
-        ReentrantReadWriteLock* lock;
+private:
+    TestReadLockInterruptiblyInterruptedRunnable(
+        const TestReadLockInterruptiblyInterruptedRunnable&);
+    TestReadLockInterruptiblyInterruptedRunnable operator=(
+        const TestReadLockInterruptiblyInterruptedRunnable&);
 
-    private:
+public:
+    TestReadLockInterruptiblyInterruptedRunnable(
+        ReentrantReadWriteLockTest* test,
+        ReentrantReadWriteLock*     lock)
+        : Runnable(),
+          test(test),
+          lock(lock)
+    {
+    }
 
-        TestReadLockInterruptiblyInterruptedRunnable(const TestReadLockInterruptiblyInterruptedRunnable&);
-        TestReadLockInterruptiblyInterruptedRunnable operator= (const TestReadLockInterruptiblyInterruptedRunnable&);
+    virtual ~TestReadLockInterruptiblyInterruptedRunnable()
+    {
+    }
 
-    public:
-
-        TestReadLockInterruptiblyInterruptedRunnable(ReentrantReadWriteLockTest* test, ReentrantReadWriteLock* lock) :
-            Runnable(), test(test), lock(lock) {}
-        virtual ~TestReadLockInterruptiblyInterruptedRunnable() {}
-
-        virtual void run() {
-            try {
-                lock->readLock().lockInterruptibly();
-            } catch (InterruptedException& success) {
-            }
+    virtual void run()
+    {
+        try
+        {
+            lock->readLock().lockInterruptibly();
         }
-    };
-}
+        catch (InterruptedException& success)
+        {
+        }
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ReentrantReadWriteLockTest, testReadLockInterruptiblyInterrupted) {
-    ReentrantReadWriteLock lock;
+TEST_F(ReentrantReadWriteLockTest, testReadLockInterruptiblyInterrupted)
+{
+    ReentrantReadWriteLock                       lock;
     TestReadLockInterruptiblyInterruptedRunnable runnable(this, &lock);
-    Thread t(&runnable);
+    Thread                                       t(&runnable);
 
     lock.writeLock().lock();
 
-    try {
+    try
+    {
         t.start();
-        Thread::sleep( SHORT_DELAY_MS);
+        Thread::sleep(SHORT_DELAY_MS);
         t.interrupt();
         Thread::sleep(SHORT_DELAY_MS);
         lock.writeLock().unlock();
         t.join();
-    } catch (Exception& e) {
+    }
+    catch (Exception& e)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class TestReadTryLockInterruptedRunnable : public Runnable {
-    private:
+class TestReadTryLockInterruptedRunnable : public Runnable
+{
+private:
+    ReentrantReadWriteLockTest* test;
+    ReentrantReadWriteLock*     lock;
 
-        ReentrantReadWriteLockTest* test;
-        ReentrantReadWriteLock* lock;
+private:
+    TestReadTryLockInterruptedRunnable(
+        const TestReadTryLockInterruptedRunnable&);
+    TestReadTryLockInterruptedRunnable operator=(
+        const TestReadTryLockInterruptedRunnable&);
 
-    private:
+public:
+    TestReadTryLockInterruptedRunnable(ReentrantReadWriteLockTest* test,
+                                       ReentrantReadWriteLock*     lock)
+        : Runnable(),
+          test(test),
+          lock(lock)
+    {
+    }
 
-        TestReadTryLockInterruptedRunnable(const TestReadTryLockInterruptedRunnable&);
-        TestReadTryLockInterruptedRunnable operator= (const TestReadTryLockInterruptedRunnable&);
+    virtual ~TestReadTryLockInterruptedRunnable()
+    {
+    }
 
-    public:
-
-        TestReadTryLockInterruptedRunnable(ReentrantReadWriteLockTest* test, ReentrantReadWriteLock* lock) :
-            Runnable(), test(test), lock(lock) {}
-        virtual ~TestReadTryLockInterruptedRunnable() {}
-
-        virtual void run() {
-            try {
-                lock->readLock().tryLock(1000, TimeUnit::MILLISECONDS);
-                test->threadShouldThrow();
-            } catch (InterruptedException& success) {
-            }
+    virtual void run()
+    {
+        try
+        {
+            lock->readLock().tryLock(1000, TimeUnit::MILLISECONDS);
+            test->threadShouldThrow();
         }
-    };
-}
+        catch (InterruptedException& success)
+        {
+        }
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ReentrantReadWriteLockTest, testReadTryLockInterrupted) {
-    ReentrantReadWriteLock lock;
+TEST_F(ReentrantReadWriteLockTest, testReadTryLockInterrupted)
+{
+    ReentrantReadWriteLock             lock;
     TestReadTryLockInterruptedRunnable runnable(this, &lock);
-    Thread t(&runnable);
+    Thread                             t(&runnable);
 
     lock.writeLock().lock();
 
-    try {
+    try
+    {
         t.start();
         t.interrupt();
         t.join();
-    } catch (Exception& e) {
+    }
+    catch (Exception& e)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class TestWriteTryLockWhenLockedRunnable : public Runnable {
-    private:
+class TestWriteTryLockWhenLockedRunnable : public Runnable
+{
+private:
+    ReentrantReadWriteLockTest* test;
+    ReentrantReadWriteLock*     lock;
 
-        ReentrantReadWriteLockTest* test;
-        ReentrantReadWriteLock* lock;
+private:
+    TestWriteTryLockWhenLockedRunnable(
+        const TestWriteTryLockWhenLockedRunnable&);
+    TestWriteTryLockWhenLockedRunnable operator=(
+        const TestWriteTryLockWhenLockedRunnable&);
 
-    private:
+public:
+    TestWriteTryLockWhenLockedRunnable(ReentrantReadWriteLockTest* test,
+                                       ReentrantReadWriteLock*     lock)
+        : Runnable(),
+          test(test),
+          lock(lock)
+    {
+    }
 
-        TestWriteTryLockWhenLockedRunnable(const TestWriteTryLockWhenLockedRunnable&);
-        TestWriteTryLockWhenLockedRunnable operator= (const TestWriteTryLockWhenLockedRunnable&);
+    virtual ~TestWriteTryLockWhenLockedRunnable()
+    {
+    }
 
-    public:
-
-        TestWriteTryLockWhenLockedRunnable(ReentrantReadWriteLockTest* test, ReentrantReadWriteLock* lock) :
-            Runnable(), test(test), lock(lock) {}
-        virtual ~TestWriteTryLockWhenLockedRunnable() {}
-
-        virtual void run() {
-            test->threadAssertFalse(lock->writeLock().tryLock());
-        }
-    };
-}
+    virtual void run()
+    {
+        test->threadAssertFalse(lock->writeLock().tryLock());
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ReentrantReadWriteLockTest, testWriteTryLockWhenLocked) {
-
-    ReentrantReadWriteLock lock;
+TEST_F(ReentrantReadWriteLockTest, testWriteTryLockWhenLocked)
+{
+    ReentrantReadWriteLock             lock;
     TestWriteTryLockWhenLockedRunnable runnable(this, &lock);
-    Thread t(&runnable);
+    Thread                             t(&runnable);
     lock.writeLock().lock();
 
-    try {
+    try
+    {
         t.start();
         t.join();
         lock.writeLock().unlock();
-    } catch (Exception& e) {
+    }
+    catch (Exception& e)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class TestReadTryLockWhenLockedRunnable : public Runnable {
-    private:
+class TestReadTryLockWhenLockedRunnable : public Runnable
+{
+private:
+    ReentrantReadWriteLockTest* test;
+    ReentrantReadWriteLock*     lock;
 
-        ReentrantReadWriteLockTest* test;
-        ReentrantReadWriteLock* lock;
+private:
+    TestReadTryLockWhenLockedRunnable(const TestReadTryLockWhenLockedRunnable&);
+    TestReadTryLockWhenLockedRunnable operator=(
+        const TestReadTryLockWhenLockedRunnable&);
 
-    private:
+public:
+    TestReadTryLockWhenLockedRunnable(ReentrantReadWriteLockTest* test,
+                                      ReentrantReadWriteLock*     lock)
+        : Runnable(),
+          test(test),
+          lock(lock)
+    {
+    }
 
-        TestReadTryLockWhenLockedRunnable(const TestReadTryLockWhenLockedRunnable&);
-        TestReadTryLockWhenLockedRunnable operator= (const TestReadTryLockWhenLockedRunnable&);
+    virtual ~TestReadTryLockWhenLockedRunnable()
+    {
+    }
 
-    public:
-
-        TestReadTryLockWhenLockedRunnable(ReentrantReadWriteLockTest* test, ReentrantReadWriteLock* lock) :
-            Runnable(), test(test), lock(lock) {}
-        virtual ~TestReadTryLockWhenLockedRunnable() {}
-
-        virtual void run() {
-            test->threadAssertFalse(lock->readLock().tryLock());
-        }
-    };
-}
+    virtual void run()
+    {
+        test->threadAssertFalse(lock->readLock().tryLock());
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ReentrantReadWriteLockTest, testReadTryLockWhenLocked) {
-    ReentrantReadWriteLock lock;
+TEST_F(ReentrantReadWriteLockTest, testReadTryLockWhenLocked)
+{
+    ReentrantReadWriteLock            lock;
     TestReadTryLockWhenLockedRunnable runnable(this, &lock);
-    Thread t(&runnable);
+    Thread                            t(&runnable);
 
     lock.writeLock().lock();
 
-    try {
+    try
+    {
         t.start();
         t.join();
         lock.writeLock().unlock();
-    } catch (Exception& e) {
+    }
+    catch (Exception& e)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class TestMultipleReadLocksRunnable : public Runnable {
-    private:
+class TestMultipleReadLocksRunnable : public Runnable
+{
+private:
+    ReentrantReadWriteLockTest* test;
+    ReentrantReadWriteLock*     lock;
 
-        ReentrantReadWriteLockTest* test;
-        ReentrantReadWriteLock* lock;
+private:
+    TestMultipleReadLocksRunnable(const TestMultipleReadLocksRunnable&);
+    TestMultipleReadLocksRunnable operator=(
+        const TestMultipleReadLocksRunnable&);
 
-    private:
+public:
+    TestMultipleReadLocksRunnable(ReentrantReadWriteLockTest* test,
+                                  ReentrantReadWriteLock*     lock)
+        : Runnable(),
+          test(test),
+          lock(lock)
+    {
+    }
 
-        TestMultipleReadLocksRunnable(const TestMultipleReadLocksRunnable&);
-        TestMultipleReadLocksRunnable operator= (const TestMultipleReadLocksRunnable&);
+    virtual ~TestMultipleReadLocksRunnable()
+    {
+    }
 
-    public:
-
-        TestMultipleReadLocksRunnable(ReentrantReadWriteLockTest* test, ReentrantReadWriteLock* lock) :
-            Runnable(), test(test), lock(lock) {}
-        virtual ~TestMultipleReadLocksRunnable() {}
-
-        virtual void run() {
-            test->threadAssertTrue(lock->readLock().tryLock());
-            lock->readLock().unlock();
-        }
-    };
-}
+    virtual void run()
+    {
+        test->threadAssertTrue(lock->readLock().tryLock());
+        lock->readLock().unlock();
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ReentrantReadWriteLockTest, testMultipleReadLocks) {
-    ReentrantReadWriteLock lock;
+TEST_F(ReentrantReadWriteLockTest, testMultipleReadLocks)
+{
+    ReentrantReadWriteLock        lock;
     TestMultipleReadLocksRunnable runnable(this, &lock);
-    Thread t(&runnable);
+    Thread                        t(&runnable);
 
     lock.readLock().lock();
-    try {
+    try
+    {
         t.start();
         t.join();
         lock.readLock().unlock();
-    } catch (Exception& e) {
+    }
+    catch (Exception& e)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class TestWriteAfterMultipleReadLocksRunnable1 : public Runnable {
-    private:
+class TestWriteAfterMultipleReadLocksRunnable1 : public Runnable
+{
+private:
+    ReentrantReadWriteLockTest* test;
+    ReentrantReadWriteLock*     lock;
 
-        ReentrantReadWriteLockTest* test;
-        ReentrantReadWriteLock* lock;
+private:
+    TestWriteAfterMultipleReadLocksRunnable1(
+        const TestWriteAfterMultipleReadLocksRunnable1&);
+    TestWriteAfterMultipleReadLocksRunnable1 operator=(
+        const TestWriteAfterMultipleReadLocksRunnable1&);
 
-    private:
+public:
+    TestWriteAfterMultipleReadLocksRunnable1(ReentrantReadWriteLockTest* test,
+                                             ReentrantReadWriteLock*     lock)
+        : Runnable(),
+          test(test),
+          lock(lock)
+    {
+    }
 
-        TestWriteAfterMultipleReadLocksRunnable1(const TestWriteAfterMultipleReadLocksRunnable1&);
-        TestWriteAfterMultipleReadLocksRunnable1 operator= (const TestWriteAfterMultipleReadLocksRunnable1&);
+    virtual ~TestWriteAfterMultipleReadLocksRunnable1()
+    {
+    }
 
-    public:
+    virtual void run()
+    {
+        lock->readLock().lock();
+        lock->readLock().unlock();
+    }
+};
 
-        TestWriteAfterMultipleReadLocksRunnable1(ReentrantReadWriteLockTest* test, ReentrantReadWriteLock* lock) :
-            Runnable(), test(test), lock(lock) {}
-        virtual ~TestWriteAfterMultipleReadLocksRunnable1() {}
+class TestWriteAfterMultipleReadLocksRunnable2 : public Runnable
+{
+private:
+    ReentrantReadWriteLockTest* test;
+    ReentrantReadWriteLock*     lock;
 
-        virtual void run() {
-            lock->readLock().lock();
-            lock->readLock().unlock();
-        }
-    };
+private:
+    TestWriteAfterMultipleReadLocksRunnable2(
+        const TestWriteAfterMultipleReadLocksRunnable2&);
+    TestWriteAfterMultipleReadLocksRunnable2 operator=(
+        const TestWriteAfterMultipleReadLocksRunnable2&);
 
-    class TestWriteAfterMultipleReadLocksRunnable2 : public Runnable {
-    private:
+public:
+    TestWriteAfterMultipleReadLocksRunnable2(ReentrantReadWriteLockTest* test,
+                                             ReentrantReadWriteLock*     lock)
+        : Runnable(),
+          test(test),
+          lock(lock)
+    {
+    }
 
-        ReentrantReadWriteLockTest* test;
-        ReentrantReadWriteLock* lock;
+    virtual ~TestWriteAfterMultipleReadLocksRunnable2()
+    {
+    }
 
-    private:
-
-        TestWriteAfterMultipleReadLocksRunnable2(const TestWriteAfterMultipleReadLocksRunnable2&);
-        TestWriteAfterMultipleReadLocksRunnable2 operator= (const TestWriteAfterMultipleReadLocksRunnable2&);
-
-    public:
-
-        TestWriteAfterMultipleReadLocksRunnable2(ReentrantReadWriteLockTest* test, ReentrantReadWriteLock* lock) :
-            Runnable(), test(test), lock(lock) {}
-        virtual ~TestWriteAfterMultipleReadLocksRunnable2() {}
-
-        virtual void run() {
-            lock->writeLock().lock();
-            lock->writeLock().unlock();
-        }
-    };
-}
+    virtual void run()
+    {
+        lock->writeLock().lock();
+        lock->writeLock().unlock();
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ReentrantReadWriteLockTest, testWriteAfterMultipleReadLocks) {
-
-    ReentrantReadWriteLock lock;
+TEST_F(ReentrantReadWriteLockTest, testWriteAfterMultipleReadLocks)
+{
+    ReentrantReadWriteLock                   lock;
     TestWriteAfterMultipleReadLocksRunnable1 runnable1(this, &lock);
     TestWriteAfterMultipleReadLocksRunnable2 runnable2(this, &lock);
-    Thread t1(&runnable1);
-    Thread t2(&runnable2);
+    Thread                                   t1(&runnable1);
+    Thread                                   t2(&runnable2);
 
     lock.readLock().lock();
 
-    try {
+    try
+    {
         t1.start();
         t2.start();
         Thread::sleep(SHORT_DELAY_MS);
@@ -590,64 +754,79 @@ TEST_F(ReentrantReadWriteLockTest, testWriteAfterMultipleReadLocks) {
         t2.join(MEDIUM_DELAY_MS);
         ASSERT_TRUE(!t1.isAlive());
         ASSERT_TRUE(!t2.isAlive());
-    } catch (Exception& e) {
+    }
+    catch (Exception& e)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class TestReadAfterWriteLockRunnable : public Runnable {
-    private:
+class TestReadAfterWriteLockRunnable : public Runnable
+{
+private:
+    ReentrantReadWriteLockTest* test;
+    ReentrantReadWriteLock*     lock;
 
-        ReentrantReadWriteLockTest* test;
-        ReentrantReadWriteLock* lock;
+private:
+    TestReadAfterWriteLockRunnable(const TestReadAfterWriteLockRunnable&);
+    TestReadAfterWriteLockRunnable operator=(
+        const TestReadAfterWriteLockRunnable&);
 
-    private:
+public:
+    TestReadAfterWriteLockRunnable(ReentrantReadWriteLockTest* test,
+                                   ReentrantReadWriteLock*     lock)
+        : Runnable(),
+          test(test),
+          lock(lock)
+    {
+    }
 
-        TestReadAfterWriteLockRunnable(const TestReadAfterWriteLockRunnable&);
-        TestReadAfterWriteLockRunnable operator= (const TestReadAfterWriteLockRunnable&);
+    virtual ~TestReadAfterWriteLockRunnable()
+    {
+    }
 
-    public:
-
-        TestReadAfterWriteLockRunnable(ReentrantReadWriteLockTest* test, ReentrantReadWriteLock* lock) :
-            Runnable(), test(test), lock(lock) {}
-        virtual ~TestReadAfterWriteLockRunnable() {}
-
-        virtual void run() {
-            lock->readLock().lock();
-            lock->readLock().unlock();
-        }
-    };
-}
+    virtual void run()
+    {
+        lock->readLock().lock();
+        lock->readLock().unlock();
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ReentrantReadWriteLockTest, testReadAfterWriteLock) {
-    ReentrantReadWriteLock lock;
+TEST_F(ReentrantReadWriteLockTest, testReadAfterWriteLock)
+{
+    ReentrantReadWriteLock         lock;
     TestReadAfterWriteLockRunnable runnable(this, &lock);
-    Thread t1(&runnable);
-    Thread t2(&runnable);
+    Thread                         t1(&runnable);
+    Thread                         t2(&runnable);
 
     lock.writeLock().lock();
 
-    try {
+    try
+    {
         t1.start();
         t2.start();
-        Thread::sleep( SHORT_DELAY_MS);
+        Thread::sleep(SHORT_DELAY_MS);
         lock.writeLock().unlock();
         t1.join(MEDIUM_DELAY_MS);
         t2.join(MEDIUM_DELAY_MS);
         ASSERT_TRUE(!t1.isAlive());
         ASSERT_TRUE(!t2.isAlive());
-    } catch (Exception& e) {
+    }
+    catch (Exception& e)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ReentrantReadWriteLockTest, testReadHoldingWriteLock) {
-
+TEST_F(ReentrantReadWriteLockTest, testReadHoldingWriteLock)
+{
     ReentrantReadWriteLock lock;
     lock.writeLock().lock();
     ASSERT_TRUE(lock.readLock().tryLock());
@@ -656,47 +835,58 @@ TEST_F(ReentrantReadWriteLockTest, testReadHoldingWriteLock) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class TestReadHoldingWriteLockRunnable2 : public Runnable {
-    private:
+class TestReadHoldingWriteLockRunnable2 : public Runnable
+{
+private:
+    ReentrantReadWriteLockTest* test;
+    ReentrantReadWriteLock*     lock;
 
-        ReentrantReadWriteLockTest* test;
-        ReentrantReadWriteLock* lock;
+private:
+    TestReadHoldingWriteLockRunnable2(const TestReadHoldingWriteLockRunnable2&);
+    TestReadHoldingWriteLockRunnable2 operator=(
+        const TestReadHoldingWriteLockRunnable2&);
 
-    private:
+public:
+    TestReadHoldingWriteLockRunnable2(ReentrantReadWriteLockTest* test,
+                                      ReentrantReadWriteLock*     lock)
+        : Runnable(),
+          test(test),
+          lock(lock)
+    {
+    }
 
-        TestReadHoldingWriteLockRunnable2(const TestReadHoldingWriteLockRunnable2&);
-        TestReadHoldingWriteLockRunnable2 operator= (const TestReadHoldingWriteLockRunnable2&);
+    virtual ~TestReadHoldingWriteLockRunnable2()
+    {
+    }
 
-    public:
-
-        TestReadHoldingWriteLockRunnable2(ReentrantReadWriteLockTest* test, ReentrantReadWriteLock* lock) :
-            Runnable(), test(test), lock(lock) {}
-        virtual ~TestReadHoldingWriteLockRunnable2() {}
-
-        virtual void run() {
-            lock->readLock().lock();
-            lock->readLock().unlock();
-        }
-    };
-}
+    virtual void run()
+    {
+        lock->readLock().lock();
+        lock->readLock().unlock();
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ReentrantReadWriteLockTest, testReadHoldingWriteLock2) {
-    ReentrantReadWriteLock lock;
+TEST_F(ReentrantReadWriteLockTest, testReadHoldingWriteLock2)
+{
+    ReentrantReadWriteLock            lock;
     TestReadHoldingWriteLockRunnable2 runnable(this, &lock);
-    Thread t1(&runnable);
-    Thread t2(&runnable);
+    Thread                            t1(&runnable);
+    Thread                            t2(&runnable);
 
     lock.writeLock().lock();
 
-    try {
+    try
+    {
         t1.start();
         t2.start();
         lock.readLock().lock();
         lock.readLock().unlock();
-        Thread::sleep( SHORT_DELAY_MS);
+        Thread::sleep(SHORT_DELAY_MS);
         lock.readLock().lock();
         lock.readLock().unlock();
         lock.writeLock().unlock();
@@ -704,53 +894,66 @@ TEST_F(ReentrantReadWriteLockTest, testReadHoldingWriteLock2) {
         t2.join(MEDIUM_DELAY_MS);
         ASSERT_TRUE(!t1.isAlive());
         ASSERT_TRUE(!t2.isAlive());
-    } catch (Exception& e) {
+    }
+    catch (Exception& e)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class TestReadHoldingWriteLockRunnable3 : public Runnable {
-    private:
+class TestReadHoldingWriteLockRunnable3 : public Runnable
+{
+private:
+    ReentrantReadWriteLockTest* test;
+    ReentrantReadWriteLock*     lock;
 
-        ReentrantReadWriteLockTest* test;
-        ReentrantReadWriteLock* lock;
+private:
+    TestReadHoldingWriteLockRunnable3(const TestReadHoldingWriteLockRunnable3&);
+    TestReadHoldingWriteLockRunnable3 operator=(
+        const TestReadHoldingWriteLockRunnable3&);
 
-    private:
+public:
+    TestReadHoldingWriteLockRunnable3(ReentrantReadWriteLockTest* test,
+                                      ReentrantReadWriteLock*     lock)
+        : Runnable(),
+          test(test),
+          lock(lock)
+    {
+    }
 
-        TestReadHoldingWriteLockRunnable3(const TestReadHoldingWriteLockRunnable3&);
-        TestReadHoldingWriteLockRunnable3 operator= (const TestReadHoldingWriteLockRunnable3&);
+    virtual ~TestReadHoldingWriteLockRunnable3()
+    {
+    }
 
-    public:
-
-        TestReadHoldingWriteLockRunnable3(ReentrantReadWriteLockTest* test, ReentrantReadWriteLock* lock) :
-            Runnable(), test(test), lock(lock) {}
-        virtual ~TestReadHoldingWriteLockRunnable3() {}
-
-        virtual void run() {
-            lock->writeLock().lock();
-            lock->writeLock().unlock();
-        }
-    };
-}
+    virtual void run()
+    {
+        lock->writeLock().lock();
+        lock->writeLock().unlock();
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ReentrantReadWriteLockTest, testReadHoldingWriteLock3) {
-    ReentrantReadWriteLock lock;
+TEST_F(ReentrantReadWriteLockTest, testReadHoldingWriteLock3)
+{
+    ReentrantReadWriteLock            lock;
     TestReadHoldingWriteLockRunnable3 runnable(this, &lock);
-    Thread t1(&runnable);
-    Thread t2(&runnable);
+    Thread                            t1(&runnable);
+    Thread                            t2(&runnable);
 
     lock.writeLock().lock();
 
-    try {
+    try
+    {
         t1.start();
         t2.start();
         lock.readLock().lock();
         lock.readLock().unlock();
-        Thread::sleep( SHORT_DELAY_MS);
+        Thread::sleep(SHORT_DELAY_MS);
         lock.readLock().lock();
         lock.readLock().unlock();
         lock.writeLock().unlock();
@@ -758,53 +961,67 @@ TEST_F(ReentrantReadWriteLockTest, testReadHoldingWriteLock3) {
         t2.join(MEDIUM_DELAY_MS);
         ASSERT_TRUE(!t1.isAlive());
         ASSERT_TRUE(!t2.isAlive());
-    } catch (Exception& e) {
+    }
+    catch (Exception& e)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class TestWriteHoldingWriteLock4Runnable : public Runnable {
-    private:
+class TestWriteHoldingWriteLock4Runnable : public Runnable
+{
+private:
+    ReentrantReadWriteLockTest* test;
+    ReentrantReadWriteLock*     lock;
 
-        ReentrantReadWriteLockTest* test;
-        ReentrantReadWriteLock* lock;
+private:
+    TestWriteHoldingWriteLock4Runnable(
+        const TestWriteHoldingWriteLock4Runnable&);
+    TestWriteHoldingWriteLock4Runnable operator=(
+        const TestWriteHoldingWriteLock4Runnable&);
 
-    private:
+public:
+    TestWriteHoldingWriteLock4Runnable(ReentrantReadWriteLockTest* test,
+                                       ReentrantReadWriteLock*     lock)
+        : Runnable(),
+          test(test),
+          lock(lock)
+    {
+    }
 
-        TestWriteHoldingWriteLock4Runnable(const TestWriteHoldingWriteLock4Runnable&);
-        TestWriteHoldingWriteLock4Runnable operator= (const TestWriteHoldingWriteLock4Runnable&);
+    virtual ~TestWriteHoldingWriteLock4Runnable()
+    {
+    }
 
-    public:
-
-        TestWriteHoldingWriteLock4Runnable(ReentrantReadWriteLockTest* test, ReentrantReadWriteLock* lock) :
-            Runnable(), test(test), lock(lock) {}
-        virtual ~TestWriteHoldingWriteLock4Runnable() {}
-
-        virtual void run() {
-            lock->writeLock().lock();
-            lock->writeLock().unlock();
-        }
-    };
-}
+    virtual void run()
+    {
+        lock->writeLock().lock();
+        lock->writeLock().unlock();
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ReentrantReadWriteLockTest, testWriteHoldingWriteLock4) {
-    ReentrantReadWriteLock lock;
+TEST_F(ReentrantReadWriteLockTest, testWriteHoldingWriteLock4)
+{
+    ReentrantReadWriteLock             lock;
     TestWriteHoldingWriteLock4Runnable runnable(this, &lock);
-    Thread t1(&runnable);
-    Thread t2(&runnable);
+    Thread                             t1(&runnable);
+    Thread                             t2(&runnable);
 
     lock.writeLock().lock();
 
-    try {
+    try
+    {
         t1.start();
         t2.start();
         lock.writeLock().lock();
         lock.writeLock().unlock();
-        Thread::sleep( SHORT_DELAY_MS);
+        Thread::sleep(SHORT_DELAY_MS);
         lock.writeLock().lock();
         lock.writeLock().unlock();
         lock.writeLock().unlock();
@@ -812,14 +1029,16 @@ TEST_F(ReentrantReadWriteLockTest, testWriteHoldingWriteLock4) {
         t2.join(MEDIUM_DELAY_MS);
         ASSERT_TRUE(!t1.isAlive());
         ASSERT_TRUE(!t2.isAlive());
-    } catch (Exception& e) {
+    }
+    catch (Exception& e)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ReentrantReadWriteLockTest, testReadHoldingWriteLockFair) {
-
+TEST_F(ReentrantReadWriteLockTest, testReadHoldingWriteLockFair)
+{
     ReentrantReadWriteLock lock(true);
     lock.writeLock().lock();
     ASSERT_TRUE(lock.readLock().tryLock());
@@ -828,47 +1047,59 @@ TEST_F(ReentrantReadWriteLockTest, testReadHoldingWriteLockFair) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class TestReadHoldingWriteLockFair2Runnable : public Runnable {
-    private:
+class TestReadHoldingWriteLockFair2Runnable : public Runnable
+{
+private:
+    ReentrantReadWriteLockTest* test;
+    ReentrantReadWriteLock*     lock;
 
-        ReentrantReadWriteLockTest* test;
-        ReentrantReadWriteLock* lock;
+private:
+    TestReadHoldingWriteLockFair2Runnable(
+        const TestReadHoldingWriteLockFair2Runnable&);
+    TestReadHoldingWriteLockFair2Runnable operator=(
+        const TestReadHoldingWriteLockFair2Runnable&);
 
-    private:
+public:
+    TestReadHoldingWriteLockFair2Runnable(ReentrantReadWriteLockTest* test,
+                                          ReentrantReadWriteLock*     lock)
+        : Runnable(),
+          test(test),
+          lock(lock)
+    {
+    }
 
-        TestReadHoldingWriteLockFair2Runnable(const TestReadHoldingWriteLockFair2Runnable&);
-        TestReadHoldingWriteLockFair2Runnable operator= (const TestReadHoldingWriteLockFair2Runnable&);
+    virtual ~TestReadHoldingWriteLockFair2Runnable()
+    {
+    }
 
-    public:
-
-        TestReadHoldingWriteLockFair2Runnable(ReentrantReadWriteLockTest* test, ReentrantReadWriteLock* lock) :
-            Runnable(), test(test), lock(lock) {}
-        virtual ~TestReadHoldingWriteLockFair2Runnable() {}
-
-        virtual void run() {
-            lock->readLock().lock();
-            lock->readLock().unlock();
-        }
-    };
-}
+    virtual void run()
+    {
+        lock->readLock().lock();
+        lock->readLock().unlock();
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ReentrantReadWriteLockTest, testReadHoldingWriteLockFair2) {
-    ReentrantReadWriteLock lock(true);
+TEST_F(ReentrantReadWriteLockTest, testReadHoldingWriteLockFair2)
+{
+    ReentrantReadWriteLock                lock(true);
     TestReadHoldingWriteLockFair2Runnable runnable(this, &lock);
-    Thread t1(&runnable);
-    Thread t2(&runnable);
+    Thread                                t1(&runnable);
+    Thread                                t2(&runnable);
 
     lock.writeLock().lock();
 
-    try {
+    try
+    {
         t1.start();
         t2.start();
         lock.readLock().lock();
         lock.readLock().unlock();
-        Thread::sleep( SHORT_DELAY_MS);
+        Thread::sleep(SHORT_DELAY_MS);
         lock.readLock().lock();
         lock.readLock().unlock();
         lock.writeLock().unlock();
@@ -876,53 +1107,67 @@ TEST_F(ReentrantReadWriteLockTest, testReadHoldingWriteLockFair2) {
         t2.join(MEDIUM_DELAY_MS);
         ASSERT_TRUE(!t1.isAlive());
         ASSERT_TRUE(!t2.isAlive());
-    } catch (Exception& e) {
+    }
+    catch (Exception& e)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class TestReadHoldingWriteLockFair3Runnable : public Runnable {
-    private:
+class TestReadHoldingWriteLockFair3Runnable : public Runnable
+{
+private:
+    ReentrantReadWriteLockTest* test;
+    ReentrantReadWriteLock*     lock;
 
-        ReentrantReadWriteLockTest* test;
-        ReentrantReadWriteLock* lock;
+private:
+    TestReadHoldingWriteLockFair3Runnable(
+        const TestReadHoldingWriteLockFair3Runnable&);
+    TestReadHoldingWriteLockFair3Runnable operator=(
+        const TestReadHoldingWriteLockFair3Runnable&);
 
-    private:
+public:
+    TestReadHoldingWriteLockFair3Runnable(ReentrantReadWriteLockTest* test,
+                                          ReentrantReadWriteLock*     lock)
+        : Runnable(),
+          test(test),
+          lock(lock)
+    {
+    }
 
-        TestReadHoldingWriteLockFair3Runnable(const TestReadHoldingWriteLockFair3Runnable&);
-        TestReadHoldingWriteLockFair3Runnable operator= (const TestReadHoldingWriteLockFair3Runnable&);
+    virtual ~TestReadHoldingWriteLockFair3Runnable()
+    {
+    }
 
-    public:
-
-        TestReadHoldingWriteLockFair3Runnable(ReentrantReadWriteLockTest* test, ReentrantReadWriteLock* lock) :
-            Runnable(), test(test), lock(lock) {}
-        virtual ~TestReadHoldingWriteLockFair3Runnable() {}
-
-        virtual void run() {
-            lock->writeLock().lock();
-            lock->writeLock().unlock();
-        }
-    };
-}
+    virtual void run()
+    {
+        lock->writeLock().lock();
+        lock->writeLock().unlock();
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ReentrantReadWriteLockTest, testReadHoldingWriteLockFair3) {
-    ReentrantReadWriteLock lock(true);
+TEST_F(ReentrantReadWriteLockTest, testReadHoldingWriteLockFair3)
+{
+    ReentrantReadWriteLock                lock(true);
     TestReadHoldingWriteLockFair3Runnable runnable(this, &lock);
-    Thread t1(&runnable);
-    Thread t2(&runnable);
+    Thread                                t1(&runnable);
+    Thread                                t2(&runnable);
 
     lock.writeLock().lock();
 
-    try {
+    try
+    {
         t1.start();
         t2.start();
         lock.readLock().lock();
         lock.readLock().unlock();
-        Thread::sleep( SHORT_DELAY_MS);
+        Thread::sleep(SHORT_DELAY_MS);
         lock.readLock().lock();
         lock.readLock().unlock();
         lock.writeLock().unlock();
@@ -930,50 +1175,64 @@ TEST_F(ReentrantReadWriteLockTest, testReadHoldingWriteLockFair3) {
         t2.join(MEDIUM_DELAY_MS);
         ASSERT_TRUE(!t1.isAlive());
         ASSERT_TRUE(!t2.isAlive());
-    } catch (Exception& e) {
+    }
+    catch (Exception& e)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class TestWriteHoldingWriteLockFair4Runnable : public Runnable {
-    private:
+class TestWriteHoldingWriteLockFair4Runnable : public Runnable
+{
+private:
+    ReentrantReadWriteLockTest* test;
+    ReentrantReadWriteLock*     lock;
 
-        ReentrantReadWriteLockTest* test;
-        ReentrantReadWriteLock* lock;
+private:
+    TestWriteHoldingWriteLockFair4Runnable(
+        const TestWriteHoldingWriteLockFair4Runnable&);
+    TestWriteHoldingWriteLockFair4Runnable operator=(
+        const TestWriteHoldingWriteLockFair4Runnable&);
 
-    private:
+public:
+    TestWriteHoldingWriteLockFair4Runnable(ReentrantReadWriteLockTest* test,
+                                           ReentrantReadWriteLock*     lock)
+        : Runnable(),
+          test(test),
+          lock(lock)
+    {
+    }
 
-        TestWriteHoldingWriteLockFair4Runnable(const TestWriteHoldingWriteLockFair4Runnable&);
-        TestWriteHoldingWriteLockFair4Runnable operator= (const TestWriteHoldingWriteLockFair4Runnable&);
+    virtual ~TestWriteHoldingWriteLockFair4Runnable()
+    {
+    }
 
-    public:
-
-        TestWriteHoldingWriteLockFair4Runnable(ReentrantReadWriteLockTest* test, ReentrantReadWriteLock* lock) :
-            Runnable(), test(test), lock(lock) {}
-        virtual ~TestWriteHoldingWriteLockFair4Runnable() {}
-
-        virtual void run() {
-            lock->writeLock().lock();
-            lock->writeLock().unlock();
-        }
-    };
-}
+    virtual void run()
+    {
+        lock->writeLock().lock();
+        lock->writeLock().unlock();
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ReentrantReadWriteLockTest, testWriteHoldingWriteLockFair4) {
-    ReentrantReadWriteLock lock(true);
+TEST_F(ReentrantReadWriteLockTest, testWriteHoldingWriteLockFair4)
+{
+    ReentrantReadWriteLock                 lock(true);
     TestWriteHoldingWriteLockFair4Runnable runnable(this, &lock);
-    Thread t1(&runnable);
-    Thread t2(&runnable);
+    Thread                                 t1(&runnable);
+    Thread                                 t2(&runnable);
     lock.writeLock().lock();
 
-    try {
+    try
+    {
         t1.start();
         t2.start();
-        Thread::sleep( SHORT_DELAY_MS);
+        Thread::sleep(SHORT_DELAY_MS);
         ASSERT_TRUE(lock.isWriteLockedByCurrentThread());
         ASSERT_TRUE(lock.getWriteHoldCount() == 1);
         lock.writeLock().lock();
@@ -986,493 +1245,657 @@ TEST_F(ReentrantReadWriteLockTest, testWriteHoldingWriteLockFair4) {
         t2.join(MEDIUM_DELAY_MS);
         ASSERT_TRUE(!t1.isAlive());
         ASSERT_TRUE(!t2.isAlive());
-    } catch (Exception& e) {
+    }
+    catch (Exception& e)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class TestTryLockWhenReadLockedRunnable : public Runnable {
-    private:
+class TestTryLockWhenReadLockedRunnable : public Runnable
+{
+private:
+    ReentrantReadWriteLockTest* test;
+    ReentrantReadWriteLock*     lock;
 
-        ReentrantReadWriteLockTest* test;
-        ReentrantReadWriteLock* lock;
+private:
+    TestTryLockWhenReadLockedRunnable(const TestTryLockWhenReadLockedRunnable&);
+    TestTryLockWhenReadLockedRunnable operator=(
+        const TestTryLockWhenReadLockedRunnable&);
 
-    private:
+public:
+    TestTryLockWhenReadLockedRunnable(ReentrantReadWriteLockTest* test,
+                                      ReentrantReadWriteLock*     lock)
+        : Runnable(),
+          test(test),
+          lock(lock)
+    {
+    }
 
-        TestTryLockWhenReadLockedRunnable(const TestTryLockWhenReadLockedRunnable&);
-        TestTryLockWhenReadLockedRunnable operator= (const TestTryLockWhenReadLockedRunnable&);
+    virtual ~TestTryLockWhenReadLockedRunnable()
+    {
+    }
 
-    public:
-
-        TestTryLockWhenReadLockedRunnable(ReentrantReadWriteLockTest* test, ReentrantReadWriteLock* lock) :
-            Runnable(), test(test), lock(lock) {}
-        virtual ~TestTryLockWhenReadLockedRunnable() {}
-
-        virtual void run() {
-            test->threadAssertTrue(lock->readLock().tryLock());
-            lock->readLock().unlock();
-        }
-    };
-}
+    virtual void run()
+    {
+        test->threadAssertTrue(lock->readLock().tryLock());
+        lock->readLock().unlock();
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ReentrantReadWriteLockTest, testTryLockWhenReadLocked) {
-    ReentrantReadWriteLock lock;
+TEST_F(ReentrantReadWriteLockTest, testTryLockWhenReadLocked)
+{
+    ReentrantReadWriteLock            lock;
     TestTryLockWhenReadLockedRunnable runnable(this, &lock);
-    Thread t(&runnable);
+    Thread                            t(&runnable);
 
     lock.readLock().lock();
-    try {
+    try
+    {
         t.start();
         t.join();
         lock.readLock().unlock();
-    } catch (Exception& e) {
+    }
+    catch (Exception& e)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class TestWriteTryLockWhenReadLockedRunnable : public Runnable {
-    private:
+class TestWriteTryLockWhenReadLockedRunnable : public Runnable
+{
+private:
+    ReentrantReadWriteLockTest* test;
+    ReentrantReadWriteLock*     lock;
 
-        ReentrantReadWriteLockTest* test;
-        ReentrantReadWriteLock* lock;
+private:
+    TestWriteTryLockWhenReadLockedRunnable(
+        const TestWriteTryLockWhenReadLockedRunnable&);
+    TestWriteTryLockWhenReadLockedRunnable operator=(
+        const TestWriteTryLockWhenReadLockedRunnable&);
 
-    private:
+public:
+    TestWriteTryLockWhenReadLockedRunnable(ReentrantReadWriteLockTest* test,
+                                           ReentrantReadWriteLock*     lock)
+        : Runnable(),
+          test(test),
+          lock(lock)
+    {
+    }
 
-        TestWriteTryLockWhenReadLockedRunnable(const TestWriteTryLockWhenReadLockedRunnable&);
-        TestWriteTryLockWhenReadLockedRunnable operator= (const TestWriteTryLockWhenReadLockedRunnable&);
+    virtual ~TestWriteTryLockWhenReadLockedRunnable()
+    {
+    }
 
-    public:
-
-        TestWriteTryLockWhenReadLockedRunnable(ReentrantReadWriteLockTest* test, ReentrantReadWriteLock* lock) :
-            Runnable(), test(test), lock(lock) {}
-        virtual ~TestWriteTryLockWhenReadLockedRunnable() {}
-
-        virtual void run() {
-            test->threadAssertFalse(lock->writeLock().tryLock());
-        }
-    };
-}
+    virtual void run()
+    {
+        test->threadAssertFalse(lock->writeLock().tryLock());
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-void ReentrantReadWriteLockTest::testWriteTryLockWhenReadLocked() {
-    ReentrantReadWriteLock lock;
+void ReentrantReadWriteLockTest::testWriteTryLockWhenReadLocked()
+{
+    ReentrantReadWriteLock                 lock;
     TestWriteTryLockWhenReadLockedRunnable runnable(this, &lock);
-    Thread t(&runnable);
+    Thread                                 t(&runnable);
     lock.readLock().lock();
 
-    try {
+    try
+    {
         t.start();
         t.join();
         lock.readLock().unlock();
-    } catch (Exception& e) {
+    }
+    catch (Exception& e)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class TestTryLockWhenReadLockedFairRunnable : public Runnable {
-    private:
+class TestTryLockWhenReadLockedFairRunnable : public Runnable
+{
+private:
+    ReentrantReadWriteLockTest* test;
+    ReentrantReadWriteLock*     lock;
 
-        ReentrantReadWriteLockTest* test;
-        ReentrantReadWriteLock* lock;
+private:
+    TestTryLockWhenReadLockedFairRunnable(
+        const TestTryLockWhenReadLockedFairRunnable&);
+    TestTryLockWhenReadLockedFairRunnable operator=(
+        const TestTryLockWhenReadLockedFairRunnable&);
 
-    private:
+public:
+    TestTryLockWhenReadLockedFairRunnable(ReentrantReadWriteLockTest* test,
+                                          ReentrantReadWriteLock*     lock)
+        : Runnable(),
+          test(test),
+          lock(lock)
+    {
+    }
 
-        TestTryLockWhenReadLockedFairRunnable(const TestTryLockWhenReadLockedFairRunnable&);
-        TestTryLockWhenReadLockedFairRunnable operator= (const TestTryLockWhenReadLockedFairRunnable&);
+    virtual ~TestTryLockWhenReadLockedFairRunnable()
+    {
+    }
 
-    public:
-
-        TestTryLockWhenReadLockedFairRunnable(ReentrantReadWriteLockTest* test, ReentrantReadWriteLock* lock) :
-            Runnable(), test(test), lock(lock) {}
-        virtual ~TestTryLockWhenReadLockedFairRunnable() {}
-
-        virtual void run() {
-            test->threadAssertTrue(lock->readLock().tryLock());
-            lock->readLock().unlock();
-        }
-    };
-}
+    virtual void run()
+    {
+        test->threadAssertTrue(lock->readLock().tryLock());
+        lock->readLock().unlock();
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ReentrantReadWriteLockTest, testTryLockWhenReadLockedFair) {
-    ReentrantReadWriteLock lock(true);
+TEST_F(ReentrantReadWriteLockTest, testTryLockWhenReadLockedFair)
+{
+    ReentrantReadWriteLock                lock(true);
     TestTryLockWhenReadLockedFairRunnable runnable(this, &lock);
-    Thread t(&runnable);
+    Thread                                t(&runnable);
     lock.readLock().lock();
 
-    try {
+    try
+    {
         t.start();
         t.join();
         lock.readLock().unlock();
-    } catch (Exception& e) {
+    }
+    catch (Exception& e)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class TestWriteTryLockWhenReadLockedFairRunnable : public Runnable {
-    private:
+class TestWriteTryLockWhenReadLockedFairRunnable : public Runnable
+{
+private:
+    ReentrantReadWriteLockTest* test;
+    ReentrantReadWriteLock*     lock;
 
-        ReentrantReadWriteLockTest* test;
-        ReentrantReadWriteLock* lock;
+private:
+    TestWriteTryLockWhenReadLockedFairRunnable(
+        const TestWriteTryLockWhenReadLockedFairRunnable&);
+    TestWriteTryLockWhenReadLockedFairRunnable operator=(
+        const TestWriteTryLockWhenReadLockedFairRunnable&);
 
-    private:
+public:
+    TestWriteTryLockWhenReadLockedFairRunnable(ReentrantReadWriteLockTest* test,
+                                               ReentrantReadWriteLock*     lock)
+        : Runnable(),
+          test(test),
+          lock(lock)
+    {
+    }
 
-        TestWriteTryLockWhenReadLockedFairRunnable(const TestWriteTryLockWhenReadLockedFairRunnable&);
-        TestWriteTryLockWhenReadLockedFairRunnable operator= (const TestWriteTryLockWhenReadLockedFairRunnable&);
+    virtual ~TestWriteTryLockWhenReadLockedFairRunnable()
+    {
+    }
 
-    public:
-
-        TestWriteTryLockWhenReadLockedFairRunnable(ReentrantReadWriteLockTest* test, ReentrantReadWriteLock* lock) :
-            Runnable(), test(test), lock(lock) {}
-        virtual ~TestWriteTryLockWhenReadLockedFairRunnable() {}
-
-        virtual void run() {
-            test->threadAssertFalse(lock->writeLock().tryLock());
-        }
-    };
-}
+    virtual void run()
+    {
+        test->threadAssertFalse(lock->writeLock().tryLock());
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ReentrantReadWriteLockTest, testWriteTryLockWhenReadLockedFair) {
-    ReentrantReadWriteLock lock(true);
+TEST_F(ReentrantReadWriteLockTest, testWriteTryLockWhenReadLockedFair)
+{
+    ReentrantReadWriteLock                     lock(true);
     TestWriteTryLockWhenReadLockedFairRunnable runnable(this, &lock);
-    Thread t(&runnable);
+    Thread                                     t(&runnable);
     lock.readLock().lock();
 
-    try {
+    try
+    {
         t.start();
         t.join();
         lock.readLock().unlock();
-    } catch (Exception& e) {
+    }
+    catch (Exception& e)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class TestWriteTryLockTimeoutRunnable : public Runnable {
-    private:
+class TestWriteTryLockTimeoutRunnable : public Runnable
+{
+private:
+    ReentrantReadWriteLockTest* test;
+    ReentrantReadWriteLock*     lock;
 
-        ReentrantReadWriteLockTest* test;
-        ReentrantReadWriteLock* lock;
+private:
+    TestWriteTryLockTimeoutRunnable(const TestWriteTryLockTimeoutRunnable&);
+    TestWriteTryLockTimeoutRunnable operator=(
+        const TestWriteTryLockTimeoutRunnable&);
 
-    private:
+public:
+    TestWriteTryLockTimeoutRunnable(ReentrantReadWriteLockTest* test,
+                                    ReentrantReadWriteLock*     lock)
+        : Runnable(),
+          test(test),
+          lock(lock)
+    {
+    }
 
-        TestWriteTryLockTimeoutRunnable(const TestWriteTryLockTimeoutRunnable&);
-        TestWriteTryLockTimeoutRunnable operator= (const TestWriteTryLockTimeoutRunnable&);
+    virtual ~TestWriteTryLockTimeoutRunnable()
+    {
+    }
 
-    public:
-
-        TestWriteTryLockTimeoutRunnable(ReentrantReadWriteLockTest* test, ReentrantReadWriteLock* lock) :
-            Runnable(), test(test), lock(lock) {}
-        virtual ~TestWriteTryLockTimeoutRunnable() {}
-
-        virtual void run() {
-            try {
-                test->threadAssertFalse(lock->writeLock().tryLock(1, TimeUnit::MILLISECONDS));
-            } catch (Exception& ex) {
-                test->threadUnexpectedException();
-            }
+    virtual void run()
+    {
+        try
+        {
+            test->threadAssertFalse(
+                lock->writeLock().tryLock(1, TimeUnit::MILLISECONDS));
         }
-    };
-}
+        catch (Exception& ex)
+        {
+            test->threadUnexpectedException();
+        }
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ReentrantReadWriteLockTest, testWriteTryLockTimeout) {
-    ReentrantReadWriteLock lock;
+TEST_F(ReentrantReadWriteLockTest, testWriteTryLockTimeout)
+{
+    ReentrantReadWriteLock          lock;
     TestWriteTryLockTimeoutRunnable runnable(this, &lock);
-    Thread t(&runnable);
+    Thread                          t(&runnable);
     lock.writeLock().lock();
 
-    try {
+    try
+    {
         t.start();
         t.join();
         lock.writeLock().unlock();
-    } catch (Exception& e) {
+    }
+    catch (Exception& e)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class TestReadTryLockTimeoutRunnable : public Runnable {
-    private:
+class TestReadTryLockTimeoutRunnable : public Runnable
+{
+private:
+    ReentrantReadWriteLockTest* test;
+    ReentrantReadWriteLock*     lock;
 
-        ReentrantReadWriteLockTest* test;
-        ReentrantReadWriteLock* lock;
+private:
+    TestReadTryLockTimeoutRunnable(const TestReadTryLockTimeoutRunnable&);
+    TestReadTryLockTimeoutRunnable operator=(
+        const TestReadTryLockTimeoutRunnable&);
 
-    private:
+public:
+    TestReadTryLockTimeoutRunnable(ReentrantReadWriteLockTest* test,
+                                   ReentrantReadWriteLock*     lock)
+        : Runnable(),
+          test(test),
+          lock(lock)
+    {
+    }
 
-        TestReadTryLockTimeoutRunnable(const TestReadTryLockTimeoutRunnable&);
-        TestReadTryLockTimeoutRunnable operator= (const TestReadTryLockTimeoutRunnable&);
+    virtual ~TestReadTryLockTimeoutRunnable()
+    {
+    }
 
-    public:
-
-        TestReadTryLockTimeoutRunnable(ReentrantReadWriteLockTest* test, ReentrantReadWriteLock* lock) :
-            Runnable(), test(test), lock(lock) {}
-        virtual ~TestReadTryLockTimeoutRunnable() {}
-
-        virtual void run() {
-            try {
-                test->threadAssertFalse(lock->readLock().tryLock(1, TimeUnit::MILLISECONDS));
-            } catch (Exception& ex) {
-                test->threadUnexpectedException();
-            }
+    virtual void run()
+    {
+        try
+        {
+            test->threadAssertFalse(
+                lock->readLock().tryLock(1, TimeUnit::MILLISECONDS));
         }
-    };
-}
+        catch (Exception& ex)
+        {
+            test->threadUnexpectedException();
+        }
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ReentrantReadWriteLockTest, testReadTryLockTimeout) {
-    ReentrantReadWriteLock lock;
+TEST_F(ReentrantReadWriteLockTest, testReadTryLockTimeout)
+{
+    ReentrantReadWriteLock         lock;
     TestReadTryLockTimeoutRunnable runnable(this, &lock);
-    Thread t(&runnable);
+    Thread                         t(&runnable);
     lock.writeLock().lock();
 
-    try {
+    try
+    {
         t.start();
         t.join();
         lock.writeLock().unlock();
-    } catch (Exception& e) {
+    }
+    catch (Exception& e)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class TestWriteLockInterruptiblyRunnable : public Runnable {
-    private:
+class TestWriteLockInterruptiblyRunnable : public Runnable
+{
+private:
+    ReentrantReadWriteLockTest* test;
+    ReentrantReadWriteLock*     lock;
 
-        ReentrantReadWriteLockTest* test;
-        ReentrantReadWriteLock* lock;
+private:
+    TestWriteLockInterruptiblyRunnable(
+        const TestWriteLockInterruptiblyRunnable&);
+    TestWriteLockInterruptiblyRunnable operator=(
+        const TestWriteLockInterruptiblyRunnable&);
 
-    private:
+public:
+    TestWriteLockInterruptiblyRunnable(ReentrantReadWriteLockTest* test,
+                                       ReentrantReadWriteLock*     lock)
+        : Runnable(),
+          test(test),
+          lock(lock)
+    {
+    }
 
-        TestWriteLockInterruptiblyRunnable(const TestWriteLockInterruptiblyRunnable&);
-        TestWriteLockInterruptiblyRunnable operator= (const TestWriteLockInterruptiblyRunnable&);
+    virtual ~TestWriteLockInterruptiblyRunnable()
+    {
+    }
 
-    public:
-
-        TestWriteLockInterruptiblyRunnable(ReentrantReadWriteLockTest* test, ReentrantReadWriteLock* lock) :
-            Runnable(), test(test), lock(lock) {}
-        virtual ~TestWriteLockInterruptiblyRunnable() {}
-
-        virtual void run() {
-            try {
-                lock->writeLock().lockInterruptibly();
-                test->threadShouldThrow();
-            } catch(InterruptedException& success) {
-            }
+    virtual void run()
+    {
+        try
+        {
+            lock->writeLock().lockInterruptibly();
+            test->threadShouldThrow();
         }
-    };
-}
+        catch (InterruptedException& success)
+        {
+        }
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ReentrantReadWriteLockTest, testWriteLockInterruptibly) {
-    ReentrantReadWriteLock lock;
+TEST_F(ReentrantReadWriteLockTest, testWriteLockInterruptibly)
+{
+    ReentrantReadWriteLock             lock;
     TestWriteLockInterruptiblyRunnable runnable(this, &lock);
-    Thread t(&runnable);
-    try {
+    Thread                             t(&runnable);
+    try
+    {
         lock.writeLock().lockInterruptibly();
-    } catch (Exception& e) {
+    }
+    catch (Exception& e)
+    {
         unexpectedException();
     }
 
-    try {
+    try
+    {
         t.start();
         Thread::sleep(SHORT_DELAY_MS);
         t.interrupt();
         Thread::sleep(SHORT_DELAY_MS);
         t.join();
         lock.writeLock().unlock();
-    } catch (Exception& e) {
+    }
+    catch (Exception& e)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class TestReadLockInterruptiblyRunnable : public Runnable {
-    private:
+class TestReadLockInterruptiblyRunnable : public Runnable
+{
+private:
+    ReentrantReadWriteLockTest* test;
+    ReentrantReadWriteLock*     lock;
 
-        ReentrantReadWriteLockTest* test;
-        ReentrantReadWriteLock* lock;
+private:
+    TestReadLockInterruptiblyRunnable(const TestReadLockInterruptiblyRunnable&);
+    TestReadLockInterruptiblyRunnable operator=(
+        const TestReadLockInterruptiblyRunnable&);
 
-    private:
+public:
+    TestReadLockInterruptiblyRunnable(ReentrantReadWriteLockTest* test,
+                                      ReentrantReadWriteLock*     lock)
+        : Runnable(),
+          test(test),
+          lock(lock)
+    {
+    }
 
-        TestReadLockInterruptiblyRunnable(const TestReadLockInterruptiblyRunnable&);
-        TestReadLockInterruptiblyRunnable operator= (const TestReadLockInterruptiblyRunnable&);
+    virtual ~TestReadLockInterruptiblyRunnable()
+    {
+    }
 
-    public:
-
-        TestReadLockInterruptiblyRunnable(ReentrantReadWriteLockTest* test, ReentrantReadWriteLock* lock) :
-            Runnable(), test(test), lock(lock) {}
-        virtual ~TestReadLockInterruptiblyRunnable() {}
-
-        virtual void run() {
-            try {
-                lock->readLock().lockInterruptibly();
-                test->threadShouldThrow();
-            } catch(InterruptedException& success) {
-            }
+    virtual void run()
+    {
+        try
+        {
+            lock->readLock().lockInterruptibly();
+            test->threadShouldThrow();
         }
-    };
-}
+        catch (InterruptedException& success)
+        {
+        }
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ReentrantReadWriteLockTest, testReadLockInterruptibly) {
-    ReentrantReadWriteLock lock;
+TEST_F(ReentrantReadWriteLockTest, testReadLockInterruptibly)
+{
+    ReentrantReadWriteLock            lock;
     TestReadLockInterruptiblyRunnable runnable(this, &lock);
-    Thread t(&runnable);
+    Thread                            t(&runnable);
 
-    try {
+    try
+    {
         lock.writeLock().lockInterruptibly();
-    } catch (Exception& e) {
+    }
+    catch (Exception& e)
+    {
         unexpectedException();
     }
 
-    try {
+    try
+    {
         t.start();
         Thread::sleep(SHORT_DELAY_MS);
         t.interrupt();
         t.join();
         lock.writeLock().unlock();
-    } catch (Exception& e) {
+    }
+    catch (Exception& e)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ReentrantReadWriteLockTest, testAwaitIllegalMonitor) {
-
+TEST_F(ReentrantReadWriteLockTest, testAwaitIllegalMonitor)
+{
     ReentrantReadWriteLock lock;
-    Pointer<Condition> c(lock.writeLock().newCondition());
-    try {
+    Pointer<Condition>     c(lock.writeLock().newCondition());
+    try
+    {
         c->await();
         shouldThrow();
-    } catch (IllegalMonitorStateException& success) {
-    } catch (Exception& ex) {
+    }
+    catch (IllegalMonitorStateException& success)
+    {
+    }
+    catch (Exception& ex)
+    {
         shouldThrow();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ReentrantReadWriteLockTest, testSignalIllegalMonitor) {
-
+TEST_F(ReentrantReadWriteLockTest, testSignalIllegalMonitor)
+{
     ReentrantReadWriteLock lock;
-    Pointer<Condition> c(lock.writeLock().newCondition());
-    try {
+    Pointer<Condition>     c(lock.writeLock().newCondition());
+    try
+    {
         c->signal();
         shouldThrow();
-    } catch (IllegalMonitorStateException& success) {
-    } catch (Exception& ex) {
+    }
+    catch (IllegalMonitorStateException& success)
+    {
+    }
+    catch (Exception& ex)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ReentrantReadWriteLockTest, testAwaitNanosTimeout) {
-
+TEST_F(ReentrantReadWriteLockTest, testAwaitNanosTimeout)
+{
     ReentrantReadWriteLock lock;
-    Pointer<Condition> c(lock.writeLock().newCondition());
+    Pointer<Condition>     c(lock.writeLock().newCondition());
 
-    try {
+    try
+    {
         lock.writeLock().lock();
         long long t = c->awaitNanos(100);
         ASSERT_TRUE(t <= 0);
         lock.writeLock().unlock();
-    } catch (Exception& ex) {
+    }
+    catch (Exception& ex)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ReentrantReadWriteLockTest, testAwaitTimeout) {
-
+TEST_F(ReentrantReadWriteLockTest, testAwaitTimeout)
+{
     ReentrantReadWriteLock lock;
-    Pointer<Condition> c(lock.writeLock().newCondition());
-    try {
+    Pointer<Condition>     c(lock.writeLock().newCondition());
+    try
+    {
         lock.writeLock().lock();
         ASSERT_TRUE(!c->await(SHORT_DELAY_MS, TimeUnit::MILLISECONDS));
         lock.writeLock().unlock();
-    } catch (Exception& ex) {
+    }
+    catch (Exception& ex)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ReentrantReadWriteLockTest, testAwaitUntilTimeout) {
-
+TEST_F(ReentrantReadWriteLockTest, testAwaitUntilTimeout)
+{
     ReentrantReadWriteLock lock;
-    Pointer<Condition> c(lock.writeLock().newCondition());
-    try {
+    Pointer<Condition>     c(lock.writeLock().newCondition());
+    try
+    {
         lock.writeLock().lock();
         Date d;
         ASSERT_TRUE(!c->awaitUntil(Date(d.getTime() + SHORT_DELAY_MS)));
         lock.writeLock().unlock();
-    } catch (Exception& ex) {
+    }
+    catch (Exception& ex)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class TestAwaitRunnable : public Runnable {
-    private:
+class TestAwaitRunnable : public Runnable
+{
+private:
+    ReentrantReadWriteLockTest* test;
+    ReentrantReadWriteLock*     lock;
+    Condition*                  cond;
 
-        ReentrantReadWriteLockTest* test;
-        ReentrantReadWriteLock* lock;
-        Condition* cond;
+private:
+    TestAwaitRunnable(const TestAwaitRunnable&);
+    TestAwaitRunnable operator=(const TestAwaitRunnable&);
 
-    private:
+public:
+    TestAwaitRunnable(ReentrantReadWriteLockTest* test,
+                      ReentrantReadWriteLock*     lock,
+                      Condition*                  cond)
+        : Runnable(),
+          test(test),
+          lock(lock),
+          cond(cond)
+    {
+    }
 
-        TestAwaitRunnable(const TestAwaitRunnable&);
-        TestAwaitRunnable operator= (const TestAwaitRunnable&);
+    virtual ~TestAwaitRunnable()
+    {
+    }
 
-    public:
-
-        TestAwaitRunnable(ReentrantReadWriteLockTest* test, ReentrantReadWriteLock* lock, Condition* cond) :
-            Runnable(), test(test), lock(lock), cond(cond) {}
-        virtual ~TestAwaitRunnable() {}
-
-        virtual void run() {
-            try {
-                lock->writeLock().lock();
-                cond->await();
-                lock->writeLock().unlock();
-            } catch(InterruptedException& e) {
-                test->threadUnexpectedException();
-            }
+    virtual void run()
+    {
+        try
+        {
+            lock->writeLock().lock();
+            cond->await();
+            lock->writeLock().unlock();
         }
-    };
-}
+        catch (InterruptedException& e)
+        {
+            test->threadUnexpectedException();
+        }
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ReentrantReadWriteLockTest, testAwait) {
+TEST_F(ReentrantReadWriteLockTest, testAwait)
+{
     ReentrantReadWriteLock lock;
-    Pointer<Condition> c(lock.writeLock().newCondition());
-    TestAwaitRunnable runnable(this, &lock, c.get());
-    Thread t(&runnable);
+    Pointer<Condition>     c(lock.writeLock().newCondition());
+    TestAwaitRunnable      runnable(this, &lock, c.get());
+    Thread                 t(&runnable);
 
-    try {
+    try
+    {
         t.start();
         Thread::sleep(SHORT_DELAY_MS);
         lock.writeLock().lock();
@@ -1480,282 +1903,372 @@ TEST_F(ReentrantReadWriteLockTest, testAwait) {
         lock.writeLock().unlock();
         t.join(SHORT_DELAY_MS);
         ASSERT_TRUE(!t.isAlive());
-    } catch (Exception& ex) {
+    }
+    catch (Exception& ex)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class UninterruptableThread : public Thread {
-    private:
+class UninterruptableThread : public Thread
+{
+private:
+    ReentrantReadWriteLockTest*           test;
+    decaf::util::concurrent::locks::Lock& lock;
+    Condition*                            cond;
 
-        ReentrantReadWriteLockTest* test;
-        decaf::util::concurrent::locks::Lock& lock;
-        Condition* cond;
+private:
+    UninterruptableThread(const UninterruptableThread&);
+    UninterruptableThread operator=(const UninterruptableThread&);
 
-    private:
+public:
+    volatile bool canAwake;
+    volatile bool interrupted;
+    volatile bool lockStarted;
 
-        UninterruptableThread(const UninterruptableThread&);
-        UninterruptableThread operator= (const UninterruptableThread&);
+public:
+    UninterruptableThread(ReentrantReadWriteLockTest*           test,
+                          decaf::util::concurrent::locks::Lock& lock,
+                          Condition*                            cond)
+        : Thread(),
+          test(test),
+          lock(lock),
+          cond(cond),
+          canAwake(false),
+          interrupted(false),
+          lockStarted(false)
+    {
+    }
 
-    public:
+    virtual ~UninterruptableThread()
+    {
+    }
 
-        volatile bool canAwake;
-        volatile bool interrupted;
-        volatile bool lockStarted;
+    virtual void run()
+    {
+        lock.lock();
+        lockStarted = true;
 
-    public:
-
-        UninterruptableThread(ReentrantReadWriteLockTest* test, decaf::util::concurrent::locks::Lock& lock, Condition* cond) :
-            Thread(), test(test), lock(lock), cond(cond), canAwake(false), interrupted(false), lockStarted(false) {}
-        virtual ~UninterruptableThread() {}
-
-        virtual void run() {
-            lock.lock();
-            lockStarted = true;
-
-            while (!canAwake) {
-                cond->awaitUninterruptibly();
-            }
-
-            interrupted = isInterrupted();
-            lock.unlock();
+        while (!canAwake)
+        {
+            cond->awaitUninterruptibly();
         }
-    };
-}
+
+        interrupted = isInterrupted();
+        lock.unlock();
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ReentrantReadWriteLockTest, testAwaitUninterruptibly) {
-
+TEST_F(ReentrantReadWriteLockTest, testAwaitUninterruptibly)
+{
     ReentrantReadWriteLock lock;
-    Pointer<Condition> c(lock.writeLock().newCondition());
-    UninterruptableThread thread(this, lock.writeLock(), c.get());
+    Pointer<Condition>     c(lock.writeLock().newCondition());
+    UninterruptableThread  thread(this, lock.writeLock(), c.get());
 
-    try {
-
+    try
+    {
         thread.start();
 
-        while (!thread.lockStarted) {
+        while (!thread.lockStarted)
+        {
             Thread::sleep(100);
         }
 
         lock.writeLock().lock();
-        try {
+        try
+        {
             thread.interrupt();
             thread.canAwake = true;
             c->signal();
             lock.writeLock().unlock();
-        } catch(...) {
+        }
+        catch (...)
+        {
             lock.writeLock().unlock();
         }
 
         thread.join();
         ASSERT_TRUE(thread.interrupted);
         ASSERT_TRUE(!thread.isAlive());
-    } catch (Exception& ex) {
+    }
+    catch (Exception& ex)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class TestAwaitInterruptRunnable : public Runnable {
-    private:
+class TestAwaitInterruptRunnable : public Runnable
+{
+private:
+    ReentrantReadWriteLockTest* test;
+    ReentrantReadWriteLock*     lock;
+    Condition*                  cond;
 
-        ReentrantReadWriteLockTest* test;
-        ReentrantReadWriteLock* lock;
-        Condition* cond;
+private:
+    TestAwaitInterruptRunnable(const TestAwaitInterruptRunnable&);
+    TestAwaitInterruptRunnable operator=(const TestAwaitInterruptRunnable&);
 
-    private:
+public:
+    TestAwaitInterruptRunnable(ReentrantReadWriteLockTest* test,
+                               ReentrantReadWriteLock*     lock,
+                               Condition*                  cond)
+        : Runnable(),
+          test(test),
+          lock(lock),
+          cond(cond)
+    {
+    }
 
-        TestAwaitInterruptRunnable(const TestAwaitInterruptRunnable&);
-        TestAwaitInterruptRunnable operator= (const TestAwaitInterruptRunnable&);
+    virtual ~TestAwaitInterruptRunnable()
+    {
+    }
 
-    public:
-
-        TestAwaitInterruptRunnable(ReentrantReadWriteLockTest* test, ReentrantReadWriteLock* lock, Condition* cond) :
-            Runnable(), test(test), lock(lock), cond(cond) {}
-        virtual ~TestAwaitInterruptRunnable() {}
-
-        virtual void run() {
-            try {
-                lock->writeLock().lock();
-                cond->await();
-                lock->writeLock().unlock();
-                test->threadShouldThrow();
-            } catch(InterruptedException& success) {
-            }
+    virtual void run()
+    {
+        try
+        {
+            lock->writeLock().lock();
+            cond->await();
+            lock->writeLock().unlock();
+            test->threadShouldThrow();
         }
-    };
-}
+        catch (InterruptedException& success)
+        {
+        }
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ReentrantReadWriteLockTest, testAwaitInterrupt) {
-
-    ReentrantReadWriteLock lock;
-    Pointer<Condition> c(lock.writeLock().newCondition());
+TEST_F(ReentrantReadWriteLockTest, testAwaitInterrupt)
+{
+    ReentrantReadWriteLock     lock;
+    Pointer<Condition>         c(lock.writeLock().newCondition());
     TestAwaitInterruptRunnable runnable(this, &lock, c.get());
-    Thread t(&runnable);
+    Thread                     t(&runnable);
 
-    try {
+    try
+    {
         t.start();
         Thread::sleep(SHORT_DELAY_MS);
         t.interrupt();
         t.join(SHORT_DELAY_MS);
         ASSERT_TRUE(!t.isAlive());
-    } catch (Exception& ex) {
+    }
+    catch (Exception& ex)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class TestAwaitNanosInterruptRunnable : public Runnable {
-    private:
+class TestAwaitNanosInterruptRunnable : public Runnable
+{
+private:
+    ReentrantReadWriteLockTest* test;
+    ReentrantReadWriteLock*     lock;
+    Condition*                  cond;
 
-        ReentrantReadWriteLockTest* test;
-        ReentrantReadWriteLock* lock;
-        Condition* cond;
+private:
+    TestAwaitNanosInterruptRunnable(const TestAwaitNanosInterruptRunnable&);
+    TestAwaitNanosInterruptRunnable operator=(
+        const TestAwaitNanosInterruptRunnable&);
 
-    private:
+public:
+    TestAwaitNanosInterruptRunnable(ReentrantReadWriteLockTest* test,
+                                    ReentrantReadWriteLock*     lock,
+                                    Condition*                  cond)
+        : Runnable(),
+          test(test),
+          lock(lock),
+          cond(cond)
+    {
+    }
 
-        TestAwaitNanosInterruptRunnable(const TestAwaitNanosInterruptRunnable&);
-        TestAwaitNanosInterruptRunnable operator= (const TestAwaitNanosInterruptRunnable&);
+    virtual ~TestAwaitNanosInterruptRunnable()
+    {
+    }
 
-    public:
-
-        TestAwaitNanosInterruptRunnable(ReentrantReadWriteLockTest* test, ReentrantReadWriteLock* lock, Condition* cond) :
-            Runnable(), test(test), lock(lock), cond(cond) {}
-        virtual ~TestAwaitNanosInterruptRunnable() {}
-
-        virtual void run() {
-            try {
-                lock->writeLock().lock();
-                cond->awaitNanos((long long)ReentrantReadWriteLockTest::LONG_DELAY_MS * 1000000LL);
-                lock->writeLock().unlock();
-                test->threadShouldThrow();
-            } catch(InterruptedException& success) {
-            }
+    virtual void run()
+    {
+        try
+        {
+            lock->writeLock().lock();
+            cond->awaitNanos(
+                (long long)ReentrantReadWriteLockTest::LONG_DELAY_MS *
+                1000000LL);
+            lock->writeLock().unlock();
+            test->threadShouldThrow();
         }
-    };
-}
+        catch (InterruptedException& success)
+        {
+        }
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ReentrantReadWriteLockTest, testAwaitNanosInterrupt) {
-    ReentrantReadWriteLock lock;
-    Pointer<Condition> c(lock.writeLock().newCondition());
+TEST_F(ReentrantReadWriteLockTest, testAwaitNanosInterrupt)
+{
+    ReentrantReadWriteLock          lock;
+    Pointer<Condition>              c(lock.writeLock().newCondition());
     TestAwaitNanosInterruptRunnable runnable(this, &lock, c.get());
-    Thread t(&runnable);
+    Thread                          t(&runnable);
 
-    try {
+    try
+    {
         t.start();
         Thread::sleep(SHORT_DELAY_MS);
         t.interrupt();
         t.join(SHORT_DELAY_MS);
         ASSERT_TRUE(!t.isAlive());
-    } catch (Exception& ex) {
+    }
+    catch (Exception& ex)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class TestAwaitUntilInterruptRunnable : public Runnable {
-    private:
+class TestAwaitUntilInterruptRunnable : public Runnable
+{
+private:
+    ReentrantReadWriteLockTest* test;
+    ReentrantReadWriteLock*     lock;
+    Condition*                  cond;
 
-        ReentrantReadWriteLockTest* test;
-        ReentrantReadWriteLock* lock;
-        Condition* cond;
+private:
+    TestAwaitUntilInterruptRunnable(const TestAwaitUntilInterruptRunnable&);
+    TestAwaitUntilInterruptRunnable operator=(
+        const TestAwaitUntilInterruptRunnable&);
 
-    private:
+public:
+    TestAwaitUntilInterruptRunnable(ReentrantReadWriteLockTest* test,
+                                    ReentrantReadWriteLock*     lock,
+                                    Condition*                  cond)
+        : Runnable(),
+          test(test),
+          lock(lock),
+          cond(cond)
+    {
+    }
 
-        TestAwaitUntilInterruptRunnable(const TestAwaitUntilInterruptRunnable&);
-        TestAwaitUntilInterruptRunnable operator= (const TestAwaitUntilInterruptRunnable&);
+    virtual ~TestAwaitUntilInterruptRunnable()
+    {
+    }
 
-    public:
-
-        TestAwaitUntilInterruptRunnable(ReentrantReadWriteLockTest* test, ReentrantReadWriteLock* lock, Condition* cond) :
-            Runnable(), test(test), lock(lock), cond(cond) {}
-        virtual ~TestAwaitUntilInterruptRunnable() {}
-
-        virtual void run() {
-            try {
-                lock->writeLock().lock();
-                decaf::util::Date d;
-                cond->awaitUntil(decaf::util::Date(d.getTime() + 10000));
-                lock->writeLock().unlock();
-                test->threadShouldThrow();
-            } catch(InterruptedException& success) {
-            }
+    virtual void run()
+    {
+        try
+        {
+            lock->writeLock().lock();
+            decaf::util::Date d;
+            cond->awaitUntil(decaf::util::Date(d.getTime() + 10000));
+            lock->writeLock().unlock();
+            test->threadShouldThrow();
         }
-    };
-}
+        catch (InterruptedException& success)
+        {
+        }
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ReentrantReadWriteLockTest, testAwaitUntilInterrupt) {
-    ReentrantReadWriteLock lock;
-    Pointer<Condition> c(lock.writeLock().newCondition());
+TEST_F(ReentrantReadWriteLockTest, testAwaitUntilInterrupt)
+{
+    ReentrantReadWriteLock          lock;
+    Pointer<Condition>              c(lock.writeLock().newCondition());
     TestAwaitUntilInterruptRunnable runnable(this, &lock, c.get());
-    Thread t(&runnable);
+    Thread                          t(&runnable);
 
-    try {
+    try
+    {
         t.start();
         Thread::sleep(SHORT_DELAY_MS);
         t.interrupt();
         t.join(SHORT_DELAY_MS);
         ASSERT_TRUE(!t.isAlive());
-    } catch (Exception& ex) {
+    }
+    catch (Exception& ex)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class TestSignalAllRunnable : public Runnable {
-    private:
+class TestSignalAllRunnable : public Runnable
+{
+private:
+    ReentrantReadWriteLockTest* test;
+    ReentrantReadWriteLock*     lock;
+    Condition*                  cond;
 
-        ReentrantReadWriteLockTest* test;
-        ReentrantReadWriteLock* lock;
-        Condition* cond;
+private:
+    TestSignalAllRunnable(const TestSignalAllRunnable&);
+    TestSignalAllRunnable operator=(const TestSignalAllRunnable&);
 
-    private:
+public:
+    TestSignalAllRunnable(ReentrantReadWriteLockTest* test,
+                          ReentrantReadWriteLock*     lock,
+                          Condition*                  cond)
+        : Runnable(),
+          test(test),
+          lock(lock),
+          cond(cond)
+    {
+    }
 
-        TestSignalAllRunnable(const TestSignalAllRunnable&);
-        TestSignalAllRunnable operator= (const TestSignalAllRunnable&);
+    virtual ~TestSignalAllRunnable()
+    {
+    }
 
-    public:
-
-        TestSignalAllRunnable(ReentrantReadWriteLockTest* test, ReentrantReadWriteLock* lock, Condition* cond) :
-            Runnable(), test(test), lock(lock), cond(cond) {}
-        virtual ~TestSignalAllRunnable() {}
-
-        virtual void run() {
-            try {
-                lock->writeLock().lock();
-                cond->await();
-                lock->writeLock().unlock();
-            } catch(InterruptedException& e) {
-                test->threadUnexpectedException();
-            }
+    virtual void run()
+    {
+        try
+        {
+            lock->writeLock().lock();
+            cond->await();
+            lock->writeLock().unlock();
         }
-    };
-}
+        catch (InterruptedException& e)
+        {
+            test->threadUnexpectedException();
+        }
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ReentrantReadWriteLockTest, testSignalAll) {
+TEST_F(ReentrantReadWriteLockTest, testSignalAll)
+{
     ReentrantReadWriteLock lock;
-    Pointer<Condition> c(lock.writeLock().newCondition());
-    TestSignalAllRunnable runnable(this, &lock, c.get());
-    Thread t1(&runnable);
-    Thread t2(&runnable);
+    Pointer<Condition>     c(lock.writeLock().newCondition());
+    TestSignalAllRunnable  runnable(this, &lock, c.get());
+    Thread                 t1(&runnable);
+    Thread                 t2(&runnable);
 
-    try {
+    try
+    {
         t1.start();
         t2.start();
         Thread::sleep(SHORT_DELAY_MS);
@@ -1766,20 +2279,24 @@ TEST_F(ReentrantReadWriteLockTest, testSignalAll) {
         t2.join(SHORT_DELAY_MS);
         ASSERT_TRUE(!t1.isAlive());
         ASSERT_TRUE(!t2.isAlive());
-    } catch (Exception& ex) {
+    }
+    catch (Exception& ex)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ReentrantReadWriteLockTest, testHasQueuedThreads) {
-    ReentrantReadWriteLock lock;
-    InterruptedLockRunnable interrupted(this, &lock);
+TEST_F(ReentrantReadWriteLockTest, testHasQueuedThreads)
+{
+    ReentrantReadWriteLock    lock;
+    InterruptedLockRunnable   interrupted(this, &lock);
     InterruptibleLockRunnable interruptable(this, &lock);
-    Thread t1(&interrupted);
-    Thread t2(&interruptable);
+    Thread                    t1(&interrupted);
+    Thread                    t2(&interruptable);
 
-    try {
+    try
+    {
         ASSERT_TRUE(!lock.hasQueuedThreads());
         lock.writeLock().lock();
         t1.start();
@@ -1796,30 +2313,38 @@ TEST_F(ReentrantReadWriteLockTest, testHasQueuedThreads) {
         ASSERT_TRUE(!lock.hasQueuedThreads());
         t1.join();
         t2.join();
-    } catch (Exception& e) {
+    }
+    catch (Exception& e)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ReentrantReadWriteLockTest, testHasQueuedThreadNPE) {
+TEST_F(ReentrantReadWriteLockTest, testHasQueuedThreadNPE)
+{
     ReentrantReadWriteLock sync;
-    try {
+    try
+    {
         sync.hasQueuedThread(NULL);
         shouldThrow();
-    } catch (NullPointerException& success) {
+    }
+    catch (NullPointerException& success)
+    {
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ReentrantReadWriteLockTest, testHasQueuedThread) {
-    ReentrantReadWriteLock sync;
-    InterruptedLockRunnable interrupted(this, &sync);
+TEST_F(ReentrantReadWriteLockTest, testHasQueuedThread)
+{
+    ReentrantReadWriteLock    sync;
+    InterruptedLockRunnable   interrupted(this, &sync);
     InterruptibleLockRunnable interruptable(this, &sync);
-    Thread t1(&interrupted);
-    Thread t2(&interruptable);
+    Thread                    t1(&interrupted);
+    Thread                    t2(&interruptable);
 
-    try {
+    try
+    {
         ASSERT_TRUE(!sync.hasQueuedThread(&t1));
         ASSERT_TRUE(!sync.hasQueuedThread(&t2));
         sync.writeLock().lock();
@@ -1841,20 +2366,24 @@ TEST_F(ReentrantReadWriteLockTest, testHasQueuedThread) {
         ASSERT_TRUE(!sync.hasQueuedThread(&t2));
         t1.join();
         t2.join();
-    } catch (Exception& e) {
+    }
+    catch (Exception& e)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ReentrantReadWriteLockTest, testGetQueueLength) {
-    ReentrantReadWriteLock lock;
-    InterruptedLockRunnable interrupted(this, &lock);
+TEST_F(ReentrantReadWriteLockTest, testGetQueueLength)
+{
+    ReentrantReadWriteLock    lock;
+    InterruptedLockRunnable   interrupted(this, &lock);
     InterruptibleLockRunnable interruptable(this, &lock);
-    Thread t1(&interrupted);
-    Thread t2(&interruptable);
+    Thread                    t1(&interrupted);
+    Thread                    t2(&interruptable);
 
-    try {
+    try
+    {
         ASSERT_EQ(0, lock.getQueueLength());
         lock.writeLock().lock();
         t1.start();
@@ -1871,206 +2400,289 @@ TEST_F(ReentrantReadWriteLockTest, testGetQueueLength) {
         ASSERT_EQ(0, lock.getQueueLength());
         t1.join();
         t2.join();
-    } catch (Exception& e) {
+    }
+    catch (Exception& e)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ReentrantReadWriteLockTest, testGetQueuedThreads) {
+TEST_F(ReentrantReadWriteLockTest, testGetQueuedThreads)
+{
     PublicReentrantReadWriteLock lock;
-    InterruptedLockRunnable interrupted(this, &lock);
-    InterruptibleLockRunnable interruptable(this, &lock);
-    Thread t1(&interrupted);
-    Thread t2(&interruptable);
+    InterruptedLockRunnable      interrupted(this, &lock);
+    InterruptibleLockRunnable    interruptable(this, &lock);
+    Thread                       t1(&interrupted);
+    Thread                       t2(&interruptable);
 
-    try {
-        ASSERT_TRUE(Pointer<Collection<Thread*> >(lock.getQueuedThreadsPublic())->isEmpty());
+    try
+    {
+        ASSERT_TRUE(Pointer<Collection<Thread*>>(lock.getQueuedThreadsPublic())
+                        ->isEmpty());
         lock.writeLock().lock();
-        ASSERT_TRUE(Pointer<Collection<Thread*> >(lock.getQueuedThreadsPublic())->isEmpty());
+        ASSERT_TRUE(Pointer<Collection<Thread*>>(lock.getQueuedThreadsPublic())
+                        ->isEmpty());
         t1.start();
         Thread::sleep(SHORT_DELAY_MS);
-        ASSERT_TRUE(Pointer<Collection<Thread*> >(lock.getQueuedThreadsPublic())->contains(&t1));
+        ASSERT_TRUE(Pointer<Collection<Thread*>>(lock.getQueuedThreadsPublic())
+                        ->contains(&t1));
         t2.start();
         Thread::sleep(SHORT_DELAY_MS);
-        ASSERT_TRUE(Pointer<Collection<Thread*> >(lock.getQueuedThreadsPublic())->contains(&t1));
-        ASSERT_TRUE(Pointer<Collection<Thread*> >(lock.getQueuedThreadsPublic())->contains(&t2));
+        ASSERT_TRUE(Pointer<Collection<Thread*>>(lock.getQueuedThreadsPublic())
+                        ->contains(&t1));
+        ASSERT_TRUE(Pointer<Collection<Thread*>>(lock.getQueuedThreadsPublic())
+                        ->contains(&t2));
         t1.interrupt();
         Thread::sleep(SHORT_DELAY_MS);
-        ASSERT_TRUE(!Pointer<Collection<Thread*> >(lock.getQueuedThreadsPublic())->contains(&t1));
-        ASSERT_TRUE(Pointer<Collection<Thread*> >(lock.getQueuedThreadsPublic())->contains(&t2));
+        ASSERT_TRUE(!Pointer<Collection<Thread*>>(lock.getQueuedThreadsPublic())
+                         ->contains(&t1));
+        ASSERT_TRUE(Pointer<Collection<Thread*>>(lock.getQueuedThreadsPublic())
+                        ->contains(&t2));
         lock.writeLock().unlock();
         Thread::sleep(SHORT_DELAY_MS);
-        ASSERT_TRUE(Pointer<Collection<Thread*> >(lock.getQueuedThreadsPublic())->isEmpty());
+        ASSERT_TRUE(Pointer<Collection<Thread*>>(lock.getQueuedThreadsPublic())
+                        ->isEmpty());
         t1.join();
         t2.join();
-    } catch (Exception& e) {
+    }
+    catch (Exception& e)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ReentrantReadWriteLockTest, testHasWaitersNPE) {
+TEST_F(ReentrantReadWriteLockTest, testHasWaitersNPE)
+{
     ReentrantReadWriteLock lock;
-    try {
+    try
+    {
         lock.hasWaiters(NULL);
         shouldThrow();
-    } catch (NullPointerException& success) {
-    } catch (Exception& ex) {
+    }
+    catch (NullPointerException& success)
+    {
+    }
+    catch (Exception& ex)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ReentrantReadWriteLockTest, testGetWaitQueueLengthNPE) {
-ReentrantReadWriteLock lock;
-    try {
+TEST_F(ReentrantReadWriteLockTest, testGetWaitQueueLengthNPE)
+{
+    ReentrantReadWriteLock lock;
+    try
+    {
         lock.getWaitQueueLength(NULL);
         shouldThrow();
-    } catch (NullPointerException& success) {
-    } catch (Exception& ex) {
+    }
+    catch (NullPointerException& success)
+    {
+    }
+    catch (Exception& ex)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ReentrantReadWriteLockTest, testGetWaitingThreadsNPE) {
+TEST_F(ReentrantReadWriteLockTest, testGetWaitingThreadsNPE)
+{
     PublicReentrantReadWriteLock lock;
-    try {
+    try
+    {
         lock.getWaitingThreadsPublic(NULL);
         shouldThrow();
-    } catch (NullPointerException& success) {
-    } catch (Exception& ex) {
+    }
+    catch (NullPointerException& success)
+    {
+    }
+    catch (Exception& ex)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ReentrantReadWriteLockTest, testHasWaitersIAE) {
+TEST_F(ReentrantReadWriteLockTest, testHasWaitersIAE)
+{
     ReentrantReadWriteLock lock;
-    Pointer<Condition> c(lock.writeLock().newCondition());
+    Pointer<Condition>     c(lock.writeLock().newCondition());
     ReentrantReadWriteLock lock2;
-    try {
+    try
+    {
         lock2.hasWaiters(c.get());
         shouldThrow();
-    } catch (IllegalArgumentException& success) {
-    } catch (Exception& ex) {
+    }
+    catch (IllegalArgumentException& success)
+    {
+    }
+    catch (Exception& ex)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ReentrantReadWriteLockTest, testHasWaitersIMSE) {
+TEST_F(ReentrantReadWriteLockTest, testHasWaitersIMSE)
+{
     ReentrantReadWriteLock lock;
-    Pointer<Condition> c(lock.writeLock().newCondition());
-    try {
+    Pointer<Condition>     c(lock.writeLock().newCondition());
+    try
+    {
         lock.hasWaiters(c.get());
         shouldThrow();
-    } catch (IllegalMonitorStateException& success) {
-    } catch (Exception& ex) {
+    }
+    catch (IllegalMonitorStateException& success)
+    {
+    }
+    catch (Exception& ex)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ReentrantReadWriteLockTest, testGetWaitQueueLengthIAE) {
+TEST_F(ReentrantReadWriteLockTest, testGetWaitQueueLengthIAE)
+{
     ReentrantReadWriteLock lock;
-    Pointer<Condition> c(lock.writeLock().newCondition());
+    Pointer<Condition>     c(lock.writeLock().newCondition());
     ReentrantReadWriteLock lock2;
-    try {
+    try
+    {
         lock2.getWaitQueueLength(c.get());
         shouldThrow();
-    } catch (IllegalArgumentException& success) {
-    } catch (Exception& ex) {
+    }
+    catch (IllegalArgumentException& success)
+    {
+    }
+    catch (Exception& ex)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ReentrantReadWriteLockTest, testGetWaitQueueLengthIMSE) {
+TEST_F(ReentrantReadWriteLockTest, testGetWaitQueueLengthIMSE)
+{
     ReentrantReadWriteLock lock;
-    Pointer<Condition> c(lock.writeLock().newCondition());
-    try {
+    Pointer<Condition>     c(lock.writeLock().newCondition());
+    try
+    {
         lock.getWaitQueueLength(c.get());
         shouldThrow();
-    } catch (IllegalMonitorStateException& success) {
-    } catch (Exception& ex) {
+    }
+    catch (IllegalMonitorStateException& success)
+    {
+    }
+    catch (Exception& ex)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ReentrantReadWriteLockTest, testGetWaitingThreadsIAE) {
+TEST_F(ReentrantReadWriteLockTest, testGetWaitingThreadsIAE)
+{
     PublicReentrantReadWriteLock lock;
-    Pointer<Condition> c(lock.writeLock().newCondition());
+    Pointer<Condition>           c(lock.writeLock().newCondition());
     PublicReentrantReadWriteLock lock2;
-    try {
+    try
+    {
         lock2.getWaitingThreadsPublic(c.get());
         shouldThrow();
-    } catch (IllegalArgumentException& success) {
-    } catch (Exception& ex) {
+    }
+    catch (IllegalArgumentException& success)
+    {
+    }
+    catch (Exception& ex)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ReentrantReadWriteLockTest, testGetWaitingThreadsIMSE) {
+TEST_F(ReentrantReadWriteLockTest, testGetWaitingThreadsIMSE)
+{
     PublicReentrantReadWriteLock lock;
-    Pointer<Condition> c(lock.writeLock().newCondition());
-    try {
+    Pointer<Condition>           c(lock.writeLock().newCondition());
+    try
+    {
         lock.getWaitingThreadsPublic(c.get());
         shouldThrow();
-    } catch (IllegalMonitorStateException& success) {
-    } catch (Exception& ex) {
+    }
+    catch (IllegalMonitorStateException& success)
+    {
+    }
+    catch (Exception& ex)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class TestHasWaitersRunnable : public Runnable {
-    private:
+class TestHasWaitersRunnable : public Runnable
+{
+private:
+    ReentrantReadWriteLockTest* test;
+    ReentrantReadWriteLock*     lock;
+    Condition*                  cond;
 
-        ReentrantReadWriteLockTest* test;
-        ReentrantReadWriteLock* lock;
-        Condition* cond;
+private:
+    TestHasWaitersRunnable(const TestHasWaitersRunnable&);
+    TestHasWaitersRunnable operator=(const TestHasWaitersRunnable&);
 
-    private:
+public:
+    TestHasWaitersRunnable(ReentrantReadWriteLockTest* test,
+                           ReentrantReadWriteLock*     lock,
+                           Condition*                  cond)
+        : Runnable(),
+          test(test),
+          lock(lock),
+          cond(cond)
+    {
+    }
 
-        TestHasWaitersRunnable(const TestHasWaitersRunnable&);
-        TestHasWaitersRunnable operator= (const TestHasWaitersRunnable&);
+    virtual ~TestHasWaitersRunnable()
+    {
+    }
 
-    public:
-
-        TestHasWaitersRunnable(ReentrantReadWriteLockTest* test, ReentrantReadWriteLock* lock, Condition* cond) :
-            Runnable(), test(test), lock(lock), cond(cond) {}
-        virtual ~TestHasWaitersRunnable() {}
-
-        virtual void run() {
-            try {
-                lock->writeLock().lock();
-                test->threadAssertFalse(lock->hasWaiters(cond));
-                test->threadAssertEquals(0, lock->getWaitQueueLength(cond));
-                cond->await();
-                lock->writeLock().unlock();
-            } catch(InterruptedException& e) {
-                test->threadUnexpectedException();
-            }
+    virtual void run()
+    {
+        try
+        {
+            lock->writeLock().lock();
+            test->threadAssertFalse(lock->hasWaiters(cond));
+            test->threadAssertEquals(0, lock->getWaitQueueLength(cond));
+            cond->await();
+            lock->writeLock().unlock();
         }
-    };
-}
+        catch (InterruptedException& e)
+        {
+            test->threadUnexpectedException();
+        }
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ReentrantReadWriteLockTest, testHasWaiters) {
+TEST_F(ReentrantReadWriteLockTest, testHasWaiters)
+{
     ReentrantReadWriteLock lock;
-    Pointer<Condition> c(lock.writeLock().newCondition());
+    Pointer<Condition>     c(lock.writeLock().newCondition());
     TestHasWaitersRunnable runnable(this, &lock, c.get());
-    Thread t(&runnable);
+    Thread                 t(&runnable);
 
-    try {
+    try
+    {
         t.start();
-        Thread::sleep( SHORT_DELAY_MS);
+        Thread::sleep(SHORT_DELAY_MS);
         lock.writeLock().lock();
         ASSERT_TRUE(lock.hasWaiters(c.get()));
         ASSERT_EQ(1, lock.getWaitQueueLength(c.get()));
@@ -2083,56 +2695,74 @@ TEST_F(ReentrantReadWriteLockTest, testHasWaiters) {
         lock.writeLock().unlock();
         t.join(SHORT_DELAY_MS);
         ASSERT_TRUE(!t.isAlive());
-    } catch (Exception& ex) {
+    }
+    catch (Exception& ex)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class TestGetWaitQueueLengthRunnable : public Runnable {
-    private:
+class TestGetWaitQueueLengthRunnable : public Runnable
+{
+private:
+    ReentrantReadWriteLockTest* test;
+    ReentrantReadWriteLock*     lock;
+    Condition*                  cond;
 
-        ReentrantReadWriteLockTest* test;
-        ReentrantReadWriteLock* lock;
-        Condition* cond;
+private:
+    TestGetWaitQueueLengthRunnable(const TestGetWaitQueueLengthRunnable&);
+    TestGetWaitQueueLengthRunnable operator=(
+        const TestGetWaitQueueLengthRunnable&);
 
-    private:
+public:
+    TestGetWaitQueueLengthRunnable(ReentrantReadWriteLockTest* test,
+                                   ReentrantReadWriteLock*     lock,
+                                   Condition*                  cond)
+        : Runnable(),
+          test(test),
+          lock(lock),
+          cond(cond)
+    {
+    }
 
-        TestGetWaitQueueLengthRunnable(const TestGetWaitQueueLengthRunnable&);
-        TestGetWaitQueueLengthRunnable operator= (const TestGetWaitQueueLengthRunnable&);
+    virtual ~TestGetWaitQueueLengthRunnable()
+    {
+    }
 
-    public:
-
-        TestGetWaitQueueLengthRunnable(ReentrantReadWriteLockTest* test, ReentrantReadWriteLock* lock, Condition* cond) :
-            Runnable(), test(test), lock(lock), cond(cond) {}
-        virtual ~TestGetWaitQueueLengthRunnable() {}
-
-        virtual void run() {
-            try {
-                lock->writeLock().lock();
-                test->threadAssertFalse(lock->hasWaiters(cond));
-                test->threadAssertEquals(0, lock->getWaitQueueLength(cond));
-                cond->await();
-                lock->writeLock().unlock();
-            } catch(InterruptedException& e) {
-                test->threadUnexpectedException();
-            }
+    virtual void run()
+    {
+        try
+        {
+            lock->writeLock().lock();
+            test->threadAssertFalse(lock->hasWaiters(cond));
+            test->threadAssertEquals(0, lock->getWaitQueueLength(cond));
+            cond->await();
+            lock->writeLock().unlock();
         }
-    };
-}
+        catch (InterruptedException& e)
+        {
+            test->threadUnexpectedException();
+        }
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ReentrantReadWriteLockTest, testGetWaitQueueLength) {
-    ReentrantReadWriteLock lock;
-    Pointer<Condition> c(lock.writeLock().newCondition());
+TEST_F(ReentrantReadWriteLockTest, testGetWaitQueueLength)
+{
+    ReentrantReadWriteLock         lock;
+    Pointer<Condition>             c(lock.writeLock().newCondition());
     TestGetWaitQueueLengthRunnable runnable(this, &lock, c.get());
-    Thread t(&runnable);
+    Thread                         t(&runnable);
 
-    try {
+    try
+    {
         t.start();
-        Thread::sleep( SHORT_DELAY_MS);
+        Thread::sleep(SHORT_DELAY_MS);
         lock.writeLock().lock();
         ASSERT_TRUE(lock.hasWaiters(c.get()));
         ASSERT_EQ(1, lock.getWaitQueueLength(c.get()));
@@ -2145,118 +2775,162 @@ TEST_F(ReentrantReadWriteLockTest, testGetWaitQueueLength) {
         lock.writeLock().unlock();
         t.join(SHORT_DELAY_MS);
         ASSERT_TRUE(!t.isAlive());
-    } catch (Exception& ex) {
+    }
+    catch (Exception& ex)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class TestGetWaitingThreadsRunnable1 : public Runnable {
-    private:
+class TestGetWaitingThreadsRunnable1 : public Runnable
+{
+private:
+    ReentrantReadWriteLockTest*   test;
+    PublicReentrantReadWriteLock* lock;
+    Condition*                    cond;
 
-        ReentrantReadWriteLockTest* test;
-        PublicReentrantReadWriteLock* lock;
-        Condition* cond;
+private:
+    TestGetWaitingThreadsRunnable1(const TestGetWaitingThreadsRunnable1&);
+    TestGetWaitingThreadsRunnable1 operator=(
+        const TestGetWaitingThreadsRunnable1&);
 
-    private:
+public:
+    TestGetWaitingThreadsRunnable1(ReentrantReadWriteLockTest*   test,
+                                   PublicReentrantReadWriteLock* lock,
+                                   Condition*                    cond)
+        : Runnable(),
+          test(test),
+          lock(lock),
+          cond(cond)
+    {
+    }
 
-        TestGetWaitingThreadsRunnable1(const TestGetWaitingThreadsRunnable1&);
-        TestGetWaitingThreadsRunnable1 operator= (const TestGetWaitingThreadsRunnable1&);
+    virtual ~TestGetWaitingThreadsRunnable1()
+    {
+    }
 
-    public:
-
-        TestGetWaitingThreadsRunnable1(ReentrantReadWriteLockTest* test, PublicReentrantReadWriteLock* lock, Condition* cond) :
-            Runnable(), test(test), lock(lock), cond(cond) {}
-        virtual ~TestGetWaitingThreadsRunnable1() {}
-
-        virtual void run() {
-            try {
-                lock->writeLock().lock();
-                test->threadAssertTrue(
-                    Pointer<Collection<Thread*> >(lock->getWaitingThreadsPublic(cond))->isEmpty());
-                cond->await();
-                lock->writeLock().unlock();
-            } catch(InterruptedException& e) {
-                test->threadUnexpectedException();
-            }
+    virtual void run()
+    {
+        try
+        {
+            lock->writeLock().lock();
+            test->threadAssertTrue(Pointer<Collection<Thread*>>(
+                                       lock->getWaitingThreadsPublic(cond))
+                                       ->isEmpty());
+            cond->await();
+            lock->writeLock().unlock();
         }
-    };
-
-    class TestGetWaitingThreadsRunnable2 : public Runnable {
-    private:
-
-        ReentrantReadWriteLockTest* test;
-        PublicReentrantReadWriteLock* lock;
-        Condition* cond;
-
-    private:
-
-        TestGetWaitingThreadsRunnable2(const TestGetWaitingThreadsRunnable2&);
-        TestGetWaitingThreadsRunnable2 operator= (const TestGetWaitingThreadsRunnable2&);
-
-    public:
-
-        TestGetWaitingThreadsRunnable2(ReentrantReadWriteLockTest* test, PublicReentrantReadWriteLock* lock, Condition* cond) :
-            Runnable(), test(test), lock(lock), cond(cond) {}
-        virtual ~TestGetWaitingThreadsRunnable2() {}
-
-        virtual void run() {
-            try {
-                lock->writeLock().lock();
-                test->threadAssertFalse(
-                    Pointer<Collection<Thread*> >(lock->getWaitingThreadsPublic(cond))->isEmpty());
-                cond->await();
-                lock->writeLock().unlock();
-            } catch(InterruptedException& e) {
-                test->threadUnexpectedException();
-            }
+        catch (InterruptedException& e)
+        {
+            test->threadUnexpectedException();
         }
-    };
-}
+    }
+};
+
+class TestGetWaitingThreadsRunnable2 : public Runnable
+{
+private:
+    ReentrantReadWriteLockTest*   test;
+    PublicReentrantReadWriteLock* lock;
+    Condition*                    cond;
+
+private:
+    TestGetWaitingThreadsRunnable2(const TestGetWaitingThreadsRunnable2&);
+    TestGetWaitingThreadsRunnable2 operator=(
+        const TestGetWaitingThreadsRunnable2&);
+
+public:
+    TestGetWaitingThreadsRunnable2(ReentrantReadWriteLockTest*   test,
+                                   PublicReentrantReadWriteLock* lock,
+                                   Condition*                    cond)
+        : Runnable(),
+          test(test),
+          lock(lock),
+          cond(cond)
+    {
+    }
+
+    virtual ~TestGetWaitingThreadsRunnable2()
+    {
+    }
+
+    virtual void run()
+    {
+        try
+        {
+            lock->writeLock().lock();
+            test->threadAssertFalse(Pointer<Collection<Thread*>>(
+                                        lock->getWaitingThreadsPublic(cond))
+                                        ->isEmpty());
+            cond->await();
+            lock->writeLock().unlock();
+        }
+        catch (InterruptedException& e)
+        {
+            test->threadUnexpectedException();
+        }
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ReentrantReadWriteLockTest, testGetWaitingThreads) {
-    PublicReentrantReadWriteLock lock;
-    Pointer<Condition> c(lock.writeLock().newCondition());
+TEST_F(ReentrantReadWriteLockTest, testGetWaitingThreads)
+{
+    PublicReentrantReadWriteLock   lock;
+    Pointer<Condition>             c(lock.writeLock().newCondition());
     TestGetWaitingThreadsRunnable1 runnable1(this, &lock, c.get());
     TestGetWaitingThreadsRunnable2 runnable2(this, &lock, c.get());
-    Thread t1(&runnable1);
-    Thread t2(&runnable2);
+    Thread                         t1(&runnable1);
+    Thread                         t2(&runnable2);
 
-    try {
+    try
+    {
         lock.writeLock().lock();
-        ASSERT_TRUE(Pointer<Collection<Thread*> >(lock.getWaitingThreadsPublic(c.get()))->isEmpty());
+        ASSERT_TRUE(
+            Pointer<Collection<Thread*>>(lock.getWaitingThreadsPublic(c.get()))
+                ->isEmpty());
         lock.writeLock().unlock();
         t1.start();
-        Thread::sleep( SHORT_DELAY_MS);
+        Thread::sleep(SHORT_DELAY_MS);
         t2.start();
         Thread::sleep(SHORT_DELAY_MS);
         lock.writeLock().lock();
         ASSERT_TRUE(lock.hasWaiters(c.get()));
-        ASSERT_TRUE(Pointer<Collection<Thread*> >(lock.getWaitingThreadsPublic(c.get()))->contains(&t1));
-        ASSERT_TRUE(Pointer<Collection<Thread*> >(lock.getWaitingThreadsPublic(c.get()))->contains(&t2));
+        ASSERT_TRUE(
+            Pointer<Collection<Thread*>>(lock.getWaitingThreadsPublic(c.get()))
+                ->contains(&t1));
+        ASSERT_TRUE(
+            Pointer<Collection<Thread*>>(lock.getWaitingThreadsPublic(c.get()))
+                ->contains(&t2));
         c->signalAll();
         lock.writeLock().unlock();
         Thread::sleep(SHORT_DELAY_MS);
         lock.writeLock().lock();
         ASSERT_TRUE(!lock.hasWaiters(c.get()));
-        ASSERT_TRUE(Pointer<Collection<Thread*> >(lock.getWaitingThreadsPublic(c.get()))->isEmpty());
+        ASSERT_TRUE(
+            Pointer<Collection<Thread*>>(lock.getWaitingThreadsPublic(c.get()))
+                ->isEmpty());
         lock.writeLock().unlock();
         t1.join(SHORT_DELAY_MS);
         t2.join(SHORT_DELAY_MS);
         ASSERT_TRUE(!t1.isAlive());
         ASSERT_TRUE(!t2.isAlive());
-    } catch (Exception& ex) {
+    }
+    catch (Exception& ex)
+    {
         unexpectedException();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ReentrantReadWriteLockTest, testToString) {
+TEST_F(ReentrantReadWriteLockTest, testToString)
+{
     ReentrantReadWriteLock lock;
-    std::string us = lock.toString();
+    std::string            us = lock.toString();
     ASSERT_TRUE(us.find_first_of("Write locks = 0") != std::string::npos);
     ASSERT_TRUE(us.find_first_of("Read locks = 0") != std::string::npos);
     lock.writeLock().lock();
@@ -2272,9 +2946,10 @@ TEST_F(ReentrantReadWriteLockTest, testToString) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ReentrantReadWriteLockTest, testReadLockToString) {
+TEST_F(ReentrantReadWriteLockTest, testReadLockToString)
+{
     ReentrantReadWriteLock lock;
-    std::string us = lock.readLock().toString();
+    std::string            us = lock.readLock().toString();
     ASSERT_TRUE(us.find_first_of("Read locks = 0") != std::string::npos);
     lock.readLock().lock();
     lock.readLock().lock();
@@ -2283,9 +2958,10 @@ TEST_F(ReentrantReadWriteLockTest, testReadLockToString) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ReentrantReadWriteLockTest, testWriteLockToString) {
+TEST_F(ReentrantReadWriteLockTest, testWriteLockToString)
+{
     ReentrantReadWriteLock lock;
-    std::string us = lock.writeLock().toString();
+    std::string            us = lock.writeLock().toString();
     ASSERT_TRUE(us.find_first_of("Unlocked") != std::string::npos);
     lock.writeLock().lock();
     std::string ls = lock.writeLock().toString();
@@ -2293,57 +2969,74 @@ TEST_F(ReentrantReadWriteLockTest, testWriteLockToString) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    const int MAX_ITERATION = 5000;
+const int MAX_ITERATION = 5000;
 
-    class TestMultipleReaderThreadsRunnable : public Runnable {
-    private:
+class TestMultipleReaderThreadsRunnable : public Runnable
+{
+private:
+    ReentrantReadWriteLockTest* test;
+    ReentrantReadWriteLock*     lock;
 
-        ReentrantReadWriteLockTest* test;
-        ReentrantReadWriteLock* lock;
+private:
+    TestMultipleReaderThreadsRunnable(const TestMultipleReaderThreadsRunnable&);
+    TestMultipleReaderThreadsRunnable operator=(
+        const TestMultipleReaderThreadsRunnable&);
 
-    private:
+public:
+    TestMultipleReaderThreadsRunnable(ReentrantReadWriteLockTest* test,
+                                      ReentrantReadWriteLock*     lock)
+        : Runnable(),
+          test(test),
+          lock(lock)
+    {
+    }
 
-        TestMultipleReaderThreadsRunnable(const TestMultipleReaderThreadsRunnable&);
-        TestMultipleReaderThreadsRunnable operator= (const TestMultipleReaderThreadsRunnable&);
+    virtual ~TestMultipleReaderThreadsRunnable()
+    {
+    }
 
-    public:
-
-        TestMultipleReaderThreadsRunnable(ReentrantReadWriteLockTest* test, ReentrantReadWriteLock* lock) :
-            Runnable(), test(test), lock(lock) {}
-        virtual ~TestMultipleReaderThreadsRunnable() {}
-
-        virtual void run() {
-            try {
-                for (int i = 0; i < MAX_ITERATION; ++i) {
-                    test->threadAssertTrue(lock->readLock().tryLock());
-                    lock->readLock().unlock();
-                }
-            } catch (Exception& ex) {
-                test->threadUnexpectedException();
+    virtual void run()
+    {
+        try
+        {
+            for (int i = 0; i < MAX_ITERATION; ++i)
+            {
+                test->threadAssertTrue(lock->readLock().tryLock());
+                lock->readLock().unlock();
             }
         }
-    };
-}
+        catch (Exception& ex)
+        {
+            test->threadUnexpectedException();
+        }
+    }
+};
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ReentrantReadWriteLockTest, testMultipleReaderThreads) {
+TEST_F(ReentrantReadWriteLockTest, testMultipleReaderThreads)
+{
     const int THREAD_QTY = 50;
 
-    ReentrantReadWriteLock lock;
+    ReentrantReadWriteLock            lock;
     TestMultipleReaderThreadsRunnable runnable(this, &lock);
 
     std::vector<Thread*> threads;
-    for (int i = 0; i < THREAD_QTY; ++i) {
+    for (int i = 0; i < THREAD_QTY; ++i)
+    {
         threads.push_back(new Thread(&runnable));
     }
 
-    for (int i = 0; i < THREAD_QTY; ++i) {
+    for (int i = 0; i < THREAD_QTY; ++i)
+    {
         threads[i]->start();
     }
 
-    for (int i = 0; i < THREAD_QTY; ++i) {
+    for (int i = 0; i < THREAD_QTY; ++i)
+    {
         threads[i]->join();
         delete threads[i];
     }

@@ -18,68 +18,72 @@
 #ifndef FAILOVERTRANSPORTLISTENER_H_
 #define FAILOVERTRANSPORTLISTENER_H_
 
-#include <activemq/util/Config.h>
 #include <activemq/transport/TransportListener.h>
+#include <activemq/util/Config.h>
 #include <decaf/lang/Pointer.h>
 
-namespace activemq {
-namespace transport {
-namespace failover {
+namespace activemq
+{
+namespace transport
+{
+    namespace failover
+    {
 
-    class FailoverTransport;
-
-    /**
-     * Utility class used by the Transport to perform the work of responding to events
-     * from the active Transport.
-     *
-     * @since 3.0
-     */
-    class AMQCPP_API FailoverTransportListener: public TransportListener {
-    private:
-
-        // The Transport that created this listener
-        FailoverTransport* parent;
-
-    private:
-
-        FailoverTransportListener(const FailoverTransportListener&);
-        FailoverTransportListener& operator=(const FailoverTransportListener&);
-
-    public:
-
-        FailoverTransportListener(FailoverTransport* parent);
-
-        virtual ~FailoverTransportListener();
+        class FailoverTransport;
 
         /**
-         * Event handler for the receipt of a command.  The transport passes
-         * off all received commands to its listeners, the listener then owns
-         * the Object.  If there is no registered listener the Transport deletes
-         * the command upon receipt.
+         * Utility class used by the Transport to perform the work of responding
+         * to events from the active Transport.
          *
-         * @param command the received command object.
+         * @since 3.0
          */
-        virtual void onCommand(const Pointer<Command> command);
+        class AMQCPP_API FailoverTransportListener : public TransportListener
+        {
+        private:
+            // The Transport that created this listener
+            FailoverTransport* parent;
 
-        /**
-         * Event handler for an exception from a command transport.
-         *
-         * @param ex The exception.
-         */
-        virtual void onException(const decaf::lang::Exception& ex);
+        private:
+            FailoverTransportListener(const FailoverTransportListener&);
+            FailoverTransportListener& operator=(
+                const FailoverTransportListener&);
 
-        /**
-         * The transport has suffered an interruption from which it hopes to recover
-         */
-        virtual void transportInterrupted();
+        public:
+            FailoverTransportListener(FailoverTransport* parent);
 
-        /**
-         * The transport has resumed after an interruption
-         */
-        virtual void transportResumed();
+            virtual ~FailoverTransportListener();
 
-    };
+            /**
+             * Event handler for the receipt of a command.  The transport passes
+             * off all received commands to its listeners, the listener then
+             * owns the Object.  If there is no registered listener the
+             * Transport deletes the command upon receipt.
+             *
+             * @param command the received command object.
+             */
+            virtual void onCommand(const Pointer<Command> command);
 
-}}}
+            /**
+             * Event handler for an exception from a command transport.
+             *
+             * @param ex The exception.
+             */
+            virtual void onException(const decaf::lang::Exception& ex);
+
+            /**
+             * The transport has suffered an interruption from which it hopes to
+             * recover
+             */
+            virtual void transportInterrupted();
+
+            /**
+             * The transport has resumed after an interruption
+             */
+            virtual void transportResumed();
+        };
+
+    }  // namespace failover
+}  // namespace transport
+}  // namespace activemq
 
 #endif /* FAILOVERTRANSPORTLISTENER_H_ */

@@ -17,16 +17,15 @@
 
 #include <gtest/gtest.h>
 
-#include <activemq/transport/Transport.h>
-#include <activemq/wireformat/WireFormat.h>
+#include <activemq/commands/ActiveMQTopic.h>
+#include <activemq/commands/ConnectionInfo.h>
+#include <activemq/commands/Message.h>
+#include <activemq/commands/SessionInfo.h>
 #include <activemq/state/ConnectionStateTracker.h>
 #include <activemq/state/ConsumerState.h>
 #include <activemq/state/SessionState.h>
-#include <activemq/commands/ActiveMQTopic.h>
-#include <activemq/commands/Message.h>
-#include <activemq/commands/ConnectionInfo.h>
-#include <activemq/commands/SessionInfo.h>
-#include <activemq/commands/Message.h>
+#include <activemq/transport/Transport.h>
+#include <activemq/wireformat/WireFormat.h>
 #include <decaf/lang/Pointer.h>
 #include <decaf/lang/exceptions/UnsupportedOperationException.h>
 #include <decaf/util/LinkedList.h>
@@ -41,180 +40,219 @@ using namespace decaf::util;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
-    class ConnectionStateTrackerTest : public ::testing::Test {
-    };
+class ConnectionStateTrackerTest : public ::testing::Test
+{
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-namespace {
+namespace
+{
 
-    class TrackingTransport : public activemq::transport::Transport {
-    public:
+class TrackingTransport : public activemq::transport::Transport
+{
+public:
+    LinkedList<Pointer<Command>> connections;
+    LinkedList<Pointer<Command>> sessions;
+    LinkedList<Pointer<Command>> producers;
+    LinkedList<Pointer<Command>> consumers;
+    LinkedList<Pointer<Command>> messages;
+    LinkedList<Pointer<Command>> messagePulls;
 
-        LinkedList< Pointer<Command> > connections;
-        LinkedList< Pointer<Command> > sessions;
-        LinkedList< Pointer<Command> > producers;
-        LinkedList< Pointer<Command> > consumers;
-        LinkedList< Pointer<Command> > messages;
-        LinkedList< Pointer<Command> > messagePulls;
-
-    public:
-
-        virtual ~TrackingTransport() {}
-
-        virtual void start() {}
-
-        virtual void stop() {}
-
-        virtual void close() {}
-
-        virtual void oneway(const Pointer<Command> command) {
-            if (command->isConnectionInfo()) {
-                connections.add(command);
-            } else if (command->isSessionInfo()) {
-                sessions.add(command);
-            } else if (command->isProducerInfo()) {
-                producers.add(command);
-            } else if (command->isConsumerInfo()) {
-                consumers.add(command);
-            } else if (command->isMessage()) {
-                messages.add(command);
-            } else if (command->isMessagePull()) {
-                messagePulls.add(command);
-            }
-        }
-
-        virtual Pointer<FutureResponse> asyncRequest(const Pointer<Command> command,
-                                                     const Pointer<ResponseCallback> responseCallback) {
-            throw UnsupportedOperationException();
-        }
-
-        virtual Pointer<Response> request(const Pointer<Command> command) {
-            throw UnsupportedOperationException();
-        }
-
-        virtual Pointer<Response> request(const Pointer<Command> command, unsigned int timeout) {
-            throw UnsupportedOperationException();
-        }
-
-        virtual Pointer<wireformat::WireFormat> getWireFormat() const {
-            return Pointer<wireformat::WireFormat>();
-        }
-
-        virtual void setWireFormat(const Pointer<wireformat::WireFormat> wireFormat) {
-        }
-
-        virtual void setTransportListener(TransportListener* listener) {
-        }
-
-        virtual TransportListener* getTransportListener() const {
-            return NULL;
-        }
-
-        virtual Transport* narrow(const std::type_info& typeId) {
-            return NULL;
-        }
-
-        virtual bool isFaultTolerant() const {
-            return false;
-        }
-
-        virtual bool isConnected() const {
-            return true;
-        }
-
-        virtual bool isClosed() const {
-            return false;
-        }
-
-        virtual bool isReconnectSupported() const {
-            return false;
-        }
-
-        virtual bool isUpdateURIsSupported() const {
-            return false;
-        }
-
-        virtual std::string getRemoteAddress() const {
-            return "";
-        }
-
-        virtual void reconnect(const decaf::net::URI& uri)  {
-        }
-
-        virtual void updateURIs(bool rebalance, const decaf::util::List<decaf::net::URI>& uris) {
-        }
-
-    };
-
-    class ConnectionData {
-    public:
-
-        Pointer<ConnectionInfo> connection;
-        Pointer<SessionInfo> session;
-        Pointer<ConsumerInfo> consumer;
-        Pointer<ProducerInfo> producer;
-
-    };
-
-    ConnectionData createConnectionState(ConnectionStateTracker& tracker) {
-
-        ConnectionData conn;
-
-        Pointer<ConnectionId> connectionId(new ConnectionId);
-        connectionId->setValue("CONNECTION");
-        conn.connection.reset(new ConnectionInfo);
-        conn.connection->setConnectionId(connectionId);
-
-        Pointer<SessionId> session_id(new SessionId);
-        session_id->setConnectionId("CONNECTION");
-        session_id->setValue(12345);
-        conn.session.reset(new SessionInfo);
-        conn.session->setSessionId(session_id);
-
-        Pointer<ConsumerId> consumer_id(new ConsumerId);
-        consumer_id->setConnectionId("CONNECTION");
-        consumer_id->setSessionId(12345);
-        consumer_id->setValue(42);
-        conn.consumer.reset(new ConsumerInfo);
-        conn.consumer->setConsumerId(consumer_id);
-
-        Pointer<ProducerId> producer_id(new ProducerId);
-        producer_id->setConnectionId("CONNECTION");
-        producer_id->setSessionId(12345);
-        producer_id->setValue(42);
-        conn.producer.reset(new ProducerInfo);
-        conn.producer->setProducerId(producer_id);
-
-        tracker.processConnectionInfo(conn.connection.get());
-        tracker.processSessionInfo(conn.session.get());
-        tracker.processConsumerInfo(conn.consumer.get());
-        tracker.processProducerInfo(conn.producer.get());
-
-        return conn;
+public:
+    virtual ~TrackingTransport()
+    {
     }
 
-    void clearConnectionState(ConnectionStateTracker& tracker, ConnectionData& conn) {
-        tracker.processRemoveProducer(conn.producer->getProducerId().get());
-        tracker.processRemoveConsumer(conn.consumer->getConsumerId().get());
-        tracker.processRemoveSession(conn.session->getSessionId().get());
-        tracker.processRemoveConnection(conn.connection->getConnectionId().get());
+    virtual void start()
+    {
     }
 
+    virtual void stop()
+    {
+    }
+
+    virtual void close()
+    {
+    }
+
+    virtual void oneway(const Pointer<Command> command)
+    {
+        if (command->isConnectionInfo())
+        {
+            connections.add(command);
+        }
+        else if (command->isSessionInfo())
+        {
+            sessions.add(command);
+        }
+        else if (command->isProducerInfo())
+        {
+            producers.add(command);
+        }
+        else if (command->isConsumerInfo())
+        {
+            consumers.add(command);
+        }
+        else if (command->isMessage())
+        {
+            messages.add(command);
+        }
+        else if (command->isMessagePull())
+        {
+            messagePulls.add(command);
+        }
+    }
+
+    virtual Pointer<FutureResponse> asyncRequest(
+        const Pointer<Command>          command,
+        const Pointer<ResponseCallback> responseCallback)
+    {
+        throw UnsupportedOperationException();
+    }
+
+    virtual Pointer<Response> request(const Pointer<Command> command)
+    {
+        throw UnsupportedOperationException();
+    }
+
+    virtual Pointer<Response> request(const Pointer<Command> command,
+                                      unsigned int           timeout)
+    {
+        throw UnsupportedOperationException();
+    }
+
+    virtual Pointer<wireformat::WireFormat> getWireFormat() const
+    {
+        return Pointer<wireformat::WireFormat>();
+    }
+
+    virtual void setWireFormat(const Pointer<wireformat::WireFormat> wireFormat)
+    {
+    }
+
+    virtual void setTransportListener(TransportListener* listener)
+    {
+    }
+
+    virtual TransportListener* getTransportListener() const
+    {
+        return NULL;
+    }
+
+    virtual Transport* narrow(const std::type_info& typeId)
+    {
+        return NULL;
+    }
+
+    virtual bool isFaultTolerant() const
+    {
+        return false;
+    }
+
+    virtual bool isConnected() const
+    {
+        return true;
+    }
+
+    virtual bool isClosed() const
+    {
+        return false;
+    }
+
+    virtual bool isReconnectSupported() const
+    {
+        return false;
+    }
+
+    virtual bool isUpdateURIsSupported() const
+    {
+        return false;
+    }
+
+    virtual std::string getRemoteAddress() const
+    {
+        return "";
+    }
+
+    virtual void reconnect(const decaf::net::URI& uri)
+    {
+    }
+
+    virtual void updateURIs(bool                                      rebalance,
+                            const decaf::util::List<decaf::net::URI>& uris)
+    {
+    }
+};
+
+class ConnectionData
+{
+public:
+    Pointer<ConnectionInfo> connection;
+    Pointer<SessionInfo>    session;
+    Pointer<ConsumerInfo>   consumer;
+    Pointer<ProducerInfo>   producer;
+};
+
+ConnectionData createConnectionState(ConnectionStateTracker& tracker)
+{
+    ConnectionData conn;
+
+    Pointer<ConnectionId> connectionId(new ConnectionId);
+    connectionId->setValue("CONNECTION");
+    conn.connection.reset(new ConnectionInfo);
+    conn.connection->setConnectionId(connectionId);
+
+    Pointer<SessionId> session_id(new SessionId);
+    session_id->setConnectionId("CONNECTION");
+    session_id->setValue(12345);
+    conn.session.reset(new SessionInfo);
+    conn.session->setSessionId(session_id);
+
+    Pointer<ConsumerId> consumer_id(new ConsumerId);
+    consumer_id->setConnectionId("CONNECTION");
+    consumer_id->setSessionId(12345);
+    consumer_id->setValue(42);
+    conn.consumer.reset(new ConsumerInfo);
+    conn.consumer->setConsumerId(consumer_id);
+
+    Pointer<ProducerId> producer_id(new ProducerId);
+    producer_id->setConnectionId("CONNECTION");
+    producer_id->setSessionId(12345);
+    producer_id->setValue(42);
+    conn.producer.reset(new ProducerInfo);
+    conn.producer->setProducerId(producer_id);
+
+    tracker.processConnectionInfo(conn.connection.get());
+    tracker.processSessionInfo(conn.session.get());
+    tracker.processConsumerInfo(conn.consumer.get());
+    tracker.processProducerInfo(conn.producer.get());
+
+    return conn;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-TEST_F(ConnectionStateTrackerTest, test) {
+void clearConnectionState(ConnectionStateTracker& tracker, ConnectionData& conn)
+{
+    tracker.processRemoveProducer(conn.producer->getProducerId().get());
+    tracker.processRemoveConsumer(conn.consumer->getConsumerId().get());
+    tracker.processRemoveSession(conn.session->getSessionId().get());
+    tracker.processRemoveConnection(conn.connection->getConnectionId().get());
+}
 
+}  // namespace
+
+////////////////////////////////////////////////////////////////////////////////
+TEST_F(ConnectionStateTrackerTest, test)
+{
     ConnectionStateTracker tracker;
-    ConnectionData conn = createConnectionState(tracker);
+    ConnectionData         conn = createConnectionState(tracker);
     clearConnectionState(tracker, conn);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ConnectionStateTrackerTest, testMessageCache) {
-
+TEST_F(ConnectionStateTrackerTest, testMessageCache)
+{
     Pointer<TrackingTransport> transport(new TrackingTransport);
-    ConnectionStateTracker tracker;
+    ConnectionStateTracker     tracker;
     tracker.setTrackMessages(true);
 
     ConnectionData conn = createConnectionState(tracker);
@@ -231,7 +269,8 @@ TEST_F(ConnectionStateTrackerTest, testMessageCache) {
 
     int sequenceId = 1;
 
-    for (int i = 0; i < 100; ++i) {
+    for (int i = 0; i < 100; ++i)
+    {
         decaf::lang::Pointer<commands::MessageId> id(new commands::MessageId());
         id->setProducerId(conn.producer->getProducerId());
         id->setProducerSequenceId(sequenceId++);
@@ -244,21 +283,24 @@ TEST_F(ConnectionStateTrackerTest, testMessageCache) {
 
     tracker.restore(transport);
 
-    ASSERT_EQ(4, transport->messages.size()) << ("Should only be three messages");
+    ASSERT_EQ(4, transport->messages.size())
+        << ("Should only be three messages");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(ConnectionStateTrackerTest, testMessagePullCache) {
-
+TEST_F(ConnectionStateTrackerTest, testMessagePullCache)
+{
     Pointer<TrackingTransport> transport(new TrackingTransport);
-    ConnectionStateTracker tracker;
+    ConnectionStateTracker     tracker;
     tracker.setTrackMessages(true);
 
     ConnectionData conn = createConnectionState(tracker);
 
-    for (int i = 0; i < 100; ++i) {
+    for (int i = 0; i < 100; ++i)
+    {
         Pointer<commands::MessagePull> pull(new commands::MessagePull());
-        Pointer<ActiveMQDestination> destination(new ActiveMQTopic("TEST" + Integer::toString(i)));
+        Pointer<ActiveMQDestination>   destination(
+            new ActiveMQTopic("TEST" + Integer::toString(i)));
         pull->setConsumerId(conn.consumer->getConsumerId());
         pull->setDestination(destination);
         tracker.processMessagePull(pull.get());
@@ -267,5 +309,6 @@ TEST_F(ConnectionStateTrackerTest, testMessagePullCache) {
 
     tracker.restore(transport);
 
-    ASSERT_EQ(10, transport->messagePulls.size()) << ("Should only be three message pulls");
+    ASSERT_EQ(10, transport->messagePulls.size())
+        << ("Should only be three message pulls");
 }

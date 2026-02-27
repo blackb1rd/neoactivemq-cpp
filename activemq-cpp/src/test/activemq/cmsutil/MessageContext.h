@@ -21,66 +21,85 @@
 #include <cms/Destination.h>
 #include <cms/Message.h>
 
-namespace activemq {
-namespace cmsutil {
+namespace activemq
+{
+namespace cmsutil
+{
 
-    class MessageContext {
-
+    class MessageContext
+    {
     public:
-
-        class SendListener {
+        class SendListener
+        {
         public:
-
-            virtual ~SendListener() {}
+            virtual ~SendListener()
+            {
+            }
 
             virtual void onSend(const cms::Destination* destination,
-                cms::Message* message, int deliveryMode, int priority,
-                long long timeToLive) = 0;
+                                cms::Message*           message,
+                                int                     deliveryMode,
+                                int                     priority,
+                                long long               timeToLive) = 0;
 
             virtual cms::Message* doReceive(const cms::Destination* dest,
-                                            const std::string& selector,
-                                            bool noLocal,
+                                            const std::string&      selector,
+                                            bool                    noLocal,
                                             long long timeout) = 0;
         };
 
     private:
-
         MessageContext(const MessageContext&);
-        MessageContext& operator= (const MessageContext&);
+        MessageContext& operator=(const MessageContext&);
 
     private:
-
         SendListener* listener;
 
     public:
-
-        MessageContext() : listener(NULL) {
+        MessageContext()
+            : listener(NULL)
+        {
         }
 
-        virtual ~MessageContext(){}
+        virtual ~MessageContext()
+        {
+        }
 
-        void setSendListener(SendListener* listener) {
+        void setSendListener(SendListener* listener)
+        {
             this->listener = listener;
         }
 
         void send(const cms::Destination* destination,
-                  cms::Message* message, int deliveryMode, int priority, long long timeToLive) {
-
-            if( listener != NULL ) {
-                listener->onSend(destination, message, deliveryMode, priority, timeToLive);
+                  cms::Message*           message,
+                  int                     deliveryMode,
+                  int                     priority,
+                  long long               timeToLive)
+        {
+            if (listener != NULL)
+            {
+                listener->onSend(destination,
+                                 message,
+                                 deliveryMode,
+                                 priority,
+                                 timeToLive);
             }
         }
 
-        cms::Message* receive(const cms::Destination* dest, const std::string& selector,
-                              bool noLocal,  long long timeout) {
-
-            if (listener != NULL) {
+        cms::Message* receive(const cms::Destination* dest,
+                              const std::string&      selector,
+                              bool                    noLocal,
+                              long long               timeout)
+        {
+            if (listener != NULL)
+            {
                 return listener->doReceive(dest, selector, noLocal, timeout);
             }
 
             return NULL;
         }
     };
-}}
+}  // namespace cmsutil
+}  // namespace activemq
 
 #endif /*_ACTIVEMQ_CMSUTIL_MESSAGECONTEXT_H_*/

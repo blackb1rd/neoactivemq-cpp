@@ -21,16 +21,18 @@
 #include <decaf/io/FilterOutputStream.h>
 #include <decaf/lang/exceptions/IllegalArgumentException.h>
 
-namespace decaf{
-namespace io{
+namespace decaf
+{
+namespace io
+{
 
     /**
      * Wrapper around another output stream that buffers
      * output before writing to the target output stream.
      */
-    class DECAF_API BufferedOutputStream: public FilterOutputStream {
+    class DECAF_API BufferedOutputStream : public FilterOutputStream
+    {
     private:
-
         /**
          * The internal buffer.
          */
@@ -52,12 +54,10 @@ namespace io{
         int tail;
 
     private:
-
         BufferedOutputStream(const BufferedOutputStream&);
         BufferedOutputStream& operator=(const BufferedOutputStream&);
 
     public:
-
         /**
          * Constructor.
          *
@@ -80,7 +80,9 @@ namespace io{
          *
          * @throws IllegalArgumentException if the bufferSize given is negative.
          */
-        BufferedOutputStream(OutputStream* stream, int bufferSize, bool own = false);
+        BufferedOutputStream(OutputStream* stream,
+                             int           bufferSize,
+                             bool          own = false);
 
         virtual ~BufferedOutputStream();
 
@@ -90,15 +92,16 @@ namespace io{
         virtual void flush();
 
     protected:
-
         virtual void doWriteByte(unsigned char c);
 
         virtual void doWriteArray(const unsigned char* buffer, int size);
 
-        virtual void doWriteArrayBounded(const unsigned char* buffer, int size, int offset, int length);
+        virtual void doWriteArrayBounded(const unsigned char* buffer,
+                                         int                  size,
+                                         int                  offset,
+                                         int                  length);
 
     private:
-
         /**
          * Initializes the internal structures.
          *
@@ -111,9 +114,9 @@ namespace io{
          * Writes the contents of the buffer to the output stream.
          */
         void emptyBuffer();
-
     };
 
-}}
+}  // namespace io
+}  // namespace decaf
 
 #endif /*_DECAF_IO_BUFFEREDOUTPUTSTREAM_H_*/

@@ -80,7 +80,7 @@ jobs:
       run: cmake --install output/build/${{ matrix.config.preset }} --prefix output/install/${{ matrix.config.preset }}
 
     - name: Upload build artifacts
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v7
       with:
         name: linux-build-${{ matrix.config.preset }}
         path: |
@@ -151,7 +151,7 @@ jobs:
 
     - name: Upload test results
       if: failure()
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v7
       with:
         name: test-results-${{ matrix.config.preset }}-unit-${{ strategy.job-index }}
         path: |
@@ -215,7 +215,7 @@ jobs:
 
     - name: Upload test results
       if: failure()
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v7
       with:
         name: test-results-${{ matrix.config.preset }}-benchmark
         path: |
@@ -305,7 +305,7 @@ jobs:
 
     - name: Upload test results
       if: failure()
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v7
       with:
         name: test-results-gcc-integration-${{ matrix.activemq.name }}
         path: |
@@ -397,7 +397,7 @@ jobs:
 
     - name: Upload test results
       if: failure()
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v7
       with:
         name: test-results-gcc-ssl-integration-${{ matrix.activemq.name }}
         path: |
@@ -487,7 +487,7 @@ jobs:
 
     - name: Upload test results
       if: failure()
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v7
       with:
         name: test-results-gcc-integration-benchmark-${{ matrix.activemq.name }}
         path: |

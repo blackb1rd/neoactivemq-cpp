@@ -150,7 +150,7 @@ jobs:
       run: cmake --preset ${{ matrix.config.preset }}
 
     - name: Download build artifacts
-      uses: actions/download-artifact@v7
+      uses: actions/download-artifact@v8
       with:
         name: windows-build-${{ matrix.config.preset }}
         path: output/build/${{ matrix.config.preset }}/
@@ -219,7 +219,7 @@ jobs:
       run: cmake --preset ${{ matrix.config.preset }}
 
     - name: Download build artifacts
-      uses: actions/download-artifact@v7
+      uses: actions/download-artifact@v8
       with:
         name: windows-build-${{ matrix.config.preset }}
         path: output/build/${{ matrix.config.preset }}/
@@ -440,7 +440,7 @@ jobs:
       run: cmake --preset ${{ matrix.config.preset }}
 
     - name: Download build artifacts
-      uses: actions/download-artifact@v7
+      uses: actions/download-artifact@v8
       with:
         name: windows-build-${{ matrix.config.preset }}
         path: output/build/${{ matrix.config.preset }}/
@@ -510,7 +510,7 @@ jobs:
       run: cmake --preset ${{ matrix.config.preset }}
 
     - name: Download build artifacts
-      uses: actions/download-artifact@v7
+      uses: actions/download-artifact@v8
       with:
         name: windows-build-${{ matrix.config.preset }}
         path: output/build/${{ matrix.config.preset }}/

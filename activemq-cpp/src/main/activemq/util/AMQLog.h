@@ -31,8 +31,8 @@
 #include <unordered_map>
 #include <vector>
 
-// RDTSC intrinsics for fast timestamps
-#if defined(_MSC_VER)
+// Platform intrinsics for fast timestamps
+#if defined(_MSC_VER) && (defined(_M_X64) || defined(_M_IX86) || defined(_M_ARM64))
 #include <intrin.h>
 #elif defined(__x86_64__) || defined(__i386__)
 #include <x86intrin.h>
@@ -50,14 +50,17 @@ namespace util
      */
     inline uint64_t rdtsc()
     {
-#if defined(_MSC_VER)
-        // MSVC intrinsic
+#if defined(_MSC_VER) && (defined(_M_X64) || defined(_M_IX86))
+        // MSVC x86/x64 intrinsic
         return __rdtsc();
 #elif defined(__x86_64__) || defined(__i386__)
         // GCC/Clang x86
         return __rdtsc();
+#elif defined(_M_ARM64)
+        // MSVC ARM64: use _ReadStatusReg for CNTVCT_EL0
+        return static_cast<uint64_t>(_ReadStatusReg(0x5F02));
 #elif defined(__aarch64__)
-        // ARM64: use CNTVCT_EL0 (virtual counter)
+        // GCC/Clang ARM64: use CNTVCT_EL0 (virtual counter)
         uint64_t val;
         __asm__ __volatile__("mrs %0, cntvct_el0" : "=r"(val));
         return val;

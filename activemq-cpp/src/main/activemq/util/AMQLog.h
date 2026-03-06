@@ -32,7 +32,8 @@
 #include <vector>
 
 // Platform intrinsics for fast timestamps
-#if defined(_MSC_VER) && (defined(_M_X64) || defined(_M_IX86) || defined(_M_ARM64))
+#if defined(_MSC_VER) && \
+    (defined(_M_X64) || defined(_M_IX86) || defined(_M_ARM64))
 #include <intrin.h>
 #elif defined(__x86_64__) || defined(__i386__)
 #include <x86intrin.h>

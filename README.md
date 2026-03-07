@@ -419,10 +419,12 @@ CI uses Clang/clang-cl to benefit from better diagnostics, improved sanitizer su
 
 ## 8. Notes for Windows Users
 
+- **Minimum supported OS: Windows 10** (`_WIN32_WINNT=0x0A00`) — Windows 7/8/8.1 are not supported
 - Visual Studio 2019 or later is required for C++17 support
 - No need to manually install dependencies — vcpkg handles everything
-- The Platform SDK is included with Visual Studio 2019+
+- The Windows 10 SDK is included with Visual Studio 2019+; it provides all required headers (`bcrypt.h`, etc.)
 - clang-cl is included with Visual Studio 2019+ (LLVM toolset component)
+- Winsock (`ws2_32`) is linked automatically via the `asio` dependency — no manual linkage required
 - When linking applications:
   - **Static library** (default): No special considerations
   - **Shared library**: Ensure runtime library matches (MD vs MT flags)

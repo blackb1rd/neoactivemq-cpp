@@ -757,8 +757,10 @@ if(WIN32)
       AMQCPP_DLL
     )
   endif()
-  target_link_libraries(neoactivemq-cpp PRIVATE ws2_32 bcrypt)
-  target_compile_definitions(neoactivemq-cpp PRIVATE _WIN32_WINNT=0x0601)
+  # ws2_32 is provided transitively by asio::asio on Windows.
+  # bcrypt is linked via decaf which uses BCryptGenRandom in SecureRandomImpl.
+  target_link_libraries(neoactivemq-cpp PRIVATE bcrypt)
+  target_compile_definitions(neoactivemq-cpp PRIVATE _WIN32_WINNT=0x0A00)
 endif()
 
 # Ensure C++ threading is available on all platforms

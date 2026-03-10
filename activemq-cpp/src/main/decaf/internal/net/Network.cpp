@@ -142,7 +142,8 @@ void Network::initializeNetworking()
 {
     // On Windows, ASIO internally calls WSAStartup/WSACleanup via
     // asio::detail::winsock_init when an io_context is created, so no
-    // manual Winsock initialization is needed here.
+    // manual Winsock initialization is needed here. ws2_32 is also linked
+    // transitively by asio::asio and is not listed explicitly in CMake.
 #ifndef _WIN32
     // Remove the SIGPIPE so that the application isn't aborted if a connected
     // socket breaks during a read or write.

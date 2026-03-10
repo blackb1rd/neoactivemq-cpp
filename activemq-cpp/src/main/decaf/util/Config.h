@@ -117,9 +117,10 @@
 #ifndef _WIN32_WINNT
 
 /*
- * Restrict the server to a subset of Windows XP header files by default
+ * Target Windows 10 and later. This aligns with the minimum supported
+ * OS for this library and matches the CMake build system definitions.
  */
-#define _WIN32_WINNT 0x0501
+#define _WIN32_WINNT 0x0A00
 #endif
 #ifndef NOUSER
 #define NOUSER

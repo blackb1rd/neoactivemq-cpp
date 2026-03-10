@@ -106,6 +106,6 @@ if(WIN32)
   if(AMQCPP_SHARED_LIB)
     set_target_properties(activemq_cms PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
   endif()
-  target_link_libraries(activemq_cms PRIVATE ws2_32)
-  target_compile_definitions(activemq_cms PRIVATE _WIN32_WINNT=0x0601)
+  # ws2_32 is provided transitively by asio::asio on Windows.
+  target_compile_definitions(activemq_cms PRIVATE _WIN32_WINNT=0x0A00)
 endif()

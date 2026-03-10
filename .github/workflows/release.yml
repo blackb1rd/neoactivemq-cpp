@@ -108,9 +108,6 @@ jobs:
             build_type: Release
             arch: x86
             artifact_name: activemq-cpp-${{ needs.create-release.outputs.new_version }}-windows-x86
-          - os: macos-13
-            preset: x64-osx-release
-            artifact_name: activemq-cpp-${{ needs.create-release.outputs.new_version }}-macos-x64
           - os: macos-latest
             preset: arm64-osx-release
             artifact_name: activemq-cpp-${{ needs.create-release.outputs.new_version }}-macos-arm64

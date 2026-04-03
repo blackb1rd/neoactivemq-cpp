@@ -1,0 +1,616 @@
+================================================================================
+DECAF REMOVAL
+Replace decaf with idiomatic C++17 + Asio + zlib
+================================================================================
+
+GOAL
+----
+Delete the decaf utility library (~680 files, ~93K lines). Replace with
+C++17 standard library, Asio (already a dependency), and direct zlib/OpenSSL
+calls. No compatibility layers. No Java-style abstractions. No fallback.
+
+After this change:
+  - decaf/ is gone from src/main/ and src/test/
+  - All code uses std:: types directly
+  - ~40% fewer files, significantly faster builds
+  - No more Java-in-C++ indirection layer
+
+
+================================================================================
+REPLACEMENT MAPPING (DECISIONS, NOT OPTIONS)
+================================================================================
+
+Each decaf type has exactly ONE replacement. No "Strategy A vs B."
+
+--------------------------------------------------------------------
+decaf::lang
+--------------------------------------------------------------------
+
+  Pointer<T>             -> std::shared_ptr<T>
+  ArrayPointer<T>        -> std::vector<T>
+  Thread                 -> std::thread  (caller must join or detach)
+  Runnable               -> std::function<void()>  (or lambda)
+  String                 -> std::string  (already the case in many places)
+  Integer/Long/Float/    -> primitive types + std::to_string / std::stoi / etc.
+   Double/Boolean
+  System::currentTimeMs  -> std::chrono::steady_clock::now()
+  Math                   -> <cmath>
+  Comparable<T>          -> operator< + operator==
+
+  Pointer<T> API migration (mechanical):
+    Pointer<T>(new T(...))     ->  std::make_shared<T>(...)
+    ptr.dynamicCast<U>()       ->  std::dynamic_pointer_cast<U>(ptr)
+    ptr.get()                  ->  ptr.get()                (same)
+    ptr == NULL                ->  ptr == nullptr  or  !ptr
+    Pointer<T>(ptr.release())  ->  std::move(ptr)
+
+--------------------------------------------------------------------
+decaf::lang::Exception hierarchy
+--------------------------------------------------------------------
+
+  Use std:: exception types directly. The C++ standard library already
+  provides the hierarchy we need:
+
+    std::exception
+      std::runtime_error           <- general errors
+        std::system_error          <- OS/IO errors (has error_code)
+      std::logic_error             <- programmer errors
+        std::invalid_argument      <- IllegalArgumentException
+        std::out_of_range          <- IndexOutOfBoundsException
+        std::domain_error          <- ClassCastException
+
+  What std:: does NOT have:
+    IOException -- use std::system_error (it carries std::error_code,
+                   designed exactly for I/O errors)
+    CMSException -- keep as the public API exception type
+                    (it's in cms/, not decaf/)
+
+  Exception migration by current decaf type:
+    decaf::lang::Exception                    -> std::runtime_error
+    decaf::lang::RuntimeException             -> std::runtime_error
+    decaf::lang::IllegalArgumentException     -> std::invalid_argument
+    decaf::lang::IllegalStateException        -> std::logic_error
+    decaf::lang::NullPointerException         -> std::logic_error (or remove*)
+    decaf::lang::IndexOutOfBoundsException    -> std::out_of_range
+    decaf::lang::ClassCastException           -> std::bad_cast
+    decaf::lang::UnsupportedOperationException-> std::logic_error
+    decaf::lang::InterruptedException         -> std::runtime_error
+    decaf::io::IOException                    -> std::system_error
+    decaf::io::EOFException                   -> std::system_error
+    decaf::net::SocketException               -> std::system_error
+
+  * NullPointerException: In idiomatic C++, null dereference is a bug,
+    not a recoverable exception. Most throw sites should become asserts
+    or precondition checks, not exceptions.
+
+  Catch-block migration:
+    OLD:  catch (decaf::lang::Exception& e) { ... e.getMessage() ... }
+    NEW:  catch (const std::exception& e) { ... e.what() ... }
+
+  This is MORE idiomatic than a custom hierarchy. catch(const std::exception&)
+  at boundaries catches everything. Specific catches where needed.
+
+  NOTE: decaf exceptions carry __FILE__, __LINE__, and a stack trace.
+  For __FILE__/__LINE__ at throw sites, use a macro if needed:
+    #define AMQ_THROW(ExType, msg) throw ExType(std::string(msg) + \
+        " [" + __FILE__ + ":" + std::to_string(__LINE__) + "]")
+  Stack traces are rarely needed in production messaging code.
+
+--------------------------------------------------------------------
+decaf::util (Collections)
+--------------------------------------------------------------------
+
+  ArrayList<T>           -> std::vector<T>
+  LinkedList<T>          -> std::list<T>
+  HashMap<K,V>           -> std::unordered_map<K,V>
+  HashSet<T>             -> std::unordered_set<T>
+  TreeMap<K,V>           -> std::map<K,V>
+  TreeSet<T>             -> std::set<T>
+  Properties             -> std::unordered_map<std::string, std::string>
+  Queue<T>               -> std::queue<T>
+  Deque<T>               -> std::deque<T>
+  Iterator<T>            -> range-based for / standard iterators
+  Comparator<T>          -> std::less<T> or custom callable
+  Arrays                 -> <algorithm>
+  Collections            -> <algorithm>
+  Date                   -> std::chrono::system_clock::time_point
+  UUID                   -> keep minimal impl (~50 lines) or use OS API
+  Random                 -> std::mt19937 + <random>
+  Timer/TimerTask        -> Asio steady_timer (already a dep)
+
+  Collection API migration:
+    list.add(x)          ->  vec.push_back(x)
+    list.get(i)          ->  vec[i]  (no bounds check, same as Java's
+                              fast-path; use vec.at(i) only where decaf
+                              threw IndexOutOfBoundsException and caller
+                              caught it)
+    list.remove(i)       ->  vec.erase(vec.begin() + i)
+    map.put(k, v)        ->  map.insert_or_assign(k, v)
+    map.get(k)           ->  map.at(k) or map.find(k)->second
+    map.containsKey(k)   ->  map.count(k) > 0
+    set.contains(x)      ->  set.count(x) > 0
+
+  Properties helper functions (free functions, ~30 lines):
+    int getProperty(const Properties& p, std::string_view key, int def);
+    bool getProperty(const Properties& p, std::string_view key, bool def);
+    std::string getProperty(const Properties& p, std::string_view key,
+                            std::string_view def);
+
+--------------------------------------------------------------------
+decaf::util::concurrent (Threading)
+--------------------------------------------------------------------
+
+  Mutex                  -> std::mutex
+  Lock                   -> std::scoped_lock or std::unique_lock
+  ReentrantLock          -> std::mutex  (refactor call sites to not re-enter;
+                            see RECURSIVE MUTEX ELIMINATION below)
+  ReadWriteLock          -> std::shared_mutex  (C++17)
+  Condition              -> std::condition_variable
+  CountDownLatch         -> activemq::util::Latch
+                            (~30 lines: std::mutex + std::condition_variable
+                            + counter. See WHAT WE KEEP below.)
+  Semaphore              -> activemq::util::Semaphore
+                            (~30 lines: std::mutex + std::condition_variable
+                            + counter. See WHAT WE KEEP below.)
+  AtomicBoolean          -> std::atomic<bool>
+  AtomicInteger          -> std::atomic<int>
+  AtomicReference<T>     -> std::shared_ptr<T> guarded by std::mutex
+                            (std::atomic<shared_ptr> requires C++20)
+  Future<T>              -> std::future<T>
+  Callable<T>            -> std::function<T()>  (or std::packaged_task)
+  ThreadPoolExecutor     -> Asio io_context + thread pool
+  Executors              -> factory free functions using Asio
+  ConcurrentHashMap      -> std::unordered_map + std::shared_mutex
+  CopyOnWriteArrayList   -> std::vector + std::shared_mutex
+  LinkedBlockingQueue    -> activemq::util::BlockingQueue<T>
+                            (~40 lines: std::deque + std::mutex
+                            + std::condition_variable)
+
+  synchronized() macro (67 files, 481 usages):
+    OLD:  synchronized(this->mutex) { ... }
+    NEW:  { std::scoped_lock lk(mutex_); ... }
+
+    Migration is mechanical. Each synchronized() becomes a scoped_lock
+    in a new scope block. The Synchronizable interface is deleted.
+
+  RECURSIVE MUTEX ELIMINATION:
+    Do NOT replace ReentrantLock with std::recursive_mutex.
+    Recursive mutex is a design smell -- it hides unclear lock ownership
+    and makes reasoning about thread safety harder.
+
+    For each ReentrantLock usage, refactor to use std::mutex by:
+
+    1. Split public/private: Public methods lock, private methods assume
+       the lock is already held. This is the most common fix.
+
+         OLD (recursive):
+           void Foo::methodA() {
+               std::lock_guard lk(mutex_);
+               // ... work ...
+               methodB();  // re-enters the lock
+           }
+           void Foo::methodB() {
+               std::lock_guard lk(mutex_);
+               // ... work ...
+           }
+
+         NEW (non-recursive):
+           void Foo::methodA() {
+               std::scoped_lock lk(mutex_);
+               // ... work ...
+               methodBLocked();  // called with lock held
+           }
+           void Foo::methodB() {
+               std::scoped_lock lk(mutex_);
+               methodBLocked();
+           }
+           void Foo::methodBLocked() {
+               // ... work ... (caller holds mutex_)
+           }
+
+    2. Reduce lock scope: If the re-entry was due to overly broad
+       locking, narrow the critical section so the nested call
+       happens outside the lock.
+
+    3. Factor out state: If a method needs to both lock and call
+       another locking method, extract the shared state into a
+       separate struct and pass it by reference under a single lock.
+
+    GOOD NEWS: ReentrantLock is only used inside decaf/ itself (0 usages
+    in activemq/). So there are no call sites to refactor -- the
+    ReentrantLock simply disappears with decaf. If any future code
+    needs a re-entrant pattern, use the public/private split above
+    with std::mutex, not std::recursive_mutex.
+
+--------------------------------------------------------------------
+decaf::io (I/O Streams)
+--------------------------------------------------------------------
+
+  The entire Java-style InputStream/OutputStream hierarchy is deleted.
+  No base classes, no FilterInputStream, no decorator pattern.
+
+  For OpenWire serialization, replace DataInputStream/DataOutputStream
+  with lightweight value types:
+
+    struct ByteReader {
+        const uint8_t* pos;
+        const uint8_t* end;
+
+        int8_t   readByte();
+        int16_t  readShort();        // big-endian
+        int32_t  readInt();          // big-endian
+        int64_t  readLong();         // big-endian
+        float    readFloat();
+        double   readDouble();
+        bool     readBoolean();
+        std::string readUTF();       // length-prefixed UTF-8
+
+        void readBytes(uint8_t* out, size_t n);
+        size_t remaining() const;
+    };
+
+    struct ByteWriter {
+        std::vector<uint8_t>& buf;
+
+        void writeByte(int8_t v);
+        void writeShort(int16_t v);  // big-endian
+        void writeInt(int32_t v);    // big-endian
+        void writeLong(int64_t v);   // big-endian
+        void writeFloat(float v);
+        void writeDouble(double v);
+        void writeBoolean(bool v);
+        void writeUTF(std::string_view s);
+
+        void writeBytes(const uint8_t* data, size_t len);
+    };
+
+  ~150 lines each. No virtual dispatch. No heap allocation.
+  No inheritance. Just pointer arithmetic and endian conversion.
+
+  This is faster than the current DataInputStream/DataOutputStream
+  (no virtual calls, no buffering layers, no stream state).
+
+  WireFormat interface changes:
+    OLD: Command* unmarshal(Transport*, DataInputStream*)
+    NEW: std::shared_ptr<Command> unmarshal(Transport*, ByteReader&)
+
+    OLD: void marshal(Command*, Transport*, DataOutputStream*)
+    NEW: void marshal(const Command&, Transport*, ByteWriter&)
+
+  ByteArrayInputStream -> ByteReader over the array
+  ByteArrayOutputStream -> ByteWriter into a std::vector<uint8_t>
+  BufferedInputStream/OutputStream -> deleted (Asio handles buffering)
+
+--------------------------------------------------------------------
+decaf::net (Networking)
+--------------------------------------------------------------------
+
+  Socket                 -> asio::ip::tcp::socket
+  ServerSocket           -> asio::ip::tcp::acceptor (test only)
+  SocketFactory          -> deleted
+  URI                    -> keep as activemq::util::URI (~300 lines)
+                            (ActiveMQ broker URI format is non-standard:
+                             failover:(tcp://host:port,...)?key=value)
+  URL                    -> deleted (unused by core protocol)
+  InetAddress            -> asio::ip::address
+  SocketInputStream      -> Asio read/write operations
+  SocketOutputStream     -> Asio read/write operations
+  ssl::SSLSocket         -> asio::ssl::stream<tcp::socket>
+  ssl::SSLContext        -> asio::ssl::context
+  ssl::SSLSocketFactory  -> deleted
+
+  NOTE: The async transport plan (plan 02) replaces the blocking
+  socket layer with IAsyncChannel + AsioAsyncChannel. During decaf
+  removal, replace decaf::net::Socket with asio::ip::tcp::socket
+  using blocking operations (same semantics). Plan 02 then changes
+  the model from blocking to async. This keeps each plan focused.
+
+--------------------------------------------------------------------
+decaf::security (Crypto)
+--------------------------------------------------------------------
+
+  MessageDigest          -> OpenSSL EVP_MD API directly
+  SecureRandom           -> OpenSSL RAND_bytes
+  cert::*                -> OpenSSL X509 API directly
+
+  Only used when AMQCPP_USE_SSL=ON. ~30 call sites.
+
+--------------------------------------------------------------------
+decaf::util::zip (Compression)
+--------------------------------------------------------------------
+
+  Deflater/Inflater      -> zlib deflate/inflate directly
+  CRC32                  -> zlib crc32()
+  Adler32                -> zlib adler32()
+
+  ~10 call sites. Replace with direct zlib calls. No wrapper class
+  needed -- the call sites are few and localized.
+
+--------------------------------------------------------------------
+decaf::util::logging (Logging)
+--------------------------------------------------------------------
+
+  Replace the entire Java-style Logger/Handler/Formatter/LogManager
+  with a single callback:
+
+    enum class LogLevel { Trace, Debug, Info, Warn, Error, Fatal };
+
+    using LogCallback = std::function<void(LogLevel, std::string_view)>;
+
+    void setLogCallback(LogCallback cb);
+
+  ~20 lines of code. Users provide their own sink (spdlog, stdout,
+  Qt logging, whatever). The library just calls the callback.
+
+  Existing AMQ_LOG_* macros rewritten to call the callback.
+
+--------------------------------------------------------------------
+decaf::nio (Buffers)
+--------------------------------------------------------------------
+
+  ByteBuffer             -> std::vector<uint8_t>
+  IntBuffer/etc.         -> deleted (unused outside decaf internals)
+
+--------------------------------------------------------------------
+decaf::internal (Platform-specific)
+--------------------------------------------------------------------
+
+  Deleted entirely. Platform-specific code replaced by:
+    - Asio (networking, TCP, SSL)
+    - OpenSSL (crypto)
+    - C++ standard library (everything else)
+    - Windows CNG calls -> OpenSSL (one crypto backend)
+
+
+================================================================================
+WHAT WE KEEP (~800 lines total)
+================================================================================
+
+Only code with no C++17 std:: equivalent. Everything else is deleted.
+
+  1. activemq::io::ByteReader / ByteWriter       (~300 lines)
+     Big-endian binary serialization for OpenWire wire format.
+     Value types, no inheritance, no virtual dispatch.
+
+  2. activemq::util::URI                          (~300 lines)
+     Parse ActiveMQ broker URIs.
+     Simplified from decaf::net::URI (no HTTP, no file protocol).
+
+  3. activemq::util::BlockingQueue<T>             (~40 lines)
+     std::deque + std::mutex + std::condition_variable.
+     Used by transport layer for command dispatch.
+
+  4. activemq::util::Latch                        (~30 lines)
+     std::mutex + std::condition_variable + counter.
+     Replaces decaf::util::concurrent::CountDownLatch.
+     (std::latch is C++20; this is the C++17 equivalent.)
+
+  5. activemq::util::Semaphore                    (~30 lines)
+     std::mutex + std::condition_variable + counter.
+     Replaces decaf::util::concurrent::Semaphore.
+     (std::counting_semaphore is C++20; this is the C++17 equivalent.)
+
+  6. Log callback                                 (~20 lines)
+     enum LogLevel + setLogCallback() + macro.
+
+  7. Properties helper functions                   (~30 lines)
+     Free functions for typed property access.
+
+Total: ~750 lines replacing ~93,000 lines.
+
+
+================================================================================
+PHASED REMOVAL
+================================================================================
+
+5 phases. Each is one or more PRs. Tests pass after every phase.
+
+--------------------------------------------------------------------
+PHASE 1: Replace Pointer<T> + primitive wrappers + atomics
+--------------------------------------------------------------------
+Scope: ~200+ files, mechanical transformation.
+
+  Pointer<T>          -> std::shared_ptr<T>  (everywhere)
+  ArrayPointer<T>     -> std::vector<T>
+  AtomicBoolean       -> std::atomic<bool>
+  AtomicInteger       -> std::atomic<int>
+  Integer::parseInt   -> std::stoi
+  Long::parseLong     -> std::stoll
+  Boolean::parseBoolean -> (inline comparison)
+  System::currentTimeMillis -> std::chrono
+
+  Approach:
+  - Start with activemq/ headers (change signatures first)
+  - Then activemq/ implementations
+  - Then test files
+  - Build + test after each batch of ~20 files
+
+  This is the highest-volume phase but the most mechanical.
+  Most changes are regex-replaceable.
+
+  Can be split into 2-3 PRs if too large for review.
+
+--------------------------------------------------------------------
+PHASE 2: Replace exceptions
+--------------------------------------------------------------------
+Scope: ~150 files, mostly catch/throw sites.
+
+  - Replace throw sites: change exception types per mapping above
+  - Replace catch blocks: catch(const std::exception& e), e.what()
+  - Replace NullPointerException throws with asserts or preconditions
+  - Create ByteReader/ByteWriter (needed before Phase 4 but small
+    enough to include here)
+  - Keep cms::CMSException as the public API exception type
+
+  Approach:
+  - grep for each decaf exception type
+  - Batch by exception type (all IllegalArgumentException, then all
+    IOException, etc.)
+  - Build + test after each batch
+
+  1-2 PRs.
+
+--------------------------------------------------------------------
+PHASE 3: Replace collections + threading + synchronized
+--------------------------------------------------------------------
+Scope: ~200 files.
+
+  Collections:
+    ArrayList<T>    -> std::vector<T>
+    HashMap<K,V>    -> std::unordered_map<K,V>
+    LinkedList<T>   -> std::list<T>
+    (etc. per mapping above)
+
+  Threading:
+    Mutex           -> std::mutex
+    synchronized()  -> std::scoped_lock  (67 files, 481 usages)
+    CountDownLatch  -> activemq::util::Latch
+    Semaphore       -> activemq::util::Semaphore
+    Thread          -> std::thread
+    (etc. per mapping above)
+
+  Create the kept utility classes in this phase:
+    - activemq::util::Latch
+    - activemq::util::Semaphore
+    - activemq::util::BlockingQueue<T>
+
+  These are combined because collections and threading are often
+  used together (e.g., synchronized access to a HashMap).
+
+  Approach:
+  - Replace synchronized() first (widest usage, blocks other changes)
+  - Then collections (batch by container type)
+  - Then remaining threading primitives
+  - Delete the Synchronizable interface
+  - Build + test after each batch
+
+  2-3 PRs.
+
+--------------------------------------------------------------------
+PHASE 4: Replace I/O + networking + security + zip + logging
+--------------------------------------------------------------------
+Scope: ~100 files.
+
+  I/O:
+  - Create ByteReader/ByteWriter (if not already done in Phase 2)
+  - Update WireFormat/OpenWireFormat to use ByteReader/ByteWriter
+  - Update all marshal/unmarshal call sites
+  - Delete InputStream/OutputStream hierarchy
+
+  Networking:
+  - Replace decaf::net::Socket with asio::ip::tcp::socket
+  - Replace decaf::net::ServerSocket with asio::ip::tcp::acceptor
+  - Create activemq::util::URI (stripped-down broker URI parser)
+  - Replace SSL classes with asio::ssl:: equivalents
+  - Delete SocketFactory, URLEncoder, etc.
+
+  Security:
+  - Replace MessageDigest with direct OpenSSL EVP calls
+  - Replace SecureRandom with OpenSSL RAND_bytes
+
+  Compression:
+  - Replace Deflater/Inflater with direct zlib calls
+
+  Logging:
+  - Create log callback (setLogCallback + AMQ_LOG_* macros)
+  - Replace all Logger usage
+
+  2-3 PRs (I/O + networking in one, security + zip + logging in another).
+
+--------------------------------------------------------------------
+PHASE 5: Delete decaf/ and clean up
+--------------------------------------------------------------------
+Scope: deletion + final sweep.
+
+  - Delete activemq-cpp/src/main/decaf/  (680 files)
+  - Delete activemq-cpp/src/test/decaf/  (122 files)
+  - Remove decaf from CMakeLists.txt source lists
+  - Remove decaf test registrations
+  - grep for any remaining #include <decaf/...> (should be zero)
+  - Update AGENTS.md (remove decaf references)
+  - Final full test run on all platforms
+
+  1 PR.
+
+
+================================================================================
+RISKS
+================================================================================
+
+RISK 1: Scale
+  ~500 files modified, ~800 deleted over 5 phases. Mitigated by:
+  - Each phase is independently testable
+  - Most changes are mechanical (regex-assisted)
+  - Split large phases into multiple PRs
+
+RISK 2: Behavioral differences in collections
+  Decaf collections throw on invalid access. std:: containers use UB
+  (operator[]) or throw std::out_of_range (.at()). For each call site:
+  - If decaf threw and caller caught it -> use .at()
+  - If decaf threw and nobody caught it -> use operator[] (bug = bug)
+  - Review the Pattern 4 catch example (DynamicDestinationResolver)
+    for sites that rely on exception-on-miss semantics
+
+RISK 3: Pointer<T> edge cases
+  decaf::lang::Pointer throws NullPointerException on null deref.
+  std::shared_ptr has UB on null deref. Call sites that dereference
+  a possibly-null Pointer and catch NullPointerException must be
+  changed to explicit null checks before deref.
+
+RISK 4: synchronized() scope
+  The synchronized() macro creates a for-loop scope. Replacing with
+  std::scoped_lock in a block scope must preserve the exact same
+  critical section boundaries. Review each of the 481 usages.
+
+RISK 5: OpenWire serialization correctness
+  ByteReader/ByteWriter replacing DataInputStream/DataOutputStream
+  must produce byte-identical output. Test with a corpus of captured
+  OpenWire frames. Benchmark before/after (this is the hot path).
+
+RISK 6: SSL integration
+  decaf::net::ssl wraps OpenSSL with a Socket-like API. asio::ssl::stream
+  has a different API. The SSL transport code needs careful rewriting.
+  This is the hardest part of Phase 4.
+
+RISK 7: std::thread requires explicit join
+  Unlike decaf::lang::Thread which may have had RAII-style cleanup,
+  std::thread terminates the program if destroyed without join() or
+  detach(). Every std::thread must be joined in the owning class
+  destructor or use a small RAII wrapper:
+
+    class JoinableThread {
+        std::thread t_;
+    public:
+        template<typename F>
+        explicit JoinableThread(F&& f) : t_(std::forward<F>(f)) {}
+        ~JoinableThread() { if (t_.joinable()) t_.join(); }
+        // non-copyable, movable
+    };
+
+  This is ~10 lines added to the utility set if needed broadly.
+
+
+================================================================================
+FUTURE CONSIDERATIONS
+================================================================================
+
+These are not required for decaf removal but worth tracking:
+
+1. C++20 upgrade (future PR)
+   Would allow replacing:
+     - activemq::util::Latch      -> std::latch
+     - activemq::util::Semaphore  -> std::counting_semaphore
+     - std::thread                 -> std::jthread (RAII + stop_token)
+     - const uint8_t* + size_t    -> std::span<const uint8_t>
+     - map.count(k) > 0           -> map.contains(k)
+   All three CI compilers already support C++20. Consider after
+   decaf removal is complete and stable.
+
+2. std::expected<T, E> (C++23)
+   Replace exception-based error handling in non-exceptional paths
+   (e.g., property lookups, URI parsing) with value-or-error returns.
+
+
+================================================================================
+END OF PLAN
+================================================================================

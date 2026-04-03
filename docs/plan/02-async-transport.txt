@@ -1,0 +1,451 @@
+================================================================================
+ASYNC TRANSPORT
+Eliminate internal threads; push-driven I/O with Asio as built-in default
+================================================================================
+
+ASSUMES: Plan 01 (decaf removal) is complete.
+  - All types are std:: (shared_ptr, mutex, thread, etc.)
+  - ByteReader/ByteWriter exist for OpenWire serialization
+  - Networking uses asio::ip::tcp::socket (blocking, from Phase 4)
+  - No decaf:: references remain
+  - C++17 standard
+
+
+GOAL
+----
+Replace the blocking-thread I/O model in IOTransport/TcpTransport with a
+push-driven async model.
+
+After this change:
+  - Library creates ZERO threads for I/O
+  - IAsyncChannel interface allows any event loop (Qt, libuv, epoll)
+  - AsioAsyncChannel ships as the built-in default (Asio already a dep)
+  - Old blocking TcpTransport is deleted entirely -- no fallback
+  - InactivityMonitor timers use Asio steady_timer
+  - All interfaces use C++17 (no std::span, no coroutines in public API)
+
+
+================================================================================
+CURRENT ARCHITECTURE (post-decaf, pre-async)
+================================================================================
+
+Transport chain (bottom to top):
+  IOTransport          <- blocking read thread, uses asio::ip::tcp::socket
+  TcpTransport         <- creates socket, wraps with buffered I/O
+  [optional filters]   <- LoggingTransport, InactivityMonitor, WireFormatNegotiator
+  ResponseCorrelator   <- matches request/response command IDs
+  FailoverTransport    <- reconnection logic
+  ActiveMQConnection   <- top-level user-visible object
+
+Current flow:
+  1. IOTransport::start() launches std::thread running read loop
+  2. Read loop calls wireFormat->unmarshal(transport, reader)  [BLOCKS]
+  3. unmarshal() reads 4-byte length prefix then N bytes
+  4. Read loop calls fire(command) -> listener->onCommand()
+  5. IOTransport::oneway() calls wireFormat->marshal() then writes  [BLOCKS]
+
+OpenWire framing:
+  - Bytes 0-3: big-endian int32 = body length (N)
+  - Bytes 4..4+N: frame body
+  - Total frame size on wire = 4 + N bytes
+
+
+================================================================================
+PHASE 1: IAsyncChannel INTERFACE
+================================================================================
+
+New file: activemq/transport/IAsyncChannel.h
+
+Pure abstract interface. The library uses this for all I/O. No framework
+dependency. Users implementing Qt/libuv channels implement this.
+
+  namespace activemq::transport {
+
+  class IAsyncChannel {
+  public:
+      using ReadCallback  = std::function<void(const uint8_t* data, size_t len)>;
+      using ErrorCallback = std::function<void(std::error_code ec)>;
+      using DoneCallback  = std::function<void(std::error_code ec)>;
+
+      virtual ~IAsyncChannel() = default;
+
+      virtual void asyncConnect(const std::string& host,
+                                uint16_t port,
+                                DoneCallback onConnected) = 0;
+
+      // Called once after connect. Channel calls onData for each chunk.
+      // Channel calls onError on connection loss.
+      virtual void beginRead(ReadCallback onData,
+                             ErrorCallback onError) = 0;
+
+      // Write bytes. onDone fires when all bytes are sent to OS.
+      // Library guarantees no overlapping writes.
+      virtual void asyncWrite(const uint8_t* data,
+                              size_t len,
+                              DoneCallback onDone) = 0;
+
+      virtual void close() = 0;
+  };
+
+  } // namespace activemq::transport
+
+Design notes:
+  - Raw pointer + size for C++17 compatibility (upgrade to std::span
+    if the project moves to C++20 later).
+  - std::function for callbacks, std::error_code for errors -- C++17 stdlib.
+  - No nativeHandle() -- not needed. InactivityMonitor uses timers.
+  - No virtual defaults -- every method must be implemented.
+
+
+================================================================================
+PHASE 2: AsioAsyncChannel (BUILT-IN DEFAULT)
+================================================================================
+
+New files:
+  activemq/transport/AsioAsyncChannel.h
+  activemq/transport/AsioAsyncChannel.cpp
+
+This is the library's built-in IAsyncChannel using Asio. Ships with the
+library. Users who don't care about event loop integration use this.
+
+  namespace activemq::transport {
+
+  class AsioAsyncChannel : public IAsyncChannel {
+      asio::io_context& ctx_;
+      asio::ip::tcp::socket socket_;
+      std::array<uint8_t, 8192> readBuf_;
+
+  public:
+      // Takes a reference to an io_context.
+      // The library manages one io_context per connection.
+      explicit AsioAsyncChannel(asio::io_context& ctx);
+
+      void asyncConnect(std::string_view host,
+                        uint16_t port,
+                        DoneCallback onConnected) override;
+
+      void beginRead(ReadCallback onData,
+                     ErrorCallback onError) override;
+
+      void asyncWrite(const uint8_t* data,
+                      size_t len,
+                      DoneCallback onDone) override;
+
+      void close() override;
+  };
+
+  } // namespace activemq::transport
+
+Implementation:
+  - asyncConnect(): asio::async_connect with resolved endpoints
+  - beginRead(): asio::async_read_some in a loop (re-arms after each callback)
+  - asyncWrite(): asio::async_write (guaranteed complete write)
+  - close(): socket_.close() + cancel pending ops
+
+SSL variant: AsioSslAsyncChannel wraps asio::ssl::stream<tcp::socket>.
+Same interface, same implementation pattern. Created when URI scheme
+is "ssl://" or "tls://".
+
+FUTURE: C++20 coroutines
+  If the project upgrades to C++20 later, the AsioAsyncChannel internals
+  could use coroutines for cleaner code (co_await socket_.async_read_some).
+  The IAsyncChannel interface would stay callback-based (for Qt/libuv users),
+  but the Asio implementation could use coroutines internally.
+
+
+================================================================================
+PHASE 3: ReceiveBuffer
+================================================================================
+
+New file: activemq/transport/ReceiveBuffer.h (header-only or .h + .cpp)
+
+Accumulates bytes pushed from IAsyncChannel::onData. Detects complete
+OpenWire frames.
+
+  class ReceiveBuffer {
+      std::vector<uint8_t> storage_;
+      size_t readPos_ = 0;
+
+  public:
+      void feed(const uint8_t* data, size_t len);
+
+      bool hasCompleteFrame() const;
+
+      // Returns a ByteReader over exactly one complete frame.
+      // Caller must call advance() when done.
+      ByteReader borrowFrame() const;
+
+      // Advance past the borrowed frame.
+      void advance();
+
+      void clear();
+  };
+
+  hasCompleteFrame():
+    available = storage_.size() - readPos_;
+    if (available < 4) return false;
+    bodyLen = read_big_endian_u32(storage_.data() + readPos_);
+    return available >= 4 + bodyLen;
+
+  borrowFrame():
+    Returns ByteReader{storage_.data() + readPos_, 4 + bodyLen}.
+    Zero copy -- ByteReader is a view.
+
+  advance():
+    readPos_ += 4 + bodyLen;
+    Compact (memmove) when readPos_ > storage_.capacity() / 2.
+
+Not thread-safe by design. All calls happen on the event-loop thread.
+
+
+================================================================================
+PHASE 4: REFACTOR IOTransport -- REMOVE THREAD, ADD PUSH MODEL
+================================================================================
+
+Files changed:
+  activemq/transport/IOTransport.h
+  activemq/transport/IOTransport.cpp
+
+REMOVE:
+  - Read thread (std::thread)
+  - Blocking read loop (run())
+  - Stream-based I/O
+  - setInputStream() / setOutputStream()
+
+ADD:
+  - IAsyncChannel* channel_
+  - ReceiveBuffer receiveBuffer_
+  - std::vector<uint8_t> sendBuf_
+
+CHANGED:
+
+  start():
+    OLD: Launches read thread
+    NEW: channel_->beginRead(
+             [this](const uint8_t* data, size_t len) { onDataReceived(data, len); },
+             [this](std::error_code ec) { onChannelError(ec); });
+
+  oneway(command):
+    OLD: synchronized { marshal to stream, flush }
+    NEW: sendBuf_.clear();
+         ByteWriter writer{sendBuf_};
+         wireFormat_->marshal(command, this, writer);
+         channel_->asyncWrite(sendBuf_.data(), sendBuf_.size(),
+             [this](std::error_code ec) {
+                 if (ec) fire(std::system_error(ec));
+             });
+
+  close():
+    OLD: Close streams, join thread
+    NEW: channel_->close()
+
+NEW private methods:
+
+  void onDataReceived(const uint8_t* data, size_t len) {
+      receiveBuffer_.feed(data, len);
+      while (receiveBuffer_.hasCompleteFrame()) {
+          ByteReader reader = receiveBuffer_.borrowFrame();
+          std::shared_ptr<Command> cmd = wireFormat_->unmarshal(this, reader);
+          receiveBuffer_.advance();
+          fire(cmd);
+      }
+  }
+
+  void onChannelError(std::error_code ec) {
+      fire(std::system_error(ec, "transport I/O error"));
+  }
+
+No deprecated stubs. No compile flags. No fallback. Clean break.
+
+
+================================================================================
+PHASE 5: DELETE TcpTransport, UPDATE FACTORY
+================================================================================
+
+DELETE:
+  activemq/transport/tcp/TcpTransport.h
+  activemq/transport/tcp/TcpTransport.cpp
+
+TcpTransport created decaf::net::Socket and injected streams into
+IOTransport. This entire pattern is gone. IOTransport now takes an
+IAsyncChannel.
+
+UPDATE TcpTransportFactory:
+  - doCreateComposite() creates AsioAsyncChannel (or AsioSslAsyncChannel
+    for ssl:// URIs)
+  - Injects channel into IOTransport via setChannel()
+  - User can override by providing a custom IAsyncChannel via
+    ConnectionFactory options
+
+PUBLIC API for custom channels:
+
+  // In ConnectionFactory or transport configuration:
+  using ChannelFactory = std::function<
+      std::unique_ptr<IAsyncChannel>(asio::io_context&)>;
+
+  void setChannelFactory(ChannelFactory factory);
+
+  // Qt user example:
+  factory.setChannelFactory([](asio::io_context&) {
+      return std::make_unique<QtAsyncChannel>();
+  });
+
+The library manages an asio::io_context internally (one per connection,
+with a single worker thread running io_context::run()). The io_context
+is passed to the channel factory. For AsioAsyncChannel, this is the
+event loop. For Qt/libuv channels, they ignore it and use their own.
+
+
+================================================================================
+PHASE 6: REPLACE InactivityMonitor TIMERS
+================================================================================
+
+The InactivityMonitor currently uses decaf::util::Timer (backed by a
+dedicated thread). Replace with Asio steady_timer on the same
+io_context used by the transport.
+
+  class InactivityMonitor : public TransportFilter {
+      asio::steady_timer readTimer_;
+      asio::steady_timer writeTimer_;
+
+      void scheduleReadCheck() {
+          readTimer_.expires_after(readCheckInterval_);
+          readTimer_.async_wait([this](std::error_code ec) {
+              if (!ec) onReadCheck();
+          });
+      }
+
+      void scheduleWriteCheck() {
+          writeTimer_.expires_after(writeCheckInterval_);
+          writeTimer_.async_wait([this](std::error_code ec) {
+              if (!ec) onWriteCheck();
+          });
+      }
+  };
+
+This eliminates the Scheduler thread. One fewer thread per connection.
+
+DELETE:
+  activemq/threads/Scheduler.h/.cpp (uses old Timer thread)
+  Any remaining Timer/TimerTask usage
+
+
+================================================================================
+TEST PLAN
+================================================================================
+
+GROUP 1: ReceiveBuffer
+  - Empty buffer: hasCompleteFrame() == false
+  - Header only (4 bytes): hasCompleteFrame() == false
+  - Complete frame: hasCompleteFrame() == true
+  - Two frames in one feed: drain yields both in order
+  - Frame split across multiple feeds: correct reassembly
+  - Zero-length body frame: no crash
+  - Large frame (1MB): correct
+  - Compaction: memory bounded after many frames
+
+GROUP 2: IOTransport push model (MockAsyncChannel)
+  - start() calls beginRead() once
+  - Feed complete frame -> fire() called with correct command
+  - Feed frame byte-by-byte -> fire() called once
+  - Feed two frames -> fire() called twice
+  - oneway() produces correct bytes (round-trip with unmarshal)
+  - Channel error -> listener->onException()
+  - close() -> channel->close(), no further callbacks
+
+GROUP 3: AsioAsyncChannel (loopback server)
+  - Connect to loopback, read/write round-trip
+  - Connect to refused port -> error callback
+  - Server close -> error callback
+  - close() while reading -> clean shutdown
+
+GROUP 4: Integration (IOTransport + AsioAsyncChannel)
+  - Full connect/send/receive with mock OpenWire server
+  - 10,000 messages throughput test
+  - Large message (500KB) reassembly
+  - SSL variant: same tests with AsioSslAsyncChannel
+
+GROUP 5: Regression
+  - Full ctest suite passes
+  - Integration tests with real ActiveMQ broker
+
+
+================================================================================
+FILE CHANGE SUMMARY
+================================================================================
+
+NEW FILES:
+  activemq/transport/IAsyncChannel.h
+  activemq/transport/AsioAsyncChannel.h
+  activemq/transport/AsioAsyncChannel.cpp
+  activemq/transport/AsioSslAsyncChannel.h       (if SSL enabled)
+  activemq/transport/AsioSslAsyncChannel.cpp
+  activemq/transport/ReceiveBuffer.h
+  activemq/transport/ReceiveBuffer.cpp
+
+MODIFIED FILES:
+  activemq/transport/IOTransport.h               (rewrite)
+  activemq/transport/IOTransport.cpp              (rewrite)
+  activemq/transport/tcp/TcpTransportFactory.cpp  (create AsioAsyncChannel)
+  activemq/transport/inactivity/InactivityMonitor (use Asio timers)
+  CMakeLists.txt                                  (add/remove sources)
+
+DELETED FILES:
+  activemq/transport/tcp/TcpTransport.h
+  activemq/transport/tcp/TcpTransport.cpp
+  activemq/threads/Scheduler.h
+  activemq/threads/Scheduler.cpp
+
+
+================================================================================
+IMPLEMENTATION ORDER
+================================================================================
+
+Step  Files                            Testable after?
+----  -----                            ---------------
+1     IAsyncChannel.h                  Yes (header only)
+2     ReceiveBuffer.h/.cpp             Yes (Group 1 tests)
+3     AsioAsyncChannel.h/.cpp          Yes (Group 3 tests)
+4     IOTransport refactor             Yes (Group 2 tests)
+5     Delete TcpTransport, update      Yes (Group 4 + 5)
+      TcpTransportFactory
+6     InactivityMonitor timers         Yes (full regression)
+
+
+================================================================================
+RISKS
+================================================================================
+
+RISK 1: WireFormat::unmarshal() partial reads
+  ByteReader is backed by exactly one frame's bytes (already in memory).
+  unmarshal() will never block. VERIFY: unmarshal() never reads past
+  frame boundary.
+
+RISK 2: Stomp wire format
+  StompWireFormat uses newline-delimited framing, not length-prefixed.
+  ReceiveBuffer::hasCompleteFrame() is OpenWire-specific. If Stomp
+  support is needed, add a StompReceiveBuffer with line-based detection.
+  DECISION: Defer Stomp async. Keep as separate future work.
+
+RISK 3: Write ordering
+  IAsyncChannel contract: no overlapping writes. IOTransport::oneway()
+  must enforce this. If oneway() is called while a write is in flight,
+  queue the write internally. Use std::deque<std::vector<uint8_t>> as
+  a write queue, drain on each DoneCallback.
+
+RISK 4: io_context lifetime
+  The library-managed io_context must outlive the AsioAsyncChannel.
+  Tie io_context lifetime to the connection (one per ActiveMQConnection).
+  The io_context::run() worker thread is a std::thread that is joined
+  when the connection closes. Call io_context::stop() first to unblock
+  the run() call, then join the thread.
+
+RISK 5: SSL async
+  asio::ssl::async_handshake must complete before beginRead(). The
+  AsioSslAsyncChannel::asyncConnect() should perform both TCP connect
+  and SSL handshake before calling onConnected.
+
+
+================================================================================
+END OF PLAN
+================================================================================

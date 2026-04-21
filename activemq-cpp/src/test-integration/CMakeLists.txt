@@ -55,6 +55,7 @@ set(INTEGRATION_TEST_SRCS
   # OpenWire protocol tests
   activemq/test/openwire/OpenwireAdvisoryTest.cpp
   activemq/test/openwire/OpenwireAsyncSenderTest.cpp
+  activemq/test/openwire/OpenwireBulkMessageTest.cpp
   activemq/test/openwire/OpenwireClientAckTest.cpp
   activemq/test/openwire/OpenwireCmsConnectionStartStopTest.cpp
   activemq/test/openwire/OpenWireCmsSendWithAsyncCallbackTest.cpp
@@ -86,6 +87,7 @@ set(INTEGRATION_TEST_SRCS
   # OpenWire SSL protocol tests (require SSL broker: docker compose --profile ssl up)
   activemq/test/openwire_ssl/OpenwireSslAdvisoryTest.cpp
   activemq/test/openwire_ssl/OpenwireSslAsyncSenderTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslBulkMessageTest.cpp
   activemq/test/openwire_ssl/OpenwireSslClientAckTest.cpp
   activemq/test/openwire_ssl/OpenwireSslCmsConnectionStartStopTest.cpp
   activemq/test/openwire_ssl/OpenwireSslCmsSendWithAsyncCallbackTest.cpp
@@ -167,8 +169,10 @@ include(StaticTestDiscovery)
 # OpenWire integration tests (non-SSL)
 # Requires: docker compose up (default broker on port 61616)
 set(INTEGRATION_OPENWIRE_TEST_DISCOVERY_SRCS
+  activemq/test/BulkMessageTest.cpp
   activemq/test/openwire/OpenwireAdvisoryTest.cpp
   activemq/test/openwire/OpenwireAsyncSenderTest.cpp
+  activemq/test/openwire/OpenwireBulkMessageTest.cpp
   activemq/test/openwire/OpenwireClientAckTest.cpp
   activemq/test/openwire/OpenwireCmsConnectionStartStopTest.cpp
   activemq/test/openwire/OpenWireCmsSendWithAsyncCallbackTest.cpp
@@ -202,7 +206,7 @@ static_discover_tests(neoactivemq-integration-test
   SOURCES ${INTEGRATION_OPENWIRE_TEST_DISCOVERY_SRCS}
   LABELS "integration;integration-openwire"
   PROPERTIES
-    TIMEOUT 300
+    TIMEOUT 1800
     ENVIRONMENT "CTEST_OUTPUT_ON_FAILURE=1"
 )
 
@@ -211,6 +215,7 @@ static_discover_tests(neoactivemq-integration-test
 set(INTEGRATION_OPENWIRE_SSL_TEST_DISCOVERY_SRCS
   activemq/test/openwire_ssl/OpenwireSslAdvisoryTest.cpp
   activemq/test/openwire_ssl/OpenwireSslAsyncSenderTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslBulkMessageTest.cpp
   activemq/test/openwire_ssl/OpenwireSslClientAckTest.cpp
   activemq/test/openwire_ssl/OpenwireSslCmsConnectionStartStopTest.cpp
   activemq/test/openwire_ssl/OpenwireSslCmsSendWithAsyncCallbackTest.cpp

@@ -131,35 +131,35 @@ public:
 
 struct FanoutClientState
 {
-    std::unique_ptr<cms::Connection>                       connection;
-    std::unique_ptr<cms::Session>                          session;
-    std::vector<std::unique_ptr<cms::Destination>>         topics;
-    std::vector<std::unique_ptr<cms::MessageConsumer>>     consumers;
-    std::unique_ptr<CountingListener>                      listener;
+    std::unique_ptr<cms::Connection>                   connection;
+    std::unique_ptr<cms::Session>                      session;
+    std::vector<std::unique_ptr<cms::Destination>>     topics;
+    std::vector<std::unique_ptr<cms::MessageConsumer>> consumers;
+    std::unique_ptr<CountingListener>                  listener;
 };
 
 class ClientSetupThread : public Thread
 {
 private:
-    cms::ConnectionFactory*                               factory;
-    const std::vector<std::string>*                       topicNames;
-    std::vector<std::unique_ptr<FanoutClientState>>*      clients;
-    std::atomic<long long>*                               topicCounter;
-    int                                                   startIdx;
-    int                                                   endIdx;
-    std::atomic<int>*                                     errorCount;
+    cms::ConnectionFactory*                          factory;
+    const std::vector<std::string>*                  topicNames;
+    std::vector<std::unique_ptr<FanoutClientState>>* clients;
+    std::atomic<long long>*                          topicCounter;
+    int                                              startIdx;
+    int                                              endIdx;
+    std::atomic<int>*                                errorCount;
 
     ClientSetupThread(const ClientSetupThread&);
     ClientSetupThread& operator=(const ClientSetupThread&);
 
 public:
-    ClientSetupThread(cms::ConnectionFactory*                          factory,
-                      const std::vector<std::string>*                  topicNames,
+    ClientSetupThread(cms::ConnectionFactory*         factory,
+                      const std::vector<std::string>* topicNames,
                       std::vector<std::unique_ptr<FanoutClientState>>* clients,
-                      std::atomic<long long>*                          topicCounter,
-                      int                                              startIdx,
-                      int                                              endIdx,
-                      std::atomic<int>*                                errorCount)
+                      std::atomic<long long>* topicCounter,
+                      int                     startIdx,
+                      int                     endIdx,
+                      std::atomic<int>*       errorCount)
         : factory(factory),
           topicNames(topicNames),
           clients(clients),
@@ -230,10 +230,10 @@ private:
 
 public:
     ClientPingThread(std::vector<std::unique_ptr<FanoutClientState>>* clients,
-                     const std::string*                               pingQueueName,
-                     int                                              startIdx,
-                     int                                              endIdx,
-                     std::atomic<int>*                                errorCount)
+                     const std::string* pingQueueName,
+                     int                startIdx,
+                     int                endIdx,
+                     std::atomic<int>*  errorCount)
         : clients(clients),
           pingQueueName(pingQueueName),
           startIdx(startIdx),
@@ -318,16 +318,16 @@ void BulkMessageTest::testBulkMessageSendReceive()
 ////////////////////////////////////////////////////////////////////////////////
 void BulkMessageTest::testHighFanout5000Clients()
 {
-    const int       CLIENT_COUNT          = 5000;
-    const int       TOPIC_COUNT           = 10;
-    const int       MSG_PER_TOPIC         = 200;
-    const int       MSG_SIZE              = 128;
-    const int       SETUP_THREADS         = 32;
-    const long long RECEIVE_TIMEOUT_MS    = 20LL * 60LL * 1000LL;  // 20 min
-    const long long EXPECTED_PER_CLIENT   =
-        (long long)TOPIC_COUNT * (long long)MSG_PER_TOPIC;
-    const long long EXPECTED_TOPIC_DELIVERIES =
-        (long long)CLIENT_COUNT * EXPECTED_PER_CLIENT;
+    const int       CLIENT_COUNT        = 5000;
+    const int       TOPIC_COUNT         = 10;
+    const int       MSG_PER_TOPIC       = 200;
+    const int       MSG_SIZE            = 128;
+    const int       SETUP_THREADS       = 32;
+    const long long RECEIVE_TIMEOUT_MS  = 20LL * 60LL * 1000LL;  // 20 min
+    const long long EXPECTED_PER_CLIENT = (long long)TOPIC_COUNT *
+                                          (long long)MSG_PER_TOPIC;
+    const long long EXPECTED_TOPIC_DELIVERIES = (long long)CLIENT_COUNT *
+                                                EXPECTED_PER_CLIENT;
     const long long EXPECTED_PING_DELIVERIES = (long long)CLIENT_COUNT;
 
     std::string              baseName = UUID::randomUUID().toString();
@@ -461,8 +461,7 @@ void BulkMessageTest::testHighFanout5000Clients()
         << "Errors while clients published ping messages";
 
     // Poll until expected counts are reached or timeout.
-    long long deadline =
-        System::currentTimeMillis() + RECEIVE_TIMEOUT_MS;
+    long long deadline = System::currentTimeMillis() + RECEIVE_TIMEOUT_MS;
     while (System::currentTimeMillis() < deadline)
     {
         long long topicNow = totalTopicReceives.load();
@@ -552,11 +551,11 @@ void BulkMessageTest::testHighFanout5000Clients()
 
     ASSERT_EQ(EXPECTED_TOPIC_DELIVERIES, finalTopic)
         << "Topic deliveries: expected " << EXPECTED_TOPIC_DELIVERIES
-        << ", got " << finalTopic
-        << " (missing " << (EXPECTED_TOPIC_DELIVERIES - finalTopic) << ")";
+        << ", got " << finalTopic << " (missing "
+        << (EXPECTED_TOPIC_DELIVERIES - finalTopic) << ")";
     ASSERT_EQ(EXPECTED_PING_DELIVERIES, finalPing)
-        << "Ping deliveries: expected " << EXPECTED_PING_DELIVERIES
-        << ", got " << finalPing;
+        << "Ping deliveries: expected " << EXPECTED_PING_DELIVERIES << ", got "
+        << finalPing;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

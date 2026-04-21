@@ -2176,7 +2176,7 @@ int Threading::createThreadLocalSlot(ThreadLocalImpl* threadLocal)
         if (library->tlsSlots[i] == NULL)
         {
             library->tlsSlots[i] = threadLocal;
-            index = i;
+            index                = i;
             break;
         }
     }
@@ -2228,8 +2228,10 @@ void Threading::destoryThreadLocalSlot(int slot)
         library->activeThreads.begin();
     while (iter != library->activeThreads.end())
     {
-        current          = *(iter++);
-        void* value      = (slot < static_cast<int>(current->tls.size())) ? current->tls[slot] : NULL;
+        current     = *(iter++);
+        void* value = (slot < static_cast<int>(current->tls.size()))
+                          ? current->tls[slot]
+                          : NULL;
         if (value != NULL)
         {
             local->doDelete(value);
@@ -2241,8 +2243,10 @@ void Threading::destoryThreadLocalSlot(int slot)
         library->osThreads.begin();
     while (osIter != library->osThreads.end())
     {
-        current          = (*(osIter++))->getHandle();
-        void* value      = (slot < static_cast<int>(current->tls.size())) ? current->tls[slot] : NULL;
+        current     = (*(osIter++))->getHandle();
+        void* value = (slot < static_cast<int>(current->tls.size()))
+                          ? current->tls[slot]
+                          : NULL;
         if (value != NULL)
         {
             local->doDelete(value);

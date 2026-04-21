@@ -37,9 +37,10 @@ namespace internal
         namespace concurrent
         {
 
-// DECAF_MAX_TLS_SLOTS was previously a fixed limit (384). TLS slot storage
-// is now dynamic — the per-thread tls vector grows on demand, and the global
-// slot registry (ThreadingLibrary::tlsSlots) expands without bound.
+            // DECAF_MAX_TLS_SLOTS was previously a fixed limit (384). TLS slot
+            // storage is now dynamic — the per-thread tls vector grows on
+            // demand, and the global slot registry (ThreadingLibrary::tlsSlots)
+            // expands without bound.
 
             /**
              * This is the main method for thread instances, this value is valid

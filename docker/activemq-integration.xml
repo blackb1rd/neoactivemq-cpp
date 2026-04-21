@@ -1,9 +1,12 @@
 <!--
-    ActiveMQ broker configuration with SSL transport connector for integration testing.
+    ActiveMQ broker configuration for integration testing.
 
-    This configuration provides an SSL-only transport connector on port 61617.
-
-    Certificate files are expected to be mounted at /opt/apache-activemq/conf/certs/
+    Differs from the stock image config in two ways:
+      - OpenWire and STOMP transportConnectors set maximumConnections=20000 so
+        high-fanout tests (e.g. BulkMessageIntegrationTest.testHighFanout5000Clients)
+        do not hit the stock default of 1000.
+      - Exposes the same ports/protocols as the default image config so existing
+        integration tests (OpenWire on 61616, STOMP on 61613) are unaffected.
 -->
 <beans
   xmlns="http://www.springframework.org/schema/beans"
@@ -22,14 +25,6 @@
     <broker xmlns="http://activemq.apache.org/schema/core"
             brokerName="localhost"
             dataDirectory="${activemq.data}">
-
-        <sslContext>
-            <sslContext
-                keyStore="file:/opt/apache-activemq/conf/certs/broker.p12"
-                keyStorePassword="password"
-                trustStore="file:/opt/apache-activemq/conf/certs/broker-truststore.p12"
-                trustStorePassword="password"/>
-        </sslContext>
 
         <destinationPolicy>
             <policyMap>
@@ -66,8 +61,8 @@
         </systemUsage>
 
         <transportConnectors>
-            <!-- SSL OpenWire connector (SSL-only, no plaintext tcp) -->
-            <transportConnector name="ssl" uri="ssl://0.0.0.0:61617?maximumConnections=20000&amp;wireFormat.maxFrameSize=104857600&amp;needClientAuth=false"/>
+            <transportConnector name="openwire" uri="tcp://0.0.0.0:61616?maximumConnections=20000&amp;wireFormat.maxFrameSize=104857600"/>
+            <transportConnector name="stomp"    uri="stomp://0.0.0.0:61613?maximumConnections=20000&amp;wireFormat.maxFrameSize=104857600"/>
         </transportConnectors>
 
         <shutdownHooks>

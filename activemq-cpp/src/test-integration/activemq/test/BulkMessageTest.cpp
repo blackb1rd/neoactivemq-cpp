@@ -30,9 +30,14 @@
 #include <algorithm>
 #include <atomic>
 #include <memory>
+#include <mutex>
 #include <sstream>
 #include <string>
 #include <vector>
+
+#ifndef _WIN32
+#include <sys/resource.h>
+#endif
 
 using namespace std;
 using namespace cms;
@@ -148,6 +153,8 @@ private:
     int                                              startIdx;
     int                                              endIdx;
     std::atomic<int>*                                errorCount;
+    std::string*                                     firstErrorMsg;
+    std::mutex*                                      firstErrorMutex;
 
     ClientSetupThread(const ClientSetupThread&);
     ClientSetupThread& operator=(const ClientSetupThread&);
@@ -159,14 +166,18 @@ public:
                       std::atomic<long long>* topicCounter,
                       int                     startIdx,
                       int                     endIdx,
-                      std::atomic<int>*       errorCount)
+                      std::atomic<int>*       errorCount,
+                      std::string*            firstErrorMsg,
+                      std::mutex*             firstErrorMutex)
         : factory(factory),
           topicNames(topicNames),
           clients(clients),
           topicCounter(topicCounter),
           startIdx(startIdx),
           endIdx(endIdx),
-          errorCount(errorCount)
+          errorCount(errorCount),
+          firstErrorMsg(firstErrorMsg),
+          firstErrorMutex(firstErrorMutex)
     {
     }
 
@@ -204,9 +215,14 @@ public:
 
                 (*clients)[i] = std::move(cs);
             }
-            catch (std::exception&)
+            catch (std::exception& e)
             {
-                errorCount->fetch_add(1, std::memory_order_relaxed);
+                int prev = errorCount->fetch_add(1, std::memory_order_relaxed);
+                if (prev == 0)
+                {
+                    std::lock_guard<std::mutex> lk(*firstErrorMutex);
+                    *firstErrorMsg = e.what();
+                }
             }
             catch (...)
             {
@@ -363,9 +379,24 @@ void BulkMessageTest::testHighFanout5000Clients()
     CountingListener pingListener(&totalPingReceives);
     pingConsumer->setMessageListener(&pingListener);
 
+    // Log the effective resource limits so CI failures are self-diagnosable.
+#ifndef _WIN32
+    {
+        struct rlimit rl;
+        getrlimit(RLIMIT_NOFILE, &rl);
+        std::cout << "[testHighFanout] RLIMIT_NOFILE: soft=" << rl.rlim_cur
+                  << " hard=" << rl.rlim_max << std::endl;
+        getrlimit(RLIMIT_NPROC, &rl);
+        std::cout << "[testHighFanout] RLIMIT_NPROC:  soft=" << rl.rlim_cur
+                  << " hard=" << rl.rlim_max << std::endl;
+    }
+#endif
+
     // Parallel client setup: 5000 sequential createConnection calls would
     // take too long, so distribute across SETUP_THREADS workers.
     std::atomic<int>                                setupErrors(0);
+    std::string                                     firstSetupError;
+    std::mutex                                      firstSetupErrorMutex;
     std::vector<std::unique_ptr<ClientSetupThread>> setupThreads;
     int clientsPerThread = (CLIENT_COUNT + SETUP_THREADS - 1) / SETUP_THREADS;
     for (int t = 0; t < SETUP_THREADS; ++t)
@@ -383,7 +414,9 @@ void BulkMessageTest::testHighFanout5000Clients()
                                   &totalTopicReceives,
                                   s,
                                   e,
-                                  &setupErrors));
+                                  &setupErrors,
+                                  &firstSetupError,
+                                  &firstSetupErrorMutex));
         th->start();
         setupThreads.push_back(std::move(th));
     }
@@ -398,7 +431,9 @@ void BulkMessageTest::testHighFanout5000Clients()
         << "Errors during 5000-client setup. Each connection uses ~2 FDs and "
            "spawns 4 threads (IOTransport + 2 Timer + CompositeTaskRunner). "
            "Required: ulimit -n >=10000, ulimit -u >=20100, broker "
-           "maximumConnections>=5000. Use sudo prlimit to raise hard limits.";
+           "maximumConnections>=5000. Use sudo prlimit to raise hard limits. "
+           "First error: "
+        << firstSetupError;
 
     // Dedicated publisher: sends MSG_PER_TOPIC messages to each topic.
     std::unique_ptr<cms::Connection> pubConn(factory->createConnection());

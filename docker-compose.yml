@@ -11,10 +11,13 @@ services:
       - ./docker/activemq-integration.xml:/opt/apache-activemq/conf/activemq.xml:ro
     environment:
       - ACTIVEMQ_OPTS=-Xms512m -Xmx2g -Djetty.host=0.0.0.0
-    # Raise broker FD limit so high-fanout integration tests can open thousands
-    # of sockets; stock container default is typically 1024.
+    # Raise broker FD and thread limits so high-fanout tests (5000 connections,
+    # each requiring broker-side threads and sockets) do not hit defaults.
     ulimits:
       nofile:
+        soft: 65536
+        hard: 65536
+      nproc:
         soft: 65536
         hard: 65536
     healthcheck:
@@ -64,10 +67,12 @@ services:
       - ./docker/ssl/certs:/opt/apache-activemq/conf/certs:ro
     environment:
       - ACTIVEMQ_OPTS=-Xms512m -Xmx2g -Djetty.host=0.0.0.0
-    # Raise broker FD limit so high-fanout integration tests can open thousands
-    # of sockets; stock container default is typically 1024.
+    # Raise broker FD and thread limits for high-fanout tests.
     ulimits:
       nofile:
+        soft: 65536
+        hard: 65536
+      nproc:
         soft: 65536
         hard: 65536
     healthcheck:

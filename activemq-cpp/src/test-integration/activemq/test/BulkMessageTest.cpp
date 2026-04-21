@@ -395,8 +395,10 @@ void BulkMessageTest::testHighFanout5000Clients()
         (*it)->join();
     }
     ASSERT_EQ(0, setupErrors.load())
-        << "Errors during 5000-client setup (broker maxConnections, Linux "
-           "ulimit -n, or RAM exhausted). Check broker and runner limits.";
+        << "Errors during 5000-client setup. Each connection uses ~2 FDs and "
+           "spawns 4 threads (IOTransport + 2 Timer + CompositeTaskRunner). "
+           "Required: ulimit -n >=10000, ulimit -u >=20100, broker "
+           "maximumConnections>=5000. Use sudo prlimit to raise hard limits.";
 
     // Dedicated publisher: sends MSG_PER_TOPIC messages to each topic.
     std::unique_ptr<cms::Connection> pubConn(factory->createConnection());

@@ -458,8 +458,6 @@ ThreadHandle* initThreadHandle(ThreadHandle* thread)
     thread->monitor            = NULL;
     thread->joiningThread      = NULL;
 
-    ::memset(thread->tls, 0, sizeof(thread->tls));
-
     try
     {
         PlatformThread::createMutex(&thread->mutex);
@@ -538,7 +536,7 @@ bool interruptWaitingThread(ThreadHandle* self DECAF_UNUSED,
 
 void threadExitTlsCleanup(ThreadHandle* thread)
 {
-    for (int index = 0; index < DECAF_MAX_TLS_SLOTS; ++index)
+    for (int index = 0; index < static_cast<int>(thread->tls.size()); ++index)
     {
         if (thread->tls[index] != NULL)
         {
@@ -989,8 +987,6 @@ void Threading::initialize()
     library->monitors        = new MonitorPool;
     library->monitors->head  = batchAllocateMonitors();
     library->monitors->count = MONITOR_POOL_BLOCK_SIZE;
-
-    library->tlsSlots.resize(DECAF_MAX_TLS_SLOTS);
 
     // We mark the thread where Decaf's Init routine is called from as our Main
     // Thread.
@@ -2171,28 +2167,39 @@ int Threading::createThreadLocalSlot(ThreadLocalImpl* threadLocal)
                                    "Null ThreadLocalImpl Pointer Passed.");
     }
 
-    int index;
+    int index = -1;
 
     PlatformThread::lockMutex(library->tlsLock);
 
-    for (index = 0; index < DECAF_MAX_TLS_SLOTS; index++)
+    for (int i = 0; i < static_cast<int>(library->tlsSlots.size()); i++)
     {
-        if (library->tlsSlots[index] == NULL)
+        if (library->tlsSlots[i] == NULL)
         {
-            library->tlsSlots[index] = threadLocal;
+            library->tlsSlots[i] = threadLocal;
+            index = i;
             break;
         }
     }
 
+    if (index == -1)
+    {
+        index = static_cast<int>(library->tlsSlots.size());
+        library->tlsSlots.push_back(threadLocal);
+    }
+
     PlatformThread::unlockMutex(library->tlsLock);
 
-    return index < DECAF_MAX_TLS_SLOTS ? index : -1;
+    return index;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void* Threading::getThreadLocalValue(int slot)
 {
     ThreadHandle* thisThread = getCurrentThreadHandle();
+    if (slot < 0 || slot >= static_cast<int>(thisThread->tls.size()))
+    {
+        return NULL;
+    }
     return thisThread->tls[slot];
 }
 
@@ -2200,7 +2207,11 @@ void* Threading::getThreadLocalValue(int slot)
 void Threading::setThreadLocalValue(int slot, void* value)
 {
     ThreadHandle* thisThread = getCurrentThreadHandle();
-    thisThread->tls[slot]    = value;
+    if (slot >= static_cast<int>(thisThread->tls.size()))
+    {
+        thisThread->tls.resize(slot + 1, NULL);
+    }
+    thisThread->tls[slot] = value;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -2217,8 +2228,8 @@ void Threading::destoryThreadLocalSlot(int slot)
         library->activeThreads.begin();
     while (iter != library->activeThreads.end())
     {
-        current     = *(iter++);
-        void* value = current->tls[slot];
+        current          = *(iter++);
+        void* value      = (slot < static_cast<int>(current->tls.size())) ? current->tls[slot] : NULL;
         if (value != NULL)
         {
             local->doDelete(value);
@@ -2230,8 +2241,8 @@ void Threading::destoryThreadLocalSlot(int slot)
         library->osThreads.begin();
     while (osIter != library->osThreads.end())
     {
-        current     = (*(osIter++))->getHandle();
-        void* value = current->tls[slot];
+        current          = (*(osIter++))->getHandle();
+        void* value      = (slot < static_cast<int>(current->tls.size())) ? current->tls[slot] : NULL;
         if (value != NULL)
         {
             local->doDelete(value);

@@ -42,6 +42,25 @@ int main(int argc, char** argv)
     long long testTimeoutSeconds = 300;  // Per-test timeout: 5 minutes default
     bool      useTeamCity        = false;
 
+    // Allow environment override for stress tests that need more time.
+    // Set NEOACTIVEMQ_WATCHDOG_TIMEOUT=<seconds> (e.g. via CMake ENVIRONMENT
+    // test property) to give a specific test its own watchdog budget.
+    const char* envTimeout = std::getenv("NEOACTIVEMQ_WATCHDOG_TIMEOUT");
+    if (envTimeout != nullptr)
+    {
+        try
+        {
+            long long envSecs = std::stoll(envTimeout);
+            if (envSecs > 0)
+            {
+                testTimeoutSeconds = envSecs;
+            }
+        }
+        catch (...)
+        {
+        }
+    }
+
     // Let GTest parse --gtest_* flags first
     ::testing::InitGoogleTest(&argc, argv);
 

@@ -210,6 +210,16 @@ static_discover_tests(neoactivemq-integration-test
     ENVIRONMENT "CTEST_OUTPUT_ON_FAILURE=1"
 )
 
+# testHighFanout5000Clients sets up 5000 connections (takes ~350 s on CI),
+# then sends and receives 10 M messages. Give it a watchdog budget that
+# matches the CTest TIMEOUT so the dump fires before CTest kills the process.
+set_tests_properties(
+    "integration/activemq/test/openwire/activemq/test/BulkMessageIntegrationTest.testHighFanout5000Clients"
+    PROPERTIES
+    TIMEOUT 1800
+    ENVIRONMENT "CTEST_OUTPUT_ON_FAILURE=1;NEOACTIVEMQ_WATCHDOG_TIMEOUT=1750"
+)
+
 # OpenWire SSL integration tests
 # Requires: docker compose --profile ssl up (SSL broker on port 61617)
 set(INTEGRATION_OPENWIRE_SSL_TEST_DISCOVERY_SRCS

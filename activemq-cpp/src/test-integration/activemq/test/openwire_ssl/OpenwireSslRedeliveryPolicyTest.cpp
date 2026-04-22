@@ -57,10 +57,10 @@ namespace test
 #include <activemq/core/policies/DefaultRedeliveryPolicy.h>
 
 #include <decaf/lang/Long.h>
-#include <memory>
 #include <decaf/lang/Thread.h>
 #include <decaf/util/concurrent/CountDownLatch.h>
 #include <decaf/util/concurrent/atomic/AtomicInteger.h>
+#include <memory>
 
 using namespace cms;
 using namespace activemq;
@@ -117,7 +117,8 @@ TEST_F(OpenwireSslRedeliveryPolicyTest,
     std::shared_ptr<ActiveMQConnectionFactory> connectionFactory(
         new ActiveMQConnectionFactory(getBrokerURL()));
 
-    std::shared_ptr<Connection> connection(connectionFactory->createConnection());
+    std::shared_ptr<Connection> connection(
+        connectionFactory->createConnection());
     std::shared_ptr<ActiveMQConnection> amqConnection =
         std::dynamic_pointer_cast<ActiveMQConnection>(connection);
 
@@ -131,7 +132,7 @@ TEST_F(OpenwireSslRedeliveryPolicyTest,
     connection->start();
     std::shared_ptr<Session> session(
         connection->createSession(Session::SESSION_TRANSACTED));
-    std::shared_ptr<Queue>           destination(session->createTemporaryQueue());
+    std::shared_ptr<Queue> destination(session->createTemporaryQueue());
     std::shared_ptr<MessageProducer> producer(
         session->createProducer(destination.get()));
     std::shared_ptr<MessageConsumer> consumer(
@@ -146,7 +147,8 @@ TEST_F(OpenwireSslRedeliveryPolicyTest,
     session->commit();
 
     std::shared_ptr<cms::Message> received(consumer->receive(1000));
-    std::shared_ptr<TextMessage>  textMessage = std::dynamic_pointer_cast<TextMessage>(received);
+    std::shared_ptr<TextMessage>  textMessage =
+        std::dynamic_pointer_cast<TextMessage>(received);
     ASSERT_TRUE(textMessage != NULL);
     ASSERT_EQ(std::string("1st"), textMessage->getText());
     session->rollback();
@@ -184,7 +186,8 @@ TEST_F(OpenwireSslRedeliveryPolicyTest,
     std::shared_ptr<ActiveMQConnectionFactory> connectionFactory(
         new ActiveMQConnectionFactory(getBrokerURL()));
 
-    std::shared_ptr<Connection> connection(connectionFactory->createConnection());
+    std::shared_ptr<Connection> connection(
+        connectionFactory->createConnection());
     std::shared_ptr<ActiveMQConnection> amqConnection =
         std::dynamic_pointer_cast<ActiveMQConnection>(connection);
 
@@ -196,7 +199,7 @@ TEST_F(OpenwireSslRedeliveryPolicyTest,
     connection->start();
     std::shared_ptr<Session> session(
         connection->createSession(Session::SESSION_TRANSACTED));
-    std::shared_ptr<Queue>           destination(session->createTemporaryQueue());
+    std::shared_ptr<Queue> destination(session->createTemporaryQueue());
     std::shared_ptr<MessageProducer> producer(
         session->createProducer(destination.get()));
     std::shared_ptr<MessageConsumer> consumer(
@@ -211,7 +214,8 @@ TEST_F(OpenwireSslRedeliveryPolicyTest,
     session->commit();
 
     std::shared_ptr<cms::Message> received(consumer->receive(1000));
-    std::shared_ptr<TextMessage>  textMessage = std::dynamic_pointer_cast<TextMessage>(received);
+    std::shared_ptr<TextMessage>  textMessage =
+        std::dynamic_pointer_cast<TextMessage>(received);
     ASSERT_TRUE(textMessage != NULL);
     ASSERT_EQ(std::string("1st"), textMessage->getText());
     session->rollback();
@@ -247,7 +251,8 @@ TEST_F(OpenwireSslRedeliveryPolicyTest, testDLQHandling)
     std::shared_ptr<ActiveMQConnectionFactory> connectionFactory(
         new ActiveMQConnectionFactory(getBrokerURL()));
 
-    std::shared_ptr<Connection> connection(connectionFactory->createConnection());
+    std::shared_ptr<Connection> connection(
+        connectionFactory->createConnection());
     std::shared_ptr<ActiveMQConnection> amqConnection =
         std::dynamic_pointer_cast<ActiveMQConnection>(connection);
 
@@ -260,14 +265,15 @@ TEST_F(OpenwireSslRedeliveryPolicyTest, testDLQHandling)
     connection->start();
     std::shared_ptr<Session> session(
         connection->createSession(Session::SESSION_TRANSACTED));
-    std::shared_ptr<Queue>           destination(session->createTemporaryQueue());
+    std::shared_ptr<Queue> destination(session->createTemporaryQueue());
     std::shared_ptr<MessageProducer> producer(
         session->createProducer(destination.get()));
     std::shared_ptr<MessageConsumer> consumer(
         session->createConsumer(destination.get()));
     std::shared_ptr<Queue> dlq(session->createQueue("ActiveMQ.DLQ"));
     amqConnection->destroyDestination(dlq.get());
-    std::shared_ptr<MessageConsumer> dlqConsumer(session->createConsumer(dlq.get()));
+    std::shared_ptr<MessageConsumer> dlqConsumer(
+        session->createConsumer(dlq.get()));
 
     // Send the messages
     std::shared_ptr<TextMessage> message1(session->createTextMessage("1st"));
@@ -278,7 +284,8 @@ TEST_F(OpenwireSslRedeliveryPolicyTest, testDLQHandling)
     session->commit();
 
     std::shared_ptr<cms::Message> received(consumer->receive(1000));
-    std::shared_ptr<TextMessage>  textMessage = std::dynamic_pointer_cast<TextMessage>(received);
+    std::shared_ptr<TextMessage>  textMessage =
+        std::dynamic_pointer_cast<TextMessage>(received);
     ASSERT_TRUE(textMessage != NULL) << ("Failed to get first delivery");
     ASSERT_EQ(std::string("1st"), textMessage->getText());
     session->rollback();
@@ -325,7 +332,8 @@ TEST_F(OpenwireSslRedeliveryPolicyTest, testInfiniteMaximumNumberOfRedeliveries)
     std::shared_ptr<ActiveMQConnectionFactory> connectionFactory(
         new ActiveMQConnectionFactory(getBrokerURL()));
 
-    std::shared_ptr<Connection> connection(connectionFactory->createConnection());
+    std::shared_ptr<Connection> connection(
+        connectionFactory->createConnection());
     std::shared_ptr<ActiveMQConnection> amqConnection =
         std::dynamic_pointer_cast<ActiveMQConnection>(connection);
 
@@ -339,7 +347,7 @@ TEST_F(OpenwireSslRedeliveryPolicyTest, testInfiniteMaximumNumberOfRedeliveries)
     connection->start();
     std::shared_ptr<Session> session(
         connection->createSession(Session::SESSION_TRANSACTED));
-    std::shared_ptr<Queue>           destination(session->createTemporaryQueue());
+    std::shared_ptr<Queue> destination(session->createTemporaryQueue());
     std::shared_ptr<MessageProducer> producer(
         session->createProducer(destination.get()));
     std::shared_ptr<MessageConsumer> consumer(
@@ -354,7 +362,8 @@ TEST_F(OpenwireSslRedeliveryPolicyTest, testInfiniteMaximumNumberOfRedeliveries)
     session->commit();
 
     std::shared_ptr<cms::Message> received(consumer->receive(1000));
-    std::shared_ptr<TextMessage>  textMessage = std::dynamic_pointer_cast<TextMessage>(received);
+    std::shared_ptr<TextMessage>  textMessage =
+        std::dynamic_pointer_cast<TextMessage>(received);
     ASSERT_TRUE(textMessage != NULL) << ("Failed to get first delivery");
     ASSERT_EQ(std::string("1st"), textMessage->getText());
     session->rollback();
@@ -404,7 +413,8 @@ TEST_F(OpenwireSslRedeliveryPolicyTest, testMaximumRedeliveryDelay)
     std::shared_ptr<ActiveMQConnectionFactory> connectionFactory(
         new ActiveMQConnectionFactory(getBrokerURL()));
 
-    std::shared_ptr<Connection> connection(connectionFactory->createConnection());
+    std::shared_ptr<Connection> connection(
+        connectionFactory->createConnection());
     std::shared_ptr<ActiveMQConnection> amqConnection =
         std::dynamic_pointer_cast<ActiveMQConnection>(connection);
 
@@ -421,7 +431,7 @@ TEST_F(OpenwireSslRedeliveryPolicyTest, testMaximumRedeliveryDelay)
     connection->start();
     std::shared_ptr<Session> session(
         connection->createSession(Session::SESSION_TRANSACTED));
-    std::shared_ptr<Queue>           destination(session->createTemporaryQueue());
+    std::shared_ptr<Queue> destination(session->createTemporaryQueue());
     std::shared_ptr<MessageProducer> producer(
         session->createProducer(destination.get()));
     std::shared_ptr<MessageConsumer> consumer(
@@ -442,14 +452,16 @@ TEST_F(OpenwireSslRedeliveryPolicyTest, testMaximumRedeliveryDelay)
         // we should be able to get the 1st message redelivered until a
         // session.commit is called
         received.reset(consumer->receive(2000));
-        std::shared_ptr<TextMessage> textMessage = std::dynamic_pointer_cast<TextMessage>(received);
+        std::shared_ptr<TextMessage> textMessage =
+            std::dynamic_pointer_cast<TextMessage>(received);
         ASSERT_TRUE(textMessage != NULL) << ("Failed to get message");
         ASSERT_EQ(std::string("1st"), textMessage->getText());
         session->rollback();
     }
 
     received.reset(consumer->receive(2000));
-    std::shared_ptr<TextMessage> textMessage = std::dynamic_pointer_cast<TextMessage>(received);
+    std::shared_ptr<TextMessage> textMessage =
+        std::dynamic_pointer_cast<TextMessage>(received);
     ASSERT_TRUE(textMessage != NULL) << ("Failed to get message one last time");
     ASSERT_EQ(std::string("1st"), textMessage->getText());
     session->commit();
@@ -470,7 +482,8 @@ TEST_F(OpenwireSslRedeliveryPolicyTest, testZeroMaximumNumberOfRedeliveries)
     std::shared_ptr<ActiveMQConnectionFactory> connectionFactory(
         new ActiveMQConnectionFactory(getBrokerURL()));
 
-    std::shared_ptr<Connection> connection(connectionFactory->createConnection());
+    std::shared_ptr<Connection> connection(
+        connectionFactory->createConnection());
     std::shared_ptr<ActiveMQConnection> amqConnection =
         std::dynamic_pointer_cast<ActiveMQConnection>(connection);
 
@@ -484,7 +497,7 @@ TEST_F(OpenwireSslRedeliveryPolicyTest, testZeroMaximumNumberOfRedeliveries)
     connection->start();
     std::shared_ptr<Session> session(
         connection->createSession(Session::SESSION_TRANSACTED));
-    std::shared_ptr<Queue>           destination(session->createTemporaryQueue());
+    std::shared_ptr<Queue> destination(session->createTemporaryQueue());
     std::shared_ptr<MessageProducer> producer(
         session->createProducer(destination.get()));
     std::shared_ptr<MessageConsumer> consumer(
@@ -499,7 +512,8 @@ TEST_F(OpenwireSslRedeliveryPolicyTest, testZeroMaximumNumberOfRedeliveries)
     session->commit();
 
     std::shared_ptr<cms::Message> received(consumer->receive(1000));
-    std::shared_ptr<TextMessage>  textMessage = std::dynamic_pointer_cast<TextMessage>(received);
+    std::shared_ptr<TextMessage>  textMessage =
+        std::dynamic_pointer_cast<TextMessage>(received);
     ASSERT_TRUE(textMessage != NULL) << ("Failed to get first delivery");
     ASSERT_EQ(std::string("1st"), textMessage->getText());
     session->rollback();
@@ -519,7 +533,8 @@ TEST_F(OpenwireSslRedeliveryPolicyTest, testRepeatedRedeliveryReceiveNoCommit)
     std::shared_ptr<ActiveMQConnectionFactory> connectionFactory(
         new ActiveMQConnectionFactory(getBrokerURL()));
 
-    std::shared_ptr<Connection> connection(connectionFactory->createConnection());
+    std::shared_ptr<Connection> connection(
+        connectionFactory->createConnection());
     std::shared_ptr<ActiveMQConnection> amqConnection =
         std::dynamic_pointer_cast<ActiveMQConnection>(connection);
 
@@ -533,7 +548,8 @@ TEST_F(OpenwireSslRedeliveryPolicyTest, testRepeatedRedeliveryReceiveNoCommit)
     amqConnection->destroyDestination(dlq.get());
     std::shared_ptr<MessageProducer> producer(
         dlqSession->createProducer(destination.get()));
-    std::shared_ptr<MessageConsumer> consumer(dlqSession->createConsumer(dlq.get()));
+    std::shared_ptr<MessageConsumer> consumer(
+        dlqSession->createConsumer(dlq.get()));
 
     std::shared_ptr<TextMessage> message1(dlqSession->createTextMessage("1st"));
     producer->send(message1.get());
@@ -582,7 +598,8 @@ TEST_F(OpenwireSslRedeliveryPolicyTest, testRepeatedRedeliveryReceiveNoCommit)
     // We should be able to get the message off the DLQ now.
     std::shared_ptr<cms::Message> received(consumer->receive(1000));
     ASSERT_TRUE(received != NULL) << ("Failed to get from DLQ");
-    std::shared_ptr<TextMessage> textMessage = std::dynamic_pointer_cast<TextMessage>(received);
+    std::shared_ptr<TextMessage> textMessage =
+        std::dynamic_pointer_cast<TextMessage>(received);
     ASSERT_EQ(std::string("1st"), textMessage->getText());
 
     if (textMessage->propertyExists("dlqDeliveryFailureCause"))
@@ -643,7 +660,8 @@ TEST_F(OpenwireSslRedeliveryPolicyTest, testRepeatedRedeliveryOnMessageNoCommit)
     std::shared_ptr<ActiveMQConnectionFactory> connectionFactory(
         new ActiveMQConnectionFactory(getBrokerURL()));
 
-    std::shared_ptr<Connection> connection(connectionFactory->createConnection());
+    std::shared_ptr<Connection> connection(
+        connectionFactory->createConnection());
     std::shared_ptr<ActiveMQConnection> amqConnection =
         std::dynamic_pointer_cast<ActiveMQConnection>(connection);
 
@@ -657,7 +675,8 @@ TEST_F(OpenwireSslRedeliveryPolicyTest, testRepeatedRedeliveryOnMessageNoCommit)
     amqConnection->destroyDestination(dlq.get());
     std::shared_ptr<MessageProducer> producer(
         dlqSession->createProducer(destination.get()));
-    std::shared_ptr<MessageConsumer> consumer(dlqSession->createConsumer(dlq.get()));
+    std::shared_ptr<MessageConsumer> consumer(
+        dlqSession->createConsumer(dlq.get()));
 
     // Send the messages
     std::shared_ptr<TextMessage> message1(dlqSession->createTextMessage("1st"));
@@ -708,7 +727,8 @@ TEST_F(OpenwireSslRedeliveryPolicyTest, testRepeatedRedeliveryOnMessageNoCommit)
     // We should be able to get the message off the DLQ now.
     std::shared_ptr<cms::Message> received(consumer->receive(1000));
     ASSERT_TRUE(received != NULL) << ("Failed to get from DLQ");
-    std::shared_ptr<TextMessage> textMessage = std::dynamic_pointer_cast<TextMessage>(received);
+    std::shared_ptr<TextMessage> textMessage =
+        std::dynamic_pointer_cast<TextMessage>(received);
     ASSERT_EQ(std::string("1st"), textMessage->getText());
 
     if (textMessage->propertyExists("dlqDeliveryFailureCause"))
@@ -730,7 +750,8 @@ TEST_F(OpenwireSslRedeliveryPolicyTest, testInitialRedeliveryDelayZero)
     std::shared_ptr<ActiveMQConnectionFactory> connectionFactory(
         new ActiveMQConnectionFactory(getBrokerURL()));
 
-    std::shared_ptr<Connection> connection(connectionFactory->createConnection());
+    std::shared_ptr<Connection> connection(
+        connectionFactory->createConnection());
     std::shared_ptr<ActiveMQConnection> amqConnection =
         std::dynamic_pointer_cast<ActiveMQConnection>(connection);
 
@@ -743,7 +764,7 @@ TEST_F(OpenwireSslRedeliveryPolicyTest, testInitialRedeliveryDelayZero)
     connection->start();
     std::shared_ptr<Session> session(
         connection->createSession(Session::SESSION_TRANSACTED));
-    std::shared_ptr<Queue>           destination(session->createTemporaryQueue());
+    std::shared_ptr<Queue> destination(session->createTemporaryQueue());
     std::shared_ptr<MessageProducer> producer(
         session->createProducer(destination.get()));
     std::shared_ptr<MessageConsumer> consumer(
@@ -758,7 +779,8 @@ TEST_F(OpenwireSslRedeliveryPolicyTest, testInitialRedeliveryDelayZero)
     session->commit();
 
     std::shared_ptr<cms::Message> received(consumer->receive(100));
-    std::shared_ptr<TextMessage>  textMessage = std::dynamic_pointer_cast<TextMessage>(received);
+    std::shared_ptr<TextMessage>  textMessage =
+        std::dynamic_pointer_cast<TextMessage>(received);
     ASSERT_TRUE(textMessage != NULL) << ("Failed to get first delivery");
     ASSERT_EQ(std::string("1st"), textMessage->getText());
     session->rollback();
@@ -782,7 +804,8 @@ TEST_F(OpenwireSslRedeliveryPolicyTest, testInitialRedeliveryDelayOne)
     std::shared_ptr<ActiveMQConnectionFactory> connectionFactory(
         new ActiveMQConnectionFactory(getBrokerURL()));
 
-    std::shared_ptr<Connection> connection(connectionFactory->createConnection());
+    std::shared_ptr<Connection> connection(
+        connectionFactory->createConnection());
     std::shared_ptr<ActiveMQConnection> amqConnection =
         std::dynamic_pointer_cast<ActiveMQConnection>(connection);
 
@@ -795,7 +818,7 @@ TEST_F(OpenwireSslRedeliveryPolicyTest, testInitialRedeliveryDelayOne)
     connection->start();
     std::shared_ptr<Session> session(
         connection->createSession(Session::SESSION_TRANSACTED));
-    std::shared_ptr<Queue>           destination(session->createTemporaryQueue());
+    std::shared_ptr<Queue> destination(session->createTemporaryQueue());
     std::shared_ptr<MessageProducer> producer(
         session->createProducer(destination.get()));
     std::shared_ptr<MessageConsumer> consumer(
@@ -810,7 +833,8 @@ TEST_F(OpenwireSslRedeliveryPolicyTest, testInitialRedeliveryDelayOne)
     session->commit();
 
     std::shared_ptr<cms::Message> received(consumer->receive(100));
-    std::shared_ptr<TextMessage>  textMessage = std::dynamic_pointer_cast<TextMessage>(received);
+    std::shared_ptr<TextMessage>  textMessage =
+        std::dynamic_pointer_cast<TextMessage>(received);
     ASSERT_TRUE(textMessage != NULL) << ("Failed to get first delivery");
     ASSERT_EQ(std::string("1st"), textMessage->getText());
     session->rollback();
@@ -836,7 +860,8 @@ TEST_F(OpenwireSslRedeliveryPolicyTest, testRedeliveryDelayOne)
     std::shared_ptr<ActiveMQConnectionFactory> connectionFactory(
         new ActiveMQConnectionFactory(getBrokerURL()));
 
-    std::shared_ptr<Connection> connection(connectionFactory->createConnection());
+    std::shared_ptr<Connection> connection(
+        connectionFactory->createConnection());
     std::shared_ptr<ActiveMQConnection> amqConnection =
         std::dynamic_pointer_cast<ActiveMQConnection>(connection);
 
@@ -850,7 +875,7 @@ TEST_F(OpenwireSslRedeliveryPolicyTest, testRedeliveryDelayOne)
     connection->start();
     std::shared_ptr<Session> session(
         connection->createSession(Session::SESSION_TRANSACTED));
-    std::shared_ptr<Queue>           destination(session->createTemporaryQueue());
+    std::shared_ptr<Queue> destination(session->createTemporaryQueue());
     std::shared_ptr<MessageProducer> producer(
         session->createProducer(destination.get()));
     std::shared_ptr<MessageConsumer> consumer(
@@ -865,7 +890,8 @@ TEST_F(OpenwireSslRedeliveryPolicyTest, testRedeliveryDelayOne)
     session->commit();
 
     std::shared_ptr<cms::Message> received(consumer->receive(100));
-    std::shared_ptr<TextMessage>  textMessage = std::dynamic_pointer_cast<TextMessage>(received);
+    std::shared_ptr<TextMessage>  textMessage =
+        std::dynamic_pointer_cast<TextMessage>(received);
     ASSERT_TRUE(textMessage != NULL) << ("Failed to get first delivery");
     ASSERT_EQ(std::string("1st"), textMessage->getText());
     session->rollback();

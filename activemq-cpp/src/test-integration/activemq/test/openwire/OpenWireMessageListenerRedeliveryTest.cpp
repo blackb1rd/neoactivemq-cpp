@@ -201,10 +201,10 @@ public:
 class TrackingMessageListener : public cms::MessageListener
 {
 private:
-    CountDownLatch                   doneLatch;
+    CountDownLatch                           doneLatch;
     ArrayList<std::shared_ptr<cms::Message>> received;
-    std::string                      testName;
-    int                              count;
+    std::string                              testName;
+    int                                      count;
 
 public:
     TrackingMessageListener(const std::string& testName)

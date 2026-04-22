@@ -21,13 +21,13 @@
 #include <activemq/util/IntegrationCommon.h>
 
 #include <decaf/lang/Integer.h>
-#include <memory>
 #include <decaf/lang/Runnable.h>
 #include <decaf/util/Random.h>
 #include <decaf/util/concurrent/CopyOnWriteArrayList.h>
 #include <decaf/util/concurrent/LinkedBlockingQueue.h>
 #include <decaf/util/concurrent/ThreadPoolExecutor.h>
 #include <decaf/util/concurrent/TimeUnit.h>
+#include <memory>
 
 using namespace std;
 using namespace cms;
@@ -166,7 +166,8 @@ TEST_F(OpenwireSslCmsConnectionStartStopTest,
     // Send the message.
     std::shared_ptr<MessageProducer> producer(
         startedSession->createProducer(topic.get()));
-    std::shared_ptr<TextMessage> message(startedSession->createTextMessage("Hello"));
+    std::shared_ptr<TextMessage> message(
+        startedSession->createTextMessage("Hello"));
     producer->send(message.get());
 
     // Test the assertions.

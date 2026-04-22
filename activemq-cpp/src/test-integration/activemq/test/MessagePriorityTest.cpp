@@ -22,9 +22,9 @@
 #include <activemq/exceptions/ActiveMQException.h>
 #include <activemq/util/CMSListener.h>
 
-#include <memory>
 #include <decaf/lang/Thread.h>
 #include <decaf/util/UUID.h>
+#include <memory>
 
 using namespace std;
 using namespace cms;
@@ -71,7 +71,8 @@ public:
 
     virtual void run()
     {
-        std::shared_ptr<MessageProducer> producer(session->createProducer(destination));
+        std::shared_ptr<MessageProducer> producer(
+            session->createProducer(destination));
         producer->setDeliveryMode(cms::DeliveryMode::NON_PERSISTENT);
         producer->setPriority(priority);
 
@@ -105,10 +106,11 @@ void MessagePriorityTest::testMessagePrioritySendReceive()
 
     connectionFactory->setMessagePrioritySupported(true);
 
-    std::shared_ptr<Connection> connection(connectionFactory->createConnection());
-    std::shared_ptr<Session>    session(
+    std::shared_ptr<Connection> connection(
+        connectionFactory->createConnection());
+    std::shared_ptr<Session> session(
         connection->createSession(Session::AUTO_ACKNOWLEDGE));
-    std::shared_ptr<Queue>           destination(session->createTemporaryQueue());
+    std::shared_ptr<Queue> destination(session->createTemporaryQueue());
     std::shared_ptr<MessageProducer> producer(
         session->createProducer(destination.get()));
     std::shared_ptr<MessageConsumer> consumer(

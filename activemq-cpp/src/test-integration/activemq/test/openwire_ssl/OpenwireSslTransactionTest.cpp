@@ -186,14 +186,16 @@ TEST_F(OpenwireSslTransactionTest, testSendSessionClose)
     std::shared_ptr<ActiveMQConnectionFactory> connectionFactory(
         new ActiveMQConnectionFactory(getBrokerURL()));
 
-    std::shared_ptr<Connection> connection(connectionFactory->createConnection());
+    std::shared_ptr<Connection> connection(
+        connectionFactory->createConnection());
     std::shared_ptr<ActiveMQConnection> amqConnection =
         std::dynamic_pointer_cast<ActiveMQConnection>(connection);
 
     connection->start();
     std::shared_ptr<Session> session(
         connection->createSession(Session::SESSION_TRANSACTED));
-    std::shared_ptr<Queue> destination(session->createQueue("testSendSessionClose"));
+    std::shared_ptr<Queue> destination(
+        session->createQueue("testSendSessionClose"));
 
     // Create the messages used for this test
     std::unique_ptr<TextMessage> outbound1(

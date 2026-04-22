@@ -41,14 +41,16 @@ using namespace decaf::lang;
 using namespace decaf::util;
 
 ////////////////////////////////////////////////////////////////////////////////
-std::shared_ptr<Transport> TcpTransportFactory::create(const decaf::net::URI& location)
+std::shared_ptr<Transport> TcpTransportFactory::create(
+    const decaf::net::URI& location)
 {
     try
     {
         Properties properties =
             activemq::util::URISupport::parseQuery(location.getQuery());
 
-        std::shared_ptr<WireFormat> wireFormat = this->createWireFormat(properties);
+        std::shared_ptr<WireFormat> wireFormat =
+            this->createWireFormat(properties);
 
         // Create the initial Composite Transport, then wrap it in the normal
         // Filters for a non-composite Transport which right now is just a
@@ -74,7 +76,8 @@ std::shared_ptr<Transport> TcpTransportFactory::createComposite(
         Properties properties =
             activemq::util::URISupport::parseQuery(location.getQuery());
 
-        std::shared_ptr<WireFormat> wireFormat = this->createWireFormat(properties);
+        std::shared_ptr<WireFormat> wireFormat =
+            this->createWireFormat(properties);
 
         // Create the initial Transport, then wrap it in the normal Filters
         return doCreateComposite(location, wireFormat, properties);
@@ -137,26 +140,26 @@ void TcpTransportFactory::doConfigureTransport(
 {
     try
     {
-        std::shared_ptr<TcpTransport> tcp = std::dynamic_pointer_cast<TcpTransport>(transport);
+        std::shared_ptr<TcpTransport> tcp =
+            std::dynamic_pointer_cast<TcpTransport>(transport);
 
-        tcp->setInputBufferSize(std::stoi(
-            properties.getProperty("inputBufferSize", "8192")));
-        tcp->setOutputBufferSize(std::stoi(
-            properties.getProperty("outputBufferSize", "8192")));
+        tcp->setInputBufferSize(
+            std::stoi(properties.getProperty("inputBufferSize", "8192")));
+        tcp->setOutputBufferSize(
+            std::stoi(properties.getProperty("outputBufferSize", "8192")));
         tcp->setTrace(Boolean::parseBoolean(
             properties.getProperty("transport.tcpTracingEnabled", "false")));
-        tcp->setLinger(
-            std::stoi(properties.getProperty("soLinger", "-1")));
+        tcp->setLinger(std::stoi(properties.getProperty("soLinger", "-1")));
         tcp->setKeepAlive(Boolean::parseBoolean(
             properties.getProperty("soKeepAlive", "false")));
-        tcp->setReceiveBufferSize(std::stoi(
-            properties.getProperty("soReceiveBufferSize", "-1")));
-        tcp->setSendBufferSize(std::stoi(
-            properties.getProperty("soSendBufferSize", "-1")));
+        tcp->setReceiveBufferSize(
+            std::stoi(properties.getProperty("soReceiveBufferSize", "-1")));
+        tcp->setSendBufferSize(
+            std::stoi(properties.getProperty("soSendBufferSize", "-1")));
         tcp->setTcpNoDelay(Boolean::parseBoolean(
             properties.getProperty("tcpNoDelay", "true")));
-        tcp->setConnectTimeout(std::stoi(
-            properties.getProperty("soConnectTimeout", "3000")));
+        tcp->setConnectTimeout(
+            std::stoi(properties.getProperty("soConnectTimeout", "3000")));
     }
     AMQ_CATCH_RETHROW(ActiveMQException)
     AMQ_CATCH_EXCEPTION_CONVERT(Exception, ActiveMQException)

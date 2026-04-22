@@ -72,7 +72,7 @@ namespace transport
              *      The URI of the host this transport is to connect to.
              */
             SslTransport(const std::shared_ptr<Transport> next,
-                         const decaf::net::URI&            location);
+                         const decaf::net::URI&           location);
 
             /**
              * Creates a new instance of the SslTransport with URI properties.
@@ -85,8 +85,8 @@ namespace transport
              *      The properties parsed from the URI query string.
              */
             SslTransport(const std::shared_ptr<Transport> next,
-                         const decaf::net::URI&            location,
-                         const decaf::util::Properties&    properties);
+                         const decaf::net::URI&           location,
+                         const decaf::util::Properties&   properties);
 
             virtual ~SslTransport();
 

@@ -71,8 +71,7 @@ namespace transport
              * @throws ActiveMQException if an error occurs while creating the
              * agent.
              */
-            virtual std::shared_ptr<AbstractDiscoveryAgent>
-            doCreateAgent() = 0;
+            virtual std::shared_ptr<AbstractDiscoveryAgent> doCreateAgent() = 0;
 
         protected:
             /**

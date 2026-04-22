@@ -53,7 +53,9 @@ ReadChecker::~ReadChecker()
 ////////////////////////////////////////////////////////////////////////////////
 void ReadChecker::run()
 {
-    long long now     = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+    long long now = std::chrono::duration_cast<std::chrono::milliseconds>(
+                        std::chrono::system_clock::now().time_since_epoch())
+                        .count();
     long long elapsed = (now - this->lastRunTime);
 
     // Perhaps the timer executed a read check late.. and then executes

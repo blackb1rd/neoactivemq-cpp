@@ -56,12 +56,14 @@ namespace transport
             InactivityMonitor operator=(const InactivityMonitor&);
 
         public:
-            InactivityMonitor(const std::shared_ptr<Transport>              next,
-                              const std::shared_ptr<wireformat::WireFormat> wireFormat);
+            InactivityMonitor(
+                const std::shared_ptr<Transport>              next,
+                const std::shared_ptr<wireformat::WireFormat> wireFormat);
 
-            InactivityMonitor(const std::shared_ptr<Transport>              next,
-                              const decaf::util::Properties&        properties,
-                              const std::shared_ptr<wireformat::WireFormat> wireFormat);
+            InactivityMonitor(
+                const std::shared_ptr<Transport>              next,
+                const decaf::util::Properties&                properties,
+                const std::shared_ptr<wireformat::WireFormat> wireFormat);
 
             virtual ~InactivityMonitor();
 

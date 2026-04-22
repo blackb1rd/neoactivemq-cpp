@@ -219,7 +219,8 @@ namespace transport
                 {
                     try
                     {
-                        std::shared_ptr<KeepAliveInfo> info(new KeepAliveInfo());
+                        std::shared_ptr<KeepAliveInfo> info(
+                            new KeepAliveInfo());
                         info->setResponseRequired(
                             this->parent->members->keepAliveResponseRequired);
                         this->parent->oneway(info);
@@ -243,8 +244,9 @@ namespace transport
 }  // namespace activemq
 
 ////////////////////////////////////////////////////////////////////////////////
-InactivityMonitor::InactivityMonitor(const std::shared_ptr<Transport>  next,
-                                     const std::shared_ptr<WireFormat> wireFormat)
+InactivityMonitor::InactivityMonitor(
+    const std::shared_ptr<Transport>  next,
+    const std::shared_ptr<WireFormat> wireFormat)
     : TransportFilter(next),
       members(new InactivityMonitorData(wireFormat))
 {
@@ -565,11 +567,11 @@ void InactivityMonitor::startMonitorThreads()
         {
             this->members->monitorStarted.store(true);
             this->members->writeCheckerTask = new WriteChecker(this);
-            this->members->readCheckerTask = new ReadChecker(this);
-            this->members->writeCheckTime = this->members->readCheckTime > 3
-                                                ? this->members->readCheckTime /
+            this->members->readCheckerTask  = new ReadChecker(this);
+            this->members->writeCheckTime   = this->members->readCheckTime > 3
+                                                  ? this->members->readCheckTime /
                                                       3
-                                                : this->members->readCheckTime;
+                                                  : this->members->readCheckTime;
 
             AMQ_LOG_INFO(
                 "InactivityMonitor",
@@ -595,7 +597,8 @@ void InactivityMonitor::startMonitorThreads()
 void InactivityMonitor::stopMonitorThreads()
 {
     bool _e_monitorStarted = true;
-    if (this->members->monitorStarted.compare_exchange_strong(_e_monitorStarted, false))
+    if (this->members->monitorStarted.compare_exchange_strong(_e_monitorStarted,
+                                                              false))
     {
         AMQ_LOG_DEBUG("InactivityMonitor", "Stopping monitor threads");
 

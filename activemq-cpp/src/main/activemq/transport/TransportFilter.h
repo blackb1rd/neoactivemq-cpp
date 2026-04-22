@@ -125,14 +125,16 @@ namespace transport
             return next->asyncRequest(command, responseCallback);
         }
 
-        virtual std::shared_ptr<Response> request(const std::shared_ptr<Command> command)
+        virtual std::shared_ptr<Response> request(
+            const std::shared_ptr<Command> command)
         {
             checkClosed();
             return next->request(command);
         }
 
-        virtual std::shared_ptr<Response> request(const std::shared_ptr<Command> command,
-                                          unsigned int           timeout)
+        virtual std::shared_ptr<Response> request(
+            const std::shared_ptr<Command> command,
+            unsigned int                   timeout)
         {
             checkClosed();
             return next->request(command, timeout);

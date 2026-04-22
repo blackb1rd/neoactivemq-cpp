@@ -100,7 +100,7 @@ namespace transport
 
 ////////////////////////////////////////////////////////////////////////////////
 TcpTransport::TcpTransport(const std::shared_ptr<Transport> next,
-                           const decaf::net::URI&            location)
+                           const decaf::net::URI&           location)
     : TransportFilter(next),
       impl(new TcpTransportImpl(location))
 {

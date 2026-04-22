@@ -73,10 +73,10 @@ void AbstractDiscoveryAgentFactory::doConfigureAgent(
             options.getProperty("useExponentialBackOff", "true")));
         agent->setBackOffMultiplier(
             std::stoll(options.getProperty("backOffMultiplier", "2")));
-        agent->setMaxReconnectAttempts(std::stoi(
-            options.getProperty("maxReconnectAttempts", "-1")));
-        agent->setInitialReconnectDelay(std::stoll(
-            options.getProperty("initialReconnectDelay", "10")));
+        agent->setMaxReconnectAttempts(
+            std::stoi(options.getProperty("maxReconnectAttempts", "-1")));
+        agent->setInitialReconnectDelay(
+            std::stoll(options.getProperty("initialReconnectDelay", "10")));
         agent->setGroup(options.getProperty("group", "default"));
         agent->setGroup(options.getProperty("service", ""));
     }

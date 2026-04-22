@@ -18,11 +18,11 @@
 #include "ResponseCorrelator.h"
 #include <algorithm>
 
-#include <atomic>
 #include <decaf/util/ArrayList.h>
 #include <decaf/util/HashMap.h>
 #include <decaf/util/concurrent/Mutex.h>
 #include <decaf/util/logging/LoggerDefines.h>
+#include <atomic>
 
 #include <activemq/commands/ExceptionResponse.h>
 #include <activemq/commands/Response.h>
@@ -53,14 +53,15 @@ private:
     ResponseFinalizer operator=(const ResponseFinalizer&);
 
 private:
-    Mutex*                                          mutex;
-    int                                                          commandId;
+    Mutex*                                                  mutex;
+    int                                                     commandId;
     HashMap<unsigned int, std::shared_ptr<FutureResponse>>* map;
 
 public:
-    ResponseFinalizer(Mutex*                                               mutex,
-                      int                                                  commandId,
-                      HashMap<unsigned int, std::shared_ptr<FutureResponse>>* map)
+    ResponseFinalizer(
+        Mutex*                                                  mutex,
+        int                                                     commandId,
+        HashMap<unsigned int, std::shared_ptr<FutureResponse>>* map)
         : mutex(mutex),
           commandId(commandId),
           map(map)
@@ -240,7 +241,8 @@ std::shared_ptr<FutureResponse> ResponseCorrelator::asyncRequest(
     AMQ_CATCHALL_THROW(IOException)
 }
 
-std::shared_ptr<Response> ResponseCorrelator::request(const std::shared_ptr<Command> command)
+std::shared_ptr<Response> ResponseCorrelator::request(
+    const std::shared_ptr<Command> command)
 {
     try
     {
@@ -320,8 +322,9 @@ std::shared_ptr<Response> ResponseCorrelator::request(const std::shared_ptr<Comm
     AMQ_CATCHALL_THROW(IOException)
 }
 
-std::shared_ptr<Response> ResponseCorrelator::request(const std::shared_ptr<Command> command,
-                                              unsigned int           timeout)
+std::shared_ptr<Response> ResponseCorrelator::request(
+    const std::shared_ptr<Command> command,
+    unsigned int                   timeout)
 {
     try
     {
@@ -404,7 +407,8 @@ void ResponseCorrelator::onCommand(const std::shared_ptr<Command> command)
         return;
     }
 
-    std::shared_ptr<Response> response = std::dynamic_pointer_cast<Response>(command);
+    std::shared_ptr<Response> response =
+        std::dynamic_pointer_cast<Response>(command);
     AMQ_LOG_DEBUG(
         "ResponseCorrelator",
         "onCommand() response correlationId=" << response->getCorrelationId());
@@ -436,7 +440,8 @@ void ResponseCorrelator::onCommand(const std::shared_ptr<Command> command)
                 commands::ExceptionResponse::ID_EXCEPTIONRESPONSE)
             {
                 std::shared_ptr<commands::ExceptionResponse> exResponse =
-                    std::dynamic_pointer_cast<commands::ExceptionResponse>(response);
+                    std::dynamic_pointer_cast<commands::ExceptionResponse>(
+                        response);
                 if (exResponse->getException() != NULL)
                 {
                     AMQ_LOG_ERROR(
@@ -516,17 +521,19 @@ void ResponseCorrelator::dispose(std::shared_ptr<Exception> error)
 
     if (!requestsCopy.isEmpty())
     {
-        std::shared_ptr<commands::BrokerError> exception(new commands::BrokerError);
+        std::shared_ptr<commands::BrokerError> exception(
+            new commands::BrokerError);
         exception->setExceptionClass("java.io.IOException");
         exception->setMessage(error->getMessage());
 
         // Create individual ExceptionResponse for each pending request with
         // correct correlation ID
-        std::shared_ptr<Iterator<unsigned int>> iter(requestsCopy.keySet().iterator());
+        std::shared_ptr<Iterator<unsigned int>> iter(
+            requestsCopy.keySet().iterator());
         while (iter->hasNext())
         {
-            unsigned int                     correlationId = iter->next();
-            std::shared_ptr<FutureResponse>  futureResponse =
+            unsigned int                    correlationId = iter->next();
+            std::shared_ptr<FutureResponse> futureResponse =
                 requestsCopy.get(correlationId);
 
             // Create a unique ExceptionResponse for this request with the

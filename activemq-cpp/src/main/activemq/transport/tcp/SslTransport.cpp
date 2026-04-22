@@ -41,7 +41,7 @@ using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 SslTransport::SslTransport(const std::shared_ptr<Transport> next,
-                           const decaf::net::URI&            location)
+                           const decaf::net::URI&           location)
     : TcpTransport(next, location),
       sslSocket(NULL),
       properties()
@@ -50,8 +50,8 @@ SslTransport::SslTransport(const std::shared_ptr<Transport> next,
 
 ////////////////////////////////////////////////////////////////////////////////
 SslTransport::SslTransport(const std::shared_ptr<Transport> next,
-                           const decaf::net::URI&            location,
-                           const decaf::util::Properties&    properties)
+                           const decaf::net::URI&           location,
+                           const decaf::util::Properties&   properties)
     : TcpTransport(next, location),
       sslSocket(NULL),
       properties(properties)

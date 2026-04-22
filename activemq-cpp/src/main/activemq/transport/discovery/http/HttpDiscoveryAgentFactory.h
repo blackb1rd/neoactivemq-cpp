@@ -40,8 +40,7 @@ namespace transport
                 virtual ~HttpDiscoveryAgentFactory();
 
             protected:
-                virtual std::shared_ptr<AbstractDiscoveryAgent>
-                doCreateAgent();
+                virtual std::shared_ptr<AbstractDiscoveryAgent> doCreateAgent();
 
                 virtual void doConfigureAgent(
                     std::shared_ptr<AbstractDiscoveryAgent> agent,

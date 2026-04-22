@@ -58,7 +58,8 @@ void LoggingTransport::oneway(const std::shared_ptr<Command> command)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::shared_ptr<Response> LoggingTransport::request(const std::shared_ptr<Command> command)
+std::shared_ptr<Response> LoggingTransport::request(
+    const std::shared_ptr<Command> command)
 {
     try
     {
@@ -76,15 +77,17 @@ std::shared_ptr<Response> LoggingTransport::request(const std::shared_ptr<Comman
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::shared_ptr<Response> LoggingTransport::request(const std::shared_ptr<Command> command,
-                                            unsigned int           timeout)
+std::shared_ptr<Response> LoggingTransport::request(
+    const std::shared_ptr<Command> command,
+    unsigned int                   timeout)
 {
     try
     {
         std::cout << "SEND: " << command->toString() << std::endl;
 
         // Delegate to the base class.
-        std::shared_ptr<Response> response = TransportFilter::request(command, timeout);
+        std::shared_ptr<Response> response =
+            TransportFilter::request(command, timeout);
 
         return response;
     }

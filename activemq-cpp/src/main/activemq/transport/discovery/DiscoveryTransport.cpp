@@ -60,9 +60,9 @@ namespace transport
         public:
             std::shared_ptr<CompositeTransport> next;
             std::shared_ptr<DiscoveryAgent>     agent;
-            StlMap<std::string, URI>    serviceURIs;
-            Properties                  parameters;
-            Mutex                       lock;
+            StlMap<std::string, URI>            serviceURIs;
+            Properties                          parameters;
+            Mutex                               lock;
 
         private:
             DiscoveryTransportData(const DiscoveryTransportData&);
@@ -178,8 +178,7 @@ void DiscoveryTransport::doClose()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DiscoveryTransport::setDiscoveryAgent(
-    std::shared_ptr<DiscoveryAgent> agent)
+void DiscoveryTransport::setDiscoveryAgent(std::shared_ptr<DiscoveryAgent> agent)
 {
     if (!agent)
     {

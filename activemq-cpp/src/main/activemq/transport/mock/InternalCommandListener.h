@@ -50,11 +50,11 @@ namespace transport
               public decaf::lang::Thread
         {
         private:
-            MockTransport*                                       transport;
-            std::shared_ptr<ResponseBuilder>                     responseBuilder;
-            bool                                                 done;
-            decaf::util::concurrent::CountDownLatch              startedLatch;
-            decaf::util::LinkedList<std::shared_ptr<Command>>    inboundQueue;
+            MockTransport*                                    transport;
+            std::shared_ptr<ResponseBuilder>                  responseBuilder;
+            bool                                              done;
+            decaf::util::concurrent::CountDownLatch           startedLatch;
+            decaf::util::LinkedList<std::shared_ptr<Command>> inboundQueue;
 
         private:
             InternalCommandListener(const InternalCommandListener&);

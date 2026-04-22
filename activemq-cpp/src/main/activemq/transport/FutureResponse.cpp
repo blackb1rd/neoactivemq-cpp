@@ -42,7 +42,8 @@ FutureResponse::FutureResponse()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-FutureResponse::FutureResponse(const std::shared_ptr<ResponseCallback> responseCallback)
+FutureResponse::FutureResponse(
+    const std::shared_ptr<ResponseCallback> responseCallback)
     : responseLatch(1),
       response(),
       responseCallback(responseCallback)

@@ -26,10 +26,10 @@
 
 #include <decaf/io/InterruptedIOException.h>
 #include <decaf/lang/Thread.h>
-#include <memory>
 #include <decaf/lang/exceptions/InterruptedException.h>
 #include <decaf/util/concurrent/CountDownLatch.h>
 #include <decaf/util/concurrent/Mutex.h>
+#include <memory>
 
 namespace activemq
 {
@@ -47,8 +47,8 @@ namespace transport
     {
     private:
         mutable decaf::util::concurrent::CountDownLatch responseLatch;
-        std::shared_ptr<Response>                               response;
-        std::shared_ptr<ResponseCallback>                       responseCallback;
+        std::shared_ptr<Response>                       response;
+        std::shared_ptr<ResponseCallback>               responseCallback;
 
     public:
         FutureResponse();

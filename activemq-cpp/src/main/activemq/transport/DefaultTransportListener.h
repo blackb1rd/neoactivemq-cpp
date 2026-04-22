@@ -49,7 +49,8 @@ namespace transport
          *
          * @param command the received command object.
          */
-        virtual void onCommand(const std::shared_ptr<Command> command AMQCPP_UNUSED)
+        virtual void onCommand(
+            const std::shared_ptr<Command> command AMQCPP_UNUSED)
         {
         }
 

@@ -48,7 +48,8 @@ namespace transport
              * to assign.
              * @throws ActiveMQexception if an error occurs
              */
-            virtual std::shared_ptr<Transport> create(const decaf::net::URI& location);
+            virtual std::shared_ptr<Transport> create(
+                const decaf::net::URI& location);
 
             /**
              * Creates a slimed down Transport instance which can be used in

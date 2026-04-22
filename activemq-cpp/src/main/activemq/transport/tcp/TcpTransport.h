@@ -67,7 +67,7 @@ namespace transport
              *      The URI of the host this transport is to connect to.
              */
             TcpTransport(const std::shared_ptr<Transport> next,
-                         const decaf::net::URI&            location);
+                         const decaf::net::URI&           location);
 
             virtual ~TcpTransport();
 

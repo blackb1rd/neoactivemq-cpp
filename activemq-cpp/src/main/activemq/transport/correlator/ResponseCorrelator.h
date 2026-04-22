@@ -76,10 +76,12 @@ namespace transport
                 const std::shared_ptr<Command>          command,
                 const std::shared_ptr<ResponseCallback> responseCallback);
 
-            virtual std::shared_ptr<Response> request(const std::shared_ptr<Command> command);
+            virtual std::shared_ptr<Response> request(
+                const std::shared_ptr<Command> command);
 
-            virtual std::shared_ptr<Response> request(const std::shared_ptr<Command> command,
-                                              unsigned int           timeout);
+            virtual std::shared_ptr<Response> request(
+                const std::shared_ptr<Command> command,
+                unsigned int                   timeout);
 
             /**
              * This is called in the context of the nested transport's reading

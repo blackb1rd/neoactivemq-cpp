@@ -104,7 +104,10 @@ URI URIPool::getURI()
             if (isRandomize())
             {
                 Random rand;
-                rand.setSeed(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count());
+                rand.setSeed(
+                    std::chrono::duration_cast<std::chrono::milliseconds>(
+                        std::chrono::system_clock::now().time_since_epoch())
+                        .count());
                 index = rand.nextInt((int)uriPool.size());
             }
 

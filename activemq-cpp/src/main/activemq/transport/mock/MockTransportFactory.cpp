@@ -41,14 +41,16 @@ using namespace decaf::io;
 using namespace decaf::lang;
 
 ////////////////////////////////////////////////////////////////////////////////
-std::shared_ptr<Transport> MockTransportFactory::create(const decaf::net::URI& location)
+std::shared_ptr<Transport> MockTransportFactory::create(
+    const decaf::net::URI& location)
 {
     try
     {
         Properties properties =
             activemq::util::URISupport::parseQuery(location.getQuery());
 
-        std::shared_ptr<WireFormat> wireFormat = this->createWireFormat(properties);
+        std::shared_ptr<WireFormat> wireFormat =
+            this->createWireFormat(properties);
 
         // Create the initial Transport, then wrap it in the normal Filters
         std::shared_ptr<Transport> transport(
@@ -82,7 +84,8 @@ std::shared_ptr<Transport> MockTransportFactory::createComposite(
         Properties properties =
             activemq::util::URISupport::parseQuery(location.getQuery());
 
-        std::shared_ptr<WireFormat> wireFormat = this->createWireFormat(properties);
+        std::shared_ptr<WireFormat> wireFormat =
+            this->createWireFormat(properties);
 
         // Create the initial Transport, then wrap it in the normal Filters
         return doCreateComposite(location, wireFormat, properties);
@@ -94,7 +97,7 @@ std::shared_ptr<Transport> MockTransportFactory::createComposite(
 
 ////////////////////////////////////////////////////////////////////////////////
 std::shared_ptr<Transport> MockTransportFactory::doCreateComposite(
-    const decaf::net::URI& location       AMQCPP_UNUSED,
+    const decaf::net::URI& location               AMQCPP_UNUSED,
     const std::shared_ptr<wireformat::WireFormat> wireFormat,
     const decaf::util::Properties&                properties)
 {
@@ -129,8 +132,8 @@ std::shared_ptr<Transport> MockTransportFactory::doCreateComposite(
 
         transport->setFailOnSendMessage(Boolean::parseBoolean(
             properties.getProperty("failOnSendMessage", "false")));
-        transport->setNumSentMessageBeforeFail(std::stoi(
-            properties.getProperty("numSentMessageBeforeFail", "0")));
+        transport->setNumSentMessageBeforeFail(
+            std::stoi(properties.getProperty("numSentMessageBeforeFail", "0")));
         transport->setFailOnReceiveMessage(Boolean::parseBoolean(
             properties.getProperty("failOnReceiveMessage", "false")));
         transport->setNumReceivedMessageBeforeFail(std::stoi(

@@ -158,15 +158,17 @@ namespace transport
          *
          * This method always thrown an UnsupportedOperationException.
          */
-        virtual std::shared_ptr<Response> request(const std::shared_ptr<Command> command);
+        virtual std::shared_ptr<Response> request(
+            const std::shared_ptr<Command> command);
 
         /**
          * {@inheritDoc}
          *
          * This method always thrown an UnsupportedOperationException.
          */
-        virtual std::shared_ptr<Response> request(const std::shared_ptr<Command> command,
-                                          unsigned int           timeout);
+        virtual std::shared_ptr<Response> request(
+            const std::shared_ptr<Command> command,
+            unsigned int                   timeout);
 
         virtual std::shared_ptr<wireformat::WireFormat> getWireFormat() const;
 

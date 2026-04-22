@@ -51,31 +51,33 @@ namespace transport
 
             BackupTransportPoolImpl* impl;
 
-            FailoverTransport*                        parent;
-            std::shared_ptr<CompositeTaskRunner>      taskRunner;
-            std::shared_ptr<CloseTransportsTask>      closeTask;
-            std::shared_ptr<URIPool>                  uriPool;
-            std::shared_ptr<URIPool>                  updates;
-            std::shared_ptr<URIPool>                  priorityUriPool;
-            volatile int                              backupPoolSize;
-            volatile bool                             enabled;
-            volatile int                              maxReconnectDelay;
+            FailoverTransport*                   parent;
+            std::shared_ptr<CompositeTaskRunner> taskRunner;
+            std::shared_ptr<CloseTransportsTask> closeTask;
+            std::shared_ptr<URIPool>             uriPool;
+            std::shared_ptr<URIPool>             updates;
+            std::shared_ptr<URIPool>             priorityUriPool;
+            volatile int                         backupPoolSize;
+            volatile bool                        enabled;
+            volatile int                         maxReconnectDelay;
 
         public:
-            BackupTransportPool(FailoverTransport*                        parent,
-                                const std::shared_ptr<CompositeTaskRunner> taskRunner,
-                                const std::shared_ptr<CloseTransportsTask> closeTask,
-                                const std::shared_ptr<URIPool>             uriPool,
-                                const std::shared_ptr<URIPool>             updates,
-                                const std::shared_ptr<URIPool>             priorityUriPool);
+            BackupTransportPool(
+                FailoverTransport*                         parent,
+                const std::shared_ptr<CompositeTaskRunner> taskRunner,
+                const std::shared_ptr<CloseTransportsTask> closeTask,
+                const std::shared_ptr<URIPool>             uriPool,
+                const std::shared_ptr<URIPool>             updates,
+                const std::shared_ptr<URIPool>             priorityUriPool);
 
-            BackupTransportPool(FailoverTransport*                        parent,
-                                int                                        backupPoolSize,
-                                const std::shared_ptr<CompositeTaskRunner> taskRunner,
-                                const std::shared_ptr<CloseTransportsTask> closeTask,
-                                const std::shared_ptr<URIPool>             uriPool,
-                                const std::shared_ptr<URIPool>             updates,
-                                const std::shared_ptr<URIPool>             priorityUriPool);
+            BackupTransportPool(
+                FailoverTransport*                         parent,
+                int                                        backupPoolSize,
+                const std::shared_ptr<CompositeTaskRunner> taskRunner,
+                const std::shared_ptr<CloseTransportsTask> closeTask,
+                const std::shared_ptr<URIPool>             uriPool,
+                const std::shared_ptr<URIPool>             updates,
+                const std::shared_ptr<URIPool>             priorityUriPool);
 
             virtual ~BackupTransportPool();
 

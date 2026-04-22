@@ -45,7 +45,8 @@ std::shared_ptr<Transport> FailoverTransportFactory::create(
         Properties properties;  // unused but necessary for now.
 
         // Create the initial Transport, then wrap it in the normal Filters
-        std::shared_ptr<Transport> transport(doCreateComposite(location, properties));
+        std::shared_ptr<Transport> transport(
+            doCreateComposite(location, properties));
 
         // Create the Transport for response correlator
         transport.reset(new ResponseCorrelator(transport));
@@ -80,8 +81,8 @@ std::shared_ptr<Transport> FailoverTransportFactory::doCreateComposite(
 {
     try
     {
-        CompositeData                        data = URISupport::parseComposite(location);
-        std::shared_ptr<FailoverTransport>   transport(new FailoverTransport());
+        CompositeData data = URISupport::parseComposite(location);
+        std::shared_ptr<FailoverTransport> transport(new FailoverTransport());
 
         Properties topLvlProperties = data.getParameters();
 
@@ -114,17 +115,17 @@ std::shared_ptr<Transport> FailoverTransportFactory::doCreateComposite(
             topLvlProperties.getProperty("randomize", "true")));
         transport->setBackup(Boolean::parseBoolean(
             topLvlProperties.getProperty("backup", "false")));
-        transport->setBackupPoolSize(std::stoi(
-            topLvlProperties.getProperty("backupPoolSize", "1")));
+        transport->setBackupPoolSize(
+            std::stoi(topLvlProperties.getProperty("backupPoolSize", "1")));
         transport->setTimeout(std::stoll(
             topLvlProperties.getProperty("timeout",
                                          "30000")));  // 30 second default
         transport->setTrackMessages(Boolean::parseBoolean(
             topLvlProperties.getProperty("trackMessages", "false")));
-        transport->setMaxCacheSize(std::stoi(
-            topLvlProperties.getProperty("maxCacheSize", "131072")));
-        transport->setMaxPullCacheSize(std::stoi(
-            topLvlProperties.getProperty("maxPullCacheSize", "10")));
+        transport->setMaxCacheSize(
+            std::stoi(topLvlProperties.getProperty("maxCacheSize", "131072")));
+        transport->setMaxPullCacheSize(
+            std::stoi(topLvlProperties.getProperty("maxPullCacheSize", "10")));
         transport->setUpdateURIsSupported(Boolean::parseBoolean(
             topLvlProperties.getProperty("updateURIsSupported", "true")));
         transport->setPriorityBackup(Boolean::parseBoolean(

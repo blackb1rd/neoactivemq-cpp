@@ -55,13 +55,13 @@ namespace transport
             BackupTransportPoolImpl& operator=(const BackupTransportPoolImpl&);
 
         public:
-            BackupTransportPool*                 pool;
-            FailoverTransport*                   parent;
+            BackupTransportPool*                         pool;
+            FailoverTransport*                           parent;
             LinkedList<std::shared_ptr<BackupTransport>> backups;
-            volatile bool                        pending;
-            volatile bool                        closed;
-            volatile int                         priorityBackups;
-            Mutex                                retryMutex;
+            volatile bool                                pending;
+            volatile bool                                closed;
+            volatile int                                 priorityBackups;
+            Mutex                                        retryMutex;
 
             BackupTransportPoolImpl(BackupTransportPool* pool,
                                     FailoverTransport*   parent)
@@ -106,12 +106,12 @@ namespace transport
 
 ////////////////////////////////////////////////////////////////////////////////
 BackupTransportPool::BackupTransportPool(
-    FailoverTransport*                          parent,
-    const std::shared_ptr<CompositeTaskRunner>  taskRunner,
-    const std::shared_ptr<CloseTransportsTask>  closeTask,
-    const std::shared_ptr<URIPool>              uriPool,
-    const std::shared_ptr<URIPool>              updates,
-    const std::shared_ptr<URIPool>              priorityUriPool)
+    FailoverTransport*                         parent,
+    const std::shared_ptr<CompositeTaskRunner> taskRunner,
+    const std::shared_ptr<CloseTransportsTask> closeTask,
+    const std::shared_ptr<URIPool>             uriPool,
+    const std::shared_ptr<URIPool>             updates,
+    const std::shared_ptr<URIPool>             priorityUriPool)
     : impl(NULL),
       parent(parent),
       taskRunner(taskRunner),
@@ -166,13 +166,13 @@ BackupTransportPool::BackupTransportPool(
 
 ////////////////////////////////////////////////////////////////////////////////
 BackupTransportPool::BackupTransportPool(
-    FailoverTransport*                          parent,
-    int                                         backupPoolSize,
-    const std::shared_ptr<CompositeTaskRunner>  taskRunner,
-    const std::shared_ptr<CloseTransportsTask>  closeTask,
-    const std::shared_ptr<URIPool>              uriPool,
-    const std::shared_ptr<URIPool>              updates,
-    const std::shared_ptr<URIPool>              priorityUriPool)
+    FailoverTransport*                         parent,
+    int                                        backupPoolSize,
+    const std::shared_ptr<CompositeTaskRunner> taskRunner,
+    const std::shared_ptr<CloseTransportsTask> closeTask,
+    const std::shared_ptr<URIPool>             uriPool,
+    const std::shared_ptr<URIPool>             updates,
+    const std::shared_ptr<URIPool>             priorityUriPool)
     : impl(NULL),
       parent(parent),
       taskRunner(taskRunner),
@@ -524,12 +524,12 @@ void BackupTransportPool::onBackupTransportFailure(
 {
     synchronized(&this->impl->backups)
     {
-        // Use a shared_ptr to keep the BackupTransport alive after iter->remove().
-        // iter->remove() drops the list's shared_ptr (the only other holder),
-        // which would immediately destroy the BackupTransport and make
-        // failedTransport a dangling pointer before we can read
+        // Use a shared_ptr to keep the BackupTransport alive after
+        // iter->remove(). iter->remove() drops the list's shared_ptr (the only
+        // other holder), which would immediately destroy the BackupTransport
+        // and make failedTransport a dangling pointer before we can read
         // isPriority()/getUri()/getTransport().
-        std::shared_ptr<BackupTransport>                                        found;
+        std::shared_ptr<BackupTransport>                            found;
         std::unique_ptr<Iterator<std::shared_ptr<BackupTransport>>> iter(
             this->impl->backups.iterator());
 
@@ -590,7 +590,8 @@ std::shared_ptr<Transport> BackupTransportPool::createTransport(
                 "Invalid URI specified, no valid Factory Found.");
         }
 
-        std::shared_ptr<Transport> transport(factory->createComposite(location));
+        std::shared_ptr<Transport> transport(
+            factory->createComposite(location));
 
         return transport;
     }

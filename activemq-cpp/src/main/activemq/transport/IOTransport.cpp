@@ -28,8 +28,8 @@
 #include <activemq/wireformat/WireFormat.h>
 #include <activemq/wireformat/openwire/OpenWireFormat.h>
 #include <decaf/lang/exceptions/UnsupportedOperationException.h>
-#include <atomic>
 #include <decaf/util/concurrent/Concurrent.h>
+#include <atomic>
 #include <typeinfo>
 
 using namespace activemq;
@@ -55,7 +55,8 @@ namespace activemq
 namespace transport
 {
 
-    void IOTransport::logMessageDispatchDetails(const std::shared_ptr<Command>& command)
+    void IOTransport::logMessageDispatchDetails(
+        const std::shared_ptr<Command>& command)
     {
         try
         {
@@ -70,7 +71,7 @@ namespace transport
             {
                 return;
             }
-            const std::shared_ptr<MessageId>&           msgId = msg->getMessageId();
+            const std::shared_ptr<MessageId>& msgId = msg->getMessageId();
             const std::shared_ptr<ActiveMQDestination>& dest =
                 dispatch->getDestination();
             AMQ_LOG_INFO("MessageReceived",
@@ -96,12 +97,12 @@ namespace transport
 
     public:
         std::shared_ptr<wireformat::WireFormat> wireFormat;
-        TransportListener*              listener;
-        decaf::io::DataInputStream*     inputStream;
-        decaf::io::DataOutputStream*    outputStream;
+        TransportListener*                      listener;
+        decaf::io::DataInputStream*             inputStream;
+        decaf::io::DataOutputStream*            outputStream;
         std::shared_ptr<decaf::lang::Thread>    thread;
-        std::atomic<bool>               closed;
-        std::atomic<bool>               started;
+        std::atomic<bool>                       closed;
+        std::atomic<bool>                       started;
 
         IOTransportImpl()
             : wireFormat(),
@@ -569,9 +570,9 @@ std::shared_ptr<Response> IOTransport::request(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::shared_ptr<Response> IOTransport::request(const std::shared_ptr<Command> command
-                                                            AMQCPP_UNUSED,
-                                       unsigned int timeout AMQCPP_UNUSED)
+std::shared_ptr<Response> IOTransport::request(
+    const std::shared_ptr<Command> command AMQCPP_UNUSED,
+    unsigned int timeout                   AMQCPP_UNUSED)
 {
     throw UnsupportedOperationException(
         __FILE__,
@@ -598,7 +599,8 @@ std::shared_ptr<wireformat::WireFormat> IOTransport::getWireFormat() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void IOTransport::setWireFormat(const std::shared_ptr<wireformat::WireFormat> wireFormat)
+void IOTransport::setWireFormat(
+    const std::shared_ptr<wireformat::WireFormat> wireFormat)
 {
     this->impl->wireFormat = wireFormat;
 }

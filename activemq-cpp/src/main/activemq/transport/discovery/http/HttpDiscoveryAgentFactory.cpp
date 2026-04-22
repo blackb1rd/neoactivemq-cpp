@@ -38,7 +38,8 @@ HttpDiscoveryAgentFactory::~HttpDiscoveryAgentFactory()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::shared_ptr<AbstractDiscoveryAgent> HttpDiscoveryAgentFactory::doCreateAgent()
+std::shared_ptr<AbstractDiscoveryAgent>
+HttpDiscoveryAgentFactory::doCreateAgent()
 {
     return std::shared_ptr<AbstractDiscoveryAgent>(new HttpDiscoveryAgent);
 }

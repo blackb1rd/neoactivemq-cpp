@@ -89,7 +89,8 @@ std::shared_ptr<Transport> DiscoveryTransportFactory::doCreateTransport(
         // TODO create using factory and pass in params.
         std::shared_ptr<CompositeTransport> failover(new FailoverTransport());
 
-        std::shared_ptr<DiscoveryTransport> transport(new DiscoveryTransport(failover));
+        std::shared_ptr<DiscoveryTransport> transport(
+            new DiscoveryTransport(failover));
 
         // TODO set all discovery options on the transport.
 
@@ -101,7 +102,8 @@ std::shared_ptr<Transport> DiscoveryTransportFactory::doCreateTransport(
 
         // TODO error?
 
-        std::shared_ptr<DiscoveryAgent> agent = agentFactory->createAgent(agentURI);
+        std::shared_ptr<DiscoveryAgent> agent =
+            agentFactory->createAgent(agentURI);
         transport->setDiscoveryAgent(agent);
 
         return transport;

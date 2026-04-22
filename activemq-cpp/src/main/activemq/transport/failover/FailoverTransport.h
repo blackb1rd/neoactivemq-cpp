@@ -111,15 +111,19 @@ namespace transport
                 const std::shared_ptr<Command>          command,
                 const std::shared_ptr<ResponseCallback> responseCallback);
 
-            virtual std::shared_ptr<Response> request(const std::shared_ptr<Command> command);
+            virtual std::shared_ptr<Response> request(
+                const std::shared_ptr<Command> command);
 
-            virtual std::shared_ptr<Response> request(const std::shared_ptr<Command> command,
-                                              unsigned int           timeout);
+            virtual std::shared_ptr<Response> request(
+                const std::shared_ptr<Command> command,
+                unsigned int                   timeout);
 
-            virtual std::shared_ptr<wireformat::WireFormat> getWireFormat() const;
+            virtual std::shared_ptr<wireformat::WireFormat> getWireFormat()
+                const;
 
             virtual void setWireFormat(
-                const std::shared_ptr<wireformat::WireFormat> wireFormat AMQCPP_UNUSED)
+                const std::shared_ptr<wireformat::WireFormat> wireFormat
+                    AMQCPP_UNUSED)
             {
             }
 

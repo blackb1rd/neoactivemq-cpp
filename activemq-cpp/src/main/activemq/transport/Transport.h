@@ -131,7 +131,8 @@ namespace transport
          * @throws UnsupportedOperationException if this method is not
          * implemented by this transport.
          */
-        virtual std::shared_ptr<Response> request(const std::shared_ptr<Command> command) = 0;
+        virtual std::shared_ptr<Response> request(
+            const std::shared_ptr<Command> command) = 0;
 
         /**
          * Sends the given command to the broker and then waits for the
@@ -149,8 +150,9 @@ namespace transport
          * @throws UnsupportedOperationException if this method is not
          * implemented by this transport.
          */
-        virtual std::shared_ptr<Response> request(const std::shared_ptr<Command> command,
-                                          unsigned int           timeout) = 0;
+        virtual std::shared_ptr<Response> request(
+            const std::shared_ptr<Command> command,
+            unsigned int                   timeout) = 0;
 
         /**
          * Gets the WireFormat instance that is in use by this transport.  In
@@ -159,7 +161,8 @@ namespace transport
          *
          * @return The WireFormat the object used to encode / decode commands.
          */
-        virtual std::shared_ptr<wireformat::WireFormat> getWireFormat() const = 0;
+        virtual std::shared_ptr<wireformat::WireFormat> getWireFormat()
+            const = 0;
 
         /**
          * Sets the WireFormat instance to use.

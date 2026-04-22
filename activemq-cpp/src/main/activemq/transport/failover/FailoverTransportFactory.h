@@ -48,7 +48,8 @@ namespace transport
             {
             }
 
-            virtual std::shared_ptr<Transport> create(const decaf::net::URI& location);
+            virtual std::shared_ptr<Transport> create(
+                const decaf::net::URI& location);
 
             virtual std::shared_ptr<Transport> createComposite(
                 const decaf::net::URI& location);

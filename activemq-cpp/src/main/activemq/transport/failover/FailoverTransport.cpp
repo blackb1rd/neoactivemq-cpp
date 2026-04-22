@@ -31,8 +31,6 @@
 #include <activemq/transport/failover/URIPool.h>
 #include <activemq/util/AMQLog.h>
 #include <activemq/util/URISupport.h>
-#include <chrono>
-#include <memory>
 #include <decaf/lang/exceptions/IllegalThreadStateException.h>
 #include <decaf/util/LinkedList.h>
 #include <decaf/util/Random.h>
@@ -41,6 +39,8 @@
 #include <decaf/util/concurrent/Mutex.h>
 #include <decaf/util/concurrent/TimeUnit.h>
 #include <atomic>
+#include <chrono>
+#include <memory>
 #include <sstream>
 #include <vector>
 
@@ -113,9 +113,9 @@ namespace transport
             mutable Mutex sleepMutex;
             mutable Mutex listenerMutex;
 
-            StlMap<int, std::shared_ptr<Command>>  requestMap;
-            StlMap<std::string, BrokerState>       brokerStates;  // Per-broker state
-                                                                  // tracking
+            StlMap<int, std::shared_ptr<Command>> requestMap;
+            StlMap<std::string, BrokerState> brokerStates;  // Per-broker state
+                                                            // tracking
 
             std::shared_ptr<URIPool>             uris;
             std::shared_ptr<URIPool>             priorityUris;
@@ -174,8 +174,10 @@ namespace transport
                   backups(),
                   closeTask(std::make_shared<CloseTransportsTask>()),
                   taskRunner(std::make_shared<CompositeTaskRunner>()),
-                  disposedListener(std::make_shared<DefaultTransportListener>()),
-                  myTransportListener(std::make_shared<FailoverTransportListener>(parent)),
+                  disposedListener(
+                      std::make_shared<DefaultTransportListener>()),
+                  myTransportListener(
+                      std::make_shared<FailoverTransportListener>(parent)),
                   transportListener(NULL)
             {
                 this->backups.reset(new BackupTransportPool(parent,
@@ -221,9 +223,12 @@ namespace transport
              */
             void markBrokerConnecting(const decaf::net::URI& uri)
             {
-                BrokerState& state    = getBrokerState(uri);
-                state.status          = BrokerStatus::CONNECTING;
-                state.lastAttemptTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+                BrokerState& state = getBrokerState(uri);
+                state.status       = BrokerStatus::CONNECTING;
+                state.lastAttemptTime =
+                    std::chrono::duration_cast<std::chrono::milliseconds>(
+                        std::chrono::system_clock::now().time_since_epoch())
+                        .count();
             }
 
             /**
@@ -231,11 +236,14 @@ namespace transport
              */
             void markBrokerConnected(const decaf::net::URI& uri)
             {
-                BrokerState& state    = getBrokerState(uri);
-                state.status          = BrokerStatus::CONNECTED;
-                state.failureCount    = 0;
-                state.lastSuccessTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-                state.lastError       = "";
+                BrokerState& state = getBrokerState(uri);
+                state.status       = BrokerStatus::CONNECTED;
+                state.failureCount = 0;
+                state.lastSuccessTime =
+                    std::chrono::duration_cast<std::chrono::milliseconds>(
+                        std::chrono::system_clock::now().time_since_epoch())
+                        .count();
+                state.lastError = "";
             }
 
             /**
@@ -336,7 +344,10 @@ namespace transport
             void recoverExhaustedBrokers()
             {
                 const long long RECOVERY_COOLDOWN = 300000;  // 5 minutes
-                long long       now               = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+                long long       now =
+                    std::chrono::duration_cast<std::chrono::milliseconds>(
+                        std::chrono::system_clock::now().time_since_epoch())
+                        .count();
 
                 std::shared_ptr<Iterator<std::string>> iter(
                     brokerStates.keySet().iterator());
@@ -429,8 +440,8 @@ namespace transport
                     std::shared_ptr<IOException> ioException;
                     try
                     {
-                        ioException =
-                            std::dynamic_pointer_cast<IOException>(this->connectionFailure);
+                        ioException = std::dynamic_pointer_cast<IOException>(
+                            this->connectionFailure);
                     }
                     AMQ_CATCH_NOTHROW(ClassCastException)
 
@@ -730,14 +741,21 @@ void FailoverTransport::oneway(const std::shared_ptr<Command> command)
                     // Wait for transport to be connected.
                     std::shared_ptr<Transport> transport =
                         this->impl->connectedTransport;
-                    long long start    = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-                    bool      timedout = false;
+                    long long start =
+                        std::chrono::duration_cast<std::chrono::milliseconds>(
+                            std::chrono::system_clock::now().time_since_epoch())
+                            .count();
+                    bool timedout = false;
 
                     while (!transport && !this->impl->closed &&
                            !this->impl->connectionFailure &&
                            this->impl->willReconnect())
                     {
-                        long long end = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+                        long long end =
+                            std::chrono::duration_cast<std::chrono::milliseconds>(
+                                std::chrono::system_clock::now()
+                                    .time_since_epoch())
+                                .count();
                         if (command->isMessage() && this->impl->timeout > 0 &&
                             (end - start > this->impl->timeout))
                         {
@@ -797,15 +815,13 @@ void FailoverTransport::oneway(const std::shared_ptr<Command> command)
                         tracked = stateTracker.track(command);
                         synchronized(&this->impl->requestMap)
                         {
-                            if (tracked &&
-                                tracked->isWaitingForResponse())
+                            if (tracked && tracked->isWaitingForResponse())
                             {
                                 this->impl->requestMap.put(
                                     command->getCommandId(),
                                     tracked);
                             }
-                            else if (!tracked &&
-                                     command->isResponseRequired())
+                            else if (!tracked && command->isResponseRequired())
                             {
                                 this->impl->requestMap.put(
                                     command->getCommandId(),
@@ -919,7 +935,7 @@ std::shared_ptr<Response> FailoverTransport::request(
 ////////////////////////////////////////////////////////////////////////////////
 std::shared_ptr<Response> FailoverTransport::request(
     const std::shared_ptr<Command> command AMQCPP_UNUSED,
-    unsigned int timeout AMQCPP_UNUSED)
+    unsigned int timeout                   AMQCPP_UNUSED)
 {
     throw decaf::lang::exceptions::UnsupportedOperationException(
         __FILE__,
@@ -1081,8 +1097,9 @@ void FailoverTransport::reconnect(bool rebalance)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransport::restoreTransport(const std::shared_ptr<Transport> transport,
-                                         bool alreadyStarted)
+void FailoverTransport::restoreTransport(
+    const std::shared_ptr<Transport> transport,
+    bool                             alreadyStarted)
 {
     try
     {
@@ -1113,7 +1130,8 @@ void FailoverTransport::restoreTransport(const std::shared_ptr<Transport> transp
             commands.copy(this->impl->requestMap);
         }
 
-        std::shared_ptr<Iterator<std::shared_ptr<Command>>> iter(commands.values().iterator());
+        std::shared_ptr<Iterator<std::shared_ptr<Command>>> iter(
+            commands.values().iterator());
         while (iter->hasNext())
         {
             transport->oneway(iter->next());
@@ -1197,7 +1215,8 @@ void FailoverTransport::handleTransportFailure(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransport::handleConnectionControl(const std::shared_ptr<Command> control)
+void FailoverTransport::handleConnectionControl(
+    const std::shared_ptr<Command> control)
 {
     try
     {
@@ -1452,7 +1471,8 @@ bool FailoverTransport::iterate()
                         transport->setTransportListener(
                             this->impl->myTransportListener.get());
                         // Take ownership of the transport
-                        priorityBackup->setTransport(std::shared_ptr<Transport>());
+                        priorityBackup->setTransport(
+                            std::shared_ptr<Transport>());
                         transportAlreadyStarted = true;
                     }
 
@@ -1473,7 +1493,8 @@ bool FailoverTransport::iterate()
                             catch (...)
                             {
                             }
-                            remaining->setTransport(std::shared_ptr<Transport>());
+                            remaining->setTransport(
+                                std::shared_ptr<Transport>());
                         }
                         else
                         {
@@ -1500,7 +1521,8 @@ bool FailoverTransport::iterate()
                         // Take ownership of the transport: clear the backup's
                         // reference so its destructor won't close the transport
                         // we're about to use.
-                        backupTransport->setTransport(std::shared_ptr<Transport>());
+                        backupTransport->setTransport(
+                            std::shared_ptr<Transport>());
                         transportAlreadyStarted = true;
                     }
                 }
@@ -1572,8 +1594,7 @@ bool FailoverTransport::iterate()
                 }
 
                 while ((transport || !connectList->isEmpty()) &&
-                       !this->impl->connectedTransport &&
-                       !this->impl->closed)
+                       !this->impl->connectedTransport && !this->impl->closed)
                 {
                     try
                     {
@@ -1651,7 +1672,8 @@ bool FailoverTransport::iterate()
                                              transportAlreadyStarted);
                         }
 
-                        transportAlreadyStarted = false;  // Reset for next iteration
+                        transportAlreadyStarted =
+                            false;  // Reset for next iteration
                         // Check if we were closed during the blocking
                         // restoreTransport() operation
                         if (this->impl->closed)
@@ -1809,7 +1831,7 @@ bool FailoverTransport::iterate()
         // maxReconnectAttempts is per-host, not global - only fail when ALL
         // hosts are exhausted
         std::shared_ptr<URIPool> checkList = this->impl->getConnectList();
-        bool             allExhausted =
+        bool                     allExhausted =
             reconnectAttempts >= 0 &&
             this->impl->allUrisExhausted(checkList->getURIList(),
                                          reconnectAttempts);
@@ -1901,7 +1923,8 @@ bool FailoverTransport::iterate()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::shared_ptr<Transport> FailoverTransport::createTransport(const URI& location) const
+std::shared_ptr<Transport> FailoverTransport::createTransport(
+    const URI& location) const
 {
     try
     {
@@ -1935,7 +1958,8 @@ std::shared_ptr<Transport> FailoverTransport::createTransport(const URI& locatio
             }
         }
 
-        std::shared_ptr<Transport> transport(factory->createComposite(transportUri));
+        std::shared_ptr<Transport> transport(
+            factory->createComposite(transportUri));
 
         return transport;
     }
@@ -2017,7 +2041,8 @@ void FailoverTransport::processResponse(const std::shared_ptr<Response> response
     {
         try
         {
-            std::shared_ptr<Tracked> tracked = std::dynamic_pointer_cast<Tracked>(object);
+            std::shared_ptr<Tracked> tracked =
+                std::dynamic_pointer_cast<Tracked>(object);
             if (tracked)
             {
                 tracked->onResponse();
@@ -2031,7 +2056,7 @@ void FailoverTransport::processResponse(const std::shared_ptr<Response> response
 std::shared_ptr<wireformat::WireFormat> FailoverTransport::getWireFormat() const
 {
     std::shared_ptr<wireformat::WireFormat> result;
-    std::shared_ptr<Transport>              transport = this->impl->connectedTransport;
+    std::shared_ptr<Transport> transport = this->impl->connectedTransport;
 
     if (transport)
     {

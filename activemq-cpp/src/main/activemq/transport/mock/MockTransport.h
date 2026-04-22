@@ -66,13 +66,13 @@ namespace transport
         class AMQCPP_API MockTransport : public Transport
         {
         private:
-            std::shared_ptr<ResponseBuilder>               responseBuilder;
-            std::shared_ptr<wireformat::WireFormat>        wireFormat;
-            TransportListener*                             outgoingListener;
-            TransportListener*                             listener;
-            std::atomic<int>                               nextCommandId;
-            InternalCommandListener                        internalListener;
-            static MockTransport*                          instance;
+            std::shared_ptr<ResponseBuilder>        responseBuilder;
+            std::shared_ptr<wireformat::WireFormat> wireFormat;
+            TransportListener*                      outgoingListener;
+            TransportListener*                      listener;
+            std::atomic<int>                        nextCommandId;
+            InternalCommandListener                 internalListener;
+            static MockTransport*                   instance;
 
             std::string name;
 
@@ -95,8 +95,9 @@ namespace transport
             MockTransport operator=(const MockTransport&);
 
         public:
-            MockTransport(const std::shared_ptr<wireformat::WireFormat> wireFormat,
-                          const std::shared_ptr<ResponseBuilder> responseBuilder);
+            MockTransport(
+                const std::shared_ptr<wireformat::WireFormat> wireFormat,
+                const std::shared_ptr<ResponseBuilder>        responseBuilder);
 
             virtual ~MockTransport()
             {
@@ -176,13 +177,16 @@ namespace transport
                 const std::shared_ptr<Command>          command,
                 const std::shared_ptr<ResponseCallback> responseCallback);
 
-            virtual std::shared_ptr<Response> request(const std::shared_ptr<Command> command);
+            virtual std::shared_ptr<Response> request(
+                const std::shared_ptr<Command> command);
 
-            virtual std::shared_ptr<Response> request(const std::shared_ptr<Command> command,
-                                              unsigned int           timeout);
+            virtual std::shared_ptr<Response> request(
+                const std::shared_ptr<Command> command,
+                unsigned int                   timeout);
 
             virtual void setWireFormat(
-                const std::shared_ptr<wireformat::WireFormat> wireFormat AMQCPP_UNUSED)
+                const std::shared_ptr<wireformat::WireFormat> wireFormat
+                    AMQCPP_UNUSED)
             {
             }
 

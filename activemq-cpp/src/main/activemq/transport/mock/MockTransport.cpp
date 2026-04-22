@@ -31,8 +31,9 @@ using namespace decaf::lang::exceptions;
 MockTransport* MockTransport::instance = NULL;
 
 ////////////////////////////////////////////////////////////////////////////////
-MockTransport::MockTransport(const std::shared_ptr<WireFormat>      wireFormat,
-                             const std::shared_ptr<ResponseBuilder> responseBuilder)
+MockTransport::MockTransport(
+    const std::shared_ptr<WireFormat>      wireFormat,
+    const std::shared_ptr<ResponseBuilder> responseBuilder)
     : responseBuilder(responseBuilder),
       wireFormat(wireFormat),
       outgoingListener(),
@@ -138,7 +139,8 @@ std::shared_ptr<FutureResponse> MockTransport::asyncRequest(
 
             std::shared_ptr<FutureResponse> future(
                 new FutureResponse(responseCallback));
-            std::shared_ptr<Response> response(responseBuilder->buildResponse(command));
+            std::shared_ptr<Response> response(
+                responseBuilder->buildResponse(command));
 
             future->setResponse(response);
 
@@ -158,7 +160,8 @@ std::shared_ptr<FutureResponse> MockTransport::asyncRequest(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::shared_ptr<Response> MockTransport::request(const std::shared_ptr<Command> command)
+std::shared_ptr<Response> MockTransport::request(
+    const std::shared_ptr<Command> command)
 {
     try
     {
@@ -200,8 +203,9 @@ std::shared_ptr<Response> MockTransport::request(const std::shared_ptr<Command> 
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::shared_ptr<Response> MockTransport::request(const std::shared_ptr<Command> command,
-                                         unsigned int timeout   AMQCPP_UNUSED)
+std::shared_ptr<Response> MockTransport::request(
+    const std::shared_ptr<Command> command,
+    unsigned int timeout           AMQCPP_UNUSED)
 {
     try
     {

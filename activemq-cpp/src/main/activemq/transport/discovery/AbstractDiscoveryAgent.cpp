@@ -73,9 +73,9 @@ namespace transport
             int       maxReconnectAttempts;
             long long keepAliveInterval;
 
-            std::atomic<bool>                        started;
-            std::shared_ptr<Thread>                  worker;
-            std::shared_ptr<ThreadPoolExecutor>      executor;
+            std::atomic<bool>                   started;
+            std::shared_ptr<Thread>             worker;
+            std::shared_ptr<ThreadPoolExecutor> executor;
 
             HashMap<std::string, std::shared_ptr<DiscoveredBrokerData>>
                   discoveredServices;
@@ -180,8 +180,9 @@ namespace transport
                     }
 
                     // Is it not yet time?
-                    if (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count() <
-                        service->getNextRecoveryTime())
+                    if (std::chrono::duration_cast<std::chrono::milliseconds>(
+                            std::chrono::system_clock::now().time_since_epoch())
+                            .count() < service->getNextRecoveryTime())
                     {
                         return false;
                     }
@@ -197,7 +198,10 @@ namespace transport
             {
                 synchronized(&discoveredServicesLock)
                 {
-                    service->setLastHeartBeatTime(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count());
+                    service->setLastHeartBeatTime(
+                        std::chrono::duration_cast<std::chrono::milliseconds>(
+                            std::chrono::system_clock::now().time_since_epoch())
+                            .count());
 
                     // Consider that the broker recovery has succeeded if it has
                     // not failed in 60 seconds.
@@ -209,7 +213,10 @@ namespace transport
                     {
                         service->setFailureCount(0);
                         service->setNextRecoveryTime(
-                            std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count());
+                            std::chrono::duration_cast<std::chrono::milliseconds>(
+                                std::chrono::system_clock::now()
+                                    .time_since_epoch())
+                                .count());
                     }
                 }
             }
@@ -239,7 +246,11 @@ namespace transport
                         }
 
                         service->setNextRecoveryTime(
-                            std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count() + reconnectDelay);
+                            std::chrono::duration_cast<std::chrono::milliseconds>(
+                                std::chrono::system_clock::now()
+                                    .time_since_epoch())
+                                .count() +
+                            reconnectDelay);
                         return true;
                     }
                 }
@@ -657,7 +668,10 @@ void AbstractDiscoveryAgent::doTimeKeepingServices()
 {
     if (impl->started.load())
     {
-        long long currentTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+        long long currentTime =
+            std::chrono::duration_cast<std::chrono::milliseconds>(
+                std::chrono::system_clock::now().time_since_epoch())
+                .count();
         if (currentTime < impl->lastAdvertizeTime ||
             ((currentTime - impl->keepAliveInterval) > impl->lastAdvertizeTime))
         {
@@ -672,7 +686,9 @@ void AbstractDiscoveryAgent::doTimeKeepingServices()
 void AbstractDiscoveryAgent::doExpireOldServices()
 {
     long long expireTime =
-        std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count() -
+        std::chrono::duration_cast<std::chrono::milliseconds>(
+            std::chrono::system_clock::now().time_since_epoch())
+            .count() -
         (impl->keepAliveInterval * HEARTBEAT_MISS_BEFORE_DEATH);
 
     std::vector<std::shared_ptr<DiscoveredBrokerData>> services;

@@ -53,6 +53,8 @@ WriteChecker::~WriteChecker()
 ////////////////////////////////////////////////////////////////////////////////
 void WriteChecker::run()
 {
-    this->lastRunTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+    this->lastRunTime = std::chrono::duration_cast<std::chrono::milliseconds>(
+                            std::chrono::system_clock::now().time_since_epoch())
+                            .count();
     this->parent->writeCheck();
 }

@@ -60,7 +60,8 @@ void FailoverTransportListener::onCommand(const std::shared_ptr<Command> command
 
     if (command->isResponse())
     {
-        std::shared_ptr<Response> response = std::dynamic_pointer_cast<Response>(command);
+        std::shared_ptr<Response> response =
+            std::dynamic_pointer_cast<Response>(command);
         parent->processResponse(response);
     }
 

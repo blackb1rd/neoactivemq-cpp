@@ -57,15 +57,17 @@ namespace transport
              *
              * Not supported by this class - throws an exception.
              */
-            virtual std::shared_ptr<Response> request(const std::shared_ptr<Command> command);
+            virtual std::shared_ptr<Response> request(
+                const std::shared_ptr<Command> command);
 
             /**
              * {@inheritDoc}
              *
              * Not supported by this class - throws an exception.
              */
-            virtual std::shared_ptr<Response> request(const std::shared_ptr<Command> command,
-                                              unsigned int           timeout);
+            virtual std::shared_ptr<Response> request(
+                const std::shared_ptr<Command> command,
+                unsigned int                   timeout);
         };
 
     }  // namespace logging

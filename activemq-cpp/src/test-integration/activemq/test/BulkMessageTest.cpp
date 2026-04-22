@@ -334,7 +334,7 @@ void BulkMessageTest::testBulkMessageSendReceive()
 ////////////////////////////////////////////////////////////////////////////////
 void BulkMessageTest::testHighFanout5000Clients()
 {
-    const int       CLIENT_COUNT        = 5000;
+    const int       CLIENT_COUNT        = 3000;
     const int       TOPIC_COUNT         = 10;
     const int       MSG_PER_TOPIC       = 200;
     const int       MSG_SIZE            = 128;

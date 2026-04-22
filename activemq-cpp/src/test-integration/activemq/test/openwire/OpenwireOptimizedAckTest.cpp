@@ -56,9 +56,9 @@ namespace test
 #include <activemq/core/PrefetchPolicy.h>
 #include <activemq/exceptions/ActiveMQException.h>
 
-#include <memory>
 #include <decaf/lang/Thread.h>
 #include <decaf/util/concurrent/atomic/AtomicInteger.h>
+#include <memory>
 
 using namespace std;
 using namespace cms;
@@ -111,7 +111,8 @@ TEST_F(OpenwireOptimizedAckTest, testOptimizedAckSettings)
 
     ASSERT_EQ(100, connectionFactory->getPrefetchPolicy()->getQueuePrefetch());
 
-    std::shared_ptr<Connection> connection(connectionFactory->createConnection());
+    std::shared_ptr<Connection> connection(
+        connectionFactory->createConnection());
     connection->start();
     std::shared_ptr<Session> session(
         connection->createSession(Session::AUTO_ACKNOWLEDGE));
@@ -148,14 +149,15 @@ TEST_F(OpenwireOptimizedAckTest, testOptimizedAckWithExpiredMsgs)
     std::shared_ptr<ActiveMQConnectionFactory> connectionFactory(
         new ActiveMQConnectionFactory(getBrokerURL()));
 
-    std::shared_ptr<Connection> connection(connectionFactory->createConnection());
-    std::shared_ptr<Session>    session(
+    std::shared_ptr<Connection> connection(
+        connectionFactory->createConnection());
+    std::shared_ptr<Session> session(
         connection->createSession(Session::AUTO_ACKNOWLEDGE));
     std::shared_ptr<Destination> destination(session->createQueue("TEST.FOO"));
 
     std::shared_ptr<MessageConsumer> consumer(
         session->createConsumer(destination.get()));
-    MyMessageListener        listener;
+    MyMessageListener                listener;
     std::shared_ptr<MessageProducer> producer(
         session->createProducer(destination.get()));
     producer->setDeliveryMode(cms::DeliveryMode::NON_PERSISTENT);
@@ -207,7 +209,8 @@ TEST_F(OpenwireOptimizedAckTest, testOptimizedAckWithExpiredMsgsSync)
     std::shared_ptr<ActiveMQConnectionFactory> connectionFactory(
         new ActiveMQConnectionFactory(getBrokerURL()));
 
-    std::shared_ptr<Connection> connection(connectionFactory->createConnection());
+    std::shared_ptr<Connection> connection(
+        connectionFactory->createConnection());
     connection->start();
     std::shared_ptr<Session> session(
         connection->createSession(Session::AUTO_ACKNOWLEDGE));
@@ -257,7 +260,8 @@ TEST_F(OpenwireOptimizedAckTest, testOptimizedAckWithExpiredMsgsSync2)
     std::shared_ptr<ActiveMQConnectionFactory> connectionFactory(
         new ActiveMQConnectionFactory(getBrokerURL()));
 
-    std::shared_ptr<Connection> connection(connectionFactory->createConnection());
+    std::shared_ptr<Connection> connection(
+        connectionFactory->createConnection());
     connection->start();
     std::shared_ptr<Session> session(
         connection->createSession(Session::AUTO_ACKNOWLEDGE));

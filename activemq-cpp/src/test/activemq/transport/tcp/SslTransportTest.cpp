@@ -36,11 +36,11 @@
 #include <decaf/util/Properties.h>
 
 #include <activemq/util/Config.h>
-#include <memory>
 #include <decaf/lang/Thread.h>
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
+#include <memory>
 
 using namespace activemq;
 using namespace activemq::io;
@@ -68,15 +68,17 @@ TEST_F(SslTransportTest, testSslTransportCreate)
         URI uri("ssl://localhost:61617");
 
         // Create the wireformat
-        Properties              properties;
-        std::shared_ptr<OpenWireFormat> wireformat(new OpenWireFormat(properties));
+        Properties                      properties;
+        std::shared_ptr<OpenWireFormat> wireformat(
+            new OpenWireFormat(properties));
 
         // Create IOTransport as the base
-        std::shared_ptr<Transport> transport(
-            new IOTransport(std::dynamic_pointer_cast<wireformat::WireFormat>(wireformat)));
+        std::shared_ptr<Transport> transport(new IOTransport(
+            std::dynamic_pointer_cast<wireformat::WireFormat>(wireformat)));
 
         // Wrap with SslTransport
-        std::shared_ptr<SslTransport> sslTransport(new SslTransport(transport, uri));
+        std::shared_ptr<SslTransport> sslTransport(
+            new SslTransport(transport, uri));
 
         // Verify the transport was created successfully
         ASSERT_TRUE(sslTransport.get() != NULL);
@@ -293,11 +295,13 @@ TEST_F(SslTransportTest, testSslConnectionFailureHandling)
         // Test that SSL connection failures are properly cleaned up
         URI uri("ssl://localhost:9999");  // Likely unused port
 
-        Properties              properties;
-        std::shared_ptr<OpenWireFormat> wireformat(new OpenWireFormat(properties));
-        std::shared_ptr<Transport>      transport(
-            new IOTransport(std::dynamic_pointer_cast<wireformat::WireFormat>(wireformat)));
-        std::shared_ptr<SslTransport> sslTransport(new SslTransport(transport, uri));
+        Properties                      properties;
+        std::shared_ptr<OpenWireFormat> wireformat(
+            new OpenWireFormat(properties));
+        std::shared_ptr<Transport>    transport(new IOTransport(
+            std::dynamic_pointer_cast<wireformat::WireFormat>(wireformat)));
+        std::shared_ptr<SslTransport> sslTransport(
+            new SslTransport(transport, uri));
 
         sslTransport->setConnectTimeout(500);
 
@@ -339,10 +343,12 @@ TEST_F(SslTransportTest, testSslTransportWithProperties)
         properties.setProperty("transport.tcpNoDelay", "true");
         properties.setProperty("transport.soKeepAlive", "true");
 
-        std::shared_ptr<OpenWireFormat> wireformat(new OpenWireFormat(properties));
-        std::shared_ptr<Transport>      transport(
-            new IOTransport(std::dynamic_pointer_cast<wireformat::WireFormat>(wireformat)));
-        std::shared_ptr<SslTransport> sslTransport(new SslTransport(transport, uri));
+        std::shared_ptr<OpenWireFormat> wireformat(
+            new OpenWireFormat(properties));
+        std::shared_ptr<Transport>    transport(new IOTransport(
+            std::dynamic_pointer_cast<wireformat::WireFormat>(wireformat)));
+        std::shared_ptr<SslTransport> sslTransport(
+            new SslTransport(transport, uri));
 
         // Apply properties
         sslTransport->setLinger(0);

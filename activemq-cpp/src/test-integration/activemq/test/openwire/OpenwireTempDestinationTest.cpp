@@ -375,7 +375,7 @@ TEST_F(OpenwireTempDestinationTest, testTmpQueueWorksUnderLoad)
     int dataSize = 1024;
 
     ArrayList<std::shared_ptr<BytesMessage>> list(count);
-    std::unique_ptr<TemporaryQueue>  queue(
+    std::unique_ptr<TemporaryQueue>          queue(
         cmsProvider->getSession()->createTemporaryQueue());
     std::unique_ptr<MessageProducer> producer(
         cmsProvider->getSession()->createProducer(queue.get()));

@@ -24,12 +24,12 @@
 #include <activemq/transport/tcp/TcpTransportFactory.h>
 
 #include <decaf/lang/Integer.h>
-#include <memory>
 #include <decaf/lang/Thread.h>
 #include <decaf/net/URI.h>
 #include <decaf/util/Random.h>
 #include <decaf/util/concurrent/CountDownLatch.h>
 #include <decaf/util/concurrent/atomic/AtomicBoolean.h>
+#include <memory>
 
 #include <activemq/util/Config.h>
 #include <chrono>
@@ -182,8 +182,8 @@ TEST_F(SingleBrokerReconnectTest, testAppLevelReconnectAfterBrokerRestart)
     std::string         uri = "tcp://127.0.0.1:61101";
 
     // === First connection ===
-    SingleBrokerListener listener1;
-    std::shared_ptr<Transport>   transport1(factory.create(uri));
+    SingleBrokerListener       listener1;
+    std::shared_ptr<Transport> transport1(factory.create(uri));
     transport1->setTransportListener(&listener1);
     transport1->start();
 
@@ -207,8 +207,8 @@ TEST_F(SingleBrokerReconnectTest, testAppLevelReconnectAfterBrokerRestart)
     broker->waitUntilStarted();
 
     // Create NEW transport (this is the app-level reconnect pattern)
-    SingleBrokerListener listener2;
-    std::shared_ptr<Transport>   transport2(factory.create(uri));
+    SingleBrokerListener       listener2;
+    std::shared_ptr<Transport> transport2(factory.create(uri));
     transport2->setTransportListener(&listener2);
     transport2->start();
 
@@ -231,8 +231,8 @@ TEST_F(SingleBrokerReconnectTest, testFuzzyBrokerUpDown)
     const int NUM_CYCLES = 10;
 
     std::shared_ptr<MockBrokerService> broker(new MockBrokerService(61102));
-    TcpTransportFactory        factory;
-    std::string                uri = "tcp://127.0.0.1:61102";
+    TcpTransportFactory                factory;
+    std::string                        uri = "tcp://127.0.0.1:61102";
 
     Random rand;
     rand.setSeed(System::currentTimeMillis());
@@ -251,8 +251,8 @@ TEST_F(SingleBrokerReconnectTest, testFuzzyBrokerUpDown)
         Thread::sleep(rand.nextInt(100) + 50);
 
         // Try to connect
-        SingleBrokerListener listener;
-        std::shared_ptr<Transport>   transport;
+        SingleBrokerListener       listener;
+        std::shared_ptr<Transport> transport;
 
         try
         {
@@ -289,8 +289,8 @@ TEST_F(SingleBrokerReconnectTest, testFuzzyBrokerUpDown)
                 broker->waitUntilStarted();
 
                 // App-level reconnect with new transport
-                SingleBrokerListener reconnectListener;
-                std::shared_ptr<Transport>   newTransport(factory.create(uri));
+                SingleBrokerListener       reconnectListener;
+                std::shared_ptr<Transport> newTransport(factory.create(uri));
                 newTransport->setTransportListener(&reconnectListener);
 
                 try

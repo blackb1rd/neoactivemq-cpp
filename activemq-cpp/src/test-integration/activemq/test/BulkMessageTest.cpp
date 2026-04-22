@@ -85,7 +85,8 @@ public:
     {
         cms::Session* session(cmsProducerProvider->getSession());
         Destination*  destination = cmsProducerProvider->getDestination();
-        std::shared_ptr<MessageProducer> producer(session->createProducer(destination));
+        std::shared_ptr<MessageProducer> producer(
+            session->createProducer(destination));
         producer->setDeliveryMode(cms::DeliveryMode::NON_PERSISTENT);
 
         std::string DATA = "abcdefghijklmnopqrstuvwxyz";

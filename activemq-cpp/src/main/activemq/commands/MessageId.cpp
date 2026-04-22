@@ -20,8 +20,10 @@
 #include <activemq/state/CommandVisitor.h>
 #include <decaf/internal/util/StringUtils.h>
 #include <decaf/lang/exceptions/NullPointerException.h>
+#include <decaf/lang/exceptions/NumberFormatException.h>
 #include <decaf/util/HashCode.h>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 
 using namespace std;
@@ -382,8 +384,19 @@ void MessageId::setValue(const std::string& key)
 
     if (p != std::string::npos)
     {
-        producerSequenceId =
-            std::stoll(messageKey.substr(p + 1, std::string::npos));
+        try
+        {
+            producerSequenceId =
+                std::stoll(messageKey.substr(p + 1, std::string::npos));
+        }
+        catch (const std::invalid_argument& e)
+        {
+            throw decaf::lang::exceptions::NumberFormatException(&e);
+        }
+        catch (const std::out_of_range& e)
+        {
+            throw decaf::lang::exceptions::NumberFormatException(&e);
+        }
         messageKey = messageKey.substr(0, p);
     }
 

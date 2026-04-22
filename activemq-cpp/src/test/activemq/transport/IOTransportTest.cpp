@@ -291,7 +291,7 @@ TEST_F(IOTransportTest, testStartClose)
     decaf::io::DataInputStream              input(&is);
     decaf::io::DataOutputStream             output(&os);
     MyTransportListener                     listener;
-    std::shared_ptr<MyWireFormat>                   wireFormat(new MyWireFormat());
+    std::shared_ptr<MyWireFormat>           wireFormat(new MyWireFormat());
     IOTransport                             transport(wireFormat);
     transport.setTransportListener(&listener);
     transport.setInputStream(&input);
@@ -313,7 +313,7 @@ TEST_F(IOTransportTest, testStressTransportStartClose)
     decaf::io::DataOutputStream             output(&bos);
 
     std::shared_ptr<MyWireFormat> wireFormat(new MyWireFormat());
-    MyTransportListener   listener;
+    MyTransportListener           listener;
 
     for (int i = 0; i < 50; ++i)
     {
@@ -351,8 +351,8 @@ TEST_F(IOTransportTest, testRead)
     decaf::io::DataOutputStream             output(&os);
 
     std::shared_ptr<MyWireFormat> wireFormat(new MyWireFormat());
-    MyTransportListener   listener(10);
-    IOTransport           transport;
+    MyTransportListener           listener(10);
+    IOTransport                   transport;
     transport.setInputStream(&input);
     transport.setOutputStream(&output);
     transport.setTransportListener(&listener);
@@ -392,8 +392,8 @@ TEST_F(IOTransportTest, testWrite)
     decaf::io::DataOutputStream             output(&os);
 
     std::shared_ptr<MyWireFormat> wireFormat(new MyWireFormat());
-    MyTransportListener   listener;
-    IOTransport           transport;
+    MyTransportListener           listener;
+    IOTransport                   transport;
     transport.setInputStream(&input);
     transport.setOutputStream(&output);
     transport.setTransportListener(&listener);
@@ -437,8 +437,8 @@ TEST_F(IOTransportTest, testException)
     decaf::io::DataOutputStream             output(&os);
 
     std::shared_ptr<MyWireFormat> wireFormat(new MyWireFormat());
-    MyTransportListener   listener;
-    IOTransport           transport;
+    MyTransportListener           listener;
+    IOTransport                   transport;
     wireFormat->throwException = true;
     transport.setInputStream(&input);
     transport.setOutputStream(&output);

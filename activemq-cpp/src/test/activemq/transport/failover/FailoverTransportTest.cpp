@@ -26,11 +26,11 @@
 #include <activemq/transport/failover/FailoverTransportFactory.h>
 #include <activemq/transport/mock/MockTransport.h>
 #include <activemq/util/AMQLog.h>
-#include <memory>
 #include <decaf/lang/Thread.h>
 #include <decaf/util/UUID.h>
 #include <decaf/util/concurrent/CountDownLatch.h>
 #include <decaf/util/concurrent/Mutex.h>
+#include <memory>
 
 #include <activemq/commands/ConnectionInfo.h>
 #include <activemq/commands/ConsumerInfo.h>
@@ -60,9 +60,12 @@ class FailoverTransportTest : public ::testing::Test
 {
 protected:
     std::shared_ptr<ConnectionInfo> createConnection();
-    std::shared_ptr<SessionInfo>  createSession(const std::shared_ptr<ConnectionInfo>& parent);
-    std::shared_ptr<ConsumerInfo> createConsumer(const std::shared_ptr<SessionInfo>& parent);
-    std::shared_ptr<ProducerInfo> createProducer(const std::shared_ptr<SessionInfo>& parent);
+    std::shared_ptr<SessionInfo>    createSession(
+           const std::shared_ptr<ConnectionInfo>& parent);
+    std::shared_ptr<ConsumerInfo> createConsumer(
+        const std::shared_ptr<SessionInfo>& parent);
+    std::shared_ptr<ProducerInfo> createProducer(
+        const std::shared_ptr<SessionInfo>& parent);
 
     void disposeOf(const std::shared_ptr<SessionInfo>& session,
                    std::shared_ptr<Transport>&         transport);
@@ -253,8 +256,9 @@ std::shared_ptr<ProducerInfo> FailoverTransportTest::createProducer(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransportTest::disposeOf(const std::shared_ptr<SessionInfo>& session,
-                                      std::shared_ptr<Transport>&         transport)
+void FailoverTransportTest::disposeOf(
+    const std::shared_ptr<SessionInfo>& session,
+    std::shared_ptr<Transport>&         transport)
 {
     std::shared_ptr<RemoveInfo> command(new RemoveInfo());
     command->setObjectId(session->getSessionId());
@@ -262,8 +266,9 @@ void FailoverTransportTest::disposeOf(const std::shared_ptr<SessionInfo>& sessio
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransportTest::disposeOf(const std::shared_ptr<ConsumerInfo>& consumer,
-                                      std::shared_ptr<Transport>&          transport)
+void FailoverTransportTest::disposeOf(
+    const std::shared_ptr<ConsumerInfo>& consumer,
+    std::shared_ptr<Transport>&          transport)
 {
     std::shared_ptr<RemoveInfo> command(new RemoveInfo());
     command->setObjectId(consumer->getConsumerId());
@@ -271,8 +276,9 @@ void FailoverTransportTest::disposeOf(const std::shared_ptr<ConsumerInfo>& consu
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransportTest::disposeOf(const std::shared_ptr<ProducerInfo>& producer,
-                                      std::shared_ptr<Transport>&          transport)
+void FailoverTransportTest::disposeOf(
+    const std::shared_ptr<ProducerInfo>& producer,
+    std::shared_ptr<Transport>&          transport)
 {
     std::shared_ptr<RemoveInfo> command(new RemoveInfo());
     command->setObjectId(producer->getProducerId());
@@ -433,7 +439,7 @@ TEST_F(FailoverTransportTest, testSendOnewayMessage)
 {
     std::string uri = "failover://(mock://localhost:61616)?randomize=false";
 
-    const int                numMessages = 1000;
+    const int                        numMessages = 1000;
     std::shared_ptr<ActiveMQMessage> message(new ActiveMQMessage());
 
     MessageCountingListener  messageCounter;

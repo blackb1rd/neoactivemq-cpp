@@ -58,11 +58,11 @@ namespace test
 #include <activemq/core/PrefetchPolicy.h>
 #include <activemq/exceptions/ActiveMQException.h>
 
-#include <memory>
 #include <decaf/lang/Thread.h>
 #include <decaf/util/LinkedHashSet.h>
 #include <decaf/util/LinkedList.h>
 #include <decaf/util/concurrent/atomic/AtomicInteger.h>
+#include <memory>
 
 using namespace std;
 using namespace cms;
@@ -89,10 +89,12 @@ void sendMessages(const std::string& uri,
 {
     std::shared_ptr<ActiveMQConnectionFactory> connectionFactory(
         new ActiveMQConnectionFactory(uri));
-    std::shared_ptr<Connection> connection(connectionFactory->createConnection());
-    std::shared_ptr<Session>    session(
+    std::shared_ptr<Connection> connection(
+        connectionFactory->createConnection());
+    std::shared_ptr<Session> session(
         connection->createSession(Session::AUTO_ACKNOWLEDGE));
-    std::shared_ptr<Destination>     destination(session->createQueue(destinationName));
+    std::shared_ptr<Destination> destination(
+        session->createQueue(destinationName));
     std::shared_ptr<MessageProducer> producer(
         session->createProducer(destination.get()));
     for (int i = 0; i < count; ++i)
@@ -108,10 +110,12 @@ void destroyDestination(const std::string& uri,
 {
     std::shared_ptr<ActiveMQConnectionFactory> connectionFactory(
         new ActiveMQConnectionFactory(uri));
-    std::shared_ptr<Connection> connection(connectionFactory->createConnection());
-    std::shared_ptr<Session>    session(
+    std::shared_ptr<Connection> connection(
+        connectionFactory->createConnection());
+    std::shared_ptr<Session> session(
         connection->createSession(Session::AUTO_ACKNOWLEDGE));
-    std::shared_ptr<Destination> destination(session->createQueue(destinationName));
+    std::shared_ptr<Destination> destination(
+        session->createQueue(destinationName));
     std::shared_ptr<ActiveMQConnection> amqCon =
         std::dynamic_pointer_cast<ActiveMQConnection>(connection);
     amqCon->destroyDestination(destination.get());
@@ -174,7 +178,8 @@ public:
 
             for (int i = 0; i < produceMessages; i++)
             {
-                std::shared_ptr<TextMessage> message(session->createTextMessage());
+                std::shared_ptr<TextMessage> message(
+                    session->createTextMessage());
                 message->setLongProperty("TestTime",
                                          System::currentTimeMillis());
                 try
@@ -208,14 +213,14 @@ public:
 class TestConsumer : public Thread, public MessageListener
 {
 private:
-    std::string                        brokerUri;
-    std::string                        destinationName;
-    CountDownLatch                     totalMessages;
-    int                                expected;
-    int                                receivedCount;
-    bool                               rolledBack;
-    bool                               failed;
-    LinkedList<int>*                   messages;
+    std::string                                brokerUri;
+    std::string                                destinationName;
+    CountDownLatch                             totalMessages;
+    int                                        expected;
+    int                                        receivedCount;
+    bool                                       rolledBack;
+    bool                                       failed;
+    LinkedList<int>*                           messages;
     std::shared_ptr<ActiveMQConnectionFactory> connectionFactory;
     std::shared_ptr<Connection>                connection;
     std::shared_ptr<Session>                   session;
@@ -353,7 +358,7 @@ public:
 class SomeRollbacksListener : public cms::MessageListener
 {
 private:
-    int                                count;
+    int                                        count;
     std::shared_ptr<Session>                   session;
     LinkedHashSet<std::shared_ptr<MessageId>>* received;
 
@@ -450,8 +455,8 @@ TEST_F(OpenwireNonBlockingRedeliveryTest, testConsumerMessagesAreNotOrdered)
 
     ASSERT_TRUE(!consumer.isFailed());
 
-    bool                   ordered = true;
-    int                    lastId  = 0;
+    bool                           ordered = true;
+    int                            lastId  = 0;
     std::shared_ptr<Iterator<int>> sequenceIds(messages.iterator());
     while (sequenceIds->hasNext())
     {
@@ -484,10 +489,12 @@ TEST_F(OpenwireNonBlockingRedeliveryTest,
 
     std::shared_ptr<ActiveMQConnectionFactory> connectionFactory(
         new ActiveMQConnectionFactory(getBrokerURL()));
-    std::shared_ptr<Connection> connection(connectionFactory->createConnection());
-    std::shared_ptr<Session>    session(
+    std::shared_ptr<Connection> connection(
+        connectionFactory->createConnection());
+    std::shared_ptr<Session> session(
         connection->createSession(Session::SESSION_TRANSACTED));
-    std::shared_ptr<Destination>     destination(session->createQueue(destinationName));
+    std::shared_ptr<Destination> destination(
+        session->createQueue(destinationName));
     std::shared_ptr<MessageConsumer> consumer(
         session->createConsumer(destination.get()));
 
@@ -532,10 +539,12 @@ TEST_F(OpenwireNonBlockingRedeliveryTest, testMessageRedeliveriesAreInOrder)
 
     std::shared_ptr<ActiveMQConnectionFactory> connectionFactory(
         new ActiveMQConnectionFactory(getBrokerURL()));
-    std::shared_ptr<Connection> connection(connectionFactory->createConnection());
-    std::shared_ptr<Session>    session(
+    std::shared_ptr<Connection> connection(
+        connectionFactory->createConnection());
+    std::shared_ptr<Session> session(
         connection->createSession(Session::SESSION_TRANSACTED));
-    std::shared_ptr<Destination>     destination(session->createQueue(destinationName));
+    std::shared_ptr<Destination> destination(
+        session->createQueue(destinationName));
     std::shared_ptr<MessageConsumer> consumer(
         session->createConsumer(destination.get()));
 
@@ -561,8 +570,10 @@ TEST_F(OpenwireNonBlockingRedeliveryTest, testMessageRedeliveriesAreInOrder)
     ASSERT_EQ(beforeRollback.size(), afterRollback.size());
     ASSERT_TRUE(beforeRollback.equals(afterRollback));
 
-    std::shared_ptr<Iterator<std::shared_ptr<MessageId>>> after(afterRollback.iterator());
-    std::shared_ptr<Iterator<std::shared_ptr<MessageId>>> before(beforeRollback.iterator());
+    std::shared_ptr<Iterator<std::shared_ptr<MessageId>>> after(
+        afterRollback.iterator());
+    std::shared_ptr<Iterator<std::shared_ptr<MessageId>>> before(
+        beforeRollback.iterator());
 
     while (before->hasNext() && after->hasNext())
     {
@@ -594,10 +605,12 @@ TEST_F(OpenwireNonBlockingRedeliveryTest, testMessageDeleiveryDoesntStop)
 
     std::shared_ptr<ActiveMQConnectionFactory> connectionFactory(
         new ActiveMQConnectionFactory(getBrokerURL()));
-    std::shared_ptr<Connection> connection(connectionFactory->createConnection());
-    std::shared_ptr<Session>    session(
+    std::shared_ptr<Connection> connection(
+        connectionFactory->createConnection());
+    std::shared_ptr<Session> session(
         connection->createSession(Session::SESSION_TRANSACTED));
-    std::shared_ptr<Destination>     destination(session->createQueue(destinationName));
+    std::shared_ptr<Destination> destination(
+        session->createQueue(destinationName));
     std::shared_ptr<MessageConsumer> consumer(
         session->createConsumer(destination.get()));
 
@@ -646,10 +659,12 @@ TEST_F(OpenwireNonBlockingRedeliveryTest,
     connectionFactory->getRedeliveryPolicy()->setInitialRedeliveryDelay(
         TimeUnit::SECONDS.toMillis(10));
 
-    std::shared_ptr<Connection> connection(connectionFactory->createConnection());
-    std::shared_ptr<Session>    session(
+    std::shared_ptr<Connection> connection(
+        connectionFactory->createConnection());
+    std::shared_ptr<Session> session(
         connection->createSession(Session::SESSION_TRANSACTED));
-    std::shared_ptr<Destination>     destination(session->createQueue(destinationName));
+    std::shared_ptr<Destination> destination(
+        session->createQueue(destinationName));
     std::shared_ptr<MessageConsumer> consumer(
         session->createConsumer(destination.get()));
 
@@ -694,10 +709,12 @@ TEST_F(OpenwireNonBlockingRedeliveryTest,
     connectionFactory->getRedeliveryPolicy()->setInitialRedeliveryDelay(
         TimeUnit::SECONDS.toMillis(10));
 
-    std::shared_ptr<Connection> connection(connectionFactory->createConnection());
-    std::shared_ptr<Session>    session(
+    std::shared_ptr<Connection> connection(
+        connectionFactory->createConnection());
+    std::shared_ptr<Session> session(
         connection->createSession(Session::SESSION_TRANSACTED));
-    std::shared_ptr<Destination>     destination(session->createQueue(destinationName));
+    std::shared_ptr<Destination> destination(
+        session->createQueue(destinationName));
     std::shared_ptr<MessageConsumer> consumer(
         session->createConsumer(destination.get()));
 
@@ -746,14 +763,17 @@ TEST_F(OpenwireNonBlockingRedeliveryTest,
     connectionFactory->getRedeliveryPolicy()->setInitialRedeliveryDelay(
         TimeUnit::SECONDS.toMillis(5));
 
-    std::shared_ptr<Connection> connection(connectionFactory->createConnection());
-    std::shared_ptr<Session>    session(
+    std::shared_ptr<Connection> connection(
+        connectionFactory->createConnection());
+    std::shared_ptr<Session> session(
         connection->createSession(Session::SESSION_TRANSACTED));
-    std::shared_ptr<Destination>     destination(session->createQueue(destinationName));
+    std::shared_ptr<Destination> destination(
+        session->createQueue(destinationName));
     std::shared_ptr<Destination>     dlq(session->createQueue("ActiveMQ.DLQ"));
     std::shared_ptr<MessageConsumer> consumer(
         session->createConsumer(destination.get()));
-    std::shared_ptr<MessageConsumer> dlqConsumer(session->createConsumer(dlq.get()));
+    std::shared_ptr<MessageConsumer> dlqConsumer(
+        session->createConsumer(dlq.get()));
 
     ReceivedListener dlqReceivedListener(&dlqed);
     dlqConsumer->setMessageListener(&dlqReceivedListener);

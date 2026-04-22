@@ -26,12 +26,12 @@
 #include <decaf/io/InputStream.h>
 #include <decaf/io/OutputStream.h>
 #include <decaf/lang/Integer.h>
-#include <memory>
 #include <decaf/net/ServerSocket.h>
 #include <decaf/net/Socket.h>
 #include <decaf/net/SocketFactory.h>
 #include <decaf/net/SocketTimeoutException.h>
 #include <decaf/util/Random.h>
+#include <memory>
 
 using namespace decaf;
 using namespace decaf::lang;
@@ -59,12 +59,12 @@ namespace
 class TestServer : public lang::Thread
 {
 private:
-    bool                    done;
-    bool                    error;
+    bool                            done;
+    bool                            error;
     std::shared_ptr<ServerSocket>   server;
     std::shared_ptr<OpenWireFormat> wireFormat;
-    CountDownLatch          started;
-    Random                  rand;
+    CountDownLatch                  started;
+    Random                          rand;
 
 public:
     TestServer()

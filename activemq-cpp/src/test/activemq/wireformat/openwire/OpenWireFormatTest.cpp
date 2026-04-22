@@ -47,7 +47,8 @@ TEST_F(OpenWireFormatTest, testProviderInfoInWireFormat)
     Properties            properties;
 
     std::shared_ptr<OpenWireFormat> myWireFormat =
-        std::dynamic_pointer_cast<OpenWireFormat>(factory.createWireFormat(properties));
+        std::dynamic_pointer_cast<OpenWireFormat>(
+            factory.createWireFormat(properties));
 
     ASSERT_EQ(
         meta.getCMSProviderName(),

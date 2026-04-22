@@ -92,13 +92,15 @@ public:
         return std::shared_ptr<FutureResponse>();
     }
 
-    virtual std::shared_ptr<Response> request(const std::shared_ptr<Command> command)
+    virtual std::shared_ptr<Response> request(
+        const std::shared_ptr<Command> command)
     {
         return std::shared_ptr<Response>();
     }
 
-    virtual std::shared_ptr<Response> request(const std::shared_ptr<Command> command,
-                                      unsigned int           timeout)
+    virtual std::shared_ptr<Response> request(
+        const std::shared_ptr<Command> command,
+        unsigned int                   timeout)
     {
         return std::shared_ptr<Response>();
     }
@@ -108,7 +110,8 @@ public:
         return std::shared_ptr<wireformat::WireFormat>();
     }
 
-    virtual void setWireFormat(const std::shared_ptr<wireformat::WireFormat> wireFormat)
+    virtual void setWireFormat(
+        const std::shared_ptr<wireformat::WireFormat> wireFormat)
     {
     }
 
@@ -206,7 +209,8 @@ public:
         dispatch->setConsumerId(cid);
 
         // Set Destination
-        std::shared_ptr<ActiveMQDestination> dest(new ActiveMQTopic("test.topic"));
+        std::shared_ptr<ActiveMQDestination> dest(
+            new ActiveMQTopic("test.topic"));
         dispatch->setDestination(dest);
 
         // Create Message with MessageId
@@ -340,7 +344,8 @@ public:
         dispatch->setConsumerId(cid);
 
         // Set Destination - durable subscriptions are for topics
-        std::shared_ptr<ActiveMQDestination> dest(new ActiveMQTopic("durable.topic"));
+        std::shared_ptr<ActiveMQDestination> dest(
+            new ActiveMQTopic("durable.topic"));
         dispatch->setDestination(dest);
 
         // Create Message with MessageId using ProducerId
@@ -408,9 +413,9 @@ class MockTransportListener : public TransportListener
 {
 private:
     std::vector<std::shared_ptr<Command>> receivedCommands;
-    std::vector<std::string>      receivedErrors;
-    CountDownLatch*               expectedCommandLatch;
-    CountDownLatch*               errorLatch;
+    std::vector<std::string>              receivedErrors;
+    CountDownLatch*                       expectedCommandLatch;
+    CountDownLatch*                       errorLatch;
 
 public:
     MockTransportListener()
@@ -529,10 +534,11 @@ TEST_F(CorruptedMessageTest, testCorruptedFirstMessage)
         new ByteArrayInputStream(&corruptedBytes[0], corruptedBytes.size()));
 
     // Create output stream to capture POISON_ACK
-    std::shared_ptr<ByteArrayOutputStream> outputStream(new ByteArrayOutputStream());
+    std::shared_ptr<ByteArrayOutputStream> outputStream(
+        new ByteArrayOutputStream());
 
     // Create wireformat for unmarshal testing
-    decaf::util::Properties props;
+    decaf::util::Properties         props;
     std::shared_ptr<OpenWireFormat> wireFormat(new OpenWireFormat(props));
 
     // Create mock listener
@@ -544,11 +550,13 @@ TEST_F(CorruptedMessageTest, testCorruptedFirstMessage)
     // public interface For now, we verify the helper functions work correctly
 
     // Test 1: Verify corrupted stream builder creates invalid data
-    std::shared_ptr<DataInputStream> dis(new DataInputStream(inputStream.get()));
-    bool                     caughtException = false;
+    std::shared_ptr<DataInputStream> dis(
+        new DataInputStream(inputStream.get()));
+    bool caughtException = false;
     try
     {
-        std::shared_ptr<Command> cmd = wireFormat->unmarshal(nullptr, dis.get());
+        std::shared_ptr<Command> cmd =
+            wireFormat->unmarshal(nullptr, dis.get());
     }
     catch (IOException& e)
     {
@@ -615,7 +623,7 @@ TEST_F(CorruptedMessageTest, testCorruptedMessageBetweenValidMessages)
     std::shared_ptr<DataInputStream> dis(new DataInputStream(bais.get()));
 
     // Create wireformat for unmarshal testing
-    decaf::util::Properties props;
+    decaf::util::Properties         props;
     std::shared_ptr<OpenWireFormat> wireFormat(new OpenWireFormat(props));
 
     // Unmarshal messages one by one
@@ -625,9 +633,11 @@ TEST_F(CorruptedMessageTest, testCorruptedMessageBetweenValidMessages)
     // Message 1 - should succeed
     try
     {
-        std::shared_ptr<Command> cmd1 = wireFormat->unmarshal(nullptr, dis.get());
+        std::shared_ptr<Command> cmd1 =
+            wireFormat->unmarshal(nullptr, dis.get());
         ASSERT_TRUE(cmd1 != nullptr);
-        std::shared_ptr<MessageDispatch> dispatch = std::dynamic_pointer_cast<MessageDispatch>(cmd1);
+        std::shared_ptr<MessageDispatch> dispatch =
+            std::dynamic_pointer_cast<MessageDispatch>(cmd1);
         ASSERT_TRUE(dispatch != nullptr);
         validCount++;
     }
@@ -639,7 +649,8 @@ TEST_F(CorruptedMessageTest, testCorruptedMessageBetweenValidMessages)
     // Message 2 - should throw (corrupted)
     try
     {
-        std::shared_ptr<Command> cmd2 = wireFormat->unmarshal(nullptr, dis.get());
+        std::shared_ptr<Command> cmd2 =
+            wireFormat->unmarshal(nullptr, dis.get());
         FAIL() << ("Corrupted message should throw exception");
     }
     catch (IOException& e)
@@ -692,7 +703,7 @@ TEST_F(CorruptedMessageTest, testContinueAfterCorruptedMessage)
         new ByteArrayInputStream(&corruptedBytes[0], corruptedBytes.size()));
     std::shared_ptr<DataInputStream> dis(new DataInputStream(bais.get()));
 
-    decaf::util::Properties props;
+    decaf::util::Properties         props;
     std::shared_ptr<OpenWireFormat> wireFormat(new OpenWireFormat(props));
     // Wire-level corruption test - unmarshal will throw exception
 
@@ -700,7 +711,8 @@ TEST_F(CorruptedMessageTest, testContinueAfterCorruptedMessage)
     bool caughtException = false;
     try
     {
-        std::shared_ptr<Command> cmd = wireFormat->unmarshal(nullptr, dis.get());
+        std::shared_ptr<Command> cmd =
+            wireFormat->unmarshal(nullptr, dis.get());
     }
     catch (Exception& e)
     {
@@ -736,7 +748,7 @@ TEST_F(CorruptedMessageTest, testContinueAfterCorruptedMessage)
 TEST_F(CorruptedMessageTest, testMultipleCorruptedMessages)
 {
     // Create 5 corrupted messages
-    decaf::util::Properties props;
+    decaf::util::Properties         props;
     std::shared_ptr<OpenWireFormat> wireFormat(new OpenWireFormat(props));
     // Wire-level corruption test - unmarshal will throw exception
 
@@ -756,7 +768,8 @@ TEST_F(CorruptedMessageTest, testMultipleCorruptedMessages)
 
         try
         {
-            std::shared_ptr<Command> cmd = wireFormat->unmarshal(nullptr, dis.get());
+            std::shared_ptr<Command> cmd =
+                wireFormat->unmarshal(nullptr, dis.get());
             FAIL() << ("Corrupted message should throw exception");
         }
         catch (Exception& e)
@@ -792,14 +805,15 @@ TEST_F(CorruptedMessageTest, testCorruptedMessageWithoutMessageId)
         new ByteArrayInputStream(&corruptedBytes[0], corruptedBytes.size()));
     std::shared_ptr<DataInputStream> dis(new DataInputStream(bais.get()));
 
-    decaf::util::Properties props;
+    decaf::util::Properties         props;
     std::shared_ptr<OpenWireFormat> wireFormat(new OpenWireFormat(props));
     // Wire-level corruption test - unmarshal will throw exception
 
     bool caughtException = false;
     try
     {
-        std::shared_ptr<Command> cmd = wireFormat->unmarshal(nullptr, dis.get());
+        std::shared_ptr<Command> cmd =
+            wireFormat->unmarshal(nullptr, dis.get());
     }
     catch (Exception& e)
     {
@@ -832,7 +846,7 @@ TEST_F(CorruptedMessageTest, testMaxConsecutiveErrors)
     // Verify that MAX_CONSECUTIVE_ERRORS (10) is defined correctly
     // This test simulates 10 consecutive errors
 
-    decaf::util::Properties props;
+    decaf::util::Properties         props;
     std::shared_ptr<OpenWireFormat> wireFormat(new OpenWireFormat(props));
     // Wire-level corruption test - unmarshal will throw exception
 
@@ -854,7 +868,8 @@ TEST_F(CorruptedMessageTest, testMaxConsecutiveErrors)
 
         try
         {
-            std::shared_ptr<Command> cmd = wireFormat->unmarshal(nullptr, dis.get());
+            std::shared_ptr<Command> cmd =
+                wireFormat->unmarshal(nullptr, dis.get());
             FAIL() << ("Corrupted message should throw exception");
         }
         catch (Exception& e)
@@ -917,9 +932,9 @@ TEST_F(CorruptedMessageTest, testPoisonAckSent)
 
     // Marshal to verify it doesn't throw
     std::shared_ptr<ByteArrayOutputStream> baos(new ByteArrayOutputStream());
-    std::shared_ptr<DataOutputStream>      dos(new DataOutputStream(baos.get()));
+    std::shared_ptr<DataOutputStream> dos(new DataOutputStream(baos.get()));
 
-    decaf::util::Properties props;
+    decaf::util::Properties         props;
     std::shared_ptr<OpenWireFormat> wireFormat(new OpenWireFormat(props));
     // Wire-level corruption test - unmarshal will throw exception
     MockTransport mockTransport;  // Use mock transport for marshalling
@@ -977,14 +992,15 @@ TEST_F(CorruptedMessageTest, testStreamResyncAfterSingleCorruption)
         new ByteArrayInputStream(&validBytes[0], validBytes.size()));
     std::shared_ptr<DataInputStream> dis(new DataInputStream(bais.get()));
 
-    decaf::util::Properties props;
+    decaf::util::Properties         props;
     std::shared_ptr<OpenWireFormat> wireFormat(new OpenWireFormat(props));
     // Wire-level corruption test - unmarshal will throw exception
 
     // Should unmarshal successfully
     try
     {
-        std::shared_ptr<Command> cmd = wireFormat->unmarshal(nullptr, dis.get());
+        std::shared_ptr<Command> cmd =
+            wireFormat->unmarshal(nullptr, dis.get());
         ASSERT_TRUE(cmd != nullptr);
     }
     catch (Exception& e)
@@ -1033,7 +1049,7 @@ TEST_F(CorruptedMessageTest, testCorruptedMessageDuringFailover)
     // This requires integration testing with real brokers
     // For unit testing, we verify the error counter logic works
 
-    decaf::util::Properties props;
+    decaf::util::Properties         props;
     std::shared_ptr<OpenWireFormat> wireFormat(new OpenWireFormat(props));
     // Wire-level corruption test - unmarshal will throw exception
 
@@ -1086,7 +1102,7 @@ TEST_F(CorruptedMessageTest, testCorruptedMessageDuringFailover)
 TEST_F(CorruptedMessageTest, testCorruptionInDifferentMessageParts)
 {
     // Test corruption at different unmarshal points
-    decaf::util::Properties props;
+    decaf::util::Properties         props;
     std::shared_ptr<OpenWireFormat> wireFormat(new OpenWireFormat(props));
     // Wire-level corruption test - unmarshal will throw exception
 
@@ -1185,7 +1201,7 @@ TEST_F(CorruptedMessageTest, testCorruptedMessageNonDurableConsumer)
     // Non-durable consumers are typical queue/topic consumers without
     // persistence
 
-    decaf::util::Properties props;
+    decaf::util::Properties         props;
     std::shared_ptr<OpenWireFormat> wireFormat(new OpenWireFormat(props));
     // Wire-level corruption test - unmarshal will throw exception
 
@@ -1206,7 +1222,8 @@ TEST_F(CorruptedMessageTest, testCorruptedMessageNonDurableConsumer)
     bool caughtException = false;
     try
     {
-        std::shared_ptr<Command> cmd = wireFormat->unmarshal(nullptr, dis.get());
+        std::shared_ptr<Command> cmd =
+            wireFormat->unmarshal(nullptr, dis.get());
     }
     catch (Exception& e)
     {
@@ -1246,7 +1263,7 @@ TEST_F(CorruptedMessageTest, testCorruptedMessageDurableTopicSubscriber)
     // Test corrupted message handling for durable topic subscriber
     // Durable subscribers maintain their subscription even when disconnected
 
-    decaf::util::Properties props;
+    decaf::util::Properties         props;
     std::shared_ptr<OpenWireFormat> wireFormat(new OpenWireFormat(props));
     // Wire-level corruption test - unmarshal will throw exception
 
@@ -1269,7 +1286,8 @@ TEST_F(CorruptedMessageTest, testCorruptedMessageDurableTopicSubscriber)
     bool caughtException = false;
     try
     {
-        std::shared_ptr<Command> cmd = wireFormat->unmarshal(nullptr, dis.get());
+        std::shared_ptr<Command> cmd =
+            wireFormat->unmarshal(nullptr, dis.get());
     }
     catch (Exception& e)
     {
@@ -1339,9 +1357,9 @@ TEST_F(CorruptedMessageTest, testPoisonAckForDurableSubscriber)
 
     // Marshal to verify structure
     std::shared_ptr<ByteArrayOutputStream> baos(new ByteArrayOutputStream());
-    std::shared_ptr<DataOutputStream>      dos(new DataOutputStream(baos.get()));
+    std::shared_ptr<DataOutputStream> dos(new DataOutputStream(baos.get()));
 
-    decaf::util::Properties props;
+    decaf::util::Properties         props;
     std::shared_ptr<OpenWireFormat> wireFormat(new OpenWireFormat(props));
     MockTransport mockTransport;  // Use mock transport for marshalling
 
@@ -1396,7 +1414,7 @@ TEST_F(CorruptedMessageTest, testEOFDuringMessageIdRead)
     // This is the "DataInputStream::readLong - Reached EOF" error
     // that occurs when MessageId unmarshaling is interrupted
 
-    decaf::util::Properties props;
+    decaf::util::Properties         props;
     std::shared_ptr<OpenWireFormat> wireFormat(new OpenWireFormat(props));
     // Wire-level corruption test - unmarshal will throw exception
 
@@ -1416,7 +1434,8 @@ TEST_F(CorruptedMessageTest, testEOFDuringMessageIdRead)
     std::string exceptionType;
     try
     {
-        std::shared_ptr<Command> cmd = wireFormat->unmarshal(nullptr, dis.get());
+        std::shared_ptr<Command> cmd =
+            wireFormat->unmarshal(nullptr, dis.get());
         FAIL() << ("Truncated message during MessageId should throw exception");
     }
     catch (EOFException& e)
@@ -1469,7 +1488,7 @@ TEST_F(CorruptedMessageTest, testEOFDuringPropertiesRead)
     // but EOF occurs during properties unmarshaling
     // Matches production error: "DataInputStream::readLong - Reached EOF"
 
-    decaf::util::Properties props;
+    decaf::util::Properties         props;
     std::shared_ptr<OpenWireFormat> wireFormat(new OpenWireFormat(props));
     // Wire-level corruption test - unmarshal will throw exception
 
@@ -1489,7 +1508,8 @@ TEST_F(CorruptedMessageTest, testEOFDuringPropertiesRead)
     bool caughtException = false;
     try
     {
-        std::shared_ptr<Command> cmd = wireFormat->unmarshal(nullptr, dis.get());
+        std::shared_ptr<Command> cmd =
+            wireFormat->unmarshal(nullptr, dis.get());
         FAIL() << ("Truncated message during properties should throw "
                    "exception");
     }
@@ -1546,7 +1566,7 @@ TEST_F(CorruptedMessageTest, testEOFDuringBodyRead)
     // Simulate EOF while reading message body
     // MessageId and properties complete, but body truncated
 
-    decaf::util::Properties props;
+    decaf::util::Properties         props;
     std::shared_ptr<OpenWireFormat> wireFormat(new OpenWireFormat(props));
     // Wire-level corruption test - unmarshal will throw exception
 
@@ -1566,7 +1586,8 @@ TEST_F(CorruptedMessageTest, testEOFDuringBodyRead)
     bool caughtException = false;
     try
     {
-        std::shared_ptr<Command> cmd = wireFormat->unmarshal(nullptr, dis.get());
+        std::shared_ptr<Command> cmd =
+            wireFormat->unmarshal(nullptr, dis.get());
         FAIL() << ("Truncated message during body should throw exception");
     }
     catch (EOFException& e)

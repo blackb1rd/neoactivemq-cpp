@@ -93,8 +93,8 @@ class MyCMSMessageListener : public cms::MessageListener
 {
 public:
     std::vector<std::shared_ptr<cms::Message>> messages;
-    decaf::util::concurrent::Mutex     mutex;
-    bool                               ack;
+    decaf::util::concurrent::Mutex             mutex;
+    bool                                       ack;
 
 public:
     MyCMSMessageListener(bool ack = false)
@@ -246,7 +246,8 @@ void ActiveMQSessionTest::injectTextMessage(const std::string       message,
 
     std::shared_ptr<MessageDispatch> dispatch(new MessageDispatch());
     dispatch->setMessage(msg);
-    dispatch->setConsumerId(std::shared_ptr<ConsumerId>(id.cloneDataStructure()));
+    dispatch->setConsumerId(
+        std::shared_ptr<ConsumerId>(id.cloneDataStructure()));
 
     dTransport->fireCommand(dispatch);
 }

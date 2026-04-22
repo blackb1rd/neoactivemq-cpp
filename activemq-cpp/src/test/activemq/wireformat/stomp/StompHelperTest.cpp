@@ -52,7 +52,8 @@ TEST_F(StompHelperTest, testConvertDestinationFromCommand)
     wireformat.setTopicPrefix("mytopics://");
     StompHelper helper(&wireformat);
 
-    std::shared_ptr<ActiveMQDestination> destination(new ActiveMQTopic("SomeTopic"));
+    std::shared_ptr<ActiveMQDestination> destination(
+        new ActiveMQTopic("SomeTopic"));
 
     std::string result = helper.convertDestination(destination);
 

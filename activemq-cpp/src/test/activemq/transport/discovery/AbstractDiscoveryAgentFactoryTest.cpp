@@ -131,10 +131,12 @@ void AbstractDiscoveryAgentFactoryTest::test()
     DiscoveryAgentFactory* factory = registry.findFactory("mock");
     ASSERT_TRUE(factory != NULL);
 
-    std::shared_ptr<DiscoveryAgent> agent(factory->createAgent(URI("mock://default")));
+    std::shared_ptr<DiscoveryAgent> agent(
+        factory->createAgent(URI("mock://default")));
     ASSERT_TRUE(agent != NULL);
 
-    std::shared_ptr<MockDiscoveryAgent> mock = std::dynamic_pointer_cast<MockDiscoveryAgent>(agent);
+    std::shared_ptr<MockDiscoveryAgent> mock =
+        std::dynamic_pointer_cast<MockDiscoveryAgent>(agent);
     ASSERT_TRUE(mock != NULL);
 
     registry.unregisterAllFactories();

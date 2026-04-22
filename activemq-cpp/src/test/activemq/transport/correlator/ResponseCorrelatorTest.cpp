@@ -82,12 +82,12 @@ public:
 class MyTransport : public Transport, public decaf::lang::Runnable
 {
 public:
-    TransportListener*                                      listener;
-    decaf::lang::Thread*                                    thread;
-    decaf::util::concurrent::Mutex                          mutex;
-    decaf::util::concurrent::Mutex                          startedMutex;
-    bool                                                    done;
-    std::queue<std::shared_ptr<commands::Command>>          requests;
+    TransportListener*                             listener;
+    decaf::lang::Thread*                           thread;
+    decaf::util::concurrent::Mutex                 mutex;
+    decaf::util::concurrent::Mutex                 startedMutex;
+    bool                                           done;
+    std::queue<std::shared_ptr<commands::Command>> requests;
 
 private:
     MyTransport(const MyTransport&);
@@ -137,7 +137,7 @@ public:
 
     virtual std::shared_ptr<Response> request(
         const std::shared_ptr<Command> command AMQCPP_UNUSED,
-        unsigned int timeout AMQCPP_UNUSED)
+        unsigned int timeout                   AMQCPP_UNUSED)
     {
         throw decaf::lang::exceptions::UnsupportedOperationException(__FILE__,
                                                                      __LINE__,
@@ -193,7 +193,8 @@ public:
         }
     }
 
-    virtual std::shared_ptr<Response> createResponse(const std::shared_ptr<Command> command)
+    virtual std::shared_ptr<Response> createResponse(
+        const std::shared_ptr<Command> command)
     {
         std::shared_ptr<Response> resp(new commands::Response());
         resp->setCorrelationId(command->getCommandId());
@@ -325,7 +326,8 @@ public:
     {
     }
 
-    virtual std::shared_ptr<Response> createResponse(const std::shared_ptr<Command> command)
+    virtual std::shared_ptr<Response> createResponse(
+        const std::shared_ptr<Command> command)
     {
         throw exceptions::ActiveMQException(__FILE__, __LINE__, "bad stuff");
     }
@@ -372,9 +374,9 @@ public:
 class RequestThread : public decaf::lang::Thread
 {
 public:
-    Transport*                      transport;
-    std::shared_ptr<MyCommand>      cmd;
-    std::shared_ptr<Response>       resp;
+    Transport*                 transport;
+    std::shared_ptr<MyCommand> cmd;
+    std::shared_ptr<Response>  resp;
 
 private:
     RequestThread(const RequestThread&);
@@ -417,9 +419,9 @@ TEST_F(ResponseCorrelatorTest, testBasics)
 {
     // Use heap-allocated objects to control destruction order and avoid
     // MSVC debug runtime hang when destroying shared_ptr<MyCommand>.
-    MyListener*                     listener = new MyListener();
-    std::shared_ptr<MyTransport>    transport(new MyTransport());
-    ResponseCorrelator*             correlator = new ResponseCorrelator(transport);
+    MyListener*                  listener = new MyListener();
+    std::shared_ptr<MyTransport> transport(new MyTransport());
+    ResponseCorrelator*          correlator = new ResponseCorrelator(transport);
     correlator->setTransportListener(listener);
     ASSERT_TRUE(transport->listener == correlator);
 
@@ -431,8 +433,8 @@ TEST_F(ResponseCorrelatorTest, testBasics)
     }
 
     // Send one request.
-    std::shared_ptr<MyCommand>  cmd(new MyCommand);
-    std::shared_ptr<Response>   resp = correlator->request(cmd);
+    std::shared_ptr<MyCommand> cmd(new MyCommand);
+    std::shared_ptr<Response>  resp = correlator->request(cmd);
 
     ASSERT_TRUE(resp != NULL);
     ASSERT_TRUE(resp->getCorrelationId() == cmd->getCommandId());
@@ -460,9 +462,9 @@ TEST_F(ResponseCorrelatorTest, testOneway)
 {
     // Use heap-allocated objects to control destruction order and avoid
     // MSVC debug runtime hang when destroying shared_ptr<MyCommand>.
-    MyListener*                     listener = new MyListener();
-    std::shared_ptr<MyTransport>    transport(new MyTransport());
-    ResponseCorrelator*             correlator = new ResponseCorrelator(transport);
+    MyListener*                  listener = new MyListener();
+    std::shared_ptr<MyTransport> transport(new MyTransport());
+    ResponseCorrelator*          correlator = new ResponseCorrelator(transport);
     correlator->setTransportListener(listener);
     ASSERT_TRUE(transport->listener == correlator);
 
@@ -474,8 +476,8 @@ TEST_F(ResponseCorrelatorTest, testOneway)
     }
 
     // Send many oneway requests (we'll get them back asynchronously).
-    const unsigned int                          numCommands = 1000;
-    std::vector<std::shared_ptr<MyCommand>>     commands;
+    const unsigned int                      numCommands = 1000;
+    std::vector<std::shared_ptr<MyCommand>> commands;
     commands.reserve(numCommands);
     for (unsigned int ix = 0; ix < numCommands; ++ix)
     {
@@ -505,9 +507,9 @@ TEST_F(ResponseCorrelatorTest, testTransportException)
 {
     // Use heap-allocated objects to control destruction order and avoid
     // MSVC debug runtime hang when destroying shared_ptr<MyCommand>.
-    MyListener*                         listener = new MyListener();
-    std::shared_ptr<MyBrokenTransport>  transport(new MyBrokenTransport());
-    ResponseCorrelator*                 correlator = new ResponseCorrelator(transport);
+    MyListener*                        listener = new MyListener();
+    std::shared_ptr<MyBrokenTransport> transport(new MyBrokenTransport());
+    ResponseCorrelator* correlator = new ResponseCorrelator(transport);
     correlator->setTransportListener(listener);
     ASSERT_TRUE(transport->listener == correlator);
 
@@ -551,9 +553,9 @@ TEST_F(ResponseCorrelatorTest, testMultiRequests)
 {
     // Use heap-allocated objects to control destruction order and avoid
     // MSVC debug runtime hang when destroying shared_ptr<MyCommand>.
-    MyListener*                     listener = new MyListener();
-    std::shared_ptr<MyTransport>    transport(new MyTransport());
-    ResponseCorrelator*             correlator = new ResponseCorrelator(transport);
+    MyListener*                  listener = new MyListener();
+    std::shared_ptr<MyTransport> transport(new MyTransport());
+    ResponseCorrelator*          correlator = new ResponseCorrelator(transport);
     correlator->setTransportListener(listener);
     ASSERT_TRUE(transport->listener == correlator);
 
@@ -625,8 +627,8 @@ TEST_F(ResponseCorrelatorTest, testMultiRequests)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(ResponseCorrelatorTest, testNarrow)
 {
-    std::shared_ptr<MyTransport>    transport(new MyTransport());
-    ResponseCorrelator              correlator(transport);
+    std::shared_ptr<MyTransport> transport(new MyTransport());
+    ResponseCorrelator           correlator(transport);
 
     MyTransport& transportRef = *transport;
     Transport*   narrowed     = correlator.narrow(typeid(transportRef));

@@ -51,7 +51,8 @@ public:
     {
     }
 
-    virtual void dispatch(const std::shared_ptr<commands::MessageDispatch>& message)
+    virtual void dispatch(
+        const std::shared_ptr<commands::MessageDispatch>& message)
     {
     }
 
@@ -85,10 +86,10 @@ TEST_F(ConnectionAuditTest, testConstructor2)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(ConnectionAuditTest, testIsDuplicate)
 {
-    int                           count = 10000;
-    ConnectionAudit               audit;
+    int                                   count = 10000;
+    ConnectionAudit                       audit;
     ArrayList<std::shared_ptr<MessageId>> list;
-    std::shared_ptr<MyDispatcher>                 dispatcher(new MyDispatcher);
+    std::shared_ptr<MyDispatcher>         dispatcher(new MyDispatcher);
 
     std::shared_ptr<ProducerId> pid(new ProducerId);
     pid->setConnectionId("test");
@@ -125,18 +126,19 @@ TEST_F(ConnectionAuditTest, testIsDuplicate)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(ConnectionAuditTest, testRollbackDuplicate)
 {
-    int                           count = 10000;
-    ConnectionAudit               audit;
+    int                                   count = 10000;
+    ConnectionAudit                       audit;
     ArrayList<std::shared_ptr<MessageId>> list;
-    std::shared_ptr<MyDispatcher>                 dispatcher(new MyDispatcher);
+    std::shared_ptr<MyDispatcher>         dispatcher(new MyDispatcher);
 
     std::shared_ptr<ProducerId> pid(new ProducerId);
     pid->setConnectionId("test");
     pid->setSessionId(0);
     pid->setValue(1);
 
-    std::shared_ptr<ActiveMQDestination> destination(new ActiveMQQueue("TEST.QUEUE"));
-    std::shared_ptr<Message>             message(new Message());
+    std::shared_ptr<ActiveMQDestination> destination(
+        new ActiveMQQueue("TEST.QUEUE"));
+    std::shared_ptr<Message> message(new Message());
     message->setDestination(destination);
 
     for (int i = 0; i < count; i++)

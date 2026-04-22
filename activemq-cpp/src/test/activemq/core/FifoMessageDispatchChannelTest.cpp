@@ -78,7 +78,7 @@ TEST_F(FifoMessageDispatchChannelTest, testClose)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(FifoMessageDispatchChannelTest, testEnqueue)
 {
-    FifoMessageDispatchChannel channel;
+    FifoMessageDispatchChannel       channel;
     std::shared_ptr<MessageDispatch> dispatch1(new MessageDispatch());
     std::shared_ptr<MessageDispatch> dispatch2(new MessageDispatch());
 
@@ -99,7 +99,7 @@ TEST_F(FifoMessageDispatchChannelTest, testEnqueue)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(FifoMessageDispatchChannelTest, testEnqueueFront)
 {
-    FifoMessageDispatchChannel channel;
+    FifoMessageDispatchChannel       channel;
     std::shared_ptr<MessageDispatch> dispatch1(new MessageDispatch());
     std::shared_ptr<MessageDispatch> dispatch2(new MessageDispatch());
 
@@ -125,7 +125,7 @@ TEST_F(FifoMessageDispatchChannelTest, testEnqueueFront)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(FifoMessageDispatchChannelTest, testPeek)
 {
-    FifoMessageDispatchChannel channel;
+    FifoMessageDispatchChannel       channel;
     std::shared_ptr<MessageDispatch> dispatch1(new MessageDispatch());
     std::shared_ptr<MessageDispatch> dispatch2(new MessageDispatch());
 

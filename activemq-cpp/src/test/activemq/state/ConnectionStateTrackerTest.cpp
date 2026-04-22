@@ -26,9 +26,9 @@
 #include <activemq/state/SessionState.h>
 #include <activemq/transport/Transport.h>
 #include <activemq/wireformat/WireFormat.h>
-#include <memory>
 #include <decaf/lang/exceptions/UnsupportedOperationException.h>
 #include <decaf/util/LinkedList.h>
+#include <memory>
 
 using namespace std;
 using namespace activemq;
@@ -110,13 +110,15 @@ public:
         throw UnsupportedOperationException();
     }
 
-    virtual std::shared_ptr<Response> request(const std::shared_ptr<Command> command)
+    virtual std::shared_ptr<Response> request(
+        const std::shared_ptr<Command> command)
     {
         throw UnsupportedOperationException();
     }
 
-    virtual std::shared_ptr<Response> request(const std::shared_ptr<Command> command,
-                                      unsigned int           timeout)
+    virtual std::shared_ptr<Response> request(
+        const std::shared_ptr<Command> command,
+        unsigned int                   timeout)
     {
         throw UnsupportedOperationException();
     }
@@ -126,7 +128,8 @@ public:
         return std::shared_ptr<wireformat::WireFormat>();
     }
 
-    virtual void setWireFormat(const std::shared_ptr<wireformat::WireFormat> wireFormat)
+    virtual void setWireFormat(
+        const std::shared_ptr<wireformat::WireFormat> wireFormat)
     {
     }
 
@@ -252,7 +255,7 @@ TEST_F(ConnectionStateTrackerTest, test)
 TEST_F(ConnectionStateTrackerTest, testMessageCache)
 {
     std::shared_ptr<TrackingTransport> transport(new TrackingTransport);
-    ConnectionStateTracker     tracker;
+    ConnectionStateTracker             tracker;
     tracker.setTrackMessages(true);
 
     ConnectionData conn = createConnectionState(tracker);
@@ -291,15 +294,16 @@ TEST_F(ConnectionStateTrackerTest, testMessageCache)
 TEST_F(ConnectionStateTrackerTest, testMessagePullCache)
 {
     std::shared_ptr<TrackingTransport> transport(new TrackingTransport);
-    ConnectionStateTracker     tracker;
+    ConnectionStateTracker             tracker;
     tracker.setTrackMessages(true);
 
     ConnectionData conn = createConnectionState(tracker);
 
     for (int i = 0; i < 100; ++i)
     {
-        std::shared_ptr<commands::MessagePull> pull(new commands::MessagePull());
-        std::shared_ptr<ActiveMQDestination>   destination(
+        std::shared_ptr<commands::MessagePull> pull(
+            new commands::MessagePull());
+        std::shared_ptr<ActiveMQDestination> destination(
             new ActiveMQTopic("TEST" + Integer::toString(i)));
         pull->setConsumerId(conn.consumer->getConsumerId());
         pull->setDestination(destination);

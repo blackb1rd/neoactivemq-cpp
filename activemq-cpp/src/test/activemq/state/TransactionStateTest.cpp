@@ -46,6 +46,7 @@ TEST_F(TransactionStateTest, test)
     ASSERT_TRUE(state.getId() != NULL);
 
     std::shared_ptr<LocalTransactionId> temp;
-    ASSERT_NO_THROW(temp = std::dynamic_pointer_cast<LocalTransactionId>(state.getId()));
+    ASSERT_NO_THROW(
+        temp = std::dynamic_pointer_cast<LocalTransactionId>(state.getId()));
     ASSERT_TRUE(temp->getValue() == id->getValue());
 }

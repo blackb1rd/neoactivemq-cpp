@@ -169,7 +169,8 @@ void AbstractDiscoveryAgentTest::test()
     DiscoveryAgentFactory* factory = registry.findFactory("mock");
     ASSERT_TRUE(factory != NULL);
 
-    std::shared_ptr<DiscoveryAgent> agent(factory->createAgent(URI("mock://default")));
+    std::shared_ptr<DiscoveryAgent> agent(
+        factory->createAgent(URI("mock://default")));
     ASSERT_TRUE(agent != NULL);
 
     agent->setDiscoveryListener(&listener);

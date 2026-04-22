@@ -46,7 +46,8 @@ TEST_F(StompWireFormatFactoryTest, testCreateWireFormat)
 
     std::shared_ptr<WireFormat> format(factory.createWireFormat(properties));
 
-    std::shared_ptr<StompWireFormat> stomp = std::dynamic_pointer_cast<StompWireFormat>(format);
+    std::shared_ptr<StompWireFormat> stomp =
+        std::dynamic_pointer_cast<StompWireFormat>(format);
 
     ASSERT_EQ(std::string("/test-topic/"), stomp->getTopicPrefix());
     ASSERT_EQ(std::string("/test-queue/"), stomp->getQueuePrefix());

@@ -118,7 +118,7 @@ void ActiveMQMessageTest::SetUp()
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(ActiveMQMessageTest, test)
 {
-    ActiveMQMessage       myMessage;
+    ActiveMQMessage               myMessage;
     std::shared_ptr<MyAckHandler> ackHandler = std::make_shared<MyAckHandler>();
 
     ASSERT_TRUE(myMessage.getDataStructureType() ==

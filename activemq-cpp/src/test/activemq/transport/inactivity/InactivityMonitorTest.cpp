@@ -102,7 +102,8 @@ void InactivityMonitorTest::SetUp()
     URI                  uri("mock://mock?wireformat=openwire");
     MockTransportFactory factory;
 
-    this->transport = std::dynamic_pointer_cast<MockTransport>(factory.createComposite(uri));
+    this->transport =
+        std::dynamic_pointer_cast<MockTransport>(factory.createComposite(uri));
 
     this->localWireFormatInfo.reset(new WireFormatInfo());
 

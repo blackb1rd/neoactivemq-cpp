@@ -61,8 +61,8 @@ TEST_F(ActiveMQMessageAuditTest, testIsDuplicateString)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(ActiveMQMessageAuditTest, testIsDuplicateMessageId)
 {
-    int                           count = 10000;
-    ActiveMQMessageAudit          audit;
+    int                                   count = 10000;
+    ActiveMQMessageAudit                  audit;
     ArrayList<std::shared_ptr<MessageId>> list;
 
     std::shared_ptr<ProducerId> pid(new ProducerId);
@@ -117,8 +117,8 @@ TEST_F(ActiveMQMessageAuditTest, testRollbackString)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(ActiveMQMessageAuditTest, testRollbackMessageId)
 {
-    int                           count = 10000;
-    ActiveMQMessageAudit          audit;
+    int                                   count = 10000;
+    ActiveMQMessageAudit                  audit;
     ArrayList<std::shared_ptr<MessageId>> list;
 
     std::shared_ptr<ProducerId> pid(new ProducerId);
@@ -181,8 +181,8 @@ TEST_F(ActiveMQMessageAuditTest, testIsInOrderString)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(ActiveMQMessageAuditTest, testIsInOrderMessageId)
 {
-    int                           count = 10000;
-    ActiveMQMessageAudit          audit;
+    int                                   count = 10000;
+    ActiveMQMessageAudit                  audit;
     ArrayList<std::shared_ptr<MessageId>> list;
 
     std::shared_ptr<ProducerId> pid(new ProducerId);
@@ -219,8 +219,8 @@ TEST_F(ActiveMQMessageAuditTest, testIsInOrderMessageId)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(ActiveMQMessageAuditTest, testGetLastSeqId)
 {
-    int                           count = 10000;
-    ActiveMQMessageAudit          audit;
+    int                                   count = 10000;
+    ActiveMQMessageAudit                  audit;
     ArrayList<std::shared_ptr<MessageId>> list;
 
     std::shared_ptr<ProducerId> pid(new ProducerId);

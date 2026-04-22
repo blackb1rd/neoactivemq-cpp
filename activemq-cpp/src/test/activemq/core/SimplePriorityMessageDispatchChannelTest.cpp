@@ -79,8 +79,8 @@ TEST_F(SimplePriorityMessageDispatchChannelTest, testClose)
 TEST_F(SimplePriorityMessageDispatchChannelTest, testEnqueue)
 {
     SimplePriorityMessageDispatchChannel channel;
-    std::shared_ptr<MessageDispatch> dispatch1(new MessageDispatch());
-    std::shared_ptr<MessageDispatch> dispatch2(new MessageDispatch());
+    std::shared_ptr<MessageDispatch>     dispatch1(new MessageDispatch());
+    std::shared_ptr<MessageDispatch>     dispatch2(new MessageDispatch());
 
     ASSERT_TRUE(channel.isEmpty() == true);
     ASSERT_TRUE(channel.size() == 0);
@@ -100,8 +100,8 @@ TEST_F(SimplePriorityMessageDispatchChannelTest, testEnqueue)
 TEST_F(SimplePriorityMessageDispatchChannelTest, testEnqueueFront)
 {
     SimplePriorityMessageDispatchChannel channel;
-    std::shared_ptr<MessageDispatch> dispatch1(new MessageDispatch());
-    std::shared_ptr<MessageDispatch> dispatch2(new MessageDispatch());
+    std::shared_ptr<MessageDispatch>     dispatch1(new MessageDispatch());
+    std::shared_ptr<MessageDispatch>     dispatch2(new MessageDispatch());
 
     std::shared_ptr<Message> message1(new Message());
     std::shared_ptr<Message> message2(new Message());
@@ -135,8 +135,8 @@ TEST_F(SimplePriorityMessageDispatchChannelTest, testEnqueueFront)
 TEST_F(SimplePriorityMessageDispatchChannelTest, testPeek)
 {
     SimplePriorityMessageDispatchChannel channel;
-    std::shared_ptr<MessageDispatch> dispatch1(new MessageDispatch());
-    std::shared_ptr<MessageDispatch> dispatch2(new MessageDispatch());
+    std::shared_ptr<MessageDispatch>     dispatch1(new MessageDispatch());
+    std::shared_ptr<MessageDispatch>     dispatch2(new MessageDispatch());
 
     std::shared_ptr<Message> message1(new Message());
     std::shared_ptr<Message> message2(new Message());

@@ -29,13 +29,13 @@
 #include <decaf/io/InputStream.h>
 #include <decaf/io/OutputStream.h>
 #include <decaf/lang/Integer.h>
-#include <memory>
 #include <decaf/net/ServerSocket.h>
 #include <decaf/net/Socket.h>
 #include <decaf/net/SocketTimeoutException.h>
 #include <decaf/util/Properties.h>
 #include <decaf/util/Random.h>
 #include <decaf/util/concurrent/CountDownLatch.h>
+#include <memory>
 
 #include <atomic>
 #include <condition_variable>
@@ -63,18 +63,18 @@ namespace mock
     class TcpServer : public lang::Thread
     {
     private:
-        std::atomic<bool>                done;
-        std::atomic<bool>                error;
-        const int                        configuredPort;
+        std::atomic<bool>                        done;
+        std::atomic<bool>                        error;
+        const int                                configuredPort;
         std::shared_ptr<ServerSocket>            server;
         std::shared_ptr<Socket>                  clientSocket;
-        std::mutex                       socketMutex;
-        std::mutex                       startedMutex;
-        std::condition_variable          startedCondition;
-        bool                             serverStarted;
+        std::mutex                               socketMutex;
+        std::mutex                               startedMutex;
+        std::condition_variable                  startedCondition;
+        bool                                     serverStarted;
         std::shared_ptr<OpenWireFormat>          wireFormat;
         std::shared_ptr<OpenWireResponseBuilder> responeBuilder;
-        Random                           rand;
+        Random                                   rand;
 
     public:
         TcpServer()
@@ -451,7 +451,7 @@ namespace mock
 
     public:
         std::shared_ptr<TcpServer> server;
-        int                configuredPort;
+        int                        configuredPort;
 
     public:
         MockBrokerServiceImpl()

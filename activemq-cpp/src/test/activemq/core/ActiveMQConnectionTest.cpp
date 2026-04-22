@@ -126,9 +126,8 @@ namespace core
         {
         }
 
-        virtual void dispatch(
-            const std::shared_ptr<commands::MessageDispatch>&
-                data) noexcept(false)
+        virtual void dispatch(const std::shared_ptr<commands::MessageDispatch>&
+                                  data) noexcept(false)
         {
             messages.push_back(data->getMessage());
         }
@@ -146,9 +145,9 @@ TEST_F(ActiveMQConnectionTest, test2WithOpenwire)
 {
     try
     {
-        MyCommandListener                cmdListener;
-        MyDispatcher                     msgListener;
-        std::string                      connectionId = "testConnectionId";
+        MyCommandListener cmdListener;
+        MyDispatcher      msgListener;
+        std::string       connectionId = "testConnectionId";
         std::shared_ptr<decaf::util::Properties> properties(
             new decaf::util::Properties());
         std::shared_ptr<transport::Transport> transport;

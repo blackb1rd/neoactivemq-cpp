@@ -87,16 +87,27 @@ TEST_F(BrokerIdTest, test)
     ASSERT_TRUE(keys.at(2)->getValue() == "C");
 }
 
-struct SharedBrokerIdComp : public decaf::util::Comparator<std::shared_ptr<BrokerId>>
+struct SharedBrokerIdComp
+    : public decaf::util::Comparator<std::shared_ptr<BrokerId>>
 {
     virtual int compare(const std::shared_ptr<BrokerId>& left,
                         const std::shared_ptr<BrokerId>& right) const
     {
-        if (!left && !right) return 0;
-        if (!left) return -1;
-        if (!right) return 1;
+        if (!left && !right)
+        {
+            return 0;
+        }
+        if (!left)
+        {
+            return -1;
+        }
+        if (!right)
+        {
+            return 1;
+        }
         return left->compareTo(*right);
     }
+
     virtual bool operator()(const std::shared_ptr<BrokerId>& left,
                             const std::shared_ptr<BrokerId>& right) const
     {

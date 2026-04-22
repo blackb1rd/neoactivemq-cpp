@@ -55,6 +55,7 @@ set(INTEGRATION_TEST_SRCS
   # OpenWire protocol tests
   activemq/test/openwire/OpenwireAdvisoryTest.cpp
   activemq/test/openwire/OpenwireAsyncSenderTest.cpp
+  activemq/test/openwire/OpenwireBulkMessageTest.cpp
   activemq/test/openwire/OpenwireClientAckTest.cpp
   activemq/test/openwire/OpenwireCmsConnectionStartStopTest.cpp
   activemq/test/openwire/OpenWireCmsSendWithAsyncCallbackTest.cpp
@@ -86,6 +87,7 @@ set(INTEGRATION_TEST_SRCS
   # OpenWire SSL protocol tests (require SSL broker: docker compose --profile ssl up)
   activemq/test/openwire_ssl/OpenwireSslAdvisoryTest.cpp
   activemq/test/openwire_ssl/OpenwireSslAsyncSenderTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslBulkMessageTest.cpp
   activemq/test/openwire_ssl/OpenwireSslClientAckTest.cpp
   activemq/test/openwire_ssl/OpenwireSslCmsConnectionStartStopTest.cpp
   activemq/test/openwire_ssl/OpenwireSslCmsSendWithAsyncCallbackTest.cpp
@@ -162,13 +164,21 @@ endif()
 # Link to the consolidated library and Google Test
 target_link_libraries(neoactivemq-integration-test PRIVATE neoactivemq-cpp GTest::gtest)
 
+# Per-test CTest timeout for the OpenWire suite (the longest-running).
+# The watchdog fires 50 s earlier so the flight-recorder dump can complete
+# before CTest kills the process. Both values derive from one number.
+set(_INTEGRATION_TEST_TIMEOUT_S 1800)
+math(EXPR _INTEGRATION_WATCHDOG_TIMEOUT_S "${_INTEGRATION_TEST_TIMEOUT_S} - 50")
+
 include(StaticTestDiscovery)
 
 # OpenWire integration tests (non-SSL)
 # Requires: docker compose up (default broker on port 61616)
 set(INTEGRATION_OPENWIRE_TEST_DISCOVERY_SRCS
+  activemq/test/BulkMessageTest.cpp
   activemq/test/openwire/OpenwireAdvisoryTest.cpp
   activemq/test/openwire/OpenwireAsyncSenderTest.cpp
+  activemq/test/openwire/OpenwireBulkMessageTest.cpp
   activemq/test/openwire/OpenwireClientAckTest.cpp
   activemq/test/openwire/OpenwireCmsConnectionStartStopTest.cpp
   activemq/test/openwire/OpenWireCmsSendWithAsyncCallbackTest.cpp
@@ -201,8 +211,9 @@ static_discover_tests(neoactivemq-integration-test
   TEST_PREFIX "integration/activemq/test/openwire/"
   SOURCES ${INTEGRATION_OPENWIRE_TEST_DISCOVERY_SRCS}
   LABELS "integration;integration-openwire"
+  EXTRA_ARGS "-test-timeout" "${_INTEGRATION_WATCHDOG_TIMEOUT_S}"
   PROPERTIES
-    TIMEOUT 300
+    TIMEOUT ${_INTEGRATION_TEST_TIMEOUT_S}
     ENVIRONMENT "CTEST_OUTPUT_ON_FAILURE=1"
 )
 
@@ -211,6 +222,7 @@ static_discover_tests(neoactivemq-integration-test
 set(INTEGRATION_OPENWIRE_SSL_TEST_DISCOVERY_SRCS
   activemq/test/openwire_ssl/OpenwireSslAdvisoryTest.cpp
   activemq/test/openwire_ssl/OpenwireSslAsyncSenderTest.cpp
+  activemq/test/openwire_ssl/OpenwireSslBulkMessageTest.cpp
   activemq/test/openwire_ssl/OpenwireSslClientAckTest.cpp
   activemq/test/openwire_ssl/OpenwireSslCmsConnectionStartStopTest.cpp
   activemq/test/openwire_ssl/OpenwireSslCmsSendWithAsyncCallbackTest.cpp

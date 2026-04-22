@@ -21,6 +21,7 @@
 #include <decaf/internal/util/concurrent/PlatformDefs.h>
 #include <decaf/util/Config.h>
 #include <atomic>
+#include <vector>
 
 namespace decaf
 {
@@ -36,10 +37,10 @@ namespace internal
         namespace concurrent
         {
 
-/**
- * Max number of TLS keys that a thread can use.
- */
-#define DECAF_MAX_TLS_SLOTS 384
+            // DECAF_MAX_TLS_SLOTS was previously a fixed limit (384). TLS slot
+            // storage is now dynamic — the per-thread tls vector grows on
+            // demand, and the global slot registry (ThreadingLibrary::tlsSlots)
+            // expands without bound.
 
             /**
              * This is the main method for thread instances, this value is valid
@@ -85,7 +86,7 @@ namespace internal
                 bool                 willBeJoined;
                 char*                name;
                 long long            stackSize;
-                void*                tls[DECAF_MAX_TLS_SLOTS];
+                std::vector<void*>   tls;
                 threadingTask        threadMain;
                 void*                threadArg;
                 std::thread::id      threadId;

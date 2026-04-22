@@ -33,6 +33,12 @@ namespace test
         virtual ~BulkMessageTest();
 
         void testBulkMessageSendReceive();
+
+        // 5000 real client connections, 10 shared topics, 200 messages
+        // published per topic. Verifies every client receives every message
+        // (10M deliveries) and every client can publish (5000 acks via a
+        // dedicated queue). Heavy: expect 10+ minutes and high broker load.
+        void testHighFanout5000Clients();
     };
 
 }  // namespace test

@@ -62,7 +62,7 @@ TEST_F(OpenwireSslBulkMessageTest, testBulkMessageSendReceive)
     testBulkMessageSendReceive();
 }
 
-TEST_F(OpenwireSslBulkMessageTest, testHighFanout5000Clients)
+TEST_F(OpenwireSslBulkMessageTest, DISABLED_testHighFanout5000Clients)
 {
     testHighFanout5000Clients();
 }

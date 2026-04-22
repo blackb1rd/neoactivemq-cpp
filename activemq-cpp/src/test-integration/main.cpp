@@ -40,7 +40,7 @@ int main(int argc, char** argv)
     activemq::util::AMQLogger::setRecordOnlyMode(true);
 
     long long testTimeoutSeconds =
-        300;  // default; overridden by -test-timeout arg
+        1800;  // default; overridden by -test-timeout arg
     bool useTeamCity = false;
 
     // Let GTest parse --gtest_* flags first

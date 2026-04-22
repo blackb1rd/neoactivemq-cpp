@@ -164,6 +164,12 @@ endif()
 # Link to the consolidated library and Google Test
 target_link_libraries(neoactivemq-integration-test PRIVATE neoactivemq-cpp GTest::gtest)
 
+# Per-test CTest timeout for the OpenWire suite (the longest-running).
+# The watchdog fires 50 s earlier so the flight-recorder dump can complete
+# before CTest kills the process. Both values derive from one number.
+set(_INTEGRATION_TEST_TIMEOUT_S 1800)
+math(EXPR _INTEGRATION_WATCHDOG_TIMEOUT_S "${_INTEGRATION_TEST_TIMEOUT_S} - 50")
+
 include(StaticTestDiscovery)
 
 # OpenWire integration tests (non-SSL)
@@ -205,19 +211,10 @@ static_discover_tests(neoactivemq-integration-test
   TEST_PREFIX "integration/activemq/test/openwire/"
   SOURCES ${INTEGRATION_OPENWIRE_TEST_DISCOVERY_SRCS}
   LABELS "integration;integration-openwire"
+  EXTRA_ARGS "-test-timeout" "${_INTEGRATION_WATCHDOG_TIMEOUT_S}"
   PROPERTIES
-    TIMEOUT 1800
+    TIMEOUT ${_INTEGRATION_TEST_TIMEOUT_S}
     ENVIRONMENT "CTEST_OUTPUT_ON_FAILURE=1"
-)
-
-# testHighFanout5000Clients sets up 5000 connections (takes ~350 s on CI),
-# then sends and receives 10 M messages. Give it a watchdog budget that
-# matches the CTest TIMEOUT so the dump fires before CTest kills the process.
-set_tests_properties(
-    "integration/activemq/test/openwire/activemq/test/BulkMessageIntegrationTest.testHighFanout5000Clients"
-    PROPERTIES
-    TIMEOUT 1800
-    ENVIRONMENT "CTEST_OUTPUT_ON_FAILURE=1;NEOACTIVEMQ_WATCHDOG_TIMEOUT=1750"
 )
 
 # OpenWire SSL integration tests

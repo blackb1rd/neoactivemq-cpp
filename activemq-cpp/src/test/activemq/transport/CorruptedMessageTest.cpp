@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -81,34 +81,34 @@ public:
     {
     }
 
-    virtual void oneway(const Pointer<Command> command)
+    virtual void oneway(const std::shared_ptr<Command> command)
     {
     }
 
-    virtual Pointer<FutureResponse> asyncRequest(
-        const Pointer<Command>          command,
-        const Pointer<ResponseCallback> responseCallback)
+    virtual std::shared_ptr<FutureResponse> asyncRequest(
+        const std::shared_ptr<Command>          command,
+        const std::shared_ptr<ResponseCallback> responseCallback)
     {
-        return Pointer<FutureResponse>();
+        return std::shared_ptr<FutureResponse>();
     }
 
-    virtual Pointer<Response> request(const Pointer<Command> command)
+    virtual std::shared_ptr<Response> request(const std::shared_ptr<Command> command)
     {
-        return Pointer<Response>();
+        return std::shared_ptr<Response>();
     }
 
-    virtual Pointer<Response> request(const Pointer<Command> command,
+    virtual std::shared_ptr<Response> request(const std::shared_ptr<Command> command,
                                       unsigned int           timeout)
     {
-        return Pointer<Response>();
+        return std::shared_ptr<Response>();
     }
 
-    virtual Pointer<wireformat::WireFormat> getWireFormat() const
+    virtual std::shared_ptr<wireformat::WireFormat> getWireFormat() const
     {
-        return Pointer<wireformat::WireFormat>();
+        return std::shared_ptr<wireformat::WireFormat>();
     }
 
-    virtual void setWireFormat(const Pointer<wireformat::WireFormat> wireFormat)
+    virtual void setWireFormat(const std::shared_ptr<wireformat::WireFormat> wireFormat)
     {
     }
 
@@ -196,28 +196,28 @@ public:
         MockTransport mockTransport;  // Use mock transport for marshalling
 
         // Create MessageDispatch with Message
-        Pointer<MessageDispatch> dispatch(new MessageDispatch());
+        std::shared_ptr<MessageDispatch> dispatch(new MessageDispatch());
 
         // Set ConsumerId
-        Pointer<ConsumerId> cid(new ConsumerId());
+        std::shared_ptr<ConsumerId> cid(new ConsumerId());
         cid->setConnectionId(consumerId);
         cid->setSessionId(1);
         cid->setValue(1);
         dispatch->setConsumerId(cid);
 
         // Set Destination
-        Pointer<ActiveMQDestination> dest(new ActiveMQTopic("test.topic"));
+        std::shared_ptr<ActiveMQDestination> dest(new ActiveMQTopic("test.topic"));
         dispatch->setDestination(dest);
 
         // Create Message with MessageId
         // ProducerId format: connectionId:sessionId:producerValue
         // MessageId is created from ProducerId + sequence number
-        Pointer<ActiveMQTextMessage> message(new ActiveMQTextMessage());
-        Pointer<ProducerId>          pid(new ProducerId());
+        std::shared_ptr<ActiveMQTextMessage> message(new ActiveMQTextMessage());
+        std::shared_ptr<ProducerId>          pid(new ProducerId());
         pid->setConnectionId(consumerId);  // Use same connection for simplicity
         pid->setSessionId(1);
         pid->setValue(1);
-        Pointer<MessageId> mid(new MessageId(pid, 1));
+        std::shared_ptr<MessageId> mid(new MessageId(pid, 1));
         message->setMessageId(mid);
         message->setText(messageText);
 
@@ -225,7 +225,7 @@ public:
         dispatch->setRedeliveryCounter(0);
 
         // Marshal to stream using mock transport
-        wireFormat.marshal(Pointer<commands::Command>(dispatch),
+        wireFormat.marshal(std::shared_ptr<commands::Command>(dispatch),
                            &mockTransport,
                            &dos);
         dos.flush();
@@ -327,10 +327,10 @@ public:
         MockTransport mockTransport;  // Use mock transport for marshalling
 
         // Create MessageDispatch with Message
-        Pointer<MessageDispatch> dispatch(new MessageDispatch());
+        std::shared_ptr<MessageDispatch> dispatch(new MessageDispatch());
 
         // Set ConsumerId for durable subscriber
-        Pointer<ConsumerId> cid(new ConsumerId());
+        std::shared_ptr<ConsumerId> cid(new ConsumerId());
         cid->setConnectionId(connectionId);
         cid->setSessionId(1);
         cid->setValue(1);
@@ -340,16 +340,16 @@ public:
         dispatch->setConsumerId(cid);
 
         // Set Destination - durable subscriptions are for topics
-        Pointer<ActiveMQDestination> dest(new ActiveMQTopic("durable.topic"));
+        std::shared_ptr<ActiveMQDestination> dest(new ActiveMQTopic("durable.topic"));
         dispatch->setDestination(dest);
 
         // Create Message with MessageId using ProducerId
-        Pointer<ActiveMQTextMessage> message(new ActiveMQTextMessage());
-        Pointer<ProducerId>          pid(new ProducerId());
+        std::shared_ptr<ActiveMQTextMessage> message(new ActiveMQTextMessage());
+        std::shared_ptr<ProducerId>          pid(new ProducerId());
         pid->setConnectionId(connectionId);
         pid->setSessionId(1);
         pid->setValue(1);
-        Pointer<MessageId> mid(new MessageId(pid, 1));
+        std::shared_ptr<MessageId> mid(new MessageId(pid, 1));
         message->setMessageId(mid);
         message->setText(messageText);
 
@@ -360,7 +360,7 @@ public:
         dispatch->setRedeliveryCounter(0);
 
         // Marshal to stream using mock transport
-        wireFormat.marshal(Pointer<commands::Command>(dispatch),
+        wireFormat.marshal(std::shared_ptr<commands::Command>(dispatch),
                            &mockTransport,
                            &dos);
         dos.flush();
@@ -407,7 +407,7 @@ public:
 class MockTransportListener : public TransportListener
 {
 private:
-    std::vector<Pointer<Command>> receivedCommands;
+    std::vector<std::shared_ptr<Command>> receivedCommands;
     std::vector<std::string>      receivedErrors;
     CountDownLatch*               expectedCommandLatch;
     CountDownLatch*               errorLatch;
@@ -451,7 +451,7 @@ public:
         return true;
     }
 
-    virtual void onCommand(const Pointer<Command> command)
+    virtual void onCommand(const std::shared_ptr<Command> command)
     {
         receivedCommands.push_back(command);
         if (expectedCommandLatch)
@@ -477,7 +477,7 @@ public:
     {
     }
 
-    const std::vector<Pointer<Command>>& getReceivedCommands() const
+    const std::vector<std::shared_ptr<Command>>& getReceivedCommands() const
     {
         return receivedCommands;
     }
@@ -525,15 +525,15 @@ TEST_F(CorruptedMessageTest, testCorruptedFirstMessage)
             "ID:test-producer-1:1:1:1");
 
     // Create input stream with corrupted message
-    Pointer<ByteArrayInputStream> inputStream(
+    std::shared_ptr<ByteArrayInputStream> inputStream(
         new ByteArrayInputStream(&corruptedBytes[0], corruptedBytes.size()));
 
     // Create output stream to capture POISON_ACK
-    Pointer<ByteArrayOutputStream> outputStream(new ByteArrayOutputStream());
+    std::shared_ptr<ByteArrayOutputStream> outputStream(new ByteArrayOutputStream());
 
     // Create wireformat for unmarshal testing
     decaf::util::Properties props;
-    Pointer<OpenWireFormat> wireFormat(new OpenWireFormat(props));
+    std::shared_ptr<OpenWireFormat> wireFormat(new OpenWireFormat(props));
 
     // Create mock listener
     MockTransportListener listener;
@@ -544,11 +544,11 @@ TEST_F(CorruptedMessageTest, testCorruptedFirstMessage)
     // public interface For now, we verify the helper functions work correctly
 
     // Test 1: Verify corrupted stream builder creates invalid data
-    Pointer<DataInputStream> dis(new DataInputStream(inputStream.get()));
+    std::shared_ptr<DataInputStream> dis(new DataInputStream(inputStream.get()));
     bool                     caughtException = false;
     try
     {
-        Pointer<Command> cmd = wireFormat->unmarshal(nullptr, dis.get());
+        std::shared_ptr<Command> cmd = wireFormat->unmarshal(nullptr, dis.get());
     }
     catch (IOException& e)
     {
@@ -610,13 +610,13 @@ TEST_F(CorruptedMessageTest, testCorruptedMessageBetweenValidMessages)
     stream.insert(stream.end(), msg3.begin(), msg3.end());
 
     // Create input stream
-    Pointer<ByteArrayInputStream> bais(
+    std::shared_ptr<ByteArrayInputStream> bais(
         new ByteArrayInputStream(&stream[0], stream.size()));
-    Pointer<DataInputStream> dis(new DataInputStream(bais.get()));
+    std::shared_ptr<DataInputStream> dis(new DataInputStream(bais.get()));
 
     // Create wireformat for unmarshal testing
     decaf::util::Properties props;
-    Pointer<OpenWireFormat> wireFormat(new OpenWireFormat(props));
+    std::shared_ptr<OpenWireFormat> wireFormat(new OpenWireFormat(props));
 
     // Unmarshal messages one by one
     int validCount     = 0;
@@ -625,9 +625,9 @@ TEST_F(CorruptedMessageTest, testCorruptedMessageBetweenValidMessages)
     // Message 1 - should succeed
     try
     {
-        Pointer<Command> cmd1 = wireFormat->unmarshal(nullptr, dis.get());
+        std::shared_ptr<Command> cmd1 = wireFormat->unmarshal(nullptr, dis.get());
         ASSERT_TRUE(cmd1 != nullptr);
-        Pointer<MessageDispatch> dispatch = cmd1.dynamicCast<MessageDispatch>();
+        std::shared_ptr<MessageDispatch> dispatch = std::dynamic_pointer_cast<MessageDispatch>(cmd1);
         ASSERT_TRUE(dispatch != nullptr);
         validCount++;
     }
@@ -639,7 +639,7 @@ TEST_F(CorruptedMessageTest, testCorruptedMessageBetweenValidMessages)
     // Message 2 - should throw (corrupted)
     try
     {
-        Pointer<Command> cmd2 = wireFormat->unmarshal(nullptr, dis.get());
+        std::shared_ptr<Command> cmd2 = wireFormat->unmarshal(nullptr, dis.get());
         FAIL() << ("Corrupted message should throw exception");
     }
     catch (IOException& e)
@@ -688,19 +688,19 @@ TEST_F(CorruptedMessageTest, testContinueAfterCorruptedMessage)
             "ID:test-connection",
             "ID:test-message-corrupted");
 
-    Pointer<ByteArrayInputStream> bais(
+    std::shared_ptr<ByteArrayInputStream> bais(
         new ByteArrayInputStream(&corruptedBytes[0], corruptedBytes.size()));
-    Pointer<DataInputStream> dis(new DataInputStream(bais.get()));
+    std::shared_ptr<DataInputStream> dis(new DataInputStream(bais.get()));
 
     decaf::util::Properties props;
-    Pointer<OpenWireFormat> wireFormat(new OpenWireFormat(props));
+    std::shared_ptr<OpenWireFormat> wireFormat(new OpenWireFormat(props));
     // Wire-level corruption test - unmarshal will throw exception
 
     // Try to unmarshal corrupted message
     bool caughtException = false;
     try
     {
-        Pointer<Command> cmd = wireFormat->unmarshal(nullptr, dis.get());
+        std::shared_ptr<Command> cmd = wireFormat->unmarshal(nullptr, dis.get());
     }
     catch (Exception& e)
     {
@@ -737,7 +737,7 @@ TEST_F(CorruptedMessageTest, testMultipleCorruptedMessages)
 {
     // Create 5 corrupted messages
     decaf::util::Properties props;
-    Pointer<OpenWireFormat> wireFormat(new OpenWireFormat(props));
+    std::shared_ptr<OpenWireFormat> wireFormat(new OpenWireFormat(props));
     // Wire-level corruption test - unmarshal will throw exception
 
     int corruptedCount = 0;
@@ -749,14 +749,14 @@ TEST_F(CorruptedMessageTest, testMultipleCorruptedMessages)
                 "ID:conn:1",
                 msgId);
 
-        Pointer<ByteArrayInputStream> bais(
+        std::shared_ptr<ByteArrayInputStream> bais(
             new ByteArrayInputStream(&corruptedBytes[0],
                                      corruptedBytes.size()));
-        Pointer<DataInputStream> dis(new DataInputStream(bais.get()));
+        std::shared_ptr<DataInputStream> dis(new DataInputStream(bais.get()));
 
         try
         {
-            Pointer<Command> cmd = wireFormat->unmarshal(nullptr, dis.get());
+            std::shared_ptr<Command> cmd = wireFormat->unmarshal(nullptr, dis.get());
             FAIL() << ("Corrupted message should throw exception");
         }
         catch (Exception& e)
@@ -788,18 +788,18 @@ TEST_F(CorruptedMessageTest, testCorruptedMessageWithoutMessageId)
     std::vector<unsigned char> corruptedBytes =
         CorruptedStreamBuilder::createCorruptedMessageBeforeMessageId();
 
-    Pointer<ByteArrayInputStream> bais(
+    std::shared_ptr<ByteArrayInputStream> bais(
         new ByteArrayInputStream(&corruptedBytes[0], corruptedBytes.size()));
-    Pointer<DataInputStream> dis(new DataInputStream(bais.get()));
+    std::shared_ptr<DataInputStream> dis(new DataInputStream(bais.get()));
 
     decaf::util::Properties props;
-    Pointer<OpenWireFormat> wireFormat(new OpenWireFormat(props));
+    std::shared_ptr<OpenWireFormat> wireFormat(new OpenWireFormat(props));
     // Wire-level corruption test - unmarshal will throw exception
 
     bool caughtException = false;
     try
     {
-        Pointer<Command> cmd = wireFormat->unmarshal(nullptr, dis.get());
+        std::shared_ptr<Command> cmd = wireFormat->unmarshal(nullptr, dis.get());
     }
     catch (Exception& e)
     {
@@ -833,7 +833,7 @@ TEST_F(CorruptedMessageTest, testMaxConsecutiveErrors)
     // This test simulates 10 consecutive errors
 
     decaf::util::Properties props;
-    Pointer<OpenWireFormat> wireFormat(new OpenWireFormat(props));
+    std::shared_ptr<OpenWireFormat> wireFormat(new OpenWireFormat(props));
     // Wire-level corruption test - unmarshal will throw exception
 
     int       corruptedCount = 0;
@@ -847,14 +847,14 @@ TEST_F(CorruptedMessageTest, testMaxConsecutiveErrors)
                 "ID:conn:1",
                 msgId);
 
-        Pointer<ByteArrayInputStream> bais(
+        std::shared_ptr<ByteArrayInputStream> bais(
             new ByteArrayInputStream(&corruptedBytes[0],
                                      corruptedBytes.size()));
-        Pointer<DataInputStream> dis(new DataInputStream(bais.get()));
+        std::shared_ptr<DataInputStream> dis(new DataInputStream(bais.get()));
 
         try
         {
-            Pointer<Command> cmd = wireFormat->unmarshal(nullptr, dis.get());
+            std::shared_ptr<Command> cmd = wireFormat->unmarshal(nullptr, dis.get());
             FAIL() << ("Corrupted message should throw exception");
         }
         catch (Exception& e)
@@ -894,21 +894,21 @@ TEST_F(CorruptedMessageTest, testPoisonAckSent)
     // - messageId from partial Message
 
     // Create a MessageAck manually to verify the expected structure
-    Pointer<MessageAck> ack(new MessageAck());
+    std::shared_ptr<MessageAck> ack(new MessageAck());
 
     // Set up like sendPoisonAck() does
-    Pointer<ConsumerId> cid(new ConsumerId());
+    std::shared_ptr<ConsumerId> cid(new ConsumerId());
     cid->setConnectionId("ID:test-connection");
     cid->setSessionId(1);
     cid->setValue(1);
     ack->setConsumerId(cid);
 
     // Create MessageId using ProducerId (proper format)
-    Pointer<ProducerId> pid(new ProducerId());
+    std::shared_ptr<ProducerId> pid(new ProducerId());
     pid->setConnectionId("ID:test-producer");
     pid->setSessionId(1);
     pid->setValue(1);
-    Pointer<MessageId> mid(new MessageId(pid, 999));
+    std::shared_ptr<MessageId> mid(new MessageId(pid, 999));
     ack->setFirstMessageId(mid);
     ack->setLastMessageId(mid);
 
@@ -916,17 +916,17 @@ TEST_F(CorruptedMessageTest, testPoisonAckSent)
     ack->setMessageCount(1);
 
     // Marshal to verify it doesn't throw
-    Pointer<ByteArrayOutputStream> baos(new ByteArrayOutputStream());
-    Pointer<DataOutputStream>      dos(new DataOutputStream(baos.get()));
+    std::shared_ptr<ByteArrayOutputStream> baos(new ByteArrayOutputStream());
+    std::shared_ptr<DataOutputStream>      dos(new DataOutputStream(baos.get()));
 
     decaf::util::Properties props;
-    Pointer<OpenWireFormat> wireFormat(new OpenWireFormat(props));
+    std::shared_ptr<OpenWireFormat> wireFormat(new OpenWireFormat(props));
     // Wire-level corruption test - unmarshal will throw exception
     MockTransport mockTransport;  // Use mock transport for marshalling
 
     try
     {
-        wireFormat->marshal(Pointer<commands::Command>(ack),
+        wireFormat->marshal(std::shared_ptr<commands::Command>(ack),
                             &mockTransport,
                             dos.get());
         dos->flush();
@@ -973,18 +973,18 @@ TEST_F(CorruptedMessageTest, testStreamResyncAfterSingleCorruption)
                                                            "ID:msg:valid",
                                                            "Valid message");
 
-    Pointer<ByteArrayInputStream> bais(
+    std::shared_ptr<ByteArrayInputStream> bais(
         new ByteArrayInputStream(&validBytes[0], validBytes.size()));
-    Pointer<DataInputStream> dis(new DataInputStream(bais.get()));
+    std::shared_ptr<DataInputStream> dis(new DataInputStream(bais.get()));
 
     decaf::util::Properties props;
-    Pointer<OpenWireFormat> wireFormat(new OpenWireFormat(props));
+    std::shared_ptr<OpenWireFormat> wireFormat(new OpenWireFormat(props));
     // Wire-level corruption test - unmarshal will throw exception
 
     // Should unmarshal successfully
     try
     {
-        Pointer<Command> cmd = wireFormat->unmarshal(nullptr, dis.get());
+        std::shared_ptr<Command> cmd = wireFormat->unmarshal(nullptr, dis.get());
         ASSERT_TRUE(cmd != nullptr);
     }
     catch (Exception& e)
@@ -1034,7 +1034,7 @@ TEST_F(CorruptedMessageTest, testCorruptedMessageDuringFailover)
     // For unit testing, we verify the error counter logic works
 
     decaf::util::Properties props;
-    Pointer<OpenWireFormat> wireFormat(new OpenWireFormat(props));
+    std::shared_ptr<OpenWireFormat> wireFormat(new OpenWireFormat(props));
     // Wire-level corruption test - unmarshal will throw exception
 
     // Simulate MAX_CONSECUTIVE_ERRORS scenario
@@ -1046,10 +1046,10 @@ TEST_F(CorruptedMessageTest, testCorruptedMessageDuringFailover)
                 "ID:conn:1",
                 "ID:msg:" + decaf::lang::Integer::toString(i));
 
-        Pointer<ByteArrayInputStream> bais(
+        std::shared_ptr<ByteArrayInputStream> bais(
             new ByteArrayInputStream(&corruptedBytes[0],
                                      corruptedBytes.size()));
-        Pointer<DataInputStream> dis(new DataInputStream(bais.get()));
+        std::shared_ptr<DataInputStream> dis(new DataInputStream(bais.get()));
 
         try
         {
@@ -1087,16 +1087,16 @@ TEST_F(CorruptedMessageTest, testCorruptionInDifferentMessageParts)
 {
     // Test corruption at different unmarshal points
     decaf::util::Properties props;
-    Pointer<OpenWireFormat> wireFormat(new OpenWireFormat(props));
+    std::shared_ptr<OpenWireFormat> wireFormat(new OpenWireFormat(props));
     // Wire-level corruption test - unmarshal will throw exception
 
     // Case 1: Corruption before MessageId (ConsumerId level)
     {
         std::vector<unsigned char> bytes =
             CorruptedStreamBuilder::createCorruptedMessageBeforeMessageId();
-        Pointer<ByteArrayInputStream> bais(
+        std::shared_ptr<ByteArrayInputStream> bais(
             new ByteArrayInputStream(&bytes[0], bytes.size()));
-        Pointer<DataInputStream> dis(new DataInputStream(bais.get()));
+        std::shared_ptr<DataInputStream> dis(new DataInputStream(bais.get()));
 
         bool caught = false;
         try
@@ -1116,9 +1116,9 @@ TEST_F(CorruptedMessageTest, testCorruptionInDifferentMessageParts)
             CorruptedStreamBuilder::createCorruptedMessageAfterMessageId(
                 "ID:conn:1",
                 "ID:msg:1");
-        Pointer<ByteArrayInputStream> bais(
+        std::shared_ptr<ByteArrayInputStream> bais(
             new ByteArrayInputStream(&bytes[0], bytes.size()));
-        Pointer<DataInputStream> dis(new DataInputStream(bais.get()));
+        std::shared_ptr<DataInputStream> dis(new DataInputStream(bais.get()));
 
         bool caught = false;
         try
@@ -1139,9 +1139,9 @@ TEST_F(CorruptedMessageTest, testCorruptionInDifferentMessageParts)
                 "ID:conn:1",
                 "ID:msg:1",
                 50);  // Truncate at 50 bytes
-        Pointer<ByteArrayInputStream> bais(
+        std::shared_ptr<ByteArrayInputStream> bais(
             new ByteArrayInputStream(&bytes[0], bytes.size()));
-        Pointer<DataInputStream> dis(new DataInputStream(bais.get()));
+        std::shared_ptr<DataInputStream> dis(new DataInputStream(bais.get()));
 
         bool caught = false;
         try
@@ -1186,7 +1186,7 @@ TEST_F(CorruptedMessageTest, testCorruptedMessageNonDurableConsumer)
     // persistence
 
     decaf::util::Properties props;
-    Pointer<OpenWireFormat> wireFormat(new OpenWireFormat(props));
+    std::shared_ptr<OpenWireFormat> wireFormat(new OpenWireFormat(props));
     // Wire-level corruption test - unmarshal will throw exception
 
     // Create corrupted message for non-durable consumer
@@ -1198,15 +1198,15 @@ TEST_F(CorruptedMessageTest, testCorruptedMessageNonDurableConsumer)
             connectionId,
             messageId);
 
-    Pointer<ByteArrayInputStream> bais(
+    std::shared_ptr<ByteArrayInputStream> bais(
         new ByteArrayInputStream(&corruptedBytes[0], corruptedBytes.size()));
-    Pointer<DataInputStream> dis(new DataInputStream(bais.get()));
+    std::shared_ptr<DataInputStream> dis(new DataInputStream(bais.get()));
 
     // Verify corruption detected
     bool caughtException = false;
     try
     {
-        Pointer<Command> cmd = wireFormat->unmarshal(nullptr, dis.get());
+        std::shared_ptr<Command> cmd = wireFormat->unmarshal(nullptr, dis.get());
     }
     catch (Exception& e)
     {
@@ -1247,7 +1247,7 @@ TEST_F(CorruptedMessageTest, testCorruptedMessageDurableTopicSubscriber)
     // Durable subscribers maintain their subscription even when disconnected
 
     decaf::util::Properties props;
-    Pointer<OpenWireFormat> wireFormat(new OpenWireFormat(props));
+    std::shared_ptr<OpenWireFormat> wireFormat(new OpenWireFormat(props));
     // Wire-level corruption test - unmarshal will throw exception
 
     // Create corrupted message for durable subscriber
@@ -1261,15 +1261,15 @@ TEST_F(CorruptedMessageTest, testCorruptedMessageDurableTopicSubscriber)
             subscriptionName,
             messageId);
 
-    Pointer<ByteArrayInputStream> bais(
+    std::shared_ptr<ByteArrayInputStream> bais(
         new ByteArrayInputStream(&corruptedBytes[0], corruptedBytes.size()));
-    Pointer<DataInputStream> dis(new DataInputStream(bais.get()));
+    std::shared_ptr<DataInputStream> dis(new DataInputStream(bais.get()));
 
     // Verify corruption detected
     bool caughtException = false;
     try
     {
-        Pointer<Command> cmd = wireFormat->unmarshal(nullptr, dis.get());
+        std::shared_ptr<Command> cmd = wireFormat->unmarshal(nullptr, dis.get());
     }
     catch (Exception& e)
     {
@@ -1312,10 +1312,10 @@ TEST_F(CorruptedMessageTest, testPoisonAckForDurableSubscriber)
     // subscriptions
 
     // Create a MessageAck for durable subscriber
-    Pointer<MessageAck> ack(new MessageAck());
+    std::shared_ptr<MessageAck> ack(new MessageAck());
 
     // Set up ConsumerId for durable subscriber
-    Pointer<ConsumerId> cid(new ConsumerId());
+    std::shared_ptr<ConsumerId> cid(new ConsumerId());
     cid->setConnectionId("ID:durable-conn-123");
     cid->setSessionId(1);
     cid->setValue(1);
@@ -1325,11 +1325,11 @@ TEST_F(CorruptedMessageTest, testPoisonAckForDurableSubscriber)
     ack->setConsumerId(cid);
 
     // Set up MessageId using ProducerId (proper format)
-    Pointer<ProducerId> pid(new ProducerId());
+    std::shared_ptr<ProducerId> pid(new ProducerId());
     pid->setConnectionId("ID:producer-456");
     pid->setSessionId(1);
     pid->setValue(1);
-    Pointer<MessageId> mid(new MessageId(pid, 999));
+    std::shared_ptr<MessageId> mid(new MessageId(pid, 999));
     ack->setFirstMessageId(mid);
     ack->setLastMessageId(mid);
 
@@ -1338,16 +1338,16 @@ TEST_F(CorruptedMessageTest, testPoisonAckForDurableSubscriber)
     ack->setMessageCount(1);
 
     // Marshal to verify structure
-    Pointer<ByteArrayOutputStream> baos(new ByteArrayOutputStream());
-    Pointer<DataOutputStream>      dos(new DataOutputStream(baos.get()));
+    std::shared_ptr<ByteArrayOutputStream> baos(new ByteArrayOutputStream());
+    std::shared_ptr<DataOutputStream>      dos(new DataOutputStream(baos.get()));
 
     decaf::util::Properties props;
-    Pointer<OpenWireFormat> wireFormat(new OpenWireFormat(props));
+    std::shared_ptr<OpenWireFormat> wireFormat(new OpenWireFormat(props));
     MockTransport mockTransport;  // Use mock transport for marshalling
 
     try
     {
-        wireFormat->marshal(Pointer<commands::Command>(ack),
+        wireFormat->marshal(std::shared_ptr<commands::Command>(ack),
                             &mockTransport,
                             dos.get());
         dos->flush();
@@ -1397,7 +1397,7 @@ TEST_F(CorruptedMessageTest, testEOFDuringMessageIdRead)
     // that occurs when MessageId unmarshaling is interrupted
 
     decaf::util::Properties props;
-    Pointer<OpenWireFormat> wireFormat(new OpenWireFormat(props));
+    std::shared_ptr<OpenWireFormat> wireFormat(new OpenWireFormat(props));
     // Wire-level corruption test - unmarshal will throw exception
 
     // Create a truncated message that ends during MessageId read
@@ -1407,16 +1407,16 @@ TEST_F(CorruptedMessageTest, testEOFDuringMessageIdRead)
                                                        "ID:msg:1",
                                                        35);
 
-    Pointer<ByteArrayInputStream> bais(
+    std::shared_ptr<ByteArrayInputStream> bais(
         new ByteArrayInputStream(&truncatedBytes[0], truncatedBytes.size()));
-    Pointer<DataInputStream> dis(new DataInputStream(bais.get()));
+    std::shared_ptr<DataInputStream> dis(new DataInputStream(bais.get()));
 
     // Verify EOF exception thrown
     bool        caughtException = false;
     std::string exceptionType;
     try
     {
-        Pointer<Command> cmd = wireFormat->unmarshal(nullptr, dis.get());
+        std::shared_ptr<Command> cmd = wireFormat->unmarshal(nullptr, dis.get());
         FAIL() << ("Truncated message during MessageId should throw exception");
     }
     catch (EOFException& e)
@@ -1470,7 +1470,7 @@ TEST_F(CorruptedMessageTest, testEOFDuringPropertiesRead)
     // Matches production error: "DataInputStream::readLong - Reached EOF"
 
     decaf::util::Properties props;
-    Pointer<OpenWireFormat> wireFormat(new OpenWireFormat(props));
+    std::shared_ptr<OpenWireFormat> wireFormat(new OpenWireFormat(props));
     // Wire-level corruption test - unmarshal will throw exception
 
     // Create a truncated message that ends during properties read
@@ -1481,15 +1481,15 @@ TEST_F(CorruptedMessageTest, testEOFDuringPropertiesRead)
                                                        "ID:producer:1:1:1:100",
                                                        75);
 
-    Pointer<ByteArrayInputStream> bais(
+    std::shared_ptr<ByteArrayInputStream> bais(
         new ByteArrayInputStream(&truncatedBytes[0], truncatedBytes.size()));
-    Pointer<DataInputStream> dis(new DataInputStream(bais.get()));
+    std::shared_ptr<DataInputStream> dis(new DataInputStream(bais.get()));
 
     // Verify EOF exception thrown
     bool caughtException = false;
     try
     {
-        Pointer<Command> cmd = wireFormat->unmarshal(nullptr, dis.get());
+        std::shared_ptr<Command> cmd = wireFormat->unmarshal(nullptr, dis.get());
         FAIL() << ("Truncated message during properties should throw "
                    "exception");
     }
@@ -1547,7 +1547,7 @@ TEST_F(CorruptedMessageTest, testEOFDuringBodyRead)
     // MessageId and properties complete, but body truncated
 
     decaf::util::Properties props;
-    Pointer<OpenWireFormat> wireFormat(new OpenWireFormat(props));
+    std::shared_ptr<OpenWireFormat> wireFormat(new OpenWireFormat(props));
     // Wire-level corruption test - unmarshal will throw exception
 
     // Create a truncated message that ends during body read
@@ -1558,15 +1558,15 @@ TEST_F(CorruptedMessageTest, testEOFDuringBodyRead)
                                                        "ID:producer:1:1:1:200",
                                                        95);
 
-    Pointer<ByteArrayInputStream> bais(
+    std::shared_ptr<ByteArrayInputStream> bais(
         new ByteArrayInputStream(&truncatedBytes[0], truncatedBytes.size()));
-    Pointer<DataInputStream> dis(new DataInputStream(bais.get()));
+    std::shared_ptr<DataInputStream> dis(new DataInputStream(bais.get()));
 
     // Verify EOF exception thrown
     bool caughtException = false;
     try
     {
-        Pointer<Command> cmd = wireFormat->unmarshal(nullptr, dis.get());
+        std::shared_ptr<Command> cmd = wireFormat->unmarshal(nullptr, dis.get());
         FAIL() << ("Truncated message during body should throw exception");
     }
     catch (EOFException& e)

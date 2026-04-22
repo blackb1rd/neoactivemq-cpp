@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -374,7 +374,7 @@ TEST_F(OpenwireTempDestinationTest, testTmpQueueWorksUnderLoad)
     int count    = 500;
     int dataSize = 1024;
 
-    ArrayList<Pointer<BytesMessage>> list(count);
+    ArrayList<std::shared_ptr<BytesMessage>> list(count);
     std::unique_ptr<TemporaryQueue>  queue(
         cmsProvider->getSession()->createTemporaryQueue());
     std::unique_ptr<MessageProducer> producer(
@@ -389,7 +389,7 @@ TEST_F(OpenwireTempDestinationTest, testTmpQueueWorksUnderLoad)
 
     for (int i = 0; i < count; i++)
     {
-        Pointer<BytesMessage> message(
+        std::shared_ptr<BytesMessage> message(
             cmsProvider->getSession()->createBytesMessage());
         message->writeBytes(data, 0, dataSize);
         message->setIntProperty("c", i);
@@ -401,7 +401,7 @@ TEST_F(OpenwireTempDestinationTest, testTmpQueueWorksUnderLoad)
         cmsProvider->getSession()->createConsumer(queue.get()));
     for (int i = 0; i < count; i++)
     {
-        Pointer<Message> message2(consumer->receive(2000));
+        std::shared_ptr<Message> message2(consumer->receive(2000));
         ASSERT_TRUE(message2 != NULL);
         ASSERT_EQ(i, message2->getIntProperty("c"));
         ASSERT_TRUE(dynamic_cast<BytesMessage*>(message2.get()) != NULL)
@@ -414,7 +414,7 @@ TEST_F(OpenwireTempDestinationTest, testTmpQueueWorksUnderLoad)
 ///////////////////////////////////////////////////////////////////////////////
 TEST_F(OpenwireTempDestinationTest, testPublishFailsForClosedConnection)
 {
-    Pointer<ActiveMQConnectionFactory> factory(
+    std::shared_ptr<ActiveMQConnectionFactory> factory(
         new ActiveMQConnectionFactory(cmsProvider->getBrokerURL()));
     factory->setAlwaysSyncSend(true);
 
@@ -450,7 +450,7 @@ TEST_F(OpenwireTempDestinationTest, testPublishFailsForClosedConnection)
 ///////////////////////////////////////////////////////////////////////////////
 TEST_F(OpenwireTempDestinationTest, testPublishFailsForDestoryedTempDestination)
 {
-    Pointer<ActiveMQConnectionFactory> factory(
+    std::shared_ptr<ActiveMQConnectionFactory> factory(
         new ActiveMQConnectionFactory(cmsProvider->getBrokerURL()));
     factory->setAlwaysSyncSend(true);
 
@@ -500,15 +500,15 @@ TEST_F(OpenwireTempDestinationTest, testDeleteDestinationWithSubscribersFails)
 ///////////////////////////////////////////////////////////////////////////////
 TEST_F(OpenwireTempDestinationTest, testCloseConnectionWithManyTempDests)
 {
-    ArrayList<Pointer<TemporaryQueue>>  tempQueues;
-    ArrayList<Pointer<MessageProducer>> producers;
+    ArrayList<std::shared_ptr<TemporaryQueue>>  tempQueues;
+    ArrayList<std::shared_ptr<MessageProducer>> producers;
 
     for (int i = 0; i < 25; ++i)
     {
-        Pointer<TemporaryQueue> tempQueue(
+        std::shared_ptr<TemporaryQueue> tempQueue(
             cmsProvider->getSession()->createTemporaryQueue());
         tempQueues.add(tempQueue);
-        Pointer<MessageProducer> producer(
+        std::shared_ptr<MessageProducer> producer(
             cmsProvider->getSession()->createProducer(tempQueue.get()));
         producers.add(producer);
     }

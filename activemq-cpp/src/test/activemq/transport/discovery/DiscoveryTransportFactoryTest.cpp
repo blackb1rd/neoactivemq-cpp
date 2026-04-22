@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -98,10 +98,10 @@ public:
     {
     }
 
-    virtual decaf::lang::Pointer<DiscoveryAgent> createAgent(
+    virtual std::shared_ptr<DiscoveryAgent> createAgent(
         const decaf::net::URI& agentURI)
     {
-        return Pointer<DiscoveryAgent>(new MockDiscoveryAgent);
+        return std::shared_ptr<DiscoveryAgent>(new MockDiscoveryAgent);
     }
 };
 
@@ -116,7 +116,7 @@ public:
     {
     }
 
-    virtual void onCommand(const Pointer<Command> command)
+    virtual void onCommand(const std::shared_ptr<Command> command)
     {
     }
 
@@ -157,7 +157,7 @@ void DiscoveryTransportFactoryTest::test()
 {
     DiscoveryTransportFactory factory;
 
-    Pointer<Transport> transport =
+    std::shared_ptr<Transport> transport =
         factory.create(URI("discovery:mock://default"));
     ASSERT_TRUE(transport != NULL);
 

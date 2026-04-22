@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -24,7 +24,7 @@
 #include <activemq/commands/ActiveMQTopic.h>
 #include <activemq/util/AdvisorySupport.h>
 
-#include <decaf/lang/Pointer.h>
+#include <memory>
 #include <decaf/lang/exceptions/NullPointerException.h>
 
 using namespace activemq;
@@ -41,7 +41,7 @@ class AdvisorySupportTest : public ::testing::Test
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(AdvisorySupportTest, testGetTempDestinationCompositeAdvisoryTopic)
 {
-    Pointer<ActiveMQDestination> topic(
+    std::shared_ptr<ActiveMQDestination> topic(
         AdvisorySupport::getTempDestinationCompositeAdvisoryTopic());
     ASSERT_TRUE(topic != NULL);
     ASSERT_TRUE(topic->isComposite());
@@ -58,7 +58,7 @@ TEST_F(AdvisorySupportTest, testGetTempDestinationCompositeAdvisoryTopic)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(AdvisorySupportTest, testGetAllDestinationsCompositeAdvisoryTopic)
 {
-    Pointer<ActiveMQDestination> topic(
+    std::shared_ptr<ActiveMQDestination> topic(
         AdvisorySupport::getAllDestinationsCompositeAdvisoryTopic());
     ASSERT_TRUE(topic != NULL);
     ASSERT_TRUE(topic->isComposite());
@@ -77,7 +77,7 @@ TEST_F(AdvisorySupportTest, testGetAllDestinationsCompositeAdvisoryTopic)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(AdvisorySupportTest, testGetAllDestinationAdvisoryTopics)
 {
-    Pointer<ActiveMQDestination> target(new ActiveMQTopic("Test.Topic"));
+    std::shared_ptr<ActiveMQDestination> target(new ActiveMQTopic("Test.Topic"));
 
     std::vector<ActiveMQDestination*> topics =
         AdvisorySupport::getAllDestinationAdvisoryTopics(target.get());
@@ -86,7 +86,7 @@ TEST_F(AdvisorySupportTest, testGetAllDestinationAdvisoryTopics)
     std::vector<ActiveMQDestination*>::iterator iter = topics.begin();
     for (; iter != topics.end(); ++iter)
     {
-        Pointer<ActiveMQDestination> topic(*iter);
+        std::shared_ptr<ActiveMQDestination> topic(*iter);
         ASSERT_TRUE(topic->isTopic());
         ASSERT_TRUE(topic->isAdvisory() == true);
         ASSERT_TRUE(topic->isTemporary() == false);
@@ -94,7 +94,7 @@ TEST_F(AdvisorySupportTest, testGetAllDestinationAdvisoryTopics)
                         AdvisorySupport::ADVISORY_TOPIC_PREFIX) == 0);
     }
 
-    Pointer<cms::Destination> cmsDest = target.dynamicCast<cms::Destination>();
+    std::shared_ptr<cms::Destination> cmsDest = std::dynamic_pointer_cast<cms::Destination>(target);
 
     std::vector<ActiveMQDestination*> topics2 =
         AdvisorySupport::getAllDestinationAdvisoryTopics(cmsDest.get());
@@ -103,7 +103,7 @@ TEST_F(AdvisorySupportTest, testGetAllDestinationAdvisoryTopics)
     std::vector<ActiveMQDestination*>::iterator iter2 = topics2.begin();
     for (; iter2 != topics2.end(); ++iter2)
     {
-        Pointer<ActiveMQDestination> topic(*iter2);
+        std::shared_ptr<ActiveMQDestination> topic(*iter2);
         ASSERT_TRUE(topic->isTopic());
         ASSERT_TRUE(topic->isAdvisory() == true);
         ASSERT_TRUE(topic->isTemporary() == false);
@@ -128,7 +128,7 @@ TEST_F(AdvisorySupportTest, testGetAllDestinationAdvisoryTopics)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(AdvisorySupportTest, testGetConnectionAdvisoryTopic)
 {
-    Pointer<ActiveMQDestination> topic(
+    std::shared_ptr<ActiveMQDestination> topic(
         AdvisorySupport::getConnectionAdvisoryTopic());
     ASSERT_TRUE(topic != NULL);
     ASSERT_TRUE(topic->isAdvisory() == true);
@@ -144,7 +144,7 @@ TEST_F(AdvisorySupportTest, testGetConnectionAdvisoryTopic)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(AdvisorySupportTest, testGetQueueAdvisoryTopic)
 {
-    Pointer<ActiveMQDestination> topic(
+    std::shared_ptr<ActiveMQDestination> topic(
         AdvisorySupport::getQueueAdvisoryTopic());
     ASSERT_TRUE(topic != NULL);
     ASSERT_TRUE(topic->isComposite() == false);
@@ -159,7 +159,7 @@ TEST_F(AdvisorySupportTest, testGetQueueAdvisoryTopic)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(AdvisorySupportTest, testGetTopicAdvisoryTopic)
 {
-    Pointer<ActiveMQDestination> topic(
+    std::shared_ptr<ActiveMQDestination> topic(
         AdvisorySupport::getTopicAdvisoryTopic());
     ASSERT_TRUE(topic != NULL);
     ASSERT_TRUE(topic->isComposite() == false);
@@ -174,7 +174,7 @@ TEST_F(AdvisorySupportTest, testGetTopicAdvisoryTopic)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(AdvisorySupportTest, testGetTempQueueAdvisoryTopic)
 {
-    Pointer<ActiveMQDestination> topic(
+    std::shared_ptr<ActiveMQDestination> topic(
         AdvisorySupport::getTempQueueAdvisoryTopic());
     ASSERT_TRUE(topic != NULL);
     ASSERT_TRUE(topic->isComposite() == false);
@@ -190,7 +190,7 @@ TEST_F(AdvisorySupportTest, testGetTempQueueAdvisoryTopic)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(AdvisorySupportTest, testGetTempTopicAdvisoryTopic)
 {
-    Pointer<ActiveMQDestination> topic(
+    std::shared_ptr<ActiveMQDestination> topic(
         AdvisorySupport::getTempTopicAdvisoryTopic());
     ASSERT_TRUE(topic != NULL);
     ASSERT_TRUE(topic->isAdvisory() == true);
@@ -206,9 +206,9 @@ TEST_F(AdvisorySupportTest, testGetTempTopicAdvisoryTopic)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(AdvisorySupportTest, testGetConsumerAdvisoryTopic)
 {
-    Pointer<ActiveMQDestination> target(new ActiveMQTopic("Test.Topic"));
+    std::shared_ptr<ActiveMQDestination> target(new ActiveMQTopic("Test.Topic"));
 
-    Pointer<ActiveMQDestination> topic(
+    std::shared_ptr<ActiveMQDestination> topic(
         AdvisorySupport::getConsumerAdvisoryTopic(target.get()));
     ASSERT_TRUE(topic != NULL);
     ASSERT_TRUE(topic->isComposite() == false);
@@ -220,9 +220,9 @@ TEST_F(AdvisorySupportTest, testGetConsumerAdvisoryTopic)
     ASSERT_TRUE(topic->getPhysicalName().find(".Test.Topic") !=
                 std::string::npos);
 
-    Pointer<cms::Destination> cmsDest = target.dynamicCast<cms::Destination>();
+    std::shared_ptr<cms::Destination> cmsDest = std::dynamic_pointer_cast<cms::Destination>(target);
 
-    Pointer<ActiveMQDestination> cmstopic(
+    std::shared_ptr<ActiveMQDestination> cmstopic(
         AdvisorySupport::getConsumerAdvisoryTopic(cmsDest.get()));
     ASSERT_TRUE(cmstopic != NULL);
     ASSERT_TRUE(cmstopic->isComposite() == false);
@@ -249,9 +249,9 @@ TEST_F(AdvisorySupportTest, testGetConsumerAdvisoryTopic)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(AdvisorySupportTest, testGetProducerAdvisoryTopic)
 {
-    Pointer<ActiveMQDestination> target(new ActiveMQTopic("Test.Topic"));
+    std::shared_ptr<ActiveMQDestination> target(new ActiveMQTopic("Test.Topic"));
 
-    Pointer<ActiveMQDestination> topic(
+    std::shared_ptr<ActiveMQDestination> topic(
         AdvisorySupport::getProducerAdvisoryTopic(target.get()));
     ASSERT_TRUE(topic != NULL);
     ASSERT_TRUE(topic->isComposite() == false);
@@ -263,9 +263,9 @@ TEST_F(AdvisorySupportTest, testGetProducerAdvisoryTopic)
     ASSERT_TRUE(topic->getPhysicalName().find(".Test.Topic") !=
                 std::string::npos);
 
-    Pointer<cms::Destination> cmsDest = target.dynamicCast<cms::Destination>();
+    std::shared_ptr<cms::Destination> cmsDest = std::dynamic_pointer_cast<cms::Destination>(target);
 
-    Pointer<ActiveMQDestination> cmstopic(
+    std::shared_ptr<ActiveMQDestination> cmstopic(
         AdvisorySupport::getProducerAdvisoryTopic(cmsDest.get()));
     ASSERT_TRUE(cmstopic != NULL);
     ASSERT_TRUE(cmstopic->isComposite() == false);
@@ -293,9 +293,9 @@ TEST_F(AdvisorySupportTest, testGetProducerAdvisoryTopic)
 TEST_F(AdvisorySupportTest, testGetExpiredMessageTopic)
 {
     {
-        Pointer<ActiveMQDestination> target(new ActiveMQTopic("Test.Topic"));
+        std::shared_ptr<ActiveMQDestination> target(new ActiveMQTopic("Test.Topic"));
 
-        Pointer<ActiveMQDestination> topic(
+        std::shared_ptr<ActiveMQDestination> topic(
             AdvisorySupport::getExpiredMessageTopic(target.get()));
         ASSERT_TRUE(topic != NULL);
         ASSERT_TRUE(topic->isComposite() == false);
@@ -308,10 +308,10 @@ TEST_F(AdvisorySupportTest, testGetExpiredMessageTopic)
         ASSERT_TRUE(topic->getPhysicalName().find(".Test.Topic") !=
                     std::string::npos);
 
-        Pointer<cms::Destination> cmsDest =
-            target.dynamicCast<cms::Destination>();
+        std::shared_ptr<cms::Destination> cmsDest =
+            std::dynamic_pointer_cast<cms::Destination>(target);
 
-        Pointer<ActiveMQDestination> cmstopic(
+        std::shared_ptr<ActiveMQDestination> cmstopic(
             AdvisorySupport::getExpiredMessageTopic(cmsDest.get()));
         ASSERT_TRUE(cmstopic != NULL);
         ASSERT_TRUE(cmstopic->isComposite() == false);
@@ -325,9 +325,9 @@ TEST_F(AdvisorySupportTest, testGetExpiredMessageTopic)
                     std::string::npos);
     }
     {
-        Pointer<ActiveMQDestination> target(new ActiveMQQueue("Test.Queue"));
+        std::shared_ptr<ActiveMQDestination> target(new ActiveMQQueue("Test.Queue"));
 
-        Pointer<ActiveMQDestination> topic(
+        std::shared_ptr<ActiveMQDestination> topic(
             AdvisorySupport::getExpiredMessageTopic(target.get()));
         ASSERT_TRUE(topic != NULL);
         ASSERT_TRUE(topic->isComposite() == false);
@@ -340,10 +340,10 @@ TEST_F(AdvisorySupportTest, testGetExpiredMessageTopic)
         ASSERT_TRUE(topic->getPhysicalName().find(".Test.Queue") !=
                     std::string::npos);
 
-        Pointer<cms::Destination> cmsDest =
-            target.dynamicCast<cms::Destination>();
+        std::shared_ptr<cms::Destination> cmsDest =
+            std::dynamic_pointer_cast<cms::Destination>(target);
 
-        Pointer<ActiveMQDestination> cmstopic(
+        std::shared_ptr<ActiveMQDestination> cmstopic(
             AdvisorySupport::getExpiredMessageTopic(cmsDest.get()));
         ASSERT_TRUE(cmstopic != NULL);
         ASSERT_TRUE(cmstopic->isComposite() == false);
@@ -372,9 +372,9 @@ TEST_F(AdvisorySupportTest, testGetExpiredMessageTopic)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(AdvisorySupportTest, testGetExpiredTopicMessageAdvisoryTopic)
 {
-    Pointer<ActiveMQDestination> target(new ActiveMQTopic("Test.Topic"));
+    std::shared_ptr<ActiveMQDestination> target(new ActiveMQTopic("Test.Topic"));
 
-    Pointer<ActiveMQDestination> topic(
+    std::shared_ptr<ActiveMQDestination> topic(
         AdvisorySupport::getExpiredTopicMessageAdvisoryTopic(target.get()));
     ASSERT_TRUE(topic != NULL);
     ASSERT_TRUE(topic->isComposite() == false);
@@ -386,9 +386,9 @@ TEST_F(AdvisorySupportTest, testGetExpiredTopicMessageAdvisoryTopic)
     ASSERT_TRUE(topic->getPhysicalName().find(".Test.Topic") !=
                 std::string::npos);
 
-    Pointer<cms::Destination> cmsDest = target.dynamicCast<cms::Destination>();
+    std::shared_ptr<cms::Destination> cmsDest = std::dynamic_pointer_cast<cms::Destination>(target);
 
-    Pointer<ActiveMQDestination> cmstopic(
+    std::shared_ptr<ActiveMQDestination> cmstopic(
         AdvisorySupport::getExpiredTopicMessageAdvisoryTopic(cmsDest.get()));
     ASSERT_TRUE(cmstopic != NULL);
     ASSERT_TRUE(cmstopic->isComposite() == false);
@@ -415,9 +415,9 @@ TEST_F(AdvisorySupportTest, testGetExpiredTopicMessageAdvisoryTopic)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(AdvisorySupportTest, testGetExpiredQueueMessageAdvisoryTopic)
 {
-    Pointer<ActiveMQDestination> target(new ActiveMQQueue("Test.Queue"));
+    std::shared_ptr<ActiveMQDestination> target(new ActiveMQQueue("Test.Queue"));
 
-    Pointer<ActiveMQDestination> topic(
+    std::shared_ptr<ActiveMQDestination> topic(
         AdvisorySupport::getExpiredQueueMessageAdvisoryTopic(target.get()));
     ASSERT_TRUE(topic != NULL);
     ASSERT_TRUE(topic->isComposite() == false);
@@ -429,9 +429,9 @@ TEST_F(AdvisorySupportTest, testGetExpiredQueueMessageAdvisoryTopic)
     ASSERT_TRUE(topic->getPhysicalName().find(".Test.Queue") !=
                 std::string::npos);
 
-    Pointer<cms::Destination> cmsDest = target.dynamicCast<cms::Destination>();
+    std::shared_ptr<cms::Destination> cmsDest = std::dynamic_pointer_cast<cms::Destination>(target);
 
-    Pointer<ActiveMQDestination> cmstopic(
+    std::shared_ptr<ActiveMQDestination> cmstopic(
         AdvisorySupport::getExpiredQueueMessageAdvisoryTopic(cmsDest.get()));
     ASSERT_TRUE(cmstopic != NULL);
     ASSERT_TRUE(cmstopic->isComposite() == false);
@@ -459,9 +459,9 @@ TEST_F(AdvisorySupportTest, testGetExpiredQueueMessageAdvisoryTopic)
 TEST_F(AdvisorySupportTest, testGetNoConsumersAdvisoryTopic)
 {
     {
-        Pointer<ActiveMQDestination> target(new ActiveMQTopic("Test.Topic"));
+        std::shared_ptr<ActiveMQDestination> target(new ActiveMQTopic("Test.Topic"));
 
-        Pointer<ActiveMQDestination> topic(
+        std::shared_ptr<ActiveMQDestination> topic(
             AdvisorySupport::getNoConsumersAdvisoryTopic(target.get()));
         ASSERT_TRUE(topic != NULL);
         ASSERT_TRUE(topic->isComposite() == false);
@@ -473,10 +473,10 @@ TEST_F(AdvisorySupportTest, testGetNoConsumersAdvisoryTopic)
         ASSERT_TRUE(topic->getPhysicalName().find(".Test.Topic") !=
                     std::string::npos);
 
-        Pointer<cms::Destination> cmsDest =
-            target.dynamicCast<cms::Destination>();
+        std::shared_ptr<cms::Destination> cmsDest =
+            std::dynamic_pointer_cast<cms::Destination>(target);
 
-        Pointer<ActiveMQDestination> cmstopic(
+        std::shared_ptr<ActiveMQDestination> cmstopic(
             AdvisorySupport::getNoConsumersAdvisoryTopic(cmsDest.get()));
         ASSERT_TRUE(cmstopic != NULL);
         ASSERT_TRUE(cmstopic->isComposite() == false);
@@ -489,9 +489,9 @@ TEST_F(AdvisorySupportTest, testGetNoConsumersAdvisoryTopic)
                     std::string::npos);
     }
     {
-        Pointer<ActiveMQDestination> target(new ActiveMQQueue("Test.Queue"));
+        std::shared_ptr<ActiveMQDestination> target(new ActiveMQQueue("Test.Queue"));
 
-        Pointer<ActiveMQDestination> topic(
+        std::shared_ptr<ActiveMQDestination> topic(
             AdvisorySupport::getNoConsumersAdvisoryTopic(target.get()));
         ASSERT_TRUE(topic != NULL);
         ASSERT_TRUE(topic->isComposite() == false);
@@ -503,10 +503,10 @@ TEST_F(AdvisorySupportTest, testGetNoConsumersAdvisoryTopic)
         ASSERT_TRUE(topic->getPhysicalName().find(".Test.Queue") !=
                     std::string::npos);
 
-        Pointer<cms::Destination> cmsDest =
-            target.dynamicCast<cms::Destination>();
+        std::shared_ptr<cms::Destination> cmsDest =
+            std::dynamic_pointer_cast<cms::Destination>(target);
 
-        Pointer<ActiveMQDestination> cmstopic(
+        std::shared_ptr<ActiveMQDestination> cmstopic(
             AdvisorySupport::getNoConsumersAdvisoryTopic(cmsDest.get()));
         ASSERT_TRUE(cmstopic != NULL);
         ASSERT_TRUE(cmstopic->isComposite() == false);
@@ -534,9 +534,9 @@ TEST_F(AdvisorySupportTest, testGetNoConsumersAdvisoryTopic)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(AdvisorySupportTest, testGetNoTopicConsumersAdvisoryTopic)
 {
-    Pointer<ActiveMQDestination> target(new ActiveMQTopic("Test.Topic"));
+    std::shared_ptr<ActiveMQDestination> target(new ActiveMQTopic("Test.Topic"));
 
-    Pointer<ActiveMQDestination> topic(
+    std::shared_ptr<ActiveMQDestination> topic(
         AdvisorySupport::getNoTopicConsumersAdvisoryTopic(target.get()));
     ASSERT_TRUE(topic != NULL);
     ASSERT_TRUE(topic->isComposite() == false);
@@ -548,9 +548,9 @@ TEST_F(AdvisorySupportTest, testGetNoTopicConsumersAdvisoryTopic)
     ASSERT_TRUE(topic->getPhysicalName().find(".Test.Topic") !=
                 std::string::npos);
 
-    Pointer<cms::Destination> cmsDest = target.dynamicCast<cms::Destination>();
+    std::shared_ptr<cms::Destination> cmsDest = std::dynamic_pointer_cast<cms::Destination>(target);
 
-    Pointer<ActiveMQDestination> cmstopic(
+    std::shared_ptr<ActiveMQDestination> cmstopic(
         AdvisorySupport::getNoTopicConsumersAdvisoryTopic(cmsDest.get()));
     ASSERT_TRUE(cmstopic != NULL);
     ASSERT_TRUE(cmstopic->isComposite() == false);
@@ -577,9 +577,9 @@ TEST_F(AdvisorySupportTest, testGetNoTopicConsumersAdvisoryTopic)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(AdvisorySupportTest, testGetNoQueueConsumersAdvisoryTopic)
 {
-    Pointer<ActiveMQDestination> target(new ActiveMQQueue("Test.Queue"));
+    std::shared_ptr<ActiveMQDestination> target(new ActiveMQQueue("Test.Queue"));
 
-    Pointer<ActiveMQDestination> topic(
+    std::shared_ptr<ActiveMQDestination> topic(
         AdvisorySupport::getNoQueueConsumersAdvisoryTopic(target.get()));
     ASSERT_TRUE(topic != NULL);
     ASSERT_TRUE(topic->isComposite() == false);
@@ -591,9 +591,9 @@ TEST_F(AdvisorySupportTest, testGetNoQueueConsumersAdvisoryTopic)
     ASSERT_TRUE(topic->getPhysicalName().find(".Test.Queue") !=
                 std::string::npos);
 
-    Pointer<cms::Destination> cmsDest = target.dynamicCast<cms::Destination>();
+    std::shared_ptr<cms::Destination> cmsDest = std::dynamic_pointer_cast<cms::Destination>(target);
 
-    Pointer<ActiveMQDestination> cmstopic(
+    std::shared_ptr<ActiveMQDestination> cmstopic(
         AdvisorySupport::getNoQueueConsumersAdvisoryTopic(cmsDest.get()));
     ASSERT_TRUE(cmstopic != NULL);
     ASSERT_TRUE(cmstopic->isComposite() == false);
@@ -620,9 +620,9 @@ TEST_F(AdvisorySupportTest, testGetNoQueueConsumersAdvisoryTopic)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(AdvisorySupportTest, testGetSlowConsumerAdvisoryTopic)
 {
-    Pointer<ActiveMQDestination> target(new ActiveMQTopic("Test.Topic"));
+    std::shared_ptr<ActiveMQDestination> target(new ActiveMQTopic("Test.Topic"));
 
-    Pointer<ActiveMQDestination> topic(
+    std::shared_ptr<ActiveMQDestination> topic(
         AdvisorySupport::getSlowConsumerAdvisoryTopic(target.get()));
     ASSERT_TRUE(topic != NULL);
     ASSERT_TRUE(topic->isComposite() == false);
@@ -634,9 +634,9 @@ TEST_F(AdvisorySupportTest, testGetSlowConsumerAdvisoryTopic)
     ASSERT_TRUE(topic->getPhysicalName().find(".Test.Topic") !=
                 std::string::npos);
 
-    Pointer<cms::Destination> cmsDest = target.dynamicCast<cms::Destination>();
+    std::shared_ptr<cms::Destination> cmsDest = std::dynamic_pointer_cast<cms::Destination>(target);
 
-    Pointer<ActiveMQDestination> cmstopic(
+    std::shared_ptr<ActiveMQDestination> cmstopic(
         AdvisorySupport::getSlowConsumerAdvisoryTopic(cmsDest.get()));
     ASSERT_TRUE(cmstopic != NULL);
     ASSERT_TRUE(cmstopic->isComposite() == false);
@@ -663,9 +663,9 @@ TEST_F(AdvisorySupportTest, testGetSlowConsumerAdvisoryTopic)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(AdvisorySupportTest, testGetFastProducerAdvisoryTopic)
 {
-    Pointer<ActiveMQDestination> target(new ActiveMQTopic("Test.Topic"));
+    std::shared_ptr<ActiveMQDestination> target(new ActiveMQTopic("Test.Topic"));
 
-    Pointer<ActiveMQDestination> topic(
+    std::shared_ptr<ActiveMQDestination> topic(
         AdvisorySupport::getFastProducerAdvisoryTopic(target.get()));
     ASSERT_TRUE(topic != NULL);
     ASSERT_TRUE(topic->isComposite() == false);
@@ -677,9 +677,9 @@ TEST_F(AdvisorySupportTest, testGetFastProducerAdvisoryTopic)
     ASSERT_TRUE(topic->getPhysicalName().find(".Test.Topic") !=
                 std::string::npos);
 
-    Pointer<cms::Destination> cmsDest = target.dynamicCast<cms::Destination>();
+    std::shared_ptr<cms::Destination> cmsDest = std::dynamic_pointer_cast<cms::Destination>(target);
 
-    Pointer<ActiveMQDestination> cmstopic(
+    std::shared_ptr<ActiveMQDestination> cmstopic(
         AdvisorySupport::getFastProducerAdvisoryTopic(cmsDest.get()));
     ASSERT_TRUE(cmstopic != NULL);
     ASSERT_TRUE(cmstopic->isComposite() == false);
@@ -706,9 +706,9 @@ TEST_F(AdvisorySupportTest, testGetFastProducerAdvisoryTopic)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(AdvisorySupportTest, testGetMessageDiscardedAdvisoryTopic)
 {
-    Pointer<ActiveMQDestination> target(new ActiveMQTopic("Test.Topic"));
+    std::shared_ptr<ActiveMQDestination> target(new ActiveMQTopic("Test.Topic"));
 
-    Pointer<ActiveMQDestination> topic(
+    std::shared_ptr<ActiveMQDestination> topic(
         AdvisorySupport::getMessageDiscardedAdvisoryTopic(target.get()));
     ASSERT_TRUE(topic != NULL);
     ASSERT_TRUE(topic->isComposite() == false);
@@ -720,9 +720,9 @@ TEST_F(AdvisorySupportTest, testGetMessageDiscardedAdvisoryTopic)
     ASSERT_TRUE(topic->getPhysicalName().find(".Test.Topic") !=
                 std::string::npos);
 
-    Pointer<cms::Destination> cmsDest = target.dynamicCast<cms::Destination>();
+    std::shared_ptr<cms::Destination> cmsDest = std::dynamic_pointer_cast<cms::Destination>(target);
 
-    Pointer<ActiveMQDestination> cmstopic(
+    std::shared_ptr<ActiveMQDestination> cmstopic(
         AdvisorySupport::getMessageDiscardedAdvisoryTopic(cmsDest.get()));
     ASSERT_TRUE(cmstopic != NULL);
     ASSERT_TRUE(cmstopic->isComposite() == false);
@@ -749,9 +749,9 @@ TEST_F(AdvisorySupportTest, testGetMessageDiscardedAdvisoryTopic)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(AdvisorySupportTest, testGetMessageDeliveredAdvisoryTopic)
 {
-    Pointer<ActiveMQDestination> target(new ActiveMQTopic("Test.Topic"));
+    std::shared_ptr<ActiveMQDestination> target(new ActiveMQTopic("Test.Topic"));
 
-    Pointer<ActiveMQDestination> topic(
+    std::shared_ptr<ActiveMQDestination> topic(
         AdvisorySupport::getMessageDeliveredAdvisoryTopic(target.get()));
     ASSERT_TRUE(topic != NULL);
     ASSERT_TRUE(topic->isComposite() == false);
@@ -763,9 +763,9 @@ TEST_F(AdvisorySupportTest, testGetMessageDeliveredAdvisoryTopic)
     ASSERT_TRUE(topic->getPhysicalName().find(".Test.Topic") !=
                 std::string::npos);
 
-    Pointer<cms::Destination> cmsDest = target.dynamicCast<cms::Destination>();
+    std::shared_ptr<cms::Destination> cmsDest = std::dynamic_pointer_cast<cms::Destination>(target);
 
-    Pointer<ActiveMQDestination> cmstopic(
+    std::shared_ptr<ActiveMQDestination> cmstopic(
         AdvisorySupport::getMessageDeliveredAdvisoryTopic(cmsDest.get()));
     ASSERT_TRUE(cmstopic != NULL);
     ASSERT_TRUE(cmstopic->isComposite() == false);
@@ -792,9 +792,9 @@ TEST_F(AdvisorySupportTest, testGetMessageDeliveredAdvisoryTopic)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(AdvisorySupportTest, testGetMessageConsumedAdvisoryTopic)
 {
-    Pointer<ActiveMQDestination> target(new ActiveMQTopic("Test.Topic"));
+    std::shared_ptr<ActiveMQDestination> target(new ActiveMQTopic("Test.Topic"));
 
-    Pointer<ActiveMQDestination> topic(
+    std::shared_ptr<ActiveMQDestination> topic(
         AdvisorySupport::getMessageConsumedAdvisoryTopic(target.get()));
     ASSERT_TRUE(topic != NULL);
     ASSERT_TRUE(topic->isComposite() == false);
@@ -806,9 +806,9 @@ TEST_F(AdvisorySupportTest, testGetMessageConsumedAdvisoryTopic)
     ASSERT_TRUE(topic->getPhysicalName().find(".Test.Topic") !=
                 std::string::npos);
 
-    Pointer<cms::Destination> cmsDest = target.dynamicCast<cms::Destination>();
+    std::shared_ptr<cms::Destination> cmsDest = std::dynamic_pointer_cast<cms::Destination>(target);
 
-    Pointer<ActiveMQDestination> cmstopic(
+    std::shared_ptr<ActiveMQDestination> cmstopic(
         AdvisorySupport::getMessageConsumedAdvisoryTopic(cmsDest.get()));
     ASSERT_TRUE(cmstopic != NULL);
     ASSERT_TRUE(cmstopic->isComposite() == false);
@@ -835,9 +835,9 @@ TEST_F(AdvisorySupportTest, testGetMessageConsumedAdvisoryTopic)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(AdvisorySupportTest, testGetMessageDLQdAdvisoryTopic)
 {
-    Pointer<ActiveMQDestination> target(new ActiveMQTopic("Test.Topic"));
+    std::shared_ptr<ActiveMQDestination> target(new ActiveMQTopic("Test.Topic"));
 
-    Pointer<ActiveMQDestination> topic(
+    std::shared_ptr<ActiveMQDestination> topic(
         AdvisorySupport::getMessageDLQdAdvisoryTopic(target.get()));
     ASSERT_TRUE(topic != NULL);
     ASSERT_TRUE(topic->isComposite() == false);
@@ -849,9 +849,9 @@ TEST_F(AdvisorySupportTest, testGetMessageDLQdAdvisoryTopic)
     ASSERT_TRUE(topic->getPhysicalName().find(".Test.Topic") !=
                 std::string::npos);
 
-    Pointer<cms::Destination> cmsDest = target.dynamicCast<cms::Destination>();
+    std::shared_ptr<cms::Destination> cmsDest = std::dynamic_pointer_cast<cms::Destination>(target);
 
-    Pointer<ActiveMQDestination> cmstopic(
+    std::shared_ptr<ActiveMQDestination> cmstopic(
         AdvisorySupport::getMessageDLQdAdvisoryTopic(cmsDest.get()));
     ASSERT_TRUE(cmstopic != NULL);
     ASSERT_TRUE(cmstopic->isComposite() == false);
@@ -878,7 +878,7 @@ TEST_F(AdvisorySupportTest, testGetMessageDLQdAdvisoryTopic)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(AdvisorySupportTest, testGetMasterBrokerAdvisoryTopic)
 {
-    Pointer<ActiveMQDestination> topic(
+    std::shared_ptr<ActiveMQDestination> topic(
         AdvisorySupport::getMasterBrokerAdvisoryTopic());
     ASSERT_TRUE(topic != NULL);
     ASSERT_TRUE(topic->isComposite() == false);
@@ -892,7 +892,7 @@ TEST_F(AdvisorySupportTest, testGetMasterBrokerAdvisoryTopic)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(AdvisorySupportTest, testGetNetworkBridgeAdvisoryTopic)
 {
-    Pointer<ActiveMQDestination> topic(
+    std::shared_ptr<ActiveMQDestination> topic(
         AdvisorySupport::getNetworkBridgeAdvisoryTopic());
     ASSERT_TRUE(topic != NULL);
     ASSERT_TRUE(topic->isComposite() == false);
@@ -906,9 +906,9 @@ TEST_F(AdvisorySupportTest, testGetNetworkBridgeAdvisoryTopic)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(AdvisorySupportTest, testGetFullAdvisoryTopic)
 {
-    Pointer<ActiveMQDestination> target(new ActiveMQTopic("Test.Topic"));
+    std::shared_ptr<ActiveMQDestination> target(new ActiveMQTopic("Test.Topic"));
 
-    Pointer<ActiveMQDestination> topic(
+    std::shared_ptr<ActiveMQDestination> topic(
         AdvisorySupport::getFullAdvisoryTopic(target.get()));
     ASSERT_TRUE(topic != NULL);
     ASSERT_TRUE(topic->isComposite() == false);
@@ -920,9 +920,9 @@ TEST_F(AdvisorySupportTest, testGetFullAdvisoryTopic)
     ASSERT_TRUE(topic->getPhysicalName().find(".Test.Topic") !=
                 std::string::npos);
 
-    Pointer<cms::Destination> cmsDest = target.dynamicCast<cms::Destination>();
+    std::shared_ptr<cms::Destination> cmsDest = std::dynamic_pointer_cast<cms::Destination>(target);
 
-    Pointer<ActiveMQDestination> cmstopic(
+    std::shared_ptr<ActiveMQDestination> cmstopic(
         AdvisorySupport::getFullAdvisoryTopic(cmsDest.get()));
     ASSERT_TRUE(cmstopic != NULL);
     ASSERT_TRUE(cmstopic->isComposite() == false);
@@ -948,9 +948,9 @@ TEST_F(AdvisorySupportTest, testGetFullAdvisoryTopic)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(AdvisorySupportTest, testGetDestinationAdvisoryTopic)
 {
-    Pointer<ActiveMQDestination> target(new ActiveMQTopic("Test.Topic"));
+    std::shared_ptr<ActiveMQDestination> target(new ActiveMQTopic("Test.Topic"));
 
-    Pointer<ActiveMQDestination> topic(
+    std::shared_ptr<ActiveMQDestination> topic(
         AdvisorySupport::getDestinationAdvisoryTopic(target.get()));
     ASSERT_TRUE(topic != NULL);
     ASSERT_TRUE(topic->isComposite() == false);
@@ -961,9 +961,9 @@ TEST_F(AdvisorySupportTest, testGetDestinationAdvisoryTopic)
                     AdvisorySupport::ADVISORY_TOPIC_PREFIX) == 0);
     ASSERT_TRUE(topic->getPhysicalName().find(".Topic") != std::string::npos);
 
-    Pointer<cms::Destination> cmsDest = target.dynamicCast<cms::Destination>();
+    std::shared_ptr<cms::Destination> cmsDest = std::dynamic_pointer_cast<cms::Destination>(target);
 
-    Pointer<ActiveMQDestination> cmstopic(
+    std::shared_ptr<ActiveMQDestination> cmstopic(
         AdvisorySupport::getDestinationAdvisoryTopic(cmsDest.get()));
     ASSERT_TRUE(cmstopic != NULL);
     ASSERT_TRUE(cmstopic->isComposite() == false);
@@ -990,14 +990,14 @@ TEST_F(AdvisorySupportTest, testGetDestinationAdvisoryTopic)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(AdvisorySupportTest, testIsDestinationAdvisoryTopic)
 {
-    Pointer<ActiveMQDestination> target(new ActiveMQTopic("Test.Topic"));
-    Pointer<ActiveMQDestination> topic(
+    std::shared_ptr<ActiveMQDestination> target(new ActiveMQTopic("Test.Topic"));
+    std::shared_ptr<ActiveMQDestination> topic(
         AdvisorySupport::getDestinationAdvisoryTopic(target.get()));
     ASSERT_TRUE(!AdvisorySupport::isDestinationAdvisoryTopic(target.get()));
     ASSERT_TRUE(AdvisorySupport::isDestinationAdvisoryTopic(topic.get()));
 
-    Pointer<cms::Destination> cmsDest = target.dynamicCast<cms::Destination>();
-    Pointer<ActiveMQDestination> cmstopic(
+    std::shared_ptr<cms::Destination> cmsDest = std::dynamic_pointer_cast<cms::Destination>(target);
+    std::shared_ptr<ActiveMQDestination> cmstopic(
         AdvisorySupport::getDestinationAdvisoryTopic(cmsDest.get()));
     ASSERT_TRUE(!AdvisorySupport::isDestinationAdvisoryTopic(cmsDest.get()));
     ASSERT_TRUE(AdvisorySupport::isDestinationAdvisoryTopic(cmstopic.get()));
@@ -1017,14 +1017,14 @@ TEST_F(AdvisorySupportTest, testIsDestinationAdvisoryTopic)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(AdvisorySupportTest, testIsTempDestinationAdvisoryTopic)
 {
-    Pointer<ActiveMQDestination> target(new ActiveMQTempTopic("Test.Topic"));
-    Pointer<ActiveMQDestination> topic(
+    std::shared_ptr<ActiveMQDestination> target(new ActiveMQTempTopic("Test.Topic"));
+    std::shared_ptr<ActiveMQDestination> topic(
         AdvisorySupport::getDestinationAdvisoryTopic(target.get()));
     ASSERT_TRUE(!AdvisorySupport::isTempDestinationAdvisoryTopic(target.get()));
     ASSERT_TRUE(AdvisorySupport::isTempDestinationAdvisoryTopic(topic.get()));
 
-    Pointer<cms::Destination> cmsDest = target.dynamicCast<cms::Destination>();
-    Pointer<ActiveMQDestination> cmstopic(
+    std::shared_ptr<cms::Destination> cmsDest = std::dynamic_pointer_cast<cms::Destination>(target);
+    std::shared_ptr<ActiveMQDestination> cmstopic(
         AdvisorySupport::getDestinationAdvisoryTopic(cmsDest.get()));
     ASSERT_TRUE(
         !AdvisorySupport::isTempDestinationAdvisoryTopic(cmsDest.get()));
@@ -1046,14 +1046,14 @@ TEST_F(AdvisorySupportTest, testIsTempDestinationAdvisoryTopic)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(AdvisorySupportTest, testIsAdvisoryTopic)
 {
-    Pointer<ActiveMQDestination> target(new ActiveMQTempTopic("Test.Topic"));
-    Pointer<ActiveMQDestination> topic(
+    std::shared_ptr<ActiveMQDestination> target(new ActiveMQTempTopic("Test.Topic"));
+    std::shared_ptr<ActiveMQDestination> topic(
         AdvisorySupport::getConsumerAdvisoryTopic(target.get()));
     ASSERT_TRUE(!AdvisorySupport::isAdvisoryTopic(target.get()));
     ASSERT_TRUE(AdvisorySupport::isAdvisoryTopic(topic.get()));
 
-    Pointer<cms::Destination> cmsDest = target.dynamicCast<cms::Destination>();
-    Pointer<ActiveMQDestination> cmstopic(
+    std::shared_ptr<cms::Destination> cmsDest = std::dynamic_pointer_cast<cms::Destination>(target);
+    std::shared_ptr<ActiveMQDestination> cmstopic(
         AdvisorySupport::getConsumerAdvisoryTopic(cmsDest.get()));
     ASSERT_TRUE(!AdvisorySupport::isAdvisoryTopic(cmsDest.get()));
     ASSERT_TRUE(AdvisorySupport::isAdvisoryTopic(cmstopic.get()));
@@ -1071,14 +1071,14 @@ TEST_F(AdvisorySupportTest, testIsAdvisoryTopic)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(AdvisorySupportTest, testIsConnectionAdvisoryTopic)
 {
-    Pointer<ActiveMQDestination> target(new ActiveMQTempTopic("Test.Topic"));
-    Pointer<ActiveMQDestination> topic(
+    std::shared_ptr<ActiveMQDestination> target(new ActiveMQTempTopic("Test.Topic"));
+    std::shared_ptr<ActiveMQDestination> topic(
         AdvisorySupport::getConnectionAdvisoryTopic());
     ASSERT_TRUE(!AdvisorySupport::isConnectionAdvisoryTopic(target.get()));
     ASSERT_TRUE(AdvisorySupport::isConnectionAdvisoryTopic(topic.get()));
 
-    Pointer<cms::Destination> cmsDest = target.dynamicCast<cms::Destination>();
-    Pointer<ActiveMQDestination> cmstopic(
+    std::shared_ptr<cms::Destination> cmsDest = std::dynamic_pointer_cast<cms::Destination>(target);
+    std::shared_ptr<ActiveMQDestination> cmstopic(
         AdvisorySupport::getConnectionAdvisoryTopic());
     ASSERT_TRUE(!AdvisorySupport::isConnectionAdvisoryTopic(cmsDest.get()));
     ASSERT_TRUE(AdvisorySupport::isConnectionAdvisoryTopic(cmstopic.get()));
@@ -1098,14 +1098,14 @@ TEST_F(AdvisorySupportTest, testIsConnectionAdvisoryTopic)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(AdvisorySupportTest, testIsProducerAdvisoryTopic)
 {
-    Pointer<ActiveMQDestination> target(new ActiveMQTempTopic("Test.Topic"));
-    Pointer<ActiveMQDestination> topic(
+    std::shared_ptr<ActiveMQDestination> target(new ActiveMQTempTopic("Test.Topic"));
+    std::shared_ptr<ActiveMQDestination> topic(
         AdvisorySupport::getProducerAdvisoryTopic(target.get()));
     ASSERT_TRUE(!AdvisorySupport::isProducerAdvisoryTopic(target.get()));
     ASSERT_TRUE(AdvisorySupport::isProducerAdvisoryTopic(topic.get()));
 
-    Pointer<cms::Destination> cmsDest = target.dynamicCast<cms::Destination>();
-    Pointer<ActiveMQDestination> cmstopic(
+    std::shared_ptr<cms::Destination> cmsDest = std::dynamic_pointer_cast<cms::Destination>(target);
+    std::shared_ptr<ActiveMQDestination> cmstopic(
         AdvisorySupport::getProducerAdvisoryTopic(cmsDest.get()));
     ASSERT_TRUE(!AdvisorySupport::isProducerAdvisoryTopic(cmsDest.get()));
     ASSERT_TRUE(AdvisorySupport::isProducerAdvisoryTopic(cmstopic.get()));
@@ -1125,14 +1125,14 @@ TEST_F(AdvisorySupportTest, testIsProducerAdvisoryTopic)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(AdvisorySupportTest, testIsConsumerAdvisoryTopic)
 {
-    Pointer<ActiveMQDestination> target(new ActiveMQTempTopic("Test.Topic"));
-    Pointer<ActiveMQDestination> topic(
+    std::shared_ptr<ActiveMQDestination> target(new ActiveMQTempTopic("Test.Topic"));
+    std::shared_ptr<ActiveMQDestination> topic(
         AdvisorySupport::getConsumerAdvisoryTopic(target.get()));
     ASSERT_TRUE(!AdvisorySupport::isConsumerAdvisoryTopic(target.get()));
     ASSERT_TRUE(AdvisorySupport::isConsumerAdvisoryTopic(topic.get()));
 
-    Pointer<cms::Destination> cmsDest = target.dynamicCast<cms::Destination>();
-    Pointer<ActiveMQDestination> cmstopic(
+    std::shared_ptr<cms::Destination> cmsDest = std::dynamic_pointer_cast<cms::Destination>(target);
+    std::shared_ptr<ActiveMQDestination> cmstopic(
         AdvisorySupport::getConsumerAdvisoryTopic(cmsDest.get()));
     ASSERT_TRUE(!AdvisorySupport::isConsumerAdvisoryTopic(cmsDest.get()));
     ASSERT_TRUE(AdvisorySupport::isConsumerAdvisoryTopic(cmstopic.get()));
@@ -1152,14 +1152,14 @@ TEST_F(AdvisorySupportTest, testIsConsumerAdvisoryTopic)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(AdvisorySupportTest, testIsSlowConsumerAdvisoryTopic)
 {
-    Pointer<ActiveMQDestination> target(new ActiveMQTempTopic("Test.Topic"));
-    Pointer<ActiveMQDestination> topic(
+    std::shared_ptr<ActiveMQDestination> target(new ActiveMQTempTopic("Test.Topic"));
+    std::shared_ptr<ActiveMQDestination> topic(
         AdvisorySupport::getSlowConsumerAdvisoryTopic(target.get()));
     ASSERT_TRUE(!AdvisorySupport::isSlowConsumerAdvisoryTopic(target.get()));
     ASSERT_TRUE(AdvisorySupport::isSlowConsumerAdvisoryTopic(topic.get()));
 
-    Pointer<cms::Destination> cmsDest = target.dynamicCast<cms::Destination>();
-    Pointer<ActiveMQDestination> cmstopic(
+    std::shared_ptr<cms::Destination> cmsDest = std::dynamic_pointer_cast<cms::Destination>(target);
+    std::shared_ptr<ActiveMQDestination> cmstopic(
         AdvisorySupport::getSlowConsumerAdvisoryTopic(cmsDest.get()));
     ASSERT_TRUE(!AdvisorySupport::isSlowConsumerAdvisoryTopic(cmsDest.get()));
     ASSERT_TRUE(AdvisorySupport::isSlowConsumerAdvisoryTopic(cmstopic.get()));
@@ -1179,14 +1179,14 @@ TEST_F(AdvisorySupportTest, testIsSlowConsumerAdvisoryTopic)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(AdvisorySupportTest, testIsFastProducerAdvisoryTopic)
 {
-    Pointer<ActiveMQDestination> target(new ActiveMQTempTopic("Test.Topic"));
-    Pointer<ActiveMQDestination> topic(
+    std::shared_ptr<ActiveMQDestination> target(new ActiveMQTempTopic("Test.Topic"));
+    std::shared_ptr<ActiveMQDestination> topic(
         AdvisorySupport::getFastProducerAdvisoryTopic(target.get()));
     ASSERT_TRUE(!AdvisorySupport::isFastProducerAdvisoryTopic(target.get()));
     ASSERT_TRUE(AdvisorySupport::isFastProducerAdvisoryTopic(topic.get()));
 
-    Pointer<cms::Destination> cmsDest = target.dynamicCast<cms::Destination>();
-    Pointer<ActiveMQDestination> cmstopic(
+    std::shared_ptr<cms::Destination> cmsDest = std::dynamic_pointer_cast<cms::Destination>(target);
+    std::shared_ptr<ActiveMQDestination> cmstopic(
         AdvisorySupport::getFastProducerAdvisoryTopic(cmsDest.get()));
     ASSERT_TRUE(!AdvisorySupport::isFastProducerAdvisoryTopic(cmsDest.get()));
     ASSERT_TRUE(AdvisorySupport::isFastProducerAdvisoryTopic(cmstopic.get()));
@@ -1206,14 +1206,14 @@ TEST_F(AdvisorySupportTest, testIsFastProducerAdvisoryTopic)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(AdvisorySupportTest, testIsMessageConsumedAdvisoryTopic)
 {
-    Pointer<ActiveMQDestination> target(new ActiveMQTempTopic("Test.Topic"));
-    Pointer<ActiveMQDestination> topic(
+    std::shared_ptr<ActiveMQDestination> target(new ActiveMQTempTopic("Test.Topic"));
+    std::shared_ptr<ActiveMQDestination> topic(
         AdvisorySupport::getMessageConsumedAdvisoryTopic(target.get()));
     ASSERT_TRUE(!AdvisorySupport::isMessageConsumedAdvisoryTopic(target.get()));
     ASSERT_TRUE(AdvisorySupport::isMessageConsumedAdvisoryTopic(topic.get()));
 
-    Pointer<cms::Destination> cmsDest = target.dynamicCast<cms::Destination>();
-    Pointer<ActiveMQDestination> cmstopic(
+    std::shared_ptr<cms::Destination> cmsDest = std::dynamic_pointer_cast<cms::Destination>(target);
+    std::shared_ptr<ActiveMQDestination> cmstopic(
         AdvisorySupport::getMessageConsumedAdvisoryTopic(cmsDest.get()));
     ASSERT_TRUE(
         !AdvisorySupport::isMessageConsumedAdvisoryTopic(cmsDest.get()));
@@ -1235,14 +1235,14 @@ TEST_F(AdvisorySupportTest, testIsMessageConsumedAdvisoryTopic)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(AdvisorySupportTest, testIsMasterBrokerAdvisoryTopic)
 {
-    Pointer<ActiveMQDestination> target(new ActiveMQTempTopic("Test.Topic"));
-    Pointer<ActiveMQDestination> topic(
+    std::shared_ptr<ActiveMQDestination> target(new ActiveMQTempTopic("Test.Topic"));
+    std::shared_ptr<ActiveMQDestination> topic(
         AdvisorySupport::getMasterBrokerAdvisoryTopic());
     ASSERT_TRUE(!AdvisorySupport::isMasterBrokerAdvisoryTopic(target.get()));
     ASSERT_TRUE(AdvisorySupport::isMasterBrokerAdvisoryTopic(topic.get()));
 
-    Pointer<cms::Destination> cmsDest = target.dynamicCast<cms::Destination>();
-    Pointer<ActiveMQDestination> cmstopic(
+    std::shared_ptr<cms::Destination> cmsDest = std::dynamic_pointer_cast<cms::Destination>(target);
+    std::shared_ptr<ActiveMQDestination> cmstopic(
         AdvisorySupport::getMasterBrokerAdvisoryTopic());
     ASSERT_TRUE(!AdvisorySupport::isMasterBrokerAdvisoryTopic(cmsDest.get()));
     ASSERT_TRUE(AdvisorySupport::isMasterBrokerAdvisoryTopic(cmstopic.get()));
@@ -1262,15 +1262,15 @@ TEST_F(AdvisorySupportTest, testIsMasterBrokerAdvisoryTopic)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(AdvisorySupportTest, testIsMessageDeliveredAdvisoryTopic)
 {
-    Pointer<ActiveMQDestination> target(new ActiveMQTempTopic("Test.Topic"));
-    Pointer<ActiveMQDestination> topic(
+    std::shared_ptr<ActiveMQDestination> target(new ActiveMQTempTopic("Test.Topic"));
+    std::shared_ptr<ActiveMQDestination> topic(
         AdvisorySupport::getMessageDeliveredAdvisoryTopic(target.get()));
     ASSERT_TRUE(
         !AdvisorySupport::isMessageDeliveredAdvisoryTopic(target.get()));
     ASSERT_TRUE(AdvisorySupport::isMessageDeliveredAdvisoryTopic(topic.get()));
 
-    Pointer<cms::Destination> cmsDest = target.dynamicCast<cms::Destination>();
-    Pointer<ActiveMQDestination> cmstopic(
+    std::shared_ptr<cms::Destination> cmsDest = std::dynamic_pointer_cast<cms::Destination>(target);
+    std::shared_ptr<ActiveMQDestination> cmstopic(
         AdvisorySupport::getMessageDeliveredAdvisoryTopic(cmsDest.get()));
     ASSERT_TRUE(
         !AdvisorySupport::isMessageDeliveredAdvisoryTopic(cmsDest.get()));
@@ -1292,15 +1292,15 @@ TEST_F(AdvisorySupportTest, testIsMessageDeliveredAdvisoryTopic)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(AdvisorySupportTest, testIsMessageDiscardedAdvisoryTopic)
 {
-    Pointer<ActiveMQDestination> target(new ActiveMQTempTopic("Test.Topic"));
-    Pointer<ActiveMQDestination> topic(
+    std::shared_ptr<ActiveMQDestination> target(new ActiveMQTempTopic("Test.Topic"));
+    std::shared_ptr<ActiveMQDestination> topic(
         AdvisorySupport::getMessageDiscardedAdvisoryTopic(target.get()));
     ASSERT_TRUE(
         !AdvisorySupport::isMessageDiscardedAdvisoryTopic(target.get()));
     ASSERT_TRUE(AdvisorySupport::isMessageDiscardedAdvisoryTopic(topic.get()));
 
-    Pointer<cms::Destination> cmsDest = target.dynamicCast<cms::Destination>();
-    Pointer<ActiveMQDestination> cmstopic(
+    std::shared_ptr<cms::Destination> cmsDest = std::dynamic_pointer_cast<cms::Destination>(target);
+    std::shared_ptr<ActiveMQDestination> cmstopic(
         AdvisorySupport::getMessageDiscardedAdvisoryTopic(cmsDest.get()));
     ASSERT_TRUE(
         !AdvisorySupport::isMessageDiscardedAdvisoryTopic(cmsDest.get()));
@@ -1322,14 +1322,14 @@ TEST_F(AdvisorySupportTest, testIsMessageDiscardedAdvisoryTopic)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(AdvisorySupportTest, testIsMessageDLQdAdvisoryTopic)
 {
-    Pointer<ActiveMQDestination> target(new ActiveMQTempTopic("Test.Topic"));
-    Pointer<ActiveMQDestination> topic(
+    std::shared_ptr<ActiveMQDestination> target(new ActiveMQTempTopic("Test.Topic"));
+    std::shared_ptr<ActiveMQDestination> topic(
         AdvisorySupport::getMessageDLQdAdvisoryTopic(target.get()));
     ASSERT_TRUE(!AdvisorySupport::isMessageDLQdAdvisoryTopic(target.get()));
     ASSERT_TRUE(AdvisorySupport::isMessageDLQdAdvisoryTopic(topic.get()));
 
-    Pointer<cms::Destination> cmsDest = target.dynamicCast<cms::Destination>();
-    Pointer<ActiveMQDestination> cmstopic(
+    std::shared_ptr<cms::Destination> cmsDest = std::dynamic_pointer_cast<cms::Destination>(target);
+    std::shared_ptr<ActiveMQDestination> cmstopic(
         AdvisorySupport::getMessageDLQdAdvisoryTopic(cmsDest.get()));
     ASSERT_TRUE(!AdvisorySupport::isMessageDLQdAdvisoryTopic(cmsDest.get()));
     ASSERT_TRUE(AdvisorySupport::isMessageDLQdAdvisoryTopic(cmstopic.get()));
@@ -1349,14 +1349,14 @@ TEST_F(AdvisorySupportTest, testIsMessageDLQdAdvisoryTopic)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(AdvisorySupportTest, testIsFullAdvisoryTopic)
 {
-    Pointer<ActiveMQDestination> target(new ActiveMQTempTopic("Test.Topic"));
-    Pointer<ActiveMQDestination> topic(
+    std::shared_ptr<ActiveMQDestination> target(new ActiveMQTempTopic("Test.Topic"));
+    std::shared_ptr<ActiveMQDestination> topic(
         AdvisorySupport::getFullAdvisoryTopic(target.get()));
     ASSERT_TRUE(!AdvisorySupport::isFullAdvisoryTopic(target.get()));
     ASSERT_TRUE(AdvisorySupport::isFullAdvisoryTopic(topic.get()));
 
-    Pointer<cms::Destination> cmsDest = target.dynamicCast<cms::Destination>();
-    Pointer<ActiveMQDestination> cmstopic(
+    std::shared_ptr<cms::Destination> cmsDest = std::dynamic_pointer_cast<cms::Destination>(target);
+    std::shared_ptr<ActiveMQDestination> cmstopic(
         AdvisorySupport::getFullAdvisoryTopic(cmsDest.get()));
     ASSERT_TRUE(!AdvisorySupport::isFullAdvisoryTopic(cmsDest.get()));
     ASSERT_TRUE(AdvisorySupport::isFullAdvisoryTopic(cmstopic.get()));
@@ -1375,14 +1375,14 @@ TEST_F(AdvisorySupportTest, testIsFullAdvisoryTopic)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(AdvisorySupportTest, testIsNetworkBridgeAdvisoryTopic)
 {
-    Pointer<ActiveMQDestination> target(new ActiveMQTempTopic("Test.Topic"));
-    Pointer<ActiveMQDestination> topic(
+    std::shared_ptr<ActiveMQDestination> target(new ActiveMQTempTopic("Test.Topic"));
+    std::shared_ptr<ActiveMQDestination> topic(
         AdvisorySupport::getNetworkBridgeAdvisoryTopic());
     ASSERT_TRUE(!AdvisorySupport::isNetworkBridgeAdvisoryTopic(target.get()));
     ASSERT_TRUE(AdvisorySupport::isNetworkBridgeAdvisoryTopic(topic.get()));
 
-    Pointer<cms::Destination> cmsDest = target.dynamicCast<cms::Destination>();
-    Pointer<ActiveMQDestination> cmstopic(
+    std::shared_ptr<cms::Destination> cmsDest = std::dynamic_pointer_cast<cms::Destination>(target);
+    std::shared_ptr<ActiveMQDestination> cmstopic(
         AdvisorySupport::getNetworkBridgeAdvisoryTopic());
     ASSERT_TRUE(!AdvisorySupport::isNetworkBridgeAdvisoryTopic(cmsDest.get()));
     ASSERT_TRUE(AdvisorySupport::isNetworkBridgeAdvisoryTopic(cmstopic.get()));

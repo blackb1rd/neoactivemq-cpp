@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -22,7 +22,7 @@
 #include <activemq/exceptions/ActiveMQException.h>
 #include <activemq/util/CMSListener.h>
 
-#include <decaf/lang/Pointer.h>
+#include <memory>
 #include <decaf/lang/Thread.h>
 #include <decaf/util/UUID.h>
 
@@ -71,13 +71,13 @@ public:
 
     virtual void run()
     {
-        Pointer<MessageProducer> producer(session->createProducer(destination));
+        std::shared_ptr<MessageProducer> producer(session->createProducer(destination));
         producer->setDeliveryMode(cms::DeliveryMode::NON_PERSISTENT);
         producer->setPriority(priority);
 
         for (int i = 0; i < num; ++i)
         {
-            Pointer<TextMessage> message(
+            std::shared_ptr<TextMessage> message(
                 session->createTextMessage("Test Message"));
             producer->send(message.get());
         }
@@ -100,18 +100,18 @@ void MessagePriorityTest::testMessagePrioritySendReceive()
 {
     static const int MSG_COUNT = 25;
 
-    Pointer<ActiveMQConnectionFactory> connectionFactory(
+    std::shared_ptr<ActiveMQConnectionFactory> connectionFactory(
         new ActiveMQConnectionFactory(getBrokerURL()));
 
     connectionFactory->setMessagePrioritySupported(true);
 
-    Pointer<Connection> connection(connectionFactory->createConnection());
-    Pointer<Session>    session(
+    std::shared_ptr<Connection> connection(connectionFactory->createConnection());
+    std::shared_ptr<Session>    session(
         connection->createSession(Session::AUTO_ACKNOWLEDGE));
-    Pointer<Queue>           destination(session->createTemporaryQueue());
-    Pointer<MessageProducer> producer(
+    std::shared_ptr<Queue>           destination(session->createTemporaryQueue());
+    std::shared_ptr<MessageProducer> producer(
         session->createProducer(destination.get()));
-    Pointer<MessageConsumer> consumer(
+    std::shared_ptr<MessageConsumer> consumer(
         session->createConsumer(destination.get()));
 
     connection->start();
@@ -129,7 +129,7 @@ void MessagePriorityTest::testMessagePrioritySendReceive()
 
     for (int i = 0; i < MSG_COUNT * 2; ++i)
     {
-        Pointer<cms::Message> message(consumer->receive(2000));
+        std::shared_ptr<cms::Message> message(consumer->receive(2000));
         ASSERT_TRUE(message != NULL);
         ASSERT_TRUE(message->getCMSPriority() == (i < MSG_COUNT ? 9 : 1));
     }

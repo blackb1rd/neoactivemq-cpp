@@ -72,14 +72,9 @@ namespace core
         {
         }
 
-        virtual void onCommand(const Pointer<Command> command)
+        virtual void onCommand(const std::shared_ptr<commands::Command> command)
         {
             cmd = command.get();
-        }
-
-        virtual void onCommand(commands::Command* command)
-        {
-            cmd = command;
         }
     };
 
@@ -119,7 +114,7 @@ namespace core
     class MyDispatcher : public Dispatcher
     {
     public:
-        std::vector<decaf::lang::Pointer<commands::Message>> messages;
+        std::vector<std::shared_ptr<commands::Message>> messages;
 
     public:
         MyDispatcher()
@@ -132,7 +127,7 @@ namespace core
         }
 
         virtual void dispatch(
-            const decaf::lang::Pointer<commands::MessageDispatch>&
+            const std::shared_ptr<commands::MessageDispatch>&
                 data) noexcept(false)
         {
             messages.push_back(data->getMessage());
@@ -154,9 +149,9 @@ TEST_F(ActiveMQConnectionTest, test2WithOpenwire)
         MyCommandListener                cmdListener;
         MyDispatcher                     msgListener;
         std::string                      connectionId = "testConnectionId";
-        Pointer<decaf::util::Properties> properties(
+        std::shared_ptr<decaf::util::Properties> properties(
             new decaf::util::Properties());
-        Pointer<Transport> transport;
+        std::shared_ptr<transport::Transport> transport;
 
         properties->setProperty("wireFormat", "openwire");
         decaf::net::URI uri("mock://mock?wireFormat=openwire");

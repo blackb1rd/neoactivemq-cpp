@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -20,7 +20,6 @@
 #include <activemq/exceptions/ActiveMQException.h>
 #include <activemq/util/CMSListener.h>
 
-#include <decaf/lang/Pointer.h>
 #include <decaf/lang/System.h>
 #include <decaf/lang/Thread.h>
 #include <decaf/util/UUID.h>
@@ -86,7 +85,7 @@ public:
     {
         cms::Session* session(cmsProducerProvider->getSession());
         Destination*  destination = cmsProducerProvider->getDestination();
-        Pointer<MessageProducer> producer(session->createProducer(destination));
+        std::shared_ptr<MessageProducer> producer(session->createProducer(destination));
         producer->setDeliveryMode(cms::DeliveryMode::NON_PERSISTENT);
 
         std::string DATA = "abcdefghijklmnopqrstuvwxyz";
@@ -96,7 +95,7 @@ public:
             body += DATA.at(i % DATA.length());
         }
 
-        Pointer<BytesMessage> message;
+        std::shared_ptr<BytesMessage> message;
 
         for (int i = 0; i < num; ++i)
         {
@@ -322,7 +321,7 @@ void BulkMessageTest::testBulkMessageSendReceive()
                           MSG_SIZE);
     thread.start();
 
-    Pointer<cms::Message> message;
+    std::shared_ptr<cms::Message> message;
 
     for (int i = 0; i < MSG_COUNT; ++i)
     {

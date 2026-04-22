@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -67,10 +67,10 @@ public:
         return 1;
     }
 
-    virtual decaf::lang::Pointer<commands::Command> visit(
+    virtual std::shared_ptr<commands::Command> visit(
         activemq::state::CommandVisitor* visitor)
     {
-        return decaf::lang::Pointer<commands::Command>();
+        return std::shared_ptr<commands::Command>();
     }
 
     virtual std::string toString() const
@@ -120,13 +120,13 @@ public:
         return false;
     }
 
-    virtual Pointer<Transport> createNegotiator(
-        const Pointer<transport::Transport> transport)
+    virtual std::shared_ptr<Transport> createNegotiator(
+        const std::shared_ptr<transport::Transport> transport)
     {
-        return Pointer<wireformat::WireFormatNegotiator>();
+        return std::shared_ptr<wireformat::WireFormatNegotiator>();
     }
 
-    virtual Pointer<commands::Command> unmarshal(
+    virtual std::shared_ptr<commands::Command> unmarshal(
         const activemq::transport::Transport* transport AMQCPP_UNUSED,
         decaf::io::DataInputStream*                     inputStream)
     {
@@ -148,7 +148,7 @@ public:
 
             synchronized(inputStream)
             {
-                Pointer<MyCommand> command(new MyCommand());
+                std::shared_ptr<MyCommand> command(new MyCommand());
                 try
                 {
                     // Throw a little uncertainty into the test.
@@ -183,10 +183,10 @@ public:
             throw cx;
         }
 
-        return Pointer<Command>();
+        return std::shared_ptr<Command>();
     }
 
-    virtual void marshal(const Pointer<commands::Command> command,
+    virtual void marshal(const std::shared_ptr<commands::Command> command,
                          const activemq::transport::Transport* transport
                                                       AMQCPP_UNUSED,
                          decaf::io::DataOutputStream* outputStream)
@@ -248,7 +248,7 @@ public:
         latch.await();
     }
 
-    virtual void onCommand(const Pointer<commands::Command> command)
+    virtual void onCommand(const std::shared_ptr<commands::Command> command)
     {
         const MyCommand* cmd = dynamic_cast<const MyCommand*>(command.get());
         str += cmd->c;
@@ -291,7 +291,7 @@ TEST_F(IOTransportTest, testStartClose)
     decaf::io::DataInputStream              input(&is);
     decaf::io::DataOutputStream             output(&os);
     MyTransportListener                     listener;
-    Pointer<MyWireFormat>                   wireFormat(new MyWireFormat());
+    std::shared_ptr<MyWireFormat>                   wireFormat(new MyWireFormat());
     IOTransport                             transport(wireFormat);
     transport.setTransportListener(&listener);
     transport.setInputStream(&input);
@@ -312,7 +312,7 @@ TEST_F(IOTransportTest, testStressTransportStartClose)
     decaf::io::DataInputStream              input(&bis);
     decaf::io::DataOutputStream             output(&bos);
 
-    Pointer<MyWireFormat> wireFormat(new MyWireFormat());
+    std::shared_ptr<MyWireFormat> wireFormat(new MyWireFormat());
     MyTransportListener   listener;
 
     for (int i = 0; i < 50; ++i)
@@ -350,7 +350,7 @@ TEST_F(IOTransportTest, testRead)
     decaf::io::DataInputStream              input(&is);
     decaf::io::DataOutputStream             output(&os);
 
-    Pointer<MyWireFormat> wireFormat(new MyWireFormat());
+    std::shared_ptr<MyWireFormat> wireFormat(new MyWireFormat());
     MyTransportListener   listener(10);
     IOTransport           transport;
     transport.setInputStream(&input);
@@ -391,7 +391,7 @@ TEST_F(IOTransportTest, testWrite)
     decaf::io::DataInputStream              input(&is);
     decaf::io::DataOutputStream             output(&os);
 
-    Pointer<MyWireFormat> wireFormat(new MyWireFormat());
+    std::shared_ptr<MyWireFormat> wireFormat(new MyWireFormat());
     MyTransportListener   listener;
     IOTransport           transport;
     transport.setInputStream(&input);
@@ -401,7 +401,7 @@ TEST_F(IOTransportTest, testWrite)
 
     transport.start();
 
-    Pointer<MyCommand> cmd(new MyCommand());
+    std::shared_ptr<MyCommand> cmd(new MyCommand());
     cmd->c = '1';
     transport.oneway(cmd);
     cmd->c = '2';
@@ -436,7 +436,7 @@ TEST_F(IOTransportTest, testException)
     decaf::io::DataInputStream              input(&is);
     decaf::io::DataOutputStream             output(&os);
 
-    Pointer<MyWireFormat> wireFormat(new MyWireFormat());
+    std::shared_ptr<MyWireFormat> wireFormat(new MyWireFormat());
     MyTransportListener   listener;
     IOTransport           transport;
     wireFormat->throwException = true;

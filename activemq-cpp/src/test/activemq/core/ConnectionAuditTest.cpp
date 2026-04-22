@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -51,7 +51,7 @@ public:
     {
     }
 
-    virtual void dispatch(const Pointer<commands::MessageDispatch>& message)
+    virtual void dispatch(const std::shared_ptr<commands::MessageDispatch>& message)
     {
     }
 
@@ -87,23 +87,23 @@ TEST_F(ConnectionAuditTest, testIsDuplicate)
 {
     int                           count = 10000;
     ConnectionAudit               audit;
-    ArrayList<Pointer<MessageId>> list;
-    Pointer<MyDispatcher>         dispatcher(new MyDispatcher);
+    ArrayList<std::shared_ptr<MessageId>> list;
+    std::shared_ptr<MyDispatcher>                 dispatcher(new MyDispatcher);
 
-    Pointer<ProducerId> pid(new ProducerId);
+    std::shared_ptr<ProducerId> pid(new ProducerId);
     pid->setConnectionId("test");
     pid->setSessionId(0);
     pid->setValue(1);
 
-    Pointer<Message> message(new Message());
+    std::shared_ptr<Message> message(new Message());
 
     for (int i = 0; i < count; i++)
     {
-        Pointer<ActiveMQDestination> destination(
+        std::shared_ptr<ActiveMQDestination> destination(
             new ActiveMQQueue("TEST.QUEUE"));
         message->setDestination(destination);
 
-        Pointer<MessageId> id(new MessageId);
+        std::shared_ptr<MessageId> id(new MessageId);
         id->setProducerId(pid);
         id->setProducerSequenceId(i);
         list.add(id);
@@ -115,7 +115,7 @@ TEST_F(ConnectionAuditTest, testIsDuplicate)
     int index = list.size() - 1 - audit.getAuditDepth();
     for (; index < list.size(); index++)
     {
-        Pointer<MessageId> id = list.get(index);
+        std::shared_ptr<MessageId> id = list.get(index);
         message->setMessageId(id);
         ASSERT_TRUE(audit.isDuplicate(dispatcher.get(), message))
             << (std::string() + "duplicate msg:" + id->toString());
@@ -127,21 +127,21 @@ TEST_F(ConnectionAuditTest, testRollbackDuplicate)
 {
     int                           count = 10000;
     ConnectionAudit               audit;
-    ArrayList<Pointer<MessageId>> list;
-    Pointer<MyDispatcher>         dispatcher(new MyDispatcher);
+    ArrayList<std::shared_ptr<MessageId>> list;
+    std::shared_ptr<MyDispatcher>                 dispatcher(new MyDispatcher);
 
-    Pointer<ProducerId> pid(new ProducerId);
+    std::shared_ptr<ProducerId> pid(new ProducerId);
     pid->setConnectionId("test");
     pid->setSessionId(0);
     pid->setValue(1);
 
-    Pointer<ActiveMQDestination> destination(new ActiveMQQueue("TEST.QUEUE"));
-    Pointer<Message>             message(new Message());
+    std::shared_ptr<ActiveMQDestination> destination(new ActiveMQQueue("TEST.QUEUE"));
+    std::shared_ptr<Message>             message(new Message());
     message->setDestination(destination);
 
     for (int i = 0; i < count; i++)
     {
-        Pointer<MessageId> id(new MessageId);
+        std::shared_ptr<MessageId> id(new MessageId);
         id->setProducerId(pid);
         id->setProducerSequenceId(i);
         list.add(id);
@@ -153,7 +153,7 @@ TEST_F(ConnectionAuditTest, testRollbackDuplicate)
     int index = list.size() - 1 - audit.getAuditDepth();
     for (; index < list.size(); index++)
     {
-        Pointer<MessageId> id = list.get(index);
+        std::shared_ptr<MessageId> id = list.get(index);
         message->setMessageId(id);
         ASSERT_TRUE(audit.isDuplicate(dispatcher.get(), message))
             << (std::string() + "duplicate msg:" + id->toString());

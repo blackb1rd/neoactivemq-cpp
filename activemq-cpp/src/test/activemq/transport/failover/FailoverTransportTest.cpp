@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -26,7 +26,7 @@
 #include <activemq/transport/failover/FailoverTransportFactory.h>
 #include <activemq/transport/mock/MockTransport.h>
 #include <activemq/util/AMQLog.h>
-#include <decaf/lang/Pointer.h>
+#include <memory>
 #include <decaf/lang/Thread.h>
 #include <decaf/util/UUID.h>
 #include <decaf/util/concurrent/CountDownLatch.h>
@@ -54,23 +54,22 @@ using namespace decaf::lang;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 
-using decaf::lang::Pointer;
 using namespace activemq::commands;
 
 class FailoverTransportTest : public ::testing::Test
 {
 protected:
-    Pointer<ConnectionInfo> createConnection();
-    Pointer<SessionInfo>  createSession(const Pointer<ConnectionInfo>& parent);
-    Pointer<ConsumerInfo> createConsumer(const Pointer<SessionInfo>& parent);
-    Pointer<ProducerInfo> createProducer(const Pointer<SessionInfo>& parent);
+    std::shared_ptr<ConnectionInfo> createConnection();
+    std::shared_ptr<SessionInfo>  createSession(const std::shared_ptr<ConnectionInfo>& parent);
+    std::shared_ptr<ConsumerInfo> createConsumer(const std::shared_ptr<SessionInfo>& parent);
+    std::shared_ptr<ProducerInfo> createProducer(const std::shared_ptr<SessionInfo>& parent);
 
-    void disposeOf(const Pointer<SessionInfo>& session,
-                   Pointer<Transport>&         transport);
-    void disposeOf(const Pointer<ConsumerInfo>& consumer,
-                   Pointer<Transport>&          transport);
-    void disposeOf(const Pointer<ProducerInfo>& producer,
-                   Pointer<Transport>&          transport);
+    void disposeOf(const std::shared_ptr<SessionInfo>& session,
+                   std::shared_ptr<Transport>&         transport);
+    void disposeOf(const std::shared_ptr<ConsumerInfo>& consumer,
+                   std::shared_ptr<Transport>&          transport);
+    void disposeOf(const std::shared_ptr<ProducerInfo>& producer,
+                   std::shared_ptr<Transport>&          transport);
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -101,7 +100,7 @@ public:
     {
     }
 
-    virtual void onCommand(const Pointer<Command> command AMQCPP_UNUSED)
+    virtual void onCommand(const std::shared_ptr<Command> command AMQCPP_UNUSED)
     {
         numMessages++;
     }
@@ -114,8 +113,8 @@ namespace
 class PriorityBackupListener : public DefaultTransportListener
 {
 private:
-    Pointer<CountDownLatch> interruptedLatch;
-    Pointer<CountDownLatch> resumedLatch;
+    std::shared_ptr<CountDownLatch> interruptedLatch;
+    std::shared_ptr<CountDownLatch> resumedLatch;
 
     Mutex resetMutex;
 
@@ -133,7 +132,7 @@ public:
 
     virtual void transportInterrupted()
     {
-        Pointer<CountDownLatch> latch;
+        std::shared_ptr<CountDownLatch> latch;
         synchronized(&resetMutex)
         {
             latch = interruptedLatch;
@@ -146,7 +145,7 @@ public:
 
     virtual void transportResumed()
     {
-        Pointer<CountDownLatch> latch;
+        std::shared_ptr<CountDownLatch> latch;
         synchronized(&resetMutex)
         {
             latch = resumedLatch;
@@ -168,7 +167,7 @@ public:
 
     bool awaitInterruption()
     {
-        Pointer<CountDownLatch> latch;
+        std::shared_ptr<CountDownLatch> latch;
         synchronized(&resetMutex)
         {
             latch = interruptedLatch;
@@ -179,7 +178,7 @@ public:
 
     bool awaitResumed()
     {
-        Pointer<CountDownLatch> latch;
+        std::shared_ptr<CountDownLatch> latch;
         synchronized(&resetMutex)
         {
             latch = resumedLatch;
@@ -191,12 +190,12 @@ public:
 }  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<ConnectionInfo> FailoverTransportTest::createConnection()
+std::shared_ptr<ConnectionInfo> FailoverTransportTest::createConnection()
 {
-    Pointer<ConnectionId> id(new ConnectionId());
+    std::shared_ptr<ConnectionId> id(new ConnectionId());
     id->setValue(UUID::randomUUID().toString());
 
-    Pointer<ConnectionInfo> info(new ConnectionInfo());
+    std::shared_ptr<ConnectionInfo> info(new ConnectionInfo());
     info->setClientId(UUID::randomUUID().toString());
     info->setConnectionId(id);
 
@@ -204,78 +203,78 @@ Pointer<ConnectionInfo> FailoverTransportTest::createConnection()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<SessionInfo> FailoverTransportTest::createSession(
-    const Pointer<ConnectionInfo>& parent)
+std::shared_ptr<SessionInfo> FailoverTransportTest::createSession(
+    const std::shared_ptr<ConnectionInfo>& parent)
 {
     static int idx = 1;
 
-    Pointer<SessionId> id(new SessionId());
+    std::shared_ptr<SessionId> id(new SessionId());
     id->setConnectionId(parent->getConnectionId()->getValue());
     id->setValue(idx++);
 
-    Pointer<SessionInfo> info(new SessionInfo());
+    std::shared_ptr<SessionInfo> info(new SessionInfo());
     info->setSessionId(id);
 
     return info;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<ConsumerInfo> FailoverTransportTest::createConsumer(
-    const Pointer<SessionInfo>& parent)
+std::shared_ptr<ConsumerInfo> FailoverTransportTest::createConsumer(
+    const std::shared_ptr<SessionInfo>& parent)
 {
     static int idx = 1;
 
-    Pointer<ConsumerId> id(new ConsumerId());
+    std::shared_ptr<ConsumerId> id(new ConsumerId());
     id->setConnectionId(parent->getSessionId()->getConnectionId());
     id->setSessionId(parent->getSessionId()->getValue());
     id->setValue(idx++);
 
-    Pointer<ConsumerInfo> info(new ConsumerInfo());
+    std::shared_ptr<ConsumerInfo> info(new ConsumerInfo());
     info->setConsumerId(id);
 
     return info;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<ProducerInfo> FailoverTransportTest::createProducer(
-    const Pointer<SessionInfo>& parent)
+std::shared_ptr<ProducerInfo> FailoverTransportTest::createProducer(
+    const std::shared_ptr<SessionInfo>& parent)
 {
     static int idx = 1;
 
-    Pointer<ProducerId> id(new ProducerId());
+    std::shared_ptr<ProducerId> id(new ProducerId());
     id->setConnectionId(parent->getSessionId()->getConnectionId());
     id->setSessionId(parent->getSessionId()->getValue());
     id->setValue(idx++);
 
-    Pointer<ProducerInfo> info(new ProducerInfo());
+    std::shared_ptr<ProducerInfo> info(new ProducerInfo());
     info->setProducerId(id);
 
     return info;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransportTest::disposeOf(const Pointer<SessionInfo>& session,
-                                      Pointer<Transport>&         transport)
+void FailoverTransportTest::disposeOf(const std::shared_ptr<SessionInfo>& session,
+                                      std::shared_ptr<Transport>&         transport)
 {
-    Pointer<RemoveInfo> command(new RemoveInfo());
+    std::shared_ptr<RemoveInfo> command(new RemoveInfo());
     command->setObjectId(session->getSessionId());
     transport->oneway(command);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransportTest::disposeOf(const Pointer<ConsumerInfo>& consumer,
-                                      Pointer<Transport>&          transport)
+void FailoverTransportTest::disposeOf(const std::shared_ptr<ConsumerInfo>& consumer,
+                                      std::shared_ptr<Transport>&          transport)
 {
-    Pointer<RemoveInfo> command(new RemoveInfo());
+    std::shared_ptr<RemoveInfo> command(new RemoveInfo());
     command->setObjectId(consumer->getConsumerId());
     transport->oneway(command);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransportTest::disposeOf(const Pointer<ProducerInfo>& producer,
-                                      Pointer<Transport>&          transport)
+void FailoverTransportTest::disposeOf(const std::shared_ptr<ProducerInfo>& producer,
+                                      std::shared_ptr<Transport>&          transport)
 {
-    Pointer<RemoveInfo> command(new RemoveInfo());
+    std::shared_ptr<RemoveInfo> command(new RemoveInfo());
     command->setObjectId(producer->getProducerId());
     transport->oneway(command);
 }
@@ -288,7 +287,7 @@ TEST_F(FailoverTransportTest, testTransportCreate)
     DefaultTransportListener listener;
     FailoverTransportFactory factory;
 
-    Pointer<Transport> transport(factory.create(uri));
+    std::shared_ptr<Transport> transport(factory.create(uri));
     ASSERT_TRUE(transport != NULL);
     transport->setTransportListener(&listener);
 
@@ -315,7 +314,7 @@ TEST_F(FailoverTransportTest, testTransportCreateWithBackups)
     DefaultTransportListener listener;
     FailoverTransportFactory factory;
 
-    Pointer<Transport> transport(factory.create(uri));
+    std::shared_ptr<Transport> transport(factory.create(uri));
     ASSERT_TRUE(transport != NULL);
     transport->setTransportListener(&listener);
 
@@ -345,7 +344,7 @@ TEST_F(FailoverTransportTest, testTransportCreateFailOnCreate)
     FailToConnectListener    listener;
     FailoverTransportFactory factory;
 
-    Pointer<Transport> transport(factory.create(uri));
+    std::shared_ptr<Transport> transport(factory.create(uri));
     ASSERT_TRUE(transport != NULL);
     transport->setTransportListener(&listener);
 
@@ -374,12 +373,12 @@ TEST_F(FailoverTransportTest, testTransportCreateFailOnCreateSendMessage)
                       "useExponentialBackOff=false&maxReconnectAttempts=3&"
                       "startupMaxReconnectAttempts=3&initialReconnectDelay=100";
 
-    Pointer<ActiveMQMessage> message(new ActiveMQMessage());
+    std::shared_ptr<ActiveMQMessage> message(new ActiveMQMessage());
 
     FailToConnectListener    listener;
     FailoverTransportFactory factory;
 
-    Pointer<Transport> transport(factory.create(uri));
+    std::shared_ptr<Transport> transport(factory.create(uri));
     ASSERT_TRUE(transport != NULL);
     transport->setTransportListener(&listener);
 
@@ -410,7 +409,7 @@ TEST_F(FailoverTransportTest, testFailingBackupCreation)
     DefaultTransportListener listener;
     FailoverTransportFactory factory;
 
-    Pointer<Transport> transport(factory.create(uri));
+    std::shared_ptr<Transport> transport(factory.create(uri));
     ASSERT_TRUE(transport != NULL);
     transport->setTransportListener(&listener);
 
@@ -435,13 +434,13 @@ TEST_F(FailoverTransportTest, testSendOnewayMessage)
     std::string uri = "failover://(mock://localhost:61616)?randomize=false";
 
     const int                numMessages = 1000;
-    Pointer<ActiveMQMessage> message(new ActiveMQMessage());
+    std::shared_ptr<ActiveMQMessage> message(new ActiveMQMessage());
 
     MessageCountingListener  messageCounter;
     DefaultTransportListener listener;
     FailoverTransportFactory factory;
 
-    Pointer<Transport> transport(factory.create(uri));
+    std::shared_ptr<Transport> transport(factory.create(uri));
     ASSERT_TRUE(transport != NULL);
     transport->setTransportListener(&listener);
 
@@ -481,13 +480,13 @@ TEST_F(FailoverTransportTest, testSendRequestMessage)
 {
     std::string uri = "failover://(mock://localhost:61616)?randomize=false";
 
-    Pointer<ActiveMQMessage> message(new ActiveMQMessage());
+    std::shared_ptr<ActiveMQMessage> message(new ActiveMQMessage());
 
     MessageCountingListener  messageCounter;
     DefaultTransportListener listener;
     FailoverTransportFactory factory;
 
-    Pointer<Transport> transport(factory.create(uri));
+    std::shared_ptr<Transport> transport(factory.create(uri));
     ASSERT_TRUE(transport != NULL);
     transport->setTransportListener(&listener);
 
@@ -528,13 +527,13 @@ TEST_F(FailoverTransportTest, testSendOnewayMessageFail)
         "failover://(mock://localhost:61616?failOnSendMessage=true,"
         "mock://localhost:61618)?randomize=false";
 
-    Pointer<ActiveMQMessage> message(new ActiveMQMessage());
+    std::shared_ptr<ActiveMQMessage> message(new ActiveMQMessage());
 
     MessageCountingListener  messageCounter;
     DefaultTransportListener listener;
     FailoverTransportFactory factory;
 
-    Pointer<Transport> transport(factory.create(uri));
+    std::shared_ptr<Transport> transport(factory.create(uri));
     ASSERT_TRUE(transport != NULL);
     transport->setTransportListener(&listener);
 
@@ -575,13 +574,13 @@ TEST_F(FailoverTransportTest, testSendRequestMessageFail)
         "failover://(mock://localhost:61616?failOnSendMessage=true,"
         "mock://localhost:61618)?randomize=false";
 
-    Pointer<ActiveMQMessage> message(new ActiveMQMessage());
+    std::shared_ptr<ActiveMQMessage> message(new ActiveMQMessage());
 
     MessageCountingListener  messageCounter;
     DefaultTransportListener listener;
     FailoverTransportFactory factory;
 
-    Pointer<Transport> transport(factory.create(uri));
+    std::shared_ptr<Transport> transport(factory.create(uri));
     ASSERT_TRUE(transport != NULL);
     transport->setTransportListener(&listener);
 
@@ -623,7 +622,7 @@ TEST_F(FailoverTransportTest, testWithOpewireCommands)
     DefaultTransportListener listener;
     FailoverTransportFactory factory;
 
-    Pointer<Transport> transport(factory.create(uri));
+    std::shared_ptr<Transport> transport(factory.create(uri));
     ASSERT_TRUE(transport != NULL);
     transport->setTransportListener(&listener);
 
@@ -638,20 +637,20 @@ TEST_F(FailoverTransportTest, testWithOpewireCommands)
     Thread::sleep(1000);
     ASSERT_TRUE(failover->isConnected() == true);
 
-    Pointer<ConnectionInfo> connection = createConnection();
+    std::shared_ptr<ConnectionInfo> connection = createConnection();
     transport->request(connection);
-    Pointer<SessionInfo> session1 = createSession(connection);
+    std::shared_ptr<SessionInfo> session1 = createSession(connection);
     transport->request(session1);
-    Pointer<SessionInfo> session2 = createSession(connection);
+    std::shared_ptr<SessionInfo> session2 = createSession(connection);
     transport->request(session2);
-    Pointer<ConsumerInfo> consumer1 = createConsumer(session1);
+    std::shared_ptr<ConsumerInfo> consumer1 = createConsumer(session1);
     transport->request(consumer1);
-    Pointer<ConsumerInfo> consumer2 = createConsumer(session1);
+    std::shared_ptr<ConsumerInfo> consumer2 = createConsumer(session1);
     transport->request(consumer2);
-    Pointer<ConsumerInfo> consumer3 = createConsumer(session2);
+    std::shared_ptr<ConsumerInfo> consumer3 = createConsumer(session2);
     transport->request(consumer3);
 
-    Pointer<ProducerInfo> producer1 = createProducer(session2);
+    std::shared_ptr<ProducerInfo> producer1 = createProducer(session2);
     transport->request(producer1);
 
     // Remove the Producers
@@ -667,7 +666,7 @@ TEST_F(FailoverTransportTest, testWithOpewireCommands)
     this->disposeOf(session2, transport);
 
     // Indicate that we are done.
-    Pointer<ShutdownInfo> shutdown(new ShutdownInfo());
+    std::shared_ptr<ShutdownInfo> shutdown(new ShutdownInfo());
     transport->oneway(shutdown);
 
     transport->close();
@@ -682,14 +681,14 @@ TEST_F(FailoverTransportTest, testTransportHandlesConnectionControl)
 
     std::string reconnectStr = "mock://localhost:61613?name=Reconnect";
 
-    Pointer<ConnectionControl> control(new ConnectionControl());
+    std::shared_ptr<ConnectionControl> control(new ConnectionControl());
     control->setReconnectTo(reconnectStr);
     control->setRebalanceConnection(true);
 
     DefaultTransportListener listener;
     FailoverTransportFactory factory;
 
-    Pointer<Transport> transport(factory.create(uri));
+    std::shared_ptr<Transport> transport(factory.create(uri));
     ASSERT_TRUE(transport != NULL);
     transport->setTransportListener(&listener);
 
@@ -744,7 +743,7 @@ TEST_F(FailoverTransportTest, testPriorityBackupConfig)
     DefaultTransportListener listener;
     FailoverTransportFactory factory;
 
-    Pointer<Transport> transport(factory.create(uri));
+    std::shared_ptr<Transport> transport(factory.create(uri));
     ASSERT_TRUE(transport != NULL);
     transport->setTransportListener(&listener);
 
@@ -786,7 +785,7 @@ TEST_F(FailoverTransportTest, testUriOptionsApplied)
     DefaultTransportListener listener;
     FailoverTransportFactory factory;
 
-    Pointer<Transport> transport(factory.create(uri));
+    std::shared_ptr<Transport> transport(factory.create(uri));
     ASSERT_TRUE(transport != NULL);
     transport->setTransportListener(&listener);
 
@@ -842,7 +841,7 @@ TEST_F(FailoverTransportTest, testConnectedToMockBroker)
     DefaultTransportListener listener;
     FailoverTransportFactory factory;
 
-    Pointer<Transport> transport(factory.create(uri));
+    std::shared_ptr<Transport> transport(factory.create(uri));
     ASSERT_TRUE(transport != NULL);
     transport->setTransportListener(&listener);
 
@@ -880,7 +879,7 @@ TEST_F(FailoverTransportTest, testMaxReconnectsZeroAttemptsOneConnect)
     DefaultTransportListener listener;
     FailoverTransportFactory factory;
 
-    Pointer<Transport> transport(factory.create(uri));
+    std::shared_ptr<Transport> transport(factory.create(uri));
     ASSERT_TRUE(transport != NULL);
     transport->setTransportListener(&listener);
 
@@ -907,12 +906,12 @@ TEST_F(FailoverTransportTest, testMaxReconnectsHonorsConfiguration)
                       "mock://localhost:61617?failOnCreate=true)"
                       "?randomize=false&maxReconnectAttempts=2";
 
-    Pointer<WireFormatInfo> info(new WireFormatInfo());
+    std::shared_ptr<WireFormatInfo> info(new WireFormatInfo());
 
     DefaultTransportListener listener;
     FailoverTransportFactory factory;
 
-    Pointer<Transport> transport(factory.create(uri));
+    std::shared_ptr<Transport> transport(factory.create(uri));
     ASSERT_TRUE(transport != NULL);
     transport->setTransportListener(&listener);
 
@@ -944,12 +943,12 @@ TEST_F(FailoverTransportTest, testStartupMaxReconnectsHonorsConfiguration)
         "?randomize=false&startupMaxReconnectAttempts=2&maxReconnectAttempts=0&"
         "initialReconnectDelay=100&useExponentialBackOff=false";
 
-    Pointer<WireFormatInfo> info(new WireFormatInfo());
+    std::shared_ptr<WireFormatInfo> info(new WireFormatInfo());
 
     DefaultTransportListener listener;
     FailoverTransportFactory factory;
 
-    Pointer<Transport> transport(factory.create(uri));
+    std::shared_ptr<Transport> transport(factory.create(uri));
     ASSERT_TRUE(transport != NULL);
     transport->setTransportListener(&listener);
 
@@ -981,8 +980,8 @@ TEST_F(FailoverTransportTest, testStartupMaxReconnectsHonorsConfiguration)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(FailoverTransportTest, testFailoverNoRandomizeBothOnline)
 {
-    Pointer<MockBrokerService> broker1(new MockBrokerService());
-    Pointer<MockBrokerService> broker2(new MockBrokerService());
+    std::shared_ptr<MockBrokerService> broker1(new MockBrokerService());
+    std::shared_ptr<MockBrokerService> broker2(new MockBrokerService());
 
     // Both brokers online
     broker1->start();
@@ -1004,7 +1003,7 @@ TEST_F(FailoverTransportTest, testFailoverNoRandomizeBothOnline)
     DefaultTransportListener listener;
     FailoverTransportFactory factory;
 
-    Pointer<Transport> transport(factory.create(uri));
+    std::shared_ptr<Transport> transport(factory.create(uri));
     ASSERT_TRUE(transport != NULL);
     transport->setTransportListener(&listener);
 
@@ -1050,8 +1049,8 @@ TEST_F(FailoverTransportTest, testFailoverNoRandomizeBothOnline)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(FailoverTransportTest, testFailoverNoRandomizeBroker1OnlyOnline)
 {
-    Pointer<MockBrokerService> broker1(new MockBrokerService());
-    Pointer<MockBrokerService> broker2(new MockBrokerService());
+    std::shared_ptr<MockBrokerService> broker1(new MockBrokerService());
+    std::shared_ptr<MockBrokerService> broker2(new MockBrokerService());
 
     // Start both to get dynamic ports, then stop broker2
     broker1->start();
@@ -1077,7 +1076,7 @@ TEST_F(FailoverTransportTest, testFailoverNoRandomizeBroker1OnlyOnline)
     DefaultTransportListener listener;
     FailoverTransportFactory factory;
 
-    Pointer<Transport> transport(factory.create(uri));
+    std::shared_ptr<Transport> transport(factory.create(uri));
     ASSERT_TRUE(transport != NULL);
     transport->setTransportListener(&listener);
 
@@ -1128,8 +1127,8 @@ TEST_F(FailoverTransportTest, testFailoverNoRandomizeBroker1OnlyOnline)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(FailoverTransportTest, testFailoverNoRandomizeBroker2OnlyOnline)
 {
-    Pointer<MockBrokerService> broker1(new MockBrokerService());
-    Pointer<MockBrokerService> broker2(new MockBrokerService());
+    std::shared_ptr<MockBrokerService> broker1(new MockBrokerService());
+    std::shared_ptr<MockBrokerService> broker2(new MockBrokerService());
 
     // Start both to get dynamic ports, then stop broker1
     broker1->start();
@@ -1154,7 +1153,7 @@ TEST_F(FailoverTransportTest, testFailoverNoRandomizeBroker2OnlyOnline)
     DefaultTransportListener listener;
     FailoverTransportFactory factory;
 
-    Pointer<Transport> transport(factory.create(uri));
+    std::shared_ptr<Transport> transport(factory.create(uri));
     ASSERT_TRUE(transport != NULL);
     transport->setTransportListener(&listener);
 
@@ -1223,8 +1222,8 @@ TEST_F(FailoverTransportTest,
         tempSocket2.close();
     }
 
-    Pointer<MockBrokerService> broker1(new MockBrokerService(port1));
-    Pointer<MockBrokerService> broker2(new MockBrokerService(port2));
+    std::shared_ptr<MockBrokerService> broker1(new MockBrokerService(port1));
+    std::shared_ptr<MockBrokerService> broker2(new MockBrokerService(port2));
 
     // Both brokers offline initially
     // Use 127.0.0.1 instead of localhost to avoid IPv6 resolution issues on CI
@@ -1242,7 +1241,7 @@ TEST_F(FailoverTransportTest,
     DefaultTransportListener listener;
     FailoverTransportFactory factory;
 
-    Pointer<Transport> transport(factory.create(uri));
+    std::shared_ptr<Transport> transport(factory.create(uri));
     ASSERT_TRUE(transport != NULL);
     transport->setTransportListener(&listener);
 
@@ -1297,8 +1296,8 @@ TEST_F(FailoverTransportTest,
         tempSocket2.close();
     }
 
-    Pointer<MockBrokerService> broker1(new MockBrokerService(port1));
-    Pointer<MockBrokerService> broker2(new MockBrokerService(port2));
+    std::shared_ptr<MockBrokerService> broker1(new MockBrokerService(port1));
+    std::shared_ptr<MockBrokerService> broker2(new MockBrokerService(port2));
 
     // Both brokers offline initially
     // Use 127.0.0.1 instead of localhost to avoid IPv6 resolution issues on CI
@@ -1316,7 +1315,7 @@ TEST_F(FailoverTransportTest,
     DefaultTransportListener listener;
     FailoverTransportFactory factory;
 
-    Pointer<Transport> transport(factory.create(uri));
+    std::shared_ptr<Transport> transport(factory.create(uri));
     ASSERT_TRUE(transport != NULL);
     transport->setTransportListener(&listener);
 
@@ -1358,8 +1357,8 @@ TEST_F(FailoverTransportTest,
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(FailoverTransportTest, testFailoverWithRandomizeBothOnline)
 {
-    Pointer<MockBrokerService> broker1(new MockBrokerService());
-    Pointer<MockBrokerService> broker2(new MockBrokerService());
+    std::shared_ptr<MockBrokerService> broker1(new MockBrokerService());
+    std::shared_ptr<MockBrokerService> broker2(new MockBrokerService());
 
     // Both brokers online
     broker1->start();
@@ -1381,7 +1380,7 @@ TEST_F(FailoverTransportTest, testFailoverWithRandomizeBothOnline)
     DefaultTransportListener listener;
     FailoverTransportFactory factory;
 
-    Pointer<Transport> transport(factory.create(uri));
+    std::shared_ptr<Transport> transport(factory.create(uri));
     ASSERT_TRUE(transport != NULL);
     transport->setTransportListener(&listener);
 
@@ -1429,8 +1428,8 @@ TEST_F(FailoverTransportTest, testFailoverWithRandomizeBothOnline)
 TEST_F(FailoverTransportTest, testFailoverWithRandomizeBroker1OnlyOnline)
 {
     // Use dynamic ports (port 0) to avoid port conflicts
-    Pointer<MockBrokerService> broker1(new MockBrokerService());
-    Pointer<MockBrokerService> broker2(new MockBrokerService());
+    std::shared_ptr<MockBrokerService> broker1(new MockBrokerService());
+    std::shared_ptr<MockBrokerService> broker2(new MockBrokerService());
 
     // Start both brokers to get their dynamic ports
     broker1->start();
@@ -1458,7 +1457,7 @@ TEST_F(FailoverTransportTest, testFailoverWithRandomizeBroker1OnlyOnline)
     DefaultTransportListener listener;
     FailoverTransportFactory factory;
 
-    Pointer<Transport> transport(factory.create(uri));
+    std::shared_ptr<Transport> transport(factory.create(uri));
     ASSERT_TRUE(transport != NULL);
     transport->setTransportListener(&listener);
 
@@ -1509,8 +1508,8 @@ TEST_F(FailoverTransportTest, testFailoverWithRandomizeBroker1OnlyOnline)
 TEST_F(FailoverTransportTest, testFailoverWithRandomizeBroker2OnlyOnline)
 {
     // Use dynamic ports (port 0) to avoid port conflicts
-    Pointer<MockBrokerService> broker1(new MockBrokerService());
-    Pointer<MockBrokerService> broker2(new MockBrokerService());
+    std::shared_ptr<MockBrokerService> broker1(new MockBrokerService());
+    std::shared_ptr<MockBrokerService> broker2(new MockBrokerService());
 
     // Start both brokers to get their dynamic ports
     broker1->start();
@@ -1536,7 +1535,7 @@ TEST_F(FailoverTransportTest, testFailoverWithRandomizeBroker2OnlyOnline)
     DefaultTransportListener listener;
     FailoverTransportFactory factory;
 
-    Pointer<Transport> transport(factory.create(uri));
+    std::shared_ptr<Transport> transport(factory.create(uri));
     ASSERT_TRUE(transport != NULL);
     transport->setTransportListener(&listener);
 
@@ -1604,8 +1603,8 @@ TEST_F(FailoverTransportTest,
         tempSocket2.close();
     }
 
-    Pointer<MockBrokerService> broker1(new MockBrokerService(port1));
-    Pointer<MockBrokerService> broker2(new MockBrokerService(port2));
+    std::shared_ptr<MockBrokerService> broker1(new MockBrokerService(port1));
+    std::shared_ptr<MockBrokerService> broker2(new MockBrokerService(port2));
 
     // Both brokers offline initially
     // Use 127.0.0.1 instead of localhost to avoid IPv6 resolution issues on CI
@@ -1620,7 +1619,7 @@ TEST_F(FailoverTransportTest,
     DefaultTransportListener listener;
     FailoverTransportFactory factory;
 
-    Pointer<Transport> transport(factory.create(uri));
+    std::shared_ptr<Transport> transport(factory.create(uri));
     ASSERT_TRUE(transport != NULL);
     transport->setTransportListener(&listener);
 
@@ -1674,8 +1673,8 @@ TEST_F(FailoverTransportTest,
         tempSocket2.close();
     }
 
-    Pointer<MockBrokerService> broker1(new MockBrokerService(port1));
-    Pointer<MockBrokerService> broker2(new MockBrokerService(port2));
+    std::shared_ptr<MockBrokerService> broker1(new MockBrokerService(port1));
+    std::shared_ptr<MockBrokerService> broker2(new MockBrokerService(port2));
 
     // Both brokers offline initially
     // Use 127.0.0.1 instead of localhost to avoid IPv6 resolution issues on CI
@@ -1690,7 +1689,7 @@ TEST_F(FailoverTransportTest,
     DefaultTransportListener listener;
     FailoverTransportFactory factory;
 
-    Pointer<Transport> transport(factory.create(uri));
+    std::shared_ptr<Transport> transport(factory.create(uri));
     ASSERT_TRUE(transport != NULL);
     transport->setTransportListener(&listener);
 
@@ -1727,8 +1726,8 @@ TEST_F(FailoverTransportTest,
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(FailoverTransportTest, testConnectedToPriorityOnFirstTryThenFailover)
 {
-    Pointer<MockBrokerService> broker1(new MockBrokerService());
-    Pointer<MockBrokerService> broker2(new MockBrokerService());
+    std::shared_ptr<MockBrokerService> broker1(new MockBrokerService());
+    std::shared_ptr<MockBrokerService> broker2(new MockBrokerService());
 
     broker1->start();
     broker1->waitUntilStarted();
@@ -1748,7 +1747,7 @@ TEST_F(FailoverTransportTest, testConnectedToPriorityOnFirstTryThenFailover)
     PriorityBackupListener   listener;
     FailoverTransportFactory factory;
 
-    Pointer<Transport> transport(factory.create(uri));
+    std::shared_ptr<Transport> transport(factory.create(uri));
     ASSERT_TRUE(transport != NULL);
 
     transport->setTransportListener(&listener);
@@ -1805,8 +1804,8 @@ TEST_F(FailoverTransportTest, testConnectsToPriorityOnceStarted)
         tempSocket.close();
     }
 
-    Pointer<MockBrokerService> broker1(new MockBrokerService(port1));
-    Pointer<MockBrokerService> broker2(new MockBrokerService());
+    std::shared_ptr<MockBrokerService> broker1(new MockBrokerService(port1));
+    std::shared_ptr<MockBrokerService> broker2(new MockBrokerService());
 
     broker2->start();
     broker2->waitUntilStarted();
@@ -1822,7 +1821,7 @@ TEST_F(FailoverTransportTest, testConnectsToPriorityOnceStarted)
     PriorityBackupListener   listener;
     FailoverTransportFactory factory;
 
-    Pointer<Transport> transport(factory.create(uri));
+    std::shared_ptr<Transport> transport(factory.create(uri));
     ASSERT_TRUE(transport != NULL);
 
     transport->setTransportListener(&listener);
@@ -1878,9 +1877,9 @@ TEST_F(FailoverTransportTest, testConnectsToPriorityAfterInitialBackupFails)
         tempSocket.close();
     }
 
-    Pointer<MockBrokerService> broker1(new MockBrokerService(port1));
-    Pointer<MockBrokerService> broker2(new MockBrokerService());
-    Pointer<MockBrokerService> broker3(new MockBrokerService());
+    std::shared_ptr<MockBrokerService> broker1(new MockBrokerService(port1));
+    std::shared_ptr<MockBrokerService> broker2(new MockBrokerService());
+    std::shared_ptr<MockBrokerService> broker3(new MockBrokerService());
 
     broker2->start();
     broker2->waitUntilStarted();
@@ -1903,7 +1902,7 @@ TEST_F(FailoverTransportTest, testConnectsToPriorityAfterInitialBackupFails)
     PriorityBackupListener   listener;
     FailoverTransportFactory factory;
 
-    Pointer<Transport> transport(factory.create(uri));
+    std::shared_ptr<Transport> transport(factory.create(uri));
     ASSERT_TRUE(transport != NULL);
     transport->setTransportListener(&listener);
 
@@ -1965,8 +1964,8 @@ TEST_F(FailoverTransportTest, testConnectsToPriorityAfterInitialBackupFails)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(FailoverTransportTest, testPriorityBackupRapidSwitchingOnRestore)
 {
-    Pointer<MockBrokerService> broker1(new MockBrokerService());
-    Pointer<MockBrokerService> broker2(new MockBrokerService());
+    std::shared_ptr<MockBrokerService> broker1(new MockBrokerService());
+    std::shared_ptr<MockBrokerService> broker2(new MockBrokerService());
 
     broker1->start();
     broker1->waitUntilStarted();
@@ -1986,7 +1985,7 @@ TEST_F(FailoverTransportTest, testPriorityBackupRapidSwitchingOnRestore)
     PriorityBackupListener   listener;
     FailoverTransportFactory factory;
 
-    Pointer<Transport> transport(factory.create(uri));
+    std::shared_ptr<Transport> transport(factory.create(uri));
     ASSERT_TRUE(transport != NULL);
 
     transport->setTransportListener(&listener);
@@ -2043,8 +2042,8 @@ TEST_F(FailoverTransportTest, testPriorityBackupRapidSwitchingOnRestore)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(FailoverTransportTest, testSimpleBrokerRestart)
 {
-    Pointer<MockBrokerService> broker1(new MockBrokerService());
-    Pointer<MockBrokerService> broker2(new MockBrokerService());
+    std::shared_ptr<MockBrokerService> broker1(new MockBrokerService());
+    std::shared_ptr<MockBrokerService> broker2(new MockBrokerService());
 
     // Start both brokers
     broker1->start();
@@ -2066,7 +2065,7 @@ TEST_F(FailoverTransportTest, testSimpleBrokerRestart)
     DefaultTransportListener listener;
     FailoverTransportFactory factory;
 
-    Pointer<Transport> transport(factory.create(uri));
+    std::shared_ptr<Transport> transport(factory.create(uri));
     ASSERT_TRUE(transport != NULL);
 
     transport->setTransportListener(&listener);
@@ -2213,8 +2212,8 @@ TEST_F(FailoverTransportTest, testSimpleBrokerRestart)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(FailoverTransportTest, testBrokerRestartWithProperSync)
 {
-    Pointer<MockBrokerService> broker1(new MockBrokerService());
-    Pointer<MockBrokerService> broker2(new MockBrokerService());
+    std::shared_ptr<MockBrokerService> broker1(new MockBrokerService());
+    std::shared_ptr<MockBrokerService> broker2(new MockBrokerService());
 
     // Start both brokers
     broker1->start();
@@ -2235,7 +2234,7 @@ TEST_F(FailoverTransportTest, testBrokerRestartWithProperSync)
     PriorityBackupListener   listener;
     FailoverTransportFactory factory;
 
-    Pointer<Transport> transport(factory.create(uri));
+    std::shared_ptr<Transport> transport(factory.create(uri));
     ASSERT_TRUE(transport != NULL);
 
     transport->setTransportListener(&listener);
@@ -2307,8 +2306,8 @@ TEST_F(FailoverTransportTest, testBrokerRestartWithProperSync)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(FailoverTransportTest, testFuzzyBrokerAvailability)
 {
-    Pointer<MockBrokerService> broker1(new MockBrokerService());
-    Pointer<MockBrokerService> broker2(new MockBrokerService());
+    std::shared_ptr<MockBrokerService> broker1(new MockBrokerService());
+    std::shared_ptr<MockBrokerService> broker2(new MockBrokerService());
 
     // Start with both brokers online
     broker1->start();
@@ -2333,7 +2332,7 @@ TEST_F(FailoverTransportTest, testFuzzyBrokerAvailability)
     PriorityBackupListener   listener;
     FailoverTransportFactory factory;
 
-    Pointer<Transport> transport(factory.create(uri));
+    std::shared_ptr<Transport> transport(factory.create(uri));
     ASSERT_TRUE(transport != NULL);
 
     transport->setTransportListener(&listener);

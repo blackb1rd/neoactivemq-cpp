@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -56,7 +56,7 @@ namespace test
 #include <activemq/core/PrefetchPolicy.h>
 #include <activemq/exceptions/ActiveMQException.h>
 
-#include <decaf/lang/Pointer.h>
+#include <memory>
 #include <decaf/lang/Thread.h>
 #include <decaf/util/concurrent/atomic/AtomicInteger.h>
 
@@ -103,7 +103,7 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(OpenwireOptimizedAckTest, testOptimizedAckSettings)
 {
-    Pointer<ActiveMQConnectionFactory> connectionFactory(
+    std::shared_ptr<ActiveMQConnectionFactory> connectionFactory(
         new ActiveMQConnectionFactory(getBrokerURL()));
 
     connectionFactory->setOptimizeAcknowledgeTimeOut(500);
@@ -111,32 +111,32 @@ TEST_F(OpenwireOptimizedAckTest, testOptimizedAckSettings)
 
     ASSERT_EQ(100, connectionFactory->getPrefetchPolicy()->getQueuePrefetch());
 
-    Pointer<Connection> connection(connectionFactory->createConnection());
+    std::shared_ptr<Connection> connection(connectionFactory->createConnection());
     connection->start();
-    Pointer<Session> session(
+    std::shared_ptr<Session> session(
         connection->createSession(Session::AUTO_ACKNOWLEDGE));
-    Pointer<Destination> destination(session->createQueue("TEST.FOO"));
+    std::shared_ptr<Destination> destination(session->createQueue("TEST.FOO"));
 
-    Pointer<MessageConsumer> consumer(
+    std::shared_ptr<MessageConsumer> consumer(
         session->createConsumer(destination.get()));
 
-    Pointer<ActiveMQConsumer> amqConsumer =
-        consumer.dynamicCast<ActiveMQConsumer>();
+    std::shared_ptr<ActiveMQConsumer> amqConsumer =
+        std::dynamic_pointer_cast<ActiveMQConsumer>(consumer);
     ASSERT_TRUE(amqConsumer->isOptimizeAcknowledge());
     ASSERT_TRUE(amqConsumer->getOptimizedAckScheduledAckInterval() == 1000);
 
-    Pointer<MessageProducer> producer(
+    std::shared_ptr<MessageProducer> producer(
         session->createProducer(destination.get()));
     producer->setDeliveryMode(cms::DeliveryMode::NON_PERSISTENT);
 
     std::string text = std::string() + "Hello world! From: " +
                        Thread::currentThread()->getName();
-    Pointer<TextMessage> message;
+    std::shared_ptr<TextMessage> message;
 
     message.reset(session->createTextMessage(text));
     producer->send(message.get());
 
-    Pointer<Message> received(consumer->receive(5000));
+    std::shared_ptr<Message> received(consumer->receive(5000));
     ASSERT_TRUE(received != NULL);
 
     Thread::sleep(1200);
@@ -145,24 +145,24 @@ TEST_F(OpenwireOptimizedAckTest, testOptimizedAckSettings)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(OpenwireOptimizedAckTest, testOptimizedAckWithExpiredMsgs)
 {
-    Pointer<ActiveMQConnectionFactory> connectionFactory(
+    std::shared_ptr<ActiveMQConnectionFactory> connectionFactory(
         new ActiveMQConnectionFactory(getBrokerURL()));
 
-    Pointer<Connection> connection(connectionFactory->createConnection());
-    Pointer<Session>    session(
+    std::shared_ptr<Connection> connection(connectionFactory->createConnection());
+    std::shared_ptr<Session>    session(
         connection->createSession(Session::AUTO_ACKNOWLEDGE));
-    Pointer<Destination> destination(session->createQueue("TEST.FOO"));
+    std::shared_ptr<Destination> destination(session->createQueue("TEST.FOO"));
 
-    Pointer<MessageConsumer> consumer(
+    std::shared_ptr<MessageConsumer> consumer(
         session->createConsumer(destination.get()));
     MyMessageListener        listener;
-    Pointer<MessageProducer> producer(
+    std::shared_ptr<MessageProducer> producer(
         session->createProducer(destination.get()));
     producer->setDeliveryMode(cms::DeliveryMode::NON_PERSISTENT);
 
     std::string text = std::string() + "Hello world! From: " +
                        Thread::currentThread()->getName();
-    Pointer<TextMessage> message;
+    std::shared_ptr<TextMessage> message;
 
     // Produce msgs that will expire quickly
     for (int i = 0; i < 45; i++)
@@ -204,24 +204,24 @@ TEST_F(OpenwireOptimizedAckTest, testOptimizedAckWithExpiredMsgs)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(OpenwireOptimizedAckTest, testOptimizedAckWithExpiredMsgsSync)
 {
-    Pointer<ActiveMQConnectionFactory> connectionFactory(
+    std::shared_ptr<ActiveMQConnectionFactory> connectionFactory(
         new ActiveMQConnectionFactory(getBrokerURL()));
 
-    Pointer<Connection> connection(connectionFactory->createConnection());
+    std::shared_ptr<Connection> connection(connectionFactory->createConnection());
     connection->start();
-    Pointer<Session> session(
+    std::shared_ptr<Session> session(
         connection->createSession(Session::AUTO_ACKNOWLEDGE));
-    Pointer<Destination> destination(session->createQueue("TEST.FOO"));
+    std::shared_ptr<Destination> destination(session->createQueue("TEST.FOO"));
 
-    Pointer<MessageConsumer> consumer(
+    std::shared_ptr<MessageConsumer> consumer(
         session->createConsumer(destination.get()));
-    Pointer<MessageProducer> producer(
+    std::shared_ptr<MessageProducer> producer(
         session->createProducer(destination.get()));
     producer->setDeliveryMode(cms::DeliveryMode::NON_PERSISTENT);
 
     std::string text = std::string() + "Hello world! From: " +
                        Thread::currentThread()->getName();
-    Pointer<TextMessage> message;
+    std::shared_ptr<TextMessage> message;
 
     // Produce msgs that will expire quickly
     for (int i = 0; i < 45; i++)
@@ -241,7 +241,7 @@ TEST_F(OpenwireOptimizedAckTest, testOptimizedAckWithExpiredMsgsSync)
 
     for (int counter = 1; counter <= 60; ++counter)
     {
-        Pointer<Message> message(consumer->receive(2000));
+        std::shared_ptr<Message> message(consumer->receive(2000));
         ASSERT_TRUE(message != NULL);
     }
 
@@ -254,24 +254,24 @@ TEST_F(OpenwireOptimizedAckTest, testOptimizedAckWithExpiredMsgsSync)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(OpenwireOptimizedAckTest, testOptimizedAckWithExpiredMsgsSync2)
 {
-    Pointer<ActiveMQConnectionFactory> connectionFactory(
+    std::shared_ptr<ActiveMQConnectionFactory> connectionFactory(
         new ActiveMQConnectionFactory(getBrokerURL()));
 
-    Pointer<Connection> connection(connectionFactory->createConnection());
+    std::shared_ptr<Connection> connection(connectionFactory->createConnection());
     connection->start();
-    Pointer<Session> session(
+    std::shared_ptr<Session> session(
         connection->createSession(Session::AUTO_ACKNOWLEDGE));
-    Pointer<Destination> destination(session->createQueue("TEST.FOO"));
+    std::shared_ptr<Destination> destination(session->createQueue("TEST.FOO"));
 
-    Pointer<MessageConsumer> consumer(
+    std::shared_ptr<MessageConsumer> consumer(
         session->createConsumer(destination.get()));
-    Pointer<MessageProducer> producer(
+    std::shared_ptr<MessageProducer> producer(
         session->createProducer(destination.get()));
     producer->setDeliveryMode(cms::DeliveryMode::NON_PERSISTENT);
 
     std::string text = std::string() + "Hello world! From: " +
                        Thread::currentThread()->getName();
-    Pointer<TextMessage> message;
+    std::shared_ptr<TextMessage> message;
 
     // Produce msgs that don't expire
     for (int i = 0; i < 56; i++)
@@ -296,7 +296,7 @@ TEST_F(OpenwireOptimizedAckTest, testOptimizedAckWithExpiredMsgsSync2)
 
     for (int counter = 1; counter <= 60; ++counter)
     {
-        Pointer<Message> message(consumer->receive(2000));
+        std::shared_ptr<Message> message(consumer->receive(2000));
         ASSERT_TRUE(message != NULL);
     }
 

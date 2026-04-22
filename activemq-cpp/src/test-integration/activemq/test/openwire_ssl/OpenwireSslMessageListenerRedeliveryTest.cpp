@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -53,7 +53,6 @@ namespace test
 #include <activemq/core/ActiveMQConnectionFactory.h>
 #include <activemq/core/policies/DefaultRedeliveryPolicy.h>
 
-#include <decaf/lang/Pointer.h>
 #include <decaf/lang/Runnable.h>
 #include <decaf/lang/Thread.h>
 #include <decaf/util/ArrayList.h>
@@ -203,7 +202,7 @@ class TrackingMessageListener : public cms::MessageListener
 {
 private:
     CountDownLatch                   doneLatch;
-    ArrayList<Pointer<cms::Message>> received;
+    ArrayList<std::shared_ptr<cms::Message>> received;
     std::string                      testName;
     int                              count;
 
@@ -229,7 +228,7 @@ public:
         return received.size();
     }
 
-    ArrayList<Pointer<cms::Message>>& getReceived()
+    ArrayList<std::shared_ptr<cms::Message>>& getReceived()
     {
         return received;
     }
@@ -243,7 +242,7 @@ public:
     {
         try
         {
-            Pointer<cms::Message> copy(message->clone());
+            std::shared_ptr<cms::Message> copy(message->clone());
             received.add(copy);
             doneLatch.countDown();
         }
@@ -466,7 +465,7 @@ TEST_F(OpenwireSslMessageListenerRedeliveryTest,
         << ("got dlq message");
 
     // check DLQ message cause is captured
-    Pointer<cms::Message> dlqMessage = dlqListener.getReceived().get(0);
+    std::shared_ptr<cms::Message> dlqMessage = dlqListener.getReceived().get(0);
     ASSERT_TRUE(dlqMessage != NULL) << ("dlq message captured");
     String cause =
         dlqMessage->getStringProperty(DLQ_DELIVERY_FAILURE_CAUSE_PROPERTY);
@@ -532,7 +531,7 @@ TEST_F(OpenwireSslMessageListenerRedeliveryTest,
         << ("got dlq message");
 
     // check DLQ message cause is captured
-    Pointer<cms::Message> dlqMessage = dlqListener.getReceived().get(0);
+    std::shared_ptr<cms::Message> dlqMessage = dlqListener.getReceived().get(0);
     ASSERT_TRUE(dlqMessage != NULL) << ("dlq message captured");
     String cause =
         dlqMessage->getStringProperty(DLQ_DELIVERY_FAILURE_CAUSE_PROPERTY);

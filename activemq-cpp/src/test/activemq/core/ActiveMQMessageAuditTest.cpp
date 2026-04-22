@@ -63,16 +63,16 @@ TEST_F(ActiveMQMessageAuditTest, testIsDuplicateMessageId)
 {
     int                           count = 10000;
     ActiveMQMessageAudit          audit;
-    ArrayList<Pointer<MessageId>> list;
+    ArrayList<std::shared_ptr<MessageId>> list;
 
-    Pointer<ProducerId> pid(new ProducerId);
+    std::shared_ptr<ProducerId> pid(new ProducerId);
     pid->setConnectionId("test");
     pid->setSessionId(0);
     pid->setValue(1);
 
     for (int i = 0; i < count; i++)
     {
-        Pointer<MessageId> id(new MessageId);
+        std::shared_ptr<MessageId> id(new MessageId);
         id->setProducerId(pid);
         id->setProducerSequenceId(i);
         list.add(id);
@@ -82,7 +82,7 @@ TEST_F(ActiveMQMessageAuditTest, testIsDuplicateMessageId)
     int index = list.size() - 1 - audit.getAuditDepth();
     for (; index < list.size(); index++)
     {
-        Pointer<MessageId> id = list.get(index);
+        std::shared_ptr<MessageId> id = list.get(index);
         ASSERT_TRUE(audit.isDuplicate(id))
             << (std::string() + "duplicate msg:" + id->toString());
     }
@@ -119,16 +119,16 @@ TEST_F(ActiveMQMessageAuditTest, testRollbackMessageId)
 {
     int                           count = 10000;
     ActiveMQMessageAudit          audit;
-    ArrayList<Pointer<MessageId>> list;
+    ArrayList<std::shared_ptr<MessageId>> list;
 
-    Pointer<ProducerId> pid(new ProducerId);
+    std::shared_ptr<ProducerId> pid(new ProducerId);
     pid->setConnectionId("test");
     pid->setSessionId(0);
     pid->setValue(1);
 
     for (int i = 0; i < count; i++)
     {
-        Pointer<MessageId> id(new MessageId);
+        std::shared_ptr<MessageId> id(new MessageId);
         id->setProducerId(pid);
         id->setProducerSequenceId(i);
         list.add(id);
@@ -138,7 +138,7 @@ TEST_F(ActiveMQMessageAuditTest, testRollbackMessageId)
     int index = list.size() - 1 - audit.getAuditDepth();
     for (; index < list.size(); index++)
     {
-        Pointer<MessageId> id = list.get(index);
+        std::shared_ptr<MessageId> id = list.get(index);
         ASSERT_TRUE(audit.isDuplicate(id))
             << (std::string() + "duplicate msg:" + id->toString());
         audit.rollback(id);
@@ -183,16 +183,16 @@ TEST_F(ActiveMQMessageAuditTest, testIsInOrderMessageId)
 {
     int                           count = 10000;
     ActiveMQMessageAudit          audit;
-    ArrayList<Pointer<MessageId>> list;
+    ArrayList<std::shared_ptr<MessageId>> list;
 
-    Pointer<ProducerId> pid(new ProducerId);
+    std::shared_ptr<ProducerId> pid(new ProducerId);
     pid->setConnectionId("test");
     pid->setSessionId(0);
     pid->setValue(1);
 
     for (int i = 0; i < count; i++)
     {
-        Pointer<MessageId> id(new MessageId);
+        std::shared_ptr<MessageId> id(new MessageId);
         id->setProducerId(pid);
         id->setProducerSequenceId(i);
 
@@ -209,7 +209,7 @@ TEST_F(ActiveMQMessageAuditTest, testIsInOrderMessageId)
 
     for (int i = 0; i < list.size(); i++)
     {
-        Pointer<MessageId> mid = list.get(i);
+        std::shared_ptr<MessageId> mid = list.get(i);
         ASSERT_TRUE(!audit.isInOrder(mid))
             << (std::string("Out of order msg: ") + mid->toString());
         ASSERT_TRUE(!audit.isDuplicate(mid));
@@ -221,13 +221,13 @@ TEST_F(ActiveMQMessageAuditTest, testGetLastSeqId)
 {
     int                           count = 10000;
     ActiveMQMessageAudit          audit;
-    ArrayList<Pointer<MessageId>> list;
+    ArrayList<std::shared_ptr<MessageId>> list;
 
-    Pointer<ProducerId> pid(new ProducerId);
+    std::shared_ptr<ProducerId> pid(new ProducerId);
     pid->setConnectionId("test");
     pid->setSessionId(0);
     pid->setValue(1);
-    Pointer<MessageId> id(new MessageId);
+    std::shared_ptr<MessageId> id(new MessageId);
     id->setProducerId(pid);
 
     for (int i = 0; i < count; i++)

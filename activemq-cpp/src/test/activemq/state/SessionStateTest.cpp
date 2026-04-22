@@ -19,13 +19,12 @@
 
 #include <activemq/commands/SessionInfo.h>
 #include <activemq/state/SessionState.h>
-#include <decaf/lang/Pointer.h>
+#include <memory>
 
 using namespace std;
 using namespace activemq;
 using namespace activemq::state;
 using namespace activemq::commands;
-using namespace decaf::lang;
 
 class SessionStateTest : public ::testing::Test
 {
@@ -35,26 +34,26 @@ class SessionStateTest : public ::testing::Test
 TEST_F(SessionStateTest, test)
 {
     // Create a Consumer
-    Pointer<ConsumerId> cid(new ConsumerId);
+    std::shared_ptr<ConsumerId> cid(new ConsumerId);
     cid->setConnectionId("CONNECTION");
     cid->setSessionId(4096);
     cid->setValue(42);
-    Pointer<ConsumerInfo> cinfo(new ConsumerInfo());
+    std::shared_ptr<ConsumerInfo> cinfo(new ConsumerInfo());
     cinfo->setConsumerId(cid);
 
     // Create a Producer
-    Pointer<ProducerId> pid(new ProducerId);
+    std::shared_ptr<ProducerId> pid(new ProducerId);
     pid->setConnectionId("CONNECTION");
     pid->setSessionId(42);
     pid->setValue(4096);
-    Pointer<ProducerInfo> pinfo(new ProducerInfo());
+    std::shared_ptr<ProducerInfo> pinfo(new ProducerInfo());
     pinfo->setProducerId(pid);
 
     // Create a Session
-    Pointer<SessionId> id(new SessionId);
+    std::shared_ptr<SessionId> id(new SessionId);
     id->setConnectionId("CONNECTION");
     id->setValue(42);
-    Pointer<SessionInfo> info(new SessionInfo);
+    std::shared_ptr<SessionInfo> info(new SessionInfo);
     info->setSessionId(id);
 
     SessionState state(info);

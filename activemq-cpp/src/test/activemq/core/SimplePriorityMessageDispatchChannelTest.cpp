@@ -79,8 +79,8 @@ TEST_F(SimplePriorityMessageDispatchChannelTest, testClose)
 TEST_F(SimplePriorityMessageDispatchChannelTest, testEnqueue)
 {
     SimplePriorityMessageDispatchChannel channel;
-    Pointer<MessageDispatch>             dispatch1(new MessageDispatch());
-    Pointer<MessageDispatch>             dispatch2(new MessageDispatch());
+    std::shared_ptr<MessageDispatch> dispatch1(new MessageDispatch());
+    std::shared_ptr<MessageDispatch> dispatch2(new MessageDispatch());
 
     ASSERT_TRUE(channel.isEmpty() == true);
     ASSERT_TRUE(channel.size() == 0);
@@ -100,11 +100,11 @@ TEST_F(SimplePriorityMessageDispatchChannelTest, testEnqueue)
 TEST_F(SimplePriorityMessageDispatchChannelTest, testEnqueueFront)
 {
     SimplePriorityMessageDispatchChannel channel;
-    Pointer<MessageDispatch>             dispatch1(new MessageDispatch());
-    Pointer<MessageDispatch>             dispatch2(new MessageDispatch());
+    std::shared_ptr<MessageDispatch> dispatch1(new MessageDispatch());
+    std::shared_ptr<MessageDispatch> dispatch2(new MessageDispatch());
 
-    Pointer<Message> message1(new Message());
-    Pointer<Message> message2(new Message());
+    std::shared_ptr<Message> message1(new Message());
+    std::shared_ptr<Message> message2(new Message());
 
     message1->setPriority(2);
     message2->setPriority(1);
@@ -135,11 +135,11 @@ TEST_F(SimplePriorityMessageDispatchChannelTest, testEnqueueFront)
 TEST_F(SimplePriorityMessageDispatchChannelTest, testPeek)
 {
     SimplePriorityMessageDispatchChannel channel;
-    Pointer<MessageDispatch>             dispatch1(new MessageDispatch());
-    Pointer<MessageDispatch>             dispatch2(new MessageDispatch());
+    std::shared_ptr<MessageDispatch> dispatch1(new MessageDispatch());
+    std::shared_ptr<MessageDispatch> dispatch2(new MessageDispatch());
 
-    Pointer<Message> message1(new Message());
-    Pointer<Message> message2(new Message());
+    std::shared_ptr<Message> message1(new Message());
+    std::shared_ptr<Message> message2(new Message());
 
     message1->setPriority(2);
     message2->setPriority(1);
@@ -175,13 +175,13 @@ TEST_F(SimplePriorityMessageDispatchChannelTest, testDequeueNoWait)
 {
     SimplePriorityMessageDispatchChannel channel;
 
-    Pointer<MessageDispatch> dispatch1(new MessageDispatch());
-    Pointer<MessageDispatch> dispatch2(new MessageDispatch());
-    Pointer<MessageDispatch> dispatch3(new MessageDispatch());
+    std::shared_ptr<MessageDispatch> dispatch1(new MessageDispatch());
+    std::shared_ptr<MessageDispatch> dispatch2(new MessageDispatch());
+    std::shared_ptr<MessageDispatch> dispatch3(new MessageDispatch());
 
-    Pointer<Message> message1(new Message());
-    Pointer<Message> message2(new Message());
-    Pointer<Message> message3(new Message());
+    std::shared_ptr<Message> message1(new Message());
+    std::shared_ptr<Message> message2(new Message());
+    std::shared_ptr<Message> message3(new Message());
 
     message1->setPriority(2);
     message2->setPriority(3);
@@ -217,13 +217,13 @@ TEST_F(SimplePriorityMessageDispatchChannelTest, testDequeue)
 {
     SimplePriorityMessageDispatchChannel channel;
 
-    Pointer<MessageDispatch> dispatch1(new MessageDispatch());
-    Pointer<MessageDispatch> dispatch2(new MessageDispatch());
-    Pointer<MessageDispatch> dispatch3(new MessageDispatch());
+    std::shared_ptr<MessageDispatch> dispatch1(new MessageDispatch());
+    std::shared_ptr<MessageDispatch> dispatch2(new MessageDispatch());
+    std::shared_ptr<MessageDispatch> dispatch3(new MessageDispatch());
 
-    Pointer<Message> message1(new Message());
-    Pointer<Message> message2(new Message());
-    Pointer<Message> message3(new Message());
+    std::shared_ptr<Message> message1(new Message());
+    std::shared_ptr<Message> message2(new Message());
+    std::shared_ptr<Message> message3(new Message());
 
     message1->setPriority(2);
     message2->setPriority(3);
@@ -260,13 +260,13 @@ TEST_F(SimplePriorityMessageDispatchChannelTest, testRemoveAll)
 {
     SimplePriorityMessageDispatchChannel channel;
 
-    Pointer<MessageDispatch> dispatch1(new MessageDispatch());
-    Pointer<MessageDispatch> dispatch2(new MessageDispatch());
-    Pointer<MessageDispatch> dispatch3(new MessageDispatch());
+    std::shared_ptr<MessageDispatch> dispatch1(new MessageDispatch());
+    std::shared_ptr<MessageDispatch> dispatch2(new MessageDispatch());
+    std::shared_ptr<MessageDispatch> dispatch3(new MessageDispatch());
 
-    Pointer<Message> message1(new Message());
-    Pointer<Message> message2(new Message());
-    Pointer<Message> message3(new Message());
+    std::shared_ptr<Message> message1(new Message());
+    std::shared_ptr<Message> message2(new Message());
+    std::shared_ptr<Message> message3(new Message());
 
     message1->setPriority(2);
     message2->setPriority(3);

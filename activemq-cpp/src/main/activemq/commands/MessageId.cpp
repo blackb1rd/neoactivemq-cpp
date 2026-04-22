@@ -391,11 +391,13 @@ void MessageId::setValue(const std::string& key)
         }
         catch (const std::invalid_argument& e)
         {
-            throw decaf::lang::exceptions::NumberFormatException(&e);
+            throw decaf::lang::exceptions::NumberFormatException(
+                __FILE__, __LINE__, e.what());
         }
         catch (const std::out_of_range& e)
         {
-            throw decaf::lang::exceptions::NumberFormatException(&e);
+            throw decaf::lang::exceptions::NumberFormatException(
+                __FILE__, __LINE__, e.what());
         }
         messageKey = messageKey.substr(0, p);
     }

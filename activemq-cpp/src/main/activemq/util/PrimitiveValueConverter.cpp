@@ -162,7 +162,7 @@ int PrimitiveValueConverter::convert<int>(const PrimitiveValueNode& value) const
             {
                 return std::stoi(value.getString());
             }
-            catch (decaf::lang::Exception& ex)
+            catch (const std::exception&)
             {
             }
         }
@@ -196,7 +196,7 @@ long long PrimitiveValueConverter::convert<long long>(
             {
                 return std::stoll(value.getString());
             }
-            catch (decaf::lang::Exception& ex)
+            catch (const std::exception&)
             {
             }
         }

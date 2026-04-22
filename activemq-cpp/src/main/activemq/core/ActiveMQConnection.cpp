@@ -444,6 +444,9 @@ namespace core
             catch (Exception& ex)
             {
             }
+            catch (const std::exception&)
+            {
+            }
         }
     };
 
@@ -485,7 +488,9 @@ namespace core
                               "handling exception: " << error->getMessage());
 
                 // Mark this Connection as having a Failed transport.
-                this->connection->setFirstFailureError(error);
+                // Clone the error so setFirstFailureError can take ownership
+                // while ex (shared_ptr) still manages the original lifetime.
+                this->connection->setFirstFailureError(error->clone());
 
                 std::shared_ptr<Transport> transport = this->config->transport;
                 if (transport != nullptr)

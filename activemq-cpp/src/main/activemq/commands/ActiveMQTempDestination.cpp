@@ -76,7 +76,7 @@ void ActiveMQTempDestination::setPhysicalName(const std::string& physicalName)
             {
                 this->sequenceId = std::stoi(seqStr);
             }
-            catch (decaf::lang::exceptions::NumberFormatException& e)
+            catch (const std::exception&)
             {
                 // Not the expected format so ignore.
             }

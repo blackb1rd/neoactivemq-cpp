@@ -26,7 +26,7 @@
 #include <activemq/util/Config.h>
 
 #include <decaf/lang/Exception.h>
-#include <decaf/lang/Pointer.h>
+#include <memory>
 
 namespace activemq
 {
@@ -37,7 +37,6 @@ namespace transport
 
         using activemq::commands::Command;
         using activemq::commands::Response;
-        using decaf::lang::Pointer;
 
         class CorrelatorData;
 
@@ -66,20 +65,20 @@ namespace transport
              *
              * @throws NullPointerException if next if NULL.
              */
-            ResponseCorrelator(Pointer<Transport> next);
+            ResponseCorrelator(std::shared_ptr<Transport> next);
 
             virtual ~ResponseCorrelator();
 
         public:  // Transport Methods
-            virtual void oneway(const Pointer<Command> command);
+            virtual void oneway(const std::shared_ptr<Command> command);
 
-            virtual Pointer<FutureResponse> asyncRequest(
-                const Pointer<Command>          command,
-                const Pointer<ResponseCallback> responseCallback);
+            virtual std::shared_ptr<FutureResponse> asyncRequest(
+                const std::shared_ptr<Command>          command,
+                const std::shared_ptr<ResponseCallback> responseCallback);
 
-            virtual Pointer<Response> request(const Pointer<Command> command);
+            virtual std::shared_ptr<Response> request(const std::shared_ptr<Command> command);
 
-            virtual Pointer<Response> request(const Pointer<Command> command,
+            virtual std::shared_ptr<Response> request(const std::shared_ptr<Command> command,
                                               unsigned int           timeout);
 
             /**
@@ -91,7 +90,7 @@ namespace transport
              * @param command
              *      The received from the nested transport.
              */
-            virtual void onCommand(const Pointer<Command> command);
+            virtual void onCommand(const std::shared_ptr<Command> command);
 
             /**
              * Event handler for an exception from a command transport.
@@ -107,7 +106,7 @@ namespace transport
             virtual void doClose();
 
         private:
-            void dispose(Pointer<decaf::lang::Exception> ex);
+            void dispose(std::shared_ptr<decaf::lang::Exception> ex);
         };
 
     }  // namespace correlator

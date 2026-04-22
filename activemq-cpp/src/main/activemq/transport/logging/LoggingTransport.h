@@ -18,9 +18,10 @@
 #ifndef _ACTIVEMQ_TRANSPORT_LOGGING_LOGGINGTRANSPORT_H_
 #define _ACTIVEMQ_TRANSPORT_LOGGING_LOGGINGTRANSPORT_H_
 
+#include <memory>
+
 #include <activemq/transport/TransportFilter.h>
 #include <activemq/util/Config.h>
-#include <decaf/lang/Pointer.h>
 
 namespace activemq
 {
@@ -28,8 +29,6 @@ namespace transport
 {
     namespace logging
     {
-
-        using decaf::lang::Pointer;
 
         /**
          * A transport filter that logs commands as they are sent/received.
@@ -41,31 +40,31 @@ namespace transport
              * Constructor.
              * @param next - the next Transport in the chain
              */
-            LoggingTransport(const Pointer<Transport> next);
+            LoggingTransport(const std::shared_ptr<Transport> next);
 
             virtual ~LoggingTransport()
             {
             }
 
         public:  // TransportFilter methods.
-            virtual void onCommand(const Pointer<Command> command);
+            virtual void onCommand(const std::shared_ptr<Command> command);
 
         public:  // TransportFilter methods.
-            virtual void oneway(const Pointer<Command> command);
+            virtual void oneway(const std::shared_ptr<Command> command);
 
             /**
              * {@inheritDoc}
              *
              * Not supported by this class - throws an exception.
              */
-            virtual Pointer<Response> request(const Pointer<Command> command);
+            virtual std::shared_ptr<Response> request(const std::shared_ptr<Command> command);
 
             /**
              * {@inheritDoc}
              *
              * Not supported by this class - throws an exception.
              */
-            virtual Pointer<Response> request(const Pointer<Command> command,
+            virtual std::shared_ptr<Response> request(const std::shared_ptr<Command> command,
                                               unsigned int           timeout);
         };
 

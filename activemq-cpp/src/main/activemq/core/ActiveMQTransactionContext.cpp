@@ -67,11 +67,11 @@ namespace core
         mutable decaf::util::concurrent::Mutex mutex;
 
         // Tracks local transactions
-        Pointer<commands::TransactionId> transactionId;
+        std::shared_ptr<commands::TransactionId> transactionId;
 
         // To track XA transactions.
-        Pointer<Xid> associatedXid;
-        int          beforeEndIndex;
+        std::shared_ptr<Xid> associatedXid;
+        int                  beforeEndIndex;
 
         TxContextData()
             : mutex(),
@@ -96,17 +96,17 @@ private:
     Finally& operator=(const Finally&);
 
 private:
-    decaf::util::StlSet<Pointer<Synchronization>>* syncs;
+    decaf::util::StlSet<std::shared_ptr<Synchronization>>* syncs;
 
 public:
-    Finally(decaf::util::StlSet<Pointer<Synchronization>>* syncs)
+    Finally(decaf::util::StlSet<std::shared_ptr<Synchronization>>* syncs)
         : syncs(syncs)
     {
     }
 
     ~Finally()
     {
-        if (this->syncs != NULL)
+        if (this->syncs != nullptr)
         {
             this->syncs->clear();
         }
@@ -126,7 +126,7 @@ ActiveMQTransactionContext::ActiveMQTransactionContext(
 {
     try
     {
-        if (session == NULL)
+        if (session == nullptr)
         {
             throw NullPointerException(
                 __FILE__,
@@ -154,7 +154,7 @@ ActiveMQTransactionContext::~ActiveMQTransactionContext()
 
 ////////////////////////////////////////////////////////////////////////////////
 void ActiveMQTransactionContext::addSynchronization(
-    const Pointer<Synchronization>& sync)
+    const std::shared_ptr<Synchronization>& sync)
 {
     synchronized(&this->synchronizations)
     {
@@ -164,7 +164,7 @@ void ActiveMQTransactionContext::addSynchronization(
 
 ////////////////////////////////////////////////////////////////////////////////
 void ActiveMQTransactionContext::removeSynchronization(
-    const Pointer<Synchronization>& sync)
+    const std::shared_ptr<Synchronization>& sync)
 {
     synchronized(&this->synchronizations)
     {
@@ -191,12 +191,12 @@ void ActiveMQTransactionContext::begin()
                 this->synchronizations.clear();
             }
 
-            Pointer<LocalTransactionId> id(new LocalTransactionId());
+            std::shared_ptr<LocalTransactionId> id(new LocalTransactionId());
             id->setConnectionId(
                 this->connection->getConnectionInfo().getConnectionId());
             id->setValue(this->connection->getNextLocalTransactionId());
 
-            Pointer<TransactionInfo> transactionInfo(new TransactionInfo());
+            std::shared_ptr<TransactionInfo> transactionInfo(new TransactionInfo());
             transactionInfo->setConnectionId(id->getConnectionId());
             transactionInfo->setTransactionId(id);
             transactionInfo->setType(
@@ -206,7 +206,7 @@ void ActiveMQTransactionContext::begin()
 
             synchronized(&this->context->mutex)
             {
-                this->context->transactionId = id.dynamicCast<TransactionId>();
+                this->context->transactionId = std::dynamic_pointer_cast<TransactionId>(id);
             }
         }
     }
@@ -240,7 +240,7 @@ void ActiveMQTransactionContext::commit()
 
         if (isInTransaction())
         {
-            Pointer<TransactionInfo> info(new TransactionInfo());
+            std::shared_ptr<TransactionInfo> info(new TransactionInfo());
             info->setConnectionId(
                 this->connection->getConnectionInfo().getConnectionId());
             info->setType(ActiveMQConstants::TRANSACTION_STATE_COMMITONEPHASE);
@@ -250,7 +250,7 @@ void ActiveMQTransactionContext::commit()
                 info->setTransactionId(this->context->transactionId);
                 // Before we send the command NULL the id in case of an
                 // exception.
-                this->context->transactionId.reset(NULL);
+                this->context->transactionId.reset();
             }
 
             try
@@ -296,7 +296,7 @@ void ActiveMQTransactionContext::rollback()
 
         if (isInTransaction())
         {
-            Pointer<TransactionInfo> info(new TransactionInfo());
+            std::shared_ptr<TransactionInfo> info(new TransactionInfo());
             info->setConnectionId(
                 this->connection->getConnectionInfo().getConnectionId());
 
@@ -307,7 +307,7 @@ void ActiveMQTransactionContext::rollback()
 
                 // Before we send the command NULL the id in case of an
                 // exception.
-                this->context->transactionId.reset(NULL);
+                this->context->transactionId.reset();
             }
 
             this->connection->syncRequest(
@@ -329,7 +329,7 @@ void ActiveMQTransactionContext::beforeEnd()
     // Transaction.
     synchronized(&this->synchronizations)
     {
-        std::unique_ptr<decaf::util::Iterator<Pointer<Synchronization>>> iter(
+        std::unique_ptr<decaf::util::Iterator<std::shared_ptr<Synchronization>>> iter(
             this->synchronizations.iterator());
 
         while (iter->hasNext())
@@ -348,7 +348,7 @@ void ActiveMQTransactionContext::afterCommit()
     {
         Finally finalizer(&this->synchronizations);
 
-        std::unique_ptr<decaf::util::Iterator<Pointer<Synchronization>>> iter(
+        std::unique_ptr<decaf::util::Iterator<std::shared_ptr<Synchronization>>> iter(
             this->synchronizations.iterator());
 
         while (iter->hasNext())
@@ -367,7 +367,7 @@ void ActiveMQTransactionContext::afterRollback()
     {
         Finally finalizer(&this->synchronizations);
 
-        std::unique_ptr<decaf::util::Iterator<Pointer<Synchronization>>> iter(
+        std::unique_ptr<decaf::util::Iterator<std::shared_ptr<Synchronization>>> iter(
             this->synchronizations.iterator());
 
         while (iter->hasNext())
@@ -378,7 +378,7 @@ void ActiveMQTransactionContext::afterRollback()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const Pointer<TransactionId>& ActiveMQTransactionContext::getTransactionId()
+const std::shared_ptr<TransactionId>& ActiveMQTransactionContext::getTransactionId()
     const
 {
     // Note: This method returns a reference - caller must ensure thread-safety.
@@ -393,7 +393,7 @@ bool ActiveMQTransactionContext::isInTransaction() const
     bool result = false;
     synchronized(&this->context->mutex)
     {
-        result = this->context->transactionId != NULL;
+        result = this->context->transactionId != nullptr;
     }
     return result;
 }
@@ -404,7 +404,7 @@ bool ActiveMQTransactionContext::isInLocalTransaction() const
     bool result = false;
     synchronized(&this->context->mutex)
     {
-        result = this->context->transactionId != NULL &&
+        result = this->context->transactionId != nullptr &&
                  this->context->transactionId->isLocalTransactionId();
     }
     return result;
@@ -416,7 +416,7 @@ bool ActiveMQTransactionContext::isInXATransaction() const
     bool result = false;
     synchronized(&this->context->mutex)
     {
-        result = this->context->transactionId != NULL &&
+        result = this->context->transactionId != nullptr &&
                  this->context->transactionId->isXATransactionId();
     }
     return result;
@@ -437,7 +437,7 @@ bool ActiveMQTransactionContext::setTransactionTimeout(int seconds AMQCPP_UNUSED
 ////////////////////////////////////////////////////////////////////////////////
 int ActiveMQTransactionContext::recover(int flag AMQCPP_UNUSED, Xid** recovered)
 {
-    Pointer<TransactionInfo> info(new TransactionInfo());
+    std::shared_ptr<TransactionInfo> info(new TransactionInfo());
     info->setConnectionId(
         this->connection->getConnectionInfo().getConnectionId());
     info->setType(ActiveMQConstants::TRANSACTION_STATE_RECOVER);
@@ -447,13 +447,13 @@ int ActiveMQTransactionContext::recover(int flag AMQCPP_UNUSED, Xid** recovered)
         this->connection->checkClosedOrFailed();
         this->connection->ensureConnectionInfoSent();
 
-        Pointer<Response> response = this->connection->syncRequest(
+        std::shared_ptr<Response> response = this->connection->syncRequest(
             info,
             this->connection->getRequestTimeout());
-        Pointer<DataArrayResponse> arrayResponse =
-            response.dynamicCast<DataArrayResponse>();
+        std::shared_ptr<DataArrayResponse> arrayResponse =
+            std::dynamic_pointer_cast<DataArrayResponse>(response);
 
-        std::vector<Pointer<DataStructure>> array = arrayResponse->getData();
+        std::vector<std::shared_ptr<DataStructure>> array = arrayResponse->getData();
 
         int size = (int)array.size();
 
@@ -468,8 +468,8 @@ int ActiveMQTransactionContext::recover(int flag AMQCPP_UNUSED, Xid** recovered)
             // client is now responsible for freeing this memory.
             for (int i = 0; i < size; ++i)
             {
-                Pointer<XATransactionId> xid =
-                    array[i].dynamicCast<XATransactionId>();
+                std::shared_ptr<XATransactionId> xid =
+                    std::dynamic_pointer_cast<XATransactionId>(array[i]);
                 recovered[i] = xid->clone();
             }
         }
@@ -495,7 +495,7 @@ void ActiveMQTransactionContext::start(const Xid* xid, int flags)
     }
 
     // Are we already associated?
-    if (this->context->associatedXid != NULL)
+    if (this->context->associatedXid != nullptr)
     {
         throw new XAException(XAException::XAER_PROTO);
     }
@@ -526,11 +526,11 @@ int ActiveMQTransactionContext::prepare(const Xid* xid)
 {
     // We allow interleaving multiple transactions, so we don't limit prepare to
     // the associated xid.
-    Pointer<XATransactionId> x;
+    std::shared_ptr<XATransactionId> x;
 
     // THIS SHOULD NEVER HAPPEN because end(xid, TMSUCCESS) should have been
     // called first
-    if (xid == NULL || equals(this->context->associatedXid.get(), xid))
+    if (xid == nullptr || equals(this->context->associatedXid.get(), xid))
     {
         throw XAException(XAException::XAER_PROTO);
     }
@@ -541,19 +541,19 @@ int ActiveMQTransactionContext::prepare(const Xid* xid)
 
     try
     {
-        Pointer<TransactionInfo> info(new TransactionInfo());
+        std::shared_ptr<TransactionInfo> info(new TransactionInfo());
         info->setConnectionId(
             this->connection->getConnectionInfo().getConnectionId());
         info->setTransactionId(x);
         info->setType(ActiveMQConstants::TRANSACTION_STATE_PREPARE);
 
         // Find out if the server wants to commit or rollback.
-        Pointer<Response> response = this->connection->syncRequest(
+        std::shared_ptr<Response> response = this->connection->syncRequest(
             info,
             this->connection->getRequestTimeout());
 
-        Pointer<IntegerResponse> intResponse =
-            response.dynamicCast<IntegerResponse>();
+        std::shared_ptr<IntegerResponse> intResponse =
+            std::dynamic_pointer_cast<IntegerResponse>(response);
 
         if (XAResource::XA_RDONLY == intResponse->getResult())
         {
@@ -596,11 +596,11 @@ void ActiveMQTransactionContext::commit(const Xid* xid, bool onePhase)
 {
     // We allow interleaving multiple transactions, so we don't limit prepare to
     // the associated xid.
-    Pointer<XATransactionId> x;
+    std::shared_ptr<XATransactionId> x;
 
     // THIS SHOULD NEVER HAPPEN because end(xid, TMSUCCESS) should have been
     // called first
-    if (xid == NULL || equals(this->context->associatedXid.get(), xid))
+    if (xid == nullptr || equals(this->context->associatedXid.get(), xid))
     {
         throw XAException(XAException::XAER_PROTO);
     }
@@ -615,7 +615,7 @@ void ActiveMQTransactionContext::commit(const Xid* xid, bool onePhase)
         this->connection->ensureConnectionInfoSent();
 
         // Let the server know that the tx is rollback.
-        Pointer<TransactionInfo> info(new TransactionInfo());
+        std::shared_ptr<TransactionInfo> info(new TransactionInfo());
         info->setConnectionId(
             this->connection->getConnectionInfo().getConnectionId());
         info->setTransactionId(x);
@@ -659,9 +659,9 @@ void ActiveMQTransactionContext::rollback(const Xid* xid)
 {
     // We allow interleaving multiple transactions, so we don't limit prepare to
     // the associated xid.
-    Pointer<XATransactionId> x;
+    std::shared_ptr<XATransactionId> x;
 
-    if (xid == NULL)
+    if (xid == nullptr)
     {
         throw XAException(XAException::XAER_PROTO);
     }
@@ -670,7 +670,7 @@ void ActiveMQTransactionContext::rollback(const Xid* xid)
     {
         if (equals(this->context->associatedXid.get(), xid))
         {
-            x = this->context->transactionId.dynamicCast<XATransactionId>();
+            x = std::dynamic_pointer_cast<XATransactionId>(this->context->transactionId);
         }
         else
         {
@@ -684,7 +684,7 @@ void ActiveMQTransactionContext::rollback(const Xid* xid)
         this->connection->ensureConnectionInfoSent();
 
         // Let the server know that the tx is rollback.
-        Pointer<TransactionInfo> info(new TransactionInfo());
+        std::shared_ptr<TransactionInfo> info(new TransactionInfo());
         info->setConnectionId(
             this->connection->getConnectionInfo().getConnectionId());
         info->setTransactionId(x);
@@ -769,9 +769,9 @@ void ActiveMQTransactionContext::forget(const Xid* xid)
 {
     // We allow interleaving multiple transactions, so we don't limit prepare to
     // the associated xid.
-    Pointer<XATransactionId> x;
+    std::shared_ptr<XATransactionId> x;
 
-    if (xid == NULL)
+    if (xid == nullptr)
     {
         throw XAException(XAException::XAER_PROTO);
     }
@@ -780,7 +780,7 @@ void ActiveMQTransactionContext::forget(const Xid* xid)
     {
         if (equals(this->context->associatedXid.get(), xid))
         {
-            x = this->context->transactionId.dynamicCast<XATransactionId>();
+            x = std::dynamic_pointer_cast<XATransactionId>(this->context->transactionId);
         }
         else
         {
@@ -789,7 +789,7 @@ void ActiveMQTransactionContext::forget(const Xid* xid)
     }
 
     // Let the server know that the tx is rollback.
-    Pointer<TransactionInfo> info(new TransactionInfo());
+    std::shared_ptr<TransactionInfo> info(new TransactionInfo());
     info->setConnectionId(
         this->connection->getConnectionInfo().getConnectionId());
     info->setTransactionId(x);
@@ -813,7 +813,7 @@ void ActiveMQTransactionContext::forget(const Xid* xid)
 ////////////////////////////////////////////////////////////////////////////////
 bool ActiveMQTransactionContext::isSameRM(const XAResource* resource)
 {
-    if (resource == NULL)
+    if (resource == nullptr)
     {
         return false;
     }
@@ -821,7 +821,7 @@ bool ActiveMQTransactionContext::isSameRM(const XAResource* resource)
     const ActiveMQTransactionContext* cntx =
         dynamic_cast<const ActiveMQTransactionContext*>(resource);
 
-    if (cntx == NULL)
+    if (cntx == nullptr)
     {
         return false;
     }
@@ -857,9 +857,9 @@ void ActiveMQTransactionContext::setXid(const Xid* xid)
         throw toXAException(e);
     }
 
-    if (xid != NULL)
+    if (xid != nullptr)
     {
-        Pointer<TransactionInfo> info(new TransactionInfo());
+        std::shared_ptr<TransactionInfo> info(new TransactionInfo());
         info->setConnectionId(
             this->connection->getConnectionInfo().getConnectionId());
 
@@ -889,11 +889,11 @@ void ActiveMQTransactionContext::setXid(const Xid* xid)
     }
     else
     {
-        Pointer<TransactionInfo> info;
+        std::shared_ptr<TransactionInfo> info;
 
         synchronized(&this->context->mutex)
         {
-            if (this->context->transactionId != NULL)
+            if (this->context->transactionId != nullptr)
             {
                 info.reset(new TransactionInfo());
                 info->setConnectionId(
@@ -903,11 +903,11 @@ void ActiveMQTransactionContext::setXid(const Xid* xid)
             }
 
             // remove the association currently in place.
-            this->context->associatedXid.reset(NULL);
-            this->context->transactionId.reset(NULL);
+            this->context->associatedXid.reset();
+            this->context->transactionId.reset();
         }
 
-        if (info != NULL)
+        if (info != nullptr)
         {
             try
             {
@@ -932,7 +932,7 @@ bool ActiveMQTransactionContext::equals(const cms::Xid* local,
         return true;
     }
 
-    if ((local == NULL) ^ (remote == NULL))
+    if ((local == nullptr) ^ (remote == nullptr))
     {
         return false;
     }

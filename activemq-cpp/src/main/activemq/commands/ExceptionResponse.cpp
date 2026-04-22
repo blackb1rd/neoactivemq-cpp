@@ -24,7 +24,7 @@ using namespace std;
 using namespace activemq;
 using namespace activemq::exceptions;
 using namespace activemq::commands;
-using namespace decaf::lang;
+
 using namespace decaf::lang::exceptions;
 
 /*
@@ -40,7 +40,7 @@ using namespace decaf::lang::exceptions;
 ////////////////////////////////////////////////////////////////////////////////
 ExceptionResponse::ExceptionResponse()
     : Response(),
-      exception(NULL)
+      exception()
 {
 }
 
@@ -100,7 +100,7 @@ std::string ExceptionResponse::toString() const
 
     stream << "ExceptionResponse { ";
     stream << "Exception = ";
-    if (this->getException() != NULL)
+    if (this->getException())
     {
         stream << this->getException()->toString();
     }
@@ -129,14 +129,14 @@ bool ExceptionResponse::equals(const DataStructure* value) const
         return false;
     }
 
-    if (this->getException() != NULL)
+    if (this->getException())
     {
         if (!this->getException()->equals(valuePtr->getException().get()))
         {
             return false;
         }
     }
-    else if (valuePtr->getException() != NULL)
+    else if (valuePtr->getException())
     {
         return false;
     }
@@ -148,20 +148,20 @@ bool ExceptionResponse::equals(const DataStructure* value) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const decaf::lang::Pointer<BrokerError>& ExceptionResponse::getException() const
+const std::shared_ptr<BrokerError>& ExceptionResponse::getException() const
 {
     return exception;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<BrokerError>& ExceptionResponse::getException()
+std::shared_ptr<BrokerError>& ExceptionResponse::getException()
 {
     return exception;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void ExceptionResponse::setException(
-    const decaf::lang::Pointer<BrokerError>& exception)
+    const std::shared_ptr<BrokerError>& exception)
 {
     this->exception = exception;
 }

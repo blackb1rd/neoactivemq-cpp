@@ -20,9 +20,9 @@
 #include <activemq/exceptions/ActiveMQException.h>
 #include <activemq/util/URISupport.h>
 
+#include <memory>
+
 #include <decaf/lang/Boolean.h>
-#include <decaf/lang/Integer.h>
-#include <decaf/lang/Long.h>
 
 using namespace decaf;
 using namespace decaf::net;
@@ -40,12 +40,12 @@ AbstractDiscoveryAgentFactory::~AbstractDiscoveryAgentFactory()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<DiscoveryAgent> AbstractDiscoveryAgentFactory::createAgent(
+std::shared_ptr<DiscoveryAgent> AbstractDiscoveryAgentFactory::createAgent(
     const URI& agentURI)
 {
     try
     {
-        Pointer<AbstractDiscoveryAgent> agent = this->doCreateAgent();
+        std::shared_ptr<AbstractDiscoveryAgent> agent = this->doCreateAgent();
 
         agent->setDiscoveryURI(agentURI);
         Properties options = URISupport::parseParameters(agentURI);
@@ -60,22 +60,22 @@ Pointer<DiscoveryAgent> AbstractDiscoveryAgentFactory::createAgent(
 
 ////////////////////////////////////////////////////////////////////////////////
 void AbstractDiscoveryAgentFactory::doConfigureAgent(
-    Pointer<AbstractDiscoveryAgent> agent,
-    const Properties&               options)
+    std::shared_ptr<AbstractDiscoveryAgent> agent,
+    const Properties&                       options)
 {
     try
     {
         agent->setKeepAliveInterval(
-            Long::parseLong(options.getProperty("keepAliveInterval", "500")));
+            std::stoll(options.getProperty("keepAliveInterval", "500")));
         agent->setMaxReconnectDelay(
-            Long::parseLong(options.getProperty("maxReconnectDelay", "30000")));
+            std::stoll(options.getProperty("maxReconnectDelay", "30000")));
         agent->setUseExponentialBackOff(Boolean::parseBoolean(
             options.getProperty("useExponentialBackOff", "true")));
         agent->setBackOffMultiplier(
-            Long::parseLong(options.getProperty("backOffMultiplier", "2")));
-        agent->setMaxReconnectAttempts(Integer::parseInt(
+            std::stoll(options.getProperty("backOffMultiplier", "2")));
+        agent->setMaxReconnectAttempts(std::stoi(
             options.getProperty("maxReconnectAttempts", "-1")));
-        agent->setInitialReconnectDelay(Long::parseLong(
+        agent->setInitialReconnectDelay(std::stoll(
             options.getProperty("initialReconnectDelay", "10")));
         agent->setGroup(options.getProperty("group", "default"));
         agent->setGroup(options.getProperty("service", ""));

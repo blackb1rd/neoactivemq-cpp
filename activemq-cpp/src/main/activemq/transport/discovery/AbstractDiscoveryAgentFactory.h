@@ -20,7 +20,8 @@
 
 #include <activemq/util/Config.h>
 
-#include <decaf/lang/Pointer.h>
+#include <memory>
+
 #include <decaf/net/URI.h>
 #include <decaf/util/Properties.h>
 
@@ -54,7 +55,7 @@ namespace transport
              * @return a new DiscoveryAgent instance with all URI options
              * applied.
              */
-            virtual decaf::lang::Pointer<DiscoveryAgent> createAgent(
+            virtual std::shared_ptr<DiscoveryAgent> createAgent(
                 const decaf::net::URI& agentURI);
 
         protected:
@@ -70,7 +71,7 @@ namespace transport
              * @throws ActiveMQException if an error occurs while creating the
              * agent.
              */
-            virtual decaf::lang::Pointer<AbstractDiscoveryAgent>
+            virtual std::shared_ptr<AbstractDiscoveryAgent>
             doCreateAgent() = 0;
 
         protected:
@@ -94,8 +95,8 @@ namespace transport
              * options.
              */
             virtual void doConfigureAgent(
-                decaf::lang::Pointer<AbstractDiscoveryAgent> agent,
-                const decaf::util::Properties&               options);
+                std::shared_ptr<AbstractDiscoveryAgent> agent,
+                const decaf::util::Properties&          options);
         };
 
     }  // namespace discovery

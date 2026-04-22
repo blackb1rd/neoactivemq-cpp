@@ -27,7 +27,7 @@
 #include <activemq/commands/BaseCommand.h>
 #include <activemq/commands/ConsumerId.h>
 #include <activemq/util/Config.h>
-#include <decaf/lang/Pointer.h>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -35,8 +35,6 @@ namespace activemq
 {
 namespace commands
 {
-
-    using decaf::lang::Pointer;
 
     /*
      *
@@ -50,9 +48,9 @@ namespace commands
     class AMQCPP_API ConsumerControl : public BaseCommand
     {
     protected:
-        Pointer<ActiveMQDestination> destination;
-        bool                         close;
-        Pointer<ConsumerId>          consumerId;
+        std::shared_ptr<ActiveMQDestination> destination;
+        bool                                 close;
+        std::shared_ptr<ConsumerId>          consumerId;
         int                          prefetch;
         bool                         flush;
         bool                         start;
@@ -80,17 +78,17 @@ namespace commands
 
         virtual bool equals(const DataStructure* value) const;
 
-        virtual const Pointer<ActiveMQDestination>& getDestination() const;
-        virtual Pointer<ActiveMQDestination>&       getDestination();
-        virtual void                                setDestination(
-                                           const Pointer<ActiveMQDestination>& destination);
+        virtual const std::shared_ptr<ActiveMQDestination>& getDestination() const;
+        virtual std::shared_ptr<ActiveMQDestination>&       getDestination();
+        virtual void                                        setDestination(
+                                                   const std::shared_ptr<ActiveMQDestination>& destination);
 
         virtual bool isClose() const;
         virtual void setClose(bool close);
 
-        virtual const Pointer<ConsumerId>& getConsumerId() const;
-        virtual Pointer<ConsumerId>&       getConsumerId();
-        virtual void setConsumerId(const Pointer<ConsumerId>& consumerId);
+        virtual const std::shared_ptr<ConsumerId>& getConsumerId() const;
+        virtual std::shared_ptr<ConsumerId>&       getConsumerId();
+        virtual void setConsumerId(const std::shared_ptr<ConsumerId>& consumerId);
 
         virtual int  getPrefetch() const;
         virtual void setPrefetch(int prefetch);
@@ -112,7 +110,7 @@ namespace commands
             return true;
         }
 
-        virtual Pointer<Command> visit(activemq::state::CommandVisitor* visitor);
+        virtual std::shared_ptr<Command> visit(activemq::state::CommandVisitor* visitor);
     };
 
 }  // namespace commands

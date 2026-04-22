@@ -21,16 +21,15 @@
 #include <activemq/core/MessageDispatchChannel.h>
 #include <activemq/util/Config.h>
 
-#include <decaf/lang/ArrayPointer.h>
 #include <decaf/util/LinkedList.h>
 #include <decaf/util/concurrent/Mutex.h>
+#include <memory>
+#include <vector>
 
 namespace activemq
 {
 namespace core
 {
-
-    using decaf::lang::ArrayPointer;
 
     class AMQCPP_API SimplePriorityMessageDispatchChannel
         : public MessageDispatchChannel
@@ -43,7 +42,7 @@ namespace core
 
         mutable decaf::util::concurrent::Mutex mutex;
 
-        mutable ArrayPointer<decaf::util::LinkedList<Pointer<MessageDispatch>>>
+        mutable std::vector<decaf::util::LinkedList<std::shared_ptr<MessageDispatch>>>
             channels;
 
         int enqueued;
@@ -58,9 +57,9 @@ namespace core
         SimplePriorityMessageDispatchChannel();
         virtual ~SimplePriorityMessageDispatchChannel();
 
-        virtual void enqueue(const Pointer<MessageDispatch>& message);
+        virtual void enqueue(const std::shared_ptr<MessageDispatch>& message);
 
-        virtual void enqueueFirst(const Pointer<MessageDispatch>& message);
+        virtual void enqueueFirst(const std::shared_ptr<MessageDispatch>& message);
 
         virtual bool isEmpty() const;
 
@@ -74,11 +73,11 @@ namespace core
             return this->running;
         }
 
-        virtual Pointer<MessageDispatch> dequeue(long long timeout);
+        virtual std::shared_ptr<MessageDispatch> dequeue(long long timeout);
 
-        virtual Pointer<MessageDispatch> dequeueNoWait();
+        virtual std::shared_ptr<MessageDispatch> dequeueNoWait();
 
-        virtual Pointer<MessageDispatch> peek() const;
+        virtual std::shared_ptr<MessageDispatch> peek() const;
 
         virtual void start();
 
@@ -90,7 +89,7 @@ namespace core
 
         virtual int size() const;
 
-        virtual std::vector<Pointer<MessageDispatch>> removeAll();
+        virtual std::vector<std::shared_ptr<MessageDispatch>> removeAll();
 
     public:
         virtual void lock()
@@ -134,12 +133,13 @@ namespace core
         }
 
     private:
-        decaf::util::LinkedList<Pointer<MessageDispatch>>& getChannel(
-            const Pointer<MessageDispatch>& dispatch);
+        decaf::util::LinkedList<std::shared_ptr<MessageDispatch>>& getChannel(
+            const std::shared_ptr<MessageDispatch>& dispatch);
 
-        Pointer<MessageDispatch> removeFirst();
 
-        Pointer<MessageDispatch> getFirst() const;
+        std::shared_ptr<MessageDispatch> removeFirst();
+
+        std::shared_ptr<MessageDispatch> getFirst() const;
     };
 
 }  // namespace core

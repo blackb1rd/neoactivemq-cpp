@@ -25,6 +25,7 @@
 #include <cms/MessageNotWriteableException.h>
 
 #include <algorithm>
+#include <string>
 
 #include <decaf/io/BufferedInputStream.h>
 #include <decaf/io/ByteArrayInputStream.h>
@@ -34,9 +35,9 @@
 #include <decaf/lang/Character.h>
 #include <decaf/lang/Double.h>
 #include <decaf/lang/Float.h>
+#include <decaf/lang/Math.h>
 #include <decaf/lang/Integer.h>
 #include <decaf/lang/Long.h>
-#include <decaf/lang/Math.h>
 #include <decaf/lang/Short.h>
 #include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/util/zip/DeflaterOutputStream.h>
@@ -864,7 +865,7 @@ int ActiveMQStreamMessage::readInt() const
         }
         if (type == PrimitiveValueNode::STRING_TYPE)
         {
-            return Integer::valueOf(this->dataIn->readUTF()).intValue();
+            return std::stoi(this->dataIn->readUTF());
         }
 
         if (type == PrimitiveValueNode::NULL_TYPE)
@@ -950,7 +951,7 @@ long long ActiveMQStreamMessage::readLong() const
         }
         if (type == PrimitiveValueNode::STRING_TYPE)
         {
-            return Long::valueOf(this->dataIn->readUTF()).longValue();
+            return std::stoll(this->dataIn->readUTF());
         }
 
         if (type == PrimitiveValueNode::NULL_TYPE)

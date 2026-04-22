@@ -21,9 +21,9 @@
 #include <activemq/exceptions/ActiveMQException.h>
 #include <activemq/transport/Transport.h>
 #include <activemq/util/Config.h>
-#include <decaf/lang/Pointer.h>
 #include <decaf/net/URI.h>
 #include <decaf/util/Properties.h>
+#include <memory>
 
 namespace activemq
 {
@@ -55,7 +55,7 @@ namespace transport
          * assign.
          * @throws ActiveMQexception if an error occurs
          */
-        virtual Pointer<Transport> create(const decaf::net::URI& location) = 0;
+        virtual std::shared_ptr<Transport> create(const decaf::net::URI& location) = 0;
 
         /**
          * Creates a slimed down Transport instance which can be used in
@@ -64,7 +64,7 @@ namespace transport
          * assign.
          * @throws ActiveMQexception if an error occurs
          */
-        virtual Pointer<Transport> createComposite(
+        virtual std::shared_ptr<Transport> createComposite(
             const decaf::net::URI& location) = 0;
     };
 

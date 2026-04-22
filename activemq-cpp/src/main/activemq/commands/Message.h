@@ -34,8 +34,8 @@
 #include <activemq/core/ActiveMQAckHandler.h>
 #include <activemq/util/Config.h>
 #include <activemq/util/PrimitiveMap.h>
-#include <decaf/lang/Pointer.h>
 #include <decaf/util/concurrent/Mutex.h>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -50,8 +50,6 @@ namespace core
 namespace commands
 {
 
-    using decaf::lang::Pointer;
-
     /*
      *
      *  Command code for OpenWire format for Message
@@ -64,36 +62,36 @@ namespace commands
     class AMQCPP_API Message : public BaseCommand
     {
     protected:
-        Pointer<ProducerId>                         producerId;
-        Pointer<ActiveMQDestination>                destination;
-        Pointer<TransactionId>                      transactionId;
-        Pointer<ActiveMQDestination>                originalDestination;
-        Pointer<MessageId>                          messageId;
-        Pointer<TransactionId>                      originalTransactionId;
-        std::string                                 groupID;
-        int                                         groupSequence;
-        std::string                                 correlationId;
-        bool                                        persistent;
-        long long                                   expiration;
-        unsigned char                               priority;
-        Pointer<ActiveMQDestination>                replyTo;
-        long long                                   timestamp;
-        std::string                                 type;
-        std::vector<unsigned char>                  content;
-        std::vector<unsigned char>                  marshalledProperties;
-        Pointer<DataStructure>                      dataStructure;
-        Pointer<ConsumerId>                         targetConsumerId;
-        bool                                        compressed;
-        int                                         redeliveryCounter;
-        std::vector<decaf::lang::Pointer<BrokerId>> brokerPath;
-        long long                                   arrival;
-        std::string                                 userID;
-        bool                                        recievedByDFBridge;
-        bool                                        droppable;
-        std::vector<decaf::lang::Pointer<BrokerId>> cluster;
-        long long                                   brokerInTime;
-        long long                                   brokerOutTime;
-        bool                                        jMSXGroupFirstForConsumer;
+        std::shared_ptr<ProducerId>                         producerId;
+        std::shared_ptr<ActiveMQDestination>                destination;
+        std::shared_ptr<TransactionId>                      transactionId;
+        std::shared_ptr<ActiveMQDestination>                originalDestination;
+        std::shared_ptr<MessageId>                          messageId;
+        std::shared_ptr<TransactionId>                      originalTransactionId;
+        std::string                                         groupID;
+        int                                                 groupSequence;
+        std::string                                         correlationId;
+        bool                                                persistent;
+        long long                                           expiration;
+        unsigned char                                       priority;
+        std::shared_ptr<ActiveMQDestination>                replyTo;
+        long long                                           timestamp;
+        std::string                                         type;
+        std::vector<unsigned char>                          content;
+        std::vector<unsigned char>                          marshalledProperties;
+        std::shared_ptr<DataStructure>                      dataStructure;
+        std::shared_ptr<ConsumerId>                         targetConsumerId;
+        bool                                                compressed;
+        int                                                 redeliveryCounter;
+        std::vector<std::shared_ptr<BrokerId>>              brokerPath;
+        long long                                           arrival;
+        std::string                                         userID;
+        bool                                                recievedByDFBridge;
+        bool                                                droppable;
+        std::vector<std::shared_ptr<BrokerId>>              cluster;
+        long long                                           brokerInTime;
+        long long                                           brokerOutTime;
+        bool                                                jMSXGroupFirstForConsumer;
 
     public:
         const static unsigned char ID_MESSAGE = 0;
@@ -101,7 +99,7 @@ namespace commands
     private:
         // Used to allow a client to call Message::acknowledge when in the
         // Client Ack mode.
-        Pointer<core::ActiveMQAckHandler> ackHandler;
+        std::shared_ptr<core::ActiveMQAckHandler> ackHandler;
 
         // Message properties, these are Marshaled and Unmarshaled from the
         // Message Command's marshaledProperties vector.
@@ -158,18 +156,15 @@ namespace commands
         virtual bool equals(const DataStructure* value) const;
 
         /**
-         * Create a Pointer based copy of this message.  Useful for chaining a
+         * Create a shared_ptr based copy of this message.  Useful for chaining a
          * clone operation with other operation such as casting to a cms Message
          * type.
          *
-         *   Pointer<cms::Message> cmsMsg =
-         * message->copy().dynamic_cast<cms::Message>();
-         *
-         * @return a Pointer<Message> which is a duplicate of this object.
+         * @return a std::shared_ptr<Message> which is a duplicate of this object.
          */
-        Pointer<Message> copy() const
+        std::shared_ptr<Message> copy() const
         {
-            return Pointer<Message>(this->cloneDataStructure());
+            return std::shared_ptr<Message>(this->cloneDataStructure());
         }
 
         /**
@@ -205,7 +200,7 @@ namespace commands
          * @param handler ActiveMQAckHandler to call
          */
         virtual void setAckHandler(
-            const Pointer<core::ActiveMQAckHandler>& handler)
+            const std::shared_ptr<core::ActiveMQAckHandler>& handler)
         {
             this->ackHandler = handler;
         }
@@ -215,7 +210,7 @@ namespace commands
          * when the Acknowledge method is called.
          * @return handler ActiveMQAckHandler to call or NULL if not set
          */
-        virtual Pointer<core::ActiveMQAckHandler> getAckHandler() const
+        virtual std::shared_ptr<core::ActiveMQAckHandler> getAckHandler() const
         {
             return this->ackHandler;
         }
@@ -322,34 +317,34 @@ namespace commands
             this->readOnlyBody = value;
         }
 
-        virtual const Pointer<ProducerId>& getProducerId() const;
-        virtual Pointer<ProducerId>&       getProducerId();
-        virtual void setProducerId(const Pointer<ProducerId>& producerId);
+        virtual const std::shared_ptr<ProducerId>& getProducerId() const;
+        virtual std::shared_ptr<ProducerId>&       getProducerId();
+        virtual void setProducerId(const std::shared_ptr<ProducerId>& producerId);
 
-        virtual const Pointer<ActiveMQDestination>& getDestination() const;
-        virtual Pointer<ActiveMQDestination>&       getDestination();
-        virtual void                                setDestination(
-                                           const Pointer<ActiveMQDestination>& destination);
+        virtual const std::shared_ptr<ActiveMQDestination>& getDestination() const;
+        virtual std::shared_ptr<ActiveMQDestination>&       getDestination();
+        virtual void                                        setDestination(
+                                           const std::shared_ptr<ActiveMQDestination>& destination);
 
-        virtual const Pointer<TransactionId>& getTransactionId() const;
-        virtual Pointer<TransactionId>&       getTransactionId();
-        virtual void                          setTransactionId(
-                                     const Pointer<TransactionId>& transactionId);
+        virtual const std::shared_ptr<TransactionId>& getTransactionId() const;
+        virtual std::shared_ptr<TransactionId>&       getTransactionId();
+        virtual void                                  setTransactionId(
+                                     const std::shared_ptr<TransactionId>& transactionId);
 
-        virtual const Pointer<ActiveMQDestination>& getOriginalDestination()
+        virtual const std::shared_ptr<ActiveMQDestination>& getOriginalDestination()
             const;
-        virtual Pointer<ActiveMQDestination>& getOriginalDestination();
-        virtual void                          setOriginalDestination(
-                                     const Pointer<ActiveMQDestination>& originalDestination);
+        virtual std::shared_ptr<ActiveMQDestination>& getOriginalDestination();
+        virtual void                                  setOriginalDestination(
+                                     const std::shared_ptr<ActiveMQDestination>& originalDestination);
 
-        virtual const Pointer<MessageId>& getMessageId() const;
-        virtual Pointer<MessageId>&       getMessageId();
-        virtual void setMessageId(const Pointer<MessageId>& messageId);
+        virtual const std::shared_ptr<MessageId>& getMessageId() const;
+        virtual std::shared_ptr<MessageId>&       getMessageId();
+        virtual void setMessageId(const std::shared_ptr<MessageId>& messageId);
 
-        virtual const Pointer<TransactionId>& getOriginalTransactionId() const;
-        virtual Pointer<TransactionId>&       getOriginalTransactionId();
-        virtual void                          setOriginalTransactionId(
-                                     const Pointer<TransactionId>& originalTransactionId);
+        virtual const std::shared_ptr<TransactionId>& getOriginalTransactionId() const;
+        virtual std::shared_ptr<TransactionId>&       getOriginalTransactionId();
+        virtual void                                  setOriginalTransactionId(
+                                     const std::shared_ptr<TransactionId>& originalTransactionId);
 
         virtual const std::string& getGroupID() const;
         virtual std::string&       getGroupID();
@@ -371,9 +366,9 @@ namespace commands
         virtual unsigned char getPriority() const;
         virtual void          setPriority(unsigned char priority);
 
-        virtual const Pointer<ActiveMQDestination>& getReplyTo() const;
-        virtual Pointer<ActiveMQDestination>&       getReplyTo();
-        virtual void setReplyTo(const Pointer<ActiveMQDestination>& replyTo);
+        virtual const std::shared_ptr<ActiveMQDestination>& getReplyTo() const;
+        virtual std::shared_ptr<ActiveMQDestination>&       getReplyTo();
+        virtual void setReplyTo(const std::shared_ptr<ActiveMQDestination>& replyTo);
 
         virtual long long getTimestamp() const;
         virtual void      setTimestamp(long long timestamp);
@@ -392,15 +387,15 @@ namespace commands
         virtual void                        setMarshalledProperties(
                                    const std::vector<unsigned char>& marshalledProperties);
 
-        virtual const Pointer<DataStructure>& getDataStructure() const;
-        virtual Pointer<DataStructure>&       getDataStructure();
-        virtual void                          setDataStructure(
-                                     const Pointer<DataStructure>& dataStructure);
+        virtual const std::shared_ptr<DataStructure>& getDataStructure() const;
+        virtual std::shared_ptr<DataStructure>&       getDataStructure();
+        virtual void                                  setDataStructure(
+                                     const std::shared_ptr<DataStructure>& dataStructure);
 
-        virtual const Pointer<ConsumerId>& getTargetConsumerId() const;
-        virtual Pointer<ConsumerId>&       getTargetConsumerId();
-        virtual void                       setTargetConsumerId(
-                                  const Pointer<ConsumerId>& targetConsumerId);
+        virtual const std::shared_ptr<ConsumerId>& getTargetConsumerId() const;
+        virtual std::shared_ptr<ConsumerId>&       getTargetConsumerId();
+        virtual void                               setTargetConsumerId(
+                                  const std::shared_ptr<ConsumerId>& targetConsumerId);
 
         virtual bool isCompressed() const;
         virtual void setCompressed(bool compressed);
@@ -408,11 +403,11 @@ namespace commands
         virtual int  getRedeliveryCounter() const;
         virtual void setRedeliveryCounter(int redeliveryCounter);
 
-        virtual const std::vector<decaf::lang::Pointer<BrokerId>>&
+        virtual const std::vector<std::shared_ptr<BrokerId>>&
         getBrokerPath() const;
-        virtual std::vector<decaf::lang::Pointer<BrokerId>>& getBrokerPath();
-        virtual void                                         setBrokerPath(
-                                                    const std::vector<decaf::lang::Pointer<BrokerId>>& brokerPath);
+        virtual std::vector<std::shared_ptr<BrokerId>>& getBrokerPath();
+        virtual void                                    setBrokerPath(
+                                                    const std::vector<std::shared_ptr<BrokerId>>& brokerPath);
 
         virtual long long getArrival() const;
         virtual void      setArrival(long long arrival);
@@ -427,11 +422,11 @@ namespace commands
         virtual bool isDroppable() const;
         virtual void setDroppable(bool droppable);
 
-        virtual const std::vector<decaf::lang::Pointer<BrokerId>>& getCluster()
+        virtual const std::vector<std::shared_ptr<BrokerId>>& getCluster()
             const;
-        virtual std::vector<decaf::lang::Pointer<BrokerId>>& getCluster();
-        virtual void                                         setCluster(
-                                                    const std::vector<decaf::lang::Pointer<BrokerId>>& cluster);
+        virtual std::vector<std::shared_ptr<BrokerId>>& getCluster();
+        virtual void                                    setCluster(
+                                                    const std::vector<std::shared_ptr<BrokerId>>& cluster);
 
         virtual long long getBrokerInTime() const;
         virtual void      setBrokerInTime(long long brokerInTime);
@@ -451,7 +446,7 @@ namespace commands
             return true;
         }
 
-        virtual Pointer<Command> visit(activemq::state::CommandVisitor* visitor);
+        virtual std::shared_ptr<Command> visit(activemq::state::CommandVisitor* visitor);
     };
 
 }  // namespace commands

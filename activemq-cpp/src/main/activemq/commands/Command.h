@@ -21,7 +21,7 @@
 #include <activemq/commands/BaseDataStructure.h>
 #include <activemq/exceptions/ActiveMQException.h>
 #include <activemq/util/Config.h>
-#include <decaf/lang/Pointer.h>
+#include <memory>
 #include <string>
 
 namespace activemq
@@ -79,7 +79,7 @@ namespace commands
          * @return a Response to the visitor being called or NULL if no
          * response.
          */
-        virtual decaf::lang::Pointer<commands::Command> visit(
+        virtual std::shared_ptr<commands::Command> visit(
             activemq::state::CommandVisitor* visitor) = 0;
 
         /*

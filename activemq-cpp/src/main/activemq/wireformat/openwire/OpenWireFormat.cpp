@@ -30,8 +30,6 @@
 #include <activemq/wireformat/openwire/utils/BooleanStream.h>
 #include <decaf/io/ByteArrayOutputStream.h>
 #include <decaf/lang/Boolean.h>
-#include <decaf/lang/Integer.h>
-#include <decaf/lang/Long.h>
 #include <decaf/lang/Math.h>
 #include <decaf/util/UUID.h>
 
@@ -92,12 +90,12 @@ OpenWireFormat::~OpenWireFormat()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Transport> OpenWireFormat::createNegotiator(
-    const Pointer<Transport> transport)
+std::shared_ptr<Transport> OpenWireFormat::createNegotiator(
+    const std::shared_ptr<Transport> transport)
 {
     try
     {
-        return Pointer<Transport>(
+        return std::shared_ptr<Transport>(
             new OpenWireFormatNegotiator(this, transport));
     }
     AMQ_CATCH_RETHROW(UnsupportedOperationException)
@@ -155,15 +153,15 @@ void OpenWireFormat::addMarshaller(DataStreamMarshaller* marshaller)
 
 ////////////////////////////////////////////////////////////////////////////////
 void OpenWireFormat::setPreferedWireFormatInfo(
-    const Pointer<commands::WireFormatInfo> info)
+    const std::shared_ptr<commands::WireFormatInfo> info)
 {
     this->preferedWireFormatInfo = info;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenWireFormat::marshal(const Pointer<commands::Command>      command,
-                             const activemq::transport::Transport* transport,
-                             decaf::io::DataOutputStream*          dataOut)
+void OpenWireFormat::marshal(const std::shared_ptr<commands::Command> command,
+                             const activemq::transport::Transport*    transport,
+                             decaf::io::DataOutputStream*             dataOut)
 {
     if (transport == NULL)
     {
@@ -198,7 +196,7 @@ void OpenWireFormat::marshal(const Pointer<commands::Command>      command,
                     __FILE__,
                     __LINE__,
                     (string("OpenWireFormat::marshal - Unknown data type: ") +
-                     Integer::toString(type))
+                     std::to_string(type))
                         .c_str());
             }
 
@@ -270,7 +268,7 @@ void OpenWireFormat::marshal(const Pointer<commands::Command>      command,
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<commands::Command> OpenWireFormat::unmarshal(
+std::shared_ptr<commands::Command> OpenWireFormat::unmarshal(
     const activemq::transport::Transport* transport,
     decaf::io::DataInputStream*           dis)
 {
@@ -289,9 +287,9 @@ Pointer<commands::Command> OpenWireFormat::unmarshal(
         }
 
         // Get the unmarshalled DataStructure
-        Pointer<DataStructure> data(doUnmarshal(transport, dis));
+        std::shared_ptr<DataStructure> data(doUnmarshal(transport, dis));
 
-        if (data == NULL)
+        if (!data)
         {
             throw IOException(__FILE__,
                               __LINE__,
@@ -302,7 +300,7 @@ Pointer<commands::Command> OpenWireFormat::unmarshal(
         // Now all unmarshals from this level should result in an object
         // that is a commands::Command type, if its not then the cast will
         // throw an ClassCastException.
-        Pointer<Command> command = data.dynamicCast<Command>();
+        std::shared_ptr<Command> command = std::dynamic_pointer_cast<Command>(data);
 
         return command;
     }
@@ -329,25 +327,25 @@ commands::DataStructure* OpenWireFormat::doUnmarshal(
         class Finally
         {
         private:
-            decaf::util::concurrent::atomic::AtomicBoolean* state;
-            const activemq::transport::Transport**          transportPtr;
+            std::atomic<bool>*                     state;
+            const activemq::transport::Transport** transportPtr;
 
         private:
             Finally(const Finally&);
             Finally& operator=(const Finally&);
 
         public:
-            Finally(decaf::util::concurrent::atomic::AtomicBoolean* state,
+            Finally(std::atomic<bool>*                     state,
                     const activemq::transport::Transport** transportPtr)
                 : state(state),
                   transportPtr(transportPtr)
             {
-                state->set(true);
+                state->store(true);
             }
 
             ~Finally()
             {
-                state->set(false);
+                state->store(false);
                 if (transportPtr != nullptr)
                 {
                     *transportPtr = nullptr;
@@ -370,7 +368,7 @@ commands::DataStructure* OpenWireFormat::doUnmarshal(
                     __FILE__,
                     __LINE__,
                     (string("OpenWireFormat::marshal - Unknown data type: ") +
-                     Integer::toString(dataType))
+                     std::to_string(dataType))
                         .c_str());
             }
 
@@ -440,7 +438,7 @@ int OpenWireFormat::tightMarshalNestedObject1(commands::DataStructure* object,
                 __FILE__,
                 __LINE__,
                 (string("OpenWireFormat::marshal - Unknown data type: ") +
-                 Integer::toString(type))
+                 std::to_string(type))
                     .c_str());
         }
 
@@ -484,7 +482,7 @@ void OpenWireFormat::tightMarshalNestedObject2(DataStructure*    o,
                     __FILE__,
                     __LINE__,
                     (string("OpenWireFormat::marshal - Unknown data type: ") +
-                     Integer::toString(type))
+                     std::to_string(type))
                         .c_str());
             }
 
@@ -515,7 +513,7 @@ DataStructure* OpenWireFormat::tightUnmarshalNestedObject(DataInputStream* dis,
                     __FILE__,
                     __LINE__,
                     (string("OpenWireFormat::marshal - Unknown data type: ") +
-                     Integer::toString(dataType))
+                     std::to_string(dataType))
                         .c_str());
             }
 
@@ -567,7 +565,7 @@ DataStructure* OpenWireFormat::looseUnmarshalNestedObject(
                     __FILE__,
                     __LINE__,
                     (string("OpenWireFormat::marshal - Unknown data type: ") +
-                     Integer::toString(dataType))
+                     std::to_string(dataType))
                         .c_str());
             }
 
@@ -608,7 +606,7 @@ void OpenWireFormat::looseMarshalNestedObject(
                     __FILE__,
                     __LINE__,
                     (string("OpenWireFormat::marshal - Unknown data type: ") +
-                     Integer::toString(dataType))
+                     std::to_string(dataType))
                         .c_str());
             }
 
@@ -624,7 +622,7 @@ void OpenWireFormat::looseMarshalNestedObject(
 ////////////////////////////////////////////////////////////////////////////////
 void OpenWireFormat::renegotiateWireFormat(const WireFormatInfo& info)
 {
-    if (preferedWireFormatInfo == NULL)
+    if (!preferedWireFormatInfo)
     {
         throw IllegalStateException(__FILE__,
                                     __LINE__,

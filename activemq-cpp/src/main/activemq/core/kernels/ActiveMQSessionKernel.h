@@ -40,12 +40,10 @@
 #include <activemq/util/LongSequenceGenerator.h>
 #include <activemq/util/Usage.h>
 
-#include <decaf/lang/Pointer.h>
 #include <decaf/util/ArrayList.h>
 #include <decaf/util/Properties.h>
-#include <decaf/util/concurrent/atomic/AtomicBoolean.h>
-#include <decaf/util/concurrent/atomic/AtomicInteger.h>
 
+#include <atomic>
 #include <memory>
 #include <string>
 
@@ -62,9 +60,6 @@ namespace core
     namespace kernels
     {
 
-        using decaf::lang::Pointer;
-        using decaf::util::concurrent::atomic::AtomicBoolean;
-
         class SessionConfig;
 
         class AMQCPP_API ActiveMQSessionKernel : public virtual cms::Session,
@@ -79,12 +74,12 @@ namespace core
             /**
              * SessionInfo for this Session
              */
-            Pointer<commands::SessionInfo> sessionInfo;
+            std::shared_ptr<commands::SessionInfo> sessionInfo;
 
             /**
              * Transaction Management object
              */
-            Pointer<ActiveMQTransactionContext> transaction;
+            std::shared_ptr<ActiveMQTransactionContext> transaction;
 
             /**
              * Connection
@@ -95,7 +90,7 @@ namespace core
              * Indicates that this connection has been closed, it is no longer
              * usable after this becomes true
              */
-            AtomicBoolean closed;
+            std::atomic<bool> closed;
 
             /**
              * Sends incoming messages to the registered consumers.
@@ -132,10 +127,10 @@ namespace core
             ActiveMQSessionKernel& operator=(const ActiveMQSessionKernel&);
 
         public:
-            ActiveMQSessionKernel(ActiveMQConnection* connection,
-                                  const Pointer<commands::SessionId>& id,
-                                  cms::Session::AcknowledgeMode       ackMode,
-                                  const decaf::util::Properties& properties);
+            ActiveMQSessionKernel(ActiveMQConnection*                          connection,
+                                  const std::shared_ptr<commands::SessionId>& id,
+                                  cms::Session::AcknowledgeMode                ackMode,
+                                  const decaf::util::Properties&               properties);
 
             virtual ~ActiveMQSessionKernel();
 
@@ -146,6 +141,7 @@ namespace core
              * redelivered.
              */
             virtual void redispatch(MessageDispatchChannel& unconsumedMessages);
+
 
             /**
              * Stops asynchronous message delivery.
@@ -194,7 +190,7 @@ namespace core
              * Dispatches a message to a particular consumer.
              * @param message - the message to be dispatched
              */
-            virtual void dispatch(const Pointer<MessageDispatch>& message);
+            virtual void dispatch(const std::shared_ptr<MessageDispatch>& message);
 
         public:  // Implements Methods
             virtual void close();
@@ -291,15 +287,15 @@ namespace core
              * @throws CMSException if an error occurs while sending the
              * message.
              */
-            void send(kernels::ActiveMQProducerKernel*       producer,
-                      Pointer<commands::ActiveMQDestination> destination,
-                      cms::Message*                          message,
-                      int                                    deliveryMode,
-                      int                                    priority,
-                      long long                              timeToLive,
-                      util::MemoryUsage*                     producerWindow,
-                      long long                              sendTimeout,
-                      cms::AsyncCallback*                    onComplete);
+            void send(kernels::ActiveMQProducerKernel*                      producer,
+                      std::shared_ptr<commands::ActiveMQDestination>        destination,
+                      cms::Message*                                         message,
+                      int                                                   deliveryMode,
+                      int                                                   priority,
+                      long long                                             timeToLive,
+                      util::MemoryUsage*                                    producerWindow,
+                      long long                                             sendTimeout,
+                      cms::AsyncCallback*                                   onComplete);
 
             /**
              * This method gets any registered exception listener of this
@@ -362,9 +358,9 @@ namespace core
             }
 
             /**
-             * Gets a Pointer to this Session's Scheduler instance
+             * Gets a std::shared_ptr to this Session's Scheduler instance
              */
-            Pointer<threads::Scheduler> getScheduler() const;
+            std::shared_ptr<threads::Scheduler> getScheduler() const;
 
             /**
              * Gets the currently set Last Delivered Sequence Id
@@ -399,7 +395,7 @@ namespace core
              * @throws ActiveMQException if not currently connected, or if the
              *         operation fails for any reason.
              */
-            void oneway(Pointer<commands::Command> command);
+            void oneway(std::shared_ptr<commands::Command> command);
 
             /**
              * Sends a synchronous request and returns the response from the
@@ -411,15 +407,15 @@ namespace core
              *      The time to wait for a response, default is zero or
              * infinite.
              *
-             * @return Pointer to a Response object that the broker has returned
+             * @return std::shared_ptr to a Response object that the broker has returned
              * for the Command sent.
              *
              * @throws ActiveMQException thrown if an error response was
              * received from the broker, or if any other error occurred.
              */
-            Pointer<commands::Response> syncRequest(
-                Pointer<commands::Command> command,
-                unsigned int               timeout = 0);
+            std::shared_ptr<commands::Response> syncRequest(
+                std::shared_ptr<commands::Command> command,
+                unsigned int                       timeout = 0);
 
             /**
              * Adds a MessageConsumerKernel to this session registering it with
@@ -431,7 +427,7 @@ namespace core
              *
              * @throw ActiveMQException if an internal error occurs.
              */
-            void addConsumer(Pointer<ActiveMQConsumerKernel> consumer);
+            void addConsumer(std::shared_ptr<ActiveMQConsumerKernel> consumer);
 
             /**
              * Dispose of a MessageConsumer from this session.  Removes it from
@@ -443,7 +439,7 @@ namespace core
              *
              * @throw ActiveMQException if an internal error occurs.
              */
-            void removeConsumer(Pointer<ActiveMQConsumerKernel> consumer);
+            void removeConsumer(std::shared_ptr<ActiveMQConsumerKernel> consumer);
 
             /**
              * Adds a MessageProducer to this session registering it with the
@@ -455,7 +451,7 @@ namespace core
              *
              * @throw ActiveMQException if an internal error occurs.
              */
-            void addProducer(Pointer<ActiveMQProducerKernel> producer);
+            void addProducer(std::shared_ptr<ActiveMQProducerKernel> producer);
 
             /**
              * Dispose of a MessageProducer from this session.  Removes it from
@@ -466,7 +462,7 @@ namespace core
              *
              * @throw ActiveMQException if an internal error occurs.
              */
-            void removeProducer(Pointer<ActiveMQProducerKernel> producer);
+            void removeProducer(std::shared_ptr<ActiveMQProducerKernel> producer);
 
             /**
              * Starts if not already start a Transaction for this Session.  If
@@ -479,11 +475,11 @@ namespace core
             virtual void doStartTransaction();
 
             /**
-             * Gets the Pointer to this Session's TransactionContext
+             * Gets the std::shared_ptr to this Session's TransactionContext
              *
-             * @return a Pointer to this Session's TransactionContext
+             * @return a std::shared_ptr to this Session's TransactionContext
              */
-            Pointer<ActiveMQTransactionContext> getTransactionContext()
+            std::shared_ptr<ActiveMQTransactionContext> getTransactionContext()
             {
                 return this->transaction;
             }
@@ -505,8 +501,7 @@ namespace core
              * all messages that are currently in progress.
              */
             void clearMessagesInProgress(
-                decaf::lang::Pointer<
-                    decaf::util::concurrent::atomic::AtomicInteger>
+                std::shared_ptr<std::atomic<int>>
                     transportsInterrupted);
 
             /**
@@ -519,13 +514,13 @@ namespace core
              * Get the Next available Consumer Id
              * @return the next id in the sequence.
              */
-            Pointer<commands::ConsumerId> getNextConsumerId();
+            std::shared_ptr<commands::ConsumerId> getNextConsumerId();
 
             /**
              * Get the Next available Producer Id
              * @return the next id in the sequence.
              */
-            Pointer<commands::ProducerId> getNextProducerId();
+            std::shared_ptr<commands::ProducerId> getNextProducerId();
 
             /**
              * Performs the actual Session close operations.  This method is
@@ -553,8 +548,8 @@ namespace core
              * @param prefetch
              *      The new prefetch value.
              */
-            void setPrefetchSize(Pointer<commands::ConsumerId> id,
-                                 int                           prefetch);
+            void setPrefetchSize(std::shared_ptr<commands::ConsumerId> id,
+                                 int                                   prefetch);
 
             /**
              * Close the specified consumer if present in this Session.
@@ -562,7 +557,7 @@ namespace core
              * @param id
              *      The consumer Id to close.
              */
-            void close(Pointer<commands::ConsumerId> id);
+            void close(std::shared_ptr<commands::ConsumerId> id);
 
             /**
              * Checks if the given destination is currently in use by any
@@ -571,21 +566,21 @@ namespace core
              * @return true if there is a consumer of this destination in this
              * Session.
              */
-            bool isInUse(Pointer<commands::ActiveMQDestination> destination);
+            bool isInUse(std::shared_ptr<commands::ActiveMQDestination> destination);
 
             /**
-             * @return a Pointer to an ActiveMQProducerKernel using its
+             * @return a std::shared_ptr to an ActiveMQProducerKernel using its
              * ProducerId, or NULL.
              */
-            Pointer<ActiveMQProducerKernel> lookupProducerKernel(
-                Pointer<commands::ProducerId> id);
+            std::shared_ptr<ActiveMQProducerKernel> lookupProducerKernel(
+                std::shared_ptr<commands::ProducerId> id);
 
             /**
-             * @return a Pointer to an ActiveMQConsumerKernel using its
+             * @return a std::shared_ptr to an ActiveMQConsumerKernel using its
              * ConsumerId, or NULL.
              */
-            Pointer<ActiveMQConsumerKernel> lookupConsumerKernel(
-                Pointer<commands::ConsumerId> id);
+            std::shared_ptr<ActiveMQConsumerKernel> lookupConsumerKernel(
+                std::shared_ptr<commands::ConsumerId> id);
 
             /**
              * Gives each consumer a chance to dispatch messages that have been
@@ -623,7 +618,7 @@ namespace core
              * @param async
              *      True if the command can be sent asynchronously.
              */
-            void sendAck(decaf::lang::Pointer<commands::MessageAck> ack,
+            void sendAck(std::shared_ptr<commands::MessageAck> ack,
                          bool async = false);
 
             /**
@@ -650,7 +645,7 @@ namespace core
              * @return a list containing a pointer to each consumer active in
              * this session.
              */
-            decaf::util::ArrayList<Pointer<ActiveMQConsumerKernel>>
+            decaf::util::ArrayList<std::shared_ptr<ActiveMQConsumerKernel>>
             getConsumers() const;
 
         private:

@@ -25,8 +25,8 @@
 #include <activemq/transport/ResponseCallback.h>
 
 #include <decaf/io/InterruptedIOException.h>
-#include <decaf/lang/Pointer.h>
 #include <decaf/lang/Thread.h>
+#include <memory>
 #include <decaf/lang/exceptions/InterruptedException.h>
 #include <decaf/util/concurrent/CountDownLatch.h>
 #include <decaf/util/concurrent/Mutex.h>
@@ -37,7 +37,6 @@ namespace transport
 {
 
     using activemq::commands::Response;
-    using decaf::lang::Pointer;
 
     /**
      * A container that holds a response object.  Callers of the getResponse
@@ -48,13 +47,13 @@ namespace transport
     {
     private:
         mutable decaf::util::concurrent::CountDownLatch responseLatch;
-        Pointer<Response>                               response;
-        Pointer<ResponseCallback>                       responseCallback;
+        std::shared_ptr<Response>                               response;
+        std::shared_ptr<ResponseCallback>                       responseCallback;
 
     public:
         FutureResponse();
 
-        FutureResponse(const Pointer<ResponseCallback> responseCallback);
+        FutureResponse(const std::shared_ptr<ResponseCallback> responseCallback);
 
         virtual ~FutureResponse();
 
@@ -66,8 +65,8 @@ namespace transport
          * @throws InterruptedIOException if the wait for response is
          * interrupted.
          */
-        Pointer<Response> getResponse() const;
-        Pointer<Response> getResponse();
+        std::shared_ptr<Response> getResponse() const;
+        std::shared_ptr<Response> getResponse();
 
         /**
          * Getters for the response property. Timed Wait.
@@ -80,14 +79,14 @@ namespace transport
          * @throws InterruptedIOException if the wait for response is
          * interrupted.
          */
-        Pointer<Response> getResponse(unsigned int timeout) const;
-        Pointer<Response> getResponse(unsigned int timeout);
+        std::shared_ptr<Response> getResponse(unsigned int timeout) const;
+        std::shared_ptr<Response> getResponse(unsigned int timeout);
 
         /**
          * Setter for the response property.
          * @param response the response object for the request.
          */
-        void setResponse(Pointer<Response> response);
+        void setResponse(std::shared_ptr<Response> response);
     };
 
 }  // namespace transport

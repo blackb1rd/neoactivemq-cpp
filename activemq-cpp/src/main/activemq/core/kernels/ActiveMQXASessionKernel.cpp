@@ -29,9 +29,9 @@ using namespace decaf::lang;
 
 ////////////////////////////////////////////////////////////////////////////////
 ActiveMQXASessionKernel::ActiveMQXASessionKernel(
-    ActiveMQConnection*                 connection,
-    const Pointer<commands::SessionId>& sessionId,
-    const decaf::util::Properties&      properties)
+    ActiveMQConnection*                              connection,
+    const std::shared_ptr<commands::SessionId>&      sessionId,
+    const decaf::util::Properties&                   properties)
     : ActiveMQSessionKernel(connection,
                             sessionId,
                             cms::Session::AUTO_ACKNOWLEDGE,

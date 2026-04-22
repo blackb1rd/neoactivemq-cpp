@@ -18,6 +18,8 @@
 #ifndef _ACTIVEMQ_TRANSPORT_MOCK_MOCKTRANSPORTFACTORY_H_
 #define _ACTIVEMQ_TRANSPORT_MOCK_MOCKTRANSPORTFACTORY_H_
 
+#include <memory>
+
 #include <activemq/transport/AbstractTransportFactory.h>
 #include <activemq/util/Config.h>
 
@@ -27,8 +29,6 @@ namespace transport
 {
     namespace mock
     {
-
-        using decaf::lang::Pointer;
 
         /**
          * Manufactures MockTransports, which are objects that
@@ -48,7 +48,7 @@ namespace transport
              * to assign.
              * @throws ActiveMQexception if an error occurs
              */
-            virtual Pointer<Transport> create(const decaf::net::URI& location);
+            virtual std::shared_ptr<Transport> create(const decaf::net::URI& location);
 
             /**
              * Creates a slimed down Transport instance which can be used in
@@ -57,7 +57,7 @@ namespace transport
              * to assign.
              * @throws ActiveMQexception if an error occurs
              */
-            virtual Pointer<Transport> createComposite(
+            virtual std::shared_ptr<Transport> createComposite(
                 const decaf::net::URI& location);
 
         protected:
@@ -73,10 +73,10 @@ namespace transport
              * @return Pointer to a new Transport instance.
              * @throws ActiveMQexception if an error occurs
              */
-            virtual Pointer<Transport> doCreateComposite(
-                const decaf::net::URI&                location,
-                const Pointer<wireformat::WireFormat> wireFormat,
-                const decaf::util::Properties&        properties);
+            virtual std::shared_ptr<Transport> doCreateComposite(
+                const decaf::net::URI&                        location,
+                const std::shared_ptr<wireformat::WireFormat> wireFormat,
+                const decaf::util::Properties&                properties);
         };
 
     }  // namespace mock

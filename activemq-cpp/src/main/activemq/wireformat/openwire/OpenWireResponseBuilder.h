@@ -20,8 +20,8 @@
 
 #include <activemq/transport/mock/ResponseBuilder.h>
 #include <activemq/util/Config.h>
-#include <decaf/lang/Pointer.h>
 #include <decaf/util/LinkedList.h>
+#include <memory>
 
 namespace activemq
 {
@@ -29,8 +29,6 @@ namespace wireformat
 {
     namespace openwire
     {
-
-        using decaf::lang::Pointer;
 
         /**
          * Used to allow a MockTransport to generate response commands to
@@ -48,12 +46,12 @@ namespace wireformat
             {
             }
 
-            virtual Pointer<commands::Response> buildResponse(
-                const Pointer<commands::Command> command);
+            virtual std::shared_ptr<commands::Response> buildResponse(
+                const std::shared_ptr<commands::Command> command);
 
             virtual void buildIncomingCommands(
-                const Pointer<commands::Command>                     command,
-                decaf::util::LinkedList<Pointer<commands::Command>>& queue);
+                const std::shared_ptr<commands::Command>                     command,
+                decaf::util::LinkedList<std::shared_ptr<commands::Command>>& queue);
         };
 
     }  // namespace openwire

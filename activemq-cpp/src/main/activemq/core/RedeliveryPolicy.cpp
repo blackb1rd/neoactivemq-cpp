@@ -19,8 +19,6 @@
 
 #include <decaf/lang/Boolean.h>
 #include <decaf/lang/Double.h>
-#include <decaf/lang/Integer.h>
-#include <decaf/lang/Long.h>
 #include <decaf/lang/Short.h>
 
 using namespace activemq;
@@ -63,18 +61,18 @@ void RedeliveryPolicy::configure(const decaf::util::Properties& properties)
                 "cms.redeliveryPolicy.initialRedeliveryDelay"))
         {
             this->setInitialRedeliveryDelay(
-                Long::parseLong(properties.getProperty(
+                std::stoll(properties.getProperty(
                     "cms.redeliveryPolicy.initialRedeliveryDelay")));
         }
         if (properties.hasProperty("cms.redeliveryPolicy.redeliveryDelay"))
         {
-            this->setRedeliveryDelay(Long::parseLong(properties.getProperty(
+            this->setRedeliveryDelay(std::stoll(properties.getProperty(
                 "cms.redeliveryPolicy.redeliveryDelay")));
         }
         if (properties.hasProperty("cms.redeliveryPolicy.maximumRedeliveries"))
         {
             this->setMaximumRedeliveries(
-                Integer::parseInt(properties.getProperty(
+                std::stoi(properties.getProperty(
                     "cms.redeliveryPolicy.maximumRedeliveries")));
         }
         if (properties.hasProperty(
@@ -94,7 +92,7 @@ void RedeliveryPolicy::configure(const decaf::util::Properties& properties)
         if (properties.hasProperty("cms.redeliveryPolicy.maxRedeliveryDelay"))
         {
             this->setMaximumRedeliveryDelay(
-                Long::parseLong(properties.getProperty("cms.redeliveryPolicy."
+                std::stoll(properties.getProperty("cms.redeliveryPolicy."
                                                        "maxRedeliveryDelay")));
         }
     }

@@ -62,7 +62,7 @@ void ServiceSupport::dispose(Service* service)
 ////////////////////////////////////////////////////////////////////////////////
 void ServiceSupport::start()
 {
-    if (started.compareAndSet(false, true))
+    if (!started.exchange(true))
     {
         bool success = false;
         try
@@ -72,11 +72,11 @@ void ServiceSupport::start()
         }
         catch (...)
         {
-            this->started.set(success);
+            this->started.store(success);
         }
 
-        this->stopping.set(false);
-        this->stopped.set(!success);
+        this->stopping.store(false);
+        this->stopped.store(!success);
 
         synchronized(&this->listeners)
         {
@@ -93,9 +93,9 @@ void ServiceSupport::start()
 ////////////////////////////////////////////////////////////////////////////////
 void ServiceSupport::stop()
 {
-    if (this->stopped.compareAndSet(false, true))
+    if (!this->stopped.exchange(true))
     {
-        this->stopping.set(true);
+        this->stopping.store(true);
         ServiceStopper stopper;
         try
         {
@@ -106,9 +106,9 @@ void ServiceSupport::stop()
             stopper.onException(this, e);
         }
 
-        this->stopped.set(true);
-        this->started.set(false);
-        this->stopping.set(false);
+        this->stopped.store(true);
+        this->started.store(false);
+        this->stopping.store(false);
 
         synchronized(&this->listeners)
         {
@@ -127,19 +127,19 @@ void ServiceSupport::stop()
 ////////////////////////////////////////////////////////////////////////////////
 bool ServiceSupport::isStarted() const
 {
-    return this->started.get();
+    return this->started.load();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 bool ServiceSupport::isStopping() const
 {
-    return this->stopping.get();
+    return this->stopping.load();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 bool ServiceSupport::isStopped() const
 {
-    return this->stopped.get();
+    return this->stopped.load();
 }
 
 ////////////////////////////////////////////////////////////////////////////////

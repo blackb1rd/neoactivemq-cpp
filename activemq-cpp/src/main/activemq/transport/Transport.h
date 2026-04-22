@@ -28,10 +28,10 @@
 #include <decaf/io/IOException.h>
 #include <decaf/io/InputStream.h>
 #include <decaf/io/OutputStream.h>
-#include <decaf/lang/Pointer.h>
 #include <decaf/lang/exceptions/UnsupportedOperationException.h>
 #include <decaf/net/URI.h>
 #include <decaf/util/List.h>
+#include <memory>
 #include <typeinfo>
 
 namespace activemq
@@ -49,7 +49,6 @@ namespace transport
 
     using activemq::commands::Command;
     using activemq::commands::Response;
-    using decaf::lang::Pointer;
 
     /**
      * Interface for a transport layer for command objects.  Callers can
@@ -94,7 +93,7 @@ namespace transport
          * @throws UnsupportedOperationException if this method is not
          * implemented by this transport.
          */
-        virtual void oneway(const Pointer<Command> command) = 0;
+        virtual void oneway(const std::shared_ptr<Command> command) = 0;
 
         /**
          * Sends a commands asynchronously, returning a FutureResponse object
@@ -115,9 +114,9 @@ namespace transport
          * @throws UnsupportedOperationException if this method is not
          * implemented by this transport.
          */
-        virtual Pointer<FutureResponse> asyncRequest(
-            const Pointer<Command>          command,
-            const Pointer<ResponseCallback> responseCallback) = 0;
+        virtual std::shared_ptr<FutureResponse> asyncRequest(
+            const std::shared_ptr<Command>          command,
+            const std::shared_ptr<ResponseCallback> responseCallback) = 0;
 
         /**
          * Sends the given command to the broker and then waits for the
@@ -132,7 +131,7 @@ namespace transport
          * @throws UnsupportedOperationException if this method is not
          * implemented by this transport.
          */
-        virtual Pointer<Response> request(const Pointer<Command> command) = 0;
+        virtual std::shared_ptr<Response> request(const std::shared_ptr<Command> command) = 0;
 
         /**
          * Sends the given command to the broker and then waits for the
@@ -150,7 +149,7 @@ namespace transport
          * @throws UnsupportedOperationException if this method is not
          * implemented by this transport.
          */
-        virtual Pointer<Response> request(const Pointer<Command> command,
+        virtual std::shared_ptr<Response> request(const std::shared_ptr<Command> command,
                                           unsigned int           timeout) = 0;
 
         /**
@@ -160,7 +159,7 @@ namespace transport
          *
          * @return The WireFormat the object used to encode / decode commands.
          */
-        virtual Pointer<wireformat::WireFormat> getWireFormat() const = 0;
+        virtual std::shared_ptr<wireformat::WireFormat> getWireFormat() const = 0;
 
         /**
          * Sets the WireFormat instance to use.
@@ -168,7 +167,7 @@ namespace transport
          *      The WireFormat the object used to encode / decode commands.
          */
         virtual void setWireFormat(
-            const Pointer<wireformat::WireFormat> wireFormat) = 0;
+            const std::shared_ptr<wireformat::WireFormat> wireFormat) = 0;
 
         /**
          * Sets the observer of asynchronous events from this transport.

@@ -20,7 +20,7 @@
 
 #include <activemq/exceptions/ActiveMQException.h>
 #include <activemq/util/Config.h>
-#include <decaf/lang/Pointer.h>
+#include <memory>
 
 namespace activemq
 {
@@ -76,123 +76,123 @@ namespace state
     public:
         virtual ~CommandVisitor();
 
-        virtual decaf::lang::Pointer<commands::Command> processTransactionInfo(
+        virtual std::shared_ptr<commands::Command> processTransactionInfo(
             commands::TransactionInfo* info) = 0;
 
-        virtual decaf::lang::Pointer<commands::Command> processRemoveInfo(
+        virtual std::shared_ptr<commands::Command> processRemoveInfo(
             commands::RemoveInfo* info) = 0;
 
-        virtual decaf::lang::Pointer<commands::Command> processConnectionInfo(
+        virtual std::shared_ptr<commands::Command> processConnectionInfo(
             commands::ConnectionInfo* info) = 0;
 
-        virtual decaf::lang::Pointer<commands::Command> processSessionInfo(
+        virtual std::shared_ptr<commands::Command> processSessionInfo(
             commands::SessionInfo* info) = 0;
 
-        virtual decaf::lang::Pointer<commands::Command> processProducerInfo(
+        virtual std::shared_ptr<commands::Command> processProducerInfo(
             commands::ProducerInfo* info) = 0;
 
-        virtual decaf::lang::Pointer<commands::Command> processConsumerInfo(
+        virtual std::shared_ptr<commands::Command> processConsumerInfo(
             commands::ConsumerInfo* info) = 0;
 
-        virtual decaf::lang::Pointer<commands::Command> processRemoveConnection(
+        virtual std::shared_ptr<commands::Command> processRemoveConnection(
             commands::ConnectionId* id) = 0;
 
-        virtual decaf::lang::Pointer<commands::Command> processRemoveSession(
+        virtual std::shared_ptr<commands::Command> processRemoveSession(
             commands::SessionId* id) = 0;
 
-        virtual decaf::lang::Pointer<commands::Command> processRemoveProducer(
+        virtual std::shared_ptr<commands::Command> processRemoveProducer(
             commands::ProducerId* id) = 0;
 
-        virtual decaf::lang::Pointer<commands::Command> processRemoveConsumer(
+        virtual std::shared_ptr<commands::Command> processRemoveConsumer(
             commands::ConsumerId* id) = 0;
 
-        virtual decaf::lang::Pointer<commands::Command> processDestinationInfo(
+        virtual std::shared_ptr<commands::Command> processDestinationInfo(
             commands::DestinationInfo* info) = 0;
 
-        virtual decaf::lang::Pointer<commands::Command>
+        virtual std::shared_ptr<commands::Command>
         processRemoveDestination(commands::DestinationInfo* info) = 0;
 
-        virtual decaf::lang::Pointer<commands::Command>
+        virtual std::shared_ptr<commands::Command>
         processRemoveSubscriptionInfo(
             commands::RemoveSubscriptionInfo* info) = 0;
 
-        virtual decaf::lang::Pointer<commands::Command> processMessage(
+        virtual std::shared_ptr<commands::Command> processMessage(
             commands::Message* send) = 0;
 
-        virtual decaf::lang::Pointer<commands::Command> processMessageAck(
+        virtual std::shared_ptr<commands::Command> processMessageAck(
             commands::MessageAck* ack) = 0;
 
-        virtual decaf::lang::Pointer<commands::Command> processMessagePull(
+        virtual std::shared_ptr<commands::Command> processMessagePull(
             commands::MessagePull* pull) = 0;
 
-        virtual decaf::lang::Pointer<commands::Command> processBeginTransaction(
+        virtual std::shared_ptr<commands::Command> processBeginTransaction(
             commands::TransactionInfo* info) = 0;
 
-        virtual decaf::lang::Pointer<commands::Command>
+        virtual std::shared_ptr<commands::Command>
         processPrepareTransaction(commands::TransactionInfo* info) = 0;
 
-        virtual decaf::lang::Pointer<commands::Command>
+        virtual std::shared_ptr<commands::Command>
         processCommitTransactionOnePhase(commands::TransactionInfo* info) = 0;
 
-        virtual decaf::lang::Pointer<commands::Command>
+        virtual std::shared_ptr<commands::Command>
         processCommitTransactionTwoPhase(commands::TransactionInfo* info) = 0;
 
-        virtual decaf::lang::Pointer<commands::Command>
+        virtual std::shared_ptr<commands::Command>
         processRollbackTransaction(commands::TransactionInfo* info) = 0;
 
-        virtual decaf::lang::Pointer<commands::Command> processWireFormat(
+        virtual std::shared_ptr<commands::Command> processWireFormat(
             commands::WireFormatInfo* info) = 0;
 
-        virtual decaf::lang::Pointer<commands::Command> processKeepAliveInfo(
+        virtual std::shared_ptr<commands::Command> processKeepAliveInfo(
             commands::KeepAliveInfo* info) = 0;
 
-        virtual decaf::lang::Pointer<commands::Command> processShutdownInfo(
+        virtual std::shared_ptr<commands::Command> processShutdownInfo(
             commands::ShutdownInfo* info) = 0;
 
-        virtual decaf::lang::Pointer<commands::Command> processFlushCommand(
+        virtual std::shared_ptr<commands::Command> processFlushCommand(
             commands::FlushCommand* command) = 0;
 
-        virtual decaf::lang::Pointer<commands::Command> processBrokerInfo(
+        virtual std::shared_ptr<commands::Command> processBrokerInfo(
             commands::BrokerInfo* info) = 0;
 
-        virtual decaf::lang::Pointer<commands::Command>
+        virtual std::shared_ptr<commands::Command>
         processRecoverTransactions(commands::TransactionInfo* info) = 0;
 
-        virtual decaf::lang::Pointer<commands::Command>
+        virtual std::shared_ptr<commands::Command>
         processForgetTransaction(commands::TransactionInfo* info) = 0;
 
-        virtual decaf::lang::Pointer<commands::Command> processEndTransaction(
+        virtual std::shared_ptr<commands::Command> processEndTransaction(
             commands::TransactionInfo* info) = 0;
 
-        virtual decaf::lang::Pointer<commands::Command>
+        virtual std::shared_ptr<commands::Command>
         processMessageDispatchNotification(
             commands::MessageDispatchNotification* notification) = 0;
 
-        virtual decaf::lang::Pointer<commands::Command> processProducerAck(
+        virtual std::shared_ptr<commands::Command> processProducerAck(
             commands::ProducerAck* ack) = 0;
 
-        virtual decaf::lang::Pointer<commands::Command> processMessageDispatch(
+        virtual std::shared_ptr<commands::Command> processMessageDispatch(
             commands::MessageDispatch* dispatch) = 0;
 
-        virtual decaf::lang::Pointer<commands::Command> processControlCommand(
+        virtual std::shared_ptr<commands::Command> processControlCommand(
             commands::ControlCommand* command) = 0;
 
-        virtual decaf::lang::Pointer<commands::Command> processConnectionError(
+        virtual std::shared_ptr<commands::Command> processConnectionError(
             commands::ConnectionError* error) = 0;
 
-        virtual decaf::lang::Pointer<commands::Command>
+        virtual std::shared_ptr<commands::Command>
         processConnectionControl(commands::ConnectionControl* control) = 0;
 
-        virtual decaf::lang::Pointer<commands::Command> processConsumerControl(
+        virtual std::shared_ptr<commands::Command> processConsumerControl(
             commands::ConsumerControl* control) = 0;
 
-        virtual decaf::lang::Pointer<commands::Command> processBrokerError(
+        virtual std::shared_ptr<commands::Command> processBrokerError(
             commands::BrokerError* error) = 0;
 
-        virtual decaf::lang::Pointer<commands::Command> processReplayCommand(
+        virtual std::shared_ptr<commands::Command> processReplayCommand(
             commands::ReplayCommand* replay) = 0;
 
-        virtual decaf::lang::Pointer<commands::Command> processResponse(
+        virtual std::shared_ptr<commands::Command> processResponse(
             commands::Response* response) = 0;
     };
 

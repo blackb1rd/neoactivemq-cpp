@@ -23,7 +23,7 @@
 
 using namespace std;
 using namespace decaf;
-using namespace decaf::lang;
+
 using namespace decaf::lang::exceptions;
 using namespace activemq;
 using namespace activemq::exceptions;
@@ -202,7 +202,7 @@ bool WireFormatInfo::equals(const DataStructure* value) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<commands::Command> WireFormatInfo::visit(
+std::shared_ptr<commands::Command> WireFormatInfo::visit(
     activemq::state::CommandVisitor* visitor)
 {
     return visitor->processWireFormat(this);

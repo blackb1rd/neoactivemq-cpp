@@ -26,7 +26,7 @@
 #include <activemq/commands/DataStructure.h>
 #include <activemq/commands/Response.h>
 #include <activemq/util/Config.h>
-#include <decaf/lang/Pointer.h>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -34,8 +34,6 @@ namespace activemq
 {
 namespace commands
 {
-
-    using decaf::lang::Pointer;
 
     /*
      *
@@ -49,7 +47,7 @@ namespace commands
     class AMQCPP_API DataResponse : public Response
     {
     protected:
-        Pointer<DataStructure> data;
+        std::shared_ptr<DataStructure> data;
 
     public:
         const static unsigned char ID_DATARESPONSE = 32;
@@ -73,9 +71,9 @@ namespace commands
 
         virtual bool equals(const DataStructure* value) const;
 
-        virtual const Pointer<DataStructure>& getData() const;
-        virtual Pointer<DataStructure>&       getData();
-        virtual void setData(const Pointer<DataStructure>& data);
+        virtual const std::shared_ptr<DataStructure>& getData() const;
+        virtual std::shared_ptr<DataStructure>&       getData();
+        virtual void setData(const std::shared_ptr<DataStructure>& data);
     };
 
 }  // namespace commands

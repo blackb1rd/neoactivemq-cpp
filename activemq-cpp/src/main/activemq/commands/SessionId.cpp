@@ -30,7 +30,7 @@ using namespace std;
 using namespace activemq;
 using namespace activemq::exceptions;
 using namespace activemq::commands;
-using namespace decaf::lang;
+
 using namespace decaf::lang::exceptions;
 using namespace decaf::internal::util;
 
@@ -274,7 +274,7 @@ int SessionId::getHashCode() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const Pointer<ConnectionId>& SessionId::getParentId() const
+const std::shared_ptr<ConnectionId>& SessionId::getParentId() const
 {
     if (this->parentId == NULL)
     {

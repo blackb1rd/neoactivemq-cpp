@@ -18,10 +18,10 @@
 #include "ResponseCorrelator.h"
 #include <algorithm>
 
+#include <atomic>
 #include <decaf/util/ArrayList.h>
 #include <decaf/util/HashMap.h>
 #include <decaf/util/concurrent/Mutex.h>
-#include <decaf/util/concurrent/atomic/AtomicInteger.h>
 #include <decaf/util/logging/LoggerDefines.h>
 
 #include <activemq/commands/ExceptionResponse.h>
@@ -54,13 +54,13 @@ private:
 
 private:
     Mutex*                                          mutex;
-    int                                             commandId;
-    HashMap<unsigned int, Pointer<FutureResponse>>* map;
+    int                                                          commandId;
+    HashMap<unsigned int, std::shared_ptr<FutureResponse>>* map;
 
 public:
-    ResponseFinalizer(Mutex*                                          mutex,
-                      int                                             commandId,
-                      HashMap<unsigned int, Pointer<FutureResponse>>* map)
+    ResponseFinalizer(Mutex*                                               mutex,
+                      int                                                  commandId,
+                      HashMap<unsigned int, std::shared_ptr<FutureResponse>>* map)
         : mutex(mutex),
           commandId(commandId),
           map(map)
@@ -100,23 +100,22 @@ namespace transport
         {
         public:
             // The next command id for sent commands.
-            decaf::util::concurrent::atomic::AtomicInteger nextCommandId;
+            std::atomic<int> nextCommandId;
 
             // Map of request ids to future response objects.
-            HashMap<unsigned int, Pointer<FutureResponse>> requestMap;
+            HashMap<unsigned int, std::shared_ptr<FutureResponse>> requestMap;
 
             // Sync object for accessing the request map.
             decaf::util::concurrent::Mutex mapMutex;
 
             // Indicates that an the filter is now unusable from some error.
-            Pointer<Exception> priorError;
+            std::shared_ptr<Exception> priorError;
 
         public:
             CorrelatorData()
                 : nextCommandId(1),
                   requestMap(),
-                  mapMutex(),
-                  priorError(NULL)
+                  mapMutex()
             {
             }
         };
@@ -126,7 +125,7 @@ namespace transport
 }  // namespace activemq
 
 ////////////////////////////////////////////////////////////////////////////////
-ResponseCorrelator::ResponseCorrelator(Pointer<Transport> next)
+ResponseCorrelator::ResponseCorrelator(std::shared_ptr<Transport> next)
     : TransportFilter(next),
       impl(new CorrelatorData)
 {
@@ -146,13 +145,13 @@ ResponseCorrelator::~ResponseCorrelator()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ResponseCorrelator::oneway(const Pointer<Command> command)
+void ResponseCorrelator::oneway(const std::shared_ptr<Command> command)
 {
     try
     {
         checkClosed();
 
-        command->setCommandId(this->impl->nextCommandId.getAndIncrement());
+        command->setCommandId(this->impl->nextCommandId.fetch_add(1));
         command->setResponseRequired(false);
 
         next->oneway(command);
@@ -165,26 +164,26 @@ void ResponseCorrelator::oneway(const Pointer<Command> command)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<FutureResponse> ResponseCorrelator::asyncRequest(
-    const Pointer<Command>          command,
-    const Pointer<ResponseCallback> responseCallback)
+std::shared_ptr<FutureResponse> ResponseCorrelator::asyncRequest(
+    const std::shared_ptr<Command>          command,
+    const std::shared_ptr<ResponseCallback> responseCallback)
 {
     try
     {
         checkClosed();
 
-        command->setCommandId(this->impl->nextCommandId.getAndIncrement());
+        command->setCommandId(this->impl->nextCommandId.fetch_add(1));
         command->setResponseRequired(true);
 
         // Add a future response object to the map indexed by this command id.
-        Pointer<FutureResponse> futureResponse(
+        std::shared_ptr<FutureResponse> futureResponse(
             new FutureResponse(responseCallback));
-        Pointer<Exception> priorError;
+        std::shared_ptr<Exception> priorError;
 
         synchronized(&this->impl->mapMutex)
         {
             priorError = this->impl->priorError;
-            if (priorError == NULL)
+            if (!priorError)
             {
                 this->impl->requestMap.put(
                     (unsigned int)command->getCommandId(),
@@ -192,11 +191,11 @@ Pointer<FutureResponse> ResponseCorrelator::asyncRequest(
             }
         }
 
-        if (priorError != NULL)
+        if (priorError)
         {
-            Pointer<commands::BrokerError> exception(
+            std::shared_ptr<commands::BrokerError> exception(
                 new commands::BrokerError(priorError));
-            Pointer<commands::ExceptionResponse> response(
+            std::shared_ptr<commands::ExceptionResponse> response(
                 new commands::ExceptionResponse);
             response->setException(exception);
 
@@ -241,13 +240,13 @@ Pointer<FutureResponse> ResponseCorrelator::asyncRequest(
     AMQ_CATCHALL_THROW(IOException)
 }
 
-Pointer<Response> ResponseCorrelator::request(const Pointer<Command> command)
+std::shared_ptr<Response> ResponseCorrelator::request(const std::shared_ptr<Command> command)
 {
     try
     {
         checkClosed();
 
-        command->setCommandId(this->impl->nextCommandId.getAndIncrement());
+        command->setCommandId(this->impl->nextCommandId.fetch_add(1));
         command->setResponseRequired(true);
 
         AMQ_LOG_DEBUG(
@@ -257,13 +256,13 @@ Pointer<Response> ResponseCorrelator::request(const Pointer<Command> command)
                 << AMQLogger::commandTypeName(command->getDataStructureType()));
 
         // Add a future response object to the map indexed by this command id.
-        Pointer<FutureResponse> futureResponse(new FutureResponse());
-        Pointer<Exception>      priorError;
+        std::shared_ptr<FutureResponse> futureResponse(new FutureResponse());
+        std::shared_ptr<Exception>      priorError;
 
         synchronized(&this->impl->mapMutex)
         {
             priorError = this->impl->priorError;
-            if (priorError == NULL)
+            if (!priorError)
             {
                 this->impl->requestMap.put(
                     (unsigned int)command->getCommandId(),
@@ -282,7 +281,7 @@ Pointer<Response> ResponseCorrelator::request(const Pointer<Command> command)
             }
         }
 
-        if (priorError != NULL)
+        if (priorError)
         {
             throw IOException(__FILE__,
                               __LINE__,
@@ -295,7 +294,7 @@ Pointer<Response> ResponseCorrelator::request(const Pointer<Command> command)
                                     &this->impl->requestMap);
 
         // Wait to be notified of the response via the futureResponse object.
-        Pointer<commands::Response> response;
+        std::shared_ptr<commands::Response> response;
 
         // Send the request.
         next->oneway(command);
@@ -303,7 +302,7 @@ Pointer<Response> ResponseCorrelator::request(const Pointer<Command> command)
         // Get the response.
         response = futureResponse->getResponse();
 
-        if (response == NULL)
+        if (!response)
         {
             throw IOException(
                 __FILE__,
@@ -321,24 +320,24 @@ Pointer<Response> ResponseCorrelator::request(const Pointer<Command> command)
     AMQ_CATCHALL_THROW(IOException)
 }
 
-Pointer<Response> ResponseCorrelator::request(const Pointer<Command> command,
+std::shared_ptr<Response> ResponseCorrelator::request(const std::shared_ptr<Command> command,
                                               unsigned int           timeout)
 {
     try
     {
         checkClosed();
 
-        command->setCommandId(this->impl->nextCommandId.getAndIncrement());
+        command->setCommandId(this->impl->nextCommandId.fetch_add(1));
         command->setResponseRequired(true);
 
         // Add a future response object to the map indexed by this command id.
-        Pointer<FutureResponse> futureResponse(new FutureResponse());
-        Pointer<Exception>      priorError;
+        std::shared_ptr<FutureResponse> futureResponse(new FutureResponse());
+        std::shared_ptr<Exception>      priorError;
 
         synchronized(&this->impl->mapMutex)
         {
             priorError = this->impl->priorError;
-            if (priorError == NULL)
+            if (!priorError)
             {
                 this->impl->requestMap.put(
                     (unsigned int)command->getCommandId(),
@@ -346,7 +345,7 @@ Pointer<Response> ResponseCorrelator::request(const Pointer<Command> command,
             }
         }
 
-        if (priorError != NULL)
+        if (priorError)
         {
             throw IOException(__FILE__,
                               __LINE__,
@@ -359,7 +358,7 @@ Pointer<Response> ResponseCorrelator::request(const Pointer<Command> command,
                                     &this->impl->requestMap);
 
         // Wait to be notified of the response via the futureResponse object.
-        Pointer<commands::Response> response;
+        std::shared_ptr<commands::Response> response;
 
         // Send the request.
         next->oneway(command);
@@ -367,7 +366,7 @@ Pointer<Response> ResponseCorrelator::request(const Pointer<Command> command,
         // Get the response.
         response = futureResponse->getResponse(timeout);
 
-        if (response == NULL)
+        if (!response)
         {
             throw IOException(
                 __FILE__,
@@ -386,7 +385,7 @@ Pointer<Response> ResponseCorrelator::request(const Pointer<Command> command,
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ResponseCorrelator::onCommand(const Pointer<Command> command)
+void ResponseCorrelator::onCommand(const std::shared_ptr<Command> command)
 {
     // Log all incoming commands from broker
     AMQ_LOG_DEBUG(
@@ -405,7 +404,7 @@ void ResponseCorrelator::onCommand(const Pointer<Command> command)
         return;
     }
 
-    Pointer<Response> response = command.dynamicCast<Response>();
+    std::shared_ptr<Response> response = std::dynamic_pointer_cast<Response>(command);
     AMQ_LOG_DEBUG(
         "ResponseCorrelator",
         "onCommand() response correlationId=" << response->getCorrelationId());
@@ -413,7 +412,7 @@ void ResponseCorrelator::onCommand(const Pointer<Command> command)
     // It is a response - let's correlate ...
     synchronized(&this->impl->mapMutex)
     {
-        Pointer<FutureResponse> futureResponse;
+        std::shared_ptr<FutureResponse> futureResponse;
         try
         {
             futureResponse =
@@ -432,12 +431,12 @@ void ResponseCorrelator::onCommand(const Pointer<Command> command)
             // Check if it's an ExceptionResponse - these should always be
             // propagated even if we don't have the original request, as they
             // indicate broker-level errors Note: Must check type first because
-            // dynamicCast throws ClassCastException on failure
+            // dynamic_pointer_cast returns nullptr on failure
             if (response->getDataStructureType() ==
                 commands::ExceptionResponse::ID_EXCEPTIONRESPONSE)
             {
-                Pointer<commands::ExceptionResponse> exResponse =
-                    response.dynamicCast<commands::ExceptionResponse>();
+                std::shared_ptr<commands::ExceptionResponse> exResponse =
+                    std::dynamic_pointer_cast<commands::ExceptionResponse>(response);
                 if (exResponse->getException() != NULL)
                 {
                     AMQ_LOG_ERROR(
@@ -448,7 +447,7 @@ void ResponseCorrelator::onCommand(const Pointer<Command> command)
                     // Propagate the exception to the transport listener
                     // This ensures broker errors are not silently discarded
                     // during reconnection
-                    if (this->impl->priorError == NULL)
+                    if (!this->impl->priorError)
                     {
                         this->impl->priorError.reset(new IOException(
                             __FILE__,
@@ -474,7 +473,7 @@ void ResponseCorrelator::doClose()
 {
     try
     {
-        dispose(Pointer<Exception>(
+        dispose(std::shared_ptr<Exception>(
             new IOException(__FILE__, __LINE__, "Transport Stopped")));
     }
     AMQ_CATCH_RETHROW(IOException)
@@ -485,20 +484,20 @@ void ResponseCorrelator::doClose()
 ////////////////////////////////////////////////////////////////////////////////
 void ResponseCorrelator::onException(const decaf::lang::Exception& ex)
 {
-    dispose(Pointer<Exception>(ex.clone()));
+    dispose(std::shared_ptr<Exception>(ex.clone()));
     TransportFilter::onException(ex);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ResponseCorrelator::dispose(Pointer<Exception> error)
+void ResponseCorrelator::dispose(std::shared_ptr<Exception> error)
 {
     AMQ_LOG_DEBUG("ResponseCorrelator",
                   "dispose() called error=" << error->getMessage());
 
-    HashMap<unsigned int, Pointer<FutureResponse>> requestsCopy;
+    HashMap<unsigned int, std::shared_ptr<FutureResponse>> requestsCopy;
     synchronized(&this->impl->mapMutex)
     {
-        if (this->impl->priorError == NULL)
+        if (!this->impl->priorError)
         {
             AMQ_LOG_DEBUG("ResponseCorrelator",
                           "dispose() clearing map, size="
@@ -517,22 +516,22 @@ void ResponseCorrelator::dispose(Pointer<Exception> error)
 
     if (!requestsCopy.isEmpty())
     {
-        Pointer<commands::BrokerError> exception(new commands::BrokerError);
+        std::shared_ptr<commands::BrokerError> exception(new commands::BrokerError);
         exception->setExceptionClass("java.io.IOException");
         exception->setMessage(error->getMessage());
 
         // Create individual ExceptionResponse for each pending request with
         // correct correlation ID
-        Pointer<Iterator<unsigned int>> iter(requestsCopy.keySet().iterator());
+        std::shared_ptr<Iterator<unsigned int>> iter(requestsCopy.keySet().iterator());
         while (iter->hasNext())
         {
-            unsigned int            correlationId = iter->next();
-            Pointer<FutureResponse> futureResponse =
+            unsigned int                     correlationId = iter->next();
+            std::shared_ptr<FutureResponse>  futureResponse =
                 requestsCopy.get(correlationId);
 
             // Create a unique ExceptionResponse for this request with the
             // correct correlation ID
-            Pointer<commands::ExceptionResponse> errorResponse(
+            std::shared_ptr<commands::ExceptionResponse> errorResponse(
                 new commands::ExceptionResponse);
             errorResponse->setCorrelationId(correlationId);
             errorResponse->setException(exception);

@@ -24,7 +24,7 @@ using namespace std;
 using namespace activemq;
 using namespace activemq::exceptions;
 using namespace activemq::commands;
-using namespace decaf::lang;
+
 using namespace decaf::lang::exceptions;
 
 /*
@@ -41,10 +41,10 @@ using namespace decaf::lang::exceptions;
 SubscriptionInfo::SubscriptionInfo()
     : BaseDataStructure(),
       clientId(""),
-      destination(NULL),
+      destination(),
       selector(""),
       subcriptionName(""),
-      subscribedDestination(NULL),
+      subscribedDestination(),
       noLocal(false)
 {
 }
@@ -110,7 +110,7 @@ std::string SubscriptionInfo::toString() const
     stream << "ClientId = " << this->getClientId();
     stream << ", ";
     stream << "Destination = ";
-    if (this->getDestination() != NULL)
+    if (this->getDestination())
     {
         stream << this->getDestination()->toString();
     }
@@ -124,7 +124,7 @@ std::string SubscriptionInfo::toString() const
     stream << "SubcriptionName = " << this->getSubcriptionName();
     stream << ", ";
     stream << "SubscribedDestination = ";
-    if (this->getSubscribedDestination() != NULL)
+    if (this->getSubscribedDestination())
     {
         stream << this->getSubscribedDestination()->toString();
     }
@@ -159,14 +159,14 @@ bool SubscriptionInfo::equals(const DataStructure* value) const
     {
         return false;
     }
-    if (this->getDestination() != NULL)
+    if (this->getDestination())
     {
         if (!this->getDestination()->equals(valuePtr->getDestination().get()))
         {
             return false;
         }
     }
-    else if (valuePtr->getDestination() != NULL)
+    else if (valuePtr->getDestination())
     {
         return false;
     }
@@ -178,7 +178,7 @@ bool SubscriptionInfo::equals(const DataStructure* value) const
     {
         return false;
     }
-    if (this->getSubscribedDestination() != NULL)
+    if (this->getSubscribedDestination())
     {
         if (!this->getSubscribedDestination()->equals(
                 valuePtr->getSubscribedDestination().get()))
@@ -186,7 +186,7 @@ bool SubscriptionInfo::equals(const DataStructure* value) const
             return false;
         }
     }
-    else if (valuePtr->getSubscribedDestination() != NULL)
+    else if (valuePtr->getSubscribedDestination())
     {
         return false;
     }
@@ -220,21 +220,21 @@ void SubscriptionInfo::setClientId(const std::string& clientId)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const decaf::lang::Pointer<ActiveMQDestination>&
+const std::shared_ptr<ActiveMQDestination>&
 SubscriptionInfo::getDestination() const
 {
     return destination;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<ActiveMQDestination>& SubscriptionInfo::getDestination()
+std::shared_ptr<ActiveMQDestination>& SubscriptionInfo::getDestination()
 {
     return destination;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void SubscriptionInfo::setDestination(
-    const decaf::lang::Pointer<ActiveMQDestination>& destination)
+    const std::shared_ptr<ActiveMQDestination>& destination)
 {
     this->destination = destination;
 }
@@ -276,14 +276,14 @@ void SubscriptionInfo::setSubcriptionName(const std::string& subcriptionName)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const decaf::lang::Pointer<ActiveMQDestination>&
+const std::shared_ptr<ActiveMQDestination>&
 SubscriptionInfo::getSubscribedDestination() const
 {
     return subscribedDestination;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<ActiveMQDestination>&
+std::shared_ptr<ActiveMQDestination>&
 SubscriptionInfo::getSubscribedDestination()
 {
     return subscribedDestination;
@@ -291,7 +291,7 @@ SubscriptionInfo::getSubscribedDestination()
 
 ////////////////////////////////////////////////////////////////////////////////
 void SubscriptionInfo::setSubscribedDestination(
-    const decaf::lang::Pointer<ActiveMQDestination>& subscribedDestination)
+    const std::shared_ptr<ActiveMQDestination>& subscribedDestination)
 {
     this->subscribedDestination = subscribedDestination;
 }

@@ -24,7 +24,7 @@ using namespace std;
 using namespace activemq;
 using namespace activemq::exceptions;
 using namespace activemq::commands;
-using namespace decaf::lang;
+
 using namespace decaf::lang::exceptions;
 
 /*
@@ -40,7 +40,7 @@ using namespace decaf::lang::exceptions;
 ////////////////////////////////////////////////////////////////////////////////
 ProducerAck::ProducerAck()
     : BaseCommand(),
-      producerId(NULL),
+      producerId(),
       size(0)
 {
 }
@@ -103,7 +103,7 @@ std::string ProducerAck::toString() const
            << "responseRequired = " << boolalpha << this->isResponseRequired();
     stream << ", ";
     stream << "ProducerId = ";
-    if (this->getProducerId() != NULL)
+    if (this->getProducerId())
     {
         stream << this->getProducerId()->toString();
     }
@@ -133,14 +133,14 @@ bool ProducerAck::equals(const DataStructure* value) const
         return false;
     }
 
-    if (this->getProducerId() != NULL)
+    if (this->getProducerId())
     {
         if (!this->getProducerId()->equals(valuePtr->getProducerId().get()))
         {
             return false;
         }
     }
-    else if (valuePtr->getProducerId() != NULL)
+    else if (valuePtr->getProducerId())
     {
         return false;
     }
@@ -156,20 +156,20 @@ bool ProducerAck::equals(const DataStructure* value) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const decaf::lang::Pointer<ProducerId>& ProducerAck::getProducerId() const
+const std::shared_ptr<ProducerId>& ProducerAck::getProducerId() const
 {
     return producerId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<ProducerId>& ProducerAck::getProducerId()
+std::shared_ptr<ProducerId>& ProducerAck::getProducerId()
 {
     return producerId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void ProducerAck::setProducerId(
-    const decaf::lang::Pointer<ProducerId>& producerId)
+    const std::shared_ptr<ProducerId>& producerId)
 {
     this->producerId = producerId;
 }
@@ -187,7 +187,7 @@ void ProducerAck::setSize(int size)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<commands::Command> ProducerAck::visit(
+std::shared_ptr<commands::Command> ProducerAck::visit(
     activemq::state::CommandVisitor* visitor)
 {
     return visitor->processProducerAck(this);

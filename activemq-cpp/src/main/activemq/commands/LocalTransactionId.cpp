@@ -26,7 +26,7 @@ using namespace std;
 using namespace activemq;
 using namespace activemq::exceptions;
 using namespace activemq::commands;
-using namespace decaf::lang;
+
 using namespace decaf::lang::exceptions;
 using namespace decaf::internal::util;
 
@@ -44,7 +44,7 @@ using namespace decaf::internal::util;
 LocalTransactionId::LocalTransactionId()
     : TransactionId(),
       value(0),
-      connectionId(NULL)
+      connectionId()
 {
 }
 
@@ -52,7 +52,7 @@ LocalTransactionId::LocalTransactionId()
 LocalTransactionId::LocalTransactionId(const LocalTransactionId& other)
     : TransactionId(),
       value(0),
-      connectionId(NULL)
+      connectionId()
 {
     this->copyDataStructure(&other);
 }
@@ -137,14 +137,14 @@ bool LocalTransactionId::equals(const DataStructure* value) const
     {
         return false;
     }
-    if (this->getConnectionId() != NULL)
+    if (this->getConnectionId())
     {
         if (!this->getConnectionId()->equals(valuePtr->getConnectionId().get()))
         {
             return false;
         }
     }
-    else if (valuePtr->getConnectionId() != NULL)
+    else if (valuePtr->getConnectionId())
     {
         return false;
     }
@@ -168,21 +168,21 @@ void LocalTransactionId::setValue(long long value)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const decaf::lang::Pointer<ConnectionId>& LocalTransactionId::getConnectionId()
+const std::shared_ptr<ConnectionId>& LocalTransactionId::getConnectionId()
     const
 {
     return connectionId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<ConnectionId>& LocalTransactionId::getConnectionId()
+std::shared_ptr<ConnectionId>& LocalTransactionId::getConnectionId()
 {
     return connectionId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void LocalTransactionId::setConnectionId(
-    const decaf::lang::Pointer<ConnectionId>& connectionId)
+    const std::shared_ptr<ConnectionId>& connectionId)
 {
     this->connectionId = connectionId;
 }

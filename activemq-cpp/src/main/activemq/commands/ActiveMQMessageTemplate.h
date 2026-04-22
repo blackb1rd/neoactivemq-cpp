@@ -28,6 +28,7 @@
 #include <cms/DeliveryMode.h>
 
 #include <decaf/lang/exceptions/UnsupportedOperationException.h>
+#include <memory>
 
 #include <cms/IllegalStateException.h>
 #include <cms/MessageFormatException.h>
@@ -94,12 +95,12 @@ namespace commands
                     return false;
                 }
 
-                decaf::lang::Pointer<MessageId> thisMsgId =
+                std::shared_ptr<MessageId> thisMsgId =
                     this->getMessageId();
-                decaf::lang::Pointer<MessageId> otherMsgId =
+                std::shared_ptr<MessageId> otherMsgId =
                     object->getMessageId();
 
-                return thisMsgId != NULL && otherMsgId != NULL &&
+                return thisMsgId && otherMsgId &&
                        otherMsgId->equals(thisMsgId.get());
             }
             AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
@@ -518,13 +519,13 @@ namespace commands
                 if (destination != NULL)
                 {
                     this->setDestination(
-                        decaf::lang::Pointer<ActiveMQDestination>(
+                        std::shared_ptr<ActiveMQDestination>(
                             dynamic_cast<ActiveMQDestination*>(
                                 destination->clone())));
                 }
                 else
                 {
-                    this->getDestination().reset(NULL);
+                    this->setDestination(std::shared_ptr<ActiveMQDestination>());
                 }
             }
             AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
@@ -554,16 +555,16 @@ namespace commands
         {
             try
             {
-                Pointer<MessageId> id(new MessageId(value));
+                std::shared_ptr<MessageId> id(new MessageId(value));
                 this->setMessageId(id);
             }
             catch (decaf::lang::exceptions::NumberFormatException& e)
             {
                 // we must be some foreign JMS provider or strange user-supplied
                 // String so lets set the IDs to be 1
-                Pointer<MessageId> id(new MessageId);
+                std::shared_ptr<MessageId> id(new MessageId);
                 id->setTextView(value);
-                this->setMessageId(messageId);
+                this->setMessageId(id);
             }
         }
 
@@ -598,14 +599,14 @@ namespace commands
             {
                 if (destination != NULL)
                 {
-                    this->setReplyTo(decaf::lang::Pointer<ActiveMQDestination>(
+                    this->setReplyTo(std::shared_ptr<ActiveMQDestination>(
                         dynamic_cast<ActiveMQDestination*>(
                             destination->clone())));
                 }
                 else
                 {
                     this->setReplyTo(
-                        decaf::lang::Pointer<ActiveMQDestination>());
+                        std::shared_ptr<ActiveMQDestination>());
                 }
             }
             AMQ_CATCH_ALL_THROW_CMSEXCEPTION()

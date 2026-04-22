@@ -23,11 +23,10 @@
 #include <activemq/util/Config.h>
 #include <activemq/wireformat/WireFormat.h>
 #include <activemq/wireformat/openwire/utils/BooleanStream.h>
-#include <decaf/lang/Pointer.h>
+#include <atomic>
 #include <decaf/lang/exceptions/IllegalArgumentException.h>
 #include <decaf/lang/exceptions/IllegalStateException.h>
 #include <decaf/util/Properties.h>
-#include <decaf/util/concurrent/atomic/AtomicBoolean.h>
 #include <memory>
 
 namespace activemq
@@ -41,8 +40,6 @@ namespace wireformat
         {
             class DataStreamMarshaller;
         }  // namespace marshal
-
-        using decaf::lang::Pointer;
 
         class AMQCPP_API OpenWireFormat : public wireformat::WireFormat
         {
@@ -61,7 +58,7 @@ namespace wireformat
             decaf::util::Properties properties;
 
             // Preferred WireFormatInfo
-            Pointer<commands::WireFormatInfo> preferedWireFormatInfo;
+            std::shared_ptr<commands::WireFormatInfo> preferedWireFormatInfo;
 
             // Marshalers
             std::vector<marshal::DataStreamMarshaller*> dataMarshallers;
@@ -70,7 +67,7 @@ namespace wireformat
             std::string id;
 
             // Indicates when we are in the doUnmarshal call
-            decaf::util::concurrent::atomic::AtomicBoolean receiving;
+            std::atomic<bool> receiving;
 
             // Current transport being used for unmarshal (for partial storage
             // access)
@@ -107,8 +104,8 @@ namespace wireformat
             /**
              * {@inheritDoc}
              */
-            virtual Pointer<transport::Transport> createNegotiator(
-                const Pointer<transport::Transport> transport);
+            virtual std::shared_ptr<transport::Transport> createNegotiator(
+                const std::shared_ptr<transport::Transport> transport);
 
             /**
              * Allows an external source to add marshalers to this object for
@@ -120,14 +117,14 @@ namespace wireformat
             /**
              * {@inheritDoc}
              */
-            virtual void marshal(const Pointer<commands::Command> command,
+            virtual void marshal(const std::shared_ptr<commands::Command> command,
                                  const activemq::transport::Transport* transport,
                                  decaf::io::DataOutputStream* out);
 
             /**
              * {@inheritDoc}
              */
-            virtual Pointer<commands::Command> unmarshal(
+            virtual std::shared_ptr<commands::Command> unmarshal(
                 const activemq::transport::Transport* transport,
                 decaf::io::DataInputStream*           in);
 
@@ -213,13 +210,13 @@ namespace wireformat
              * been initialized.
              */
             void setPreferedWireFormatInfo(
-                const Pointer<commands::WireFormatInfo> info);
+                const std::shared_ptr<commands::WireFormatInfo> info);
 
             /**
              * Gets the Preferred WireFormatInfo object that this class holds
              * @return pointer to a preferred WireFormatInfo object
              */
-            const Pointer<commands::WireFormatInfo>& getPreferedWireFormatInfo()
+            const std::shared_ptr<commands::WireFormatInfo>& getPreferedWireFormatInfo()
                 const
             {
                 return this->preferedWireFormatInfo;
@@ -288,7 +285,7 @@ namespace wireformat
              */
             virtual bool inReceive() const
             {
-                return this->receiving.get();
+                return this->receiving.load();
             }
 
             /**

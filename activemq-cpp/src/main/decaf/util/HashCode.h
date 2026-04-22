@@ -25,6 +25,7 @@
 #include <decaf/lang/Pointer.h>
 
 #include <functional>
+#include <memory>
 #include <string>
 
 namespace decaf
@@ -264,6 +265,20 @@ namespace util
         int operator()(decaf::lang::Pointer<T> arg) const
         {
             if (arg != NULL)
+            {
+                return HashCode<const T>()(*arg);
+            }
+            return 0;
+        }
+    };
+
+    template <typename T>
+    struct HashCode<std::shared_ptr<T>>
+        : public HashCodeUnaryBase<std::shared_ptr<T>>
+    {
+        int operator()(const std::shared_ptr<T>& arg) const
+        {
+            if (arg != nullptr)
             {
                 return HashCode<const T>()(*arg);
             }

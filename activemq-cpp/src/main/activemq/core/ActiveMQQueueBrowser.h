@@ -26,9 +26,8 @@
 #include <cms/MessageEnumeration.h>
 #include <cms/Queue.h>
 #include <cms/QueueBrowser.h>
-#include <decaf/lang/Pointer.h>
 #include <decaf/util/concurrent/Mutex.h>
-#include <decaf/util/concurrent/atomic/AtomicBoolean.h>
+#include <atomic>
 #include <memory>
 
 #include <string>
@@ -45,36 +44,33 @@ namespace core
     class ActiveMQSession;
     class Browser;
 
-    using decaf::lang::Pointer;
-
     class AMQCPP_API ActiveMQQueueBrowser : public cms::QueueBrowser,
                                             public cms::MessageEnumeration
     {
     private:
         friend class Browser;
 
-        activemq::core::kernels::ActiveMQSessionKernel* session;
-        Pointer<commands::ConsumerId>                   consumerId;
-        Pointer<commands::ActiveMQDestination>          destination;
-        std::string                                     selector;
-        bool                                            dispatchAsync;
-        cms::Queue*                                     queue;
-        decaf::util::concurrent::atomic::AtomicBoolean  closed;
+        activemq::core::kernels::ActiveMQSessionKernel*     session;
+        std::shared_ptr<commands::ConsumerId>               consumerId;
+        std::shared_ptr<commands::ActiveMQDestination>      destination;
+        std::string                                         selector;
+        bool                                                dispatchAsync;
+        cms::Queue*                                         queue;
+        std::atomic<bool>                                   closed;
 
-        mutable decaf::util::concurrent::Mutex         mutex;
-        mutable decaf::util::concurrent::Mutex         wait;
-        decaf::util::concurrent::atomic::AtomicBoolean browseDone;
+        mutable decaf::util::concurrent::Mutex              mutex;
+        mutable decaf::util::concurrent::Mutex              wait;
+        std::atomic<bool>                                   browseDone;
         // Shared validity flag - allows Browser to safely check validity even
         // after this ActiveMQQueueBrowser instance is destroyed. The Browser
         // holds its own copy of this shared_ptr, so it can check the flag
         // without accessing parent.
-        std::shared_ptr<decaf::util::concurrent::atomic::AtomicBoolean>
-            browserValid;
+        std::shared_ptr<std::atomic<bool>>                  browserValid;
         // Shared mutex for synchronizing dispatch with destroy. Browser holds
         // its own copy to ensure safe locking even during parent destruction.
-        std::shared_ptr<decaf::util::concurrent::Mutex> dispatchMutex;
+        std::shared_ptr<decaf::util::concurrent::Mutex>     dispatchMutex;
 
-        mutable Pointer<activemq::core::kernels::ActiveMQConsumerKernel> browser;
+        mutable std::shared_ptr<activemq::core::kernels::ActiveMQConsumerKernel> browser;
 
     private:
         ActiveMQQueueBrowser(const ActiveMQQueueBrowser&);
@@ -82,11 +78,11 @@ namespace core
 
     public:
         ActiveMQQueueBrowser(
-            activemq::core::kernels::ActiveMQSessionKernel* session,
-            const Pointer<commands::ConsumerId>&            consumerId,
-            const Pointer<commands::ActiveMQDestination>&   destination,
-            const std::string&                              selector,
-            bool                                            dispatchAsync);
+            activemq::core::kernels::ActiveMQSessionKernel*       session,
+            const std::shared_ptr<commands::ConsumerId>&          consumerId,
+            const std::shared_ptr<commands::ActiveMQDestination>& destination,
+            const std::string&                                    selector,
+            bool                                                  dispatchAsync);
 
         virtual ~ActiveMQQueueBrowser();
 
@@ -108,7 +104,7 @@ namespace core
         void notifyMessageAvailable();
         void waitForMessageAvailable();
 
-        Pointer<activemq::core::kernels::ActiveMQConsumerKernel>
+        std::shared_ptr<activemq::core::kernels::ActiveMQConsumerKernel>
              createConsumer();
         void destroyConsumer();
     };

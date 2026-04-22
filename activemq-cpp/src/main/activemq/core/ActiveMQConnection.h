@@ -37,8 +37,8 @@
 #include <decaf/util/ArrayList.h>
 #include <decaf/util/Properties.h>
 #include <decaf/util/concurrent/ExecutorService.h>
-#include <decaf/util/concurrent/atomic/AtomicBoolean.h>
 
+#include <atomic>
 #include <memory>
 #include <string>
 
@@ -46,8 +46,6 @@ namespace activemq
 {
 namespace core
 {
-
-    using decaf::lang::Pointer;
 
     class ActiveMQSession;
     class ConnectionConfig;
@@ -75,24 +73,24 @@ namespace core
         /**
          * Indicates if this Connection is started
          */
-        decaf::util::concurrent::atomic::AtomicBoolean started;
+        std::atomic<bool> started;
 
         /**
          * Indicates that this connection has been closed, it is no longer
          * usable after this becomes true
          */
-        decaf::util::concurrent::atomic::AtomicBoolean closed;
+        std::atomic<bool> closed;
 
         /**
          * Indicates that this connection has been closed, it is no longer
          * usable after this becomes true
          */
-        decaf::util::concurrent::atomic::AtomicBoolean closing;
+        std::atomic<bool> closing;
 
         /**
          * Indicates that this connection's Transport has failed.
          */
-        decaf::util::concurrent::atomic::AtomicBoolean transportFailed;
+        std::atomic<bool> transportFailed;
 
     private:
         ActiveMQConnection(const ActiveMQConnection&);
@@ -107,8 +105,8 @@ namespace core
          * @param properties
          *        The Properties that were defined for this connection
          */
-        ActiveMQConnection(const Pointer<transport::Transport>    transport,
-                           const Pointer<decaf::util::Properties> properties);
+        ActiveMQConnection(const std::shared_ptr<transport::Transport>    transport,
+                           const std::shared_ptr<decaf::util::Properties> properties);
 
         virtual ~ActiveMQConnection();
 
@@ -122,7 +120,7 @@ namespace core
          * operation.
          */
         virtual void addSession(
-            Pointer<activemq::core::kernels::ActiveMQSessionKernel> session);
+            std::shared_ptr<activemq::core::kernels::ActiveMQSessionKernel> session);
 
         /**
          * Removes the session resources for the given session instance.
@@ -134,7 +132,7 @@ namespace core
          * operation.
          */
         virtual void removeSession(
-            Pointer<activemq::core::kernels::ActiveMQSessionKernel> session);
+            std::shared_ptr<activemq::core::kernels::ActiveMQSessionKernel> session);
 
         /**
          * Adds an active Producer to the Set of known producers.
@@ -146,7 +144,7 @@ namespace core
          * operation.
          */
         virtual void addProducer(
-            Pointer<kernels::ActiveMQProducerKernel> producer);
+            std::shared_ptr<kernels::ActiveMQProducerKernel> producer);
 
         /**
          * Removes an active Producer to the Set of known producers.
@@ -155,7 +153,7 @@ namespace core
          * operation.
          */
         virtual void removeProducer(
-            const Pointer<commands::ProducerId>& producerId);
+            const std::shared_ptr<commands::ProducerId>& producerId);
 
         /**
          * Adds a dispatcher for a consumer.
@@ -165,7 +163,7 @@ namespace core
          * @throws CMSException if an error occurs while removing performing the
          * operation.
          */
-        virtual void addDispatcher(const Pointer<commands::ConsumerId>& consumer,
+        virtual void addDispatcher(const std::shared_ptr<commands::ConsumerId>& consumer,
                                    Dispatcher* dispatcher);
 
         /**
@@ -175,7 +173,7 @@ namespace core
          * operation.
          */
         virtual void removeDispatcher(
-            const Pointer<commands::ConsumerId>& consumer);
+            const std::shared_ptr<commands::ConsumerId>& consumer);
 
         /**
          * If supported sends a message pull request to the service provider
@@ -197,7 +195,7 @@ namespace core
          */
         bool isClosed() const
         {
-            return this->closed.get();
+            return this->closed.load();
         }
 
         /**
@@ -206,7 +204,7 @@ namespace core
          */
         bool isStarted() const
         {
-            return this->started.get();
+            return this->started.load();
         }
 
         /**
@@ -215,7 +213,7 @@ namespace core
          */
         bool isTransportFailed() const
         {
-            return this->transportFailed.get();
+            return this->transportFailed.load();
         }
 
         /**
@@ -273,8 +271,8 @@ namespace core
          *
          * @return true if the Message was seen before.
          */
-        bool isDuplicate(Dispatcher*                dispatcher,
-                         Pointer<commands::Message> message);
+        bool isDuplicate(Dispatcher*                          dispatcher,
+                         std::shared_ptr<commands::Message> message);
 
         /**
          * Mark message as received.
@@ -284,8 +282,8 @@ namespace core
          * @param message
          *      The Message that has been received.
          */
-        void rollbackDuplicate(Dispatcher*                dispatcher,
-                               Pointer<commands::Message> message);
+        void rollbackDuplicate(Dispatcher*                          dispatcher,
+                               std::shared_ptr<commands::Message> message);
 
         /**
          * Removes the Audit information stored for a given MessageConsumer
@@ -979,7 +977,7 @@ namespace core
          * transport.
          * @param command the received command object.
          */
-        virtual void onCommand(const Pointer<commands::Command> command);
+        virtual void onCommand(const std::shared_ptr<commands::Command> command);
 
         /**
          * Event handler for an exception from a command transport.
@@ -1031,7 +1029,7 @@ namespace core
          *
          * @return a reference to a Scheduler instance owned by this Connection.
          */
-        Pointer<threads::Scheduler> getScheduler() const;
+        std::shared_ptr<threads::Scheduler> getScheduler() const;
 
         /**
          * Returns the Id of the Resource Manager that this client will use
@@ -1058,7 +1056,7 @@ namespace core
          * @throws ActiveMQException if not currently connected, or if the
          * operation fails for any reason.
          */
-        void oneway(Pointer<commands::Command> command);
+        void oneway(std::shared_ptr<commands::Command> command);
 
         /**
          * Sends a synchronous request and returns the response from the broker.
@@ -1071,7 +1069,7 @@ namespace core
          *      The time in milliseconds to wait for a response, default is zero
          * or infinite.
          *
-         * @return a Pointer instance to the Response object sent from the
+         * @return a std::shared_ptr instance to the Response object sent from the
          * Broker.
          *
          * @throws BrokerException if the response from the broker is of type
@@ -1079,9 +1077,9 @@ namespace core
          * @throws ActiveMQException if any other error occurs while sending the
          * Command.
          */
-        Pointer<commands::Response> syncRequest(
-            Pointer<commands::Command> command,
-            unsigned int               timeout = 0);
+        std::shared_ptr<commands::Response> syncRequest(
+            std::shared_ptr<commands::Command> command,
+            unsigned int                       timeout = 0);
 
         /**
          * Sends a synchronous request and returns the response from the broker.
@@ -1099,8 +1097,8 @@ namespace core
          * @throws ActiveMQException if any other error occurs while sending the
          * Command.
          */
-        void asyncRequest(Pointer<commands::Command> command,
-                          cms::AsyncCallback*        onComplete);
+        void asyncRequest(std::shared_ptr<commands::Command> command,
+                          cms::AsyncCallback*                onComplete);
 
         /**
          * Notify the exception listener
@@ -1183,7 +1181,7 @@ namespace core
          *      The temporary destination that this connection should track.
          */
         void addTempDestination(
-            Pointer<commands::ActiveMQTempDestination> destination);
+            std::shared_ptr<commands::ActiveMQTempDestination> destination);
 
         /**
          * Removes the given Temporary Destination to this Connections
@@ -1194,7 +1192,7 @@ namespace core
          * tracking.
          */
         void removeTempDestination(
-            Pointer<commands::ActiveMQTempDestination> destination);
+            std::shared_ptr<commands::ActiveMQTempDestination> destination);
 
         /**
          * Removes the given Temporary Destination to this Connections
@@ -1208,7 +1206,7 @@ namespace core
          * active Session.
          */
         void deleteTempDestination(
-            Pointer<commands::ActiveMQTempDestination> destination);
+            std::shared_ptr<commands::ActiveMQTempDestination> destination);
 
         /**
          * Removes any TempDestinations that this connection has cached,
@@ -1228,7 +1226,7 @@ namespace core
          * @return true if the temporary destination was deleted already.
          */
         bool isDeleted(
-            Pointer<commands::ActiveMQTempDestination> destination) const;
+            std::shared_ptr<commands::ActiveMQTempDestination> destination) const;
 
         /**
          * Returns an ArrayList that contains a copy of all Sessions that are
@@ -1237,14 +1235,14 @@ namespace core
          * @return an ArrayList of Sessions active in this connection.
          */
         decaf::util::ArrayList<
-            Pointer<activemq::core::kernels::ActiveMQSessionKernel>>
+            std::shared_ptr<activemq::core::kernels::ActiveMQSessionKernel>>
         getSessions() const;
 
     protected:
         /**
          * @return the next available Session Id.
          */
-        virtual Pointer<commands::SessionId> getNextSessionId();
+        virtual std::shared_ptr<commands::SessionId> getNextSessionId();
 
         // Sends a oneway disconnect message to the broker.
         void disconnect(long long lastDeliveredSequenceId);
@@ -1261,16 +1259,16 @@ namespace core
         const decaf::util::Properties& getProperties() const;
 
         // Process the WireFormatInfo command
-        void onWireFormatInfo(Pointer<commands::Command> command);
+        void onWireFormatInfo(std::shared_ptr<commands::Command> command);
 
         // Process the ControlCommand command
-        void onControlCommand(Pointer<commands::Command> command);
+        void onControlCommand(std::shared_ptr<commands::Command> command);
 
         // Process the ConnectionControl command
-        void onConnectionControl(Pointer<commands::Command> command);
+        void onConnectionControl(std::shared_ptr<commands::Command> command);
 
         // Process the ConsumerControl command
-        void onConsumerControl(Pointer<commands::Command> command);
+        void onConsumerControl(std::shared_ptr<commands::Command> command);
     };
 
 }  // namespace core

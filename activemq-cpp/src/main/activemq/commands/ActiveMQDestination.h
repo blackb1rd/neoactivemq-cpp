@@ -21,12 +21,13 @@
 #include <activemq/commands/BaseDataStructure.h>
 #include <activemq/util/ActiveMQProperties.h>
 #include <activemq/util/Config.h>
+#include <activemq/util/SharedPtrComparator.h>
 #include <cms/Destination.h>
 #include <decaf/lang/Comparable.h>
-#include <decaf/lang/Pointer.h>
 #include <decaf/util/ArrayList.h>
 
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -34,8 +35,6 @@ namespace activemq
 {
 namespace commands
 {
-
-    using decaf::lang::Pointer;
 
     class AMQCPP_API ActiveMQDestination
         : public BaseDataStructure,
@@ -66,7 +65,7 @@ namespace commands
         bool exclusive;
         bool ordered;
         bool advisory;
-        mutable decaf::util::ArrayList<Pointer<ActiveMQDestination>>
+        mutable decaf::util::ArrayList<std::shared_ptr<ActiveMQDestination>>
                     compositeDestinations;
         std::string orderedTarget;
 
@@ -79,7 +78,7 @@ namespace commands
 
         static const std::string TEMP_DESTINATION_NAME_PREFIX;
 
-        typedef decaf::lang::PointerComparator<ActiveMQDestination> COMPARATOR;
+        typedef SharedPtrComparator<ActiveMQDestination> COMPARATOR;
 
     private:
         ActiveMQDestination(const ActiveMQDestination&);
@@ -254,7 +253,7 @@ namespace commands
          * comprise this Composite destination, if this destination is
          * composite, otherwise it returns an empty list.
          */
-        decaf::util::ArrayList<Pointer<ActiveMQDestination>>
+        decaf::util::ArrayList<std::shared_ptr<ActiveMQDestination>>
         getCompositeDestinations() const;
 
         /**
@@ -294,9 +293,9 @@ namespace commands
          * @param name
          *      The name
          *
-         * @return Pointer to a new ActiveMQDestination.
+         * @return std::shared_ptr to a new ActiveMQDestination.
          */
-        Pointer<ActiveMQDestination> createDestination(
+        std::shared_ptr<ActiveMQDestination> createDestination(
             const std::string& name) const
         {
             return ActiveMQDestination::createDestination(getDestinationType(),
@@ -338,9 +337,9 @@ namespace commands
          * @param type - The Type of Destination to Create
          * @param name - The Name to use in the creation of the Destination
          *
-         * @return Pointer to a new ActiveMQDestination instance.
+         * @return std::shared_ptr to a new ActiveMQDestination instance.
          */
-        static Pointer<ActiveMQDestination> createDestination(
+        static std::shared_ptr<ActiveMQDestination> createDestination(
             int                type,
             const std::string& name);
     };

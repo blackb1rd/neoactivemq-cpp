@@ -24,7 +24,7 @@ using namespace std;
 using namespace activemq;
 using namespace activemq::exceptions;
 using namespace activemq::commands;
-using namespace decaf::lang;
+
 using namespace decaf::lang::exceptions;
 
 /*
@@ -40,11 +40,11 @@ using namespace decaf::lang::exceptions;
 ////////////////////////////////////////////////////////////////////////////////
 MessagePull::MessagePull()
     : BaseCommand(),
-      consumerId(NULL),
-      destination(NULL),
+      consumerId(),
+      destination(),
       timeout(0),
       correlationId(""),
-      messageId(NULL)
+      messageId()
 {
 }
 
@@ -109,7 +109,7 @@ std::string MessagePull::toString() const
            << "responseRequired = " << boolalpha << this->isResponseRequired();
     stream << ", ";
     stream << "ConsumerId = ";
-    if (this->getConsumerId() != NULL)
+    if (this->getConsumerId())
     {
         stream << this->getConsumerId()->toString();
     }
@@ -119,7 +119,7 @@ std::string MessagePull::toString() const
     }
     stream << ", ";
     stream << "Destination = ";
-    if (this->getDestination() != NULL)
+    if (this->getDestination())
     {
         stream << this->getDestination()->toString();
     }
@@ -133,7 +133,7 @@ std::string MessagePull::toString() const
     stream << "CorrelationId = " << this->getCorrelationId();
     stream << ", ";
     stream << "MessageId = ";
-    if (this->getMessageId() != NULL)
+    if (this->getMessageId())
     {
         stream << this->getMessageId()->toString();
     }
@@ -161,25 +161,25 @@ bool MessagePull::equals(const DataStructure* value) const
         return false;
     }
 
-    if (this->getConsumerId() != NULL)
+    if (this->getConsumerId())
     {
         if (!this->getConsumerId()->equals(valuePtr->getConsumerId().get()))
         {
             return false;
         }
     }
-    else if (valuePtr->getConsumerId() != NULL)
+    else if (valuePtr->getConsumerId())
     {
         return false;
     }
-    if (this->getDestination() != NULL)
+    if (this->getDestination())
     {
         if (!this->getDestination()->equals(valuePtr->getDestination().get()))
         {
             return false;
         }
     }
-    else if (valuePtr->getDestination() != NULL)
+    else if (valuePtr->getDestination())
     {
         return false;
     }
@@ -191,14 +191,14 @@ bool MessagePull::equals(const DataStructure* value) const
     {
         return false;
     }
-    if (this->getMessageId() != NULL)
+    if (this->getMessageId())
     {
         if (!this->getMessageId()->equals(valuePtr->getMessageId().get()))
         {
             return false;
         }
     }
-    else if (valuePtr->getMessageId() != NULL)
+    else if (valuePtr->getMessageId())
     {
         return false;
     }
@@ -210,40 +210,40 @@ bool MessagePull::equals(const DataStructure* value) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const decaf::lang::Pointer<ConsumerId>& MessagePull::getConsumerId() const
+const std::shared_ptr<ConsumerId>& MessagePull::getConsumerId() const
 {
     return consumerId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<ConsumerId>& MessagePull::getConsumerId()
+std::shared_ptr<ConsumerId>& MessagePull::getConsumerId()
 {
     return consumerId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void MessagePull::setConsumerId(
-    const decaf::lang::Pointer<ConsumerId>& consumerId)
+    const std::shared_ptr<ConsumerId>& consumerId)
 {
     this->consumerId = consumerId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const decaf::lang::Pointer<ActiveMQDestination>& MessagePull::getDestination()
+const std::shared_ptr<ActiveMQDestination>& MessagePull::getDestination()
     const
 {
     return destination;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<ActiveMQDestination>& MessagePull::getDestination()
+std::shared_ptr<ActiveMQDestination>& MessagePull::getDestination()
 {
     return destination;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void MessagePull::setDestination(
-    const decaf::lang::Pointer<ActiveMQDestination>& destination)
+    const std::shared_ptr<ActiveMQDestination>& destination)
 {
     this->destination = destination;
 }
@@ -279,25 +279,25 @@ void MessagePull::setCorrelationId(const std::string& correlationId)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const decaf::lang::Pointer<MessageId>& MessagePull::getMessageId() const
+const std::shared_ptr<MessageId>& MessagePull::getMessageId() const
 {
     return messageId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<MessageId>& MessagePull::getMessageId()
+std::shared_ptr<MessageId>& MessagePull::getMessageId()
 {
     return messageId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MessagePull::setMessageId(const decaf::lang::Pointer<MessageId>& messageId)
+void MessagePull::setMessageId(const std::shared_ptr<MessageId>& messageId)
 {
     this->messageId = messageId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<commands::Command> MessagePull::visit(
+std::shared_ptr<commands::Command> MessagePull::visit(
     activemq::state::CommandVisitor* visitor)
 {
     return visitor->processMessagePull(this);

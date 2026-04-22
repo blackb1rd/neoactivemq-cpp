@@ -38,6 +38,7 @@ using namespace activemq::commands;
 using namespace activemq::exceptions;
 using namespace decaf;
 using namespace decaf::lang;
+using namespace decaf::util;
 using namespace decaf::io;
 using namespace decaf::lang::exceptions;
 
@@ -48,7 +49,7 @@ namespace state
 {
 
     class MessageCache
-        : public LinkedHashMap<Pointer<MessageId>, Pointer<Command>>
+        : public LinkedHashMap<std::shared_ptr<MessageId>, std::shared_ptr<Command>>
     {
     protected:
         ConnectionStateTracker* parent;
@@ -58,7 +59,7 @@ namespace state
 
     public:
         MessageCache(ConnectionStateTracker* parent)
-            : LinkedHashMap<Pointer<MessageId>, Pointer<Command>>(),
+            : LinkedHashMap<std::shared_ptr<MessageId>, std::shared_ptr<Command>>(),
               parent(parent),
               currentCacheSize(0)
         {
@@ -69,27 +70,27 @@ namespace state
         }
 
         virtual bool removeEldestEntry(
-            const MapEntry<Pointer<MessageId>, Pointer<Command>>& eldest)
+            const MapEntry<std::shared_ptr<MessageId>, std::shared_ptr<Command>>& eldest)
         {
             bool result = currentCacheSize > parent->getMaxMessageCacheSize();
             if (result)
             {
-                Pointer<Message> message =
-                    eldest.getValue().dynamicCast<Message>();
+                std::shared_ptr<Message> message =
+                    std::dynamic_pointer_cast<Message>(eldest.getValue());
                 currentCacheSize -= message->getSize();
             }
             return result;
         }
     };
 
-    class MessagePullCache : public LinkedHashMap<std::string, Pointer<Command>>
+    class MessagePullCache : public LinkedHashMap<std::string, std::shared_ptr<Command>>
     {
     protected:
         ConnectionStateTracker* parent;
 
     public:
         MessagePullCache(ConnectionStateTracker* parent)
-            : LinkedHashMap<std::string, Pointer<Command>>(),
+            : LinkedHashMap<std::string, std::shared_ptr<Command>>(),
               parent(parent)
         {
         }
@@ -99,7 +100,7 @@ namespace state
         }
 
         virtual bool removeEldestEntry(
-            const MapEntry<std::string, Pointer<Command>>& eldest AMQCPP_UNUSED)
+            const MapEntry<std::string, std::shared_ptr<Command>>& eldest AMQCPP_UNUSED)
         {
             return size() > parent->getMaxMessagePullCacheSize();
         }
@@ -116,11 +117,11 @@ namespace state
         ConnectionStateTracker* parent;
 
         /** Creates a unique marker for this state tracker */
-        const Pointer<Tracked> TRACKED_RESPONSE_MARKER;
+        const std::shared_ptr<Tracked> TRACKED_RESPONSE_MARKER;
 
         /** Map holding the ConnectionStates, indexed by the ConnectionId */
-        ConcurrentStlMap<Pointer<ConnectionId>,
-                         Pointer<ConnectionState>,
+        ConcurrentStlMap<std::shared_ptr<ConnectionId>,
+                         std::shared_ptr<ConnectionState>,
                          ConnectionId::COMPARATOR>
             connectionStates;
 
@@ -132,7 +133,7 @@ namespace state
 
         StateTrackerImpl(ConnectionStateTracker* parent)
             : parent(parent),
-              TRACKED_RESPONSE_MARKER(new Tracked()),
+              TRACKED_RESPONSE_MARKER(std::make_shared<Tracked>()),
               connectionStates(),
               messageCache(parent),
               messagePullCache(parent)
@@ -154,16 +155,16 @@ namespace state
     class RemoveTransactionAction : public Runnable
     {
     private:
-        Pointer<TransactionInfo> info;
-        ConnectionStateTracker*  stateTracker;
+        std::shared_ptr<TransactionInfo> info;
+        ConnectionStateTracker*          stateTracker;
 
     private:
         RemoveTransactionAction(const RemoveTransactionAction&);
         RemoveTransactionAction& operator=(const RemoveTransactionAction&);
 
     public:
-        RemoveTransactionAction(ConnectionStateTracker*  stateTracker,
-                                Pointer<TransactionInfo> info)
+        RemoveTransactionAction(ConnectionStateTracker*          stateTracker,
+                                std::shared_ptr<TransactionInfo> info)
             : info(info),
               stateTracker(stateTracker)
         {
@@ -175,12 +176,12 @@ namespace state
 
         virtual void run()
         {
-            Pointer<ConnectionId>    connectionId = info->getConnectionId();
-            Pointer<ConnectionState> cs =
+            std::shared_ptr<ConnectionId>    connectionId = info->getConnectionId();
+            std::shared_ptr<ConnectionState> cs =
                 stateTracker->impl->connectionStates.get(connectionId);
-            Pointer<TransactionState> txState =
+            std::shared_ptr<TransactionState> txState =
                 cs->removeTransactionState(info->getTransactionId());
-            if (txState != NULL)
+            if (txState)
             {
                 txState->clear();
             }
@@ -216,18 +217,18 @@ ConnectionStateTracker::~ConnectionStateTracker()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Tracked> ConnectionStateTracker::track(Pointer<Command> command)
+std::shared_ptr<Tracked> ConnectionStateTracker::track(std::shared_ptr<Command> command)
 {
     try
     {
-        Pointer<Command> result = command->visit(this);
-        if (result == NULL)
+        std::shared_ptr<Command> result = command->visit(this);
+        if (!result)
         {
-            return Pointer<Tracked>();
+            return std::shared_ptr<Tracked>();
         }
         else
         {
-            return result.dynamicCast<Tracked>();
+            return std::dynamic_pointer_cast<Tracked>(result);
         }
     }
     AMQ_CATCH_RETHROW(IOException)
@@ -236,16 +237,16 @@ Pointer<Tracked> ConnectionStateTracker::track(Pointer<Command> command)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConnectionStateTracker::trackBack(Pointer<Command> command)
+void ConnectionStateTracker::trackBack(std::shared_ptr<Command> command)
 {
     try
     {
-        if (command != NULL)
+        if (command)
         {
             if (trackMessages && command->isMessage())
             {
-                Pointer<Message> message = command.dynamicCast<Message>();
-                if (message->getTransactionId() == NULL)
+                std::shared_ptr<Message> message = std::dynamic_pointer_cast<Message>(command);
+                if (!message->getTransactionId())
                 {
                     this->impl->messageCache.currentCacheSize +=
                         message->getSize();
@@ -259,18 +260,18 @@ void ConnectionStateTracker::trackBack(Pointer<Command> command)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConnectionStateTracker::restore(Pointer<transport::Transport> transport)
+void ConnectionStateTracker::restore(std::shared_ptr<transport::Transport> transport)
 {
     try
     {
-        Pointer<Iterator<Pointer<ConnectionState>>> iterator(
+        std::shared_ptr<Iterator<std::shared_ptr<ConnectionState>>> iterator(
             this->impl->connectionStates.values().iterator());
 
         while (iterator->hasNext())
         {
-            Pointer<ConnectionState> state = iterator->next();
+            std::shared_ptr<ConnectionState> state = iterator->next();
 
-            Pointer<ConnectionInfo> info = state->getInfo();
+            std::shared_ptr<ConnectionInfo> info = state->getInfo();
             info->setFailoverReconnect(true);
             transport->oneway(info);
 
@@ -288,14 +289,14 @@ void ConnectionStateTracker::restore(Pointer<transport::Transport> transport)
         }
 
         // Now we flush messages
-        Pointer<Iterator<Pointer<Command>>> messages(
+        std::shared_ptr<Iterator<std::shared_ptr<Command>>> messages(
             this->impl->messageCache.values().iterator());
         while (messages->hasNext())
         {
             transport->oneway(messages->next());
         }
 
-        Pointer<Iterator<Pointer<Command>>> messagePullIter(
+        std::shared_ptr<Iterator<std::shared_ptr<Command>>> messagePullIter(
             this->impl->messagePullCache.values().iterator());
         while (messagePullIter->hasNext())
         {
@@ -309,26 +310,26 @@ void ConnectionStateTracker::restore(Pointer<transport::Transport> transport)
 
 ////////////////////////////////////////////////////////////////////////////////
 void ConnectionStateTracker::doRestoreTransactions(
-    Pointer<transport::Transport> transport,
-    Pointer<ConnectionState>      connectionState)
+    std::shared_ptr<transport::Transport> transport,
+    std::shared_ptr<ConnectionState>      connectionState)
 {
     try
     {
-        std::vector<Pointer<TransactionInfo>> toRollback;
+        std::vector<std::shared_ptr<TransactionInfo>> toRollback;
 
         // For any completed transactions we don't know if the commit actually
         // made it to the broker or was lost along the way, so they need to be
         // rolled back.
-        Pointer<Iterator<Pointer<TransactionState>>> iter(
+        std::shared_ptr<Iterator<std::shared_ptr<TransactionState>>> iter(
             connectionState->getTransactionStates().iterator());
         while (iter->hasNext())
         {
-            Pointer<TransactionState> txState = iter->next();
-            Pointer<Command> lastCommand = txState->getCommands().getLast();
+            std::shared_ptr<TransactionState> txState = iter->next();
+            std::shared_ptr<Command> lastCommand = txState->getCommands().getLast();
             if (lastCommand->isTransactionInfo())
             {
-                Pointer<TransactionInfo> transactionInfo =
-                    lastCommand.dynamicCast<TransactionInfo>();
+                std::shared_ptr<TransactionInfo> transactionInfo =
+                    std::dynamic_pointer_cast<TransactionInfo>(lastCommand);
                 if (transactionInfo->getType() ==
                     ActiveMQConstants::TRANSACTION_STATE_COMMITONEPHASE)
                 {
@@ -339,14 +340,14 @@ void ConnectionStateTracker::doRestoreTransactions(
 
             // replay short lived producers that may have been involved in the
             // transaction
-            Pointer<Iterator<Pointer<ProducerState>>> state(
+            std::shared_ptr<Iterator<std::shared_ptr<ProducerState>>> state(
                 txState->getProducerStates().iterator());
             while (state->hasNext())
             {
                 transport->oneway(state->next()->getInfo());
             }
 
-            std::unique_ptr<Iterator<Pointer<Command>>> commands(
+            std::unique_ptr<Iterator<std::shared_ptr<Command>>> commands(
                 txState->getCommands().iterator());
 
             while (commands->hasNext())
@@ -364,12 +365,12 @@ void ConnectionStateTracker::doRestoreTransactions(
 
         // Trigger failure of commit for all outstanding completed but in doubt
         // transactions.
-        std::vector<Pointer<TransactionInfo>>::const_iterator command =
+        std::vector<std::shared_ptr<TransactionInfo>>::const_iterator command =
             toRollback.begin();
         for (; command != toRollback.end(); ++command)
         {
-            Pointer<ExceptionResponse> response(new ExceptionResponse());
-            Pointer<BrokerError>       exception(new BrokerError());
+            std::shared_ptr<ExceptionResponse> response(new ExceptionResponse());
+            std::shared_ptr<BrokerError>       exception(new BrokerError());
             exception->setExceptionClass("TransactionRolledBackException");
             exception->setMessage(
                 std::string("Transaction completion in doubt due to failover. "
@@ -387,16 +388,16 @@ void ConnectionStateTracker::doRestoreTransactions(
 
 ////////////////////////////////////////////////////////////////////////////////
 void ConnectionStateTracker::doRestoreSessions(
-    Pointer<transport::Transport> transport,
-    Pointer<ConnectionState>      connectionState)
+    std::shared_ptr<transport::Transport> transport,
+    std::shared_ptr<ConnectionState>      connectionState)
 {
     try
     {
-        Pointer<Iterator<Pointer<SessionState>>> iter(
+        std::shared_ptr<Iterator<std::shared_ptr<SessionState>>> iter(
             connectionState->getSessionStates().iterator());
         while (iter->hasNext())
         {
-            Pointer<SessionState> state = iter->next();
+            std::shared_ptr<SessionState> state = iter->next();
             transport->oneway(state->getInfo());
 
             if (restoreProducers)
@@ -417,32 +418,32 @@ void ConnectionStateTracker::doRestoreSessions(
 
 ////////////////////////////////////////////////////////////////////////////////
 void ConnectionStateTracker::doRestoreConsumers(
-    Pointer<transport::Transport> transport,
-    Pointer<SessionState>         sessionState)
+    std::shared_ptr<transport::Transport> transport,
+    std::shared_ptr<SessionState>         sessionState)
 {
     try
     {
         // Restore the session's consumers but possibly in pull only (prefetch 0
         // state) till recovery complete
-        Pointer<ConnectionState> connectionState =
+        std::shared_ptr<ConnectionState> connectionState =
             this->impl->connectionStates.get(
                 sessionState->getInfo()->getSessionId()->getParentId());
         bool connectionInterruptionProcessingComplete =
             connectionState->isConnectionInterruptProcessingComplete();
 
-        Pointer<Iterator<Pointer<ConsumerState>>> state(
+        std::shared_ptr<Iterator<std::shared_ptr<ConsumerState>>> state(
             sessionState->getConsumerStates().iterator());
         while (state->hasNext())
         {
-            Pointer<ConsumerInfo> infoToSend = state->next()->getInfo();
-            Pointer<wireformat::WireFormat> wireFormat =
+            std::shared_ptr<ConsumerInfo> infoToSend = state->next()->getInfo();
+            std::shared_ptr<wireformat::WireFormat> wireFormat =
                 transport->getWireFormat();
 
             if (!connectionInterruptionProcessingComplete &&
                 infoToSend->getPrefetchSize() > 0 &&
                 wireFormat->getVersion() > 5)
             {
-                Pointer<ConsumerInfo> oldInfoToSend = infoToSend;
+                std::shared_ptr<ConsumerInfo> oldInfoToSend = infoToSend;
                 infoToSend.reset(oldInfoToSend->cloneDataStructure());
                 connectionState->getRecoveringPullConsumers().put(
                     infoToSend->getConsumerId(),
@@ -460,17 +461,17 @@ void ConnectionStateTracker::doRestoreConsumers(
 
 ////////////////////////////////////////////////////////////////////////////////
 void ConnectionStateTracker::doRestoreProducers(
-    Pointer<transport::Transport> transport,
-    Pointer<SessionState>         sessionState)
+    std::shared_ptr<transport::Transport> transport,
+    std::shared_ptr<SessionState>         sessionState)
 {
     try
     {
         // Restore the session's producers
-        Pointer<Iterator<Pointer<ProducerState>>> iter(
+        std::shared_ptr<Iterator<std::shared_ptr<ProducerState>>> iter(
             sessionState->getProducerStates().iterator());
         while (iter->hasNext())
         {
-            Pointer<ProducerState> state = iter->next();
+            std::shared_ptr<ProducerState> state = iter->next();
             transport->oneway(state->getInfo());
         }
     }
@@ -481,12 +482,12 @@ void ConnectionStateTracker::doRestoreProducers(
 
 ////////////////////////////////////////////////////////////////////////////////
 void ConnectionStateTracker::doRestoreTempDestinations(
-    Pointer<transport::Transport> transport,
-    Pointer<ConnectionState>      connectionState)
+    std::shared_ptr<transport::Transport> transport,
+    std::shared_ptr<ConnectionState>      connectionState)
 {
     try
     {
-        std::unique_ptr<Iterator<Pointer<DestinationInfo>>> iter(
+        std::unique_ptr<Iterator<std::shared_ptr<DestinationInfo>>> iter(
             connectionState->getTempDesinations().iterator());
 
         while (iter->hasNext())
@@ -500,19 +501,19 @@ void ConnectionStateTracker::doRestoreTempDestinations(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Command> ConnectionStateTracker::processDestinationInfo(
+std::shared_ptr<Command> ConnectionStateTracker::processDestinationInfo(
     DestinationInfo* info)
 {
     try
     {
         if (info != NULL)
         {
-            Pointer<ConnectionState> cs =
+            std::shared_ptr<ConnectionState> cs =
                 this->impl->connectionStates.get(info->getConnectionId());
-            if (cs != NULL && info->getDestination()->isTemporary())
+            if (cs && info->getDestination()->isTemporary())
             {
                 cs->addTempDestination(
-                    Pointer<DestinationInfo>(info->cloneDataStructure()));
+                    std::shared_ptr<DestinationInfo>(info->cloneDataStructure()));
             }
         }
         return this->impl->TRACKED_RESPONSE_MARKER;
@@ -523,16 +524,16 @@ Pointer<Command> ConnectionStateTracker::processDestinationInfo(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Command> ConnectionStateTracker::processRemoveDestination(
+std::shared_ptr<Command> ConnectionStateTracker::processRemoveDestination(
     DestinationInfo* info)
 {
     try
     {
         if (info != NULL)
         {
-            Pointer<ConnectionState> cs =
+            std::shared_ptr<ConnectionState> cs =
                 this->impl->connectionStates.get(info->getConnectionId());
-            if (cs != NULL && info->getDestination()->isTemporary())
+            if (cs && info->getDestination()->isTemporary())
             {
                 cs->removeTempDestination(info->getDestination());
             }
@@ -545,27 +546,27 @@ Pointer<Command> ConnectionStateTracker::processRemoveDestination(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Command> ConnectionStateTracker::processProducerInfo(ProducerInfo* info)
+std::shared_ptr<Command> ConnectionStateTracker::processProducerInfo(ProducerInfo* info)
 {
     try
     {
         if (info != NULL && info->getProducerId() != NULL)
         {
-            Pointer<SessionId> sessionId = info->getProducerId()->getParentId();
-            if (sessionId != NULL)
+            std::shared_ptr<SessionId> sessionId = info->getProducerId()->getParentId();
+            if (sessionId)
             {
-                Pointer<ConnectionId> connectionId = sessionId->getParentId();
-                if (connectionId != NULL)
+                std::shared_ptr<ConnectionId> connectionId = sessionId->getParentId();
+                if (connectionId)
                 {
-                    Pointer<ConnectionState> cs =
+                    std::shared_ptr<ConnectionState> cs =
                         this->impl->connectionStates.get(connectionId);
-                    if (cs != NULL)
+                    if (cs)
                     {
-                        Pointer<SessionState> ss =
+                        std::shared_ptr<SessionState> ss =
                             cs->getSessionState(sessionId);
-                        if (ss != NULL)
+                        if (ss)
                         {
-                            ss->addProducer(Pointer<ProducerInfo>(
+                            ss->addProducer(std::shared_ptr<ProducerInfo>(
                                 info->cloneDataStructure()));
                         }
                     }
@@ -580,28 +581,28 @@ Pointer<Command> ConnectionStateTracker::processProducerInfo(ProducerInfo* info)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Command> ConnectionStateTracker::processRemoveProducer(ProducerId* id)
+std::shared_ptr<Command> ConnectionStateTracker::processRemoveProducer(ProducerId* id)
 {
     try
     {
         if (id != NULL)
         {
-            Pointer<SessionId> sessionId = id->getParentId();
-            if (sessionId != NULL)
+            std::shared_ptr<SessionId> sessionId = id->getParentId();
+            if (sessionId)
             {
-                Pointer<ConnectionId> connectionId = sessionId->getParentId();
-                if (connectionId != NULL)
+                std::shared_ptr<ConnectionId> connectionId = sessionId->getParentId();
+                if (connectionId)
                 {
-                    Pointer<ConnectionState> cs =
+                    std::shared_ptr<ConnectionState> cs =
                         this->impl->connectionStates.get(connectionId);
-                    if (cs != NULL)
+                    if (cs)
                     {
-                        Pointer<SessionState> ss =
+                        std::shared_ptr<SessionState> ss =
                             cs->getSessionState(sessionId);
-                        if (ss != NULL)
+                        if (ss)
                         {
                             ss->removeProducer(
-                                Pointer<ProducerId>(id->cloneDataStructure()));
+                                std::shared_ptr<ProducerId>(id->cloneDataStructure()));
                         }
                     }
                 }
@@ -615,27 +616,27 @@ Pointer<Command> ConnectionStateTracker::processRemoveProducer(ProducerId* id)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Command> ConnectionStateTracker::processConsumerInfo(ConsumerInfo* info)
+std::shared_ptr<Command> ConnectionStateTracker::processConsumerInfo(ConsumerInfo* info)
 {
     try
     {
         if (info != NULL)
         {
-            Pointer<SessionId> sessionId = info->getConsumerId()->getParentId();
-            if (sessionId != NULL)
+            std::shared_ptr<SessionId> sessionId = info->getConsumerId()->getParentId();
+            if (sessionId)
             {
-                Pointer<ConnectionId> connectionId = sessionId->getParentId();
-                if (connectionId != NULL)
+                std::shared_ptr<ConnectionId> connectionId = sessionId->getParentId();
+                if (connectionId)
                 {
-                    Pointer<ConnectionState> cs =
+                    std::shared_ptr<ConnectionState> cs =
                         this->impl->connectionStates.get(connectionId);
-                    if (cs != NULL)
+                    if (cs)
                     {
-                        Pointer<SessionState> ss =
+                        std::shared_ptr<SessionState> ss =
                             cs->getSessionState(sessionId);
-                        if (ss != NULL)
+                        if (ss)
                         {
-                            ss->addConsumer(Pointer<ConsumerInfo>(
+                            ss->addConsumer(std::shared_ptr<ConsumerInfo>(
                                 info->cloneDataStructure()));
                         }
                     }
@@ -650,26 +651,26 @@ Pointer<Command> ConnectionStateTracker::processConsumerInfo(ConsumerInfo* info)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Command> ConnectionStateTracker::processRemoveConsumer(ConsumerId* id)
+std::shared_ptr<Command> ConnectionStateTracker::processRemoveConsumer(ConsumerId* id)
 {
     try
     {
         if (id != NULL)
         {
-            Pointer<SessionId> sessionId = id->getParentId();
-            if (sessionId != NULL)
+            std::shared_ptr<SessionId> sessionId = id->getParentId();
+            if (sessionId)
             {
-                Pointer<ConnectionId> connectionId = sessionId->getParentId();
-                if (connectionId != NULL)
+                std::shared_ptr<ConnectionId> connectionId = sessionId->getParentId();
+                if (connectionId)
                 {
-                    Pointer<ConnectionState> cs =
+                    std::shared_ptr<ConnectionState> cs =
                         this->impl->connectionStates.get(connectionId);
-                    Pointer<ConsumerId> consumerId(id->cloneDataStructure());
-                    if (cs != NULL)
+                    std::shared_ptr<ConsumerId> consumerId(id->cloneDataStructure());
+                    if (cs)
                     {
-                        Pointer<SessionState> ss =
+                        std::shared_ptr<SessionState> ss =
                             cs->getSessionState(sessionId);
-                        if (ss != NULL)
+                        if (ss)
                         {
                             ss->removeConsumer(consumerId);
                         }
@@ -692,22 +693,22 @@ Pointer<Command> ConnectionStateTracker::processRemoveConsumer(ConsumerId* id)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Command> ConnectionStateTracker::processSessionInfo(SessionInfo* info)
+std::shared_ptr<Command> ConnectionStateTracker::processSessionInfo(SessionInfo* info)
 {
     try
     {
         if (info != NULL)
         {
-            Pointer<ConnectionId> connectionId =
+            std::shared_ptr<ConnectionId> connectionId =
                 info->getSessionId()->getParentId();
-            if (connectionId != NULL)
+            if (connectionId)
             {
-                Pointer<ConnectionState> cs =
+                std::shared_ptr<ConnectionState> cs =
                     this->impl->connectionStates.get(connectionId);
-                if (cs != NULL)
+                if (cs)
                 {
                     cs->addSession(
-                        Pointer<SessionInfo>(info->cloneDataStructure()));
+                        std::shared_ptr<SessionInfo>(info->cloneDataStructure()));
                 }
             }
         }
@@ -719,21 +720,21 @@ Pointer<Command> ConnectionStateTracker::processSessionInfo(SessionInfo* info)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Command> ConnectionStateTracker::processRemoveSession(SessionId* id)
+std::shared_ptr<Command> ConnectionStateTracker::processRemoveSession(SessionId* id)
 {
     try
     {
         if (id != NULL)
         {
-            Pointer<ConnectionId> connectionId = id->getParentId();
-            if (connectionId != NULL)
+            std::shared_ptr<ConnectionId> connectionId = id->getParentId();
+            if (connectionId)
             {
-                Pointer<ConnectionState> cs =
+                std::shared_ptr<ConnectionState> cs =
                     this->impl->connectionStates.get(connectionId);
-                if (cs != NULL)
+                if (cs)
                 {
                     cs->removeSession(
-                        Pointer<SessionId>(id->cloneDataStructure()));
+                        std::shared_ptr<SessionId>(id->cloneDataStructure()));
                 }
             }
         }
@@ -745,17 +746,17 @@ Pointer<Command> ConnectionStateTracker::processRemoveSession(SessionId* id)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Command> ConnectionStateTracker::processConnectionInfo(
+std::shared_ptr<Command> ConnectionStateTracker::processConnectionInfo(
     ConnectionInfo* info)
 {
     try
     {
         if (info != NULL)
         {
-            Pointer<ConnectionInfo> infoCopy(info->cloneDataStructure());
+            std::shared_ptr<ConnectionInfo> infoCopy(info->cloneDataStructure());
             this->impl->connectionStates.put(
                 info->getConnectionId(),
-                Pointer<ConnectionState>(new ConnectionState(infoCopy)));
+                std::make_shared<ConnectionState>(infoCopy));
         }
         return this->impl->TRACKED_RESPONSE_MARKER;
     }
@@ -765,7 +766,7 @@ Pointer<Command> ConnectionStateTracker::processConnectionInfo(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Command> ConnectionStateTracker::processRemoveConnection(
+std::shared_ptr<Command> ConnectionStateTracker::processRemoveConnection(
     ConnectionId* id)
 {
     try
@@ -773,7 +774,7 @@ Pointer<Command> ConnectionStateTracker::processRemoveConnection(
         if (id != NULL)
         {
             this->impl->connectionStates.remove(
-                Pointer<ConnectionId>(id->cloneDataStructure()));
+                std::shared_ptr<ConnectionId>(id->cloneDataStructure()));
         }
 
         return this->impl->TRACKED_RESPONSE_MARKER;
@@ -784,7 +785,7 @@ Pointer<Command> ConnectionStateTracker::processRemoveConnection(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Command> ConnectionStateTracker::processMessage(Message* message)
+std::shared_ptr<Command> ConnectionStateTracker::processMessage(Message* message)
 {
     try
     {
@@ -792,32 +793,32 @@ Pointer<Command> ConnectionStateTracker::processMessage(Message* message)
         {
             if (trackTransactions && message->getTransactionId() != NULL)
             {
-                Pointer<ProducerId>   producerId = message->getProducerId();
-                Pointer<ConnectionId> connectionId =
+                std::shared_ptr<ProducerId>   producerId = message->getProducerId();
+                std::shared_ptr<ConnectionId> connectionId =
                     producerId->getParentId()->getParentId();
 
-                if (connectionId != NULL)
+                if (connectionId)
                 {
-                    Pointer<ConnectionState> cs =
+                    std::shared_ptr<ConnectionState> cs =
                         this->impl->connectionStates.get(connectionId);
-                    if (cs != NULL)
+                    if (cs)
                     {
-                        Pointer<TransactionState> transactionState =
+                        std::shared_ptr<TransactionState> transactionState =
                             cs->getTransactionState(
                                 message->getTransactionId());
-                        if (transactionState != NULL)
+                        if (transactionState)
                         {
-                            transactionState->addCommand(Pointer<Command>(
+                            transactionState->addCommand(std::shared_ptr<Command>(
                                 message->cloneDataStructure()));
 
                             if (trackTransactionProducers)
                             {
                                 // Track the producer in case it is closed
                                 // before a commit
-                                Pointer<SessionState> sessionState =
+                                std::shared_ptr<SessionState> sessionState =
                                     cs->getSessionState(
                                         producerId->getParentId());
-                                Pointer<ProducerState> producerState =
+                                std::shared_ptr<ProducerState> producerState =
                                     sessionState->getProducerState(producerId);
                                 producerState->setTransactionState(
                                     transactionState);
@@ -831,11 +832,11 @@ Pointer<Command> ConnectionStateTracker::processMessage(Message* message)
             {
                 this->impl->messageCache.put(
                     message->getMessageId(),
-                    Pointer<Message>(message->cloneDataStructure()));
+                    std::shared_ptr<Message>(message->cloneDataStructure()));
             }
         }
 
-        return Pointer<Response>();
+        return std::shared_ptr<Response>();
     }
     AMQ_CATCH_RETHROW(ActiveMQException)
     AMQ_CATCH_EXCEPTION_CONVERT(Exception, ActiveMQException)
@@ -843,32 +844,32 @@ Pointer<Command> ConnectionStateTracker::processMessage(Message* message)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Command> ConnectionStateTracker::processBeginTransaction(
+std::shared_ptr<Command> ConnectionStateTracker::processBeginTransaction(
     TransactionInfo* info)
 {
     try
     {
         if (trackTransactions && info != NULL)
         {
-            Pointer<ConnectionId> connectionId = info->getConnectionId();
-            if (connectionId != NULL)
+            std::shared_ptr<ConnectionId> connectionId = info->getConnectionId();
+            if (connectionId)
             {
-                Pointer<ConnectionState> cs =
+                std::shared_ptr<ConnectionState> cs =
                     this->impl->connectionStates.get(connectionId);
-                if (cs != NULL)
+                if (cs)
                 {
                     cs->addTransactionState(info->getTransactionId());
-                    Pointer<TransactionState> transactionState =
+                    std::shared_ptr<TransactionState> transactionState =
                         cs->getTransactionState(info->getTransactionId());
                     transactionState->addCommand(
-                        Pointer<Command>(info->cloneDataStructure()));
+                        std::shared_ptr<Command>(info->cloneDataStructure()));
                 }
             }
 
             return this->impl->TRACKED_RESPONSE_MARKER;
         }
 
-        return Pointer<Response>();
+        return std::shared_ptr<Response>();
     }
     AMQ_CATCH_RETHROW(ActiveMQException)
     AMQ_CATCH_EXCEPTION_CONVERT(Exception, ActiveMQException)
@@ -876,26 +877,26 @@ Pointer<Command> ConnectionStateTracker::processBeginTransaction(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Command> ConnectionStateTracker::processPrepareTransaction(
+std::shared_ptr<Command> ConnectionStateTracker::processPrepareTransaction(
     TransactionInfo* info)
 {
     try
     {
         if (trackTransactions && info != NULL)
         {
-            Pointer<ConnectionId> connectionId = info->getConnectionId();
-            if (connectionId != NULL)
+            std::shared_ptr<ConnectionId> connectionId = info->getConnectionId();
+            if (connectionId)
             {
-                Pointer<ConnectionState> cs =
+                std::shared_ptr<ConnectionState> cs =
                     this->impl->connectionStates.get(connectionId);
-                if (cs != NULL)
+                if (cs)
                 {
-                    Pointer<TransactionState> transactionState =
+                    std::shared_ptr<TransactionState> transactionState =
                         cs->getTransactionState(info->getTransactionId());
-                    if (transactionState != NULL)
+                    if (transactionState)
                     {
                         transactionState->addCommand(
-                            Pointer<Command>(info->cloneDataStructure()));
+                            std::shared_ptr<Command>(info->cloneDataStructure()));
                     }
                 }
             }
@@ -903,7 +904,7 @@ Pointer<Command> ConnectionStateTracker::processPrepareTransaction(
             return this->impl->TRACKED_RESPONSE_MARKER;
         }
 
-        return Pointer<Response>();
+        return std::shared_ptr<Response>();
     }
     AMQ_CATCH_RETHROW(ActiveMQException)
     AMQ_CATCH_EXCEPTION_CONVERT(Exception, ActiveMQException)
@@ -911,35 +912,35 @@ Pointer<Command> ConnectionStateTracker::processPrepareTransaction(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Command> ConnectionStateTracker::processCommitTransactionOnePhase(
+std::shared_ptr<Command> ConnectionStateTracker::processCommitTransactionOnePhase(
     TransactionInfo* info)
 {
     try
     {
         if (trackTransactions && info != NULL)
         {
-            Pointer<ConnectionId> connectionId = info->getConnectionId();
-            if (connectionId != NULL)
+            std::shared_ptr<ConnectionId> connectionId = info->getConnectionId();
+            if (connectionId)
             {
-                Pointer<ConnectionState> cs =
+                std::shared_ptr<ConnectionState> cs =
                     this->impl->connectionStates.get(connectionId);
-                if (cs != NULL)
+                if (cs)
                 {
-                    Pointer<TransactionState> transactionState =
+                    std::shared_ptr<TransactionState> transactionState =
                         cs->getTransactionState(info->getTransactionId());
-                    if (transactionState != NULL)
+                    if (transactionState)
                     {
-                        Pointer<TransactionInfo> infoCopy(
+                        std::shared_ptr<TransactionInfo> infoCopy(
                             info->cloneDataStructure());
                         transactionState->addCommand(infoCopy);
-                        return Pointer<Tracked>(new Tracked(Pointer<Runnable>(
-                            new RemoveTransactionAction(this, infoCopy))));
+                        return std::make_shared<Tracked>(std::shared_ptr<Runnable>(
+                            new RemoveTransactionAction(this, infoCopy)));
                     }
                 }
             }
         }
 
-        return Pointer<Response>();
+        return std::shared_ptr<Response>();
     }
     AMQ_CATCH_RETHROW(ActiveMQException)
     AMQ_CATCH_EXCEPTION_CONVERT(Exception, ActiveMQException)
@@ -947,35 +948,35 @@ Pointer<Command> ConnectionStateTracker::processCommitTransactionOnePhase(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Command> ConnectionStateTracker::processCommitTransactionTwoPhase(
+std::shared_ptr<Command> ConnectionStateTracker::processCommitTransactionTwoPhase(
     TransactionInfo* info)
 {
     try
     {
         if (trackTransactions && info != NULL)
         {
-            Pointer<ConnectionId> connectionId = info->getConnectionId();
-            if (connectionId != NULL)
+            std::shared_ptr<ConnectionId> connectionId = info->getConnectionId();
+            if (connectionId)
             {
-                Pointer<ConnectionState> cs =
+                std::shared_ptr<ConnectionState> cs =
                     this->impl->connectionStates.get(connectionId);
-                if (cs != NULL)
+                if (cs)
                 {
-                    Pointer<TransactionState> transactionState =
+                    std::shared_ptr<TransactionState> transactionState =
                         cs->getTransactionState(info->getTransactionId());
-                    if (transactionState != NULL)
+                    if (transactionState)
                     {
-                        Pointer<TransactionInfo> infoCopy(
+                        std::shared_ptr<TransactionInfo> infoCopy(
                             info->cloneDataStructure());
                         transactionState->addCommand(infoCopy);
-                        return Pointer<Tracked>(new Tracked(Pointer<Runnable>(
-                            new RemoveTransactionAction(this, infoCopy))));
+                        return std::make_shared<Tracked>(std::shared_ptr<Runnable>(
+                            new RemoveTransactionAction(this, infoCopy)));
                     }
                 }
             }
         }
 
-        return Pointer<Response>();
+        return std::shared_ptr<Response>();
     }
     AMQ_CATCH_RETHROW(ActiveMQException)
     AMQ_CATCH_EXCEPTION_CONVERT(Exception, ActiveMQException)
@@ -983,35 +984,35 @@ Pointer<Command> ConnectionStateTracker::processCommitTransactionTwoPhase(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Command> ConnectionStateTracker::processRollbackTransaction(
+std::shared_ptr<Command> ConnectionStateTracker::processRollbackTransaction(
     TransactionInfo* info)
 {
     try
     {
         if (trackTransactions && info != NULL)
         {
-            Pointer<ConnectionId> connectionId = info->getConnectionId();
-            if (connectionId != NULL)
+            std::shared_ptr<ConnectionId> connectionId = info->getConnectionId();
+            if (connectionId)
             {
-                Pointer<ConnectionState> cs =
+                std::shared_ptr<ConnectionState> cs =
                     this->impl->connectionStates.get(connectionId);
-                if (cs != NULL)
+                if (cs)
                 {
-                    Pointer<TransactionState> transactionState =
+                    std::shared_ptr<TransactionState> transactionState =
                         cs->getTransactionState(info->getTransactionId());
-                    if (transactionState != NULL)
+                    if (transactionState)
                     {
-                        Pointer<TransactionInfo> infoCopy(
+                        std::shared_ptr<TransactionInfo> infoCopy(
                             info->cloneDataStructure());
                         transactionState->addCommand(infoCopy);
-                        return Pointer<Tracked>(new Tracked(Pointer<Runnable>(
-                            new RemoveTransactionAction(this, infoCopy))));
+                        return std::make_shared<Tracked>(std::shared_ptr<Runnable>(
+                            new RemoveTransactionAction(this, infoCopy)));
                     }
                 }
             }
         }
 
-        return Pointer<Response>();
+        return std::shared_ptr<Response>();
     }
     AMQ_CATCH_RETHROW(ActiveMQException)
     AMQ_CATCH_EXCEPTION_CONVERT(Exception, ActiveMQException)
@@ -1019,26 +1020,26 @@ Pointer<Command> ConnectionStateTracker::processRollbackTransaction(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Command> ConnectionStateTracker::processEndTransaction(
+std::shared_ptr<Command> ConnectionStateTracker::processEndTransaction(
     TransactionInfo* info)
 {
     try
     {
         if (trackTransactions && info != NULL)
         {
-            Pointer<ConnectionId> connectionId = info->getConnectionId();
-            if (connectionId != NULL)
+            std::shared_ptr<ConnectionId> connectionId = info->getConnectionId();
+            if (connectionId)
             {
-                Pointer<ConnectionState> cs =
+                std::shared_ptr<ConnectionState> cs =
                     this->impl->connectionStates.get(connectionId);
-                if (cs != NULL)
+                if (cs)
                 {
-                    Pointer<TransactionState> transactionState =
+                    std::shared_ptr<TransactionState> transactionState =
                         cs->getTransactionState(info->getTransactionId());
-                    if (transactionState != NULL)
+                    if (transactionState)
                     {
                         transactionState->addCommand(
-                            Pointer<Command>(info->cloneDataStructure()));
+                            std::shared_ptr<Command>(info->cloneDataStructure()));
                     }
                 }
             }
@@ -1046,7 +1047,7 @@ Pointer<Command> ConnectionStateTracker::processEndTransaction(
             return this->impl->TRACKED_RESPONSE_MARKER;
         }
 
-        return Pointer<Response>();
+        return std::shared_ptr<Response>();
     }
     AMQ_CATCH_RETHROW(ActiveMQException)
     AMQ_CATCH_EXCEPTION_CONVERT(Exception, ActiveMQException)
@@ -1054,7 +1055,7 @@ Pointer<Command> ConnectionStateTracker::processEndTransaction(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Command> ConnectionStateTracker::processMessagePull(MessagePull* pull)
+std::shared_ptr<Command> ConnectionStateTracker::processMessagePull(MessagePull* pull)
 {
     try
     {
@@ -1065,10 +1066,10 @@ Pointer<Command> ConnectionStateTracker::processMessagePull(MessagePull* pull)
                              "::" + pull->getConsumerId()->toString();
             this->impl->messagePullCache.put(
                 id,
-                Pointer<Command>(pull->cloneDataStructure()));
+                std::shared_ptr<Command>(pull->cloneDataStructure()));
         }
 
-        return Pointer<Command>();
+        return std::shared_ptr<Command>();
     }
     AMQ_CATCH_RETHROW(ActiveMQException)
     AMQ_CATCH_EXCEPTION_CONVERT(Exception, ActiveMQException)
@@ -1077,26 +1078,26 @@ Pointer<Command> ConnectionStateTracker::processMessagePull(MessagePull* pull)
 
 ////////////////////////////////////////////////////////////////////////////////
 void ConnectionStateTracker::connectionInterruptProcessingComplete(
-    transport::Transport* transport,
-    Pointer<ConnectionId> connectionId)
+    transport::Transport*         transport,
+    std::shared_ptr<ConnectionId> connectionId)
 {
-    Pointer<ConnectionState> connectionState =
+    std::shared_ptr<ConnectionState> connectionState =
         this->impl->connectionStates.get(connectionId);
 
-    if (connectionState != NULL)
+    if (connectionState)
     {
         connectionState->setConnectionInterruptProcessingComplete(true);
 
-        StlMap<Pointer<ConsumerId>, Pointer<ConsumerInfo>, ConsumerId::COMPARATOR>
+        StlMap<std::shared_ptr<ConsumerId>, std::shared_ptr<ConsumerInfo>, ConsumerId::COMPARATOR>
             stalledConsumers = connectionState->getRecoveringPullConsumers();
 
-        Pointer<Iterator<Pointer<ConsumerId>>> key(
+        std::shared_ptr<Iterator<std::shared_ptr<ConsumerId>>> key(
             stalledConsumers.keySet().iterator());
         while (key->hasNext())
         {
-            Pointer<ConsumerControl> control(new ConsumerControl());
+            std::shared_ptr<ConsumerControl> control(new ConsumerControl());
 
-            Pointer<ConsumerId> theKey = key->next();
+            std::shared_ptr<ConsumerId> theKey = key->next();
 
             control->setConsumerId(theKey);
             control->setPrefetch(
@@ -1120,7 +1121,7 @@ void ConnectionStateTracker::connectionInterruptProcessingComplete(
 ////////////////////////////////////////////////////////////////////////////////
 void ConnectionStateTracker::transportInterrupted()
 {
-    Pointer<Iterator<Pointer<ConnectionState>>> state(
+    std::shared_ptr<Iterator<std::shared_ptr<ConnectionState>>> state(
         this->impl->connectionStates.values().iterator());
     while (state->hasNext())
     {

@@ -18,7 +18,7 @@
 #include "HexTable.h"
 
 #include <activemq/exceptions/ActiveMQException.h>
-#include <decaf/lang/Integer.h>
+#include <string>
 
 using namespace std;
 using namespace activemq;
@@ -74,7 +74,7 @@ const std::string& HexTable::operator[](std::size_t index)
                 __LINE__,
                 (string("HexTable::operator[] - Index passed is out of "
                         "Bounds") +
-                 Integer::toString((int)index))
+                 std::to_string((int)index))
                     .c_str());
         }
 
@@ -97,7 +97,7 @@ const std::string& HexTable::operator[](std::size_t index) const
                 __LINE__,
                 (string("HexTable::operator[] - Index passed is out of "
                         "Bounds") +
-                 Integer::toString((int)index))
+                 std::to_string((int)index))
                     .c_str());
         }
 

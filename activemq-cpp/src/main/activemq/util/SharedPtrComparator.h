@@ -15,23 +15,31 @@
  * limitations under the License.
  */
 
-#include "DispatchData.h"
+#ifndef _ACTIVEMQ_UTIL_SHAREDPTRCOMPARATOR_H_
+#define _ACTIVEMQ_UTIL_SHAREDPTRCOMPARATOR_H_
 
-using namespace activemq;
-using namespace activemq::core;
+#include <memory>
 
-////////////////////////////////////////////////////////////////////////////////
-DispatchData::DispatchData()
-    : consumerId(),
-      message()
+/**
+ * Strict-weak-ordering comparator for std::shared_ptr<T>.
+ * Dereferences both pointers and delegates to T::operator<.
+ * Drop-in replacement for decaf::lang::PointerComparator<T> after Pointer<T>
+ * is replaced by std::shared_ptr<T>.
+ */
+template<typename T>
+struct SharedPtrComparator
 {
-}
+    bool operator()(const std::shared_ptr<T>& left,
+                    const std::shared_ptr<T>& right) const
+    {
+        return *left < *right;
+    }
 
-////////////////////////////////////////////////////////////////////////////////
-DispatchData::DispatchData(
-    const std::shared_ptr<commands::ConsumerId>& consumer,
-    const std::shared_ptr<commands::Message>&    message)
-    : consumerId(consumer),
-      message(message)
-{
-}
+    int compare(const std::shared_ptr<T>& left,
+                const std::shared_ptr<T>& right) const
+    {
+        return *left < *right ? -1 : *right < *left ? 1 : 0;
+    }
+};
+
+#endif /* _ACTIVEMQ_UTIL_SHAREDPTRCOMPARATOR_H_ */

@@ -44,8 +44,6 @@ namespace core
         class ActiveMQSessionKernel;
     }  // namespace kernels
 
-    using decaf::lang::Pointer;
-
     class LocalTransactionEventListener;
     class ActiveMQConnection;
     class TxContextData;
@@ -72,7 +70,7 @@ namespace core
         ActiveMQConnection* connection;
 
         // List of Registered Synchronizations
-        decaf::util::StlSet<Pointer<Synchronization>> synchronizations;
+        decaf::util::StlSet<std::shared_ptr<Synchronization>> synchronizations;
 
     private:
         ActiveMQTransactionContext(const ActiveMQTransactionContext&);
@@ -97,13 +95,13 @@ namespace core
          * Adds a Synchronization to this Transaction.
          * @param sync - The Synchronization instance to add.
          */
-        virtual void addSynchronization(const Pointer<Synchronization>& sync);
+        virtual void addSynchronization(const std::shared_ptr<Synchronization>& sync);
 
         /**
          * Removes a Synchronization to this Transaction.
          * @param sync - The Synchronization instance to add.
          */
-        virtual void removeSynchronization(const Pointer<Synchronization>& sync);
+        virtual void removeSynchronization(const std::shared_ptr<Synchronization>& sync);
 
         /**
          * Begins a new transaction if one is not currently in progress.
@@ -129,7 +127,7 @@ namespace core
          * @return TransactionInfo
          * @throw InvalidStateException if a Transaction is not in progress.
          */
-        virtual const decaf::lang::Pointer<commands::TransactionId>&
+        virtual const std::shared_ptr<commands::TransactionId>&
         getTransactionId() const;
 
         /**

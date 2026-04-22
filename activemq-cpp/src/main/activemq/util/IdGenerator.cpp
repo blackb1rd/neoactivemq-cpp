@@ -17,8 +17,8 @@
 
 #include "IdGenerator.h"
 
-#include <decaf/lang/Long.h>
-#include <decaf/lang/System.h>
+#include <chrono>
+
 #include <decaf/lang/Thread.h>
 #include <decaf/net/InetAddress.h>
 #include <decaf/net/ServerSocket.h>
@@ -66,15 +66,15 @@ namespace util
             {
                 hostname = InetAddress::getLocalHost().getHostName();
                 ServerSocket ss(0);
-                stub = "-" + Long::toString(ss.getLocalPort()) + "-" +
-                       Long::toString(System::currentTimeMillis()) + "-";
+                stub = "-" + std::to_string(ss.getLocalPort()) + "-" +
+                       std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count()) + "-";
                 Thread::sleep(100);
                 ss.close();
             }
             catch (Exception& ioe)
             {
                 hostname = "localhost";
-                stub     = "-1-" + Long::toString(System::currentTimeMillis()) +
+                stub     = "-1-" + std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count()) +
                        "-";
             }
 
@@ -126,17 +126,17 @@ std::string IdGenerator::generateId() const
                 this->seed =
                     std::string("ID:") + IdGenerator::kernel->hostname +
                     IdGenerator::kernel->UNIQUE_STUB +
-                    Long::toString(IdGenerator::kernel->instanceCount++) + ":";
+                    std::to_string(IdGenerator::kernel->instanceCount++) + ":";
             }
             else
             {
                 this->seed =
                     prefix + IdGenerator::kernel->UNIQUE_STUB +
-                    Long::toString(IdGenerator::kernel->instanceCount++) + ":";
+                    std::to_string(IdGenerator::kernel->instanceCount++) + ":";
             }
         }
 
-        result = this->seed + Long::toString(this->sequence++);
+        result = this->seed + std::to_string(this->sequence++);
     }
 
     return result;
@@ -170,7 +170,7 @@ long long IdGenerator::getSequenceFromId(const std::string& id)
         if (index != std::string::npos && (index + 1) < id.length())
         {
             std::string numStr = id.substr(index + 1, id.length());
-            result             = Long::parseLong(numStr);
+            result             = std::stoll(numStr);
         }
     }
 

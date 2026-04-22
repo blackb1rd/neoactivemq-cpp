@@ -18,9 +18,9 @@
 #include "MessagePropertyInterceptor.h"
 
 #include <activemq/exceptions/ActiveMQException.h>
+#include <string>
 #include <cms/DeliveryMode.h>
 #include <decaf/lang/Boolean.h>
-#include <decaf/lang/Integer.h>
 
 using namespace std;
 using namespace activemq;
@@ -212,11 +212,11 @@ std::string MessagePropertyInterceptor::getStringProperty(
     }
     else if (name == "JMSXDeliveryCount")
     {
-        return Integer::toString(this->message->getRedeliveryCounter());
+        return std::to_string(this->message->getRedeliveryCounter());
     }
     else if (name == "JMSXGroupSeq")
     {
-        return Integer::toString(this->message->getGroupSequence());
+        return std::to_string(this->message->getGroupSequence());
     }
     else if (name == "JMSXGroupFirstForConsumer")
     {
@@ -365,11 +365,11 @@ void MessagePropertyInterceptor::setStringProperty(const std::string& name,
     }
     else if (name == "JMSXDeliveryCount")
     {
-        this->message->setRedeliveryCounter(Integer::parseInt(value));
+        this->message->setRedeliveryCounter(std::stoi(value));
     }
     else if (name == "JMSXGroupSeq")
     {
-        this->message->setGroupSequence(Integer::parseInt(value));
+        this->message->setGroupSequence(std::stoi(value));
     }
     else if (name == "JMSXGroupFirstForConsumer")
     {

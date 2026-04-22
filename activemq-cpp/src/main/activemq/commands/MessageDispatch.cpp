@@ -24,7 +24,7 @@ using namespace std;
 using namespace activemq;
 using namespace activemq::exceptions;
 using namespace activemq::commands;
-using namespace decaf::lang;
+
 using namespace decaf::lang::exceptions;
 
 /*
@@ -40,9 +40,9 @@ using namespace decaf::lang::exceptions;
 ////////////////////////////////////////////////////////////////////////////////
 MessageDispatch::MessageDispatch()
     : BaseCommand(),
-      consumerId(NULL),
-      destination(NULL),
-      message(NULL),
+      consumerId(),
+      destination(),
+      message(),
       redeliveryCounter(0),
       rollbackCause()
 {
@@ -108,7 +108,7 @@ std::string MessageDispatch::toString() const
            << "responseRequired = " << boolalpha << this->isResponseRequired();
     stream << ", ";
     stream << "ConsumerId = ";
-    if (this->getConsumerId() != NULL)
+    if (this->getConsumerId())
     {
         stream << this->getConsumerId()->toString();
     }
@@ -118,7 +118,7 @@ std::string MessageDispatch::toString() const
     }
     stream << ", ";
     stream << "Destination = ";
-    if (this->getDestination() != NULL)
+    if (this->getDestination())
     {
         stream << this->getDestination()->toString();
     }
@@ -128,7 +128,7 @@ std::string MessageDispatch::toString() const
     }
     stream << ", ";
     stream << "Message = ";
-    if (this->getMessage() != NULL)
+    if (this->getMessage())
     {
         stream << this->getMessage()->toString();
     }
@@ -159,36 +159,36 @@ bool MessageDispatch::equals(const DataStructure* value) const
         return false;
     }
 
-    if (this->getConsumerId() != NULL)
+    if (this->getConsumerId())
     {
         if (!this->getConsumerId()->equals(valuePtr->getConsumerId().get()))
         {
             return false;
         }
     }
-    else if (valuePtr->getConsumerId() != NULL)
+    else if (valuePtr->getConsumerId())
     {
         return false;
     }
-    if (this->getDestination() != NULL)
+    if (this->getDestination())
     {
         if (!this->getDestination()->equals(valuePtr->getDestination().get()))
         {
             return false;
         }
     }
-    else if (valuePtr->getDestination() != NULL)
+    else if (valuePtr->getDestination())
     {
         return false;
     }
-    if (this->getMessage() != NULL)
+    if (this->getMessage())
     {
         if (!this->getMessage()->equals(valuePtr->getMessage().get()))
         {
             return false;
         }
     }
-    else if (valuePtr->getMessage() != NULL)
+    else if (valuePtr->getMessage())
     {
         return false;
     }
@@ -204,58 +204,58 @@ bool MessageDispatch::equals(const DataStructure* value) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const decaf::lang::Pointer<ConsumerId>& MessageDispatch::getConsumerId() const
+const std::shared_ptr<ConsumerId>& MessageDispatch::getConsumerId() const
 {
     return consumerId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<ConsumerId>& MessageDispatch::getConsumerId()
+std::shared_ptr<ConsumerId>& MessageDispatch::getConsumerId()
 {
     return consumerId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void MessageDispatch::setConsumerId(
-    const decaf::lang::Pointer<ConsumerId>& consumerId)
+    const std::shared_ptr<ConsumerId>& consumerId)
 {
     this->consumerId = consumerId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const decaf::lang::Pointer<ActiveMQDestination>&
+const std::shared_ptr<ActiveMQDestination>&
 MessageDispatch::getDestination() const
 {
     return destination;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<ActiveMQDestination>& MessageDispatch::getDestination()
+std::shared_ptr<ActiveMQDestination>& MessageDispatch::getDestination()
 {
     return destination;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void MessageDispatch::setDestination(
-    const decaf::lang::Pointer<ActiveMQDestination>& destination)
+    const std::shared_ptr<ActiveMQDestination>& destination)
 {
     this->destination = destination;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const decaf::lang::Pointer<Message>& MessageDispatch::getMessage() const
+const std::shared_ptr<Message>& MessageDispatch::getMessage() const
 {
     return message;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<Message>& MessageDispatch::getMessage()
+std::shared_ptr<Message>& MessageDispatch::getMessage()
 {
     return message;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MessageDispatch::setMessage(const decaf::lang::Pointer<Message>& message)
+void MessageDispatch::setMessage(const std::shared_ptr<Message>& message)
 {
     this->message = message;
 }
@@ -273,7 +273,7 @@ void MessageDispatch::setRedeliveryCounter(int redeliveryCounter)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<commands::Command> MessageDispatch::visit(
+std::shared_ptr<commands::Command> MessageDispatch::visit(
     activemq::state::CommandVisitor* visitor)
 {
     return visitor->processMessageDispatch(this);

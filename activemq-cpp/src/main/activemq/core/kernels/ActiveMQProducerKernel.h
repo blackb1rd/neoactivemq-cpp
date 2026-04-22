@@ -40,8 +40,6 @@ namespace core
     namespace kernels
     {
 
-        using decaf::lang::Pointer;
-
         class ActiveMQSessionKernel;
 
         class AMQCPP_API ActiveMQProducerKernel : public cms::MessageProducer
@@ -69,7 +67,7 @@ namespace core
             ActiveMQSessionKernel* session;
 
             // This Producers protocol specific info object
-            Pointer<commands::ProducerInfo> producerInfo;
+            std::shared_ptr<commands::ProducerInfo> producerInfo;
 
             // Boolean that indicates if the consumer has been closed
             bool closed;
@@ -79,7 +77,7 @@ namespace core
             std::unique_ptr<util::MemoryUsage> memoryUsage;
 
             // The Destination assigned at creation, NULL if not assigned.
-            Pointer<cms::Destination> destination;
+            std::shared_ptr<cms::Destination> destination;
 
             // Generator of Message Sequence Id numbers for this producer.
             util::LongSequenceGenerator messageSequence;
@@ -110,10 +108,10 @@ namespace core
              *        The configured send timeout for this Producer.
              */
             ActiveMQProducerKernel(
-                ActiveMQSessionKernel*                        session,
-                const Pointer<commands::ProducerId>&          producerId,
-                const Pointer<commands::ActiveMQDestination>& destination,
-                long long                                     sendTimeout);
+                ActiveMQSessionKernel*                              session,
+                const std::shared_ptr<commands::ProducerId>&        producerId,
+                const std::shared_ptr<commands::ActiveMQDestination>& destination,
+                long long                                           sendTimeout);
 
             virtual ~ActiveMQProducerKernel();
 
@@ -303,7 +301,7 @@ namespace core
              * Retries this object ProducerInfo pointer
              * @return ProducerInfo Reference
              */
-            const Pointer<commands::ProducerInfo>& getProducerInfo() const
+            const std::shared_ptr<commands::ProducerInfo>& getProducerInfo() const
             {
                 this->checkClosed();
                 return this->producerInfo;
@@ -313,7 +311,7 @@ namespace core
              * Retries this object ProducerId or NULL if closed.
              * @return ProducerId Reference
              */
-            const Pointer<commands::ProducerId>& getProducerId() const
+            const std::shared_ptr<commands::ProducerId>& getProducerId() const
             {
                 this->checkClosed();
                 return this->producerInfo->getProducerId();

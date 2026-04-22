@@ -27,14 +27,12 @@
 #include <activemq/core/kernels/ActiveMQConsumerKernel.h>
 #include <activemq/util/Config.h>
 
-#include <decaf/lang/Pointer.h>
+#include <memory>
 
 namespace activemq
 {
 namespace core
 {
-
-    using decaf::lang::Pointer;
 
     class ActiveMQSession;
     class ActiveMQConsumerData;
@@ -57,7 +55,7 @@ namespace core
          *      This Consumer's functionality kernel.
          */
         ActiveMQConsumer(
-            const Pointer<activemq::core::kernels::ActiveMQConsumerKernel>&
+            const std::shared_ptr<activemq::core::kernels::ActiveMQConsumerKernel>&
                 kernel);
 
         virtual ~ActiveMQConsumer();
@@ -96,13 +94,13 @@ namespace core
          * Get the Consumer information for this consumer
          * @return Reference to a Consumer Info Object
          */
-        const Pointer<commands::ConsumerInfo>& getConsumerInfo() const;
+        const std::shared_ptr<commands::ConsumerInfo>& getConsumerInfo() const;
 
         /**
          * Get the Consumer Id for this consumer
          * @return Reference to a Consumer Id Object
          */
-        const Pointer<commands::ConsumerId>& getConsumerId() const;
+        const std::shared_ptr<commands::ConsumerId>& getConsumerId() const;
 
         /**
          * @return if this Consumer has been closed.

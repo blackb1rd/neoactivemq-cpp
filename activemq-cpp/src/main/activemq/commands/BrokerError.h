@@ -21,8 +21,7 @@
 #include <activemq/commands/BaseCommand.h>
 #include <activemq/exceptions/ActiveMQException.h>
 #include <activemq/util/Config.h>
-#include <decaf/lang/Pointer.h>
-
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -59,14 +58,14 @@ namespace commands
     private:
         std::string                                          message;
         std::string                                          exceptionClass;
-        std::vector<decaf::lang::Pointer<StackTraceElement>> stackTraceElements;
-        decaf::lang::Pointer<BrokerError>                    cause;
-        decaf::lang::Pointer<decaf::lang::Exception>         exCause;
+        std::vector<std::shared_ptr<StackTraceElement>> stackTraceElements;
+        std::shared_ptr<BrokerError>                    cause;
+        std::shared_ptr<decaf::lang::Exception>         exCause;
 
     public:
         BrokerError();
 
-        BrokerError(decaf::lang::Pointer<decaf::lang::Exception> exCause);
+        BrokerError(std::shared_ptr<decaf::lang::Exception> exCause);
 
         virtual ~BrokerError();
 
@@ -106,7 +105,7 @@ namespace commands
          * @return a Response to the visitor being called or NULL if no
          * response.
          */
-        virtual decaf::lang::Pointer<commands::Command> visit(
+        virtual std::shared_ptr<commands::Command> visit(
             activemq::state::CommandVisitor* visitor);
 
         /**
@@ -149,7 +148,7 @@ namespace commands
          * Gets the Broker Error that caused this exception
          * @return Broker Error Pointer
          */
-        virtual const decaf::lang::Pointer<BrokerError>& getCause() const
+        virtual const std::shared_ptr<BrokerError>& getCause() const
         {
             return cause;
         }
@@ -158,7 +157,7 @@ namespace commands
          * Sets the Broker Error that caused this exception
          * @param cause - Broker Error
          */
-        virtual void setCause(const decaf::lang::Pointer<BrokerError>& cause)
+        virtual void setCause(const std::shared_ptr<BrokerError>& cause)
         {
             this->cause = cause;
         }
@@ -167,7 +166,7 @@ namespace commands
          * Gets the Stack Trace Elements for the Exception
          * @return Stack Trace Elements
          */
-        virtual const std::vector<decaf::lang::Pointer<StackTraceElement>>&
+        virtual const std::vector<std::shared_ptr<StackTraceElement>>&
         getStackTraceElements() const
         {
             return stackTraceElements;
@@ -178,7 +177,7 @@ namespace commands
          * @param stackTraceElements - Stack Trace Elements
          */
         virtual void setStackTraceElements(
-            const std::vector<decaf::lang::Pointer<StackTraceElement>>&
+            const std::vector<std::shared_ptr<StackTraceElement>>&
                 stackTraceElements)
         {
             this->stackTraceElements = stackTraceElements;
@@ -188,7 +187,7 @@ namespace commands
          * @return the local Exception that was the source of this BrokerError
          * instance
          */
-        decaf::lang::Pointer<decaf::lang::Exception> getLocalException() const
+        std::shared_ptr<decaf::lang::Exception> getLocalException() const
         {
             return this->exCause;
         }
@@ -201,7 +200,7 @@ namespace commands
          *      The Exception that originated this BrokerError.
          */
         void setLocalException(
-            decaf::lang::Pointer<decaf::lang::Exception> exCause)
+            std::shared_ptr<decaf::lang::Exception> exCause)
         {
             this->exCause = exCause;
         }

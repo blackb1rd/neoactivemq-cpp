@@ -24,8 +24,8 @@
 #include <activemq/transport/TransportFilter.h>
 #include <activemq/wireformat/WireFormat.h>
 
-#include <decaf/lang/Pointer.h>
 #include <decaf/util/Properties.h>
+#include <memory>
 
 namespace activemq
 {
@@ -33,8 +33,6 @@ namespace transport
 {
     namespace inactivity
     {
-
-        using decaf::lang::Pointer;
 
         class ReadChecker;
         class WriteChecker;
@@ -58,21 +56,21 @@ namespace transport
             InactivityMonitor operator=(const InactivityMonitor&);
 
         public:
-            InactivityMonitor(const Pointer<Transport>              next,
-                              const Pointer<wireformat::WireFormat> wireFormat);
+            InactivityMonitor(const std::shared_ptr<Transport>              next,
+                              const std::shared_ptr<wireformat::WireFormat> wireFormat);
 
-            InactivityMonitor(const Pointer<Transport>              next,
+            InactivityMonitor(const std::shared_ptr<Transport>              next,
                               const decaf::util::Properties&        properties,
-                              const Pointer<wireformat::WireFormat> wireFormat);
+                              const std::shared_ptr<wireformat::WireFormat> wireFormat);
 
             virtual ~InactivityMonitor();
 
         public:  // TransportFilter Methods
             virtual void onException(const decaf::lang::Exception& ex);
 
-            virtual void onCommand(const Pointer<Command> command);
+            virtual void onCommand(const std::shared_ptr<Command> command);
 
-            virtual void oneway(const Pointer<Command> command);
+            virtual void oneway(const std::shared_ptr<Command> command);
 
         public:
             bool isKeepAliveResponseRequired() const;

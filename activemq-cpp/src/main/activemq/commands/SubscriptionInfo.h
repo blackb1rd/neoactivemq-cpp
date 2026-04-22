@@ -26,7 +26,7 @@
 #include <activemq/commands/ActiveMQDestination.h>
 #include <activemq/commands/BaseDataStructure.h>
 #include <activemq/util/Config.h>
-#include <decaf/lang/Pointer.h>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -34,8 +34,6 @@ namespace activemq
 {
 namespace commands
 {
-
-    using decaf::lang::Pointer;
 
     /*
      *
@@ -50,10 +48,10 @@ namespace commands
     {
     protected:
         std::string                  clientId;
-        Pointer<ActiveMQDestination> destination;
-        std::string                  selector;
-        std::string                  subcriptionName;
-        Pointer<ActiveMQDestination> subscribedDestination;
+        std::shared_ptr<ActiveMQDestination> destination;
+        std::string                          selector;
+        std::string                          subcriptionName;
+        std::shared_ptr<ActiveMQDestination> subscribedDestination;
         bool                         noLocal;
 
     public:
@@ -82,10 +80,10 @@ namespace commands
         virtual std::string&       getClientId();
         virtual void               setClientId(const std::string& clientId);
 
-        virtual const Pointer<ActiveMQDestination>& getDestination() const;
-        virtual Pointer<ActiveMQDestination>&       getDestination();
-        virtual void                                setDestination(
-                                           const Pointer<ActiveMQDestination>& destination);
+        virtual const std::shared_ptr<ActiveMQDestination>& getDestination() const;
+        virtual std::shared_ptr<ActiveMQDestination>&       getDestination();
+        virtual void                                        setDestination(
+                                           const std::shared_ptr<ActiveMQDestination>& destination);
 
         virtual const std::string& getSelector() const;
         virtual std::string&       getSelector();
@@ -95,11 +93,11 @@ namespace commands
         virtual std::string&       getSubcriptionName();
         virtual void setSubcriptionName(const std::string& subcriptionName);
 
-        virtual const Pointer<ActiveMQDestination>& getSubscribedDestination()
+        virtual const std::shared_ptr<ActiveMQDestination>& getSubscribedDestination()
             const;
-        virtual Pointer<ActiveMQDestination>& getSubscribedDestination();
-        virtual void                          setSubscribedDestination(
-                                     const Pointer<ActiveMQDestination>& subscribedDestination);
+        virtual std::shared_ptr<ActiveMQDestination>& getSubscribedDestination();
+        virtual void                                  setSubscribedDestination(
+                                     const std::shared_ptr<ActiveMQDestination>& subscribedDestination);
 
         virtual bool isNoLocal() const;
         virtual void setNoLocal(bool noLocal);

@@ -19,13 +19,14 @@
 
 #include <activemq/state/TransactionState.h>
 
+#include <memory>
+
 using namespace activemq;
 using namespace activemq::state;
 using namespace activemq::commands;
-using namespace decaf::lang;
 
 ////////////////////////////////////////////////////////////////////////////////
-ProducerState::ProducerState(Pointer<ProducerInfo> info)
+ProducerState::ProducerState(std::shared_ptr<ProducerInfo> info)
     : info(info),
       transactionState()
 {
@@ -39,7 +40,7 @@ ProducerState::~ProducerState()
 ////////////////////////////////////////////////////////////////////////////////
 std::string ProducerState::toString() const
 {
-    if (this->info != NULL)
+    if (this->info)
     {
         return this->info->toString();
     }
@@ -49,13 +50,13 @@ std::string ProducerState::toString() const
 
 ////////////////////////////////////////////////////////////////////////////////
 void ProducerState::setTransactionState(
-    Pointer<TransactionState> transactionState)
+    std::shared_ptr<TransactionState> transactionState)
 {
     this->transactionState = transactionState;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<TransactionState> ProducerState::getTransactionState() const
+std::shared_ptr<TransactionState> ProducerState::getTransactionState() const
 {
     return this->transactionState;
 }

@@ -25,11 +25,10 @@ using namespace activemq;
 using namespace activemq::commands;
 using namespace activemq::state;
 using namespace decaf;
-using namespace decaf::util;
 using namespace decaf::lang;
 
 ////////////////////////////////////////////////////////////////////////////////
-TransactionState::TransactionState(Pointer<TransactionId> id)
+TransactionState::TransactionState(std::shared_ptr<TransactionId> id)
     : commands(),
       id(id),
       disposed(false),
@@ -52,7 +51,7 @@ TransactionState::~TransactionState()
 ////////////////////////////////////////////////////////////////////////////////
 std::string TransactionState::toString() const
 {
-    if (this->id != NULL)
+    if (this->id)
     {
         return this->id->toString();
     }
@@ -63,7 +62,7 @@ std::string TransactionState::toString() const
 ////////////////////////////////////////////////////////////////////////////////
 void TransactionState::shutdown()
 {
-    this->disposed.set(true);
+    this->disposed.store(true);
     this->clear();
 }
 
@@ -75,7 +74,7 @@ void TransactionState::clear()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TransactionState::addCommand(Pointer<Command> operation)
+void TransactionState::addCommand(std::shared_ptr<Command> operation)
 {
     checkShutdown();
     commands.add(operation);
@@ -84,7 +83,7 @@ void TransactionState::addCommand(Pointer<Command> operation)
 ////////////////////////////////////////////////////////////////////////////////
 void TransactionState::checkShutdown() const
 {
-    if (this->disposed.get())
+    if (this->disposed.load())
     {
         throw decaf::lang::exceptions::IllegalStateException(
             __FILE__,
@@ -94,19 +93,19 @@ void TransactionState::checkShutdown() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TransactionState::addProducerState(Pointer<ProducerState> producerState)
+void TransactionState::addProducerState(std::shared_ptr<ProducerState> producerState)
 {
-    if (producerState != NULL)
+    if (producerState)
     {
         // Ensure the producer doesn't hold a link to this TX state to avoid a
         // circular reference that could lead to memory leaks.
-        producerState->getTransactionState().reset(NULL);
+        producerState->getTransactionState().reset();
         producers.put(producerState->getInfo()->getProducerId(), producerState);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const decaf::util::Collection<Pointer<ProducerState>>&
+const decaf::util::Collection<std::shared_ptr<ProducerState>>&
 TransactionState::getProducerStates()
 {
     return this->producers.values();

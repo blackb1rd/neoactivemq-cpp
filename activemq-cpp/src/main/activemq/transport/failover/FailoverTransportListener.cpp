@@ -18,6 +18,8 @@
 #include "FailoverTransportListener.h"
 #include "FailoverTransport.h"
 
+#include <memory>
+
 #include <activemq/commands/Response.h>
 #include <activemq/state/Tracked.h>
 #include <decaf/lang/exceptions/NullPointerException.h>
@@ -49,16 +51,16 @@ FailoverTransportListener::~FailoverTransportListener()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FailoverTransportListener::onCommand(const Pointer<Command> command)
+void FailoverTransportListener::onCommand(const std::shared_ptr<Command> command)
 {
-    if (command == NULL)
+    if (!command)
     {
         return;
     }
 
     if (command->isResponse())
     {
-        Pointer<Response> response = command.dynamicCast<Response>();
+        std::shared_ptr<Response> response = std::dynamic_pointer_cast<Response>(command);
         parent->processResponse(response);
     }
 

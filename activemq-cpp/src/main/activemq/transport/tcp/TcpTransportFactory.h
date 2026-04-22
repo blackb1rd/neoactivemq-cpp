@@ -18,6 +18,8 @@
 #ifndef _ACTIVEMQ_TRANSPORT_TCP_TCPTRANSPORTFACTORY_H_
 #define _ACTIVEMQ_TRANSPORT_TCP_TCPTRANSPORTFACTORY_H_
 
+#include <memory>
+
 #include <activemq/transport/AbstractTransportFactory.h>
 #include <activemq/util/Config.h>
 
@@ -27,8 +29,6 @@ namespace transport
 {
     namespace tcp
     {
-
-        using decaf::lang::Pointer;
 
         /**
          * Factory Responsible for creating the TcpTransport.
@@ -40,19 +40,19 @@ namespace transport
             {
             }
 
-            virtual Pointer<Transport> create(const decaf::net::URI& location);
+            virtual std::shared_ptr<Transport> create(const decaf::net::URI& location);
 
-            virtual Pointer<Transport> createComposite(
+            virtual std::shared_ptr<Transport> createComposite(
                 const decaf::net::URI& location);
 
         protected:
-            virtual Pointer<Transport> doCreateComposite(
-                const decaf::net::URI&                location,
-                const Pointer<wireformat::WireFormat> wireFormat,
-                const decaf::util::Properties&        properties);
+            virtual std::shared_ptr<Transport> doCreateComposite(
+                const decaf::net::URI&                        location,
+                const std::shared_ptr<wireformat::WireFormat> wireFormat,
+                const decaf::util::Properties&                properties);
 
             virtual void doConfigureTransport(
-                Pointer<Transport>,
+                std::shared_ptr<Transport>,
                 const decaf::util::Properties& properties);
         };
 

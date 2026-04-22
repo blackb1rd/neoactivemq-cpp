@@ -25,8 +25,9 @@
 #include <activemq/transport/failover/URIPool.h>
 #include <activemq/util/Config.h>
 
+#include <memory>
+
 #include <decaf/io/IOException.h>
-#include <decaf/lang/Pointer.h>
 #include <decaf/util/LinkedList.h>
 
 namespace activemq
@@ -37,7 +38,6 @@ namespace transport
     {
 
         using activemq::threads::CompositeTaskRunner;
-        using decaf::lang::Pointer;
         using decaf::util::LinkedList;
 
         class BackupTransportPoolImpl;
@@ -51,31 +51,31 @@ namespace transport
 
             BackupTransportPoolImpl* impl;
 
-            FailoverTransport*           parent;
-            Pointer<CompositeTaskRunner> taskRunner;
-            Pointer<CloseTransportsTask> closeTask;
-            Pointer<URIPool>             uriPool;
-            Pointer<URIPool>             updates;
-            Pointer<URIPool>             priorityUriPool;
-            volatile int                 backupPoolSize;
-            volatile bool                enabled;
-            volatile int                 maxReconnectDelay;
+            FailoverTransport*                        parent;
+            std::shared_ptr<CompositeTaskRunner>      taskRunner;
+            std::shared_ptr<CloseTransportsTask>      closeTask;
+            std::shared_ptr<URIPool>                  uriPool;
+            std::shared_ptr<URIPool>                  updates;
+            std::shared_ptr<URIPool>                  priorityUriPool;
+            volatile int                              backupPoolSize;
+            volatile bool                             enabled;
+            volatile int                              maxReconnectDelay;
 
         public:
-            BackupTransportPool(FailoverTransport*                 parent,
-                                const Pointer<CompositeTaskRunner> taskRunner,
-                                const Pointer<CloseTransportsTask> closeTask,
-                                const Pointer<URIPool>             uriPool,
-                                const Pointer<URIPool>             updates,
-                                const Pointer<URIPool> priorityUriPool);
+            BackupTransportPool(FailoverTransport*                        parent,
+                                const std::shared_ptr<CompositeTaskRunner> taskRunner,
+                                const std::shared_ptr<CloseTransportsTask> closeTask,
+                                const std::shared_ptr<URIPool>             uriPool,
+                                const std::shared_ptr<URIPool>             updates,
+                                const std::shared_ptr<URIPool>             priorityUriPool);
 
-            BackupTransportPool(FailoverTransport* parent,
-                                int                backupPoolSize,
-                                const Pointer<CompositeTaskRunner> taskRunner,
-                                const Pointer<CloseTransportsTask> closeTask,
-                                const Pointer<URIPool>             uriPool,
-                                const Pointer<URIPool>             updates,
-                                const Pointer<URIPool> priorityUriPool);
+            BackupTransportPool(FailoverTransport*                        parent,
+                                int                                        backupPoolSize,
+                                const std::shared_ptr<CompositeTaskRunner> taskRunner,
+                                const std::shared_ptr<CloseTransportsTask> closeTask,
+                                const std::shared_ptr<URIPool>             uriPool,
+                                const std::shared_ptr<URIPool>             updates,
+                                const std::shared_ptr<URIPool>             priorityUriPool);
 
             virtual ~BackupTransportPool();
 
@@ -97,7 +97,7 @@ namespace transport
              *
              * @return Pointer to a Connected Transport or NULL
              */
-            Pointer<BackupTransport> getBackup();
+            std::shared_ptr<BackupTransport> getBackup();
 
             /**
              * Connect to a Backup Broker if we haven't already connected to the
@@ -160,7 +160,7 @@ namespace transport
             // for cleanup.
             void onBackupTransportFailure(BackupTransport* failedTransport);
 
-            Pointer<Transport> createTransport(
+            std::shared_ptr<Transport> createTransport(
                 const decaf::net::URI& location) const;
         };
 

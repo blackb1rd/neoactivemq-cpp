@@ -27,7 +27,7 @@
 #include <activemq/commands/ConnectionId.h>
 #include <activemq/commands/TransactionId.h>
 #include <activemq/util/Config.h>
-#include <decaf/lang/Pointer.h>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -35,8 +35,6 @@ namespace activemq
 {
 namespace commands
 {
-
-    using decaf::lang::Pointer;
 
     /*
      *
@@ -50,8 +48,8 @@ namespace commands
     class AMQCPP_API TransactionInfo : public BaseCommand
     {
     protected:
-        Pointer<ConnectionId>  connectionId;
-        Pointer<TransactionId> transactionId;
+        std::shared_ptr<ConnectionId>  connectionId;
+        std::shared_ptr<TransactionId> transactionId;
         unsigned char          type;
 
     public:
@@ -76,14 +74,14 @@ namespace commands
 
         virtual bool equals(const DataStructure* value) const;
 
-        virtual const Pointer<ConnectionId>& getConnectionId() const;
-        virtual Pointer<ConnectionId>&       getConnectionId();
-        virtual void setConnectionId(const Pointer<ConnectionId>& connectionId);
+        virtual const std::shared_ptr<ConnectionId>& getConnectionId() const;
+        virtual std::shared_ptr<ConnectionId>&       getConnectionId();
+        virtual void setConnectionId(const std::shared_ptr<ConnectionId>& connectionId);
 
-        virtual const Pointer<TransactionId>& getTransactionId() const;
-        virtual Pointer<TransactionId>&       getTransactionId();
-        virtual void                          setTransactionId(
-                                     const Pointer<TransactionId>& transactionId);
+        virtual const std::shared_ptr<TransactionId>& getTransactionId() const;
+        virtual std::shared_ptr<TransactionId>&       getTransactionId();
+        virtual void                                  setTransactionId(
+                                     const std::shared_ptr<TransactionId>& transactionId);
 
         virtual unsigned char getType() const;
         virtual void          setType(unsigned char type);
@@ -96,7 +94,7 @@ namespace commands
             return true;
         }
 
-        virtual Pointer<Command> visit(activemq::state::CommandVisitor* visitor);
+        virtual std::shared_ptr<Command> visit(activemq::state::CommandVisitor* visitor);
     };
 
 }  // namespace commands

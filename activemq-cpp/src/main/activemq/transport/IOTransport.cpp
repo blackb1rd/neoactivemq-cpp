@@ -28,8 +28,8 @@
 #include <activemq/wireformat/WireFormat.h>
 #include <activemq/wireformat/openwire/OpenWireFormat.h>
 #include <decaf/lang/exceptions/UnsupportedOperationException.h>
+#include <atomic>
 #include <decaf/util/concurrent/Concurrent.h>
-#include <decaf/util/concurrent/atomic/AtomicBoolean.h>
 #include <typeinfo>
 
 using namespace activemq;
@@ -45,7 +45,6 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
-using namespace decaf::util::concurrent::atomic;
 
 ////////////////////////////////////////////////////////////////////////////////
 LOGDECAF_INITIALIZE(logger, IOTransport, "activemq.transport.IOTransport")
@@ -56,7 +55,7 @@ namespace activemq
 namespace transport
 {
 
-    void IOTransport::logMessageDispatchDetails(const Pointer<Command>& command)
+    void IOTransport::logMessageDispatchDetails(const std::shared_ptr<Command>& command)
     {
         try
         {
@@ -66,13 +65,13 @@ namespace transport
             {
                 return;
             }
-            const Pointer<Message>& msg = dispatch->getMessage();
-            if (msg == NULL)
+            const std::shared_ptr<Message>& msg = dispatch->getMessage();
+            if (msg == nullptr)
             {
                 return;
             }
-            const Pointer<MessageId>&           msgId = msg->getMessageId();
-            const Pointer<ActiveMQDestination>& dest =
+            const std::shared_ptr<MessageId>&           msgId = msg->getMessageId();
+            const std::shared_ptr<ActiveMQDestination>& dest =
                 dispatch->getDestination();
             AMQ_LOG_INFO("MessageReceived",
                          "Message ID: "
@@ -96,13 +95,13 @@ namespace transport
         IOTransportImpl& operator=(const IOTransportImpl&);
 
     public:
-        Pointer<wireformat::WireFormat> wireFormat;
+        std::shared_ptr<wireformat::WireFormat> wireFormat;
         TransportListener*              listener;
         decaf::io::DataInputStream*     inputStream;
         decaf::io::DataOutputStream*    outputStream;
-        Pointer<decaf::lang::Thread>    thread;
-        AtomicBoolean                   closed;
-        AtomicBoolean                   started;
+        std::shared_ptr<decaf::lang::Thread>    thread;
+        std::atomic<bool>               closed;
+        std::atomic<bool>               started;
 
         IOTransportImpl()
             : wireFormat(),
@@ -115,7 +114,7 @@ namespace transport
         {
         }
 
-        IOTransportImpl(const Pointer<WireFormat> wireFormat)
+        IOTransportImpl(const std::shared_ptr<WireFormat> wireFormat)
             : wireFormat(wireFormat),
               listener(NULL),
               inputStream(NULL),
@@ -137,7 +136,7 @@ IOTransport::IOTransport()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-IOTransport::IOTransport(const Pointer<WireFormat> wireFormat)
+IOTransport::IOTransport(const std::shared_ptr<WireFormat> wireFormat)
     : impl(new IOTransportImpl(wireFormat))
 {
 }
@@ -163,13 +162,13 @@ void IOTransport::fire(decaf::lang::Exception& ex)
 {
     AMQ_LOG_DEBUG("IOTransport",
                   "fire(Exception) started="
-                      << this->impl->started.get()
-                      << " closed=" << this->impl->closed.get()
+                      << this->impl->started.load()
+                      << " closed=" << this->impl->closed.load()
                       << " hasListener=" << (this->impl->listener != NULL)
                       << " error=" << ex.getMessage());
 
-    if (this->impl->listener != NULL && this->impl->started.get() &&
-        !this->impl->closed.get())
+    if (this->impl->listener != NULL && this->impl->started.load() &&
+        !this->impl->closed.load())
     {
         try
         {
@@ -182,20 +181,20 @@ void IOTransport::fire(decaf::lang::Exception& ex)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void IOTransport::fire(const Pointer<Command> command)
+void IOTransport::fire(const std::shared_ptr<Command> command)
 {
     try
     {
         // If we have been closed then we don't deliver any messages that
         // might have sneaked in while we where closing.
-        if (this->impl->listener == NULL || this->impl->closed.get())
+        if (this->impl->listener == NULL || this->impl->closed.load())
         {
             AMQ_LOG_DEBUG("IOTransport",
                           "fire(Command) DROPPED cmdId="
                               << command->getCommandId() << " type="
                               << AMQLogger::commandTypeName(
                                      command->getDataStructureType())
-                              << " (closed=" << this->impl->closed.get()
+                              << " (closed=" << this->impl->closed.load()
                               << " hasListener="
                               << (this->impl->listener != NULL) << ")");
             return;
@@ -213,11 +212,11 @@ void IOTransport::fire(const Pointer<Command> command)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void IOTransport::oneway(const Pointer<Command> command)
+void IOTransport::oneway(const std::shared_ptr<Command> command)
 {
     try
     {
-        if (impl->closed.get())
+        if (impl->closed.load())
         {
             throw IOException(__FILE__,
                               __LINE__,
@@ -225,7 +224,7 @@ void IOTransport::oneway(const Pointer<Command> command)
         }
 
         // Make sure the thread has been started.
-        if (impl->thread == NULL)
+        if (!impl->thread)
         {
             throw IOException(
                 __FILE__,
@@ -234,7 +233,7 @@ void IOTransport::oneway(const Pointer<Command> command)
         }
 
         // Make sure the command object is valid.
-        if (command == NULL)
+        if (!command)
         {
             throw IOException(
                 __FILE__,
@@ -278,9 +277,10 @@ void IOTransport::start()
 {
     try
     {
-        if (impl->started.compareAndSet(false, true))
+        bool _e_started = false;
+        if (impl->started.compare_exchange_strong(_e_started, true))
         {
-            if (impl->closed.get())
+            if (impl->closed.load())
             {
                 throw IOException(__FILE__,
                                   __LINE__,
@@ -290,7 +290,7 @@ void IOTransport::start()
 
             // Make sure all variables that we need have been set.
             if (impl->inputStream == NULL || impl->outputStream == NULL ||
-                impl->wireFormat.get() == NULL)
+                !impl->wireFormat)
             {
                 throw IOException(__FILE__,
                                   __LINE__,
@@ -314,7 +314,7 @@ void IOTransport::stop()
 {
     try
     {
-        this->impl->started.set(false);
+        this->impl->started.store(false);
     }
     AMQ_CATCH_RETHROW(IOException)
     AMQ_CATCH_EXCEPTION_CONVERT(Exception, IOException)
@@ -327,10 +327,10 @@ void IOTransport::close()
     class Finalizer
     {
     private:
-        Pointer<Thread> target;
+        std::shared_ptr<Thread> target;
 
     public:
-        Finalizer(Pointer<Thread> target)
+        Finalizer(std::shared_ptr<Thread> target)
             : target(target)
         {
         }
@@ -339,10 +339,10 @@ void IOTransport::close()
         {
             try
             {
-                if (target != NULL)
+                if (target)
                 {
                     target->join();
-                    target.reset(NULL);
+                    target.reset();
                 }
             }
             DECAF_CATCHALL_NOTHROW()
@@ -352,7 +352,8 @@ void IOTransport::close()
     try
     {
         // Mark this transport as closed.
-        if (impl->closed.compareAndSet(false, true))
+        bool _e_closed = false;
+        if (impl->closed.compare_exchange_strong(_e_closed, true))
         {
             Finalizer finalize(impl->thread);
 
@@ -417,7 +418,7 @@ void IOTransport::run()
         AMQ_LOG_DEBUG("IOTransport", "run() started, waiting for commands...");
 
         // Main message processing loop with internal error handling
-        while (this->impl->started.get() && !this->impl->closed.get())
+        while (this->impl->started.load() && !this->impl->closed.load())
         {
             try
             {
@@ -426,7 +427,7 @@ void IOTransport::run()
                 // connection. Lazy property unmarshaling means property
                 // corruption is detected during consumer processing and
                 // triggers redelivery (see ActiveMQConsumerKernel).
-                Pointer<Command> command(
+                std::shared_ptr<Command> command(
                     impl->wireFormat->unmarshal(this, this->impl->inputStream));
 
                 // Notify the listener.
@@ -513,8 +514,8 @@ void IOTransport::run()
 
         AMQ_LOG_DEBUG("IOTransport",
                       "run() exiting normally (started="
-                          << this->impl->started.get()
-                          << " closed=" << this->impl->closed.get() << ")");
+                          << this->impl->started.load()
+                          << " closed=" << this->impl->closed.load() << ")");
     }
     catch (exceptions::ActiveMQException& ex)
     {
@@ -542,14 +543,14 @@ void IOTransport::run()
 
     AMQ_LOG_DEBUG("IOTransport",
                   "run() thread terminated (started="
-                      << this->impl->started.get()
-                      << " closed=" << this->impl->closed.get() << ")");
+                      << this->impl->started.load()
+                      << " closed=" << this->impl->closed.load() << ")");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<FutureResponse> IOTransport::asyncRequest(
-    const Pointer<Command> command                   AMQCPP_UNUSED,
-    const Pointer<ResponseCallback> responseCallback AMQCPP_UNUSED)
+std::shared_ptr<FutureResponse> IOTransport::asyncRequest(
+    const std::shared_ptr<Command> command                   AMQCPP_UNUSED,
+    const std::shared_ptr<ResponseCallback> responseCallback AMQCPP_UNUSED)
 {
     throw UnsupportedOperationException(
         __FILE__,
@@ -558,8 +559,8 @@ Pointer<FutureResponse> IOTransport::asyncRequest(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Response> IOTransport::request(
-    const Pointer<Command> command AMQCPP_UNUSED)
+std::shared_ptr<Response> IOTransport::request(
+    const std::shared_ptr<Command> command AMQCPP_UNUSED)
 {
     throw UnsupportedOperationException(
         __FILE__,
@@ -568,7 +569,7 @@ Pointer<Response> IOTransport::request(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Response> IOTransport::request(const Pointer<Command> command
+std::shared_ptr<Response> IOTransport::request(const std::shared_ptr<Command> command
                                                             AMQCPP_UNUSED,
                                        unsigned int timeout AMQCPP_UNUSED)
 {
@@ -591,13 +592,13 @@ void IOTransport::setOutputStream(decaf::io::DataOutputStream* os)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<wireformat::WireFormat> IOTransport::getWireFormat() const
+std::shared_ptr<wireformat::WireFormat> IOTransport::getWireFormat() const
 {
     return this->impl->wireFormat;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void IOTransport::setWireFormat(const Pointer<wireformat::WireFormat> wireFormat)
+void IOTransport::setWireFormat(const std::shared_ptr<wireformat::WireFormat> wireFormat)
 {
     this->impl->wireFormat = wireFormat;
 }
@@ -617,11 +618,11 @@ TransportListener* IOTransport::getTransportListener() const
 ////////////////////////////////////////////////////////////////////////////////
 bool IOTransport::isConnected() const
 {
-    return !this->impl->closed.get();
+    return !this->impl->closed.load();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 bool IOTransport::isClosed() const
 {
-    return this->impl->closed.get();
+    return this->impl->closed.load();
 }

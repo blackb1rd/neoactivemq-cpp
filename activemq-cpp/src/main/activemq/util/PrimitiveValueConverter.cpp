@@ -17,13 +17,13 @@
 
 #include "PrimitiveValueConverter.h"
 
+#include <string>
+
 #include <decaf/lang/Boolean.h>
 #include <decaf/lang/Byte.h>
 #include <decaf/lang/Character.h>
 #include <decaf/lang/Double.h>
 #include <decaf/lang/Float.h>
-#include <decaf/lang/Integer.h>
-#include <decaf/lang/Long.h>
 #include <decaf/lang/Short.h>
 
 using namespace activemq;
@@ -160,7 +160,7 @@ int PrimitiveValueConverter::convert<int>(const PrimitiveValueNode& value) const
         {
             try
             {
-                return decaf::lang::Integer::parseInt(value.getString());
+                return std::stoi(value.getString());
             }
             catch (decaf::lang::Exception& ex)
             {
@@ -194,7 +194,7 @@ long long PrimitiveValueConverter::convert<long long>(
         {
             try
             {
-                return decaf::lang::Long::parseLong(value.getString());
+                return std::stoll(value.getString());
             }
             catch (decaf::lang::Exception& ex)
             {
@@ -284,9 +284,9 @@ std::string PrimitiveValueConverter::convert<std::string>(
         case PrimitiveValueNode::SHORT_TYPE:
             return decaf::lang::Short::toString(value.getShort());
         case PrimitiveValueNode::INTEGER_TYPE:
-            return decaf::lang::Integer::toString(value.getInt());
+            return std::to_string(value.getInt());
         case PrimitiveValueNode::LONG_TYPE:
-            return decaf::lang::Long::toString(value.getLong());
+            return std::to_string(value.getLong());
         case PrimitiveValueNode::FLOAT_TYPE:
             return decaf::lang::Float::toString(value.getFloat());
         case PrimitiveValueNode::DOUBLE_TYPE:

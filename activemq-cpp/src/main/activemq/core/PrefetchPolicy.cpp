@@ -17,11 +17,8 @@
 
 #include "PrefetchPolicy.h"
 
-#include <decaf/lang/Integer.h>
-
 using namespace activemq;
 using namespace activemq::core;
-using namespace decaf;
 using namespace decaf::lang;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -56,29 +53,29 @@ void PrefetchPolicy::configure(const decaf::util::Properties& properties)
         if (properties.hasProperty("cms.prefetchPolicy.durableTopicPrefetch"))
         {
             this->setDurableTopicPrefetch(
-                Integer::parseInt(properties.getProperty(
+                std::stoi(properties.getProperty(
                     "cms.prefetchPolicy.durableTopicPrefetch")));
         }
         if (properties.hasProperty("cms.prefetchPolicy.queueBrowserPrefetch"))
         {
             this->setQueueBrowserPrefetch(
-                Integer::parseInt(properties.getProperty(
+                std::stoi(properties.getProperty(
                     "cms.prefetchPolicy.queueBrowserPrefetch")));
         }
         if (properties.hasProperty("cms.prefetchPolicy.queuePrefetch"))
         {
-            this->setQueuePrefetch(Integer::parseInt(
+            this->setQueuePrefetch(std::stoi(
                 properties.getProperty("cms.prefetchPolicy.queuePrefetch")));
         }
         if (properties.hasProperty("cms.prefetchPolicy.topicPrefetch"))
         {
-            this->setTopicPrefetch(Integer::parseInt(
+            this->setTopicPrefetch(std::stoi(
                 properties.getProperty("cms.prefetchPolicy.topicPrefetch")));
         }
 
         if (properties.hasProperty("cms.prefetchPolicy.all"))
         {
-            int value = Integer::parseInt(
+            int value = std::stoi(
                 properties.getProperty("cms.prefetchPolicy.all"));
 
             this->setDurableTopicPrefetch(value);

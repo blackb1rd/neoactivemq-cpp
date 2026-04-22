@@ -20,7 +20,7 @@
 #include <activemq/commands/MessageDispatch.h>
 #include <activemq/exceptions/ActiveMQException.h>
 #include <activemq/transport/IOTransport.h>
-#include <decaf/lang/Pointer.h>
+#include <memory>
 #include <iostream>
 
 //
@@ -69,12 +69,12 @@ void MessageDispatchMarshaller::tightUnmarshal(OpenWireFormat*  wireFormat,
 
         MessageDispatch* info = dynamic_cast<MessageDispatch*>(dataStructure);
 
-        info->setConsumerId(Pointer<ConsumerId>(dynamic_cast<ConsumerId*>(
+        info->setConsumerId(std::shared_ptr<ConsumerId>(dynamic_cast<ConsumerId*>(
             tightUnmarshalCachedObject(wireFormat, dataIn, bs))));
         info->setDestination(
-            Pointer<ActiveMQDestination>(dynamic_cast<ActiveMQDestination*>(
+            std::shared_ptr<ActiveMQDestination>(dynamic_cast<ActiveMQDestination*>(
                 tightUnmarshalCachedObject(wireFormat, dataIn, bs))));
-        info->setMessage(Pointer<Message>(dynamic_cast<Message*>(
+        info->setMessage(std::shared_ptr<Message>(dynamic_cast<Message*>(
             tightUnmarshalNestedObject(wireFormat, dataIn, bs))));
         info->setRedeliveryCounter(dataIn->readInt());
     }
@@ -157,12 +157,12 @@ void MessageDispatchMarshaller::looseUnmarshal(OpenWireFormat*  wireFormat,
                                               dataStructure,
                                               dataIn);
         MessageDispatch* info = dynamic_cast<MessageDispatch*>(dataStructure);
-        info->setConsumerId(Pointer<ConsumerId>(dynamic_cast<ConsumerId*>(
+        info->setConsumerId(std::shared_ptr<ConsumerId>(dynamic_cast<ConsumerId*>(
             looseUnmarshalCachedObject(wireFormat, dataIn))));
         info->setDestination(
-            Pointer<ActiveMQDestination>(dynamic_cast<ActiveMQDestination*>(
+            std::shared_ptr<ActiveMQDestination>(dynamic_cast<ActiveMQDestination*>(
                 looseUnmarshalCachedObject(wireFormat, dataIn))));
-        info->setMessage(Pointer<Message>(dynamic_cast<Message*>(
+        info->setMessage(std::shared_ptr<Message>(dynamic_cast<Message*>(
             looseUnmarshalNestedObject(wireFormat, dataIn))));
         info->setRedeliveryCounter(dataIn->readInt());
     }

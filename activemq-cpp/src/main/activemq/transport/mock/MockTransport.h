@@ -27,11 +27,12 @@
 #include <activemq/util/Config.h>
 #include <activemq/wireformat/WireFormat.h>
 
-#include <decaf/lang/Pointer.h>
+#include <atomic>
+#include <memory>
+
 #include <decaf/lang/Thread.h>
 #include <decaf/util/concurrent/Concurrent.h>
 #include <decaf/util/concurrent/CountDownLatch.h>
-#include <decaf/util/concurrent/atomic/AtomicInteger.h>
 
 #include <cms/Message.h>
 
@@ -47,7 +48,6 @@ namespace transport
 
         using activemq::commands::Command;
         using activemq::commands::Response;
-        using decaf::lang::Pointer;
 
         /**
          * The MockTransport defines a base level Transport class that is
@@ -66,11 +66,11 @@ namespace transport
         class AMQCPP_API MockTransport : public Transport
         {
         private:
-            Pointer<ResponseBuilder>                       responseBuilder;
-            Pointer<wireformat::WireFormat>                wireFormat;
+            std::shared_ptr<ResponseBuilder>               responseBuilder;
+            std::shared_ptr<wireformat::WireFormat>        wireFormat;
             TransportListener*                             outgoingListener;
             TransportListener*                             listener;
-            decaf::util::concurrent::atomic::AtomicInteger nextCommandId;
+            std::atomic<int>                               nextCommandId;
             InternalCommandListener                        internalListener;
             static MockTransport*                          instance;
 
@@ -95,8 +95,8 @@ namespace transport
             MockTransport operator=(const MockTransport&);
 
         public:
-            MockTransport(const Pointer<wireformat::WireFormat> wireFormat,
-                          const Pointer<ResponseBuilder> responseBuilder);
+            MockTransport(const std::shared_ptr<wireformat::WireFormat> wireFormat,
+                          const std::shared_ptr<ResponseBuilder> responseBuilder);
 
             virtual ~MockTransport()
             {
@@ -112,7 +112,7 @@ namespace transport
              * CommandListener if there is one.
              * @param command - Command to send to the Listener.
              */
-            virtual void fireCommand(const Pointer<Command> command)
+            virtual void fireCommand(const std::shared_ptr<Command> command)
             {
                 if (listener != NULL)
                 {
@@ -143,7 +143,7 @@ namespace transport
              * @param responseBuilder - The ResponseBuilder to use from now on.
              */
             void setResponseBuilder(
-                const Pointer<ResponseBuilder> responseBuilder)
+                const std::shared_ptr<ResponseBuilder> responseBuilder)
             {
                 this->responseBuilder = responseBuilder;
             }
@@ -164,25 +164,25 @@ namespace transport
              *
              * @return the current WireFormat object.
              */
-            Pointer<wireformat::WireFormat> getWireFormat() const
+            std::shared_ptr<wireformat::WireFormat> getWireFormat() const
             {
                 return this->wireFormat;
             }
 
         public:  // Transport Methods
-            virtual void oneway(const Pointer<Command> command);
+            virtual void oneway(const std::shared_ptr<Command> command);
 
-            virtual Pointer<FutureResponse> asyncRequest(
-                const Pointer<Command>          command,
-                const Pointer<ResponseCallback> responseCallback);
+            virtual std::shared_ptr<FutureResponse> asyncRequest(
+                const std::shared_ptr<Command>          command,
+                const std::shared_ptr<ResponseCallback> responseCallback);
 
-            virtual Pointer<Response> request(const Pointer<Command> command);
+            virtual std::shared_ptr<Response> request(const std::shared_ptr<Command> command);
 
-            virtual Pointer<Response> request(const Pointer<Command> command,
+            virtual std::shared_ptr<Response> request(const std::shared_ptr<Command> command,
                                               unsigned int           timeout);
 
             virtual void setWireFormat(
-                const Pointer<wireformat::WireFormat> wireFormat AMQCPP_UNUSED)
+                const std::shared_ptr<wireformat::WireFormat> wireFormat AMQCPP_UNUSED)
             {
             }
 

@@ -23,14 +23,13 @@
 #include <activemq/util/AMQLog.h>
 #include <activemq/wireformat/openwire/marshal/BaseDataStreamMarshaller.h>
 #include <activemq/wireformat/openwire/marshal/PrimitiveTypesMarshaller.h>
-#include <decaf/lang/System.h>
+#include <chrono>
 #include <decaf/lang/exceptions/NullPointerException.h>
 
 using namespace std;
 using namespace activemq;
 using namespace activemq::exceptions;
 using namespace activemq::commands;
-using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
 /*
@@ -46,25 +45,25 @@ using namespace decaf::lang::exceptions;
 ////////////////////////////////////////////////////////////////////////////////
 Message::Message()
     : BaseCommand(),
-      producerId(NULL),
-      destination(NULL),
-      transactionId(NULL),
-      originalDestination(NULL),
-      messageId(NULL),
-      originalTransactionId(NULL),
+      producerId(),
+      destination(),
+      transactionId(),
+      originalDestination(),
+      messageId(),
+      originalTransactionId(),
       groupID(""),
       groupSequence(0),
       correlationId(""),
       persistent(false),
       expiration(0),
       priority(0),
-      replyTo(NULL),
+      replyTo(),
       timestamp(0),
       type(""),
       content(),
       marshalledProperties(),
-      dataStructure(NULL),
-      targetConsumerId(NULL),
+      dataStructure(),
+      targetConsumerId(),
       compressed(false),
       redeliveryCounter(0),
       brokerPath(),
@@ -76,7 +75,7 @@ Message::Message()
       brokerInTime(0),
       brokerOutTime(0),
       jMSXGroupFirstForConsumer(false),
-      ackHandler(NULL),
+      ackHandler(),
       properties(),
       propertiesUnmarshaled(false),
       readOnlyProperties(false),
@@ -187,7 +186,7 @@ std::string Message::toString() const
            << "responseRequired = " << boolalpha << this->isResponseRequired();
     stream << ", ";
     stream << "ProducerId = ";
-    if (this->getProducerId() != NULL)
+    if (this->getProducerId())
     {
         stream << this->getProducerId()->toString();
     }
@@ -197,7 +196,7 @@ std::string Message::toString() const
     }
     stream << ", ";
     stream << "Destination = ";
-    if (this->getDestination() != NULL)
+    if (this->getDestination())
     {
         stream << this->getDestination()->toString();
     }
@@ -207,7 +206,7 @@ std::string Message::toString() const
     }
     stream << ", ";
     stream << "TransactionId = ";
-    if (this->getTransactionId() != NULL)
+    if (this->getTransactionId())
     {
         stream << this->getTransactionId()->toString();
     }
@@ -217,7 +216,7 @@ std::string Message::toString() const
     }
     stream << ", ";
     stream << "OriginalDestination = ";
-    if (this->getOriginalDestination() != NULL)
+    if (this->getOriginalDestination())
     {
         stream << this->getOriginalDestination()->toString();
     }
@@ -227,7 +226,7 @@ std::string Message::toString() const
     }
     stream << ", ";
     stream << "MessageId = ";
-    if (this->getMessageId() != NULL)
+    if (this->getMessageId())
     {
         stream << this->getMessageId()->toString();
     }
@@ -237,7 +236,7 @@ std::string Message::toString() const
     }
     stream << ", ";
     stream << "OriginalTransactionId = ";
-    if (this->getOriginalTransactionId() != NULL)
+    if (this->getOriginalTransactionId())
     {
         stream << this->getOriginalTransactionId()->toString();
     }
@@ -259,7 +258,7 @@ std::string Message::toString() const
     stream << "Priority = " << (int)this->getPriority();
     stream << ", ";
     stream << "ReplyTo = ";
-    if (this->getReplyTo() != NULL)
+    if (this->getReplyTo())
     {
         stream << this->getReplyTo()->toString();
     }
@@ -293,7 +292,7 @@ std::string Message::toString() const
     }
     stream << ", ";
     stream << "DataStructure = ";
-    if (this->getDataStructure() != NULL)
+    if (this->getDataStructure())
     {
         stream << this->getDataStructure()->toString();
     }
@@ -303,7 +302,7 @@ std::string Message::toString() const
     }
     stream << ", ";
     stream << "TargetConsumerId = ";
-    if (this->getTargetConsumerId() != NULL)
+    if (this->getTargetConsumerId())
     {
         stream << this->getTargetConsumerId()->toString();
     }
@@ -323,7 +322,7 @@ std::string Message::toString() const
         for (size_t ibrokerPath = 0; ibrokerPath < this->getBrokerPath().size();
              ++ibrokerPath)
         {
-            if (this->getBrokerPath()[ibrokerPath] != NULL)
+            if (this->getBrokerPath()[ibrokerPath])
             {
                 stream << this->getBrokerPath()[ibrokerPath]->toString()
                        << ", ";
@@ -355,7 +354,7 @@ std::string Message::toString() const
         for (size_t icluster = 0; icluster < this->getCluster().size();
              ++icluster)
         {
-            if (this->getCluster()[icluster] != NULL)
+            if (this->getCluster()[icluster])
             {
                 stream << this->getCluster()[icluster]->toString() << ", ";
             }
@@ -397,29 +396,29 @@ bool Message::equals(const DataStructure* value) const
         return false;
     }
 
-    if (this->getProducerId() != NULL)
+    if (this->getProducerId())
     {
         if (!this->getProducerId()->equals(valuePtr->getProducerId().get()))
         {
             return false;
         }
     }
-    else if (valuePtr->getProducerId() != NULL)
+    else if (valuePtr->getProducerId())
     {
         return false;
     }
-    if (this->getDestination() != NULL)
+    if (this->getDestination())
     {
         if (!this->getDestination()->equals(valuePtr->getDestination().get()))
         {
             return false;
         }
     }
-    else if (valuePtr->getDestination() != NULL)
+    else if (valuePtr->getDestination())
     {
         return false;
     }
-    if (this->getTransactionId() != NULL)
+    if (this->getTransactionId())
     {
         if (!this->getTransactionId()->equals(
                 valuePtr->getTransactionId().get()))
@@ -427,11 +426,11 @@ bool Message::equals(const DataStructure* value) const
             return false;
         }
     }
-    else if (valuePtr->getTransactionId() != NULL)
+    else if (valuePtr->getTransactionId())
     {
         return false;
     }
-    if (this->getOriginalDestination() != NULL)
+    if (this->getOriginalDestination())
     {
         if (!this->getOriginalDestination()->equals(
                 valuePtr->getOriginalDestination().get()))
@@ -439,22 +438,22 @@ bool Message::equals(const DataStructure* value) const
             return false;
         }
     }
-    else if (valuePtr->getOriginalDestination() != NULL)
+    else if (valuePtr->getOriginalDestination())
     {
         return false;
     }
-    if (this->getMessageId() != NULL)
+    if (this->getMessageId())
     {
         if (!this->getMessageId()->equals(valuePtr->getMessageId().get()))
         {
             return false;
         }
     }
-    else if (valuePtr->getMessageId() != NULL)
+    else if (valuePtr->getMessageId())
     {
         return false;
     }
-    if (this->getOriginalTransactionId() != NULL)
+    if (this->getOriginalTransactionId())
     {
         if (!this->getOriginalTransactionId()->equals(
                 valuePtr->getOriginalTransactionId().get()))
@@ -462,7 +461,7 @@ bool Message::equals(const DataStructure* value) const
             return false;
         }
     }
-    else if (valuePtr->getOriginalTransactionId() != NULL)
+    else if (valuePtr->getOriginalTransactionId())
     {
         return false;
     }
@@ -490,14 +489,14 @@ bool Message::equals(const DataStructure* value) const
     {
         return false;
     }
-    if (this->getReplyTo() != NULL)
+    if (this->getReplyTo())
     {
         if (!this->getReplyTo()->equals(valuePtr->getReplyTo().get()))
         {
             return false;
         }
     }
-    else if (valuePtr->getReplyTo() != NULL)
+    else if (valuePtr->getReplyTo())
     {
         return false;
     }
@@ -526,7 +525,7 @@ bool Message::equals(const DataStructure* value) const
             return false;
         }
     }
-    if (this->getDataStructure() != NULL)
+    if (this->getDataStructure())
     {
         if (!this->getDataStructure()->equals(
                 valuePtr->getDataStructure().get()))
@@ -534,11 +533,11 @@ bool Message::equals(const DataStructure* value) const
             return false;
         }
     }
-    else if (valuePtr->getDataStructure() != NULL)
+    else if (valuePtr->getDataStructure())
     {
         return false;
     }
-    if (this->getTargetConsumerId() != NULL)
+    if (this->getTargetConsumerId())
     {
         if (!this->getTargetConsumerId()->equals(
                 valuePtr->getTargetConsumerId().get()))
@@ -546,7 +545,7 @@ bool Message::equals(const DataStructure* value) const
             return false;
         }
     }
-    else if (valuePtr->getTargetConsumerId() != NULL)
+    else if (valuePtr->getTargetConsumerId())
     {
         return false;
     }
@@ -561,7 +560,7 @@ bool Message::equals(const DataStructure* value) const
     for (size_t ibrokerPath = 0; ibrokerPath < this->getBrokerPath().size();
          ++ibrokerPath)
     {
-        if (this->getBrokerPath()[ibrokerPath] != NULL)
+        if (this->getBrokerPath()[ibrokerPath])
         {
             if (!this->getBrokerPath()[ibrokerPath]->equals(
                     valuePtr->getBrokerPath()[ibrokerPath].get()))
@@ -569,7 +568,7 @@ bool Message::equals(const DataStructure* value) const
                 return false;
             }
         }
-        else if (valuePtr->getBrokerPath()[ibrokerPath] != NULL)
+        else if (valuePtr->getBrokerPath()[ibrokerPath])
         {
             return false;
         }
@@ -592,7 +591,7 @@ bool Message::equals(const DataStructure* value) const
     }
     for (size_t icluster = 0; icluster < this->getCluster().size(); ++icluster)
     {
-        if (this->getCluster()[icluster] != NULL)
+        if (this->getCluster()[icluster])
         {
             if (!this->getCluster()[icluster]->equals(
                     valuePtr->getCluster()[icluster].get()))
@@ -600,7 +599,7 @@ bool Message::equals(const DataStructure* value) const
                 return false;
             }
         }
-        else if (valuePtr->getCluster()[icluster] != NULL)
+        else if (valuePtr->getCluster()[icluster])
         {
             return false;
         }
@@ -646,115 +645,115 @@ bool Message::equals(const DataStructure* value) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const decaf::lang::Pointer<ProducerId>& Message::getProducerId() const
+const std::shared_ptr<ProducerId>& Message::getProducerId() const
 {
     return producerId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<ProducerId>& Message::getProducerId()
+std::shared_ptr<ProducerId>& Message::getProducerId()
 {
     return producerId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Message::setProducerId(const decaf::lang::Pointer<ProducerId>& producerId)
+void Message::setProducerId(const std::shared_ptr<ProducerId>& producerId)
 {
     this->producerId = producerId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const decaf::lang::Pointer<ActiveMQDestination>& Message::getDestination() const
+const std::shared_ptr<ActiveMQDestination>& Message::getDestination() const
 {
     return destination;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<ActiveMQDestination>& Message::getDestination()
+std::shared_ptr<ActiveMQDestination>& Message::getDestination()
 {
     return destination;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void Message::setDestination(
-    const decaf::lang::Pointer<ActiveMQDestination>& destination)
+    const std::shared_ptr<ActiveMQDestination>& destination)
 {
     this->destination = destination;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const decaf::lang::Pointer<TransactionId>& Message::getTransactionId() const
+const std::shared_ptr<TransactionId>& Message::getTransactionId() const
 {
     return transactionId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<TransactionId>& Message::getTransactionId()
+std::shared_ptr<TransactionId>& Message::getTransactionId()
 {
     return transactionId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void Message::setTransactionId(
-    const decaf::lang::Pointer<TransactionId>& transactionId)
+    const std::shared_ptr<TransactionId>& transactionId)
 {
     this->transactionId = transactionId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const decaf::lang::Pointer<ActiveMQDestination>&
+const std::shared_ptr<ActiveMQDestination>&
 Message::getOriginalDestination() const
 {
     return originalDestination;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<ActiveMQDestination>& Message::getOriginalDestination()
+std::shared_ptr<ActiveMQDestination>& Message::getOriginalDestination()
 {
     return originalDestination;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void Message::setOriginalDestination(
-    const decaf::lang::Pointer<ActiveMQDestination>& originalDestination)
+    const std::shared_ptr<ActiveMQDestination>& originalDestination)
 {
     this->originalDestination = originalDestination;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const decaf::lang::Pointer<MessageId>& Message::getMessageId() const
+const std::shared_ptr<MessageId>& Message::getMessageId() const
 {
     return messageId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<MessageId>& Message::getMessageId()
+std::shared_ptr<MessageId>& Message::getMessageId()
 {
     return messageId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Message::setMessageId(const decaf::lang::Pointer<MessageId>& messageId)
+void Message::setMessageId(const std::shared_ptr<MessageId>& messageId)
 {
     this->messageId = messageId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const decaf::lang::Pointer<TransactionId>& Message::getOriginalTransactionId()
+const std::shared_ptr<TransactionId>& Message::getOriginalTransactionId()
     const
 {
     return originalTransactionId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<TransactionId>& Message::getOriginalTransactionId()
+std::shared_ptr<TransactionId>& Message::getOriginalTransactionId()
 {
     return originalTransactionId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void Message::setOriginalTransactionId(
-    const decaf::lang::Pointer<TransactionId>& originalTransactionId)
+    const std::shared_ptr<TransactionId>& originalTransactionId)
 {
     this->originalTransactionId = originalTransactionId;
 }
@@ -844,20 +843,20 @@ void Message::setPriority(unsigned char priority)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const decaf::lang::Pointer<ActiveMQDestination>& Message::getReplyTo() const
+const std::shared_ptr<ActiveMQDestination>& Message::getReplyTo() const
 {
     return replyTo;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<ActiveMQDestination>& Message::getReplyTo()
+std::shared_ptr<ActiveMQDestination>& Message::getReplyTo()
 {
     return replyTo;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void Message::setReplyTo(
-    const decaf::lang::Pointer<ActiveMQDestination>& replyTo)
+    const std::shared_ptr<ActiveMQDestination>& replyTo)
 {
     this->replyTo = replyTo;
 }
@@ -930,39 +929,39 @@ void Message::setMarshalledProperties(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const decaf::lang::Pointer<DataStructure>& Message::getDataStructure() const
+const std::shared_ptr<DataStructure>& Message::getDataStructure() const
 {
     return dataStructure;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<DataStructure>& Message::getDataStructure()
+std::shared_ptr<DataStructure>& Message::getDataStructure()
 {
     return dataStructure;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void Message::setDataStructure(
-    const decaf::lang::Pointer<DataStructure>& dataStructure)
+    const std::shared_ptr<DataStructure>& dataStructure)
 {
     this->dataStructure = dataStructure;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const decaf::lang::Pointer<ConsumerId>& Message::getTargetConsumerId() const
+const std::shared_ptr<ConsumerId>& Message::getTargetConsumerId() const
 {
     return targetConsumerId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<ConsumerId>& Message::getTargetConsumerId()
+std::shared_ptr<ConsumerId>& Message::getTargetConsumerId()
 {
     return targetConsumerId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void Message::setTargetConsumerId(
-    const decaf::lang::Pointer<ConsumerId>& targetConsumerId)
+    const std::shared_ptr<ConsumerId>& targetConsumerId)
 {
     this->targetConsumerId = targetConsumerId;
 }
@@ -992,20 +991,20 @@ void Message::setRedeliveryCounter(int redeliveryCounter)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::vector<decaf::lang::Pointer<BrokerId>>& Message::getBrokerPath() const
+const std::vector<std::shared_ptr<BrokerId>>& Message::getBrokerPath() const
 {
     return brokerPath;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::vector<decaf::lang::Pointer<BrokerId>>& Message::getBrokerPath()
+std::vector<std::shared_ptr<BrokerId>>& Message::getBrokerPath()
 {
     return brokerPath;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void Message::setBrokerPath(
-    const std::vector<decaf::lang::Pointer<BrokerId>>& brokerPath)
+    const std::vector<std::shared_ptr<BrokerId>>& brokerPath)
 {
     this->brokerPath = brokerPath;
 }
@@ -1065,20 +1064,20 @@ void Message::setDroppable(bool droppable)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::vector<decaf::lang::Pointer<BrokerId>>& Message::getCluster() const
+const std::vector<std::shared_ptr<BrokerId>>& Message::getCluster() const
 {
     return cluster;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::vector<decaf::lang::Pointer<BrokerId>>& Message::getCluster()
+std::vector<std::shared_ptr<BrokerId>>& Message::getCluster()
 {
     return cluster;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void Message::setCluster(
-    const std::vector<decaf::lang::Pointer<BrokerId>>& cluster)
+    const std::vector<std::shared_ptr<BrokerId>>& cluster)
 {
     this->cluster = cluster;
 }
@@ -1120,7 +1119,7 @@ void Message::setJMSXGroupFirstForConsumer(bool jMSXGroupFirstForConsumer)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<commands::Command> Message::visit(
+std::shared_ptr<commands::Command> Message::visit(
     activemq::state::CommandVisitor* visitor)
 {
     return visitor->processMessage(this);
@@ -1130,7 +1129,7 @@ decaf::lang::Pointer<commands::Command> Message::visit(
 bool Message::isExpired() const
 {
     long long expireTime  = this->getExpiration();
-    long long currentTime = decaf::lang::System::currentTimeMillis();
+    long long currentTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
     if (expireTime > 0 && currentTime > expireTime)
     {
         return true;
@@ -1218,7 +1217,7 @@ void Message::ensurePropertiesUnmarshaled() const
                 "Message",
                 "ensurePropertiesUnmarshaled(): Failed to unmarshal properties "
                 "(corrupted) for message id="
-                    << (messageId != NULL ? messageId->toString() : "NULL")
+                    << (messageId ? messageId->toString() : "NULL")
                     << ", marshalledProperties.size="
                     << marshalledProperties.size()
                     << ", exception=" << e.getMessage());

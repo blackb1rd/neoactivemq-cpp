@@ -23,20 +23,18 @@
 #include <decaf/io/DataInputStream.h>
 #include <decaf/io/DataOutputStream.h>
 #include <decaf/io/IOException.h>
-#include <decaf/lang/Pointer.h>
 
 #include <activemq/commands/Command.h>
 #include <activemq/transport/Transport.h>
 #include <activemq/util/Config.h>
 
 #include <decaf/lang/exceptions/UnsupportedOperationException.h>
+#include <memory>
 
 namespace activemq
 {
 namespace wireformat
 {
-
-    using decaf::lang::Pointer;
 
     /**
      * Provides a mechanism to marshal commands into and out of packets
@@ -60,9 +58,9 @@ namespace wireformat
          *
          * @throws IOException if an I/O error occurs.
          */
-        virtual void marshal(const Pointer<commands::Command>      command,
-                             const activemq::transport::Transport* transport,
-                             decaf::io::DataOutputStream*          out) = 0;
+        virtual void marshal(const std::shared_ptr<commands::Command> command,
+                             const activemq::transport::Transport*   transport,
+                             decaf::io::DataOutputStream*            out) = 0;
 
         /**
          * Stream based unmarshaling, blocks on reads on the input stream until
@@ -78,7 +76,7 @@ namespace wireformat
          *
          * @throws IOException if an I/O error occurs.
          */
-        virtual Pointer<commands::Command> unmarshal(
+        virtual std::shared_ptr<commands::Command> unmarshal(
             const activemq::transport::Transport* transport,
             decaf::io::DataInputStream*           in) = 0;
 
@@ -129,8 +127,8 @@ namespace wireformat
          * @throws UnsupportedOperationException if the WireFormat doesn't have
          * a Negotiator.
          */
-        virtual Pointer<transport::Transport> createNegotiator(
-            const Pointer<transport::Transport> transport) = 0;
+        virtual std::shared_ptr<transport::Transport> createNegotiator(
+            const std::shared_ptr<transport::Transport> transport) = 0;
     };
 
 }  // namespace wireformat

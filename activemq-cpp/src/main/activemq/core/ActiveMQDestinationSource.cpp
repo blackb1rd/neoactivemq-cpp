@@ -23,11 +23,11 @@
 #include <cms/MessageListener.h>
 #include <cms/Session.h>
 
-#include <decaf/lang/Pointer.h>
+#include <atomic>
 #include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/util/HashSet.h>
 #include <decaf/util/concurrent/Mutex.h>
-#include <decaf/util/concurrent/atomic/AtomicBoolean.h>
+#include <memory>
 
 #include <activemq/commands/ActiveMQDestination.h>
 #include <activemq/commands/ActiveMQQueue.h>
@@ -49,7 +49,6 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
-using namespace decaf::util::concurrent::atomic;
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace activemq
@@ -64,19 +63,19 @@ namespace core
         DestinationSourceImpl& operator=(const DestinationSourceImpl&);
 
     public:
-        AtomicBoolean       started;
-        ActiveMQConnection* connection;
-        Pointer<Session>    session;
+        std::atomic<bool>                      started;
+        ActiveMQConnection*                    connection;
+        std::shared_ptr<Session>               session;
 
-        Pointer<MessageConsumer> topicConsumer;
-        Pointer<MessageConsumer> queueConsumer;
-        Pointer<MessageConsumer> tempTopicConsumer;
-        Pointer<MessageConsumer> tempQueueConsumer;
+        std::shared_ptr<MessageConsumer> topicConsumer;
+        std::shared_ptr<MessageConsumer> queueConsumer;
+        std::shared_ptr<MessageConsumer> tempTopicConsumer;
+        std::shared_ptr<MessageConsumer> tempQueueConsumer;
 
-        HashSet<Pointer<ActiveMQDestination>> queues;
-        HashSet<Pointer<ActiveMQDestination>> topics;
-        HashSet<Pointer<ActiveMQDestination>> tempQueues;
-        HashSet<Pointer<ActiveMQDestination>> tempTopics;
+        HashSet<std::shared_ptr<ActiveMQDestination>> queues;
+        HashSet<std::shared_ptr<ActiveMQDestination>> topics;
+        HashSet<std::shared_ptr<ActiveMQDestination>> tempQueues;
+        HashSet<std::shared_ptr<ActiveMQDestination>> tempTopics;
 
         DestinationListener* listener;
         Mutex                listenerLock;
@@ -106,18 +105,19 @@ namespace core
 
         void start()
         {
-            if (started.compareAndSet(false, true))
+            bool expected = false;
+            if (started.compare_exchange_strong(expected, true))
             {
                 session.reset(
                     connection->createSession(Session::AUTO_ACKNOWLEDGE));
 
-                Pointer<ActiveMQDestination> queueAdvisories(
+                std::shared_ptr<ActiveMQDestination> queueAdvisories(
                     AdvisorySupport::getQueueAdvisoryTopic());
-                Pointer<ActiveMQDestination> topicAdvisories(
+                std::shared_ptr<ActiveMQDestination> topicAdvisories(
                     AdvisorySupport::getTopicAdvisoryTopic());
-                Pointer<ActiveMQDestination> tempQueueAdvisories(
+                std::shared_ptr<ActiveMQDestination> tempQueueAdvisories(
                     AdvisorySupport::getTempQueueAdvisoryTopic());
-                Pointer<ActiveMQDestination> tempTopicAdvisories(
+                std::shared_ptr<ActiveMQDestination> tempTopicAdvisories(
                     AdvisorySupport::getTempTopicAdvisoryTopic());
 
                 queueConsumer.reset(session->createConsumer(
@@ -140,38 +140,43 @@ namespace core
 
         void stop()
         {
-            if (started.compareAndSet(true, false))
+            bool expected = true;
+            if (started.compare_exchange_strong(expected, false))
             {
-                if (session != NULL)
+                if (session != nullptr)
                 {
                     session->close();
 
-                    queueConsumer.reset(NULL);
-                    topicConsumer.reset(NULL);
-                    tempQueueConsumer.reset(NULL);
-                    tempTopicConsumer.reset(NULL);
+                    queueConsumer.reset();
+                    topicConsumer.reset();
+                    tempQueueConsumer.reset();
+                    tempTopicConsumer.reset();
 
-                    session.reset(NULL);
+                    session.reset();
                 }
             }
         }
 
         virtual void onMessage(const cms::Message* message)
         {
-            if (!this->started.get())
+            if (!this->started.load())
             {
                 return;
             }
 
             const commands::Message* amqMessage =
                 dynamic_cast<const commands::Message*>(message);
-            if (amqMessage != NULL)
+            if (amqMessage != nullptr)
             {
-                Pointer<DataStructure> payload = amqMessage->getDataStructure();
+                std::shared_ptr<DataStructure> payload = amqMessage->getDataStructure();
                 try
                 {
-                    Pointer<DestinationInfo> destinationInfo =
-                        payload.dynamicCast<DestinationInfo>();
+                    std::shared_ptr<DestinationInfo> destinationInfo =
+                        std::dynamic_pointer_cast<DestinationInfo>(payload);
+                    if (!destinationInfo)
+                    {
+                        return;
+                    }
                     ActiveMQDestinationEvent event(destinationInfo);
                     handleDestinationEvent(event);
                 }
@@ -183,7 +188,7 @@ namespace core
 
         void handleDestinationEvent(ActiveMQDestinationEvent& event)
         {
-            Pointer<ActiveMQDestination> dest =
+            std::shared_ptr<ActiveMQDestination> dest =
                 event.getDestinationInfo()->getDestination();
 
             if (dest->isTopic())
@@ -251,7 +256,7 @@ namespace core
 
             synchronized(&listenerLock)
             {
-                if (listener != NULL)
+                if (listener != nullptr)
                 {
                     listener->onDestinationEvent(&event);
                 }
@@ -264,7 +269,7 @@ namespace core
 
             synchronized(&queues)
             {
-                Pointer<Iterator<Pointer<ActiveMQDestination>>> iter(
+                std::shared_ptr<Iterator<std::shared_ptr<ActiveMQDestination>>> iter(
                     queues.iterator());
                 while (iter->hasNext())
                 {
@@ -283,7 +288,7 @@ namespace core
 
             synchronized(&topics)
             {
-                Pointer<Iterator<Pointer<ActiveMQDestination>>> iter(
+                std::shared_ptr<Iterator<std::shared_ptr<ActiveMQDestination>>> iter(
                     topics.iterator());
                 while (iter->hasNext())
                 {
@@ -302,7 +307,7 @@ namespace core
 
             synchronized(&tempQueues)
             {
-                Pointer<Iterator<Pointer<ActiveMQDestination>>> iter(
+                std::shared_ptr<Iterator<std::shared_ptr<ActiveMQDestination>>> iter(
                     tempQueues.iterator());
                 while (iter->hasNext())
                 {
@@ -321,7 +326,7 @@ namespace core
 
             synchronized(&tempTopics)
             {
-                Pointer<Iterator<Pointer<ActiveMQDestination>>> iter(
+                std::shared_ptr<Iterator<std::shared_ptr<ActiveMQDestination>>> iter(
                     tempTopics.iterator());
                 while (iter->hasNext())
                 {
@@ -344,7 +349,7 @@ ActiveMQDestinationSource::ActiveMQDestinationSource(
     : DestinationSource(),
       impl(new DestinationSourceImpl())
 {
-    if (connection == NULL)
+    if (connection == nullptr)
     {
         throw NullPointerException(__FILE__,
                                    __LINE__,

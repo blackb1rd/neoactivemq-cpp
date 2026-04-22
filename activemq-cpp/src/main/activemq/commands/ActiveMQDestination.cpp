@@ -35,7 +35,7 @@ using namespace activemq::util;
 using namespace activemq::commands;
 using namespace decaf::internal::util;
 using namespace decaf::util;
-using namespace decaf::lang;
+
 using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -216,11 +216,11 @@ std::string ActiveMQDestination::getClientId(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<ActiveMQDestination> ActiveMQDestination::createDestination(
+std::shared_ptr<ActiveMQDestination> ActiveMQDestination::createDestination(
     int                type,
     const std::string& name)
 {
-    Pointer<ActiveMQDestination> result;
+    std::shared_ptr<ActiveMQDestination> result;
 
     if (name.find(QUEUE_QUALIFIED_PREFIX) == 0)
     {
@@ -292,7 +292,7 @@ std::string ActiveMQDestination::getDestinationTypeAsString() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::util::ArrayList<Pointer<ActiveMQDestination>>
+decaf::util::ArrayList<std::shared_ptr<ActiveMQDestination>>
 ActiveMQDestination::getCompositeDestinations() const
 {
     if (!this->compositeDestinations.isEmpty())
@@ -315,7 +315,7 @@ ActiveMQDestination::getCompositeDestinations() const
             components.add(name);
         }
 
-        Pointer<Iterator<std::string>> iterator(components.iterator());
+        std::shared_ptr<decaf::util::Iterator<std::string>> iterator(components.iterator());
         while (iterator->hasNext())
         {
             compositeDestinations.add(createDestination(iterator->next()));

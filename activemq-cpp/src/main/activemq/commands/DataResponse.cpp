@@ -24,7 +24,7 @@ using namespace std;
 using namespace activemq;
 using namespace activemq::exceptions;
 using namespace activemq::commands;
-using namespace decaf::lang;
+
 using namespace decaf::lang::exceptions;
 
 /*
@@ -40,7 +40,7 @@ using namespace decaf::lang::exceptions;
 ////////////////////////////////////////////////////////////////////////////////
 DataResponse::DataResponse()
     : Response(),
-      data(NULL)
+      data()
 {
 }
 
@@ -98,7 +98,7 @@ std::string DataResponse::toString() const
 
     stream << "DataResponse { ";
     stream << "Data = ";
-    if (this->getData() != NULL)
+    if (this->getData())
     {
         stream << this->getData()->toString();
     }
@@ -126,14 +126,14 @@ bool DataResponse::equals(const DataStructure* value) const
         return false;
     }
 
-    if (this->getData() != NULL)
+    if (this->getData())
     {
         if (!this->getData()->equals(valuePtr->getData().get()))
         {
             return false;
         }
     }
-    else if (valuePtr->getData() != NULL)
+    else if (valuePtr->getData())
     {
         return false;
     }
@@ -145,19 +145,19 @@ bool DataResponse::equals(const DataStructure* value) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const decaf::lang::Pointer<DataStructure>& DataResponse::getData() const
+const std::shared_ptr<DataStructure>& DataResponse::getData() const
 {
     return data;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<DataStructure>& DataResponse::getData()
+std::shared_ptr<DataStructure>& DataResponse::getData()
 {
     return data;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DataResponse::setData(const decaf::lang::Pointer<DataStructure>& data)
+void DataResponse::setData(const std::shared_ptr<DataStructure>& data)
 {
     this->data = data;
 }

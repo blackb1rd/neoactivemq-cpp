@@ -26,7 +26,7 @@
 #include <activemq/commands/BaseDataStructure.h>
 #include <activemq/commands/BrokerId.h>
 #include <activemq/util/Config.h>
-#include <decaf/lang/Pointer.h>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -34,8 +34,6 @@ namespace activemq
 {
 namespace commands
 {
-
-    using decaf::lang::Pointer;
 
     /*
      *
@@ -49,7 +47,7 @@ namespace commands
     class AMQCPP_API NetworkBridgeFilter : public BaseDataStructure
     {
     protected:
-        Pointer<BrokerId> networkBrokerId;
+        std::shared_ptr<BrokerId> networkBrokerId;
         int               messageTTL;
         int               consumerTTL;
 
@@ -75,10 +73,10 @@ namespace commands
 
         virtual bool equals(const DataStructure* value) const;
 
-        virtual const Pointer<BrokerId>& getNetworkBrokerId() const;
-        virtual Pointer<BrokerId>&       getNetworkBrokerId();
-        virtual void                     setNetworkBrokerId(
-                                const Pointer<BrokerId>& networkBrokerId);
+        virtual const std::shared_ptr<BrokerId>& getNetworkBrokerId() const;
+        virtual std::shared_ptr<BrokerId>&       getNetworkBrokerId();
+        virtual void                             setNetworkBrokerId(
+                                        const std::shared_ptr<BrokerId>& networkBrokerId);
 
         virtual int  getMessageTTL() const;
         virtual void setMessageTTL(int messageTTL);

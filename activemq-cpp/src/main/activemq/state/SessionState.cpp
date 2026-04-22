@@ -21,14 +21,14 @@
 
 #include <decaf/lang/exceptions/IllegalStateException.h>
 
+#include <memory>
+
 using namespace activemq;
 using namespace activemq::state;
 using namespace activemq::commands;
-using namespace decaf;
-using namespace decaf::lang;
 
 ////////////////////////////////////////////////////////////////////////////////
-SessionState::SessionState(Pointer<SessionInfo> info)
+SessionState::SessionState(std::shared_ptr<SessionInfo> info)
     : info(info),
       producers(),
       consumers(),
@@ -49,7 +49,7 @@ SessionState::~SessionState()
 ////////////////////////////////////////////////////////////////////////////////
 std::string SessionState::toString() const
 {
-    if (this->info.get() != NULL)
+    if (this->info)
     {
         return this->info->toString();
     }
@@ -60,7 +60,7 @@ std::string SessionState::toString() const
 ////////////////////////////////////////////////////////////////////////////////
 void SessionState::shutdown()
 {
-    this->disposed.set(true);
+    this->disposed.store(true);
     this->producers.clear();
     this->consumers.clear();
 }
@@ -68,7 +68,7 @@ void SessionState::shutdown()
 ////////////////////////////////////////////////////////////////////////////////
 void SessionState::checkShutdown() const
 {
-    if (this->disposed.get())
+    if (this->disposed.load())
     {
         throw decaf::lang::exceptions::IllegalStateException(
             __FILE__,
@@ -78,27 +78,27 @@ void SessionState::checkShutdown() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SessionState::addProducer(Pointer<ProducerInfo> info)
+void SessionState::addProducer(std::shared_ptr<ProducerInfo> info)
 {
     checkShutdown();
     producers.put(info->getProducerId(),
-                  Pointer<ProducerState>(new ProducerState(info)));
+                  std::make_shared<ProducerState>(info));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<ProducerState> SessionState::removeProducer(Pointer<ProducerId> id)
+std::shared_ptr<ProducerState> SessionState::removeProducer(std::shared_ptr<ProducerId> id)
 {
-    Pointer<ProducerState> producerState = producers.remove(id);
-    if (producerState != NULL)
+    std::shared_ptr<ProducerState> producerState = producers.remove(id);
+    if (producerState)
     {
-        Pointer<TransactionState> transactionState =
+        std::shared_ptr<TransactionState> transactionState =
             producerState->getTransactionState();
-        if (transactionState != NULL)
+        if (transactionState)
         {
             // allow the transaction to recreate dependent producer on recovery,
             // we hand off the producer state to the Transaction and NULL the
             // producer's reference to avoid a circular link to it.
-            producerState->setTransactionState(Pointer<TransactionState>());
+            producerState->setTransactionState(std::shared_ptr<TransactionState>());
             transactionState->addProducerState(producerState);
         }
     }
@@ -107,15 +107,15 @@ Pointer<ProducerState> SessionState::removeProducer(Pointer<ProducerId> id)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SessionState::addConsumer(Pointer<ConsumerInfo> info)
+void SessionState::addConsumer(std::shared_ptr<ConsumerInfo> info)
 {
     checkShutdown();
     consumers.put(info->getConsumerId(),
-                  Pointer<ConsumerState>(new ConsumerState(info)));
+                  std::make_shared<ConsumerState>(info));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<ConsumerState> SessionState::removeConsumer(Pointer<ConsumerId> id)
+std::shared_ptr<ConsumerState> SessionState::removeConsumer(std::shared_ptr<ConsumerId> id)
 {
     return consumers.remove(id);
 }

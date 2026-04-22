@@ -19,16 +19,15 @@
 #include <activemq/exceptions/ActiveMQException.h>
 #include <activemq/state/CommandVisitor.h>
 #include <decaf/internal/util/StringUtils.h>
-#include <decaf/lang/Long.h>
 #include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/util/HashCode.h>
 #include <sstream>
+#include <string>
 
 using namespace std;
 using namespace activemq;
 using namespace activemq::exceptions;
 using namespace activemq::commands;
-using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 using namespace decaf::internal::util;
 
@@ -89,7 +88,7 @@ ProducerId::ProducerId(std::string producerKey)
 
     if (p != std::string::npos)
     {
-        value = Long::parseLong(producerKey.substr(p + 1, std::string::npos));
+        value = std::stoll(producerKey.substr(p + 1, std::string::npos));
         producerKey = producerKey.substr(0, p);
     }
 
@@ -301,9 +300,9 @@ int ProducerId::getHashCode() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const Pointer<SessionId>& ProducerId::getParentId() const
+const std::shared_ptr<SessionId>& ProducerId::getParentId() const
 {
-    if (this->parentId == NULL)
+    if (!this->parentId)
     {
         this->parentId.reset(new SessionId(this));
     }
@@ -319,7 +318,7 @@ void ProducerId::setProducerSessionKey(std::string sessionKey)
     if (p != std::string::npos)
     {
         this->sessionId =
-            Long::parseLong(sessionKey.substr(p + 1, std::string::npos));
+            std::stoll(sessionKey.substr(p + 1, std::string::npos));
         sessionKey = sessionKey.substr(0, p);
     }
 

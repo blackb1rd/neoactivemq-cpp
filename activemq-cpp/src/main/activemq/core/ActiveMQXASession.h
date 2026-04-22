@@ -29,13 +29,11 @@ namespace activemq
 namespace core
 {
 
-    using decaf::lang::Pointer;
-
     class AMQCPP_API ActiveMQXASession : public cms::XASession,
                                          public ActiveMQSession
     {
     private:
-        Pointer<activemq::core::kernels::ActiveMQXASessionKernel> xaKernel;
+        std::shared_ptr<activemq::core::kernels::ActiveMQXASessionKernel> xaKernel;
 
     private:
         ActiveMQXASession(const ActiveMQXASession&);
@@ -43,7 +41,7 @@ namespace core
 
     public:
         ActiveMQXASession(
-            Pointer<activemq::core::kernels::ActiveMQXASessionKernel> kernel);
+            std::shared_ptr<activemq::core::kernels::ActiveMQXASessionKernel> kernel);
 
         virtual ~ActiveMQXASession();
 

@@ -24,7 +24,7 @@ using namespace std;
 using namespace activemq;
 using namespace activemq::exceptions;
 using namespace activemq::commands;
-using namespace decaf::lang;
+
 using namespace decaf::lang::exceptions;
 
 /*
@@ -40,7 +40,7 @@ using namespace decaf::lang::exceptions;
 ////////////////////////////////////////////////////////////////////////////////
 JournalTransaction::JournalTransaction()
     : BaseDataStructure(),
-      transactionId(NULL),
+      transactionId(),
       type(0),
       wasPrepared(false)
 {
@@ -104,7 +104,7 @@ std::string JournalTransaction::toString() const
 
     stream << "JournalTransaction { ";
     stream << "TransactionId = ";
-    if (this->getTransactionId() != NULL)
+    if (this->getTransactionId())
     {
         stream << this->getTransactionId()->toString();
     }
@@ -137,7 +137,7 @@ bool JournalTransaction::equals(const DataStructure* value) const
         return false;
     }
 
-    if (this->getTransactionId() != NULL)
+    if (this->getTransactionId())
     {
         if (!this->getTransactionId()->equals(
                 valuePtr->getTransactionId().get()))
@@ -145,7 +145,7 @@ bool JournalTransaction::equals(const DataStructure* value) const
             return false;
         }
     }
-    else if (valuePtr->getTransactionId() != NULL)
+    else if (valuePtr->getTransactionId())
     {
         return false;
     }
@@ -165,21 +165,21 @@ bool JournalTransaction::equals(const DataStructure* value) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const decaf::lang::Pointer<TransactionId>&
+const std::shared_ptr<TransactionId>&
 JournalTransaction::getTransactionId() const
 {
     return transactionId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<TransactionId>& JournalTransaction::getTransactionId()
+std::shared_ptr<TransactionId>& JournalTransaction::getTransactionId()
 {
     return transactionId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void JournalTransaction::setTransactionId(
-    const decaf::lang::Pointer<TransactionId>& transactionId)
+    const std::shared_ptr<TransactionId>& transactionId)
 {
     this->transactionId = transactionId;
 }

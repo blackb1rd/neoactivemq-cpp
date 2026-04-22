@@ -17,6 +17,8 @@
 
 #include "TransportRegistry.h"
 
+#include <memory>
+
 using namespace std;
 using namespace activemq;
 using namespace activemq::transport;
@@ -98,7 +100,7 @@ void TransportRegistry::unregisterFactory(const std::string& name)
 ////////////////////////////////////////////////////////////////////////////////
 void TransportRegistry::unregisterAllFactories()
 {
-    Pointer<Iterator<TransportFactory*>> iterator(
+    std::shared_ptr<Iterator<TransportFactory*>> iterator(
         this->registry.values().iterator());
     while (iterator->hasNext())
     {

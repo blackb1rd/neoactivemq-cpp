@@ -26,13 +26,13 @@
 #include <activemq/threads/CompositeTaskRunner.h>
 #include <activemq/util/AMQLog.h>
 
+#include <atomic>
+
 #include <decaf/lang/Boolean.h>
 #include <decaf/lang/Math.h>
 #include <decaf/lang/Runnable.h>
 #include <decaf/lang/Thread.h>
 #include <decaf/util/Timer.h>
-#include <decaf/util/concurrent/atomic/AtomicBoolean.h>
-#include <decaf/util/concurrent/atomic/AtomicInteger.h>
 
 using namespace std;
 using namespace activemq;
@@ -46,7 +46,6 @@ using namespace decaf;
 using namespace decaf::io;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
-using namespace decaf::util::concurrent::atomic;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
@@ -66,31 +65,31 @@ namespace transport
 
         public:
             // The configured WireFormat for the Transport Chain.
-            Pointer<WireFormat> wireFormat;
+            std::shared_ptr<WireFormat> wireFormat;
 
             // Local and Remote WireFormat information.
-            Pointer<WireFormatInfo> localWireFormatInfo;
-            Pointer<WireFormatInfo> remoteWireFormatInfo;
+            std::shared_ptr<WireFormatInfo> localWireFormatInfo;
+            std::shared_ptr<WireFormatInfo> remoteWireFormatInfo;
 
-            Pointer<ReadChecker>  readCheckerTask;
-            Pointer<WriteChecker> writeCheckerTask;
+            ReadChecker*  readCheckerTask;
+            WriteChecker* writeCheckerTask;
 
             Timer readCheckTimer;
             Timer writeCheckTimer;
 
-            Pointer<CompositeTaskRunner> asyncTasks;
+            std::shared_ptr<CompositeTaskRunner> asyncTasks;
 
-            Pointer<AsyncSignalReadErrorkTask> asyncReadTask;
-            Pointer<AsyncWriteTask>            asyncWriteTask;
+            std::shared_ptr<AsyncSignalReadErrorkTask> asyncReadTask;
+            std::shared_ptr<AsyncWriteTask>            asyncWriteTask;
 
-            AtomicBoolean monitorStarted;
+            std::atomic<bool> monitorStarted;
 
-            AtomicBoolean commandSent;
-            AtomicBoolean commandReceived;
+            std::atomic<bool> commandSent;
+            std::atomic<bool> commandReceived;
 
-            AtomicBoolean failed;
-            AtomicBoolean inRead;
-            AtomicBoolean inWrite;
+            std::atomic<bool> failed;
+            std::atomic<bool> inRead;
+            std::atomic<bool> inWrite;
 
             Mutex inWriteMutex;
             Mutex monitor;
@@ -101,12 +100,12 @@ namespace transport
 
             bool keepAliveResponseRequired;
 
-            InactivityMonitorData(const Pointer<WireFormat> wireFormat)
+            InactivityMonitorData(const std::shared_ptr<WireFormat> wireFormat)
                 : wireFormat(wireFormat),
                   localWireFormatInfo(),
                   remoteWireFormatInfo(),
-                  readCheckerTask(),
-                  writeCheckerTask(),
+                  readCheckerTask(nullptr),
+                  writeCheckerTask(nullptr),
                   readCheckTimer("InactivityMonitor Read Check Timer"),
                   writeCheckTimer("InactivityMonitor Write Check Timer"),
                   asyncTasks(),
@@ -135,7 +134,7 @@ namespace transport
         private:
             InactivityMonitor* parent;
             std::string        remote;
-            AtomicBoolean      failed;
+            std::atomic<bool>  failed;
 
         private:
             AsyncSignalReadErrorkTask(const AsyncSignalReadErrorkTask&);
@@ -153,17 +152,18 @@ namespace transport
 
             void setFailed(bool failed)
             {
-                this->failed.set(failed);
+                this->failed.store(failed);
             }
 
             virtual bool isPending() const
             {
-                return this->failed.get();
+                return this->failed.load();
             }
 
             virtual bool iterate()
             {
-                if (this->failed.compareAndSet(true, false))
+                bool _e_failed = true;
+                if (this->failed.compare_exchange_strong(_e_failed, false))
                 {
                     IOException ex(
                         __FILE__,
@@ -178,7 +178,7 @@ namespace transport
                     return false;
                 }
 
-                return this->failed.get();
+                return this->failed.load();
             }
         };
 
@@ -188,7 +188,7 @@ namespace transport
         {
         private:
             InactivityMonitor* parent;
-            AtomicBoolean      write;
+            std::atomic<bool>  write;
 
         private:
             AsyncWriteTask(const AsyncWriteTask&);
@@ -203,22 +203,23 @@ namespace transport
 
             void setWrite(bool write)
             {
-                this->write.set(write);
+                this->write.store(write);
             }
 
             virtual bool isPending() const
             {
-                return this->write.get();
+                return this->write.load();
             }
 
             virtual bool iterate()
             {
-                if (this->write.compareAndSet(true, false) &&
-                    this->parent->members->monitorStarted.get())
+                bool _e_write = true;
+                if (this->write.compare_exchange_strong(_e_write, false) &&
+                    this->parent->members->monitorStarted.load())
                 {
                     try
                     {
-                        Pointer<KeepAliveInfo> info(new KeepAliveInfo());
+                        std::shared_ptr<KeepAliveInfo> info(new KeepAliveInfo());
                         info->setResponseRequired(
                             this->parent->members->keepAliveResponseRequired);
                         this->parent->oneway(info);
@@ -233,7 +234,7 @@ namespace transport
                     }
                 }
 
-                return this->write.get();
+                return this->write.load();
             }
         };
 
@@ -242,8 +243,8 @@ namespace transport
 }  // namespace activemq
 
 ////////////////////////////////////////////////////////////////////////////////
-InactivityMonitor::InactivityMonitor(const Pointer<Transport>  next,
-                                     const Pointer<WireFormat> wireFormat)
+InactivityMonitor::InactivityMonitor(const std::shared_ptr<Transport>  next,
+                                     const std::shared_ptr<WireFormat> wireFormat)
     : TransportFilter(next),
       members(new InactivityMonitorData(wireFormat))
 {
@@ -251,9 +252,9 @@ InactivityMonitor::InactivityMonitor(const Pointer<Transport>  next,
 
 ////////////////////////////////////////////////////////////////////////////////
 InactivityMonitor::InactivityMonitor(
-    const Pointer<Transport>              next,
-    const decaf::util::Properties&        properties,
-    const Pointer<wireformat::WireFormat> wireFormat)
+    const std::shared_ptr<Transport>              next,
+    const decaf::util::Properties&                properties,
+    const std::shared_ptr<wireformat::WireFormat> wireFormat)
     : TransportFilter(next),
       members(new InactivityMonitorData(wireFormat))
 {
@@ -375,7 +376,8 @@ void InactivityMonitor::doClose()
 ////////////////////////////////////////////////////////////////////////////////
 void InactivityMonitor::onException(const decaf::lang::Exception& ex)
 {
-    if (this->members->failed.compareAndSet(false, true))
+    bool _e_failed = false;
+    if (this->members->failed.compare_exchange_strong(_e_failed, true))
     {
         stopMonitorThreads();
         TransportFilter::onException(ex);
@@ -383,10 +385,10 @@ void InactivityMonitor::onException(const decaf::lang::Exception& ex)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InactivityMonitor::onCommand(const Pointer<Command> command)
+void InactivityMonitor::onCommand(const std::shared_ptr<Command> command)
 {
-    this->members->commandReceived.set(true);
-    this->members->inRead.set(true);
+    this->members->commandReceived.store(true);
+    this->members->inRead.store(true);
 
     try
     {
@@ -395,7 +397,7 @@ void InactivityMonitor::onCommand(const Pointer<Command> command)
             synchronized(&this->members->monitor)
             {
                 this->members->remoteWireFormatInfo =
-                    command.dynamicCast<WireFormatInfo>();
+                    std::dynamic_pointer_cast<WireFormatInfo>(command);
                 try
                 {
                     startMonitorThreads();
@@ -409,18 +411,18 @@ void InactivityMonitor::onCommand(const Pointer<Command> command)
 
         TransportFilter::onCommand(command);
 
-        this->members->inRead.set(false);
+        this->members->inRead.store(false);
     }
     catch (Exception& ex)
     {
-        this->members->inRead.set(false);
+        this->members->inRead.store(false);
         ex.setMark(__FILE__, __LINE__);
         throw;
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InactivityMonitor::oneway(const Pointer<Command> command)
+void InactivityMonitor::oneway(const std::shared_ptr<Command> command)
 {
     try
     {
@@ -429,10 +431,10 @@ void InactivityMonitor::oneway(const Pointer<Command> command)
         // and gets called by more than one thread  by this class
         synchronized(&this->members->inWriteMutex)
         {
-            this->members->inWrite.set(true);
+            this->members->inWrite.store(true);
             try
             {
-                if (this->members->failed.get())
+                if (this->members->failed.load())
                 {
                     throw IOException(
                         __FILE__,
@@ -447,20 +449,20 @@ void InactivityMonitor::oneway(const Pointer<Command> command)
                     synchronized(&this->members->monitor)
                     {
                         this->members->localWireFormatInfo =
-                            command.dynamicCast<WireFormatInfo>();
+                            std::dynamic_pointer_cast<WireFormatInfo>(command);
                         startMonitorThreads();
                     }
                 }
 
                 this->next->oneway(command);
 
-                this->members->commandSent.set(true);
-                this->members->inWrite.set(false);
+                this->members->commandSent.store(true);
+                this->members->inWrite.store(false);
             }
             catch (Exception& ex)
             {
-                this->members->commandSent.set(true);
-                this->members->inWrite.set(false);
+                this->members->commandSent.store(true);
+                this->members->inWrite.store(false);
                 ex.setMark(__FILE__, __LINE__);
                 throw;
             }
@@ -481,12 +483,12 @@ bool InactivityMonitor::allowReadCheck(long long elapsed)
 ////////////////////////////////////////////////////////////////////////////////
 void InactivityMonitor::readCheck()
 {
-    if (this->members->inRead.get() || this->members->wireFormat->inReceive())
+    if (this->members->inRead.load() || this->members->wireFormat->inReceive())
     {
         return;
     }
 
-    if (!this->members->commandReceived.get())
+    if (!this->members->commandReceived.load())
     {
         AMQ_LOG_ERROR("InactivityMonitor",
                       "Read check failed - no commands received within "
@@ -497,18 +499,18 @@ void InactivityMonitor::readCheck()
         this->members->asyncTasks->wakeup();
     }
 
-    this->members->commandReceived.set(false);
+    this->members->commandReceived.store(false);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void InactivityMonitor::writeCheck()
 {
-    if (this->members->inWrite.get())
+    if (this->members->inWrite.load())
     {
         return;
     }
 
-    if (!this->members->commandSent.get())
+    if (!this->members->commandSent.load())
     {
         AMQ_LOG_DEBUG("InactivityMonitor",
                       "Sending keep-alive (no commands sent within write check "
@@ -517,23 +519,23 @@ void InactivityMonitor::writeCheck()
         this->members->asyncTasks->wakeup();
     }
 
-    this->members->commandSent.set(false);
+    this->members->commandSent.store(false);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void InactivityMonitor::startMonitorThreads()
 {
-    if (this->members->monitorStarted.get())
+    if (this->members->monitorStarted.load())
     {
         return;
     }
 
-    if (this->members->localWireFormatInfo == NULL)
+    if (!this->members->localWireFormatInfo)
     {
         return;
     }
 
-    if (this->members->remoteWireFormatInfo == NULL)
+    if (!this->members->remoteWireFormatInfo)
     {
         return;
     }
@@ -561,9 +563,9 @@ void InactivityMonitor::startMonitorThreads()
 
         if (this->members->readCheckTime > 0)
         {
-            this->members->monitorStarted.set(true);
-            this->members->writeCheckerTask.reset(new WriteChecker(this));
-            this->members->readCheckerTask.reset(new ReadChecker(this));
+            this->members->monitorStarted.store(true);
+            this->members->writeCheckerTask = new WriteChecker(this);
+            this->members->readCheckerTask = new ReadChecker(this);
             this->members->writeCheckTime = this->members->readCheckTime > 3
                                                 ? this->members->readCheckTime /
                                                       3
@@ -592,7 +594,8 @@ void InactivityMonitor::startMonitorThreads()
 ////////////////////////////////////////////////////////////////////////////////
 void InactivityMonitor::stopMonitorThreads()
 {
-    if (this->members->monitorStarted.compareAndSet(true, false))
+    bool _e_monitorStarted = true;
+    if (this->members->monitorStarted.compare_exchange_strong(_e_monitorStarted, false))
     {
         AMQ_LOG_DEBUG("InactivityMonitor", "Stopping monitor threads");
 

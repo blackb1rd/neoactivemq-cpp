@@ -18,10 +18,11 @@
 #ifndef _ACTIVEMQ_TRANSPORT_DEFAULTTRANSPORTLISTENER_H_
 #define _ACTIVEMQ_TRANSPORT_DEFAULTTRANSPORTLISTENER_H_
 
+#include <memory>
+
 #include <activemq/commands/Command.h>
 #include <activemq/transport/TransportListener.h>
 #include <activemq/util/Config.h>
-#include <decaf/lang/Pointer.h>
 
 namespace activemq
 {
@@ -29,7 +30,6 @@ namespace transport
 {
 
     using activemq::commands::Command;
-    using decaf::lang::Pointer;
 
     /**
      * A Utility class that create empty implementations for the
@@ -49,7 +49,7 @@ namespace transport
          *
          * @param command the received command object.
          */
-        virtual void onCommand(const Pointer<Command> command AMQCPP_UNUSED)
+        virtual void onCommand(const std::shared_ptr<Command> command AMQCPP_UNUSED)
         {
         }
 

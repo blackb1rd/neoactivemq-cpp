@@ -44,10 +44,10 @@ using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 ActiveMQProducerKernel::ActiveMQProducerKernel(
-    ActiveMQSessionKernel*               session,
-    const Pointer<commands::ProducerId>& producerId,
-    const Pointer<ActiveMQDestination>&  destination,
-    long long                            sendTimeout)
+    ActiveMQSessionKernel*                              session,
+    const std::shared_ptr<commands::ProducerId>&        producerId,
+    const std::shared_ptr<ActiveMQDestination>&         destination,
+    long long                                           sendTimeout)
     : disableTimestamps(false),
       disableMessageId(false),
       defaultDeliveryMode(cms::Message::DEFAULT_DELIVERY_MODE),
@@ -62,7 +62,7 @@ ActiveMQProducerKernel::ActiveMQProducerKernel(
       messageSequence(),
       transformer()
 {
-    if (session == NULL || producerId == NULL)
+    if (session == nullptr || producerId == nullptr)
     {
         throw ActiveMQException(
             __FILE__,
@@ -80,13 +80,13 @@ ActiveMQProducerKernel::ActiveMQProducerKernel(
 
     // Get any options specified in the destination and apply them to the
     // ProducerInfo object.
-    if (destination != NULL)
+    if (destination != nullptr)
     {
         const ActiveMQProperties& options = destination->getOptions();
         this->producerInfo->setDispatchAsync(Boolean::parseBoolean(
             options.getProperty("producer.dispatchAsync", "false")));
 
-        this->destination = destination.dynamicCast<cms::Destination>();
+        this->destination = std::dynamic_pointer_cast<cms::Destination>(destination);
     }
 
     // Enable producer window flow control if protocol >= 3 and the window
@@ -102,7 +102,7 @@ ActiveMQProducerKernel::ActiveMQProducerKernel(
         "ActiveMQProducerKernel",
         "Producer created: producerId="
             << producerId->toString() << ", destination="
-            << (destination != NULL ? destination->getPhysicalName() : "NULL"));
+            << (destination != nullptr ? destination->getPhysicalName() : "NULL"));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -110,7 +110,7 @@ ActiveMQProducerKernel::~ActiveMQProducerKernel()
 {
     AMQ_LOG_DEBUG("ActiveMQProducerKernel",
                   "Producer destructor called: producerId="
-                      << (producerInfo != NULL
+                      << (producerInfo != nullptr
                               ? producerInfo->getProducerId()->toString()
                               : "NULL"));
     try
@@ -136,7 +136,7 @@ void ActiveMQProducerKernel::close()
             // Remove at the Broker Side, if this fails the producer has already
             // been removed from the session and connection objects so its safe
             // for an exception to be thrown.
-            Pointer<RemoveInfo> info(new RemoveInfo);
+            std::shared_ptr<RemoveInfo> info(new RemoveInfo);
             info->setObjectId(this->producerInfo->getProducerId());
             this->session->oneway(info);
 
@@ -151,17 +151,18 @@ void ActiveMQProducerKernel::dispose()
 {
     if (!this->isClosed())
     {
-        Pointer<ActiveMQProducerKernel> producer(this);
+        // Use a non-owning shared_ptr (aliasing constructor with null deleter)
+        // to pass 'this' to removeProducer without taking ownership.
+        std::shared_ptr<ActiveMQProducerKernel> producer(
+            std::shared_ptr<ActiveMQProducerKernel>{}, this);
         try
         {
             this->session->removeProducer(producer);
         }
         catch (Exception& e)
         {
-            producer.release();
             throw;
         }
-        producer.release();
         this->closed = true;
     }
 }
@@ -305,28 +306,28 @@ void ActiveMQProducerKernel::send(const cms::Destination* destination,
     {
         this->checkClosed();
 
-        if (destination == NULL)
+        if (destination == nullptr)
         {
-            if (this->producerInfo->getDestination() == NULL)
+            if (this->producerInfo->getDestination() == nullptr)
             {
                 throw cms::UnsupportedOperationException(
                     "A destination must be specified.",
-                    NULL);
+                    nullptr);
             }
 
             throw cms::InvalidDestinationException(
                 "Don't understand null destinations",
-                NULL);
+                nullptr);
         }
 
-        Pointer<ActiveMQDestination> dest;
-        const ActiveMQDestination*   transformed;
+        std::shared_ptr<ActiveMQDestination> dest;
+        const ActiveMQDestination*           transformed;
 
         if (destination == this->destination.get())
         {
             dest = this->producerInfo->getDestination();
         }
-        else if (this->producerInfo->getDestination() == NULL)
+        else if (this->producerInfo->getDestination() == nullptr)
         {
             // We always need to use a copy of the users destination since we
             // want to control its lifetime.  If the transform results in a new
@@ -348,17 +349,17 @@ void ActiveMQProducerKernel::send(const cms::Destination* destination,
             throw cms::UnsupportedOperationException(
                 string("This producer can only send messages to: ") +
                     this->producerInfo->getDestination()->getPhysicalName(),
-                NULL);
+                nullptr);
         }
 
-        if (dest == NULL)
+        if (dest == nullptr)
         {
-            throw cms::CMSException("No destination specified", NULL);
+            throw cms::CMSException("No destination specified", nullptr);
         }
 
-        cms::Message*         outbound = message;
-        Pointer<cms::Message> scopedMessage;
-        if (this->transformer != NULL)
+        cms::Message*              outbound = message;
+        std::shared_ptr<cms::Message> scopedMessage;
+        if (this->transformer != nullptr)
         {
             if (this->transformer->producerTransform(this->session,
                                                      this,
@@ -371,7 +372,7 @@ void ActiveMQProducerKernel::send(const cms::Destination* destination,
                 // exception.
                 scopedMessage.reset(outbound);
             }
-            if (outbound == NULL)
+            if (outbound == nullptr)
             {
                 throw NullPointerException(
                     __FILE__,
@@ -380,7 +381,7 @@ void ActiveMQProducerKernel::send(const cms::Destination* destination,
             }
         }
 
-        if (this->memoryUsage.get() != NULL)
+        if (this->memoryUsage.get() != nullptr)
         {
             try
             {
@@ -425,7 +426,7 @@ void ActiveMQProducerKernel::onProducerAck(const commands::ProducerAck& ack)
                           << ack.getSize() << ", producerId="
                           << ack.getProducerId()->toString());
 
-        if (this->memoryUsage.get() != NULL)
+        if (this->memoryUsage.get() != nullptr)
         {
             this->memoryUsage->decreaseUsage(ack.getSize());
         }

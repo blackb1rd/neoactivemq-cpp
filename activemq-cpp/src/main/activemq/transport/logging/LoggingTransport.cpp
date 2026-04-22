@@ -27,13 +27,13 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-LoggingTransport::LoggingTransport(const Pointer<Transport> next)
+LoggingTransport::LoggingTransport(const std::shared_ptr<Transport> next)
     : TransportFilter(next)
 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LoggingTransport::onCommand(const Pointer<Command> command)
+void LoggingTransport::onCommand(const std::shared_ptr<Command> command)
 {
     std::cout << "RECV: " << command->toString() << std::endl;
 
@@ -42,7 +42,7 @@ void LoggingTransport::onCommand(const Pointer<Command> command)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void LoggingTransport::oneway(const Pointer<Command> command)
+void LoggingTransport::oneway(const std::shared_ptr<Command> command)
 {
     try
     {
@@ -58,14 +58,14 @@ void LoggingTransport::oneway(const Pointer<Command> command)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Response> LoggingTransport::request(const Pointer<Command> command)
+std::shared_ptr<Response> LoggingTransport::request(const std::shared_ptr<Command> command)
 {
     try
     {
         std::cout << "SEND: " << command->toString() << std::endl;
 
         // Delegate to the base class.
-        Pointer<Response> response = TransportFilter::request(command);
+        std::shared_ptr<Response> response = TransportFilter::request(command);
 
         return response;
     }
@@ -76,7 +76,7 @@ Pointer<Response> LoggingTransport::request(const Pointer<Command> command)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Response> LoggingTransport::request(const Pointer<Command> command,
+std::shared_ptr<Response> LoggingTransport::request(const std::shared_ptr<Command> command,
                                             unsigned int           timeout)
 {
     try
@@ -84,7 +84,7 @@ Pointer<Response> LoggingTransport::request(const Pointer<Command> command,
         std::cout << "SEND: " << command->toString() << std::endl;
 
         // Delegate to the base class.
-        Pointer<Response> response = TransportFilter::request(command, timeout);
+        std::shared_ptr<Response> response = TransportFilter::request(command, timeout);
 
         return response;
     }

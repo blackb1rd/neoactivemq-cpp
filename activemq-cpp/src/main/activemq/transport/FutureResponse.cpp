@@ -42,7 +42,7 @@ FutureResponse::FutureResponse()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-FutureResponse::FutureResponse(const Pointer<ResponseCallback> responseCallback)
+FutureResponse::FutureResponse(const std::shared_ptr<ResponseCallback> responseCallback)
     : responseLatch(1),
       response(),
       responseCallback(responseCallback)
@@ -55,7 +55,7 @@ FutureResponse::~FutureResponse()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Response> FutureResponse::getResponse() const
+std::shared_ptr<Response> FutureResponse::getResponse() const
 {
     try
     {
@@ -73,7 +73,7 @@ Pointer<Response> FutureResponse::getResponse() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Response> FutureResponse::getResponse()
+std::shared_ptr<Response> FutureResponse::getResponse()
 {
     try
     {
@@ -91,7 +91,7 @@ Pointer<Response> FutureResponse::getResponse()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Response> FutureResponse::getResponse(unsigned int timeout) const
+std::shared_ptr<Response> FutureResponse::getResponse(unsigned int timeout) const
 {
     try
     {
@@ -108,7 +108,7 @@ Pointer<Response> FutureResponse::getResponse(unsigned int timeout) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Response> FutureResponse::getResponse(unsigned int timeout)
+std::shared_ptr<Response> FutureResponse::getResponse(unsigned int timeout)
 {
     try
     {
@@ -125,11 +125,11 @@ Pointer<Response> FutureResponse::getResponse(unsigned int timeout)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FutureResponse::setResponse(Pointer<Response> response)
+void FutureResponse::setResponse(std::shared_ptr<Response> response)
 {
     this->response = response;
     this->responseLatch.countDown();
-    if (responseCallback != NULL)
+    if (responseCallback)
     {
         responseCallback->onComplete(this->response);
     }

@@ -25,7 +25,6 @@
 #include <activemq/util/URISupport.h>
 #include <activemq/wireformat/WireFormat.h>
 #include <decaf/lang/Boolean.h>
-#include <decaf/lang/Integer.h>
 #include <decaf/util/Properties.h>
 
 using namespace activemq;
@@ -42,19 +41,19 @@ using namespace decaf::lang;
 using namespace decaf::util;
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Transport> TcpTransportFactory::create(const decaf::net::URI& location)
+std::shared_ptr<Transport> TcpTransportFactory::create(const decaf::net::URI& location)
 {
     try
     {
         Properties properties =
             activemq::util::URISupport::parseQuery(location.getQuery());
 
-        Pointer<WireFormat> wireFormat = this->createWireFormat(properties);
+        std::shared_ptr<WireFormat> wireFormat = this->createWireFormat(properties);
 
         // Create the initial Composite Transport, then wrap it in the normal
         // Filters for a non-composite Transport which right now is just a
         // ResponseCorrelator
-        Pointer<Transport> transport(
+        std::shared_ptr<Transport> transport(
             doCreateComposite(location, wireFormat, properties));
 
         transport.reset(new ResponseCorrelator(transport));
@@ -67,7 +66,7 @@ Pointer<Transport> TcpTransportFactory::create(const decaf::net::URI& location)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Transport> TcpTransportFactory::createComposite(
+std::shared_ptr<Transport> TcpTransportFactory::createComposite(
     const decaf::net::URI& location)
 {
     try
@@ -75,7 +74,7 @@ Pointer<Transport> TcpTransportFactory::createComposite(
         Properties properties =
             activemq::util::URISupport::parseQuery(location.getQuery());
 
-        Pointer<WireFormat> wireFormat = this->createWireFormat(properties);
+        std::shared_ptr<WireFormat> wireFormat = this->createWireFormat(properties);
 
         // Create the initial Transport, then wrap it in the normal Filters
         return doCreateComposite(location, wireFormat, properties);
@@ -86,14 +85,14 @@ Pointer<Transport> TcpTransportFactory::createComposite(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Transport> TcpTransportFactory::doCreateComposite(
-    const decaf::net::URI&                location,
-    const Pointer<wireformat::WireFormat> wireFormat,
-    const decaf::util::Properties&        properties)
+std::shared_ptr<Transport> TcpTransportFactory::doCreateComposite(
+    const decaf::net::URI&                        location,
+    const std::shared_ptr<wireformat::WireFormat> wireFormat,
+    const decaf::util::Properties&                properties)
 {
     try
     {
-        Pointer<Transport> transport(new IOTransport(wireFormat));
+        std::shared_ptr<Transport> transport(new IOTransport(wireFormat));
 
         transport.reset(new TcpTransport(transport, location));
 
@@ -133,30 +132,30 @@ Pointer<Transport> TcpTransportFactory::doCreateComposite(
 
 ////////////////////////////////////////////////////////////////////////////////
 void TcpTransportFactory::doConfigureTransport(
-    Pointer<Transport>             transport,
+    std::shared_ptr<Transport>     transport,
     const decaf::util::Properties& properties)
 {
     try
     {
-        Pointer<TcpTransport> tcp = transport.dynamicCast<TcpTransport>();
+        std::shared_ptr<TcpTransport> tcp = std::dynamic_pointer_cast<TcpTransport>(transport);
 
-        tcp->setInputBufferSize(Integer::parseInt(
+        tcp->setInputBufferSize(std::stoi(
             properties.getProperty("inputBufferSize", "8192")));
-        tcp->setOutputBufferSize(Integer::parseInt(
+        tcp->setOutputBufferSize(std::stoi(
             properties.getProperty("outputBufferSize", "8192")));
         tcp->setTrace(Boolean::parseBoolean(
             properties.getProperty("transport.tcpTracingEnabled", "false")));
         tcp->setLinger(
-            Integer::parseInt(properties.getProperty("soLinger", "-1")));
+            std::stoi(properties.getProperty("soLinger", "-1")));
         tcp->setKeepAlive(Boolean::parseBoolean(
             properties.getProperty("soKeepAlive", "false")));
-        tcp->setReceiveBufferSize(Integer::parseInt(
+        tcp->setReceiveBufferSize(std::stoi(
             properties.getProperty("soReceiveBufferSize", "-1")));
-        tcp->setSendBufferSize(Integer::parseInt(
+        tcp->setSendBufferSize(std::stoi(
             properties.getProperty("soSendBufferSize", "-1")));
         tcp->setTcpNoDelay(Boolean::parseBoolean(
             properties.getProperty("tcpNoDelay", "true")));
-        tcp->setConnectTimeout(Integer::parseInt(
+        tcp->setConnectTimeout(std::stoi(
             properties.getProperty("soConnectTimeout", "3000")));
     }
     AMQ_CATCH_RETHROW(ActiveMQException)

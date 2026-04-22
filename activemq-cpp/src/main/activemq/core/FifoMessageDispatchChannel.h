@@ -21,8 +21,8 @@
 #include <activemq/core/MessageDispatchChannel.h>
 #include <activemq/util/Config.h>
 
-#include <decaf/lang/Pointer.h>
 #include <decaf/util/LinkedList.h>
+#include <memory>
 
 namespace activemq
 {
@@ -35,7 +35,7 @@ namespace core
         bool closed;
         bool running;
 
-        mutable decaf::util::LinkedList<Pointer<MessageDispatch>> channel;
+        mutable decaf::util::LinkedList<std::shared_ptr<MessageDispatch>> channel;
 
     private:
         FifoMessageDispatchChannel(const FifoMessageDispatchChannel&);
@@ -46,9 +46,9 @@ namespace core
 
         virtual ~FifoMessageDispatchChannel();
 
-        virtual void enqueue(const Pointer<MessageDispatch>& message);
+        virtual void enqueue(const std::shared_ptr<MessageDispatch>& message);
 
-        virtual void enqueueFirst(const Pointer<MessageDispatch>& message);
+        virtual void enqueueFirst(const std::shared_ptr<MessageDispatch>& message);
 
         virtual bool isEmpty() const;
 
@@ -62,11 +62,11 @@ namespace core
             return this->running;
         }
 
-        virtual Pointer<MessageDispatch> dequeue(long long timeout);
+        virtual std::shared_ptr<MessageDispatch> dequeue(long long timeout);
 
-        virtual Pointer<MessageDispatch> dequeueNoWait();
+        virtual std::shared_ptr<MessageDispatch> dequeueNoWait();
 
-        virtual Pointer<MessageDispatch> peek() const;
+        virtual std::shared_ptr<MessageDispatch> peek() const;
 
         virtual void start();
 
@@ -78,7 +78,7 @@ namespace core
 
         virtual int size() const;
 
-        virtual std::vector<Pointer<MessageDispatch>> removeAll();
+        virtual std::vector<std::shared_ptr<MessageDispatch>> removeAll();
 
     public:
         virtual void lock()

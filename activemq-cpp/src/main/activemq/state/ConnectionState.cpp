@@ -25,9 +25,10 @@
 using namespace activemq;
 using namespace activemq::state;
 using namespace activemq::commands;
+using namespace decaf::util;
 
 ////////////////////////////////////////////////////////////////////////////////
-ConnectionState::ConnectionState(Pointer<ConnectionInfo> info)
+ConnectionState::ConnectionState(std::shared_ptr<ConnectionInfo> info)
     : info(info),
       transactions(),
       sessions(),
@@ -36,9 +37,9 @@ ConnectionState::ConnectionState(Pointer<ConnectionInfo> info)
       connectionInterruptProcessingComplete(true),
       recoveringPullConsumers()
 {
-    Pointer<SessionId> sessionId(
+    std::shared_ptr<SessionId> sessionId(
         new SessionId(info->getConnectionId().get(), -1));
-    Pointer<SessionInfo> session(new SessionInfo());
+    std::shared_ptr<SessionInfo> session(new SessionInfo());
     session->setSessionId(sessionId);
 
     // Add the default session id.
@@ -56,7 +57,7 @@ ConnectionState::~ConnectionState()
 ////////////////////////////////////////////////////////////////////////////////
 std::string ConnectionState::toString() const
 {
-    if (this->info.get() != NULL)
+    if (this->info)
     {
         return this->info->toString();
     }
@@ -65,21 +66,21 @@ std::string ConnectionState::toString() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConnectionState::reset(Pointer<ConnectionInfo> info)
+void ConnectionState::reset(std::shared_ptr<ConnectionInfo> info)
 {
     this->info = info;
     transactions.clear();
     sessions.clear();
     tempDestinations.clear();
-    disposed.set(false);
+    disposed.store(false);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void ConnectionState::shutdown()
 {
-    if (this->disposed.compareAndSet(false, true))
+    if (!this->disposed.exchange(true))
     {
-        Pointer<Iterator<Pointer<SessionState>>> iterator(
+        std::shared_ptr<Iterator<std::shared_ptr<SessionState>>> iterator(
             this->sessions.values().iterator());
         while (iterator->hasNext())
         {
@@ -91,7 +92,7 @@ void ConnectionState::shutdown()
 ////////////////////////////////////////////////////////////////////////////////
 void ConnectionState::checkShutdown() const
 {
-    if (this->disposed.get())
+    if (this->disposed.load())
     {
         throw decaf::lang::exceptions::IllegalStateException(
             __FILE__,
@@ -102,14 +103,14 @@ void ConnectionState::checkShutdown() const
 
 ////////////////////////////////////////////////////////////////////////////////
 void ConnectionState::removeTempDestination(
-    Pointer<ActiveMQDestination> destination)
+    std::shared_ptr<ActiveMQDestination> destination)
 {
-    std::unique_ptr<decaf::util::Iterator<Pointer<DestinationInfo>>> iter(
+    std::unique_ptr<decaf::util::Iterator<std::shared_ptr<DestinationInfo>>> iter(
         tempDestinations.iterator());
 
     while (iter->hasNext())
     {
-        Pointer<DestinationInfo> di = iter->next();
+        std::shared_ptr<DestinationInfo> di = iter->next();
         if (di->getDestination()->equals(destination.get()))
         {
             iter->remove();

@@ -24,7 +24,7 @@
 #include <activemq/threads/Task.h>
 #include <activemq/threads/TaskRunner.h>
 #include <activemq/util/Config.h>
-#include <decaf/lang/Pointer.h>
+#include <memory>
 
 namespace activemq
 {
@@ -36,7 +36,6 @@ namespace core
     }  // namespace kernels
 
     using activemq::commands::MessageDispatch;
-    using decaf::lang::Pointer;
 
     class ActiveMQConsumer;
 
@@ -51,10 +50,10 @@ namespace core
         activemq::core::kernels::ActiveMQSessionKernel* session;
 
         /** The Channel that holds the waiting Messages for Dispatching. */
-        Pointer<MessageDispatchChannel> messageQueue;
+        std::shared_ptr<MessageDispatchChannel> messageQueue;
 
         /** The Dispatcher TaskRunner */
-        Pointer<activemq::threads::TaskRunner> taskRunner;
+        std::shared_ptr<activemq::threads::TaskRunner> taskRunner;
 
     private:
         ActiveMQSessionExecutor(const ActiveMQSessionExecutor&);
@@ -77,14 +76,14 @@ namespace core
          * end of the queue.
          * @param data - the data to be dispatched.
          */
-        virtual void execute(const Pointer<MessageDispatch>& data);
+        virtual void execute(const std::shared_ptr<MessageDispatch>& data);
 
         /**
          * Executes the dispatch.  Adds the given data to the
          * beginning of the queue.
          * @param data - the data to be dispatched.
          */
-        virtual void executeFirst(const Pointer<MessageDispatch>& data);
+        virtual void executeFirst(const std::shared_ptr<MessageDispatch>& data);
 
         /**
          * Removes all messages in the Dispatch Channel so that non are
@@ -165,7 +164,7 @@ namespace core
          * @return a vector containing all the unconsumed messages, this clears
          * the Message Dispatch Channel when called.
          */
-        std::vector<Pointer<MessageDispatch>> getUnconsumedMessages()
+        std::vector<std::shared_ptr<MessageDispatch>> getUnconsumedMessages()
         {
             return messageQueue->removeAll();
         }
@@ -175,7 +174,7 @@ namespace core
          * Dispatches a message to a particular consumer.
          * @param data - The message to be dispatched.
          */
-        virtual void dispatch(const Pointer<MessageDispatch>& data);
+        virtual void dispatch(const std::shared_ptr<MessageDispatch>& data);
     };
 
 }  // namespace core

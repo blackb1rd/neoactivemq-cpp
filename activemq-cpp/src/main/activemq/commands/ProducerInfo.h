@@ -29,7 +29,7 @@
 #include <activemq/commands/ProducerId.h>
 #include <activemq/commands/RemoveInfo.h>
 #include <activemq/util/Config.h>
-#include <decaf/lang/Pointer.h>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -37,8 +37,6 @@ namespace activemq
 {
 namespace commands
 {
-
-    using decaf::lang::Pointer;
 
     /*
      *
@@ -52,9 +50,9 @@ namespace commands
     class AMQCPP_API ProducerInfo : public BaseCommand
     {
     protected:
-        Pointer<ProducerId>                         producerId;
-        Pointer<ActiveMQDestination>                destination;
-        std::vector<decaf::lang::Pointer<BrokerId>> brokerPath;
+        std::shared_ptr<ProducerId>                         producerId;
+        std::shared_ptr<ActiveMQDestination>                destination;
+        std::vector<std::shared_ptr<BrokerId>>              brokerPath;
         bool                                        dispatchAsync;
         int                                         windowSize;
 
@@ -80,22 +78,22 @@ namespace commands
 
         virtual bool equals(const DataStructure* value) const;
 
-        Pointer<RemoveInfo> createRemoveCommand() const;
+        std::shared_ptr<RemoveInfo> createRemoveCommand() const;
 
-        virtual const Pointer<ProducerId>& getProducerId() const;
-        virtual Pointer<ProducerId>&       getProducerId();
-        virtual void setProducerId(const Pointer<ProducerId>& producerId);
+        virtual const std::shared_ptr<ProducerId>& getProducerId() const;
+        virtual std::shared_ptr<ProducerId>&       getProducerId();
+        virtual void setProducerId(const std::shared_ptr<ProducerId>& producerId);
 
-        virtual const Pointer<ActiveMQDestination>& getDestination() const;
-        virtual Pointer<ActiveMQDestination>&       getDestination();
-        virtual void                                setDestination(
-                                           const Pointer<ActiveMQDestination>& destination);
+        virtual const std::shared_ptr<ActiveMQDestination>& getDestination() const;
+        virtual std::shared_ptr<ActiveMQDestination>&       getDestination();
+        virtual void                                        setDestination(
+                                                   const std::shared_ptr<ActiveMQDestination>& destination);
 
-        virtual const std::vector<decaf::lang::Pointer<BrokerId>>&
+        virtual const std::vector<std::shared_ptr<BrokerId>>&
         getBrokerPath() const;
-        virtual std::vector<decaf::lang::Pointer<BrokerId>>& getBrokerPath();
-        virtual void                                         setBrokerPath(
-                                                    const std::vector<decaf::lang::Pointer<BrokerId>>& brokerPath);
+        virtual std::vector<std::shared_ptr<BrokerId>>& getBrokerPath();
+        virtual void                                    setBrokerPath(
+                                           const std::vector<std::shared_ptr<BrokerId>>& brokerPath);
 
         virtual bool isDispatchAsync() const;
         virtual void setDispatchAsync(bool dispatchAsync);
@@ -111,7 +109,7 @@ namespace commands
             return true;
         }
 
-        virtual Pointer<Command> visit(activemq::state::CommandVisitor* visitor);
+        virtual std::shared_ptr<Command> visit(activemq::state::CommandVisitor* visitor);
     };
 
 }  // namespace commands

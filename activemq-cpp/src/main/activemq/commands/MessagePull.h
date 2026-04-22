@@ -28,7 +28,7 @@
 #include <activemq/commands/ConsumerId.h>
 #include <activemq/commands/MessageId.h>
 #include <activemq/util/Config.h>
-#include <decaf/lang/Pointer.h>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -36,8 +36,6 @@ namespace activemq
 {
 namespace commands
 {
-
-    using decaf::lang::Pointer;
 
     /*
      *
@@ -51,11 +49,11 @@ namespace commands
     class AMQCPP_API MessagePull : public BaseCommand
     {
     protected:
-        Pointer<ConsumerId>          consumerId;
-        Pointer<ActiveMQDestination> destination;
-        long long                    timeout;
-        std::string                  correlationId;
-        Pointer<MessageId>           messageId;
+        std::shared_ptr<ConsumerId>          consumerId;
+        std::shared_ptr<ActiveMQDestination> destination;
+        long long                            timeout;
+        std::string                          correlationId;
+        std::shared_ptr<MessageId>           messageId;
 
     public:
         const static unsigned char ID_MESSAGEPULL = 20;
@@ -79,14 +77,14 @@ namespace commands
 
         virtual bool equals(const DataStructure* value) const;
 
-        virtual const Pointer<ConsumerId>& getConsumerId() const;
-        virtual Pointer<ConsumerId>&       getConsumerId();
-        virtual void setConsumerId(const Pointer<ConsumerId>& consumerId);
+        virtual const std::shared_ptr<ConsumerId>& getConsumerId() const;
+        virtual std::shared_ptr<ConsumerId>&       getConsumerId();
+        virtual void setConsumerId(const std::shared_ptr<ConsumerId>& consumerId);
 
-        virtual const Pointer<ActiveMQDestination>& getDestination() const;
-        virtual Pointer<ActiveMQDestination>&       getDestination();
-        virtual void                                setDestination(
-                                           const Pointer<ActiveMQDestination>& destination);
+        virtual const std::shared_ptr<ActiveMQDestination>& getDestination() const;
+        virtual std::shared_ptr<ActiveMQDestination>&       getDestination();
+        virtual void                                        setDestination(
+                                                   const std::shared_ptr<ActiveMQDestination>& destination);
 
         virtual long long getTimeout() const;
         virtual void      setTimeout(long long timeout);
@@ -95,9 +93,9 @@ namespace commands
         virtual std::string&       getCorrelationId();
         virtual void setCorrelationId(const std::string& correlationId);
 
-        virtual const Pointer<MessageId>& getMessageId() const;
-        virtual Pointer<MessageId>&       getMessageId();
-        virtual void setMessageId(const Pointer<MessageId>& messageId);
+        virtual const std::shared_ptr<MessageId>& getMessageId() const;
+        virtual std::shared_ptr<MessageId>&       getMessageId();
+        virtual void setMessageId(const std::shared_ptr<MessageId>& messageId);
 
         /**
          * @return an answer of true to the isMessagePull() query.
@@ -107,7 +105,7 @@ namespace commands
             return true;
         }
 
-        virtual Pointer<Command> visit(activemq::state::CommandVisitor* visitor);
+        virtual std::shared_ptr<Command> visit(activemq::state::CommandVisitor* visitor);
     };
 
 }  // namespace commands

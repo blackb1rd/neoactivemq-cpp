@@ -26,9 +26,9 @@
 #include <activemq/util/CompositeData.h>
 #include <activemq/util/URISupport.h>
 
+#include <memory>
+
 #include <decaf/lang/Boolean.h>
-#include <decaf/lang/Integer.h>
-#include <decaf/lang/Long.h>
 
 using namespace decaf;
 using namespace decaf::util;
@@ -47,13 +47,13 @@ DiscoveryTransportFactory::~DiscoveryTransportFactory()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-Pointer<Transport> DiscoveryTransportFactory::create(
+std::shared_ptr<Transport> DiscoveryTransportFactory::create(
     const decaf::net::URI& location)
 {
     try
     {
         // Create the initial Transport, then wrap it in the normal Filters
-        Pointer<Transport> transport(doCreateTransport(location));
+        std::shared_ptr<Transport> transport(doCreateTransport(location));
 
         // Create the Transport for response correlator
         transport.reset(new ResponseCorrelator(transport));
@@ -66,7 +66,7 @@ Pointer<Transport> DiscoveryTransportFactory::create(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-Pointer<Transport> DiscoveryTransportFactory::createComposite(
+std::shared_ptr<Transport> DiscoveryTransportFactory::createComposite(
     const decaf::net::URI& location)
 {
     try
@@ -79,7 +79,7 @@ Pointer<Transport> DiscoveryTransportFactory::createComposite(
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-Pointer<Transport> DiscoveryTransportFactory::doCreateTransport(
+std::shared_ptr<Transport> DiscoveryTransportFactory::doCreateTransport(
     const decaf::net::URI& location)
 {
     try
@@ -87,9 +87,9 @@ Pointer<Transport> DiscoveryTransportFactory::doCreateTransport(
         CompositeData composite = URISupport::parseComposite(location);
 
         // TODO create using factory and pass in params.
-        Pointer<CompositeTransport> failover(new FailoverTransport());
+        std::shared_ptr<CompositeTransport> failover(new FailoverTransport());
 
-        Pointer<DiscoveryTransport> transport(new DiscoveryTransport(failover));
+        std::shared_ptr<DiscoveryTransport> transport(new DiscoveryTransport(failover));
 
         // TODO set all discovery options on the transport.
 
@@ -101,7 +101,7 @@ Pointer<Transport> DiscoveryTransportFactory::doCreateTransport(
 
         // TODO error?
 
-        Pointer<DiscoveryAgent> agent = agentFactory->createAgent(agentURI);
+        std::shared_ptr<DiscoveryAgent> agent = agentFactory->createAgent(agentURI);
         transport->setDiscoveryAgent(agent);
 
         return transport;

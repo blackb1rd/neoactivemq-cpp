@@ -24,7 +24,7 @@ using namespace std;
 using namespace activemq;
 using namespace activemq::exceptions;
 using namespace activemq::commands;
-using namespace decaf::lang;
+
 using namespace decaf::lang::exceptions;
 
 /*
@@ -165,7 +165,7 @@ void ReplayCommand::setLastNakNumber(int lastNakNumber)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<commands::Command> ReplayCommand::visit(
+std::shared_ptr<commands::Command> ReplayCommand::visit(
     activemq::state::CommandVisitor* visitor)
 {
     return visitor->processReplayCommand(this);

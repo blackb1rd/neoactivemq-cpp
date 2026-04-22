@@ -41,7 +41,7 @@ FifoMessageDispatchChannel::~FifoMessageDispatchChannel()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FifoMessageDispatchChannel::enqueue(const Pointer<MessageDispatch>& message)
+void FifoMessageDispatchChannel::enqueue(const std::shared_ptr<MessageDispatch>& message)
 {
     synchronized(&channel)
     {
@@ -52,7 +52,7 @@ void FifoMessageDispatchChannel::enqueue(const Pointer<MessageDispatch>& message
 
 ////////////////////////////////////////////////////////////////////////////////
 void FifoMessageDispatchChannel::enqueueFirst(
-    const Pointer<MessageDispatch>& message)
+    const std::shared_ptr<MessageDispatch>& message)
 {
     synchronized(&channel)
     {
@@ -73,7 +73,7 @@ bool FifoMessageDispatchChannel::isEmpty() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<MessageDispatch> FifoMessageDispatchChannel::dequeue(long long timeout)
+std::shared_ptr<MessageDispatch> FifoMessageDispatchChannel::dequeue(long long timeout)
 {
     synchronized(&channel)
     {
@@ -93,60 +93,60 @@ Pointer<MessageDispatch> FifoMessageDispatchChannel::dequeue(long long timeout)
 
         if (closed || !running || channel.isEmpty())
         {
-            return Pointer<MessageDispatch>();
+            return std::shared_ptr<MessageDispatch>();
         }
 
         // Use pollFirst instead of pop to avoid NoSuchElementException
-        Pointer<MessageDispatch> result;
+        std::shared_ptr<MessageDispatch> result;
         if (channel.pollFirst(result))
         {
             return result;
         }
     }
 
-    return Pointer<MessageDispatch>();
+    return std::shared_ptr<MessageDispatch>();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<MessageDispatch> FifoMessageDispatchChannel::dequeueNoWait()
+std::shared_ptr<MessageDispatch> FifoMessageDispatchChannel::dequeueNoWait()
 {
     synchronized(&channel)
     {
         if (closed || !running || channel.isEmpty())
         {
-            return Pointer<MessageDispatch>();
+            return std::shared_ptr<MessageDispatch>();
         }
 
         // Use pollFirst instead of pop to avoid NoSuchElementException
-        Pointer<MessageDispatch> result;
+        std::shared_ptr<MessageDispatch> result;
         if (channel.pollFirst(result))
         {
             return result;
         }
     }
 
-    return Pointer<MessageDispatch>();
+    return std::shared_ptr<MessageDispatch>();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<MessageDispatch> FifoMessageDispatchChannel::peek() const
+std::shared_ptr<MessageDispatch> FifoMessageDispatchChannel::peek() const
 {
     synchronized(&channel)
     {
         if (closed || !running || channel.isEmpty())
         {
-            return Pointer<MessageDispatch>();
+            return std::shared_ptr<MessageDispatch>();
         }
 
         // Use peekFirst instead of getFirst to avoid NoSuchElementException
-        Pointer<MessageDispatch> result;
+        std::shared_ptr<MessageDispatch> result;
         if (channel.peekFirst(result))
         {
             return result;
         }
     }
 
-    return Pointer<MessageDispatch>();
+    return std::shared_ptr<MessageDispatch>();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -207,9 +207,9 @@ int FifoMessageDispatchChannel::size() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::vector<Pointer<MessageDispatch>> FifoMessageDispatchChannel::removeAll()
+std::vector<std::shared_ptr<MessageDispatch>> FifoMessageDispatchChannel::removeAll()
 {
-    std::vector<Pointer<MessageDispatch>> result;
+    std::vector<std::shared_ptr<MessageDispatch>> result;
 
     synchronized(&channel)
     {

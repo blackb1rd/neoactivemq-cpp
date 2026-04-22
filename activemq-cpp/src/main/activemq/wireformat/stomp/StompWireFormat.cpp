@@ -44,8 +44,6 @@
 #include <decaf/io/IOException.h>
 #include <decaf/lang/Boolean.h>
 #include <decaf/lang/Character.h>
-#include <decaf/lang/Integer.h>
-#include <decaf/lang/Long.h>
 #include <decaf/lang/exceptions/ClassCastException.h>
 #include <memory>
 
@@ -123,7 +121,7 @@ StompWireFormat::~StompWireFormat()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void StompWireFormat::marshal(const Pointer<Command>                command,
+void StompWireFormat::marshal(const std::shared_ptr<Command>        command,
                               const activemq::transport::Transport* transport,
                               decaf::io::DataOutputStream*          out)
 {
@@ -137,7 +135,7 @@ void StompWireFormat::marshal(const Pointer<Command>                command,
                                          "output stream is NULL");
         }
 
-        Pointer<StompFrame> frame;
+        std::shared_ptr<StompFrame> frame;
 
         if (command->isMessage())
         {
@@ -174,11 +172,11 @@ void StompWireFormat::marshal(const Pointer<Command>                command,
 
         // Some commands just don't translate to Stomp Commands, unless they
         // require a response we can just ignore them.
-        if (frame == NULL)
+        if (!frame)
         {
             if (command->isResponseRequired())
             {
-                Pointer<Response> response(new Response());
+                std::shared_ptr<Response> response(new Response());
                 response->setCorrelationId(command->getCommandId());
 
                 transport::TransportListener* listener =
@@ -201,7 +199,7 @@ void StompWireFormat::marshal(const Pointer<Command>                command,
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Command> StompWireFormat::unmarshal(
+std::shared_ptr<Command> StompWireFormat::unmarshal(
     const activemq::transport::Transport* transport,
     decaf::io::DataInputStream*           in)
 {
@@ -219,7 +217,7 @@ Pointer<Command> StompWireFormat::unmarshal(
                                      "DataInputStream passed is NULL");
     }
 
-    Pointer<StompFrame> frame;
+    std::shared_ptr<StompFrame> frame;
 
     try
     {
@@ -239,18 +237,18 @@ Pointer<Command> StompWireFormat::unmarshal(
             Finally& operator=(const Finally&);
 
         private:
-            decaf::util::concurrent::atomic::AtomicBoolean* state;
+            std::atomic<bool>* state;
 
         public:
-            Finally(decaf::util::concurrent::atomic::AtomicBoolean* state)
+            Finally(std::atomic<bool>* state)
                 : state(state)
             {
-                state->set(true);
+                state->store(true);
             }
 
             ~Finally()
             {
-                state->set(false);
+                state->store(false);
             }
         } finalizer(&(this->receiving));
 
@@ -283,8 +281,8 @@ Pointer<Command> StompWireFormat::unmarshal(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<transport::Transport> StompWireFormat::createNegotiator(
-    const Pointer<transport::Transport> transport AMQCPP_UNUSED)
+std::shared_ptr<transport::Transport> StompWireFormat::createNegotiator(
+    const std::shared_ptr<transport::Transport> transport AMQCPP_UNUSED)
 {
     throw UnsupportedOperationException(
         __FILE__,
@@ -292,25 +290,25 @@ Pointer<transport::Transport> StompWireFormat::createNegotiator(
         "No Negotiator is required to use this WireFormat.");
 
     // Apparently HP's aCC compiler is even dumber than Sun's
-    return Pointer<transport::Transport>();
+    return std::shared_ptr<transport::Transport>();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Command> StompWireFormat::unmarshalMessage(
-    const Pointer<StompFrame> frame)
+std::shared_ptr<Command> StompWireFormat::unmarshalMessage(
+    const std::shared_ptr<StompFrame> frame)
 {
-    Pointer<MessageDispatch> messageDispatch(new MessageDispatch());
+    std::shared_ptr<MessageDispatch> messageDispatch(new MessageDispatch());
 
     // We created a unique id when we registered the subscription for the
     // consumer now extract it back to a consumer Id so the ActiveMQConnection
     // can dispatch it correctly.
-    Pointer<ConsumerId> consumerId = helper->convertConsumerId(
+    std::shared_ptr<ConsumerId> consumerId = helper->convertConsumerId(
         frame->removeProperty(StompCommandConstants::HEADER_SUBSCRIPTION));
     messageDispatch->setConsumerId(consumerId);
 
     if (frame->hasProperty(StompCommandConstants::HEADER_CONTENTLENGTH))
     {
-        Pointer<ActiveMQBytesMessage> message(new ActiveMQBytesMessage());
+        std::shared_ptr<ActiveMQBytesMessage> message(new ActiveMQBytesMessage());
         frame->removeProperty(StompCommandConstants::HEADER_CONTENTLENGTH);
         helper->convertProperties(frame, message);
         message->setContent(frame->getBody());
@@ -319,7 +317,7 @@ Pointer<Command> StompWireFormat::unmarshalMessage(
     }
     else
     {
-        Pointer<ActiveMQTextMessage> message(new ActiveMQTextMessage());
+        std::shared_ptr<ActiveMQTextMessage> message(new ActiveMQTextMessage());
         helper->convertProperties(frame, message);
         message->setText((char*)&(frame->getBody()[0]));
         messageDispatch->setMessage(message);
@@ -330,10 +328,10 @@ Pointer<Command> StompWireFormat::unmarshalMessage(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Command> StompWireFormat::unmarshalReceipt(
-    const Pointer<StompFrame> frame)
+std::shared_ptr<Command> StompWireFormat::unmarshalReceipt(
+    const std::shared_ptr<StompFrame> frame)
 {
-    Pointer<Response> response(new Response());
+    std::shared_ptr<Response> response(new Response());
     if (frame->hasProperty(StompCommandConstants::HEADER_RECEIPTID))
     {
         std::string responseId =
@@ -343,7 +341,7 @@ Pointer<Command> StompWireFormat::unmarshalReceipt(
             responseId = responseId.substr(7);
         }
 
-        response->setCorrelationId(Integer::parseInt(responseId));
+        response->setCorrelationId(std::stoi(responseId));
     }
     else
     {
@@ -356,10 +354,10 @@ Pointer<Command> StompWireFormat::unmarshalReceipt(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Command> StompWireFormat::unmarshalConnected(
-    const Pointer<StompFrame> frame AMQCPP_UNUSED)
+std::shared_ptr<Command> StompWireFormat::unmarshalConnected(
+    const std::shared_ptr<StompFrame> frame AMQCPP_UNUSED)
 {
-    Pointer<Response> response(new Response());
+    std::shared_ptr<Response> response(new Response());
 
     if (this->properties->connectResponseId != -1)
     {
@@ -376,9 +374,9 @@ Pointer<Command> StompWireFormat::unmarshalConnected(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Command> StompWireFormat::unmarshalError(const Pointer<StompFrame> frame)
+std::shared_ptr<Command> StompWireFormat::unmarshalError(const std::shared_ptr<StompFrame> frame)
 {
-    Pointer<BrokerError> error(new BrokerError());
+    std::shared_ptr<BrokerError> error(new BrokerError());
     error->setMessage(
         frame->removeProperty(StompCommandConstants::HEADER_MESSAGE));
 
@@ -391,15 +389,15 @@ Pointer<Command> StompWireFormat::unmarshalError(const Pointer<StompFrame> frame
         // create a response command to answer the request.
         if (responseId.find("ignore:") == 0)
         {
-            Pointer<Response> response(new Response());
-            response->setCorrelationId(Integer::parseInt(responseId.substr(7)));
+            std::shared_ptr<Response> response(new Response());
+            response->setCorrelationId(std::stoi(responseId.substr(7)));
             return response;
         }
         else
         {
-            Pointer<ExceptionResponse> errorResponse(new ExceptionResponse());
+            std::shared_ptr<ExceptionResponse> errorResponse(new ExceptionResponse());
             errorResponse->setException(error);
-            errorResponse->setCorrelationId(Integer::parseInt(responseId));
+            errorResponse->setCorrelationId(std::stoi(responseId));
             return errorResponse;
         }
     }
@@ -410,18 +408,18 @@ Pointer<Command> StompWireFormat::unmarshalError(const Pointer<StompFrame> frame
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<StompFrame> StompWireFormat::marshalMessage(
-    const Pointer<Command> command)
+std::shared_ptr<StompFrame> StompWireFormat::marshalMessage(
+    const std::shared_ptr<Command> command)
 {
-    Pointer<Message> message = command.dynamicCast<Message>();
+    std::shared_ptr<Message> message = std::dynamic_pointer_cast<Message>(command);
 
-    Pointer<StompFrame> frame(new StompFrame());
+    std::shared_ptr<StompFrame> frame(new StompFrame());
     frame->setCommand(StompCommandConstants::SEND);
 
     if (command->isResponseRequired())
     {
         frame->setProperty(StompCommandConstants::HEADER_RECEIPT_REQUIRED,
-                           Integer::toString(command->getCommandId()));
+                           std::to_string(command->getCommandId()));
     }
 
     // Convert the standard headers to the Stomp Format.
@@ -430,8 +428,8 @@ Pointer<StompFrame> StompWireFormat::marshalMessage(
     // Convert the Content
     try
     {
-        Pointer<ActiveMQTextMessage> txtMessage =
-            message.dynamicCast<ActiveMQTextMessage>();
+        std::shared_ptr<ActiveMQTextMessage> txtMessage =
+            std::dynamic_pointer_cast<ActiveMQTextMessage>(message);
         std::string text = txtMessage->getText();
         frame->setBody((unsigned char*)text.c_str(), text.length() + 1);
         return frame;
@@ -442,12 +440,12 @@ Pointer<StompFrame> StompWireFormat::marshalMessage(
 
     try
     {
-        Pointer<ActiveMQBytesMessage> bytesMessage =
-            message.dynamicCast<ActiveMQBytesMessage>();
+        std::shared_ptr<ActiveMQBytesMessage> bytesMessage =
+            std::dynamic_pointer_cast<ActiveMQBytesMessage>(message);
         unsigned char* bodyBytes = bytesMessage->getBodyBytes();
         frame->setBody(bodyBytes, bytesMessage->getBodyLength());
         frame->setProperty(StompCommandConstants::HEADER_CONTENTLENGTH,
-                           Long::toString(bytesMessage->getBodyLength()));
+                           std::to_string(bytesMessage->getBodyLength()));
         if (bodyBytes)
         {
             delete[] bodyBytes;
@@ -466,18 +464,18 @@ Pointer<StompFrame> StompWireFormat::marshalMessage(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<StompFrame> StompWireFormat::marshalAck(const Pointer<Command> command)
+std::shared_ptr<StompFrame> StompWireFormat::marshalAck(const std::shared_ptr<Command> command)
 {
-    Pointer<MessageAck> ack = command.dynamicCast<MessageAck>();
+    std::shared_ptr<MessageAck> ack = std::dynamic_pointer_cast<MessageAck>(command);
 
-    Pointer<StompFrame> frame(new StompFrame());
+    std::shared_ptr<StompFrame> frame(new StompFrame());
     frame->setCommand(StompCommandConstants::ACK);
 
     if (command->isResponseRequired())
     {
         frame->setProperty(StompCommandConstants::HEADER_RECEIPT_REQUIRED,
                            std::string("ignore:") +
-                               Integer::toString(command->getCommandId()));
+                               std::to_string(command->getCommandId()));
     }
 
     frame->setProperty(StompCommandConstants::HEADER_MESSAGEID,
@@ -494,12 +492,12 @@ Pointer<StompFrame> StompWireFormat::marshalAck(const Pointer<Command> command)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<StompFrame> StompWireFormat::marshalConnectionInfo(
-    const Pointer<Command> command)
+std::shared_ptr<StompFrame> StompWireFormat::marshalConnectionInfo(
+    const std::shared_ptr<Command> command)
 {
-    Pointer<ConnectionInfo> info = command.dynamicCast<ConnectionInfo>();
+    std::shared_ptr<ConnectionInfo> info = std::dynamic_pointer_cast<ConnectionInfo>(command);
 
-    Pointer<StompFrame> frame(new StompFrame());
+    std::shared_ptr<StompFrame> frame(new StompFrame());
     frame->setCommand(StompCommandConstants::CONNECT);
     frame->setProperty(StompCommandConstants::HEADER_CLIENT_ID,
                        info->getClientId());
@@ -517,14 +515,14 @@ Pointer<StompFrame> StompWireFormat::marshalConnectionInfo(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<StompFrame> StompWireFormat::marshalTransactionInfo(
-    const Pointer<Command> command)
+std::shared_ptr<StompFrame> StompWireFormat::marshalTransactionInfo(
+    const std::shared_ptr<Command> command)
 {
-    Pointer<TransactionInfo>    info = command.dynamicCast<TransactionInfo>();
-    Pointer<LocalTransactionId> id =
-        info->getTransactionId().dynamicCast<LocalTransactionId>();
+    std::shared_ptr<TransactionInfo>    info = std::dynamic_pointer_cast<TransactionInfo>(command);
+    std::shared_ptr<LocalTransactionId> id =
+        std::dynamic_pointer_cast<LocalTransactionId>(info->getTransactionId());
 
-    Pointer<StompFrame> frame(new StompFrame());
+    std::shared_ptr<StompFrame> frame(new StompFrame());
 
     if (info->getType() == ActiveMQConstants::TRANSACTION_STATE_BEGIN)
     {
@@ -543,7 +541,7 @@ Pointer<StompFrame> StompWireFormat::marshalTransactionInfo(
     if (command->isResponseRequired())
     {
         frame->setProperty(StompCommandConstants::HEADER_RECEIPT_REQUIRED,
-                           Integer::toString(command->getCommandId()));
+                           std::to_string(command->getCommandId()));
     }
 
     frame->setProperty(StompCommandConstants::HEADER_TRANSACTIONID,
@@ -553,38 +551,38 @@ Pointer<StompFrame> StompWireFormat::marshalTransactionInfo(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<StompFrame> StompWireFormat::marshalShutdownInfo(
-    const Pointer<Command> command)
+std::shared_ptr<StompFrame> StompWireFormat::marshalShutdownInfo(
+    const std::shared_ptr<Command> command)
 {
-    Pointer<StompFrame> frame(new StompFrame());
+    std::shared_ptr<StompFrame> frame(new StompFrame());
     frame->setCommand(StompCommandConstants::DISCONNECT);
 
     if (command->isResponseRequired())
     {
         frame->setProperty(StompCommandConstants::HEADER_RECEIPT_REQUIRED,
-                           Integer::toString(command->getCommandId()));
+                           std::to_string(command->getCommandId()));
     }
 
     return frame;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<StompFrame> StompWireFormat::marshalRemoveInfo(
-    const Pointer<Command> command)
+std::shared_ptr<StompFrame> StompWireFormat::marshalRemoveInfo(
+    const std::shared_ptr<Command> command)
 {
-    Pointer<RemoveInfo> info = command.dynamicCast<RemoveInfo>();
-    Pointer<StompFrame> frame(new StompFrame());
+    std::shared_ptr<RemoveInfo> info = std::dynamic_pointer_cast<RemoveInfo>(command);
+    std::shared_ptr<StompFrame> frame(new StompFrame());
     frame->setCommand(StompCommandConstants::UNSUBSCRIBE);
 
     if (command->isResponseRequired())
     {
         frame->setProperty(StompCommandConstants::HEADER_RECEIPT_REQUIRED,
-                           Integer::toString(command->getCommandId()));
+                           std::to_string(command->getCommandId()));
     }
 
     try
     {
-        Pointer<ConsumerId> id = info->getObjectId().dynamicCast<ConsumerId>();
+        std::shared_ptr<ConsumerId> id = std::dynamic_pointer_cast<ConsumerId>(info->getObjectId());
         frame->setProperty(StompCommandConstants::HEADER_ID,
                            helper->convertConsumerId(id));
         return frame;
@@ -593,22 +591,22 @@ Pointer<StompFrame> StompWireFormat::marshalRemoveInfo(
     {
     }
 
-    return Pointer<StompFrame>();
+    return std::shared_ptr<StompFrame>();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<StompFrame> StompWireFormat::marshalConsumerInfo(
-    const Pointer<Command> command)
+std::shared_ptr<StompFrame> StompWireFormat::marshalConsumerInfo(
+    const std::shared_ptr<Command> command)
 {
-    Pointer<ConsumerInfo> info = command.dynamicCast<ConsumerInfo>();
+    std::shared_ptr<ConsumerInfo> info = std::dynamic_pointer_cast<ConsumerInfo>(command);
 
-    Pointer<StompFrame> frame(new StompFrame());
+    std::shared_ptr<StompFrame> frame(new StompFrame());
     frame->setCommand(StompCommandConstants::SUBSCRIBE);
 
     if (command->isResponseRequired())
     {
         frame->setProperty(StompCommandConstants::HEADER_RECEIPT_REQUIRED,
-                           Integer::toString(command->getCommandId()));
+                           std::to_string(command->getCommandId()));
     }
 
     frame->setProperty(StompCommandConstants::HEADER_DESTINATION,
@@ -669,11 +667,11 @@ Pointer<StompFrame> StompWireFormat::marshalConsumerInfo(
 
     frame->setProperty(
         StompCommandConstants::HEADER_MAXPENDINGMSGLIMIT,
-        Integer::toString(info->getMaximumPendingMessageLimit()));
+        std::to_string(info->getMaximumPendingMessageLimit()));
     frame->setProperty(StompCommandConstants::HEADER_PREFETCHSIZE,
-                       Integer::toString(info->getPrefetchSize()));
+                       std::to_string(info->getPrefetchSize()));
     frame->setProperty(StompCommandConstants::HEADER_CONSUMERPRIORITY,
-                       Integer::toString(info->getPriority()));
+                       std::to_string(info->getPriority()));
 
     if (info->isRetroactive())
     {
@@ -684,19 +682,19 @@ Pointer<StompFrame> StompWireFormat::marshalConsumerInfo(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<StompFrame> StompWireFormat::marshalRemoveSubscriptionInfo(
-    const Pointer<Command> command)
+std::shared_ptr<StompFrame> StompWireFormat::marshalRemoveSubscriptionInfo(
+    const std::shared_ptr<Command> command)
 {
-    Pointer<RemoveSubscriptionInfo> info =
-        command.dynamicCast<RemoveSubscriptionInfo>();
-    Pointer<StompFrame> frame(new StompFrame());
+    std::shared_ptr<RemoveSubscriptionInfo> info =
+        std::dynamic_pointer_cast<RemoveSubscriptionInfo>(command);
+    std::shared_ptr<StompFrame> frame(new StompFrame());
     frame->setCommand(StompCommandConstants::UNSUBSCRIBE);
 
     if (command->isResponseRequired())
     {
         frame->setProperty(StompCommandConstants::HEADER_RECEIPT_REQUIRED,
                            std::string("ignore:") +
-                               Integer::toString(command->getCommandId()));
+                               std::to_string(command->getCommandId()));
     }
 
     frame->setProperty(StompCommandConstants::HEADER_ID, info->getClientId());

@@ -24,7 +24,7 @@ using namespace std;
 using namespace activemq;
 using namespace activemq::exceptions;
 using namespace activemq::commands;
-using namespace decaf::lang;
+
 using namespace decaf::lang::exceptions;
 
 /*
@@ -40,8 +40,8 @@ using namespace decaf::lang::exceptions;
 ////////////////////////////////////////////////////////////////////////////////
 ConnectionError::ConnectionError()
     : BaseCommand(),
-      exception(NULL),
-      connectionId(NULL)
+      exception(),
+      connectionId()
 {
 }
 
@@ -103,7 +103,7 @@ std::string ConnectionError::toString() const
            << "responseRequired = " << boolalpha << this->isResponseRequired();
     stream << ", ";
     stream << "Exception = ";
-    if (this->getException() != NULL)
+    if (this->getException())
     {
         stream << this->getException()->toString();
     }
@@ -113,7 +113,7 @@ std::string ConnectionError::toString() const
     }
     stream << ", ";
     stream << "ConnectionId = ";
-    if (this->getConnectionId() != NULL)
+    if (this->getConnectionId())
     {
         stream << this->getConnectionId()->toString();
     }
@@ -142,25 +142,25 @@ bool ConnectionError::equals(const DataStructure* value) const
         return false;
     }
 
-    if (this->getException() != NULL)
+    if (this->getException())
     {
         if (!this->getException()->equals(valuePtr->getException().get()))
         {
             return false;
         }
     }
-    else if (valuePtr->getException() != NULL)
+    else if (valuePtr->getException())
     {
         return false;
     }
-    if (this->getConnectionId() != NULL)
+    if (this->getConnectionId())
     {
         if (!this->getConnectionId()->equals(valuePtr->getConnectionId().get()))
         {
             return false;
         }
     }
-    else if (valuePtr->getConnectionId() != NULL)
+    else if (valuePtr->getConnectionId())
     {
         return false;
     }
@@ -172,46 +172,46 @@ bool ConnectionError::equals(const DataStructure* value) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const decaf::lang::Pointer<BrokerError>& ConnectionError::getException() const
+const std::shared_ptr<BrokerError>& ConnectionError::getException() const
 {
     return exception;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<BrokerError>& ConnectionError::getException()
+std::shared_ptr<BrokerError>& ConnectionError::getException()
 {
     return exception;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void ConnectionError::setException(
-    const decaf::lang::Pointer<BrokerError>& exception)
+    const std::shared_ptr<BrokerError>& exception)
 {
     this->exception = exception;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const decaf::lang::Pointer<ConnectionId>& ConnectionError::getConnectionId()
+const std::shared_ptr<ConnectionId>& ConnectionError::getConnectionId()
     const
 {
     return connectionId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<ConnectionId>& ConnectionError::getConnectionId()
+std::shared_ptr<ConnectionId>& ConnectionError::getConnectionId()
 {
     return connectionId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void ConnectionError::setConnectionId(
-    const decaf::lang::Pointer<ConnectionId>& connectionId)
+    const std::shared_ptr<ConnectionId>& connectionId)
 {
     this->connectionId = connectionId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<commands::Command> ConnectionError::visit(
+std::shared_ptr<commands::Command> ConnectionError::visit(
     activemq::state::CommandVisitor* visitor)
 {
     return visitor->processConnectionError(this);

@@ -20,13 +20,13 @@
 #include <activemq/exceptions/ActiveMQException.h>
 #include <activemq/util/CMSExceptionSupport.h>
 
-#include <decaf/lang/Integer.h>
+#include <memory>
+#include <string>
 
 using namespace std;
 using namespace activemq;
 using namespace activemq::exceptions;
 using namespace activemq::commands;
-using namespace decaf::lang;
 
 ////////////////////////////////////////////////////////////////////////////////
 ActiveMQTempDestination::ActiveMQTempDestination()
@@ -74,7 +74,7 @@ void ActiveMQTempDestination::setPhysicalName(const std::string& physicalName)
         {
             try
             {
-                this->sequenceId = Integer::parseInt(seqStr);
+                this->sequenceId = std::stoi(seqStr);
             }
             catch (decaf::lang::exceptions::NumberFormatException& e)
             {
@@ -100,17 +100,8 @@ void ActiveMQTempDestination::close()
     {
         if (this->connection != NULL)
         {
-            Pointer<ActiveMQTempDestination> thisPtr(this);
-            try
-            {
-                this->connection->deleteTempDestination(thisPtr);
-                thisPtr.release();
-            }
-            catch (ActiveMQException& ex)
-            {
-                thisPtr.release();
-                throw;
-            }
+            std::shared_ptr<ActiveMQTempDestination> thisPtr(this, [](ActiveMQTempDestination*){});
+            this->connection->deleteTempDestination(thisPtr);
         }
     }
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()

@@ -21,9 +21,9 @@
 #include <activemq/commands/MessageDispatch.h>
 #include <activemq/util/Config.h>
 
-#include <decaf/lang/Pointer.h>
 #include <decaf/util/concurrent/Mutex.h>
 #include <decaf/util/concurrent/Synchronizable.h>
+#include <memory>
 
 namespace activemq
 {
@@ -31,7 +31,6 @@ namespace core
 {
 
     using activemq::commands::MessageDispatch;
-    using decaf::lang::Pointer;
 
     class AMQCPP_API MessageDispatchChannel
         : public decaf::util::concurrent::Synchronizable
@@ -44,14 +43,14 @@ namespace core
          *
          * @param message - The message to add to the Channel.
          */
-        virtual void enqueue(const Pointer<MessageDispatch>& message) = 0;
+        virtual void enqueue(const std::shared_ptr<MessageDispatch>& message) = 0;
 
         /**
          * Add a message to the front of the Channel.
          *
          * @param message - The Message to add to the front of the Channel.
          */
-        virtual void enqueueFirst(const Pointer<MessageDispatch>& message) = 0;
+        virtual void enqueueFirst(const std::shared_ptr<MessageDispatch>& message) = 0;
 
         /**
          * @return true if there are no messages in the Channel.
@@ -80,7 +79,7 @@ namespace core
          * @return null if we timeout or if the consumer is closed.
          * @throws ActiveMQException
          */
-        virtual Pointer<MessageDispatch> dequeue(long long timeout) = 0;
+        virtual std::shared_ptr<MessageDispatch> dequeue(long long timeout) = 0;
 
         /**
          * Used to get an enqueued message if there is one queued right now.  If
@@ -88,7 +87,7 @@ namespace core
          *
          * @return a message if there is one in the queue.
          */
-        virtual Pointer<MessageDispatch> dequeueNoWait() = 0;
+        virtual std::shared_ptr<MessageDispatch> dequeueNoWait() = 0;
 
         /**
          * Peek in the Queue and return the first message in the Channel without
@@ -96,7 +95,7 @@ namespace core
          *
          * @return a message if there is one in the queue.
          */
-        virtual Pointer<MessageDispatch> peek() const = 0;
+        virtual std::shared_ptr<MessageDispatch> peek() const = 0;
 
         /**
          * Starts dispatch of messages from the Channel.
@@ -130,7 +129,7 @@ namespace core
          *
          * @return a list of Messages that was previously in the Channel.
          */
-        virtual std::vector<Pointer<MessageDispatch>> removeAll() = 0;
+        virtual std::vector<std::shared_ptr<MessageDispatch>> removeAll() = 0;
     };
 
 }  // namespace core

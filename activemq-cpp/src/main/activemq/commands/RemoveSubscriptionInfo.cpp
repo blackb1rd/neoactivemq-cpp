@@ -24,7 +24,7 @@ using namespace std;
 using namespace activemq;
 using namespace activemq::exceptions;
 using namespace activemq::commands;
-using namespace decaf::lang;
+
 using namespace decaf::lang::exceptions;
 
 /*
@@ -40,7 +40,7 @@ using namespace decaf::lang::exceptions;
 ////////////////////////////////////////////////////////////////////////////////
 RemoveSubscriptionInfo::RemoveSubscriptionInfo()
     : BaseCommand(),
-      connectionId(NULL),
+      connectionId(),
       subcriptionName(""),
       clientId("")
 {
@@ -108,7 +108,7 @@ std::string RemoveSubscriptionInfo::toString() const
            << "responseRequired = " << boolalpha << this->isResponseRequired();
     stream << ", ";
     stream << "ConnectionId = ";
-    if (this->getConnectionId() != NULL)
+    if (this->getConnectionId())
     {
         stream << this->getConnectionId()->toString();
     }
@@ -141,14 +141,14 @@ bool RemoveSubscriptionInfo::equals(const DataStructure* value) const
         return false;
     }
 
-    if (this->getConnectionId() != NULL)
+    if (this->getConnectionId())
     {
         if (!this->getConnectionId()->equals(valuePtr->getConnectionId().get()))
         {
             return false;
         }
     }
-    else if (valuePtr->getConnectionId() != NULL)
+    else if (valuePtr->getConnectionId())
     {
         return false;
     }
@@ -168,21 +168,21 @@ bool RemoveSubscriptionInfo::equals(const DataStructure* value) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const decaf::lang::Pointer<ConnectionId>&
+const std::shared_ptr<ConnectionId>&
 RemoveSubscriptionInfo::getConnectionId() const
 {
     return connectionId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<ConnectionId>& RemoveSubscriptionInfo::getConnectionId()
+std::shared_ptr<ConnectionId>& RemoveSubscriptionInfo::getConnectionId()
 {
     return connectionId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void RemoveSubscriptionInfo::setConnectionId(
-    const decaf::lang::Pointer<ConnectionId>& connectionId)
+    const std::shared_ptr<ConnectionId>& connectionId)
 {
     this->connectionId = connectionId;
 }
@@ -225,7 +225,7 @@ void RemoveSubscriptionInfo::setClientId(const std::string& clientId)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<commands::Command> RemoveSubscriptionInfo::visit(
+std::shared_ptr<commands::Command> RemoveSubscriptionInfo::visit(
     activemq::state::CommandVisitor* visitor)
 {
     return visitor->processRemoveSubscriptionInfo(this);

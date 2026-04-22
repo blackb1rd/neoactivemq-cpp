@@ -24,7 +24,7 @@ using namespace std;
 using namespace activemq;
 using namespace activemq::exceptions;
 using namespace activemq::commands;
-using namespace decaf::lang;
+
 using namespace decaf::lang::exceptions;
 
 /*
@@ -40,7 +40,7 @@ using namespace decaf::lang::exceptions;
 ////////////////////////////////////////////////////////////////////////////////
 RemoveInfo::RemoveInfo()
     : BaseCommand(),
-      objectId(NULL),
+      objectId(),
       lastDeliveredSequenceId(0)
 {
 }
@@ -103,7 +103,7 @@ std::string RemoveInfo::toString() const
            << "responseRequired = " << boolalpha << this->isResponseRequired();
     stream << ", ";
     stream << "ObjectId = ";
-    if (this->getObjectId() != NULL)
+    if (this->getObjectId())
     {
         stream << this->getObjectId()->toString();
     }
@@ -134,14 +134,14 @@ bool RemoveInfo::equals(const DataStructure* value) const
         return false;
     }
 
-    if (this->getObjectId() != NULL)
+    if (this->getObjectId())
     {
         if (!this->getObjectId()->equals(valuePtr->getObjectId().get()))
         {
             return false;
         }
     }
-    else if (valuePtr->getObjectId() != NULL)
+    else if (valuePtr->getObjectId())
     {
         return false;
     }
@@ -158,19 +158,19 @@ bool RemoveInfo::equals(const DataStructure* value) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const decaf::lang::Pointer<DataStructure>& RemoveInfo::getObjectId() const
+const std::shared_ptr<DataStructure>& RemoveInfo::getObjectId() const
 {
     return objectId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<DataStructure>& RemoveInfo::getObjectId()
+std::shared_ptr<DataStructure>& RemoveInfo::getObjectId()
 {
     return objectId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void RemoveInfo::setObjectId(const decaf::lang::Pointer<DataStructure>& objectId)
+void RemoveInfo::setObjectId(const std::shared_ptr<DataStructure>& objectId)
 {
     this->objectId = objectId;
 }
@@ -188,7 +188,7 @@ void RemoveInfo::setLastDeliveredSequenceId(long long lastDeliveredSequenceId)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<commands::Command> RemoveInfo::visit(
+std::shared_ptr<commands::Command> RemoveInfo::visit(
     activemq::state::CommandVisitor* visitor)
 {
     return visitor->processRemoveInfo(this);

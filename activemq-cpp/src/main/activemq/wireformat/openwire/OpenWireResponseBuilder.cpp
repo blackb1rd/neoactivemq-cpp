@@ -46,24 +46,24 @@ using namespace decaf;
 using namespace decaf::lang;
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Response> OpenWireResponseBuilder::buildResponse(
-    const Pointer<Command> command)
+std::shared_ptr<Response> OpenWireResponseBuilder::buildResponse(
+    const std::shared_ptr<Command> command)
 {
     if (command->isResponseRequired())
     {
         // These Commands just require a response that matches their command IDs
-        Pointer<Response> response(new commands::Response());
+        std::shared_ptr<Response> response(new commands::Response());
         response->setCorrelationId(command->getCommandId());
         return response;
     }
 
-    return Pointer<Response>();
+    return std::shared_ptr<Response>();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void OpenWireResponseBuilder::buildIncomingCommands(
-    const Pointer<Command>                     command,
-    decaf::util::LinkedList<Pointer<Command>>& queue)
+    const std::shared_ptr<Command>                     command,
+    decaf::util::LinkedList<std::shared_ptr<Command>>& queue)
 {
     // Delegate this to buildResponse
     if (command->isResponseRequired())
@@ -75,7 +75,7 @@ void OpenWireResponseBuilder::buildIncomingCommands(
     {
         // Return a copy of the callers own requested WireFormatInfo
         // so they get exactly the settings they asked for.
-        queue.push(Pointer<Command>(
+        queue.push(std::shared_ptr<Command>(
             dynamic_cast<WireFormatInfo*>(command->cloneDataStructure())));
     }
 }

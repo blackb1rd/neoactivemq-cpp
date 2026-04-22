@@ -27,7 +27,7 @@
 #include <activemq/commands/BrokerError.h>
 #include <activemq/commands/ConnectionId.h>
 #include <activemq/util/Config.h>
-#include <decaf/lang/Pointer.h>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -35,8 +35,6 @@ namespace activemq
 {
 namespace commands
 {
-
-    using decaf::lang::Pointer;
 
     /*
      *
@@ -50,8 +48,8 @@ namespace commands
     class AMQCPP_API ConnectionError : public BaseCommand
     {
     protected:
-        Pointer<BrokerError>  exception;
-        Pointer<ConnectionId> connectionId;
+        std::shared_ptr<BrokerError>  exception;
+        std::shared_ptr<ConnectionId> connectionId;
 
     public:
         const static unsigned char ID_CONNECTIONERROR = 16;
@@ -75,13 +73,13 @@ namespace commands
 
         virtual bool equals(const DataStructure* value) const;
 
-        virtual const Pointer<BrokerError>& getException() const;
-        virtual Pointer<BrokerError>&       getException();
-        virtual void setException(const Pointer<BrokerError>& exception);
+        virtual const std::shared_ptr<BrokerError>& getException() const;
+        virtual std::shared_ptr<BrokerError>&       getException();
+        virtual void setException(const std::shared_ptr<BrokerError>& exception);
 
-        virtual const Pointer<ConnectionId>& getConnectionId() const;
-        virtual Pointer<ConnectionId>&       getConnectionId();
-        virtual void setConnectionId(const Pointer<ConnectionId>& connectionId);
+        virtual const std::shared_ptr<ConnectionId>& getConnectionId() const;
+        virtual std::shared_ptr<ConnectionId>&       getConnectionId();
+        virtual void setConnectionId(const std::shared_ptr<ConnectionId>& connectionId);
 
         /**
          * @return an answer of true to the isConnectionError() query.
@@ -91,7 +89,7 @@ namespace commands
             return true;
         }
 
-        virtual Pointer<Command> visit(activemq::state::CommandVisitor* visitor);
+        virtual std::shared_ptr<Command> visit(activemq::state::CommandVisitor* visitor);
     };
 
 }  // namespace commands

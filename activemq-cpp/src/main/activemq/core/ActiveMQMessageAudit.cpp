@@ -59,7 +59,7 @@ namespace core
         int   maximumNumberOfProducersToTrack;
         Mutex mutex;
 
-        LRUCache<std::string, Pointer<BitSet>> map;
+        LRUCache<std::string, std::shared_ptr<BitSet>> map;
 
         MessageAuditImpl()
             : auditDepth(2048),
@@ -85,7 +85,7 @@ namespace core
             // this shouldn't result in wrong cache entries being removed
             if (value < maximumNumberOfProducersToTrack)
             {
-                LRUCache<std::string, Pointer<BitSet>> newMap(0,
+                LRUCache<std::string, std::shared_ptr<BitSet>> newMap(0,
                                                               value,
                                                               0.75f,
                                                               true);
@@ -157,7 +157,7 @@ bool ActiveMQMessageAudit::isDuplicate(const std::string& id) const
     {
         synchronized(&this->impl->mutex)
         {
-            Pointer<BitSet> bits;
+            std::shared_ptr<BitSet> bits;
             try
             {
                 bits = this->impl->map.get(seed);
@@ -190,21 +190,21 @@ bool ActiveMQMessageAudit::isDuplicate(const std::string& id) const
 
 ////////////////////////////////////////////////////////////////////////////////
 bool ActiveMQMessageAudit::isDuplicate(
-    decaf::lang::Pointer<MessageId> msgId) const
+    std::shared_ptr<MessageId> msgId) const
 {
     bool answer = false;
 
-    if (msgId != NULL)
+    if (msgId != nullptr)
     {
-        Pointer<ProducerId> pid = msgId->getProducerId();
-        if (pid != NULL)
+        std::shared_ptr<ProducerId> pid = msgId->getProducerId();
+        if (pid != nullptr)
         {
             std::string seed = pid->toString();
             if (!seed.empty())
             {
                 synchronized(&this->impl->mutex)
                 {
-                    Pointer<BitSet> bits;
+                    std::shared_ptr<BitSet> bits;
                     try
                     {
                         bits = this->impl->map.get(seed);
@@ -245,7 +245,7 @@ void ActiveMQMessageAudit::rollback(const std::string& msgId)
     {
         synchronized(&this->impl->mutex)
         {
-            Pointer<BitSet> bits;
+            std::shared_ptr<BitSet> bits;
             try
             {
                 bits = this->impl->map.get(seed);
@@ -254,7 +254,7 @@ void ActiveMQMessageAudit::rollback(const std::string& msgId)
             {
             }
 
-            if (bits != NULL)
+            if (bits != nullptr)
             {
                 long long index = IdGenerator::getSequenceFromId(msgId);
                 if (index >= 0)
@@ -274,19 +274,19 @@ void ActiveMQMessageAudit::rollback(const std::string& msgId)
 
 ////////////////////////////////////////////////////////////////////////////////
 void ActiveMQMessageAudit::rollback(
-    decaf::lang::Pointer<commands::MessageId> msgId)
+    std::shared_ptr<commands::MessageId> msgId)
 {
-    if (msgId != NULL)
+    if (msgId != nullptr)
     {
-        Pointer<ProducerId> pid = msgId->getProducerId();
-        if (pid != NULL)
+        std::shared_ptr<ProducerId> pid = msgId->getProducerId();
+        if (pid != nullptr)
         {
             std::string seed = pid->toString();
             if (!seed.empty())
             {
                 synchronized(&this->impl->mutex)
                 {
-                    Pointer<BitSet> bits;
+                    std::shared_ptr<BitSet> bits;
                     try
                     {
                         bits = this->impl->map.get(seed);
@@ -295,7 +295,7 @@ void ActiveMQMessageAudit::rollback(
                     {
                     }
 
-                    if (bits != NULL)
+                    if (bits != nullptr)
                     {
                         long long index = msgId->getProducerSequenceId();
                         if (index >= 0)
@@ -327,7 +327,7 @@ bool ActiveMQMessageAudit::isInOrder(const std::string& msgId) const
         {
             synchronized(&this->impl->mutex)
             {
-                Pointer<BitSet> bits;
+                std::shared_ptr<BitSet> bits;
                 try
                 {
                     bits = this->impl->map.get(seed);
@@ -357,21 +357,21 @@ bool ActiveMQMessageAudit::isInOrder(const std::string& msgId) const
 
 ////////////////////////////////////////////////////////////////////////////////
 bool ActiveMQMessageAudit::isInOrder(
-    decaf::lang::Pointer<commands::MessageId> msgId) const
+    std::shared_ptr<commands::MessageId> msgId) const
 {
     bool answer = false;
 
-    if (msgId != NULL)
+    if (msgId != nullptr)
     {
-        Pointer<ProducerId> pid = msgId->getProducerId();
-        if (pid != NULL)
+        std::shared_ptr<ProducerId> pid = msgId->getProducerId();
+        if (pid != nullptr)
         {
             std::string seed = pid->toString();
             if (!seed.empty())
             {
                 synchronized(&this->impl->mutex)
                 {
-                    Pointer<BitSet> bits;
+                    std::shared_ptr<BitSet> bits;
                     try
                     {
                         bits = this->impl->map.get(seed);
@@ -401,17 +401,17 @@ bool ActiveMQMessageAudit::isInOrder(
 
 ////////////////////////////////////////////////////////////////////////////////
 long long ActiveMQMessageAudit::getLastSeqId(
-    decaf::lang::Pointer<commands::ProducerId> id) const
+    std::shared_ptr<commands::ProducerId> id) const
 {
     long result = -1;
-    if (id != NULL)
+    if (id != nullptr)
     {
         std::string seed = id->toString();
         if (!seed.empty())
         {
             synchronized(&this->impl->mutex)
             {
-                Pointer<BitSet> bits;
+                std::shared_ptr<BitSet> bits;
                 try
                 {
                     bits = this->impl->map.get(seed);
@@ -420,7 +420,7 @@ long long ActiveMQMessageAudit::getLastSeqId(
                 {
                 }
 
-                if (bits != NULL)
+                if (bits != nullptr)
                 {
                     result = bits->length() - 1;
                 }

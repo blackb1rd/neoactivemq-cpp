@@ -18,6 +18,8 @@
 #ifndef _ACTIVE_TRANSPORT_FAILOVER_FAILOVERTRANSPORT_H_
 #define _ACTIVE_TRANSPORT_FAILOVER_FAILOVERTRANSPORT_H_
 
+#include <memory>
+
 #include <activemq/commands/Command.h>
 #include <activemq/commands/ConnectionId.h>
 #include <activemq/state/ConnectionStateTracker.h>
@@ -40,7 +42,6 @@ namespace transport
     namespace failover
     {
 
-        using namespace decaf::lang;
         using activemq::commands::Command;
         using activemq::commands::Response;
 
@@ -104,21 +105,21 @@ namespace transport
 
             virtual void close();
 
-            virtual void oneway(const Pointer<Command> command);
+            virtual void oneway(const std::shared_ptr<Command> command);
 
-            virtual Pointer<FutureResponse> asyncRequest(
-                const Pointer<Command>          command,
-                const Pointer<ResponseCallback> responseCallback);
+            virtual std::shared_ptr<FutureResponse> asyncRequest(
+                const std::shared_ptr<Command>          command,
+                const std::shared_ptr<ResponseCallback> responseCallback);
 
-            virtual Pointer<Response> request(const Pointer<Command> command);
+            virtual std::shared_ptr<Response> request(const std::shared_ptr<Command> command);
 
-            virtual Pointer<Response> request(const Pointer<Command> command,
+            virtual std::shared_ptr<Response> request(const std::shared_ptr<Command> command,
                                               unsigned int           timeout);
 
-            virtual Pointer<wireformat::WireFormat> getWireFormat() const;
+            virtual std::shared_ptr<wireformat::WireFormat> getWireFormat() const;
 
             virtual void setWireFormat(
-                const Pointer<wireformat::WireFormat> wireFormat AMQCPP_UNUSED)
+                const std::shared_ptr<wireformat::WireFormat> wireFormat AMQCPP_UNUSED)
             {
             }
 
@@ -249,7 +250,7 @@ namespace transport
             const decaf::util::List<decaf::net::URI>& getPriorityURIs() const;
 
             void setConnectionInterruptProcessingComplete(
-                const Pointer<commands::ConnectionId> connectionId);
+                const std::shared_ptr<commands::ConnectionId> connectionId);
 
             bool isConnectedToPriority() const;
 
@@ -271,7 +272,7 @@ namespace transport
              * @throw IOException if an errors occurs while restoring the old
              * state.
              */
-            void restoreTransport(const Pointer<Transport> transport,
+            void restoreTransport(const std::shared_ptr<Transport> transport,
                                   bool alreadyStarted = false);
 
             /**
@@ -291,7 +292,7 @@ namespace transport
              * @param control
              *      The ConnectionControl command sent from the Broker.
              */
-            void handleConnectionControl(const Pointer<Command> control);
+            void handleConnectionControl(const std::shared_ptr<Command> control);
 
         private:
             /**
@@ -303,13 +304,13 @@ namespace transport
              * @throw IOException if an I/O error occurs while creating the new
              * Transport.
              */
-            Pointer<Transport> createTransport(
+            std::shared_ptr<Transport> createTransport(
                 const decaf::net::URI& location) const;
 
             void processNewTransports(bool        rebalance,
                                       std::string newTransports);
 
-            void processResponse(const Pointer<Response> response);
+            void processResponse(const std::shared_ptr<Response> response);
         };
 
     }  // namespace failover

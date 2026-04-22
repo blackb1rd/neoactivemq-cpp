@@ -32,8 +32,6 @@ namespace activemq
 namespace core
 {
 
-    using decaf::lang::Pointer;
-
     class ActiveMQConnection;
     class FactorySettings;
     class PrefetchPolicy;
@@ -809,8 +807,8 @@ namespace core
          * @return a new ActiveMQConnection pointer instance.
          */
         virtual ActiveMQConnection* createActiveMQConnection(
-            const Pointer<transport::Transport>&    transport,
-            const Pointer<decaf::util::Properties>& properties);
+            const std::shared_ptr<transport::Transport>&    transport,
+            const std::shared_ptr<decaf::util::Properties>& properties);
 
     private:
         cms::Connection* doCreateConnection(const decaf::net::URI& uri,

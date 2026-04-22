@@ -29,18 +29,16 @@ namespace transport
     namespace tcp
     {
 
-        using decaf::lang::Pointer;
-
         class SslTransportFactory : public TcpTransportFactory
         {
         public:
             virtual ~SslTransportFactory();
 
         protected:
-            virtual Pointer<Transport> doCreateComposite(
-                const decaf::net::URI&                location,
-                const Pointer<wireformat::WireFormat> wireFormat,
-                const decaf::util::Properties&        properties);
+            virtual std::shared_ptr<Transport> doCreateComposite(
+                const decaf::net::URI&                        location,
+                const std::shared_ptr<wireformat::WireFormat> wireFormat,
+                const decaf::util::Properties&                properties);
         };
 
     }  // namespace tcp

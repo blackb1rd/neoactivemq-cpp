@@ -61,3 +61,8 @@ TEST_F(OpenwireSslBulkMessageTest, testBulkMessageSendReceive)
 {
     testBulkMessageSendReceive();
 }
+
+TEST_F(OpenwireSslBulkMessageTest, testHighFanout5000Clients)
+{
+    testHighFanout5000Clients();
+}

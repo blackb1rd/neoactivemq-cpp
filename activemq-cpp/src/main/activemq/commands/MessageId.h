@@ -51,10 +51,10 @@ namespace commands
                                  public decaf::lang::Comparable<MessageId>
     {
     protected:
-        std::string                    textView;
+        std::string                 textView;
         std::shared_ptr<ProducerId> producerId;
-        long long                      producerSequenceId;
-        long long                      brokerSequenceId;
+        long long                   producerSequenceId;
+        long long                   brokerSequenceId;
 
     public:
         const static unsigned char ID_MESSAGEID = 110;
@@ -99,7 +99,8 @@ namespace commands
 
         virtual const std::shared_ptr<ProducerId>& getProducerId() const;
         virtual std::shared_ptr<ProducerId>&       getProducerId();
-        virtual void setProducerId(const std::shared_ptr<ProducerId>& producerId);
+        virtual void                               setProducerId(
+                                          const std::shared_ptr<ProducerId>& producerId);
 
         virtual long long getProducerSequenceId() const;
         virtual void      setProducerSequenceId(long long producerSequenceId);

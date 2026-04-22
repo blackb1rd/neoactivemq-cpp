@@ -18,9 +18,9 @@
 #include "MessagePropertyInterceptor.h"
 
 #include <activemq/exceptions/ActiveMQException.h>
-#include <string>
 #include <cms/DeliveryMode.h>
 #include <decaf/lang/Boolean.h>
+#include <string>
 
 using namespace std;
 using namespace activemq;

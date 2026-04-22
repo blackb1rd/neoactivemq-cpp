@@ -111,7 +111,8 @@ std::shared_ptr<MessageDispatch> SimplePriorityMessageDispatchChannel::dequeue(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::shared_ptr<MessageDispatch> SimplePriorityMessageDispatchChannel::dequeueNoWait()
+std::shared_ptr<MessageDispatch>
+SimplePriorityMessageDispatchChannel::dequeueNoWait()
 {
     synchronized(&mutex)
     {
@@ -126,7 +127,8 @@ std::shared_ptr<MessageDispatch> SimplePriorityMessageDispatchChannel::dequeueNo
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::shared_ptr<MessageDispatch> SimplePriorityMessageDispatchChannel::peek() const
+std::shared_ptr<MessageDispatch> SimplePriorityMessageDispatchChannel::peek()
+    const
 {
     synchronized(&mutex)
     {
@@ -210,7 +212,8 @@ SimplePriorityMessageDispatchChannel::removeAll()
     {
         for (int i = MAX_PRIORITIES - 1; i >= 0; --i)
         {
-            std::vector<std::shared_ptr<MessageDispatch>> temp(channels[i].toArray());
+            std::vector<std::shared_ptr<MessageDispatch>> temp(
+                channels[i].toArray());
             result.insert(result.end(), temp.begin(), temp.end());
             this->enqueued -= (int)temp.size();
             channels[i].clear();
@@ -237,13 +240,15 @@ SimplePriorityMessageDispatchChannel::getChannel(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::shared_ptr<MessageDispatch> SimplePriorityMessageDispatchChannel::removeFirst()
+std::shared_ptr<MessageDispatch>
+SimplePriorityMessageDispatchChannel::removeFirst()
 {
     if (this->enqueued > 0)
     {
         for (int i = MAX_PRIORITIES - 1; i >= 0; i--)
         {
-            decaf::util::LinkedList<std::shared_ptr<MessageDispatch>>& channel = channels[i];
+            decaf::util::LinkedList<std::shared_ptr<MessageDispatch>>& channel =
+                channels[i];
             if (!channel.isEmpty())
             {
                 this->enqueued--;
@@ -256,13 +261,15 @@ std::shared_ptr<MessageDispatch> SimplePriorityMessageDispatchChannel::removeFir
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::shared_ptr<MessageDispatch> SimplePriorityMessageDispatchChannel::getFirst() const
+std::shared_ptr<MessageDispatch>
+SimplePriorityMessageDispatchChannel::getFirst() const
 {
     if (this->enqueued > 0)
     {
         for (int i = MAX_PRIORITIES - 1; i >= 0; i--)
         {
-            decaf::util::LinkedList<std::shared_ptr<MessageDispatch>>& channel = channels[i];
+            decaf::util::LinkedList<std::shared_ptr<MessageDispatch>>& channel =
+                channels[i];
             if (!channel.isEmpty())
             {
                 return channel.getFirst();

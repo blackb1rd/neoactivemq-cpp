@@ -28,8 +28,8 @@ CommandVisitorAdapter::~CommandVisitorAdapter()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::shared_ptr<commands::Command> CommandVisitorAdapter::processTransactionInfo(
-    commands::TransactionInfo* info)
+std::shared_ptr<commands::Command>
+CommandVisitorAdapter::processTransactionInfo(commands::TransactionInfo* info)
 {
     if (info != nullptr)
     {

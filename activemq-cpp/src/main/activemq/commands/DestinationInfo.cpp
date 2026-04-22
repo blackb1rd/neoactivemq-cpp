@@ -230,8 +230,7 @@ bool DestinationInfo::equals(const DataStructure* value) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::shared_ptr<ConnectionId>& DestinationInfo::getConnectionId()
-    const
+const std::shared_ptr<ConnectionId>& DestinationInfo::getConnectionId() const
 {
     return connectionId;
 }
@@ -250,8 +249,8 @@ void DestinationInfo::setConnectionId(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::shared_ptr<ActiveMQDestination>&
-DestinationInfo::getDestination() const
+const std::shared_ptr<ActiveMQDestination>& DestinationInfo::getDestination()
+    const
 {
     return destination;
 }
@@ -294,8 +293,8 @@ void DestinationInfo::setTimeout(long long timeout)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::vector<std::shared_ptr<BrokerId>>&
-DestinationInfo::getBrokerPath() const
+const std::vector<std::shared_ptr<BrokerId>>& DestinationInfo::getBrokerPath()
+    const
 {
     return brokerPath;
 }

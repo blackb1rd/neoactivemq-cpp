@@ -220,8 +220,8 @@ void SubscriptionInfo::setClientId(const std::string& clientId)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::shared_ptr<ActiveMQDestination>&
-SubscriptionInfo::getDestination() const
+const std::shared_ptr<ActiveMQDestination>& SubscriptionInfo::getDestination()
+    const
 {
     return destination;
 }

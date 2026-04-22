@@ -52,15 +52,13 @@ void PrefetchPolicy::configure(const decaf::util::Properties& properties)
     {
         if (properties.hasProperty("cms.prefetchPolicy.durableTopicPrefetch"))
         {
-            this->setDurableTopicPrefetch(
-                std::stoi(properties.getProperty(
-                    "cms.prefetchPolicy.durableTopicPrefetch")));
+            this->setDurableTopicPrefetch(std::stoi(properties.getProperty(
+                "cms.prefetchPolicy.durableTopicPrefetch")));
         }
         if (properties.hasProperty("cms.prefetchPolicy.queueBrowserPrefetch"))
         {
-            this->setQueueBrowserPrefetch(
-                std::stoi(properties.getProperty(
-                    "cms.prefetchPolicy.queueBrowserPrefetch")));
+            this->setQueueBrowserPrefetch(std::stoi(properties.getProperty(
+                "cms.prefetchPolicy.queueBrowserPrefetch")));
         }
         if (properties.hasProperty("cms.prefetchPolicy.queuePrefetch"))
         {
@@ -75,8 +73,8 @@ void PrefetchPolicy::configure(const decaf::util::Properties& properties)
 
         if (properties.hasProperty("cms.prefetchPolicy.all"))
         {
-            int value = std::stoi(
-                properties.getProperty("cms.prefetchPolicy.all"));
+            int value =
+                std::stoi(properties.getProperty("cms.prefetchPolicy.all"));
 
             this->setDurableTopicPrefetch(value);
             this->setQueueBrowserPrefetch(value);

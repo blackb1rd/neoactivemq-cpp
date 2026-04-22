@@ -26,7 +26,7 @@
  * Drop-in replacement for decaf::lang::PointerComparator<T> after Pointer<T>
  * is replaced by std::shared_ptr<T>.
  */
-template<typename T>
+template <typename T>
 struct SharedPtrComparator
 {
     bool operator()(const std::shared_ptr<T>& left,

@@ -165,8 +165,7 @@ bool NetworkBridgeFilter::equals(const DataStructure* value) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::shared_ptr<BrokerId>& NetworkBridgeFilter::getNetworkBrokerId()
-    const
+const std::shared_ptr<BrokerId>& NetworkBridgeFilter::getNetworkBrokerId() const
 {
     return networkBrokerId;
 }

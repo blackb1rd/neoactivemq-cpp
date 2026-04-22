@@ -19,8 +19,8 @@
 
 #include <activemq/core/ActiveMQConstants.h>
 #include <activemq/util/AdvisorySupport.h>
-#include <atomic>
 #include <decaf/lang/exceptions/ClassCastException.h>
+#include <atomic>
 
 using namespace activemq;
 using namespace activemq::core;
@@ -43,10 +43,10 @@ namespace core
     class AdvisoryConsumerConfig
     {
     public:
-        int                              deliveredCounter;
-        std::shared_ptr<ConsumerInfo>    info;
-        std::atomic<bool>                closed;
-        int                              hashCode;
+        int                           deliveredCounter;
+        std::shared_ptr<ConsumerInfo> info;
+        std::atomic<bool>             closed;
+        int                           hashCode;
 
         AdvisoryConsumerConfig()
             : deliveredCounter(0),
@@ -61,8 +61,9 @@ namespace core
 }  // namespace activemq
 
 ////////////////////////////////////////////////////////////////////////////////
-AdvisoryConsumer::AdvisoryConsumer(ActiveMQConnection*                       connection,
-                                   std::shared_ptr<commands::ConsumerId>    consumerId)
+AdvisoryConsumer::AdvisoryConsumer(
+    ActiveMQConnection*                   connection,
+    std::shared_ptr<commands::ConsumerId> consumerId)
     : Dispatcher(),
       config(new AdvisoryConsumerConfig()),
       connection(connection)
@@ -155,7 +156,8 @@ void AdvisoryConsumer::dispatch(const std::shared_ptr<MessageDispatch>& message)
         }
     }
 
-    std::shared_ptr<DataStructure> object = message->getMessage()->getDataStructure();
+    std::shared_ptr<DataStructure> object =
+        message->getMessage()->getDataStructure();
     if (object != nullptr)
     {
         try

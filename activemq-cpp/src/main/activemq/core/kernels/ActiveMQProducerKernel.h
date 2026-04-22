@@ -108,10 +108,11 @@ namespace core
              *        The configured send timeout for this Producer.
              */
             ActiveMQProducerKernel(
-                ActiveMQSessionKernel*                              session,
-                const std::shared_ptr<commands::ProducerId>&        producerId,
-                const std::shared_ptr<commands::ActiveMQDestination>& destination,
-                long long                                           sendTimeout);
+                ActiveMQSessionKernel*                       session,
+                const std::shared_ptr<commands::ProducerId>& producerId,
+                const std::shared_ptr<commands::ActiveMQDestination>&
+                          destination,
+                long long sendTimeout);
 
             virtual ~ActiveMQProducerKernel();
 
@@ -301,7 +302,8 @@ namespace core
              * Retries this object ProducerInfo pointer
              * @return ProducerInfo Reference
              */
-            const std::shared_ptr<commands::ProducerInfo>& getProducerInfo() const
+            const std::shared_ptr<commands::ProducerInfo>& getProducerInfo()
+                const
             {
                 this->checkClosed();
                 return this->producerInfo;

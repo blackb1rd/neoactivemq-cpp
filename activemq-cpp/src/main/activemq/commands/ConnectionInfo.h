@@ -49,17 +49,17 @@ namespace commands
     class AMQCPP_API ConnectionInfo : public BaseCommand
     {
     protected:
-        std::shared_ptr<ConnectionId>                       connectionId;
-        std::string                                         clientId;
-        std::string                                         password;
-        std::string                                         userName;
+        std::shared_ptr<ConnectionId>          connectionId;
+        std::string                            clientId;
+        std::string                            password;
+        std::string                            userName;
         std::vector<std::shared_ptr<BrokerId>> brokerPath;
-        bool                                        brokerMasterConnector;
-        bool                                        manageable;
-        bool                                        clientMaster;
-        bool                                        faultTolerant;
-        bool                                        failoverReconnect;
-        std::string                                 clientIp;
+        bool                                   brokerMasterConnector;
+        bool                                   manageable;
+        bool                                   clientMaster;
+        bool                                   faultTolerant;
+        bool                                   failoverReconnect;
+        std::string                            clientIp;
 
     public:
         const static unsigned char ID_CONNECTIONINFO = 3;
@@ -87,7 +87,8 @@ namespace commands
 
         virtual const std::shared_ptr<ConnectionId>& getConnectionId() const;
         virtual std::shared_ptr<ConnectionId>&       getConnectionId();
-        virtual void setConnectionId(const std::shared_ptr<ConnectionId>& connectionId);
+        virtual void                                 setConnectionId(
+                                            const std::shared_ptr<ConnectionId>& connectionId);
 
         virtual const std::string& getClientId() const;
         virtual std::string&       getClientId();
@@ -101,11 +102,11 @@ namespace commands
         virtual std::string&       getUserName();
         virtual void               setUserName(const std::string& userName);
 
-        virtual const std::vector<std::shared_ptr<BrokerId>>&
-        getBrokerPath() const;
+        virtual const std::vector<std::shared_ptr<BrokerId>>& getBrokerPath()
+            const;
         virtual std::vector<std::shared_ptr<BrokerId>>& getBrokerPath();
         virtual void                                    setBrokerPath(
-                                           const std::vector<std::shared_ptr<BrokerId>>& brokerPath);
+                                               const std::vector<std::shared_ptr<BrokerId>>& brokerPath);
 
         virtual bool isBrokerMasterConnector() const;
         virtual void setBrokerMasterConnector(bool brokerMasterConnector);
@@ -134,7 +135,8 @@ namespace commands
             return true;
         }
 
-        virtual std::shared_ptr<Command> visit(activemq::state::CommandVisitor* visitor);
+        virtual std::shared_ptr<Command> visit(
+            activemq::state::CommandVisitor* visitor);
     };
 
 }  // namespace commands

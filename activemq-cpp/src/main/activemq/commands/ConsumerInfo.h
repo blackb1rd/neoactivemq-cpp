@@ -51,25 +51,25 @@ namespace commands
     class AMQCPP_API ConsumerInfo : public BaseCommand
     {
     protected:
-        std::shared_ptr<ConsumerId>                         consumerId;
-        bool                                               browser;
-        std::shared_ptr<ActiveMQDestination>               destination;
-        int                                                prefetchSize;
-        int                                                maximumPendingMessageLimit;
-        bool                                               dispatchAsync;
-        std::string                                        selector;
-        std::string                                        clientId;
-        std::string                                        subscriptionName;
-        bool                                               noLocal;
-        bool                                               exclusive;
-        bool                                               retroactive;
-        unsigned char                                      priority;
-        std::vector<std::shared_ptr<BrokerId>>             brokerPath;
-        std::shared_ptr<BooleanExpression>                 additionalPredicate;
-        bool                                               networkSubscription;
-        bool                                               optimizedAcknowledge;
-        bool                                               noRangeAcks;
-        std::vector<std::shared_ptr<ConsumerId>>           networkConsumerPath;
+        std::shared_ptr<ConsumerId>              consumerId;
+        bool                                     browser;
+        std::shared_ptr<ActiveMQDestination>     destination;
+        int                                      prefetchSize;
+        int                                      maximumPendingMessageLimit;
+        bool                                     dispatchAsync;
+        std::string                              selector;
+        std::string                              clientId;
+        std::string                              subscriptionName;
+        bool                                     noLocal;
+        bool                                     exclusive;
+        bool                                     retroactive;
+        unsigned char                            priority;
+        std::vector<std::shared_ptr<BrokerId>>   brokerPath;
+        std::shared_ptr<BooleanExpression>       additionalPredicate;
+        bool                                     networkSubscription;
+        bool                                     optimizedAcknowledge;
+        bool                                     noRangeAcks;
+        std::vector<std::shared_ptr<ConsumerId>> networkConsumerPath;
 
     public:
         const static unsigned char ID_CONSUMERINFO = 5;
@@ -111,15 +111,17 @@ namespace commands
 
         virtual const std::shared_ptr<ConsumerId>& getConsumerId() const;
         virtual std::shared_ptr<ConsumerId>&       getConsumerId();
-        virtual void setConsumerId(const std::shared_ptr<ConsumerId>& consumerId);
+        virtual void                               setConsumerId(
+                                          const std::shared_ptr<ConsumerId>& consumerId);
 
         virtual bool isBrowser() const;
         virtual void setBrowser(bool browser);
 
-        virtual const std::shared_ptr<ActiveMQDestination>& getDestination() const;
-        virtual std::shared_ptr<ActiveMQDestination>&       getDestination();
-        virtual void                                        setDestination(
-                                                   const std::shared_ptr<ActiveMQDestination>& destination);
+        virtual const std::shared_ptr<ActiveMQDestination>& getDestination()
+            const;
+        virtual std::shared_ptr<ActiveMQDestination>& getDestination();
+        virtual void                                  setDestination(
+                                             const std::shared_ptr<ActiveMQDestination>& destination);
 
         virtual int  getPrefetchSize() const;
         virtual void setPrefetchSize(int prefetchSize);
@@ -155,16 +157,17 @@ namespace commands
         virtual unsigned char getPriority() const;
         virtual void          setPriority(unsigned char priority);
 
-        virtual const std::vector<std::shared_ptr<BrokerId>>&
-        getBrokerPath() const;
+        virtual const std::vector<std::shared_ptr<BrokerId>>& getBrokerPath()
+            const;
         virtual std::vector<std::shared_ptr<BrokerId>>& getBrokerPath();
         virtual void                                    setBrokerPath(
-                                           const std::vector<std::shared_ptr<BrokerId>>& brokerPath);
+                                               const std::vector<std::shared_ptr<BrokerId>>& brokerPath);
 
-        virtual const std::shared_ptr<BooleanExpression>& getAdditionalPredicate() const;
+        virtual const std::shared_ptr<BooleanExpression>&
+        getAdditionalPredicate() const;
         virtual std::shared_ptr<BooleanExpression>& getAdditionalPredicate();
         virtual void                                setAdditionalPredicate(
-                                   const std::shared_ptr<BooleanExpression>& additionalPredicate);
+                                           const std::shared_ptr<BooleanExpression>& additionalPredicate);
 
         virtual bool isNetworkSubscription() const;
         virtual void setNetworkSubscription(bool networkSubscription);
@@ -180,8 +183,7 @@ namespace commands
         virtual std::vector<std::shared_ptr<ConsumerId>>&
                      getNetworkConsumerPath();
         virtual void setNetworkConsumerPath(
-            const std::vector<std::shared_ptr<ConsumerId>>&
-                networkConsumerPath);
+            const std::vector<std::shared_ptr<ConsumerId>>& networkConsumerPath);
 
         /**
          * @return an answer of true to the isConsumerInfo() query.
@@ -191,7 +193,8 @@ namespace commands
             return true;
         }
 
-        virtual std::shared_ptr<Command> visit(activemq::state::CommandVisitor* visitor);
+        virtual std::shared_ptr<Command> visit(
+            activemq::state::CommandVisitor* visitor);
     };
 
 }  // namespace commands

@@ -335,8 +335,8 @@ void ConnectionInfo::setUserName(const std::string& userName)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::vector<std::shared_ptr<BrokerId>>&
-ConnectionInfo::getBrokerPath() const
+const std::vector<std::shared_ptr<BrokerId>>& ConnectionInfo::getBrokerPath()
+    const
 {
     return brokerPath;
 }

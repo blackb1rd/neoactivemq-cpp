@@ -23,8 +23,8 @@
 #include <activemq/util/AMQLog.h>
 #include <activemq/wireformat/openwire/marshal/BaseDataStreamMarshaller.h>
 #include <activemq/wireformat/openwire/marshal/PrimitiveTypesMarshaller.h>
-#include <chrono>
 #include <decaf/lang/exceptions/NullPointerException.h>
+#include <chrono>
 
 using namespace std;
 using namespace activemq;
@@ -701,8 +701,8 @@ void Message::setTransactionId(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::shared_ptr<ActiveMQDestination>&
-Message::getOriginalDestination() const
+const std::shared_ptr<ActiveMQDestination>& Message::getOriginalDestination()
+    const
 {
     return originalDestination;
 }
@@ -739,8 +739,7 @@ void Message::setMessageId(const std::shared_ptr<MessageId>& messageId)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::shared_ptr<TransactionId>& Message::getOriginalTransactionId()
-    const
+const std::shared_ptr<TransactionId>& Message::getOriginalTransactionId() const
 {
     return originalTransactionId;
 }
@@ -855,8 +854,7 @@ std::shared_ptr<ActiveMQDestination>& Message::getReplyTo()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Message::setReplyTo(
-    const std::shared_ptr<ActiveMQDestination>& replyTo)
+void Message::setReplyTo(const std::shared_ptr<ActiveMQDestination>& replyTo)
 {
     this->replyTo = replyTo;
 }
@@ -1076,8 +1074,7 @@ std::vector<std::shared_ptr<BrokerId>>& Message::getCluster()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void Message::setCluster(
-    const std::vector<std::shared_ptr<BrokerId>>& cluster)
+void Message::setCluster(const std::vector<std::shared_ptr<BrokerId>>& cluster)
 {
     this->cluster = cluster;
 }
@@ -1128,8 +1125,11 @@ std::shared_ptr<commands::Command> Message::visit(
 ////////////////////////////////////////////////////////////////////////////////
 bool Message::isExpired() const
 {
-    long long expireTime  = this->getExpiration();
-    long long currentTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+    long long expireTime = this->getExpiration();
+    long long currentTime =
+        std::chrono::duration_cast<std::chrono::milliseconds>(
+            std::chrono::system_clock::now().time_since_epoch())
+            .count();
     if (expireTime > 0 && currentTime > expireTime)
     {
         return true;

@@ -22,10 +22,10 @@
 #include <activemq/util/Config.h>
 #include <activemq/wireformat/WireFormatNegotiator.h>
 #include <activemq/wireformat/openwire/OpenWireFormat.h>
-#include <atomic>
 #include <decaf/util/concurrent/Concurrent.h>
 #include <decaf/util/concurrent/CountDownLatch.h>
 #include <decaf/util/concurrent/Mutex.h>
+#include <atomic>
 #include <memory>
 
 namespace activemq
@@ -71,12 +71,14 @@ namespace wireformat
              * @param wireFormat - The WireFormat object we use to negotiate
              * @param next - The next transport in the chain
              */
-            OpenWireFormatNegotiator(OpenWireFormat* wireFormat,
-                                     const std::shared_ptr<transport::Transport> next);
+            OpenWireFormatNegotiator(
+                OpenWireFormat*                             wireFormat,
+                const std::shared_ptr<transport::Transport> next);
 
             virtual ~OpenWireFormatNegotiator();
 
-            virtual void oneway(const std::shared_ptr<commands::Command> command);
+            virtual void oneway(
+                const std::shared_ptr<commands::Command> command);
 
             virtual std::shared_ptr<commands::Response> request(
                 const std::shared_ptr<commands::Command> command);
@@ -86,7 +88,8 @@ namespace wireformat
                 unsigned int                             timeout);
 
         public:
-            virtual void onCommand(const std::shared_ptr<commands::Command> command);
+            virtual void onCommand(
+                const std::shared_ptr<commands::Command> command);
 
             virtual void onException(const decaf::lang::Exception& ex);
 

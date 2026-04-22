@@ -68,8 +68,9 @@ void RemoveSubscriptionInfoMarshaller::tightUnmarshal(
 
         RemoveSubscriptionInfo* info =
             dynamic_cast<RemoveSubscriptionInfo*>(dataStructure);
-        info->setConnectionId(std::shared_ptr<ConnectionId>(dynamic_cast<ConnectionId*>(
-            tightUnmarshalCachedObject(wireFormat, dataIn, bs))));
+        info->setConnectionId(
+            std::shared_ptr<ConnectionId>(dynamic_cast<ConnectionId*>(
+                tightUnmarshalCachedObject(wireFormat, dataIn, bs))));
         info->setSubcriptionName(tightUnmarshalString(dataIn, bs));
         info->setClientId(tightUnmarshalString(dataIn, bs));
     }
@@ -147,8 +148,9 @@ void RemoveSubscriptionInfoMarshaller::looseUnmarshal(
                                               dataIn);
         RemoveSubscriptionInfo* info =
             dynamic_cast<RemoveSubscriptionInfo*>(dataStructure);
-        info->setConnectionId(std::shared_ptr<ConnectionId>(dynamic_cast<ConnectionId*>(
-            looseUnmarshalCachedObject(wireFormat, dataIn))));
+        info->setConnectionId(
+            std::shared_ptr<ConnectionId>(dynamic_cast<ConnectionId*>(
+                looseUnmarshalCachedObject(wireFormat, dataIn))));
         info->setSubcriptionName(looseUnmarshalString(dataIn));
         info->setClientId(looseUnmarshalString(dataIn));
     }

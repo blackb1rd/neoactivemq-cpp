@@ -110,7 +110,8 @@ namespace wireformat
              * @param messageId - the MessageId instance to convert.
              * @return a Stomp Message Id String.
              */
-            std::string convertMessageId(const std::shared_ptr<MessageId>& messageId);
+            std::string convertMessageId(
+                const std::shared_ptr<MessageId>& messageId);
 
             /**
              * Converts a Stomp MessageId string to a MessageId
@@ -118,7 +119,8 @@ namespace wireformat
              * @param messageId - the String message Id to convert.
              * @return Pointer to a new MessageId.
              */
-            std::shared_ptr<MessageId> convertMessageId(const std::string& messageId);
+            std::shared_ptr<MessageId> convertMessageId(
+                const std::string& messageId);
 
             /**
              * Converts a ConsumerId instance to a Stomp ConsumerId String.
@@ -126,7 +128,8 @@ namespace wireformat
              * @param consumerId - the Consumer instance to convert.
              * @return a Stomp Consumer Id String.
              */
-            std::string convertConsumerId(const std::shared_ptr<ConsumerId>& consumerId);
+            std::string convertConsumerId(
+                const std::shared_ptr<ConsumerId>& consumerId);
 
             /**
              * Converts a Stomp ConsumerId string to a ConsumerId
@@ -134,7 +137,8 @@ namespace wireformat
              * @param consumerId - the String Consumer Id to convert.
              * @return Pointer to a new ConsumerId.
              */
-            std::shared_ptr<ConsumerId> convertConsumerId(const std::string& consumerId);
+            std::shared_ptr<ConsumerId> convertConsumerId(
+                const std::string& consumerId);
 
             /**
              * Converts a ProducerId instance to a Stomp ProducerId String.
@@ -142,7 +146,8 @@ namespace wireformat
              * @param producerId - the Producer instance to convert.
              * @return a Stomp Producer Id String.
              */
-            std::string convertProducerId(const std::shared_ptr<ProducerId>& producerId);
+            std::string convertProducerId(
+                const std::shared_ptr<ProducerId>& producerId);
 
             /**
              * Converts a Stomp ProducerId string to a ProducerId
@@ -150,7 +155,8 @@ namespace wireformat
              * @param producerId - the String Producer Id to convert.
              * @return Pointer to a new ProducerId.
              */
-            std::shared_ptr<ProducerId> convertProducerId(const std::string& producerId);
+            std::shared_ptr<ProducerId> convertProducerId(
+                const std::string& producerId);
 
             /**
              * Converts a TransactionId instance to a Stomp TransactionId

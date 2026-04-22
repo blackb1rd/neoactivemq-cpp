@@ -66,11 +66,12 @@ void JournalQueueAckMarshaller::tightUnmarshal(OpenWireFormat*  wireFormat,
                                                  bs);
 
         JournalQueueAck* info = dynamic_cast<JournalQueueAck*>(dataStructure);
-        info->setDestination(
-            std::shared_ptr<ActiveMQDestination>(dynamic_cast<ActiveMQDestination*>(
+        info->setDestination(std::shared_ptr<ActiveMQDestination>(
+            dynamic_cast<ActiveMQDestination*>(
                 tightUnmarshalNestedObject(wireFormat, dataIn, bs))));
-        info->setMessageAck(std::shared_ptr<MessageAck>(dynamic_cast<MessageAck*>(
-            tightUnmarshalNestedObject(wireFormat, dataIn, bs))));
+        info->setMessageAck(
+            std::shared_ptr<MessageAck>(dynamic_cast<MessageAck*>(
+                tightUnmarshalNestedObject(wireFormat, dataIn, bs))));
     }
     AMQ_CATCH_RETHROW(decaf::io::IOException)
     AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
@@ -145,11 +146,12 @@ void JournalQueueAckMarshaller::looseUnmarshal(OpenWireFormat*  wireFormat,
                                                  dataStructure,
                                                  dataIn);
         JournalQueueAck* info = dynamic_cast<JournalQueueAck*>(dataStructure);
-        info->setDestination(
-            std::shared_ptr<ActiveMQDestination>(dynamic_cast<ActiveMQDestination*>(
+        info->setDestination(std::shared_ptr<ActiveMQDestination>(
+            dynamic_cast<ActiveMQDestination*>(
                 looseUnmarshalNestedObject(wireFormat, dataIn))));
-        info->setMessageAck(std::shared_ptr<MessageAck>(dynamic_cast<MessageAck*>(
-            looseUnmarshalNestedObject(wireFormat, dataIn))));
+        info->setMessageAck(
+            std::shared_ptr<MessageAck>(dynamic_cast<MessageAck*>(
+                looseUnmarshalNestedObject(wireFormat, dataIn))));
     }
     AMQ_CATCH_RETHROW(decaf::io::IOException)
     AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,

@@ -56,8 +56,8 @@ namespace commands
         };
 
     private:
-        std::string                                          message;
-        std::string                                          exceptionClass;
+        std::string                                     message;
+        std::string                                     exceptionClass;
         std::vector<std::shared_ptr<StackTraceElement>> stackTraceElements;
         std::shared_ptr<BrokerError>                    cause;
         std::shared_ptr<decaf::lang::Exception>         exCause;
@@ -199,8 +199,7 @@ namespace commands
          * @param exCause
          *      The Exception that originated this BrokerError.
          */
-        void setLocalException(
-            std::shared_ptr<decaf::lang::Exception> exCause)
+        void setLocalException(std::shared_ptr<decaf::lang::Exception> exCause)
         {
             this->exCause = exCause;
         }

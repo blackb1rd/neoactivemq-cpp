@@ -69,10 +69,11 @@ void ProducerInfoMarshaller::tightUnmarshal(OpenWireFormat*  wireFormat,
 
         int wireVersion = wireFormat->getVersion();
 
-        info->setProducerId(std::shared_ptr<ProducerId>(dynamic_cast<ProducerId*>(
-            tightUnmarshalCachedObject(wireFormat, dataIn, bs))));
-        info->setDestination(
-            std::shared_ptr<ActiveMQDestination>(dynamic_cast<ActiveMQDestination*>(
+        info->setProducerId(
+            std::shared_ptr<ProducerId>(dynamic_cast<ProducerId*>(
+                tightUnmarshalCachedObject(wireFormat, dataIn, bs))));
+        info->setDestination(std::shared_ptr<ActiveMQDestination>(
+            dynamic_cast<ActiveMQDestination*>(
                 tightUnmarshalCachedObject(wireFormat, dataIn, bs))));
 
         if (bs->readBoolean())
@@ -197,10 +198,11 @@ void ProducerInfoMarshaller::looseUnmarshal(OpenWireFormat*  wireFormat,
 
         int wireVersion = wireFormat->getVersion();
 
-        info->setProducerId(std::shared_ptr<ProducerId>(dynamic_cast<ProducerId*>(
-            looseUnmarshalCachedObject(wireFormat, dataIn))));
-        info->setDestination(
-            std::shared_ptr<ActiveMQDestination>(dynamic_cast<ActiveMQDestination*>(
+        info->setProducerId(
+            std::shared_ptr<ProducerId>(dynamic_cast<ProducerId*>(
+                looseUnmarshalCachedObject(wireFormat, dataIn))));
+        info->setDestination(std::shared_ptr<ActiveMQDestination>(
+            dynamic_cast<ActiveMQDestination*>(
                 looseUnmarshalCachedObject(wireFormat, dataIn))));
 
         if (dataIn->readBoolean())

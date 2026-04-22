@@ -48,8 +48,8 @@ namespace commands
     {
     protected:
         std::shared_ptr<BrokerId> networkBrokerId;
-        int               messageTTL;
-        int               consumerTTL;
+        int                       messageTTL;
+        int                       consumerTTL;
 
     public:
         const static unsigned char ID_NETWORKBRIDGEFILTER = 91;

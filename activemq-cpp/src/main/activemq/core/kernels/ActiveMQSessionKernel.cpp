@@ -57,9 +57,9 @@
 #include <decaf/util/LinkedList.h>
 #include <decaf/util/Queue.h>
 #include <decaf/util/concurrent/Mutex.h>
+#include <decaf/util/concurrent/locks/ReentrantReadWriteLock.h>
 #include <atomic>
 #include <chrono>
-#include <decaf/util/concurrent/locks/ReentrantReadWriteLock.h>
 
 using namespace std;
 using namespace activemq;
@@ -93,15 +93,17 @@ namespace core
         public:
             std::atomic<bool> synchronizationRegistered;
             decaf::util::concurrent::locks::ReentrantReadWriteLock producerLock;
-            decaf::util::LinkedList<std::shared_ptr<ActiveMQProducerKernel>> producers;
+            decaf::util::LinkedList<std::shared_ptr<ActiveMQProducerKernel>>
+                                                                   producers;
             decaf::util::concurrent::locks::ReentrantReadWriteLock consumerLock;
-            decaf::util::LinkedList<std::shared_ptr<ActiveMQConsumerKernel>> consumers;
-            std::shared_ptr<Scheduler>              scheduler;
-            std::shared_ptr<CloseSynhcronization>   closeSync;
-            Mutex                                   sendMutex;
-            cms::MessageTransformer* transformer;
-            int                      hashCode;
-            bool                     sessionAsyncDispatch;
+            decaf::util::LinkedList<std::shared_ptr<ActiveMQConsumerKernel>>
+                                                  consumers;
+            std::shared_ptr<Scheduler>            scheduler;
+            std::shared_ptr<CloseSynhcronization> closeSync;
+            Mutex                                 sendMutex;
+            cms::MessageTransformer*              transformer;
+            int                                   hashCode;
+            bool                                  sessionAsyncDispatch;
 
         public:
             SessionConfig()
@@ -222,10 +224,10 @@ namespace core
 
 ////////////////////////////////////////////////////////////////////////////////
 ActiveMQSessionKernel::ActiveMQSessionKernel(
-    ActiveMQConnection*                  connection,
-    const std::shared_ptr<SessionId>&    id,
-    cms::Session::AcknowledgeMode        ackMode,
-    const Properties&                    properties)
+    ActiveMQConnection*               connection,
+    const std::shared_ptr<SessionId>& id,
+    cms::Session::AcknowledgeMode     ackMode,
+    const Properties&                 properties)
     : config(new SessionConfig),
       sessionInfo(),
       transaction(),
@@ -343,8 +345,8 @@ void ActiveMQSessionKernel::close()
         if (this->transaction->isInXATransaction())
         {
             bool syncExpected = false;
-            if (!this->config->synchronizationRegistered.compare_exchange_strong(
-                    syncExpected, true))
+            if (!this->config->synchronizationRegistered
+                     .compare_exchange_strong(syncExpected, true))
             {
                 this->config->closeSync.reset(
                     new CloseSynhcronization(this, this->config));
@@ -414,7 +416,8 @@ void ActiveMQSessionKernel::dispose()
             // Use aliasing constructor to create a non-owning shared_ptr
             // so we can pass 'this' to removeSession without taking ownership.
             std::shared_ptr<ActiveMQSessionKernel> session(
-                std::shared_ptr<ActiveMQSessionKernel>{}, this->session);
+                std::shared_ptr<ActiveMQSessionKernel>{},
+                this->session);
             try
             {
                 this->connection->removeSession(session);
@@ -441,8 +444,8 @@ void ActiveMQSessionKernel::dispose()
             // using a CopyOnWriteArrayList right now.
             ArrayList<std::shared_ptr<ActiveMQConsumerKernel>> consumers(
                 this->config->consumers);
-            std::shared_ptr<Iterator<std::shared_ptr<ActiveMQConsumerKernel>>> consumerIter(
-                consumers.iterator());
+            std::shared_ptr<Iterator<std::shared_ptr<ActiveMQConsumerKernel>>>
+                consumerIter(consumers.iterator());
             while (consumerIter->hasNext())
             {
                 try
@@ -591,8 +594,8 @@ void ActiveMQSessionKernel::recover()
         this->config->consumerLock.readLock().lock();
         try
         {
-            std::shared_ptr<Iterator<std::shared_ptr<ActiveMQConsumerKernel>>> iter(
-                this->config->consumers.iterator());
+            std::shared_ptr<Iterator<std::shared_ptr<ActiveMQConsumerKernel>>>
+                iter(this->config->consumers.iterator());
             while (iter->hasNext())
             {
                 std::shared_ptr<ActiveMQConsumerKernel> consumer = iter->next();
@@ -733,7 +736,8 @@ cms::MessageConsumer* ActiveMQSessionKernel::createConsumer(
                                     "created by this CMS Client");
         }
 
-        std::shared_ptr<ActiveMQDestination> dest(amqDestination->cloneDataStructure());
+        std::shared_ptr<ActiveMQDestination> dest(
+            amqDestination->cloneDataStructure());
 
         int prefetch = 0;
         if (dest->isTopic())
@@ -816,21 +820,23 @@ cms::MessageConsumer* ActiveMQSessionKernel::createDurableConsumer(
                                     "created by this CMS Client");
         }
 
-        std::shared_ptr<ActiveMQDestination> dest(amqDestination->cloneDataStructure());
+        std::shared_ptr<ActiveMQDestination> dest(
+            amqDestination->cloneDataStructure());
 
         // Create the consumer instance.
-        std::shared_ptr<ActiveMQConsumerKernel> consumer(new ActiveMQConsumerKernel(
-            this,
-            this->getNextConsumerId(),
-            dest,
-            name,
-            selector,
-            this->connection->getPrefetchPolicy()->getDurableTopicPrefetch(),
-            0,
-            noLocal,
-            false,
-            this->connection->isDispatchAsync(),
-            nullptr));
+        std::shared_ptr<ActiveMQConsumerKernel> consumer(
+            new ActiveMQConsumerKernel(
+                this,
+                this->getNextConsumerId(),
+                dest,
+                name,
+                selector,
+                this->connection->getPrefetchPolicy()->getDurableTopicPrefetch(),
+                0,
+                noLocal,
+                false,
+                this->connection->isDispatchAsync(),
+                nullptr));
 
         try
         {
@@ -958,7 +964,8 @@ cms::QueueBrowser* ActiveMQSessionKernel::createBrowser(
                                     "created by this CMS Client");
         }
 
-        std::shared_ptr<ActiveMQDestination> dest(amqDestination->cloneDataStructure());
+        std::shared_ptr<ActiveMQDestination> dest(
+            amqDestination->cloneDataStructure());
 
         // Create the QueueBrowser instance
         std::unique_ptr<ActiveMQQueueBrowser> browser(
@@ -1177,15 +1184,15 @@ bool ActiveMQSessionKernel::isTransacted() const
 
 ////////////////////////////////////////////////////////////////////////////////
 void ActiveMQSessionKernel::send(
-    kernels::ActiveMQProducerKernel*                producer,
-    std::shared_ptr<commands::ActiveMQDestination>  destination,
-    cms::Message*                                   message,
-    int                                             deliveryMode,
-    int                                             priority,
-    long long                                       timeToLive,
-    util::MemoryUsage*                              producerWindow,
-    long long                                       sendTimeout,
-    cms::AsyncCallback*                             onComplete)
+    kernels::ActiveMQProducerKernel*               producer,
+    std::shared_ptr<commands::ActiveMQDestination> destination,
+    cms::Message*                                  message,
+    int                                            deliveryMode,
+    int                                            priority,
+    long long                                      timeToLive,
+    util::MemoryUsage*                             producerWindow,
+    long long                                      sendTimeout,
+    cms::AsyncCallback*                            onComplete)
 {
     try
     {
@@ -1210,9 +1217,12 @@ void ActiveMQSessionKernel::send(
             // TX.
             doStartTransaction();
 
-            std::shared_ptr<TransactionId> txId = this->transaction->getTransactionId();
-            std::shared_ptr<ProducerInfo>  producerInfo = producer->getProducerInfo();
-            std::shared_ptr<ProducerId>    producerId   = producerInfo->getProducerId();
+            std::shared_ptr<TransactionId> txId =
+                this->transaction->getTransactionId();
+            std::shared_ptr<ProducerInfo> producerInfo =
+                producer->getProducerInfo();
+            std::shared_ptr<ProducerId> producerId =
+                producerInfo->getProducerId();
             long long sequenceId = producer->getNextMessageSequence();
 
             // Set the "CMS" header fields on the original message, see JMS 1.1
@@ -1221,8 +1231,10 @@ void ActiveMQSessionKernel::send(
             long long expiration = 0LL;
             if (!producer->getDisableMessageTimeStamp())
             {
-                long long timeStamp = std::chrono::duration_cast<std::chrono::milliseconds>(
-                    std::chrono::system_clock::now().time_since_epoch()).count();
+                long long timeStamp =
+                    std::chrono::duration_cast<std::chrono::milliseconds>(
+                        std::chrono::system_clock::now().time_since_epoch())
+                        .count();
                 message->setCMSTimestamp(timeStamp);
                 if (timeToLive > 0)
                 {
@@ -1239,8 +1251,7 @@ void ActiveMQSessionKernel::send(
 
             // Always assign the message ID, regardless of the disable flag.
             // Not adding a message ID will cause an NPE at the broker.
-            std::shared_ptr<commands::MessageId> id(
-                new commands::MessageId());
+            std::shared_ptr<commands::MessageId> id(new commands::MessageId());
             id->setProducerId(producerId);
             id->setProducerSequenceId(sequenceId);
 
@@ -1363,7 +1374,8 @@ void ActiveMQSessionKernel::unsubscribe(const std::string& name)
         AMQ_LOG_INFO("SessionKernel",
                      "Unsubscribing durable subscription, name=" << name);
 
-        std::shared_ptr<RemoveSubscriptionInfo> rsi(new RemoveSubscriptionInfo());
+        std::shared_ptr<RemoveSubscriptionInfo> rsi(
+            new RemoveSubscriptionInfo());
 
         rsi->setConnectionId(
             this->connection->getConnectionInfo().getConnectionId());
@@ -1380,7 +1392,8 @@ void ActiveMQSessionKernel::unsubscribe(const std::string& name)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQSessionKernel::dispatch(const std::shared_ptr<MessageDispatch>& dispatch)
+void ActiveMQSessionKernel::dispatch(
+    const std::shared_ptr<MessageDispatch>& dispatch)
 {
     if (this->executor.get() != nullptr)
     {
@@ -1491,8 +1504,9 @@ void ActiveMQSessionKernel::createTemporaryDestination(
 
         // Now that its setup, link it to this Connection so it can be closed.
         tempDestination->setConnection(this->connection);
-        this->connection->addTempDestination(std::shared_ptr<ActiveMQTempDestination>(
-            tempDestination->cloneDataStructure()));
+        this->connection->addTempDestination(
+            std::shared_ptr<ActiveMQTempDestination>(
+                tempDestination->cloneDataStructure()));
     }
     AMQ_CATCH_RETHROW(ActiveMQException)
     AMQ_CATCH_EXCEPTION_CONVERT(Exception, ActiveMQException)
@@ -1500,7 +1514,8 @@ void ActiveMQSessionKernel::createTemporaryDestination(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool ActiveMQSessionKernel::isInUse(std::shared_ptr<ActiveMQDestination> destination)
+bool ActiveMQSessionKernel::isInUse(
+    std::shared_ptr<ActiveMQDestination> destination)
 {
     this->config->consumerLock.readLock().lock();
     try
@@ -1577,8 +1592,9 @@ void ActiveMQSessionKernel::oneway(std::shared_ptr<Command> command)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::shared_ptr<Response> ActiveMQSessionKernel::syncRequest(std::shared_ptr<Command> command,
-                                                             unsigned int             timeout)
+std::shared_ptr<Response> ActiveMQSessionKernel::syncRequest(
+    std::shared_ptr<Command> command,
+    unsigned int             timeout)
 {
     try
     {
@@ -1603,7 +1619,8 @@ void ActiveMQSessionKernel::checkClosed() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQSessionKernel::addConsumer(std::shared_ptr<ActiveMQConsumerKernel> consumer)
+void ActiveMQSessionKernel::addConsumer(
+    std::shared_ptr<ActiveMQConsumerKernel> consumer)
 {
     try
     {
@@ -1669,7 +1686,8 @@ void ActiveMQSessionKernel::removeConsumer(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQSessionKernel::addProducer(std::shared_ptr<ActiveMQProducerKernel> producer)
+void ActiveMQSessionKernel::addProducer(
+    std::shared_ptr<ActiveMQProducerKernel> producer)
 {
     try
     {
@@ -1719,18 +1737,19 @@ void ActiveMQSessionKernel::removeProducer(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::shared_ptr<ActiveMQProducerKernel> ActiveMQSessionKernel::lookupProducerKernel(
-    std::shared_ptr<ProducerId> id)
+std::shared_ptr<ActiveMQProducerKernel>
+ActiveMQSessionKernel::lookupProducerKernel(std::shared_ptr<ProducerId> id)
 {
     this->config->producerLock.readLock().lock();
     try
     {
-        std::unique_ptr<Iterator<std::shared_ptr<ActiveMQProducerKernel>>> producerIter(
-            this->config->producers.iterator());
+        std::unique_ptr<Iterator<std::shared_ptr<ActiveMQProducerKernel>>>
+            producerIter(this->config->producers.iterator());
 
         while (producerIter->hasNext())
         {
-            std::shared_ptr<ActiveMQProducerKernel> producer = producerIter->next();
+            std::shared_ptr<ActiveMQProducerKernel> producer =
+                producerIter->next();
             if (producer->getProducerId()->equals(*id))
             {
                 this->config->producerLock.readLock().unlock();
@@ -1750,8 +1769,8 @@ std::shared_ptr<ActiveMQProducerKernel> ActiveMQSessionKernel::lookupProducerKer
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::shared_ptr<ActiveMQConsumerKernel> ActiveMQSessionKernel::lookupConsumerKernel(
-    std::shared_ptr<ConsumerId> id)
+std::shared_ptr<ActiveMQConsumerKernel>
+ActiveMQSessionKernel::lookupConsumerKernel(std::shared_ptr<ConsumerId> id)
 {
     this->config->consumerLock.readLock().lock();
     try
@@ -1815,7 +1834,7 @@ bool ActiveMQSessionKernel::iterateConsumers()
 
 ////////////////////////////////////////////////////////////////////////////////
 void ActiveMQSessionKernel::setPrefetchSize(std::shared_ptr<ConsumerId> id,
-                                            int                         prefetch)
+                                            int prefetch)
 {
     this->config->consumerLock.readLock().lock();
     try

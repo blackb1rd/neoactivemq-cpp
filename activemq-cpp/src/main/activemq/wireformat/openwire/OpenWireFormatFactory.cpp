@@ -46,16 +46,16 @@ std::shared_ptr<WireFormat> OpenWireFormatFactory::createWireFormat(
         std::shared_ptr<WireFormatInfo> info(new WireFormatInfo());
 
         // Configure the version to use
-        info->setVersion(std::stoi(
-            properties.getProperty("wireFormat.version", "11")));
+        info->setVersion(
+            std::stoi(properties.getProperty("wireFormat.version", "11")));
 
         // parse params out of the properties
         info->setStackTraceEnabled(Boolean::parseBoolean(
             properties.getProperty("wireFormat.stackTraceEnabled", "true")));
         info->setCacheEnabled(Boolean::parseBoolean(
             properties.getProperty("wireFormat.cacheEnabled", "false")));
-        info->setCacheSize(std::stoi(
-            properties.getProperty("wireFormat.cacheSize", "1024")));
+        info->setCacheSize(
+            std::stoi(properties.getProperty("wireFormat.cacheSize", "1024")));
         info->setTcpNoDelayEnabled(Boolean::parseBoolean(
             properties.getProperty("wireFormat.tcpNoDelayEnabled", "true")));
         info->setTightEncodingEnabled(Boolean::parseBoolean(
@@ -77,7 +77,8 @@ std::shared_ptr<WireFormat> OpenWireFormatFactory::createWireFormat(
         info->getProperties().setString("PlatformDetails", "C++");
 
         // Create the Openwire Format Object
-        std::shared_ptr<OpenWireFormat> wireFormat(new OpenWireFormat(properties));
+        std::shared_ptr<OpenWireFormat> wireFormat(
+            new OpenWireFormat(properties));
 
         // give the format object the ownership
         wireFormat->setPreferedWireFormatInfo(info);

@@ -48,18 +48,18 @@ namespace commands
     class AMQCPP_API BrokerInfo : public BaseCommand
     {
     protected:
-        std::shared_ptr<BrokerId>                             brokerId;
-        std::string                                           brokerURL;
+        std::shared_ptr<BrokerId>                brokerId;
+        std::string                              brokerURL;
         std::vector<std::shared_ptr<BrokerInfo>> peerBrokerInfos;
-        std::string                                   brokerName;
-        bool                                          slaveBroker;
-        bool                                          masterBroker;
-        bool        faultTolerantConfiguration;
-        bool        duplexConnection;
-        bool        networkConnection;
-        long long   connectionId;
-        std::string brokerUploadUrl;
-        std::string networkProperties;
+        std::string                              brokerName;
+        bool                                     slaveBroker;
+        bool                                     masterBroker;
+        bool                                     faultTolerantConfiguration;
+        bool                                     duplexConnection;
+        bool                                     networkConnection;
+        long long                                connectionId;
+        std::string                              brokerUploadUrl;
+        std::string                              networkProperties;
 
     public:
         const static unsigned char ID_BROKERINFO = 2;
@@ -93,11 +93,9 @@ namespace commands
 
         virtual const std::vector<std::shared_ptr<BrokerInfo>>&
         getPeerBrokerInfos() const;
-        virtual std::vector<std::shared_ptr<BrokerInfo>>&
-                     getPeerBrokerInfos();
-        virtual void setPeerBrokerInfos(
-            const std::vector<std::shared_ptr<BrokerInfo>>&
-                peerBrokerInfos);
+        virtual std::vector<std::shared_ptr<BrokerInfo>>& getPeerBrokerInfos();
+        virtual void                                      setPeerBrokerInfos(
+                                                 const std::vector<std::shared_ptr<BrokerInfo>>& peerBrokerInfos);
 
         virtual const std::string& getBrokerName() const;
         virtual std::string&       getBrokerName();
@@ -138,7 +136,8 @@ namespace commands
             return true;
         }
 
-        virtual std::shared_ptr<Command> visit(activemq::state::CommandVisitor* visitor);
+        virtual std::shared_ptr<Command> visit(
+            activemq::state::CommandVisitor* visitor);
     };
 
 }  // namespace commands

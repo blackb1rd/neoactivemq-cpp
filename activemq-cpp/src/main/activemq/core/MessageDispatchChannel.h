@@ -43,14 +43,16 @@ namespace core
          *
          * @param message - The message to add to the Channel.
          */
-        virtual void enqueue(const std::shared_ptr<MessageDispatch>& message) = 0;
+        virtual void enqueue(
+            const std::shared_ptr<MessageDispatch>& message) = 0;
 
         /**
          * Add a message to the front of the Channel.
          *
          * @param message - The Message to add to the front of the Channel.
          */
-        virtual void enqueueFirst(const std::shared_ptr<MessageDispatch>& message) = 0;
+        virtual void enqueueFirst(
+            const std::shared_ptr<MessageDispatch>& message) = 0;
 
         /**
          * @return true if there are no messages in the Channel.

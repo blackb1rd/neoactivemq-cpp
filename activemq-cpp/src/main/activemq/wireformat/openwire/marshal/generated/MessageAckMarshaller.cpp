@@ -69,19 +69,22 @@ void MessageAckMarshaller::tightUnmarshal(OpenWireFormat*  wireFormat,
 
         int wireVersion = wireFormat->getVersion();
 
-        info->setDestination(
-            std::shared_ptr<ActiveMQDestination>(dynamic_cast<ActiveMQDestination*>(
+        info->setDestination(std::shared_ptr<ActiveMQDestination>(
+            dynamic_cast<ActiveMQDestination*>(
                 tightUnmarshalCachedObject(wireFormat, dataIn, bs))));
         info->setTransactionId(
             std::shared_ptr<TransactionId>(dynamic_cast<TransactionId*>(
                 tightUnmarshalCachedObject(wireFormat, dataIn, bs))));
-        info->setConsumerId(std::shared_ptr<ConsumerId>(dynamic_cast<ConsumerId*>(
-            tightUnmarshalCachedObject(wireFormat, dataIn, bs))));
+        info->setConsumerId(
+            std::shared_ptr<ConsumerId>(dynamic_cast<ConsumerId*>(
+                tightUnmarshalCachedObject(wireFormat, dataIn, bs))));
         info->setAckType(dataIn->readByte());
-        info->setFirstMessageId(std::shared_ptr<MessageId>(dynamic_cast<MessageId*>(
-            tightUnmarshalNestedObject(wireFormat, dataIn, bs))));
-        info->setLastMessageId(std::shared_ptr<MessageId>(dynamic_cast<MessageId*>(
-            tightUnmarshalNestedObject(wireFormat, dataIn, bs))));
+        info->setFirstMessageId(
+            std::shared_ptr<MessageId>(dynamic_cast<MessageId*>(
+                tightUnmarshalNestedObject(wireFormat, dataIn, bs))));
+        info->setLastMessageId(
+            std::shared_ptr<MessageId>(dynamic_cast<MessageId*>(
+                tightUnmarshalNestedObject(wireFormat, dataIn, bs))));
         info->setMessageCount(dataIn->readInt());
         if (wireVersion >= 7)
         {
@@ -207,19 +210,22 @@ void MessageAckMarshaller::looseUnmarshal(OpenWireFormat*  wireFormat,
 
         int wireVersion = wireFormat->getVersion();
 
-        info->setDestination(
-            std::shared_ptr<ActiveMQDestination>(dynamic_cast<ActiveMQDestination*>(
+        info->setDestination(std::shared_ptr<ActiveMQDestination>(
+            dynamic_cast<ActiveMQDestination*>(
                 looseUnmarshalCachedObject(wireFormat, dataIn))));
         info->setTransactionId(
             std::shared_ptr<TransactionId>(dynamic_cast<TransactionId*>(
                 looseUnmarshalCachedObject(wireFormat, dataIn))));
-        info->setConsumerId(std::shared_ptr<ConsumerId>(dynamic_cast<ConsumerId*>(
-            looseUnmarshalCachedObject(wireFormat, dataIn))));
+        info->setConsumerId(
+            std::shared_ptr<ConsumerId>(dynamic_cast<ConsumerId*>(
+                looseUnmarshalCachedObject(wireFormat, dataIn))));
         info->setAckType(dataIn->readByte());
-        info->setFirstMessageId(std::shared_ptr<MessageId>(dynamic_cast<MessageId*>(
-            looseUnmarshalNestedObject(wireFormat, dataIn))));
-        info->setLastMessageId(std::shared_ptr<MessageId>(dynamic_cast<MessageId*>(
-            looseUnmarshalNestedObject(wireFormat, dataIn))));
+        info->setFirstMessageId(
+            std::shared_ptr<MessageId>(dynamic_cast<MessageId*>(
+                looseUnmarshalNestedObject(wireFormat, dataIn))));
+        info->setLastMessageId(
+            std::shared_ptr<MessageId>(dynamic_cast<MessageId*>(
+                looseUnmarshalNestedObject(wireFormat, dataIn))));
         info->setMessageCount(dataIn->readInt());
         if (wireVersion >= 7)
         {

@@ -50,7 +50,8 @@ namespace core
     public:
         std::shared_ptr<ActiveMQConsumerKernel> kernel;
 
-        ActiveMQConsumerData(const std::shared_ptr<ActiveMQConsumerKernel>& kernel)
+        ActiveMQConsumerData(
+            const std::shared_ptr<ActiveMQConsumerKernel>& kernel)
             : kernel(kernel)
         {
         }
@@ -60,7 +61,8 @@ namespace core
 }  // namespace activemq
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQConsumer::ActiveMQConsumer(const std::shared_ptr<ActiveMQConsumerKernel>& kernel)
+ActiveMQConsumer::ActiveMQConsumer(
+    const std::shared_ptr<ActiveMQConsumerKernel>& kernel)
     : MessageConsumer(),
       config(NULL)
 {
@@ -199,13 +201,15 @@ cms::MessageListener* ActiveMQConsumer::getMessageListener() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::shared_ptr<commands::ConsumerInfo>& ActiveMQConsumer::getConsumerInfo() const
+const std::shared_ptr<commands::ConsumerInfo>&
+ActiveMQConsumer::getConsumerInfo() const
 {
     return this->config->kernel->getConsumerInfo();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::shared_ptr<commands::ConsumerId>& ActiveMQConsumer::getConsumerId() const
+const std::shared_ptr<commands::ConsumerId>& ActiveMQConsumer::getConsumerId()
+    const
 {
     return this->config->kernel->getConsumerId();
 }

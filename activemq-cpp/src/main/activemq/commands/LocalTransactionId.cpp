@@ -168,8 +168,7 @@ void LocalTransactionId::setValue(long long value)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::shared_ptr<ConnectionId>& LocalTransactionId::getConnectionId()
-    const
+const std::shared_ptr<ConnectionId>& LocalTransactionId::getConnectionId() const
 {
     return connectionId;
 }

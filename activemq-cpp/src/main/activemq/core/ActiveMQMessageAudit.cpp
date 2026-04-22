@@ -86,9 +86,9 @@ namespace core
             if (value < maximumNumberOfProducersToTrack)
             {
                 LRUCache<std::string, std::shared_ptr<BitSet>> newMap(0,
-                                                              value,
-                                                              0.75f,
-                                                              true);
+                                                                      value,
+                                                                      0.75f,
+                                                                      true);
                 newMap.putAll(this->map);
                 this->map.clear();
                 this->map.putAll(newMap);
@@ -189,8 +189,7 @@ bool ActiveMQMessageAudit::isDuplicate(const std::string& id) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool ActiveMQMessageAudit::isDuplicate(
-    std::shared_ptr<MessageId> msgId) const
+bool ActiveMQMessageAudit::isDuplicate(std::shared_ptr<MessageId> msgId) const
 {
     bool answer = false;
 
@@ -273,8 +272,7 @@ void ActiveMQMessageAudit::rollback(const std::string& msgId)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQMessageAudit::rollback(
-    std::shared_ptr<commands::MessageId> msgId)
+void ActiveMQMessageAudit::rollback(std::shared_ptr<commands::MessageId> msgId)
 {
     if (msgId != nullptr)
     {

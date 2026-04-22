@@ -33,7 +33,8 @@ namespace core
                                          public ActiveMQSession
     {
     private:
-        std::shared_ptr<activemq::core::kernels::ActiveMQXASessionKernel> xaKernel;
+        std::shared_ptr<activemq::core::kernels::ActiveMQXASessionKernel>
+            xaKernel;
 
     private:
         ActiveMQXASession(const ActiveMQXASession&);
@@ -41,7 +42,8 @@ namespace core
 
     public:
         ActiveMQXASession(
-            std::shared_ptr<activemq::core::kernels::ActiveMQXASessionKernel> kernel);
+            std::shared_ptr<activemq::core::kernels::ActiveMQXASessionKernel>
+                kernel);
 
         virtual ~ActiveMQXASession();
 

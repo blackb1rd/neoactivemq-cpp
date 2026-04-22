@@ -35,9 +35,9 @@ namespace core
         {
         public:
             ActiveMQXASessionKernel(
-                ActiveMQConnection*                            connection,
-                const std::shared_ptr<commands::SessionId>&   sessionId,
-                const decaf::util::Properties&                 properties);
+                ActiveMQConnection*                         connection,
+                const std::shared_ptr<commands::SessionId>& sessionId,
+                const decaf::util::Properties&              properties);
 
             virtual ~ActiveMQXASessionKernel();
 

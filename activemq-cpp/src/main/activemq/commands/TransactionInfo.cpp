@@ -181,8 +181,7 @@ bool TransactionInfo::equals(const DataStructure* value) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::shared_ptr<ConnectionId>& TransactionInfo::getConnectionId()
-    const
+const std::shared_ptr<ConnectionId>& TransactionInfo::getConnectionId() const
 {
     return connectionId;
 }
@@ -201,8 +200,7 @@ void TransactionInfo::setConnectionId(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::shared_ptr<TransactionId>& TransactionInfo::getTransactionId()
-    const
+const std::shared_ptr<TransactionId>& TransactionInfo::getTransactionId() const
 {
     return transactionId;
 }

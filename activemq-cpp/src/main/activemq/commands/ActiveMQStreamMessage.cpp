@@ -35,9 +35,9 @@
 #include <decaf/lang/Character.h>
 #include <decaf/lang/Double.h>
 #include <decaf/lang/Float.h>
-#include <decaf/lang/Math.h>
 #include <decaf/lang/Integer.h>
 #include <decaf/lang/Long.h>
+#include <decaf/lang/Math.h>
 #include <decaf/lang/Short.h>
 #include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/util/zip/DeflaterOutputStream.h>

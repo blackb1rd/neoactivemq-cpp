@@ -73,8 +73,9 @@ void MessageIdMarshaller::tightUnmarshal(OpenWireFormat*  wireFormat,
         {
             info->setTextView(tightUnmarshalString(dataIn, bs));
         }
-        info->setProducerId(std::shared_ptr<ProducerId>(dynamic_cast<ProducerId*>(
-            tightUnmarshalCachedObject(wireFormat, dataIn, bs))));
+        info->setProducerId(
+            std::shared_ptr<ProducerId>(dynamic_cast<ProducerId*>(
+                tightUnmarshalCachedObject(wireFormat, dataIn, bs))));
         info->setProducerSequenceId(tightUnmarshalLong(wireFormat, dataIn, bs));
         info->setBrokerSequenceId(tightUnmarshalLong(wireFormat, dataIn, bs));
     }
@@ -172,8 +173,9 @@ void MessageIdMarshaller::looseUnmarshal(OpenWireFormat*  wireFormat,
         {
             info->setTextView(looseUnmarshalString(dataIn));
         }
-        info->setProducerId(std::shared_ptr<ProducerId>(dynamic_cast<ProducerId*>(
-            looseUnmarshalCachedObject(wireFormat, dataIn))));
+        info->setProducerId(
+            std::shared_ptr<ProducerId>(dynamic_cast<ProducerId*>(
+                looseUnmarshalCachedObject(wireFormat, dataIn))));
         info->setProducerSequenceId(looseUnmarshalLong(wireFormat, dataIn));
         info->setBrokerSequenceId(looseUnmarshalLong(wireFormat, dataIn));
     }

@@ -66,8 +66,9 @@ void TransactionInfoMarshaller::tightUnmarshal(OpenWireFormat*  wireFormat,
                                               bs);
 
         TransactionInfo* info = dynamic_cast<TransactionInfo*>(dataStructure);
-        info->setConnectionId(std::shared_ptr<ConnectionId>(dynamic_cast<ConnectionId*>(
-            tightUnmarshalCachedObject(wireFormat, dataIn, bs))));
+        info->setConnectionId(
+            std::shared_ptr<ConnectionId>(dynamic_cast<ConnectionId*>(
+                tightUnmarshalCachedObject(wireFormat, dataIn, bs))));
         info->setTransactionId(
             std::shared_ptr<TransactionId>(dynamic_cast<TransactionId*>(
                 tightUnmarshalCachedObject(wireFormat, dataIn, bs))));
@@ -146,8 +147,9 @@ void TransactionInfoMarshaller::looseUnmarshal(OpenWireFormat*  wireFormat,
                                               dataStructure,
                                               dataIn);
         TransactionInfo* info = dynamic_cast<TransactionInfo*>(dataStructure);
-        info->setConnectionId(std::shared_ptr<ConnectionId>(dynamic_cast<ConnectionId*>(
-            looseUnmarshalCachedObject(wireFormat, dataIn))));
+        info->setConnectionId(
+            std::shared_ptr<ConnectionId>(dynamic_cast<ConnectionId*>(
+                looseUnmarshalCachedObject(wireFormat, dataIn))));
         info->setTransactionId(
             std::shared_ptr<TransactionId>(dynamic_cast<TransactionId*>(
                 looseUnmarshalCachedObject(wireFormat, dataIn))));

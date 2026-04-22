@@ -42,7 +42,8 @@ namespace core
 
         mutable decaf::util::concurrent::Mutex mutex;
 
-        mutable std::vector<decaf::util::LinkedList<std::shared_ptr<MessageDispatch>>>
+        mutable std::vector<
+            decaf::util::LinkedList<std::shared_ptr<MessageDispatch>>>
             channels;
 
         int enqueued;
@@ -59,7 +60,8 @@ namespace core
 
         virtual void enqueue(const std::shared_ptr<MessageDispatch>& message);
 
-        virtual void enqueueFirst(const std::shared_ptr<MessageDispatch>& message);
+        virtual void enqueueFirst(
+            const std::shared_ptr<MessageDispatch>& message);
 
         virtual bool isEmpty() const;
 
@@ -135,7 +137,6 @@ namespace core
     private:
         decaf::util::LinkedList<std::shared_ptr<MessageDispatch>>& getChannel(
             const std::shared_ptr<MessageDispatch>& dispatch);
-
 
         std::shared_ptr<MessageDispatch> removeFirst();
 

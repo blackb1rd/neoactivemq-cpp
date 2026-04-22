@@ -168,8 +168,8 @@ bool RemoveSubscriptionInfo::equals(const DataStructure* value) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::shared_ptr<ConnectionId>&
-RemoveSubscriptionInfo::getConnectionId() const
+const std::shared_ptr<ConnectionId>& RemoveSubscriptionInfo::getConnectionId()
+    const
 {
     return connectionId;
 }

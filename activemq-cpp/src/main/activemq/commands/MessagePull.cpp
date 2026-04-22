@@ -222,15 +222,13 @@ std::shared_ptr<ConsumerId>& MessagePull::getConsumerId()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MessagePull::setConsumerId(
-    const std::shared_ptr<ConsumerId>& consumerId)
+void MessagePull::setConsumerId(const std::shared_ptr<ConsumerId>& consumerId)
 {
     this->consumerId = consumerId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::shared_ptr<ActiveMQDestination>& MessagePull::getDestination()
-    const
+const std::shared_ptr<ActiveMQDestination>& MessagePull::getDestination() const
 {
     return destination;
 }

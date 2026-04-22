@@ -69,8 +69,9 @@ void ConnectionInfoMarshaller::tightUnmarshal(OpenWireFormat*  wireFormat,
 
         int wireVersion = wireFormat->getVersion();
 
-        info->setConnectionId(std::shared_ptr<ConnectionId>(dynamic_cast<ConnectionId*>(
-            tightUnmarshalCachedObject(wireFormat, dataIn, bs))));
+        info->setConnectionId(
+            std::shared_ptr<ConnectionId>(dynamic_cast<ConnectionId*>(
+                tightUnmarshalCachedObject(wireFormat, dataIn, bs))));
         info->setClientId(tightUnmarshalString(dataIn, bs));
         info->setPassword(tightUnmarshalString(dataIn, bs));
         info->setUserName(tightUnmarshalString(dataIn, bs));
@@ -227,8 +228,9 @@ void ConnectionInfoMarshaller::looseUnmarshal(OpenWireFormat*  wireFormat,
 
         int wireVersion = wireFormat->getVersion();
 
-        info->setConnectionId(std::shared_ptr<ConnectionId>(dynamic_cast<ConnectionId*>(
-            looseUnmarshalCachedObject(wireFormat, dataIn))));
+        info->setConnectionId(
+            std::shared_ptr<ConnectionId>(dynamic_cast<ConnectionId*>(
+                looseUnmarshalCachedObject(wireFormat, dataIn))));
         info->setClientId(looseUnmarshalString(dataIn));
         info->setPassword(looseUnmarshalString(dataIn));
         info->setUserName(looseUnmarshalString(dataIn));

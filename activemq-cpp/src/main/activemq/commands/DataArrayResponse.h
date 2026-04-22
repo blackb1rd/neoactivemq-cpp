@@ -71,8 +71,8 @@ namespace commands
 
         virtual bool equals(const DataStructure* value) const;
 
-        virtual const std::vector<std::shared_ptr<DataStructure>>&
-        getData() const;
+        virtual const std::vector<std::shared_ptr<DataStructure>>& getData()
+            const;
         virtual std::vector<std::shared_ptr<DataStructure>>& getData();
         virtual void                                         setData(
                                                     const std::vector<std::shared_ptr<DataStructure>>& data);

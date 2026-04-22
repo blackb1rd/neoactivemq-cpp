@@ -23,10 +23,10 @@
 #include <cms/MessageListener.h>
 #include <cms/Session.h>
 
-#include <atomic>
 #include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/util/HashSet.h>
 #include <decaf/util/concurrent/Mutex.h>
+#include <atomic>
 #include <memory>
 
 #include <activemq/commands/ActiveMQDestination.h>
@@ -63,9 +63,9 @@ namespace core
         DestinationSourceImpl& operator=(const DestinationSourceImpl&);
 
     public:
-        std::atomic<bool>                      started;
-        ActiveMQConnection*                    connection;
-        std::shared_ptr<Session>               session;
+        std::atomic<bool>        started;
+        ActiveMQConnection*      connection;
+        std::shared_ptr<Session> session;
 
         std::shared_ptr<MessageConsumer> topicConsumer;
         std::shared_ptr<MessageConsumer> queueConsumer;
@@ -168,7 +168,8 @@ namespace core
                 dynamic_cast<const commands::Message*>(message);
             if (amqMessage != nullptr)
             {
-                std::shared_ptr<DataStructure> payload = amqMessage->getDataStructure();
+                std::shared_ptr<DataStructure> payload =
+                    amqMessage->getDataStructure();
                 try
                 {
                     std::shared_ptr<DestinationInfo> destinationInfo =
@@ -269,8 +270,8 @@ namespace core
 
             synchronized(&queues)
             {
-                std::shared_ptr<Iterator<std::shared_ptr<ActiveMQDestination>>> iter(
-                    queues.iterator());
+                std::shared_ptr<Iterator<std::shared_ptr<ActiveMQDestination>>>
+                    iter(queues.iterator());
                 while (iter->hasNext())
                 {
                     cms::Destination* copy =
@@ -288,8 +289,8 @@ namespace core
 
             synchronized(&topics)
             {
-                std::shared_ptr<Iterator<std::shared_ptr<ActiveMQDestination>>> iter(
-                    topics.iterator());
+                std::shared_ptr<Iterator<std::shared_ptr<ActiveMQDestination>>>
+                    iter(topics.iterator());
                 while (iter->hasNext())
                 {
                     cms::Destination* copy =
@@ -307,8 +308,8 @@ namespace core
 
             synchronized(&tempQueues)
             {
-                std::shared_ptr<Iterator<std::shared_ptr<ActiveMQDestination>>> iter(
-                    tempQueues.iterator());
+                std::shared_ptr<Iterator<std::shared_ptr<ActiveMQDestination>>>
+                    iter(tempQueues.iterator());
                 while (iter->hasNext())
                 {
                     cms::Destination* copy =
@@ -326,8 +327,8 @@ namespace core
 
             synchronized(&tempTopics)
             {
-                std::shared_ptr<Iterator<std::shared_ptr<ActiveMQDestination>>> iter(
-                    tempTopics.iterator());
+                std::shared_ptr<Iterator<std::shared_ptr<ActiveMQDestination>>>
+                    iter(tempTopics.iterator());
                 while (iter->hasNext())
                 {
                     cms::Destination* copy =

@@ -68,8 +68,9 @@ void LocalTransactionIdMarshaller::tightUnmarshal(OpenWireFormat* wireFormat,
         LocalTransactionId* info =
             dynamic_cast<LocalTransactionId*>(dataStructure);
         info->setValue(tightUnmarshalLong(wireFormat, dataIn, bs));
-        info->setConnectionId(std::shared_ptr<ConnectionId>(dynamic_cast<ConnectionId*>(
-            tightUnmarshalCachedObject(wireFormat, dataIn, bs))));
+        info->setConnectionId(
+            std::shared_ptr<ConnectionId>(dynamic_cast<ConnectionId*>(
+                tightUnmarshalCachedObject(wireFormat, dataIn, bs))));
     }
     AMQ_CATCH_RETHROW(decaf::io::IOException)
     AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
@@ -143,8 +144,9 @@ void LocalTransactionIdMarshaller::looseUnmarshal(OpenWireFormat* wireFormat,
         LocalTransactionId* info =
             dynamic_cast<LocalTransactionId*>(dataStructure);
         info->setValue(looseUnmarshalLong(wireFormat, dataIn));
-        info->setConnectionId(std::shared_ptr<ConnectionId>(dynamic_cast<ConnectionId*>(
-            looseUnmarshalCachedObject(wireFormat, dataIn))));
+        info->setConnectionId(
+            std::shared_ptr<ConnectionId>(dynamic_cast<ConnectionId*>(
+                looseUnmarshalCachedObject(wireFormat, dataIn))));
     }
     AMQ_CATCH_RETHROW(decaf::io::IOException)
     AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,

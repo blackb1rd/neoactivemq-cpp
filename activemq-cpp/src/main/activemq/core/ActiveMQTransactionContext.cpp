@@ -196,7 +196,8 @@ void ActiveMQTransactionContext::begin()
                 this->connection->getConnectionInfo().getConnectionId());
             id->setValue(this->connection->getNextLocalTransactionId());
 
-            std::shared_ptr<TransactionInfo> transactionInfo(new TransactionInfo());
+            std::shared_ptr<TransactionInfo> transactionInfo(
+                new TransactionInfo());
             transactionInfo->setConnectionId(id->getConnectionId());
             transactionInfo->setTransactionId(id);
             transactionInfo->setType(
@@ -206,7 +207,8 @@ void ActiveMQTransactionContext::begin()
 
             synchronized(&this->context->mutex)
             {
-                this->context->transactionId = std::dynamic_pointer_cast<TransactionId>(id);
+                this->context->transactionId =
+                    std::dynamic_pointer_cast<TransactionId>(id);
             }
         }
     }
@@ -329,8 +331,8 @@ void ActiveMQTransactionContext::beforeEnd()
     // Transaction.
     synchronized(&this->synchronizations)
     {
-        std::unique_ptr<decaf::util::Iterator<std::shared_ptr<Synchronization>>> iter(
-            this->synchronizations.iterator());
+        std::unique_ptr<decaf::util::Iterator<std::shared_ptr<Synchronization>>>
+            iter(this->synchronizations.iterator());
 
         while (iter->hasNext())
         {
@@ -348,8 +350,8 @@ void ActiveMQTransactionContext::afterCommit()
     {
         Finally finalizer(&this->synchronizations);
 
-        std::unique_ptr<decaf::util::Iterator<std::shared_ptr<Synchronization>>> iter(
-            this->synchronizations.iterator());
+        std::unique_ptr<decaf::util::Iterator<std::shared_ptr<Synchronization>>>
+            iter(this->synchronizations.iterator());
 
         while (iter->hasNext())
         {
@@ -367,8 +369,8 @@ void ActiveMQTransactionContext::afterRollback()
     {
         Finally finalizer(&this->synchronizations);
 
-        std::unique_ptr<decaf::util::Iterator<std::shared_ptr<Synchronization>>> iter(
-            this->synchronizations.iterator());
+        std::unique_ptr<decaf::util::Iterator<std::shared_ptr<Synchronization>>>
+            iter(this->synchronizations.iterator());
 
         while (iter->hasNext())
         {
@@ -378,8 +380,8 @@ void ActiveMQTransactionContext::afterRollback()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::shared_ptr<TransactionId>& ActiveMQTransactionContext::getTransactionId()
-    const
+const std::shared_ptr<TransactionId>&
+ActiveMQTransactionContext::getTransactionId() const
 {
     // Note: This method returns a reference - caller must ensure thread-safety.
     // The transactionId should only be modified through begin/commit/rollback
@@ -453,7 +455,8 @@ int ActiveMQTransactionContext::recover(int flag AMQCPP_UNUSED, Xid** recovered)
         std::shared_ptr<DataArrayResponse> arrayResponse =
             std::dynamic_pointer_cast<DataArrayResponse>(response);
 
-        std::vector<std::shared_ptr<DataStructure>> array = arrayResponse->getData();
+        std::vector<std::shared_ptr<DataStructure>> array =
+            arrayResponse->getData();
 
         int size = (int)array.size();
 
@@ -670,7 +673,8 @@ void ActiveMQTransactionContext::rollback(const Xid* xid)
     {
         if (equals(this->context->associatedXid.get(), xid))
         {
-            x = std::dynamic_pointer_cast<XATransactionId>(this->context->transactionId);
+            x = std::dynamic_pointer_cast<XATransactionId>(
+                this->context->transactionId);
         }
         else
         {
@@ -780,7 +784,8 @@ void ActiveMQTransactionContext::forget(const Xid* xid)
     {
         if (equals(this->context->associatedXid.get(), xid))
         {
-            x = std::dynamic_pointer_cast<XATransactionId>(this->context->transactionId);
+            x = std::dynamic_pointer_cast<XATransactionId>(
+                this->context->transactionId);
         }
         else
         {

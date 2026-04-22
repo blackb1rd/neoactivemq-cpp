@@ -69,11 +69,12 @@ void ConsumerInfoMarshaller::tightUnmarshal(OpenWireFormat*  wireFormat,
 
         int wireVersion = wireFormat->getVersion();
 
-        info->setConsumerId(std::shared_ptr<ConsumerId>(dynamic_cast<ConsumerId*>(
-            tightUnmarshalCachedObject(wireFormat, dataIn, bs))));
+        info->setConsumerId(
+            std::shared_ptr<ConsumerId>(dynamic_cast<ConsumerId*>(
+                tightUnmarshalCachedObject(wireFormat, dataIn, bs))));
         info->setBrowser(bs->readBoolean());
-        info->setDestination(
-            std::shared_ptr<ActiveMQDestination>(dynamic_cast<ActiveMQDestination*>(
+        info->setDestination(std::shared_ptr<ActiveMQDestination>(
+            dynamic_cast<ActiveMQDestination*>(
                 tightUnmarshalCachedObject(wireFormat, dataIn, bs))));
         info->setPrefetchSize(dataIn->readInt());
         info->setMaximumPendingMessageLimit(dataIn->readInt());
@@ -265,11 +266,12 @@ void ConsumerInfoMarshaller::looseUnmarshal(OpenWireFormat*  wireFormat,
 
         int wireVersion = wireFormat->getVersion();
 
-        info->setConsumerId(std::shared_ptr<ConsumerId>(dynamic_cast<ConsumerId*>(
-            looseUnmarshalCachedObject(wireFormat, dataIn))));
+        info->setConsumerId(
+            std::shared_ptr<ConsumerId>(dynamic_cast<ConsumerId*>(
+                looseUnmarshalCachedObject(wireFormat, dataIn))));
         info->setBrowser(dataIn->readBoolean());
-        info->setDestination(
-            std::shared_ptr<ActiveMQDestination>(dynamic_cast<ActiveMQDestination*>(
+        info->setDestination(std::shared_ptr<ActiveMQDestination>(
+            dynamic_cast<ActiveMQDestination*>(
                 looseUnmarshalCachedObject(wireFormat, dataIn))));
         info->setPrefetchSize(dataIn->readInt());
         info->setMaximumPendingMessageLimit(dataIn->readInt());

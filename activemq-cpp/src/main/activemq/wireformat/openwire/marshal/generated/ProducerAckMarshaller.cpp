@@ -71,8 +71,9 @@ void ProducerAckMarshaller::tightUnmarshal(OpenWireFormat*  wireFormat,
 
         if (wireVersion >= 3)
         {
-            info->setProducerId(std::shared_ptr<ProducerId>(dynamic_cast<ProducerId*>(
-                tightUnmarshalNestedObject(wireFormat, dataIn, bs))));
+            info->setProducerId(
+                std::shared_ptr<ProducerId>(dynamic_cast<ProducerId*>(
+                    tightUnmarshalNestedObject(wireFormat, dataIn, bs))));
         }
         if (wireVersion >= 3)
         {
@@ -168,8 +169,9 @@ void ProducerAckMarshaller::looseUnmarshal(OpenWireFormat*  wireFormat,
 
         if (wireVersion >= 3)
         {
-            info->setProducerId(std::shared_ptr<ProducerId>(dynamic_cast<ProducerId*>(
-                looseUnmarshalNestedObject(wireFormat, dataIn))));
+            info->setProducerId(
+                std::shared_ptr<ProducerId>(dynamic_cast<ProducerId*>(
+                    looseUnmarshalNestedObject(wireFormat, dataIn))));
         }
         if (wireVersion >= 3)
         {

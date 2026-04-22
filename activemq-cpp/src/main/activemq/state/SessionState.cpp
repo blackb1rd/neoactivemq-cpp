@@ -81,12 +81,12 @@ void SessionState::checkShutdown() const
 void SessionState::addProducer(std::shared_ptr<ProducerInfo> info)
 {
     checkShutdown();
-    producers.put(info->getProducerId(),
-                  std::make_shared<ProducerState>(info));
+    producers.put(info->getProducerId(), std::make_shared<ProducerState>(info));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::shared_ptr<ProducerState> SessionState::removeProducer(std::shared_ptr<ProducerId> id)
+std::shared_ptr<ProducerState> SessionState::removeProducer(
+    std::shared_ptr<ProducerId> id)
 {
     std::shared_ptr<ProducerState> producerState = producers.remove(id);
     if (producerState)
@@ -98,7 +98,8 @@ std::shared_ptr<ProducerState> SessionState::removeProducer(std::shared_ptr<Prod
             // allow the transaction to recreate dependent producer on recovery,
             // we hand off the producer state to the Transaction and NULL the
             // producer's reference to avoid a circular link to it.
-            producerState->setTransactionState(std::shared_ptr<TransactionState>());
+            producerState->setTransactionState(
+                std::shared_ptr<TransactionState>());
             transactionState->addProducerState(producerState);
         }
     }
@@ -110,12 +111,12 @@ std::shared_ptr<ProducerState> SessionState::removeProducer(std::shared_ptr<Prod
 void SessionState::addConsumer(std::shared_ptr<ConsumerInfo> info)
 {
     checkShutdown();
-    consumers.put(info->getConsumerId(),
-                  std::make_shared<ConsumerState>(info));
+    consumers.put(info->getConsumerId(), std::make_shared<ConsumerState>(info));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::shared_ptr<ConsumerState> SessionState::removeConsumer(std::shared_ptr<ConsumerId> id)
+std::shared_ptr<ConsumerState> SessionState::removeConsumer(
+    std::shared_ptr<ConsumerId> id)
 {
     return consumers.remove(id);
 }

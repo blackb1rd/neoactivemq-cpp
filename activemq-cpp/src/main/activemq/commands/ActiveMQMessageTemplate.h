@@ -95,10 +95,8 @@ namespace commands
                     return false;
                 }
 
-                std::shared_ptr<MessageId> thisMsgId =
-                    this->getMessageId();
-                std::shared_ptr<MessageId> otherMsgId =
-                    object->getMessageId();
+                std::shared_ptr<MessageId> thisMsgId  = this->getMessageId();
+                std::shared_ptr<MessageId> otherMsgId = object->getMessageId();
 
                 return thisMsgId && otherMsgId &&
                        otherMsgId->equals(thisMsgId.get());
@@ -518,14 +516,14 @@ namespace commands
             {
                 if (destination != NULL)
                 {
-                    this->setDestination(
-                        std::shared_ptr<ActiveMQDestination>(
-                            dynamic_cast<ActiveMQDestination*>(
-                                destination->clone())));
+                    this->setDestination(std::shared_ptr<ActiveMQDestination>(
+                        dynamic_cast<ActiveMQDestination*>(
+                            destination->clone())));
                 }
                 else
                 {
-                    this->setDestination(std::shared_ptr<ActiveMQDestination>());
+                    this->setDestination(
+                        std::shared_ptr<ActiveMQDestination>());
                 }
             }
             AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
@@ -605,8 +603,7 @@ namespace commands
                 }
                 else
                 {
-                    this->setReplyTo(
-                        std::shared_ptr<ActiveMQDestination>());
+                    this->setReplyTo(std::shared_ptr<ActiveMQDestination>());
                 }
             }
             AMQ_CATCH_ALL_THROW_CMSEXCEPTION()

@@ -100,14 +100,13 @@ namespace state
             return std::shared_ptr<commands::Command>();
         }
 
-        virtual std::shared_ptr<commands::Command>
-        processRemoveDestination(commands::DestinationInfo* info AMQCPP_UNUSED)
+        virtual std::shared_ptr<commands::Command> processRemoveDestination(
+            commands::DestinationInfo* info AMQCPP_UNUSED)
         {
             return std::shared_ptr<commands::Command>();
         }
 
-        virtual std::shared_ptr<commands::Command>
-        processRemoveSubscriptionInfo(
+        virtual std::shared_ptr<commands::Command> processRemoveSubscriptionInfo(
             commands::RemoveSubscriptionInfo* info AMQCPP_UNUSED)
         {
             return std::shared_ptr<commands::Command>();
@@ -137,8 +136,8 @@ namespace state
             return std::shared_ptr<commands::Command>();
         }
 
-        virtual std::shared_ptr<commands::Command>
-        processPrepareTransaction(commands::TransactionInfo* info AMQCPP_UNUSED)
+        virtual std::shared_ptr<commands::Command> processPrepareTransaction(
+            commands::TransactionInfo* info AMQCPP_UNUSED)
         {
             return std::shared_ptr<commands::Command>();
         }
@@ -157,8 +156,8 @@ namespace state
             return std::shared_ptr<commands::Command>();
         }
 
-        virtual std::shared_ptr<commands::Command>
-        processRollbackTransaction(commands::TransactionInfo* info AMQCPP_UNUSED)
+        virtual std::shared_ptr<commands::Command> processRollbackTransaction(
+            commands::TransactionInfo* info AMQCPP_UNUSED)
         {
             return std::shared_ptr<commands::Command>();
         }
@@ -193,14 +192,14 @@ namespace state
             return std::shared_ptr<commands::Command>();
         }
 
-        virtual std::shared_ptr<commands::Command>
-        processRecoverTransactions(commands::TransactionInfo* info AMQCPP_UNUSED)
+        virtual std::shared_ptr<commands::Command> processRecoverTransactions(
+            commands::TransactionInfo* info AMQCPP_UNUSED)
         {
             return std::shared_ptr<commands::Command>();
         }
 
-        virtual std::shared_ptr<commands::Command>
-        processForgetTransaction(commands::TransactionInfo* info AMQCPP_UNUSED)
+        virtual std::shared_ptr<commands::Command> processForgetTransaction(
+            commands::TransactionInfo* info AMQCPP_UNUSED)
         {
             return std::shared_ptr<commands::Command>();
         }

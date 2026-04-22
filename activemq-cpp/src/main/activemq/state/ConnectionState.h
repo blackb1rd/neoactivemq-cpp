@@ -58,12 +58,14 @@ namespace state
         ConcurrentStlMap<std::shared_ptr<SessionId>,
                          std::shared_ptr<SessionState>,
                          SessionId::COMPARATOR>
-                                                       sessions;
-        LinkedList<std::shared_ptr<DestinationInfo>>           tempDestinations;
-        std::atomic<bool> disposed;
+                                                     sessions;
+        LinkedList<std::shared_ptr<DestinationInfo>> tempDestinations;
+        std::atomic<bool>                            disposed;
 
         bool connectionInterruptProcessingComplete;
-        StlMap<std::shared_ptr<ConsumerId>, std::shared_ptr<ConsumerInfo>, ConsumerId::COMPARATOR>
+        StlMap<std::shared_ptr<ConsumerId>,
+               std::shared_ptr<ConsumerInfo>,
+               ConsumerId::COMPARATOR>
             recoveringPullConsumers;
 
     public:
@@ -90,20 +92,21 @@ namespace state
             tempDestinations.add(info);
         }
 
-        void removeTempDestination(std::shared_ptr<ActiveMQDestination> destination);
+        void removeTempDestination(
+            std::shared_ptr<ActiveMQDestination> destination);
 
         void addTransactionState(std::shared_ptr<TransactionId> id)
         {
             checkShutdown();
-            transactions.put(
-                std::dynamic_pointer_cast<LocalTransactionId>(id),
-                std::make_shared<TransactionState>(id));
+            transactions.put(std::dynamic_pointer_cast<LocalTransactionId>(id),
+                             std::make_shared<TransactionState>(id));
         }
 
         const std::shared_ptr<TransactionState>& getTransactionState(
             std::shared_ptr<TransactionId> id) const
         {
-            return transactions.get(std::dynamic_pointer_cast<LocalTransactionId>(id));
+            return transactions.get(
+                std::dynamic_pointer_cast<LocalTransactionId>(id));
         }
 
         const decaf::util::Collection<std::shared_ptr<TransactionState>>&
@@ -115,7 +118,8 @@ namespace state
         std::shared_ptr<TransactionState> removeTransactionState(
             std::shared_ptr<TransactionId> id)
         {
-            return transactions.remove(std::dynamic_pointer_cast<LocalTransactionId>(id));
+            return transactions.remove(
+                std::dynamic_pointer_cast<LocalTransactionId>(id));
         }
 
         void addSession(std::shared_ptr<SessionInfo> info)
@@ -125,23 +129,26 @@ namespace state
                          std::make_shared<SessionState>(info));
         }
 
-        std::shared_ptr<SessionState> removeSession(std::shared_ptr<SessionId> id)
+        std::shared_ptr<SessionState> removeSession(
+            std::shared_ptr<SessionId> id)
         {
             return sessions.remove(id);
         }
 
-        const std::shared_ptr<SessionState> getSessionState(std::shared_ptr<SessionId> id) const
+        const std::shared_ptr<SessionState> getSessionState(
+            std::shared_ptr<SessionId> id) const
         {
             return sessions.get(id);
         }
 
-        const LinkedList<std::shared_ptr<DestinationInfo>>& getTempDesinations() const
+        const LinkedList<std::shared_ptr<DestinationInfo>>& getTempDesinations()
+            const
         {
             return tempDestinations;
         }
 
-        const decaf::util::Collection<std::shared_ptr<SessionState>>& getSessionStates()
-            const
+        const decaf::util::Collection<std::shared_ptr<SessionState>>&
+        getSessionStates() const
         {
             return sessions.values();
         }

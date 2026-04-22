@@ -52,7 +52,8 @@ ActiveMQDestinationEvent::~ActiveMQDestinationEvent()
 ////////////////////////////////////////////////////////////////////////////////
 const cms::Destination* ActiveMQDestinationEvent::getDestination() const
 {
-    std::shared_ptr<ActiveMQDestination> dest = this->destination->getDestination();
+    std::shared_ptr<ActiveMQDestination> dest =
+        this->destination->getDestination();
     if (dest != nullptr)
     {
         return dest->getCMSDestination();

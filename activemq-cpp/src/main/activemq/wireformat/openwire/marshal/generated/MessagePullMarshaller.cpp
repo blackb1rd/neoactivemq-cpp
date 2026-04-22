@@ -69,10 +69,11 @@ void MessagePullMarshaller::tightUnmarshal(OpenWireFormat*  wireFormat,
 
         int wireVersion = wireFormat->getVersion();
 
-        info->setConsumerId(std::shared_ptr<ConsumerId>(dynamic_cast<ConsumerId*>(
-            tightUnmarshalCachedObject(wireFormat, dataIn, bs))));
-        info->setDestination(
-            std::shared_ptr<ActiveMQDestination>(dynamic_cast<ActiveMQDestination*>(
+        info->setConsumerId(
+            std::shared_ptr<ConsumerId>(dynamic_cast<ConsumerId*>(
+                tightUnmarshalCachedObject(wireFormat, dataIn, bs))));
+        info->setDestination(std::shared_ptr<ActiveMQDestination>(
+            dynamic_cast<ActiveMQDestination*>(
                 tightUnmarshalCachedObject(wireFormat, dataIn, bs))));
         info->setTimeout(tightUnmarshalLong(wireFormat, dataIn, bs));
         if (wireVersion >= 3)
@@ -81,8 +82,9 @@ void MessagePullMarshaller::tightUnmarshal(OpenWireFormat*  wireFormat,
         }
         if (wireVersion >= 3)
         {
-            info->setMessageId(std::shared_ptr<MessageId>(dynamic_cast<MessageId*>(
-                tightUnmarshalNestedObject(wireFormat, dataIn, bs))));
+            info->setMessageId(
+                std::shared_ptr<MessageId>(dynamic_cast<MessageId*>(
+                    tightUnmarshalNestedObject(wireFormat, dataIn, bs))));
         }
     }
     AMQ_CATCH_RETHROW(decaf::io::IOException)
@@ -189,10 +191,11 @@ void MessagePullMarshaller::looseUnmarshal(OpenWireFormat*  wireFormat,
 
         int wireVersion = wireFormat->getVersion();
 
-        info->setConsumerId(std::shared_ptr<ConsumerId>(dynamic_cast<ConsumerId*>(
-            looseUnmarshalCachedObject(wireFormat, dataIn))));
-        info->setDestination(
-            std::shared_ptr<ActiveMQDestination>(dynamic_cast<ActiveMQDestination*>(
+        info->setConsumerId(
+            std::shared_ptr<ConsumerId>(dynamic_cast<ConsumerId*>(
+                looseUnmarshalCachedObject(wireFormat, dataIn))));
+        info->setDestination(std::shared_ptr<ActiveMQDestination>(
+            dynamic_cast<ActiveMQDestination*>(
                 looseUnmarshalCachedObject(wireFormat, dataIn))));
         info->setTimeout(looseUnmarshalLong(wireFormat, dataIn));
         if (wireVersion >= 3)
@@ -201,8 +204,9 @@ void MessagePullMarshaller::looseUnmarshal(OpenWireFormat*  wireFormat,
         }
         if (wireVersion >= 3)
         {
-            info->setMessageId(std::shared_ptr<MessageId>(dynamic_cast<MessageId*>(
-                looseUnmarshalNestedObject(wireFormat, dataIn))));
+            info->setMessageId(
+                std::shared_ptr<MessageId>(dynamic_cast<MessageId*>(
+                    looseUnmarshalNestedObject(wireFormat, dataIn))));
         }
     }
     AMQ_CATCH_RETHROW(decaf::io::IOException)

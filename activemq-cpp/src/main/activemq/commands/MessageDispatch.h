@@ -86,12 +86,14 @@ namespace commands
 
         virtual const std::shared_ptr<ConsumerId>& getConsumerId() const;
         virtual std::shared_ptr<ConsumerId>&       getConsumerId();
-        virtual void setConsumerId(const std::shared_ptr<ConsumerId>& consumerId);
+        virtual void                               setConsumerId(
+                                          const std::shared_ptr<ConsumerId>& consumerId);
 
-        virtual const std::shared_ptr<ActiveMQDestination>& getDestination() const;
-        virtual std::shared_ptr<ActiveMQDestination>&       getDestination();
-        virtual void                                        setDestination(
-                                                   const std::shared_ptr<ActiveMQDestination>& destination);
+        virtual const std::shared_ptr<ActiveMQDestination>& getDestination()
+            const;
+        virtual std::shared_ptr<ActiveMQDestination>& getDestination();
+        virtual void                                  setDestination(
+                                             const std::shared_ptr<ActiveMQDestination>& destination);
 
         virtual const std::shared_ptr<Message>& getMessage() const;
         virtual std::shared_ptr<Message>&       getMessage();
@@ -108,7 +110,8 @@ namespace commands
             return true;
         }
 
-        virtual std::shared_ptr<Command> visit(activemq::state::CommandVisitor* visitor);
+        virtual std::shared_ptr<Command> visit(
+            activemq::state::CommandVisitor* visitor);
     };
 
 }  // namespace commands

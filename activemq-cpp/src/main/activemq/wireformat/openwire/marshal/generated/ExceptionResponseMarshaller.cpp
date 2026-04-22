@@ -67,8 +67,9 @@ void ExceptionResponseMarshaller::tightUnmarshal(OpenWireFormat*  wireFormat,
 
         ExceptionResponse* info =
             dynamic_cast<ExceptionResponse*>(dataStructure);
-        info->setException(std::shared_ptr<BrokerError>(dynamic_cast<BrokerError*>(
-            tightUnmarshalBrokerError(wireFormat, dataIn, bs))));
+        info->setException(
+            std::shared_ptr<BrokerError>(dynamic_cast<BrokerError*>(
+                tightUnmarshalBrokerError(wireFormat, dataIn, bs))));
     }
     AMQ_CATCH_RETHROW(decaf::io::IOException)
     AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
@@ -136,8 +137,9 @@ void ExceptionResponseMarshaller::looseUnmarshal(OpenWireFormat*  wireFormat,
         ResponseMarshaller::looseUnmarshal(wireFormat, dataStructure, dataIn);
         ExceptionResponse* info =
             dynamic_cast<ExceptionResponse*>(dataStructure);
-        info->setException(std::shared_ptr<BrokerError>(dynamic_cast<BrokerError*>(
-            looseUnmarshalBrokerError(wireFormat, dataIn))));
+        info->setException(
+            std::shared_ptr<BrokerError>(dynamic_cast<BrokerError*>(
+                looseUnmarshalBrokerError(wireFormat, dataIn))));
     }
     AMQ_CATCH_RETHROW(decaf::io::IOException)
     AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,

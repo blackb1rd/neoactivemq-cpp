@@ -41,10 +41,10 @@ namespace util
     class AMQCPP_API ServiceSupport : public Service
     {
     private:
-        std::atomic<bool> started;
-        std::atomic<bool> stopping;
-        std::atomic<bool> stopped;
-        decaf::util::ArrayList<ServiceListener*>       listeners;
+        std::atomic<bool>                        started;
+        std::atomic<bool>                        stopping;
+        std::atomic<bool>                        stopped;
+        decaf::util::ArrayList<ServiceListener*> listeners;
 
     public:
         ServiceSupport(const ServiceSupport&);

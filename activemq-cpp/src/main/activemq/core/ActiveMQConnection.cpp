@@ -54,8 +54,8 @@
 #include <decaf/util/concurrent/Mutex.h>
 #include <decaf/util/concurrent/ThreadPoolExecutor.h>
 #include <decaf/util/concurrent/TimeUnit.h>
-#include <atomic>
 #include <decaf/util/concurrent/locks/ReentrantReadWriteLock.h>
+#include <atomic>
 
 #include <activemq/commands/ActiveMQMessage.h>
 #include <activemq/commands/BrokerError.h>
@@ -218,7 +218,8 @@ namespace core
         std::shared_ptr<commands::ConnectionInfo> connectionInfo;
         std::shared_ptr<commands::BrokerInfo>     brokerInfo;
         std::shared_ptr<commands::WireFormatInfo> brokerWireFormatInfo;
-        std::shared_ptr<std::atomic<int>> transportInterruptionProcessingComplete;
+        std::shared_ptr<std::atomic<int>>
+            transportInterruptionProcessingComplete;
         std::shared_ptr<std::atomic<int>> protocolVersion;
         std::shared_ptr<CountDownLatch>   brokerInfoReceived;
         std::shared_ptr<AdvisoryConsumer> advisoryConsumer;
@@ -228,8 +229,9 @@ namespace core
         DispatcherMap dispatchers;
         ProducerMap   activeProducers;
 
-        decaf::util::concurrent::locks::ReentrantReadWriteLock  sessionsLock;
-        decaf::util::LinkedList<std::shared_ptr<ActiveMQSessionKernel>> activeSessions;
+        decaf::util::concurrent::locks::ReentrantReadWriteLock sessionsLock;
+        decaf::util::LinkedList<std::shared_ptr<ActiveMQSessionKernel>>
+            activeSessions;
         decaf::util::LinkedList<transport::TransportListener*>
             transportListeners;
 
@@ -237,8 +239,9 @@ namespace core
 
         ConnectionAudit connectionAudit;
 
-        ConnectionConfig(const std::shared_ptr<transport::Transport>    transport,
-                         const std::shared_ptr<decaf::util::Properties> properties)
+        ConnectionConfig(
+            const std::shared_ptr<transport::Transport>    transport,
+            const std::shared_ptr<decaf::util::Properties> properties)
             : properties(properties),
               transport(transport),
               clientIdGenerator(),
@@ -595,7 +598,8 @@ ActiveMQConnection::ActiveMQConnection(
       closing(false),
       transportFailed(false)
 {
-    ConnectionConfig* configuration = new ConnectionConfig(transport, properties);
+    ConnectionConfig* configuration =
+        new ConnectionConfig(transport, properties);
 
     // Register for messages and exceptions from the connector.
     transport->setTransportListener(this);
@@ -711,7 +715,8 @@ std::shared_ptr<SessionId> ActiveMQConnection::getNextSessionId()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQConnection::addSession(std::shared_ptr<ActiveMQSessionKernel> session)
+void ActiveMQConnection::addSession(
+    std::shared_ptr<ActiveMQSessionKernel> session)
 {
     try
     {
@@ -731,7 +736,8 @@ void ActiveMQConnection::addSession(std::shared_ptr<ActiveMQSessionKernel> sessi
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQConnection::removeSession(std::shared_ptr<ActiveMQSessionKernel> session)
+void ActiveMQConnection::removeSession(
+    std::shared_ptr<ActiveMQSessionKernel> session)
 {
     try
     {
@@ -752,7 +758,8 @@ void ActiveMQConnection::removeSession(std::shared_ptr<ActiveMQSessionKernel> se
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQConnection::addProducer(std::shared_ptr<ActiveMQProducerKernel> producer)
+void ActiveMQConnection::addProducer(
+    std::shared_ptr<ActiveMQProducerKernel> producer)
 {
     try
     {
@@ -796,7 +803,8 @@ void ActiveMQConnection::setClientID(const std::string& clientID)
 {
     if (this->closed.load())
     {
-        throw cms::IllegalStateException("Connection is already closed", nullptr);
+        throw cms::IllegalStateException("Connection is already closed",
+                                         nullptr);
     }
 
     if (this->config->clientIDSet)
@@ -901,8 +909,8 @@ void ActiveMQConnection::close()
             // CopyOnWriteArrayList
             ArrayList<std::shared_ptr<ActiveMQSessionKernel>> sessions(
                 this->config->activeSessions);
-            std::unique_ptr<Iterator<std::shared_ptr<ActiveMQSessionKernel>>> iter(
-                sessions.iterator());
+            std::unique_ptr<Iterator<std::shared_ptr<ActiveMQSessionKernel>>>
+                iter(sessions.iterator());
 
             // Dispose of all the Session resources we know are still open.
             while (iter->hasNext())
@@ -944,14 +952,15 @@ void ActiveMQConnection::close()
 
         ArrayList<std::shared_ptr<ActiveMQTempDestination>> tempDests(
             this->config->activeTempDestinations.values());
-        std::shared_ptr<Iterator<std::shared_ptr<ActiveMQTempDestination>>> iterator(
-            tempDests.iterator());
+        std::shared_ptr<Iterator<std::shared_ptr<ActiveMQTempDestination>>>
+            iterator(tempDests.iterator());
 
         try
         {
             while (iterator->hasNext())
             {
-                std::shared_ptr<ActiveMQTempDestination> dest = iterator->next();
+                std::shared_ptr<ActiveMQTempDestination> dest =
+                    iterator->next();
                 dest->close();
             }
         }
@@ -1023,8 +1032,8 @@ void ActiveMQConnection::cleanup()
             // CopyOnWriteArrayList
             ArrayList<std::shared_ptr<ActiveMQSessionKernel>> sessions(
                 this->config->activeSessions);
-            std::unique_ptr<Iterator<std::shared_ptr<ActiveMQSessionKernel>>> iter(
-                sessions.iterator());
+            std::unique_ptr<Iterator<std::shared_ptr<ActiveMQSessionKernel>>>
+                iter(sessions.iterator());
 
             // Dispose of all the Session resources we know are still open.
             while (iter->hasNext())
@@ -1093,8 +1102,8 @@ void ActiveMQConnection::start()
                 this->config->sessionsLock.readLock().lock();
 
                 // Start all the sessions.
-                std::unique_ptr<Iterator<std::shared_ptr<ActiveMQSessionKernel>>> iter(
-                    this->config->activeSessions.iterator());
+                std::unique_ptr<Iterator<std::shared_ptr<ActiveMQSessionKernel>>>
+                    iter(this->config->activeSessions.iterator());
                 while (iter->hasNext())
                 {
                     iter->next()->start();
@@ -1131,8 +1140,8 @@ void ActiveMQConnection::stop()
             if (this->started.compare_exchange_strong(stoppedExpected, false))
             {
                 this->config->sessionsLock.readLock().lock();
-                std::unique_ptr<Iterator<std::shared_ptr<ActiveMQSessionKernel>>> iter(
-                    this->config->activeSessions.iterator());
+                std::unique_ptr<Iterator<std::shared_ptr<ActiveMQSessionKernel>>>
+                    iter(this->config->activeSessions.iterator());
 
                 while (iter->hasNext())
                 {
@@ -1273,8 +1282,8 @@ void ActiveMQConnection::destroyDestination(
             this->config->connectionInfo->getConnectionId());
         command->setOperationType(
             ActiveMQConstants::DESTINATION_REMOVE_OPERATION);
-        command->setDestination(
-            std::shared_ptr<ActiveMQDestination>(destination->cloneDataStructure()));
+        command->setDestination(std::shared_ptr<ActiveMQDestination>(
+            destination->cloneDataStructure()));
 
         // Send the message to the broker.
         syncRequest(command);
@@ -1337,7 +1346,8 @@ void ActiveMQConnection::onCommand(const std::shared_ptr<Command> command)
                 // probably just closed.
                 if (dispatcher != nullptr)
                 {
-                    std::shared_ptr<commands::Message> message = dispatch->getMessage();
+                    std::shared_ptr<commands::Message> message =
+                        dispatch->getMessage();
 
                     // Message == nullptr to signal the end of a Queue Browse.
                     if (message != nullptr)
@@ -1376,7 +1386,8 @@ void ActiveMQConnection::onCommand(const std::shared_ptr<Command> command)
         }
         else if (command->isBrokerInfo())
         {
-            this->config->brokerInfo = std::dynamic_pointer_cast<BrokerInfo>(command);
+            this->config->brokerInfo =
+                std::dynamic_pointer_cast<BrokerInfo>(command);
             this->config->brokerInfoReceived->countDown();
         }
         else if (command->isConnectionControl())
@@ -1424,7 +1435,8 @@ void ActiveMQConnection::onCommand(const std::shared_ptr<Command> command)
 void ActiveMQConnection::onWireFormatInfo(
     std::shared_ptr<commands::Command> command AMQCPP_UNUSED)
 {
-    this->config->brokerWireFormatInfo = std::dynamic_pointer_cast<WireFormatInfo>(command);
+    this->config->brokerWireFormatInfo =
+        std::dynamic_pointer_cast<WireFormatInfo>(command);
     this->config->protocolVersion->store(
         this->config->brokerWireFormatInfo->getVersion());
 }
@@ -1444,7 +1456,8 @@ void ActiveMQConnection::onConnectionControl(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQConnection::onConsumerControl(std::shared_ptr<commands::Command> command)
+void ActiveMQConnection::onConsumerControl(
+    std::shared_ptr<commands::Command> command)
 {
     std::shared_ptr<ConsumerControl> consumerControl =
         std::dynamic_pointer_cast<ConsumerControl>(command);
@@ -1538,8 +1551,8 @@ void ActiveMQConnection::transportInterrupted()
     this->config->sessionsLock.readLock().lock();
     try
     {
-        std::unique_ptr<Iterator<std::shared_ptr<ActiveMQSessionKernel>>> sessions(
-            this->config->activeSessions.iterator());
+        std::unique_ptr<Iterator<std::shared_ptr<ActiveMQSessionKernel>>>
+            sessions(this->config->activeSessions.iterator());
         while (sessions->hasNext())
         {
             sessions->next()->clearMessagesInProgress(
@@ -1612,8 +1625,9 @@ void ActiveMQConnection::oneway(std::shared_ptr<Command> command)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::shared_ptr<Response> ActiveMQConnection::syncRequest(std::shared_ptr<Command> command,
-                                                          unsigned int             timeout)
+std::shared_ptr<Response> ActiveMQConnection::syncRequest(
+    std::shared_ptr<Command> command,
+    unsigned int             timeout)
 {
     try
     {
@@ -1681,7 +1695,7 @@ std::shared_ptr<Response> ActiveMQConnection::syncRequest(std::shared_ptr<Comman
 
 ////////////////////////////////////////////////////////////////////////////////
 void ActiveMQConnection::asyncRequest(std::shared_ptr<Command> command,
-                                      cms::AsyncCallback*       onComplete)
+                                      cms::AsyncCallback*      onComplete)
 {
     try
     {
@@ -1853,8 +1867,9 @@ void ActiveMQConnection::waitForTransportInterruptionProcessingToComplete()
 ////////////////////////////////////////////////////////////////////////////////
 void ActiveMQConnection::setTransportInterruptionProcessingComplete()
 {
-    if (this->config->transportInterruptionProcessingComplete
-            ->fetch_sub(1) - 1 == 0)
+    if (this->config->transportInterruptionProcessingComplete->fetch_sub(1) -
+            1 ==
+        0)
     {
         signalInterruptionProcessingComplete();
     }
@@ -2204,7 +2219,8 @@ ExecutorService* ActiveMQConnection::getExecutor() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-ArrayList<std::shared_ptr<ActiveMQSessionKernel>> ActiveMQConnection::getSessions() const
+ArrayList<std::shared_ptr<ActiveMQSessionKernel>>
+ActiveMQConnection::getSessions() const
 {
     ArrayList<std::shared_ptr<ActiveMQSessionKernel>> result;
 
@@ -2416,11 +2432,12 @@ void ActiveMQConnection::deleteTempDestination(
         this->config->sessionsLock.readLock().lock();
         try
         {
-            std::shared_ptr<Iterator<std::shared_ptr<ActiveMQSessionKernel>>> iterator(
-                this->config->activeSessions.iterator());
+            std::shared_ptr<Iterator<std::shared_ptr<ActiveMQSessionKernel>>>
+                iterator(this->config->activeSessions.iterator());
             while (iterator->hasNext())
             {
-                std::shared_ptr<ActiveMQSessionKernel> session = iterator->next();
+                std::shared_ptr<ActiveMQSessionKernel> session =
+                    iterator->next();
                 if (session->isInUse(destination))
                 {
                     this->config->sessionsLock.readLock().unlock();
@@ -2446,8 +2463,8 @@ void ActiveMQConnection::deleteTempDestination(
             this->config->connectionInfo->getConnectionId());
         command->setOperationType(
             ActiveMQConstants::DESTINATION_REMOVE_OPERATION);
-        command->setDestination(
-            std::shared_ptr<ActiveMQDestination>(destination->cloneDataStructure()));
+        command->setDestination(std::shared_ptr<ActiveMQDestination>(
+            destination->cloneDataStructure()));
 
         // Send the message to the broker.
         syncRequest(command);
@@ -2509,8 +2526,8 @@ bool ActiveMQConnection::isDeleted(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool ActiveMQConnection::isDuplicate(Dispatcher*                          dispatcher,
-                                     std::shared_ptr<commands::Message>   message)
+bool ActiveMQConnection::isDuplicate(Dispatcher* dispatcher,
+                                     std::shared_ptr<commands::Message> message)
 {
     if (this->config->checkForDuplicates)
     {
@@ -2532,8 +2549,9 @@ void ActiveMQConnection::removeAuditedDispatcher(Dispatcher* dispatcher)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQConnection::rollbackDuplicate(Dispatcher*                        dispatcher,
-                                           std::shared_ptr<commands::Message> message)
+void ActiveMQConnection::rollbackDuplicate(
+    Dispatcher*                        dispatcher,
+    std::shared_ptr<commands::Message> message)
 {
     // Check if connection is closed/closing to avoid accessing destroyed config
     if (this->closed.load() || this->closing.load())

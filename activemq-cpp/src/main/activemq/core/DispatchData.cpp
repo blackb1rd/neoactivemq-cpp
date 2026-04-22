@@ -28,9 +28,8 @@ DispatchData::DispatchData()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-DispatchData::DispatchData(
-    const std::shared_ptr<commands::ConsumerId>& consumer,
-    const std::shared_ptr<commands::Message>&    message)
+DispatchData::DispatchData(const std::shared_ptr<commands::ConsumerId>& consumer,
+                           const std::shared_ptr<commands::Message>& message)
     : consumerId(consumer),
       message(message)
 {

@@ -50,27 +50,28 @@ namespace core
     private:
         friend class Browser;
 
-        activemq::core::kernels::ActiveMQSessionKernel*     session;
-        std::shared_ptr<commands::ConsumerId>               consumerId;
-        std::shared_ptr<commands::ActiveMQDestination>      destination;
-        std::string                                         selector;
-        bool                                                dispatchAsync;
-        cms::Queue*                                         queue;
-        std::atomic<bool>                                   closed;
+        activemq::core::kernels::ActiveMQSessionKernel* session;
+        std::shared_ptr<commands::ConsumerId>           consumerId;
+        std::shared_ptr<commands::ActiveMQDestination>  destination;
+        std::string                                     selector;
+        bool                                            dispatchAsync;
+        cms::Queue*                                     queue;
+        std::atomic<bool>                               closed;
 
-        mutable decaf::util::concurrent::Mutex              mutex;
-        mutable decaf::util::concurrent::Mutex              wait;
-        std::atomic<bool>                                   browseDone;
+        mutable decaf::util::concurrent::Mutex mutex;
+        mutable decaf::util::concurrent::Mutex wait;
+        std::atomic<bool>                      browseDone;
         // Shared validity flag - allows Browser to safely check validity even
         // after this ActiveMQQueueBrowser instance is destroyed. The Browser
         // holds its own copy of this shared_ptr, so it can check the flag
         // without accessing parent.
-        std::shared_ptr<std::atomic<bool>>                  browserValid;
+        std::shared_ptr<std::atomic<bool>> browserValid;
         // Shared mutex for synchronizing dispatch with destroy. Browser holds
         // its own copy to ensure safe locking even during parent destruction.
-        std::shared_ptr<decaf::util::concurrent::Mutex>     dispatchMutex;
+        std::shared_ptr<decaf::util::concurrent::Mutex> dispatchMutex;
 
-        mutable std::shared_ptr<activemq::core::kernels::ActiveMQConsumerKernel> browser;
+        mutable std::shared_ptr<activemq::core::kernels::ActiveMQConsumerKernel>
+            browser;
 
     private:
         ActiveMQQueueBrowser(const ActiveMQQueueBrowser&);
@@ -82,7 +83,7 @@ namespace core
             const std::shared_ptr<commands::ConsumerId>&          consumerId,
             const std::shared_ptr<commands::ActiveMQDestination>& destination,
             const std::string&                                    selector,
-            bool                                                  dispatchAsync);
+            bool dispatchAsync);
 
         virtual ~ActiveMQQueueBrowser();
 

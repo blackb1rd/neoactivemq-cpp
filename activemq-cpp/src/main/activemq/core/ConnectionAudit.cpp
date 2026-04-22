@@ -54,8 +54,9 @@ namespace core
         StlMap<std::shared_ptr<ActiveMQDestination>,
                std::shared_ptr<ActiveMQMessageAudit>,
                ActiveMQDestination::COMPARATOR>
-                                                                  destinations;
-        LinkedHashMap<Dispatcher*, std::shared_ptr<ActiveMQMessageAudit>> dispatchers;
+            destinations;
+        LinkedHashMap<Dispatcher*, std::shared_ptr<ActiveMQMessageAudit>>
+            dispatchers;
 
         ConnectionAuditImpl()
             : mutex(),
@@ -111,8 +112,8 @@ void ConnectionAudit::removeDispatcher(Dispatcher* dispatcher)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool ConnectionAudit::isDuplicate(Dispatcher*                         dispatcher,
-                                  std::shared_ptr<commands::Message>  message)
+bool ConnectionAudit::isDuplicate(Dispatcher*                        dispatcher,
+                                  std::shared_ptr<commands::Message> message)
 {
     synchronized(&this->impl->mutex)
     {
@@ -160,8 +161,9 @@ bool ConnectionAudit::isDuplicate(Dispatcher*                         dispatcher
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConnectionAudit::rollbackDuplicate(Dispatcher*                         dispatcher,
-                                        std::shared_ptr<commands::Message>  message)
+void ConnectionAudit::rollbackDuplicate(
+    Dispatcher*                        dispatcher,
+    std::shared_ptr<commands::Message> message)
 {
     synchronized(&this->impl->mutex)
     {

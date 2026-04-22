@@ -66,16 +66,26 @@ namespace util
             {
                 hostname = InetAddress::getLocalHost().getHostName();
                 ServerSocket ss(0);
-                stub = "-" + std::to_string(ss.getLocalPort()) + "-" +
-                       std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count()) + "-";
+                stub =
+                    "-" + std::to_string(ss.getLocalPort()) + "-" +
+                    std::to_string(
+                        std::chrono::duration_cast<std::chrono::milliseconds>(
+                            std::chrono::system_clock::now().time_since_epoch())
+                            .count()) +
+                    "-";
                 Thread::sleep(100);
                 ss.close();
             }
             catch (Exception& ioe)
             {
                 hostname = "localhost";
-                stub     = "-1-" + std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count()) +
-                       "-";
+                stub =
+                    "-1-" +
+                    std::to_string(
+                        std::chrono::duration_cast<std::chrono::milliseconds>(
+                            std::chrono::system_clock::now().time_since_epoch())
+                            .count()) +
+                    "-";
             }
 
             UNIQUE_STUB = stub;

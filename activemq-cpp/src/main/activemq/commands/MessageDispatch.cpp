@@ -223,8 +223,8 @@ void MessageDispatch::setConsumerId(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::shared_ptr<ActiveMQDestination>&
-MessageDispatch::getDestination() const
+const std::shared_ptr<ActiveMQDestination>& MessageDispatch::getDestination()
+    const
 {
     return destination;
 }

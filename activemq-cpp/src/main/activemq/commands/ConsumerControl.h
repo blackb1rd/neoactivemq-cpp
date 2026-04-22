@@ -51,10 +51,10 @@ namespace commands
         std::shared_ptr<ActiveMQDestination> destination;
         bool                                 close;
         std::shared_ptr<ConsumerId>          consumerId;
-        int                          prefetch;
-        bool                         flush;
-        bool                         start;
-        bool                         stop;
+        int                                  prefetch;
+        bool                                 flush;
+        bool                                 start;
+        bool                                 stop;
 
     public:
         const static unsigned char ID_CONSUMERCONTROL = 17;
@@ -78,17 +78,19 @@ namespace commands
 
         virtual bool equals(const DataStructure* value) const;
 
-        virtual const std::shared_ptr<ActiveMQDestination>& getDestination() const;
-        virtual std::shared_ptr<ActiveMQDestination>&       getDestination();
-        virtual void                                        setDestination(
-                                                   const std::shared_ptr<ActiveMQDestination>& destination);
+        virtual const std::shared_ptr<ActiveMQDestination>& getDestination()
+            const;
+        virtual std::shared_ptr<ActiveMQDestination>& getDestination();
+        virtual void                                  setDestination(
+                                             const std::shared_ptr<ActiveMQDestination>& destination);
 
         virtual bool isClose() const;
         virtual void setClose(bool close);
 
         virtual const std::shared_ptr<ConsumerId>& getConsumerId() const;
         virtual std::shared_ptr<ConsumerId>&       getConsumerId();
-        virtual void setConsumerId(const std::shared_ptr<ConsumerId>& consumerId);
+        virtual void                               setConsumerId(
+                                          const std::shared_ptr<ConsumerId>& consumerId);
 
         virtual int  getPrefetch() const;
         virtual void setPrefetch(int prefetch);
@@ -110,7 +112,8 @@ namespace commands
             return true;
         }
 
-        virtual std::shared_ptr<Command> visit(activemq::state::CommandVisitor* visitor);
+        virtual std::shared_ptr<Command> visit(
+            activemq::state::CommandVisitor* visitor);
     };
 
 }  // namespace commands

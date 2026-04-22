@@ -60,9 +60,8 @@ void RedeliveryPolicy::configure(const decaf::util::Properties& properties)
         if (properties.hasProperty(
                 "cms.redeliveryPolicy.initialRedeliveryDelay"))
         {
-            this->setInitialRedeliveryDelay(
-                std::stoll(properties.getProperty(
-                    "cms.redeliveryPolicy.initialRedeliveryDelay")));
+            this->setInitialRedeliveryDelay(std::stoll(properties.getProperty(
+                "cms.redeliveryPolicy.initialRedeliveryDelay")));
         }
         if (properties.hasProperty("cms.redeliveryPolicy.redeliveryDelay"))
         {
@@ -71,9 +70,8 @@ void RedeliveryPolicy::configure(const decaf::util::Properties& properties)
         }
         if (properties.hasProperty("cms.redeliveryPolicy.maximumRedeliveries"))
         {
-            this->setMaximumRedeliveries(
-                std::stoi(properties.getProperty(
-                    "cms.redeliveryPolicy.maximumRedeliveries")));
+            this->setMaximumRedeliveries(std::stoi(properties.getProperty(
+                "cms.redeliveryPolicy.maximumRedeliveries")));
         }
         if (properties.hasProperty(
                 "cms.redeliveryPolicy.useCollisionAvoidance"))
@@ -93,7 +91,7 @@ void RedeliveryPolicy::configure(const decaf::util::Properties& properties)
         {
             this->setMaximumRedeliveryDelay(
                 std::stoll(properties.getProperty("cms.redeliveryPolicy."
-                                                       "maxRedeliveryDelay")));
+                                                  "maxRedeliveryDelay")));
         }
     }
     DECAF_CATCH_RETHROW(Exception)

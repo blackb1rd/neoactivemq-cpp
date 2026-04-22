@@ -164,8 +164,8 @@ bool DataArrayResponse::equals(const DataStructure* value) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::vector<std::shared_ptr<DataStructure>>&
-DataArrayResponse::getData() const
+const std::vector<std::shared_ptr<DataStructure>>& DataArrayResponse::getData()
+    const
 {
     return data;
 }

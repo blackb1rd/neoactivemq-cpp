@@ -411,8 +411,7 @@ std::shared_ptr<ConsumerId>& ConsumerInfo::getConsumerId()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConsumerInfo::setConsumerId(
-    const std::shared_ptr<ConsumerId>& consumerId)
+void ConsumerInfo::setConsumerId(const std::shared_ptr<ConsumerId>& consumerId)
 {
     this->consumerId = consumerId;
 }
@@ -430,8 +429,7 @@ void ConsumerInfo::setBrowser(bool browser)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::shared_ptr<ActiveMQDestination>& ConsumerInfo::getDestination()
-    const
+const std::shared_ptr<ActiveMQDestination>& ConsumerInfo::getDestination() const
 {
     return destination;
 }
@@ -588,8 +586,7 @@ void ConsumerInfo::setPriority(unsigned char priority)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::vector<std::shared_ptr<BrokerId>>& ConsumerInfo::getBrokerPath()
-    const
+const std::vector<std::shared_ptr<BrokerId>>& ConsumerInfo::getBrokerPath() const
 {
     return brokerPath;
 }
@@ -608,8 +605,8 @@ void ConsumerInfo::setBrokerPath(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::shared_ptr<BooleanExpression>&
-ConsumerInfo::getAdditionalPredicate() const
+const std::shared_ptr<BooleanExpression>& ConsumerInfo::getAdditionalPredicate()
+    const
 {
     return additionalPredicate;
 }
@@ -671,8 +668,7 @@ ConsumerInfo::getNetworkConsumerPath() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::vector<std::shared_ptr<ConsumerId>>&
-ConsumerInfo::getNetworkConsumerPath()
+std::vector<std::shared_ptr<ConsumerId>>& ConsumerInfo::getNetworkConsumerPath()
 {
     return networkConsumerPath;
 }

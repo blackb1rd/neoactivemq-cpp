@@ -241,15 +241,13 @@ std::shared_ptr<ProducerId>& ProducerInfo::getProducerId()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ProducerInfo::setProducerId(
-    const std::shared_ptr<ProducerId>& producerId)
+void ProducerInfo::setProducerId(const std::shared_ptr<ProducerId>& producerId)
 {
     this->producerId = producerId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::shared_ptr<ActiveMQDestination>& ProducerInfo::getDestination()
-    const
+const std::shared_ptr<ActiveMQDestination>& ProducerInfo::getDestination() const
 {
     return destination;
 }
@@ -268,8 +266,7 @@ void ProducerInfo::setDestination(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::vector<std::shared_ptr<BrokerId>>& ProducerInfo::getBrokerPath()
-    const
+const std::vector<std::shared_ptr<BrokerId>>& ProducerInfo::getBrokerPath() const
 {
     return brokerPath;
 }

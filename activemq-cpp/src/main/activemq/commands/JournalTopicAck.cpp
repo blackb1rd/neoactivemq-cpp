@@ -217,8 +217,8 @@ bool JournalTopicAck::equals(const DataStructure* value) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::shared_ptr<ActiveMQDestination>&
-JournalTopicAck::getDestination() const
+const std::shared_ptr<ActiveMQDestination>& JournalTopicAck::getDestination()
+    const
 {
     return destination;
 }
@@ -249,8 +249,7 @@ std::shared_ptr<MessageId>& JournalTopicAck::getMessageId()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void JournalTopicAck::setMessageId(
-    const std::shared_ptr<MessageId>& messageId)
+void JournalTopicAck::setMessageId(const std::shared_ptr<MessageId>& messageId)
 {
     this->messageId = messageId;
 }
@@ -304,8 +303,7 @@ void JournalTopicAck::setClientId(const std::string& clientId)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::shared_ptr<TransactionId>& JournalTopicAck::getTransactionId()
-    const
+const std::shared_ptr<TransactionId>& JournalTopicAck::getTransactionId() const
 {
     return transactionId;
 }

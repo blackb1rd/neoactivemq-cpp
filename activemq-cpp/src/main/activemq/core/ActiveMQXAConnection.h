@@ -36,8 +36,9 @@ namespace core
         ActiveMQXAConnection& operator=(const ActiveMQXAConnection&);
 
     public:
-        ActiveMQXAConnection(const std::shared_ptr<transport::Transport>& transport,
-                             const std::shared_ptr<decaf::util::Properties>& properties);
+        ActiveMQXAConnection(
+            const std::shared_ptr<transport::Transport>&    transport,
+            const std::shared_ptr<decaf::util::Properties>& properties);
 
         virtual ~ActiveMQXAConnection();
 

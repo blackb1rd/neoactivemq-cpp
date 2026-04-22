@@ -47,7 +47,8 @@ namespace core
 
     public:
         ActiveMQSession(
-            std::shared_ptr<activemq::core::kernels::ActiveMQSessionKernel> kernel);
+            std::shared_ptr<activemq::core::kernels::ActiveMQSessionKernel>
+                kernel);
 
         virtual ~ActiveMQSession();
 

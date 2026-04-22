@@ -60,10 +60,10 @@ namespace core
     public:
         void removeDispatcher(Dispatcher* dispatcher);
 
-        bool isDuplicate(Dispatcher*                             dispatcher,
+        bool isDuplicate(Dispatcher*                        dispatcher,
                          std::shared_ptr<commands::Message> message);
 
-        void rollbackDuplicate(Dispatcher* dispatcher,
+        void rollbackDuplicate(Dispatcher*                        dispatcher,
                                std::shared_ptr<commands::Message> message);
 
     public:

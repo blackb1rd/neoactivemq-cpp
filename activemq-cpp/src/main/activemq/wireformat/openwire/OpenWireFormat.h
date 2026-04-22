@@ -23,10 +23,10 @@
 #include <activemq/util/Config.h>
 #include <activemq/wireformat/WireFormat.h>
 #include <activemq/wireformat/openwire/utils/BooleanStream.h>
-#include <atomic>
 #include <decaf/lang/exceptions/IllegalArgumentException.h>
 #include <decaf/lang/exceptions/IllegalStateException.h>
 #include <decaf/util/Properties.h>
+#include <atomic>
 #include <memory>
 
 namespace activemq
@@ -117,9 +117,10 @@ namespace wireformat
             /**
              * {@inheritDoc}
              */
-            virtual void marshal(const std::shared_ptr<commands::Command> command,
-                                 const activemq::transport::Transport* transport,
-                                 decaf::io::DataOutputStream* out);
+            virtual void marshal(
+                const std::shared_ptr<commands::Command> command,
+                const activemq::transport::Transport*    transport,
+                decaf::io::DataOutputStream*             out);
 
             /**
              * {@inheritDoc}
@@ -216,8 +217,8 @@ namespace wireformat
              * Gets the Preferred WireFormatInfo object that this class holds
              * @return pointer to a preferred WireFormatInfo object
              */
-            const std::shared_ptr<commands::WireFormatInfo>& getPreferedWireFormatInfo()
-                const
+            const std::shared_ptr<commands::WireFormatInfo>&
+            getPreferedWireFormatInfo() const
             {
                 return this->preferedWireFormatInfo;
             }

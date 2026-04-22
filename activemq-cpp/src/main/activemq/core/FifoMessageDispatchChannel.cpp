@@ -41,7 +41,8 @@ FifoMessageDispatchChannel::~FifoMessageDispatchChannel()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void FifoMessageDispatchChannel::enqueue(const std::shared_ptr<MessageDispatch>& message)
+void FifoMessageDispatchChannel::enqueue(
+    const std::shared_ptr<MessageDispatch>& message)
 {
     synchronized(&channel)
     {
@@ -73,7 +74,8 @@ bool FifoMessageDispatchChannel::isEmpty() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::shared_ptr<MessageDispatch> FifoMessageDispatchChannel::dequeue(long long timeout)
+std::shared_ptr<MessageDispatch> FifoMessageDispatchChannel::dequeue(
+    long long timeout)
 {
     synchronized(&channel)
     {
@@ -207,7 +209,8 @@ int FifoMessageDispatchChannel::size() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::vector<std::shared_ptr<MessageDispatch>> FifoMessageDispatchChannel::removeAll()
+std::vector<std::shared_ptr<MessageDispatch>>
+FifoMessageDispatchChannel::removeAll()
 {
     std::vector<std::shared_ptr<MessageDispatch>> result;
 

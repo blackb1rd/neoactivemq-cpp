@@ -48,7 +48,7 @@ namespace commands
     {
     protected:
         std::shared_ptr<ProducerId> producerId;
-        int                 size;
+        int                         size;
 
     public:
         const static unsigned char ID_PRODUCERACK = 19;
@@ -74,7 +74,8 @@ namespace commands
 
         virtual const std::shared_ptr<ProducerId>& getProducerId() const;
         virtual std::shared_ptr<ProducerId>&       getProducerId();
-        virtual void setProducerId(const std::shared_ptr<ProducerId>& producerId);
+        virtual void                               setProducerId(
+                                          const std::shared_ptr<ProducerId>& producerId);
 
         virtual int  getSize() const;
         virtual void setSize(int size);
@@ -87,7 +88,8 @@ namespace commands
             return true;
         }
 
-        virtual std::shared_ptr<Command> visit(activemq::state::CommandVisitor* visitor);
+        virtual std::shared_ptr<Command> visit(
+            activemq::state::CommandVisitor* visitor);
     };
 
 }  // namespace commands

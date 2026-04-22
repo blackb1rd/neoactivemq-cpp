@@ -70,8 +70,9 @@ void NetworkBridgeFilterMarshaller::tightUnmarshal(OpenWireFormat* wireFormat,
 
         int wireVersion = wireFormat->getVersion();
 
-        info->setNetworkBrokerId(std::shared_ptr<BrokerId>(dynamic_cast<BrokerId*>(
-            tightUnmarshalCachedObject(wireFormat, dataIn, bs))));
+        info->setNetworkBrokerId(
+            std::shared_ptr<BrokerId>(dynamic_cast<BrokerId*>(
+                tightUnmarshalCachedObject(wireFormat, dataIn, bs))));
         if (wireVersion >= 10)
         {
             info->setMessageTTL(dataIn->readInt());
@@ -173,8 +174,9 @@ void NetworkBridgeFilterMarshaller::looseUnmarshal(OpenWireFormat* wireFormat,
 
         int wireVersion = wireFormat->getVersion();
 
-        info->setNetworkBrokerId(std::shared_ptr<BrokerId>(dynamic_cast<BrokerId*>(
-            looseUnmarshalCachedObject(wireFormat, dataIn))));
+        info->setNetworkBrokerId(
+            std::shared_ptr<BrokerId>(dynamic_cast<BrokerId*>(
+                looseUnmarshalCachedObject(wireFormat, dataIn))));
         if (wireVersion >= 10)
         {
             info->setMessageTTL(dataIn->readInt());

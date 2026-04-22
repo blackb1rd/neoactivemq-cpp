@@ -71,13 +71,14 @@ void ConsumerControlMarshaller::tightUnmarshal(OpenWireFormat*  wireFormat,
 
         if (wireVersion >= 6)
         {
-            info->setDestination(
-                std::shared_ptr<ActiveMQDestination>(dynamic_cast<ActiveMQDestination*>(
+            info->setDestination(std::shared_ptr<ActiveMQDestination>(
+                dynamic_cast<ActiveMQDestination*>(
                     tightUnmarshalNestedObject(wireFormat, dataIn, bs))));
         }
         info->setClose(bs->readBoolean());
-        info->setConsumerId(std::shared_ptr<ConsumerId>(dynamic_cast<ConsumerId*>(
-            tightUnmarshalNestedObject(wireFormat, dataIn, bs))));
+        info->setConsumerId(
+            std::shared_ptr<ConsumerId>(dynamic_cast<ConsumerId*>(
+                tightUnmarshalNestedObject(wireFormat, dataIn, bs))));
         info->setPrefetch(dataIn->readInt());
         if (wireVersion >= 2)
         {
@@ -208,13 +209,14 @@ void ConsumerControlMarshaller::looseUnmarshal(OpenWireFormat*  wireFormat,
 
         if (wireVersion >= 6)
         {
-            info->setDestination(
-                std::shared_ptr<ActiveMQDestination>(dynamic_cast<ActiveMQDestination*>(
+            info->setDestination(std::shared_ptr<ActiveMQDestination>(
+                dynamic_cast<ActiveMQDestination*>(
                     looseUnmarshalNestedObject(wireFormat, dataIn))));
         }
         info->setClose(dataIn->readBoolean());
-        info->setConsumerId(std::shared_ptr<ConsumerId>(dynamic_cast<ConsumerId*>(
-            looseUnmarshalNestedObject(wireFormat, dataIn))));
+        info->setConsumerId(
+            std::shared_ptr<ConsumerId>(dynamic_cast<ConsumerId*>(
+                looseUnmarshalNestedObject(wireFormat, dataIn))));
         info->setPrefetch(dataIn->readInt());
         if (wireVersion >= 2)
         {

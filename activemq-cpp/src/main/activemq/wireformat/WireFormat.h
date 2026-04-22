@@ -59,8 +59,8 @@ namespace wireformat
          * @throws IOException if an I/O error occurs.
          */
         virtual void marshal(const std::shared_ptr<commands::Command> command,
-                             const activemq::transport::Transport*   transport,
-                             decaf::io::DataOutputStream*            out) = 0;
+                             const activemq::transport::Transport*    transport,
+                             decaf::io::DataOutputStream*             out) = 0;
 
         /**
          * Stream based unmarshaling, blocks on reads on the input stream until

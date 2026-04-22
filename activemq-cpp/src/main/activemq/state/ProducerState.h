@@ -56,7 +56,8 @@ namespace state
             return this->info;
         }
 
-        void setTransactionState(std::shared_ptr<TransactionState> transactionState);
+        void setTransactionState(
+            std::shared_ptr<TransactionState> transactionState);
 
         std::shared_ptr<TransactionState> getTransactionState() const;
     };

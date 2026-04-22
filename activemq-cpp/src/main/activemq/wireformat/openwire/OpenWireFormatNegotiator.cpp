@@ -40,8 +40,9 @@ using namespace decaf::lang::exceptions;
 const int OpenWireFormatNegotiator::negotiationTimeout = 15000;
 
 ////////////////////////////////////////////////////////////////////////////////
-OpenWireFormatNegotiator::OpenWireFormatNegotiator(OpenWireFormat* wireFormat,
-                                                   const std::shared_ptr<Transport> next)
+OpenWireFormatNegotiator::OpenWireFormatNegotiator(
+    OpenWireFormat*                  wireFormat,
+    const std::shared_ptr<Transport> next)
     : WireFormatNegotiator(next),
       firstTime(true),
       wireInfoSentDownLatch(1),

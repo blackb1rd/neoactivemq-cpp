@@ -212,8 +212,8 @@ bool ConsumerControl::equals(const DataStructure* value) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::shared_ptr<ActiveMQDestination>&
-ConsumerControl::getDestination() const
+const std::shared_ptr<ActiveMQDestination>& ConsumerControl::getDestination()
+    const
 {
     return destination;
 }

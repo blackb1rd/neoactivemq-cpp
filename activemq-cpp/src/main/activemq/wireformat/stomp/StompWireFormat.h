@@ -21,8 +21,8 @@
 #include <activemq/util/Config.h>
 #include <activemq/wireformat/WireFormat.h>
 #include <activemq/wireformat/stomp/StompFrame.h>
-#include <atomic>
 #include <decaf/io/IOException.h>
+#include <atomic>
 #include <memory>
 
 namespace activemq
@@ -79,9 +79,10 @@ namespace wireformat
              *
              * @throws IOException
              */
-            virtual void marshal(const std::shared_ptr<commands::Command> command,
-                                 const activemq::transport::Transport* transport,
-                                 decaf::io::DataOutputStream* out);
+            virtual void marshal(
+                const std::shared_ptr<commands::Command> command,
+                const activemq::transport::Transport*    transport,
+                decaf::io::DataOutputStream*             out);
 
             /**
              * Stream based un-marshaling, blocks on reads on the input stream
@@ -207,13 +208,19 @@ namespace wireformat
                 const std::shared_ptr<transport::Transport> transport);
 
         private:
-            std::shared_ptr<Command> unmarshalMessage(const std::shared_ptr<StompFrame> frame);
-            std::shared_ptr<Command> unmarshalReceipt(const std::shared_ptr<StompFrame> frame);
-            std::shared_ptr<Command> unmarshalConnected(const std::shared_ptr<StompFrame> frame);
-            std::shared_ptr<Command> unmarshalError(const std::shared_ptr<StompFrame> frame);
+            std::shared_ptr<Command> unmarshalMessage(
+                const std::shared_ptr<StompFrame> frame);
+            std::shared_ptr<Command> unmarshalReceipt(
+                const std::shared_ptr<StompFrame> frame);
+            std::shared_ptr<Command> unmarshalConnected(
+                const std::shared_ptr<StompFrame> frame);
+            std::shared_ptr<Command> unmarshalError(
+                const std::shared_ptr<StompFrame> frame);
 
-            std::shared_ptr<StompFrame> marshalMessage(const std::shared_ptr<Command> command);
-            std::shared_ptr<StompFrame> marshalAck(const std::shared_ptr<Command> command);
+            std::shared_ptr<StompFrame> marshalMessage(
+                const std::shared_ptr<Command> command);
+            std::shared_ptr<StompFrame> marshalAck(
+                const std::shared_ptr<Command> command);
             std::shared_ptr<StompFrame> marshalConnectionInfo(
                 const std::shared_ptr<Command> command);
             std::shared_ptr<StompFrame> marshalTransactionInfo(

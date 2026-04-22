@@ -48,8 +48,8 @@ namespace commands
     {
     protected:
         std::shared_ptr<TransactionId> transactionId;
-        unsigned char          type;
-        bool                   wasPrepared;
+        unsigned char                  type;
+        bool                           wasPrepared;
 
     public:
         const static unsigned char ID_JOURNALTRANSACTION = 54;

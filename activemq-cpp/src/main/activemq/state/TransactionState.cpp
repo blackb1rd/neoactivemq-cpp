@@ -93,7 +93,8 @@ void TransactionState::checkShutdown() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TransactionState::addProducerState(std::shared_ptr<ProducerState> producerState)
+void TransactionState::addProducerState(
+    std::shared_ptr<ProducerState> producerState)
 {
     if (producerState)
     {

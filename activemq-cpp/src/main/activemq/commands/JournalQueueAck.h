@@ -73,14 +73,16 @@ namespace commands
 
         virtual bool equals(const DataStructure* value) const;
 
-        virtual const std::shared_ptr<ActiveMQDestination>& getDestination() const;
-        virtual std::shared_ptr<ActiveMQDestination>&       getDestination();
-        virtual void                                        setDestination(
-                                                   const std::shared_ptr<ActiveMQDestination>& destination);
+        virtual const std::shared_ptr<ActiveMQDestination>& getDestination()
+            const;
+        virtual std::shared_ptr<ActiveMQDestination>& getDestination();
+        virtual void                                  setDestination(
+                                             const std::shared_ptr<ActiveMQDestination>& destination);
 
         virtual const std::shared_ptr<MessageAck>& getMessageAck() const;
         virtual std::shared_ptr<MessageAck>&       getMessageAck();
-        virtual void setMessageAck(const std::shared_ptr<MessageAck>& messageAck);
+        virtual void                               setMessageAck(
+                                          const std::shared_ptr<MessageAck>& messageAck);
     };
 
 }  // namespace commands

@@ -95,13 +95,15 @@ namespace core
          * Adds a Synchronization to this Transaction.
          * @param sync - The Synchronization instance to add.
          */
-        virtual void addSynchronization(const std::shared_ptr<Synchronization>& sync);
+        virtual void addSynchronization(
+            const std::shared_ptr<Synchronization>& sync);
 
         /**
          * Removes a Synchronization to this Transaction.
          * @param sync - The Synchronization instance to add.
          */
-        virtual void removeSynchronization(const std::shared_ptr<Synchronization>& sync);
+        virtual void removeSynchronization(
+            const std::shared_ptr<Synchronization>& sync);
 
         /**
          * Begins a new transaction if one is not currently in progress.

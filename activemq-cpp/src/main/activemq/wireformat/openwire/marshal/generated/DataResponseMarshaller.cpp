@@ -66,8 +66,9 @@ void DataResponseMarshaller::tightUnmarshal(OpenWireFormat*  wireFormat,
                                            bs);
 
         DataResponse* info = dynamic_cast<DataResponse*>(dataStructure);
-        info->setData(std::shared_ptr<DataStructure>(dynamic_cast<DataStructure*>(
-            tightUnmarshalNestedObject(wireFormat, dataIn, bs))));
+        info->setData(
+            std::shared_ptr<DataStructure>(dynamic_cast<DataStructure*>(
+                tightUnmarshalNestedObject(wireFormat, dataIn, bs))));
     }
     AMQ_CATCH_RETHROW(decaf::io::IOException)
     AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
@@ -130,8 +131,9 @@ void DataResponseMarshaller::looseUnmarshal(OpenWireFormat*  wireFormat,
     {
         ResponseMarshaller::looseUnmarshal(wireFormat, dataStructure, dataIn);
         DataResponse* info = dynamic_cast<DataResponse*>(dataStructure);
-        info->setData(std::shared_ptr<DataStructure>(dynamic_cast<DataStructure*>(
-            looseUnmarshalNestedObject(wireFormat, dataIn))));
+        info->setData(
+            std::shared_ptr<DataStructure>(dynamic_cast<DataStructure*>(
+                looseUnmarshalNestedObject(wireFormat, dataIn))));
     }
     AMQ_CATCH_RETHROW(decaf::io::IOException)
     AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,

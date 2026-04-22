@@ -311,8 +311,8 @@ void BrokerInfo::setBrokerURL(const std::string& brokerURL)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::vector<std::shared_ptr<BrokerInfo>>&
-BrokerInfo::getPeerBrokerInfos() const
+const std::vector<std::shared_ptr<BrokerInfo>>& BrokerInfo::getPeerBrokerInfos()
+    const
 {
     return peerBrokerInfos;
 }

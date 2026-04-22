@@ -70,15 +70,15 @@ void SubscriptionInfoMarshaller::tightUnmarshal(OpenWireFormat*  wireFormat,
         int wireVersion = wireFormat->getVersion();
 
         info->setClientId(tightUnmarshalString(dataIn, bs));
-        info->setDestination(
-            std::shared_ptr<ActiveMQDestination>(dynamic_cast<ActiveMQDestination*>(
+        info->setDestination(std::shared_ptr<ActiveMQDestination>(
+            dynamic_cast<ActiveMQDestination*>(
                 tightUnmarshalCachedObject(wireFormat, dataIn, bs))));
         info->setSelector(tightUnmarshalString(dataIn, bs));
         info->setSubcriptionName(tightUnmarshalString(dataIn, bs));
         if (wireVersion >= 3)
         {
-            info->setSubscribedDestination(
-                std::shared_ptr<ActiveMQDestination>(dynamic_cast<ActiveMQDestination*>(
+            info->setSubscribedDestination(std::shared_ptr<ActiveMQDestination>(
+                dynamic_cast<ActiveMQDestination*>(
                     tightUnmarshalNestedObject(wireFormat, dataIn, bs))));
         }
         if (wireVersion >= 11)
@@ -190,15 +190,15 @@ void SubscriptionInfoMarshaller::looseUnmarshal(OpenWireFormat*  wireFormat,
         int wireVersion = wireFormat->getVersion();
 
         info->setClientId(looseUnmarshalString(dataIn));
-        info->setDestination(
-            std::shared_ptr<ActiveMQDestination>(dynamic_cast<ActiveMQDestination*>(
+        info->setDestination(std::shared_ptr<ActiveMQDestination>(
+            dynamic_cast<ActiveMQDestination*>(
                 looseUnmarshalCachedObject(wireFormat, dataIn))));
         info->setSelector(looseUnmarshalString(dataIn));
         info->setSubcriptionName(looseUnmarshalString(dataIn));
         if (wireVersion >= 3)
         {
-            info->setSubscribedDestination(
-                std::shared_ptr<ActiveMQDestination>(dynamic_cast<ActiveMQDestination*>(
+            info->setSubscribedDestination(std::shared_ptr<ActiveMQDestination>(
+                dynamic_cast<ActiveMQDestination*>(
                     looseUnmarshalNestedObject(wireFormat, dataIn))));
         }
         if (wireVersion >= 11)

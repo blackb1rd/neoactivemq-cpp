@@ -69,7 +69,7 @@ namespace state
         void restore(std::shared_ptr<transport::Transport> transport);
 
         void connectionInterruptProcessingComplete(
-            transport::Transport*              transport,
+            transport::Transport*         transport,
             std::shared_ptr<ConnectionId> connectionId);
 
         void transportInterrupted();
@@ -80,23 +80,17 @@ namespace state
         virtual std::shared_ptr<Command> processRemoveDestination(
             DestinationInfo* info);
 
-        virtual std::shared_ptr<Command> processProducerInfo(
-            ProducerInfo* info);
+        virtual std::shared_ptr<Command> processProducerInfo(ProducerInfo* info);
 
-        virtual std::shared_ptr<Command> processRemoveProducer(
-            ProducerId* id);
+        virtual std::shared_ptr<Command> processRemoveProducer(ProducerId* id);
 
-        virtual std::shared_ptr<Command> processConsumerInfo(
-            ConsumerInfo* info);
+        virtual std::shared_ptr<Command> processConsumerInfo(ConsumerInfo* info);
 
-        virtual std::shared_ptr<Command> processRemoveConsumer(
-            ConsumerId* id);
+        virtual std::shared_ptr<Command> processRemoveConsumer(ConsumerId* id);
 
-        virtual std::shared_ptr<Command> processSessionInfo(
-            SessionInfo* info);
+        virtual std::shared_ptr<Command> processSessionInfo(SessionInfo* info);
 
-        virtual std::shared_ptr<Command> processRemoveSession(
-            SessionId* id);
+        virtual std::shared_ptr<Command> processRemoveSession(SessionId* id);
 
         virtual std::shared_ptr<Command> processConnectionInfo(
             ConnectionInfo* info);
@@ -124,8 +118,7 @@ namespace state
         virtual std::shared_ptr<Command> processEndTransaction(
             TransactionInfo* info);
 
-        virtual std::shared_ptr<Command> processMessagePull(
-            MessagePull* pull);
+        virtual std::shared_ptr<Command> processMessagePull(MessagePull* pull);
 
         bool isRestoreConsumers() const
         {
@@ -222,17 +215,14 @@ namespace state
             std::shared_ptr<transport::Transport> transport,
             std::shared_ptr<ConnectionState>      connectionState);
 
-        void doRestoreSessions(
-            std::shared_ptr<transport::Transport> transport,
-            std::shared_ptr<ConnectionState>      connectionState);
+        void doRestoreSessions(std::shared_ptr<transport::Transport> transport,
+                               std::shared_ptr<ConnectionState> connectionState);
 
-        void doRestoreConsumers(
-            std::shared_ptr<transport::Transport> transport,
-            std::shared_ptr<SessionState>         sessionState);
+        void doRestoreConsumers(std::shared_ptr<transport::Transport> transport,
+                                std::shared_ptr<SessionState> sessionState);
 
-        void doRestoreProducers(
-            std::shared_ptr<transport::Transport> transport,
-            std::shared_ptr<SessionState>         sessionState);
+        void doRestoreProducers(std::shared_ptr<transport::Transport> transport,
+                                std::shared_ptr<SessionState> sessionState);
 
         void doRestoreTempDestinations(
             std::shared_ptr<transport::Transport> transport,

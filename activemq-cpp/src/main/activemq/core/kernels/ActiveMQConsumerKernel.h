@@ -73,12 +73,13 @@ namespace core
 
         public:
             ActiveMQConsumerKernel(
-                ActiveMQSessionKernel*                              session,
-                const std::shared_ptr<commands::ConsumerId>&        id,
-                const std::shared_ptr<commands::ActiveMQDestination>& destination,
-                const std::string&                                  name,
-                const std::string&                                  selector,
-                int                                                 prefetch,
+                ActiveMQSessionKernel*                       session,
+                const std::shared_ptr<commands::ConsumerId>& id,
+                const std::shared_ptr<commands::ActiveMQDestination>&
+                                      destination,
+                const std::string&    name,
+                const std::string&    selector,
+                int                   prefetch,
                 int                   maxPendingMessageCount,
                 bool                  noLocal,
                 bool                  browser,
@@ -118,7 +119,8 @@ namespace core
             virtual cms::MessageTransformer* getMessageTransformer() const;
 
         public:  // Dispatcher Methods
-            virtual void dispatch(const std::shared_ptr<MessageDispatch>& message);
+            virtual void dispatch(
+                const std::shared_ptr<MessageDispatch>& message);
 
             virtual int getHashCode() const;
 
@@ -137,7 +139,8 @@ namespace core
              *
              * @throw CMSException if an error occurs while ack'ing the message.
              */
-            void acknowledge(std::shared_ptr<commands::MessageDispatch> dispatch);
+            void acknowledge(
+                std::shared_ptr<commands::MessageDispatch> dispatch);
 
             /**
              * Method called to acknowledge the Message contained in the given
@@ -146,7 +149,7 @@ namespace core
              * @throw CMSException if an error occurs while ack'ing the message.
              */
             void acknowledge(std::shared_ptr<commands::MessageDispatch> dispatch,
-                             int                                         ackType);
+                             int ackType);
 
             /**
              * Called to Commit the current set of messages in this Transaction
@@ -185,7 +188,8 @@ namespace core
              * Get the Consumer information for this consumer
              * @return Reference to a Consumer Info Object
              */
-            const std::shared_ptr<commands::ConsumerInfo>& getConsumerInfo() const;
+            const std::shared_ptr<commands::ConsumerInfo>& getConsumerInfo()
+                const;
 
             /**
              * Get the Consumer Id for this consumer
@@ -348,8 +352,8 @@ namespace core
              * @return true if the consumer is subscribed to the given
              * destination.
              */
-            bool isInUse(
-                std::shared_ptr<commands::ActiveMQDestination> destination) const;
+            bool isInUse(std::shared_ptr<commands::ActiveMQDestination>
+                             destination) const;
 
             /**
              * Time in Milliseconds before an automatic acknowledge is done for
@@ -454,7 +458,8 @@ namespace core
             std::unique_ptr<cms::Message> createCMSMessage(
                 std::shared_ptr<commands::MessageDispatch> dispatch);
 
-            void applyDestinationOptions(std::shared_ptr<commands::ConsumerInfo> info);
+            void applyDestinationOptions(
+                std::shared_ptr<commands::ConsumerInfo> info);
 
             void sendPullRequest(long long timeout);
 
@@ -463,13 +468,13 @@ namespace core
             void checkMessageListener() const;
 
             void ackLater(std::shared_ptr<commands::MessageDispatch> message,
-                          int                                         ackType);
+                          int                                        ackType);
 
             void immediateIndividualTransactedAck(
                 std::shared_ptr<commands::MessageDispatch> dispatch);
 
-            std::shared_ptr<commands::MessageAck> makeAckForAllDeliveredMessages(
-                int type);
+            std::shared_ptr<commands::MessageAck>
+            makeAckForAllDeliveredMessages(int type);
 
             bool isAutoAcknowledgeEach() const;
 

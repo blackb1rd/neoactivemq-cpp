@@ -48,8 +48,8 @@ namespace activemq
 namespace state
 {
 
-    class MessageCache
-        : public LinkedHashMap<std::shared_ptr<MessageId>, std::shared_ptr<Command>>
+    class MessageCache : public LinkedHashMap<std::shared_ptr<MessageId>,
+                                              std::shared_ptr<Command>>
     {
     protected:
         ConnectionStateTracker* parent;
@@ -59,7 +59,8 @@ namespace state
 
     public:
         MessageCache(ConnectionStateTracker* parent)
-            : LinkedHashMap<std::shared_ptr<MessageId>, std::shared_ptr<Command>>(),
+            : LinkedHashMap<std::shared_ptr<MessageId>,
+                            std::shared_ptr<Command>>(),
               parent(parent),
               currentCacheSize(0)
         {
@@ -70,7 +71,8 @@ namespace state
         }
 
         virtual bool removeEldestEntry(
-            const MapEntry<std::shared_ptr<MessageId>, std::shared_ptr<Command>>& eldest)
+            const MapEntry<std::shared_ptr<MessageId>,
+                           std::shared_ptr<Command>>& eldest)
         {
             bool result = currentCacheSize > parent->getMaxMessageCacheSize();
             if (result)
@@ -83,7 +85,8 @@ namespace state
         }
     };
 
-    class MessagePullCache : public LinkedHashMap<std::string, std::shared_ptr<Command>>
+    class MessagePullCache
+        : public LinkedHashMap<std::string, std::shared_ptr<Command>>
     {
     protected:
         ConnectionStateTracker* parent;
@@ -100,7 +103,8 @@ namespace state
         }
 
         virtual bool removeEldestEntry(
-            const MapEntry<std::string, std::shared_ptr<Command>>& eldest AMQCPP_UNUSED)
+            const MapEntry<std::string, std::shared_ptr<Command>>& eldest
+                AMQCPP_UNUSED)
         {
             return size() > parent->getMaxMessagePullCacheSize();
         }
@@ -176,7 +180,8 @@ namespace state
 
         virtual void run()
         {
-            std::shared_ptr<ConnectionId>    connectionId = info->getConnectionId();
+            std::shared_ptr<ConnectionId> connectionId =
+                info->getConnectionId();
             std::shared_ptr<ConnectionState> cs =
                 stateTracker->impl->connectionStates.get(connectionId);
             std::shared_ptr<TransactionState> txState =
@@ -217,7 +222,8 @@ ConnectionStateTracker::~ConnectionStateTracker()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::shared_ptr<Tracked> ConnectionStateTracker::track(std::shared_ptr<Command> command)
+std::shared_ptr<Tracked> ConnectionStateTracker::track(
+    std::shared_ptr<Command> command)
 {
     try
     {
@@ -245,7 +251,8 @@ void ConnectionStateTracker::trackBack(std::shared_ptr<Command> command)
         {
             if (trackMessages && command->isMessage())
             {
-                std::shared_ptr<Message> message = std::dynamic_pointer_cast<Message>(command);
+                std::shared_ptr<Message> message =
+                    std::dynamic_pointer_cast<Message>(command);
                 if (!message->getTransactionId())
                 {
                     this->impl->messageCache.currentCacheSize +=
@@ -260,7 +267,8 @@ void ConnectionStateTracker::trackBack(std::shared_ptr<Command> command)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConnectionStateTracker::restore(std::shared_ptr<transport::Transport> transport)
+void ConnectionStateTracker::restore(
+    std::shared_ptr<transport::Transport> transport)
 {
     try
     {
@@ -325,7 +333,8 @@ void ConnectionStateTracker::doRestoreTransactions(
         while (iter->hasNext())
         {
             std::shared_ptr<TransactionState> txState = iter->next();
-            std::shared_ptr<Command> lastCommand = txState->getCommands().getLast();
+            std::shared_ptr<Command>          lastCommand =
+                txState->getCommands().getLast();
             if (lastCommand->isTransactionInfo())
             {
                 std::shared_ptr<TransactionInfo> transactionInfo =
@@ -369,8 +378,9 @@ void ConnectionStateTracker::doRestoreTransactions(
             toRollback.begin();
         for (; command != toRollback.end(); ++command)
         {
-            std::shared_ptr<ExceptionResponse> response(new ExceptionResponse());
-            std::shared_ptr<BrokerError>       exception(new BrokerError());
+            std::shared_ptr<ExceptionResponse> response(
+                new ExceptionResponse());
+            std::shared_ptr<BrokerError> exception(new BrokerError());
             exception->setExceptionClass("TransactionRolledBackException");
             exception->setMessage(
                 std::string("Transaction completion in doubt due to failover. "
@@ -512,8 +522,8 @@ std::shared_ptr<Command> ConnectionStateTracker::processDestinationInfo(
                 this->impl->connectionStates.get(info->getConnectionId());
             if (cs && info->getDestination()->isTemporary())
             {
-                cs->addTempDestination(
-                    std::shared_ptr<DestinationInfo>(info->cloneDataStructure()));
+                cs->addTempDestination(std::shared_ptr<DestinationInfo>(
+                    info->cloneDataStructure()));
             }
         }
         return this->impl->TRACKED_RESPONSE_MARKER;
@@ -546,16 +556,19 @@ std::shared_ptr<Command> ConnectionStateTracker::processRemoveDestination(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::shared_ptr<Command> ConnectionStateTracker::processProducerInfo(ProducerInfo* info)
+std::shared_ptr<Command> ConnectionStateTracker::processProducerInfo(
+    ProducerInfo* info)
 {
     try
     {
         if (info != NULL && info->getProducerId() != NULL)
         {
-            std::shared_ptr<SessionId> sessionId = info->getProducerId()->getParentId();
+            std::shared_ptr<SessionId> sessionId =
+                info->getProducerId()->getParentId();
             if (sessionId)
             {
-                std::shared_ptr<ConnectionId> connectionId = sessionId->getParentId();
+                std::shared_ptr<ConnectionId> connectionId =
+                    sessionId->getParentId();
                 if (connectionId)
                 {
                     std::shared_ptr<ConnectionState> cs =
@@ -581,7 +594,8 @@ std::shared_ptr<Command> ConnectionStateTracker::processProducerInfo(ProducerInf
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::shared_ptr<Command> ConnectionStateTracker::processRemoveProducer(ProducerId* id)
+std::shared_ptr<Command> ConnectionStateTracker::processRemoveProducer(
+    ProducerId* id)
 {
     try
     {
@@ -590,7 +604,8 @@ std::shared_ptr<Command> ConnectionStateTracker::processRemoveProducer(ProducerI
             std::shared_ptr<SessionId> sessionId = id->getParentId();
             if (sessionId)
             {
-                std::shared_ptr<ConnectionId> connectionId = sessionId->getParentId();
+                std::shared_ptr<ConnectionId> connectionId =
+                    sessionId->getParentId();
                 if (connectionId)
                 {
                     std::shared_ptr<ConnectionState> cs =
@@ -601,8 +616,8 @@ std::shared_ptr<Command> ConnectionStateTracker::processRemoveProducer(ProducerI
                             cs->getSessionState(sessionId);
                         if (ss)
                         {
-                            ss->removeProducer(
-                                std::shared_ptr<ProducerId>(id->cloneDataStructure()));
+                            ss->removeProducer(std::shared_ptr<ProducerId>(
+                                id->cloneDataStructure()));
                         }
                     }
                 }
@@ -616,16 +631,19 @@ std::shared_ptr<Command> ConnectionStateTracker::processRemoveProducer(ProducerI
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::shared_ptr<Command> ConnectionStateTracker::processConsumerInfo(ConsumerInfo* info)
+std::shared_ptr<Command> ConnectionStateTracker::processConsumerInfo(
+    ConsumerInfo* info)
 {
     try
     {
         if (info != NULL)
         {
-            std::shared_ptr<SessionId> sessionId = info->getConsumerId()->getParentId();
+            std::shared_ptr<SessionId> sessionId =
+                info->getConsumerId()->getParentId();
             if (sessionId)
             {
-                std::shared_ptr<ConnectionId> connectionId = sessionId->getParentId();
+                std::shared_ptr<ConnectionId> connectionId =
+                    sessionId->getParentId();
                 if (connectionId)
                 {
                     std::shared_ptr<ConnectionState> cs =
@@ -651,7 +669,8 @@ std::shared_ptr<Command> ConnectionStateTracker::processConsumerInfo(ConsumerInf
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::shared_ptr<Command> ConnectionStateTracker::processRemoveConsumer(ConsumerId* id)
+std::shared_ptr<Command> ConnectionStateTracker::processRemoveConsumer(
+    ConsumerId* id)
 {
     try
     {
@@ -660,12 +679,14 @@ std::shared_ptr<Command> ConnectionStateTracker::processRemoveConsumer(ConsumerI
             std::shared_ptr<SessionId> sessionId = id->getParentId();
             if (sessionId)
             {
-                std::shared_ptr<ConnectionId> connectionId = sessionId->getParentId();
+                std::shared_ptr<ConnectionId> connectionId =
+                    sessionId->getParentId();
                 if (connectionId)
                 {
                     std::shared_ptr<ConnectionState> cs =
                         this->impl->connectionStates.get(connectionId);
-                    std::shared_ptr<ConsumerId> consumerId(id->cloneDataStructure());
+                    std::shared_ptr<ConsumerId> consumerId(
+                        id->cloneDataStructure());
                     if (cs)
                     {
                         std::shared_ptr<SessionState> ss =
@@ -693,7 +714,8 @@ std::shared_ptr<Command> ConnectionStateTracker::processRemoveConsumer(ConsumerI
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::shared_ptr<Command> ConnectionStateTracker::processSessionInfo(SessionInfo* info)
+std::shared_ptr<Command> ConnectionStateTracker::processSessionInfo(
+    SessionInfo* info)
 {
     try
     {
@@ -707,8 +729,8 @@ std::shared_ptr<Command> ConnectionStateTracker::processSessionInfo(SessionInfo*
                     this->impl->connectionStates.get(connectionId);
                 if (cs)
                 {
-                    cs->addSession(
-                        std::shared_ptr<SessionInfo>(info->cloneDataStructure()));
+                    cs->addSession(std::shared_ptr<SessionInfo>(
+                        info->cloneDataStructure()));
                 }
             }
         }
@@ -720,7 +742,8 @@ std::shared_ptr<Command> ConnectionStateTracker::processSessionInfo(SessionInfo*
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::shared_ptr<Command> ConnectionStateTracker::processRemoveSession(SessionId* id)
+std::shared_ptr<Command> ConnectionStateTracker::processRemoveSession(
+    SessionId* id)
 {
     try
     {
@@ -753,7 +776,8 @@ std::shared_ptr<Command> ConnectionStateTracker::processConnectionInfo(
     {
         if (info != NULL)
         {
-            std::shared_ptr<ConnectionInfo> infoCopy(info->cloneDataStructure());
+            std::shared_ptr<ConnectionInfo> infoCopy(
+                info->cloneDataStructure());
             this->impl->connectionStates.put(
                 info->getConnectionId(),
                 std::make_shared<ConnectionState>(infoCopy));
@@ -793,7 +817,8 @@ std::shared_ptr<Command> ConnectionStateTracker::processMessage(Message* message
         {
             if (trackTransactions && message->getTransactionId() != NULL)
             {
-                std::shared_ptr<ProducerId>   producerId = message->getProducerId();
+                std::shared_ptr<ProducerId> producerId =
+                    message->getProducerId();
                 std::shared_ptr<ConnectionId> connectionId =
                     producerId->getParentId()->getParentId();
 
@@ -808,8 +833,9 @@ std::shared_ptr<Command> ConnectionStateTracker::processMessage(Message* message
                                 message->getTransactionId());
                         if (transactionState)
                         {
-                            transactionState->addCommand(std::shared_ptr<Command>(
-                                message->cloneDataStructure()));
+                            transactionState->addCommand(
+                                std::shared_ptr<Command>(
+                                    message->cloneDataStructure()));
 
                             if (trackTransactionProducers)
                             {
@@ -851,7 +877,8 @@ std::shared_ptr<Command> ConnectionStateTracker::processBeginTransaction(
     {
         if (trackTransactions && info != NULL)
         {
-            std::shared_ptr<ConnectionId> connectionId = info->getConnectionId();
+            std::shared_ptr<ConnectionId> connectionId =
+                info->getConnectionId();
             if (connectionId)
             {
                 std::shared_ptr<ConnectionState> cs =
@@ -884,7 +911,8 @@ std::shared_ptr<Command> ConnectionStateTracker::processPrepareTransaction(
     {
         if (trackTransactions && info != NULL)
         {
-            std::shared_ptr<ConnectionId> connectionId = info->getConnectionId();
+            std::shared_ptr<ConnectionId> connectionId =
+                info->getConnectionId();
             if (connectionId)
             {
                 std::shared_ptr<ConnectionState> cs =
@@ -895,8 +923,8 @@ std::shared_ptr<Command> ConnectionStateTracker::processPrepareTransaction(
                         cs->getTransactionState(info->getTransactionId());
                     if (transactionState)
                     {
-                        transactionState->addCommand(
-                            std::shared_ptr<Command>(info->cloneDataStructure()));
+                        transactionState->addCommand(std::shared_ptr<Command>(
+                            info->cloneDataStructure()));
                     }
                 }
             }
@@ -912,14 +940,15 @@ std::shared_ptr<Command> ConnectionStateTracker::processPrepareTransaction(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::shared_ptr<Command> ConnectionStateTracker::processCommitTransactionOnePhase(
-    TransactionInfo* info)
+std::shared_ptr<Command>
+ConnectionStateTracker::processCommitTransactionOnePhase(TransactionInfo* info)
 {
     try
     {
         if (trackTransactions && info != NULL)
         {
-            std::shared_ptr<ConnectionId> connectionId = info->getConnectionId();
+            std::shared_ptr<ConnectionId> connectionId =
+                info->getConnectionId();
             if (connectionId)
             {
                 std::shared_ptr<ConnectionState> cs =
@@ -933,8 +962,9 @@ std::shared_ptr<Command> ConnectionStateTracker::processCommitTransactionOnePhas
                         std::shared_ptr<TransactionInfo> infoCopy(
                             info->cloneDataStructure());
                         transactionState->addCommand(infoCopy);
-                        return std::make_shared<Tracked>(std::shared_ptr<Runnable>(
-                            new RemoveTransactionAction(this, infoCopy)));
+                        return std::make_shared<Tracked>(
+                            std::shared_ptr<Runnable>(
+                                new RemoveTransactionAction(this, infoCopy)));
                     }
                 }
             }
@@ -948,14 +978,15 @@ std::shared_ptr<Command> ConnectionStateTracker::processCommitTransactionOnePhas
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::shared_ptr<Command> ConnectionStateTracker::processCommitTransactionTwoPhase(
-    TransactionInfo* info)
+std::shared_ptr<Command>
+ConnectionStateTracker::processCommitTransactionTwoPhase(TransactionInfo* info)
 {
     try
     {
         if (trackTransactions && info != NULL)
         {
-            std::shared_ptr<ConnectionId> connectionId = info->getConnectionId();
+            std::shared_ptr<ConnectionId> connectionId =
+                info->getConnectionId();
             if (connectionId)
             {
                 std::shared_ptr<ConnectionState> cs =
@@ -969,8 +1000,9 @@ std::shared_ptr<Command> ConnectionStateTracker::processCommitTransactionTwoPhas
                         std::shared_ptr<TransactionInfo> infoCopy(
                             info->cloneDataStructure());
                         transactionState->addCommand(infoCopy);
-                        return std::make_shared<Tracked>(std::shared_ptr<Runnable>(
-                            new RemoveTransactionAction(this, infoCopy)));
+                        return std::make_shared<Tracked>(
+                            std::shared_ptr<Runnable>(
+                                new RemoveTransactionAction(this, infoCopy)));
                     }
                 }
             }
@@ -991,7 +1023,8 @@ std::shared_ptr<Command> ConnectionStateTracker::processRollbackTransaction(
     {
         if (trackTransactions && info != NULL)
         {
-            std::shared_ptr<ConnectionId> connectionId = info->getConnectionId();
+            std::shared_ptr<ConnectionId> connectionId =
+                info->getConnectionId();
             if (connectionId)
             {
                 std::shared_ptr<ConnectionState> cs =
@@ -1005,8 +1038,9 @@ std::shared_ptr<Command> ConnectionStateTracker::processRollbackTransaction(
                         std::shared_ptr<TransactionInfo> infoCopy(
                             info->cloneDataStructure());
                         transactionState->addCommand(infoCopy);
-                        return std::make_shared<Tracked>(std::shared_ptr<Runnable>(
-                            new RemoveTransactionAction(this, infoCopy)));
+                        return std::make_shared<Tracked>(
+                            std::shared_ptr<Runnable>(
+                                new RemoveTransactionAction(this, infoCopy)));
                     }
                 }
             }
@@ -1027,7 +1061,8 @@ std::shared_ptr<Command> ConnectionStateTracker::processEndTransaction(
     {
         if (trackTransactions && info != NULL)
         {
-            std::shared_ptr<ConnectionId> connectionId = info->getConnectionId();
+            std::shared_ptr<ConnectionId> connectionId =
+                info->getConnectionId();
             if (connectionId)
             {
                 std::shared_ptr<ConnectionState> cs =
@@ -1038,8 +1073,8 @@ std::shared_ptr<Command> ConnectionStateTracker::processEndTransaction(
                         cs->getTransactionState(info->getTransactionId());
                     if (transactionState)
                     {
-                        transactionState->addCommand(
-                            std::shared_ptr<Command>(info->cloneDataStructure()));
+                        transactionState->addCommand(std::shared_ptr<Command>(
+                            info->cloneDataStructure()));
                     }
                 }
             }
@@ -1055,7 +1090,8 @@ std::shared_ptr<Command> ConnectionStateTracker::processEndTransaction(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::shared_ptr<Command> ConnectionStateTracker::processMessagePull(MessagePull* pull)
+std::shared_ptr<Command> ConnectionStateTracker::processMessagePull(
+    MessagePull* pull)
 {
     try
     {
@@ -1088,7 +1124,9 @@ void ConnectionStateTracker::connectionInterruptProcessingComplete(
     {
         connectionState->setConnectionInterruptProcessingComplete(true);
 
-        StlMap<std::shared_ptr<ConsumerId>, std::shared_ptr<ConsumerInfo>, ConsumerId::COMPARATOR>
+        StlMap<std::shared_ptr<ConsumerId>,
+               std::shared_ptr<ConsumerInfo>,
+               ConsumerId::COMPARATOR>
             stalledConsumers = connectionState->getRecoveringPullConsumers();
 
         std::shared_ptr<Iterator<std::shared_ptr<ConsumerId>>> key(

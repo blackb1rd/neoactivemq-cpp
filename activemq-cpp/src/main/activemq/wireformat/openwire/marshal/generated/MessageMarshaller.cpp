@@ -57,16 +57,17 @@ void MessageMarshaller::tightUnmarshal(OpenWireFormat*  wireFormat,
 
         int wireVersion = wireFormat->getVersion();
 
-        info->setProducerId(std::shared_ptr<ProducerId>(dynamic_cast<ProducerId*>(
-            tightUnmarshalCachedObject(wireFormat, dataIn, bs))));
-        info->setDestination(
-            std::shared_ptr<ActiveMQDestination>(dynamic_cast<ActiveMQDestination*>(
+        info->setProducerId(
+            std::shared_ptr<ProducerId>(dynamic_cast<ProducerId*>(
+                tightUnmarshalCachedObject(wireFormat, dataIn, bs))));
+        info->setDestination(std::shared_ptr<ActiveMQDestination>(
+            dynamic_cast<ActiveMQDestination*>(
                 tightUnmarshalCachedObject(wireFormat, dataIn, bs))));
         info->setTransactionId(
             std::shared_ptr<TransactionId>(dynamic_cast<TransactionId*>(
                 tightUnmarshalCachedObject(wireFormat, dataIn, bs))));
-        info->setOriginalDestination(
-            std::shared_ptr<ActiveMQDestination>(dynamic_cast<ActiveMQDestination*>(
+        info->setOriginalDestination(std::shared_ptr<ActiveMQDestination>(
+            dynamic_cast<ActiveMQDestination*>(
                 tightUnmarshalCachedObject(wireFormat, dataIn, bs))));
         info->setMessageId(std::shared_ptr<MessageId>(dynamic_cast<MessageId*>(
             tightUnmarshalNestedObject(wireFormat, dataIn, bs))));
@@ -79,8 +80,8 @@ void MessageMarshaller::tightUnmarshal(OpenWireFormat*  wireFormat,
         info->setPersistent(bs->readBoolean());
         info->setExpiration(tightUnmarshalLong(wireFormat, dataIn, bs));
         info->setPriority(dataIn->readByte());
-        info->setReplyTo(
-            std::shared_ptr<ActiveMQDestination>(dynamic_cast<ActiveMQDestination*>(
+        info->setReplyTo(std::shared_ptr<ActiveMQDestination>(
+            dynamic_cast<ActiveMQDestination*>(
                 tightUnmarshalNestedObject(wireFormat, dataIn, bs))));
         info->setTimestamp(tightUnmarshalLong(wireFormat, dataIn, bs));
         info->setType(tightUnmarshalString(dataIn, bs));
@@ -90,8 +91,9 @@ void MessageMarshaller::tightUnmarshal(OpenWireFormat*  wireFormat,
         info->setDataStructure(
             std::shared_ptr<DataStructure>(dynamic_cast<DataStructure*>(
                 tightUnmarshalNestedObject(wireFormat, dataIn, bs))));
-        info->setTargetConsumerId(std::shared_ptr<ConsumerId>(dynamic_cast<ConsumerId*>(
-            tightUnmarshalCachedObject(wireFormat, dataIn, bs))));
+        info->setTargetConsumerId(
+            std::shared_ptr<ConsumerId>(dynamic_cast<ConsumerId*>(
+                tightUnmarshalCachedObject(wireFormat, dataIn, bs))));
         info->setCompressed(bs->readBoolean());
         info->setRedeliveryCounter(dataIn->readInt());
 
@@ -372,16 +374,17 @@ void MessageMarshaller::looseUnmarshal(OpenWireFormat*  wireFormat,
 
         int wireVersion = wireFormat->getVersion();
 
-        info->setProducerId(std::shared_ptr<ProducerId>(dynamic_cast<ProducerId*>(
-            looseUnmarshalCachedObject(wireFormat, dataIn))));
-        info->setDestination(
-            std::shared_ptr<ActiveMQDestination>(dynamic_cast<ActiveMQDestination*>(
+        info->setProducerId(
+            std::shared_ptr<ProducerId>(dynamic_cast<ProducerId*>(
+                looseUnmarshalCachedObject(wireFormat, dataIn))));
+        info->setDestination(std::shared_ptr<ActiveMQDestination>(
+            dynamic_cast<ActiveMQDestination*>(
                 looseUnmarshalCachedObject(wireFormat, dataIn))));
         info->setTransactionId(
             std::shared_ptr<TransactionId>(dynamic_cast<TransactionId*>(
                 looseUnmarshalCachedObject(wireFormat, dataIn))));
-        info->setOriginalDestination(
-            std::shared_ptr<ActiveMQDestination>(dynamic_cast<ActiveMQDestination*>(
+        info->setOriginalDestination(std::shared_ptr<ActiveMQDestination>(
+            dynamic_cast<ActiveMQDestination*>(
                 looseUnmarshalCachedObject(wireFormat, dataIn))));
         info->setMessageId(std::shared_ptr<MessageId>(dynamic_cast<MessageId*>(
             looseUnmarshalNestedObject(wireFormat, dataIn))));
@@ -394,8 +397,8 @@ void MessageMarshaller::looseUnmarshal(OpenWireFormat*  wireFormat,
         info->setPersistent(dataIn->readBoolean());
         info->setExpiration(looseUnmarshalLong(wireFormat, dataIn));
         info->setPriority(dataIn->readByte());
-        info->setReplyTo(
-            std::shared_ptr<ActiveMQDestination>(dynamic_cast<ActiveMQDestination*>(
+        info->setReplyTo(std::shared_ptr<ActiveMQDestination>(
+            dynamic_cast<ActiveMQDestination*>(
                 looseUnmarshalNestedObject(wireFormat, dataIn))));
         info->setTimestamp(looseUnmarshalLong(wireFormat, dataIn));
         info->setType(looseUnmarshalString(dataIn));
@@ -404,8 +407,9 @@ void MessageMarshaller::looseUnmarshal(OpenWireFormat*  wireFormat,
         info->setDataStructure(
             std::shared_ptr<DataStructure>(dynamic_cast<DataStructure*>(
                 looseUnmarshalNestedObject(wireFormat, dataIn))));
-        info->setTargetConsumerId(std::shared_ptr<ConsumerId>(dynamic_cast<ConsumerId*>(
-            looseUnmarshalCachedObject(wireFormat, dataIn))));
+        info->setTargetConsumerId(
+            std::shared_ptr<ConsumerId>(dynamic_cast<ConsumerId*>(
+                looseUnmarshalCachedObject(wireFormat, dataIn))));
         info->setCompressed(dataIn->readBoolean());
         info->setRedeliveryCounter(dataIn->readInt());
 

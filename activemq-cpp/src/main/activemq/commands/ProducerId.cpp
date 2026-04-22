@@ -88,7 +88,7 @@ ProducerId::ProducerId(std::string producerKey)
 
     if (p != std::string::npos)
     {
-        value = std::stoll(producerKey.substr(p + 1, std::string::npos));
+        value       = std::stoll(producerKey.substr(p + 1, std::string::npos));
         producerKey = producerKey.substr(0, p);
     }
 

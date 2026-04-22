@@ -50,7 +50,7 @@ namespace commands
     protected:
         std::shared_ptr<ConnectionId>  connectionId;
         std::shared_ptr<TransactionId> transactionId;
-        unsigned char          type;
+        unsigned char                  type;
 
     public:
         const static unsigned char ID_TRANSACTIONINFO = 7;
@@ -76,12 +76,13 @@ namespace commands
 
         virtual const std::shared_ptr<ConnectionId>& getConnectionId() const;
         virtual std::shared_ptr<ConnectionId>&       getConnectionId();
-        virtual void setConnectionId(const std::shared_ptr<ConnectionId>& connectionId);
+        virtual void                                 setConnectionId(
+                                            const std::shared_ptr<ConnectionId>& connectionId);
 
         virtual const std::shared_ptr<TransactionId>& getTransactionId() const;
         virtual std::shared_ptr<TransactionId>&       getTransactionId();
         virtual void                                  setTransactionId(
-                                     const std::shared_ptr<TransactionId>& transactionId);
+                                             const std::shared_ptr<TransactionId>& transactionId);
 
         virtual unsigned char getType() const;
         virtual void          setType(unsigned char type);
@@ -94,7 +95,8 @@ namespace commands
             return true;
         }
 
-        virtual std::shared_ptr<Command> visit(activemq::state::CommandVisitor* visitor);
+        virtual std::shared_ptr<Command> visit(
+            activemq::state::CommandVisitor* visitor);
     };
 
 }  // namespace commands

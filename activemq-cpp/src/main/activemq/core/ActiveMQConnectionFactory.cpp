@@ -208,9 +208,9 @@ namespace core
             this->checkForDuplicates = Boolean::parseBoolean(
                 properties->getProperty("connection.checkForDuplicates",
                                         Boolean::toString(checkForDuplicates)));
-            this->auditDepth = std::stoi(
-                properties->getProperty("connection.auditDepth",
-                                        std::to_string(auditDepth)));
+            this->auditDepth =
+                std::stoi(properties->getProperty("connection.auditDepth",
+                                                  std::to_string(auditDepth)));
             this->auditMaximumProducerNumber =
                 std::stoi(properties->getProperty(
                     "connection.auditMaximumProducerNumber",
@@ -229,33 +229,27 @@ namespace core
                         core::ActiveMQConstants::
                             CONNECTION_ADVISORYCONSUMERDISPATCHASYNC),
                     Boolean::toString(advisoryConsumerDispatchAsync)));
-            this->producerWindowSize =
-                std::stoi(properties->getProperty(
-                    core::ActiveMQConstants::toString(
-                        core::ActiveMQConstants::CONNECTION_PRODUCERWINDOWSIZE),
-                    std::to_string(producerWindowSize)));
-            this->sendTimeout =
-                std::stoi(properties->getProperty(
-                    core::ActiveMQConstants::toString(
-                        core::ActiveMQConstants::CONNECTION_SENDTIMEOUT),
-                    std::to_string(sendTimeout)));
-            this->connectResponseTimeout =
-                std::stoi(properties->getProperty(
-                    core::ActiveMQConstants::toString(
-                        core::ActiveMQConstants::
-                            CONNECTION_CONNECTRESPONSETIMEOUT),
-                    std::to_string(connectResponseTimeout)));
-            this->closeTimeout =
-                std::stoi(properties->getProperty(
-                    core::ActiveMQConstants::toString(
-                        core::ActiveMQConstants::CONNECTION_CLOSETIMEOUT),
-                    std::to_string(closeTimeout)));
-            this->requestTimeout =
-                std::stoi(properties->getProperty(
-                    core::ActiveMQConstants::toString(
-                        core::ActiveMQConstants::CONNECTION_REQUESTTIMEOUT),
-                    std::to_string(requestTimeout)));
-            this->clientId = properties->getProperty(
+            this->producerWindowSize     = std::stoi(properties->getProperty(
+                core::ActiveMQConstants::toString(
+                    core::ActiveMQConstants::CONNECTION_PRODUCERWINDOWSIZE),
+                std::to_string(producerWindowSize)));
+            this->sendTimeout            = std::stoi(properties->getProperty(
+                core::ActiveMQConstants::toString(
+                    core::ActiveMQConstants::CONNECTION_SENDTIMEOUT),
+                std::to_string(sendTimeout)));
+            this->connectResponseTimeout = std::stoi(properties->getProperty(
+                core::ActiveMQConstants::toString(
+                    core::ActiveMQConstants::CONNECTION_CONNECTRESPONSETIMEOUT),
+                std::to_string(connectResponseTimeout)));
+            this->closeTimeout           = std::stoi(properties->getProperty(
+                core::ActiveMQConstants::toString(
+                    core::ActiveMQConstants::CONNECTION_CLOSETIMEOUT),
+                std::to_string(closeTimeout)));
+            this->requestTimeout         = std::stoi(properties->getProperty(
+                core::ActiveMQConstants::toString(
+                    core::ActiveMQConstants::CONNECTION_REQUESTTIMEOUT),
+                std::to_string(requestTimeout)));
+            this->clientId               = properties->getProperty(
                 core::ActiveMQConstants::toString(
                     core::ActiveMQConstants::PARAM_CLIENTID),
                 clientId);
@@ -470,7 +464,8 @@ cms::Connection* ActiveMQConnectionFactory::doCreateConnection(
                     "failed creating new Transport");
             }
 
-            std::shared_ptr<Properties> properties(this->settings->properties->clone());
+            std::shared_ptr<Properties> properties(
+                this->settings->properties->clone());
 
             // Create and Return the new connection object.
             connection.reset(createActiveMQConnection(transport, properties));

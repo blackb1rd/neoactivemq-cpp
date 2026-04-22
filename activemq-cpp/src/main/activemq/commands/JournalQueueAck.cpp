@@ -169,8 +169,8 @@ bool JournalQueueAck::equals(const DataStructure* value) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::shared_ptr<ActiveMQDestination>&
-JournalQueueAck::getDestination() const
+const std::shared_ptr<ActiveMQDestination>& JournalQueueAck::getDestination()
+    const
 {
     return destination;
 }

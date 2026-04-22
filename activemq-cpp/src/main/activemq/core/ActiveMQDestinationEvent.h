@@ -56,8 +56,7 @@ namespace core
          *
          * @return the DestinationInfo object that triggered this event.
          */
-        std::shared_ptr<commands::DestinationInfo> getDestinationInfo()
-            const
+        std::shared_ptr<commands::DestinationInfo> getDestinationInfo() const
         {
             return this->destination;
         }

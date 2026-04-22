@@ -35,7 +35,8 @@ namespace core
         bool closed;
         bool running;
 
-        mutable decaf::util::LinkedList<std::shared_ptr<MessageDispatch>> channel;
+        mutable decaf::util::LinkedList<std::shared_ptr<MessageDispatch>>
+            channel;
 
     private:
         FifoMessageDispatchChannel(const FifoMessageDispatchChannel&);
@@ -48,7 +49,8 @@ namespace core
 
         virtual void enqueue(const std::shared_ptr<MessageDispatch>& message);
 
-        virtual void enqueueFirst(const std::shared_ptr<MessageDispatch>& message);
+        virtual void enqueueFirst(
+            const std::shared_ptr<MessageDispatch>& message);
 
         virtual bool isEmpty() const;
 

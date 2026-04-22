@@ -50,11 +50,11 @@ namespace commands
     class AMQCPP_API ProducerInfo : public BaseCommand
     {
     protected:
-        std::shared_ptr<ProducerId>                         producerId;
-        std::shared_ptr<ActiveMQDestination>                destination;
-        std::vector<std::shared_ptr<BrokerId>>              brokerPath;
-        bool                                        dispatchAsync;
-        int                                         windowSize;
+        std::shared_ptr<ProducerId>            producerId;
+        std::shared_ptr<ActiveMQDestination>   destination;
+        std::vector<std::shared_ptr<BrokerId>> brokerPath;
+        bool                                   dispatchAsync;
+        int                                    windowSize;
 
     public:
         const static unsigned char ID_PRODUCERINFO = 6;
@@ -82,18 +82,20 @@ namespace commands
 
         virtual const std::shared_ptr<ProducerId>& getProducerId() const;
         virtual std::shared_ptr<ProducerId>&       getProducerId();
-        virtual void setProducerId(const std::shared_ptr<ProducerId>& producerId);
+        virtual void                               setProducerId(
+                                          const std::shared_ptr<ProducerId>& producerId);
 
-        virtual const std::shared_ptr<ActiveMQDestination>& getDestination() const;
-        virtual std::shared_ptr<ActiveMQDestination>&       getDestination();
-        virtual void                                        setDestination(
-                                                   const std::shared_ptr<ActiveMQDestination>& destination);
+        virtual const std::shared_ptr<ActiveMQDestination>& getDestination()
+            const;
+        virtual std::shared_ptr<ActiveMQDestination>& getDestination();
+        virtual void                                  setDestination(
+                                             const std::shared_ptr<ActiveMQDestination>& destination);
 
-        virtual const std::vector<std::shared_ptr<BrokerId>>&
-        getBrokerPath() const;
+        virtual const std::vector<std::shared_ptr<BrokerId>>& getBrokerPath()
+            const;
         virtual std::vector<std::shared_ptr<BrokerId>>& getBrokerPath();
         virtual void                                    setBrokerPath(
-                                           const std::vector<std::shared_ptr<BrokerId>>& brokerPath);
+                                               const std::vector<std::shared_ptr<BrokerId>>& brokerPath);
 
         virtual bool isDispatchAsync() const;
         virtual void setDispatchAsync(bool dispatchAsync);
@@ -109,7 +111,8 @@ namespace commands
             return true;
         }
 
-        virtual std::shared_ptr<Command> visit(activemq::state::CommandVisitor* visitor);
+        virtual std::shared_ptr<Command> visit(
+            activemq::state::CommandVisitor* visitor);
     };
 
 }  // namespace commands

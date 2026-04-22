@@ -168,8 +168,7 @@ std::shared_ptr<ProducerId>& ProducerAck::getProducerId()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ProducerAck::setProducerId(
-    const std::shared_ptr<ProducerId>& producerId)
+void ProducerAck::setProducerId(const std::shared_ptr<ProducerId>& producerId)
 {
     this->producerId = producerId;
 }

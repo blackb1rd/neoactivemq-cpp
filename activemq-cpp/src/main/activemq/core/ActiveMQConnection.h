@@ -105,8 +105,9 @@ namespace core
          * @param properties
          *        The Properties that were defined for this connection
          */
-        ActiveMQConnection(const std::shared_ptr<transport::Transport>    transport,
-                           const std::shared_ptr<decaf::util::Properties> properties);
+        ActiveMQConnection(
+            const std::shared_ptr<transport::Transport>    transport,
+            const std::shared_ptr<decaf::util::Properties> properties);
 
         virtual ~ActiveMQConnection();
 
@@ -120,7 +121,8 @@ namespace core
          * operation.
          */
         virtual void addSession(
-            std::shared_ptr<activemq::core::kernels::ActiveMQSessionKernel> session);
+            std::shared_ptr<activemq::core::kernels::ActiveMQSessionKernel>
+                session);
 
         /**
          * Removes the session resources for the given session instance.
@@ -132,7 +134,8 @@ namespace core
          * operation.
          */
         virtual void removeSession(
-            std::shared_ptr<activemq::core::kernels::ActiveMQSessionKernel> session);
+            std::shared_ptr<activemq::core::kernels::ActiveMQSessionKernel>
+                session);
 
         /**
          * Adds an active Producer to the Set of known producers.
@@ -163,8 +166,9 @@ namespace core
          * @throws CMSException if an error occurs while removing performing the
          * operation.
          */
-        virtual void addDispatcher(const std::shared_ptr<commands::ConsumerId>& consumer,
-                                   Dispatcher* dispatcher);
+        virtual void addDispatcher(
+            const std::shared_ptr<commands::ConsumerId>& consumer,
+            Dispatcher*                                  dispatcher);
 
         /**
          * Removes the dispatcher for a consumer.
@@ -271,7 +275,7 @@ namespace core
          *
          * @return true if the Message was seen before.
          */
-        bool isDuplicate(Dispatcher*                          dispatcher,
+        bool isDuplicate(Dispatcher*                        dispatcher,
                          std::shared_ptr<commands::Message> message);
 
         /**
@@ -282,7 +286,7 @@ namespace core
          * @param message
          *      The Message that has been received.
          */
-        void rollbackDuplicate(Dispatcher*                          dispatcher,
+        void rollbackDuplicate(Dispatcher*                        dispatcher,
                                std::shared_ptr<commands::Message> message);
 
         /**
@@ -1069,8 +1073,8 @@ namespace core
          *      The time in milliseconds to wait for a response, default is zero
          * or infinite.
          *
-         * @return a std::shared_ptr instance to the Response object sent from the
-         * Broker.
+         * @return a std::shared_ptr instance to the Response object sent from
+         * the Broker.
          *
          * @throws BrokerException if the response from the broker is of type
          * ExceptionResponse.
@@ -1225,8 +1229,8 @@ namespace core
          *
          * @return true if the temporary destination was deleted already.
          */
-        bool isDeleted(
-            std::shared_ptr<commands::ActiveMQTempDestination> destination) const;
+        bool isDeleted(std::shared_ptr<commands::ActiveMQTempDestination>
+                           destination) const;
 
         /**
          * Returns an ArrayList that contains a copy of all Sessions that are

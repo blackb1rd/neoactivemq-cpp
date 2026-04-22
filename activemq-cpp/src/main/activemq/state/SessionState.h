@@ -74,11 +74,13 @@ namespace state
 
         void addProducer(std::shared_ptr<ProducerInfo> info);
 
-        std::shared_ptr<ProducerState> removeProducer(std::shared_ptr<ProducerId> id);
+        std::shared_ptr<ProducerState> removeProducer(
+            std::shared_ptr<ProducerId> id);
 
         void addConsumer(std::shared_ptr<ConsumerInfo> info);
 
-        std::shared_ptr<ConsumerState> removeConsumer(std::shared_ptr<ConsumerId> id);
+        std::shared_ptr<ConsumerState> removeConsumer(
+            std::shared_ptr<ConsumerId> id);
 
         const decaf::util::Collection<std::shared_ptr<ProducerState>>&
         getProducerStates() const
@@ -86,7 +88,8 @@ namespace state
             return producers.values();
         }
 
-        std::shared_ptr<ProducerState> getProducerState(std::shared_ptr<ProducerId> id)
+        std::shared_ptr<ProducerState> getProducerState(
+            std::shared_ptr<ProducerId> id)
         {
             return producers.get(id);
         }
@@ -97,7 +100,8 @@ namespace state
             return consumers.values();
         }
 
-        std::shared_ptr<ConsumerState> getConsumerState(std::shared_ptr<ConsumerId> id)
+        std::shared_ptr<ConsumerState> getConsumerState(
+            std::shared_ptr<ConsumerId> id)
         {
             return consumers.get(id);
         }

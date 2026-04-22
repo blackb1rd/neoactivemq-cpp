@@ -300,7 +300,8 @@ std::shared_ptr<commands::Command> OpenWireFormat::unmarshal(
         // Now all unmarshals from this level should result in an object
         // that is a commands::Command type, if its not then the cast will
         // throw an ClassCastException.
-        std::shared_ptr<Command> command = std::dynamic_pointer_cast<Command>(data);
+        std::shared_ptr<Command> command =
+            std::dynamic_pointer_cast<Command>(data);
 
         return command;
     }

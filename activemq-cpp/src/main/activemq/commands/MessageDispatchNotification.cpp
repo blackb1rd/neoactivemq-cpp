@@ -207,8 +207,8 @@ bool MessageDispatchNotification::equals(const DataStructure* value) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::shared_ptr<ConsumerId>&
-MessageDispatchNotification::getConsumerId() const
+const std::shared_ptr<ConsumerId>& MessageDispatchNotification::getConsumerId()
+    const
 {
     return consumerId;
 }
@@ -261,8 +261,8 @@ void MessageDispatchNotification::setDeliverySequenceId(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::shared_ptr<MessageId>&
-MessageDispatchNotification::getMessageId() const
+const std::shared_ptr<MessageId>& MessageDispatchNotification::getMessageId()
+    const
 {
     return messageId;
 }

@@ -89,7 +89,8 @@ ActiveMQSessionExecutor::~ActiveMQSessionExecutor()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQSessionExecutor::execute(const std::shared_ptr<MessageDispatch>& dispatch)
+void ActiveMQSessionExecutor::execute(
+    const std::shared_ptr<MessageDispatch>& dispatch)
 {
     if (this->session->isSessionAsyncDispatch())
     {
@@ -177,7 +178,8 @@ void ActiveMQSessionExecutor::stop()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQSessionExecutor::dispatch(const std::shared_ptr<MessageDispatch>& dispatch)
+void ActiveMQSessionExecutor::dispatch(
+    const std::shared_ptr<MessageDispatch>& dispatch)
 {
     try
     {
@@ -217,7 +219,8 @@ bool ActiveMQSessionExecutor::iterate()
 
         // No messages left queued on the listeners.. so now dispatch messages
         // queued on the session
-        std::shared_ptr<MessageDispatch> message = messageQueue->dequeueNoWait();
+        std::shared_ptr<MessageDispatch> message =
+            messageQueue->dequeueNoWait();
         if (message != nullptr)
         {
             dispatch(message);

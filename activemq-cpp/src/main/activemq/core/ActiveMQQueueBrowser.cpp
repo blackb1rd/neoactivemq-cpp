@@ -64,20 +64,21 @@ namespace core
         Browser& operator=(const Browser&);
 
     public:
-        Browser(ActiveMQQueueBrowser*                              parent,
-                ActiveMQSessionKernel*                             session,
-                const std::shared_ptr<commands::ConsumerId>&       id,
-                const std::shared_ptr<commands::ActiveMQDestination>& destination,
-                const std::string&                                 name,
-                const std::string&                                 selector,
-                int                                                prefetch,
-                int                                                maxPendingMessageCount,
-                bool                                               noLocal,
-                bool                                               browser,
-                bool                                               dispatchAsync,
-                cms::MessageListener*                              listener,
-                std::shared_ptr<std::atomic<bool>>                 validityFlag,
-                std::shared_ptr<Mutex>                             dispatchMutex)
+        Browser(
+            ActiveMQQueueBrowser*                                 parent,
+            ActiveMQSessionKernel*                                session,
+            const std::shared_ptr<commands::ConsumerId>&          id,
+            const std::shared_ptr<commands::ActiveMQDestination>& destination,
+            const std::string&                                    name,
+            const std::string&                                    selector,
+            int                                                   prefetch,
+            int                                maxPendingMessageCount,
+            bool                               noLocal,
+            bool                               browser,
+            bool                               dispatchAsync,
+            cms::MessageListener*              listener,
+            std::shared_ptr<std::atomic<bool>> validityFlag,
+            std::shared_ptr<Mutex>             dispatchMutex)
             : ActiveMQConsumerKernel(session,
                                      id,
                                      destination,
@@ -116,8 +117,8 @@ namespace core
                     if (!this->validityFlag->load())
                     {
                         // Parent is being destroyed, just dispatch to base
-                        // class if there's a message (ignore nullptr browse-done
-                        // marker)
+                        // class if there's a message (ignore nullptr
+                        // browse-done marker)
                         if (dispatched->getMessage() != nullptr)
                         {
                             ActiveMQConsumerKernel::dispatch(dispatched);
@@ -147,11 +148,11 @@ namespace core
 
 ////////////////////////////////////////////////////////////////////////////////
 ActiveMQQueueBrowser::ActiveMQQueueBrowser(
-    ActiveMQSessionKernel*                                 session,
-    const std::shared_ptr<commands::ConsumerId>&           consumerId,
-    const std::shared_ptr<commands::ActiveMQDestination>&  destination,
-    const std::string&                                     selector,
-    bool                                                   dispatchAsync)
+    ActiveMQSessionKernel*                                session,
+    const std::shared_ptr<commands::ConsumerId>&          consumerId,
+    const std::shared_ptr<commands::ActiveMQDestination>& destination,
+    const std::string&                                    selector,
+    bool                                                  dispatchAsync)
     : cms::QueueBrowser(),
       cms::MessageEnumeration(),
       session(session),
@@ -352,20 +353,21 @@ std::shared_ptr<ActiveMQConsumerKernel> ActiveMQQueueBrowser::createConsumer()
                        ->getPrefetchPolicy()
                        ->getQueueBrowserPrefetch();
 
-    std::shared_ptr<ActiveMQConsumerKernel> consumer(new Browser(this,
-                                                                  session,
-                                                                  consumerId,
-                                                                  destination,
-                                                                  "",
-                                                                  selector,
-                                                                  prefetch,
-                                                                  0,
-                                                                  false,
-                                                                  true,
-                                                                  dispatchAsync,
-                                                                  nullptr,
-                                                                  this->browserValid,
-                                                                  this->dispatchMutex));
+    std::shared_ptr<ActiveMQConsumerKernel> consumer(
+        new Browser(this,
+                    session,
+                    consumerId,
+                    destination,
+                    "",
+                    selector,
+                    prefetch,
+                    0,
+                    false,
+                    true,
+                    dispatchAsync,
+                    nullptr,
+                    this->browserValid,
+                    this->dispatchMutex));
 
     try
     {

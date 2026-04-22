@@ -54,8 +54,8 @@ MessageAck::MessageAck()
 
 ////////////////////////////////////////////////////////////////////////////////
 MessageAck::MessageAck(const std::shared_ptr<Message>& message,
-                       int                     ackType,
-                       int                     messageCount)
+                       int                             ackType,
+                       int                             messageCount)
     : BaseCommand(),
       destination(),
       transactionId(),
@@ -74,8 +74,8 @@ MessageAck::MessageAck(const std::shared_ptr<Message>& message,
 
 ////////////////////////////////////////////////////////////////////////////////
 MessageAck::MessageAck(const std::shared_ptr<MessageDispatch>& dispatch,
-                       int                             ackType,
-                       int                             messageCount)
+                       int                                     ackType,
+                       int                                     messageCount)
     : BaseCommand(),
       destination(),
       transactionId(),
@@ -324,8 +324,7 @@ bool MessageAck::equals(const DataStructure* value) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::shared_ptr<ActiveMQDestination>& MessageAck::getDestination()
-    const
+const std::shared_ptr<ActiveMQDestination>& MessageAck::getDestination() const
 {
     return destination;
 }
@@ -375,8 +374,7 @@ std::shared_ptr<ConsumerId>& MessageAck::getConsumerId()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MessageAck::setConsumerId(
-    const std::shared_ptr<ConsumerId>& consumerId)
+void MessageAck::setConsumerId(const std::shared_ptr<ConsumerId>& consumerId)
 {
     this->consumerId = consumerId;
 }
@@ -456,8 +454,7 @@ std::shared_ptr<BrokerError>& MessageAck::getPoisonCause()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MessageAck::setPoisonCause(
-    const std::shared_ptr<BrokerError>& poisonCause)
+void MessageAck::setPoisonCause(const std::shared_ptr<BrokerError>& poisonCause)
 {
     this->poisonCause = poisonCause;
 }

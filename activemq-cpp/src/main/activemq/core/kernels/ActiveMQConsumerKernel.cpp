@@ -74,7 +74,8 @@ namespace core
     namespace kernels
     {
 
-        class PreviouslyDeliveredMap : public HashMap<std::shared_ptr<MessageId>, bool>
+        class PreviouslyDeliveredMap
+            : public HashMap<std::shared_ptr<MessageId>, bool>
         {
         public:
             std::shared_ptr<TransactionId> transactionId;
@@ -97,46 +98,45 @@ namespace core
                 const ActiveMQConsumerKernelConfig&);
 
         public:
-            cms::MessageListener*                    listener;
-            cms::MessageAvailableListener*           messageAvailableListener;
-            cms::MessageTransformer*                 transformer;
-            decaf::util::concurrent::Mutex           listenerMutex;
-            std::atomic<bool>                        deliveringAcks;
-            std::atomic<bool>                        started;
-            std::atomic<bool>                        closeSyncRegistered;
-            std::atomic<bool>                        disposing;
-            std::shared_ptr<MessageDispatchChannel>  unconsumedMessages;
-            decaf::util::LinkedList<
-                std::shared_ptr<commands::MessageDispatch>>
-                                                     deliveredMessages;
-            long long                                lastDeliveredSequenceId;
-            std::shared_ptr<commands::MessageAck>    pendingAck;
-            int                                      deliveredCounter;
-            int                                      additionalWindowSize;
-            volatile bool                            synchronizationRegistered;
-            volatile bool                            isClearDeliveredList;
-            std::atomic<int>                         inProgressClearRequiredFlag;
-            long long                                redeliveryDelay;
-            std::shared_ptr<RedeliveryPolicy>        redeliveryPolicy;
-            std::shared_ptr<Exception>               failureError;
-            std::shared_ptr<Scheduler>               scheduler;
-            int                                      hashCode;
-            std::shared_ptr<PreviouslyDeliveredMap>  previouslyDeliveredMessages;
-            long long                                failoverRedeliveryWaitPeriod;
-            bool                                     transactedIndividualAck;
-            bool                                     nonBlockingRedelivery;
-            bool                                     consumerExpiryCheckEnabled;
-            bool                                     optimizeAcknowledge;
-            long long                                optimizeAckTimestamp;
-            long long                                optimizeAcknowledgeTimeOut;
-            long long                                optimizedAckScheduledAckInterval;
-            Runnable*                                optimizedAckTask;
-            int                                      ackCounter;
-            int                                      dispatchedCount;
-            std::shared_ptr<ExecutorService>         executor;
-            ActiveMQSessionKernel*                   session;
-            ActiveMQConsumerKernel*                  parent;
-            std::shared_ptr<ConsumerInfo>            info;
+            cms::MessageListener*                   listener;
+            cms::MessageAvailableListener*          messageAvailableListener;
+            cms::MessageTransformer*                transformer;
+            decaf::util::concurrent::Mutex          listenerMutex;
+            std::atomic<bool>                       deliveringAcks;
+            std::atomic<bool>                       started;
+            std::atomic<bool>                       closeSyncRegistered;
+            std::atomic<bool>                       disposing;
+            std::shared_ptr<MessageDispatchChannel> unconsumedMessages;
+            decaf::util::LinkedList<std::shared_ptr<commands::MessageDispatch>>
+                                                    deliveredMessages;
+            long long                               lastDeliveredSequenceId;
+            std::shared_ptr<commands::MessageAck>   pendingAck;
+            int                                     deliveredCounter;
+            int                                     additionalWindowSize;
+            volatile bool                           synchronizationRegistered;
+            volatile bool                           isClearDeliveredList;
+            std::atomic<int>                        inProgressClearRequiredFlag;
+            long long                               redeliveryDelay;
+            std::shared_ptr<RedeliveryPolicy>       redeliveryPolicy;
+            std::shared_ptr<Exception>              failureError;
+            std::shared_ptr<Scheduler>              scheduler;
+            int                                     hashCode;
+            std::shared_ptr<PreviouslyDeliveredMap> previouslyDeliveredMessages;
+            long long                        failoverRedeliveryWaitPeriod;
+            bool                             transactedIndividualAck;
+            bool                             nonBlockingRedelivery;
+            bool                             consumerExpiryCheckEnabled;
+            bool                             optimizeAcknowledge;
+            long long                        optimizeAckTimestamp;
+            long long                        optimizeAcknowledgeTimeOut;
+            long long                        optimizedAckScheduledAckInterval;
+            Runnable*                        optimizedAckTask;
+            int                              ackCounter;
+            int                              dispatchedCount;
+            std::shared_ptr<ExecutorService> executor;
+            ActiveMQSessionKernel*           session;
+            ActiveMQConsumerKernel*          parent;
+            std::shared_ptr<ConsumerInfo>    info;
 
             ActiveMQConsumerKernelConfig()
                 : listener(nullptr),
@@ -167,7 +167,10 @@ namespace core
                   nonBlockingRedelivery(false),
                   consumerExpiryCheckEnabled(true),
                   optimizeAcknowledge(false),
-                  optimizeAckTimestamp(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count()),
+                  optimizeAckTimestamp(
+                      std::chrono::duration_cast<std::chrono::milliseconds>(
+                          std::chrono::system_clock::now().time_since_epoch())
+                          .count()),
                   optimizeAcknowledgeTimeOut(),
                   optimizedAckScheduledAckInterval(),
                   optimizedAckTask(nullptr),
@@ -191,7 +194,9 @@ namespace core
                                         optimizeAcknowledgeTimeOut;
 
                 if (optimizeAcknowledgeTimeOut > 0 &&
-                    std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count() >= nextAckTime)
+                    std::chrono::duration_cast<std::chrono::milliseconds>(
+                        std::chrono::system_clock::now().time_since_epoch())
+                            .count() >= nextAckTime)
                 {
                     return true;
                 }
@@ -219,13 +224,14 @@ namespace core
                                                     ->getTransactionId()));
                                     }
 
-                                    std::shared_ptr<Iterator<std::shared_ptr<MessageDispatch>>>
+                                    std::shared_ptr<Iterator<
+                                        std::shared_ptr<MessageDispatch>>>
                                         iter(deliveredMessages.iterator());
 
                                     while (iter->hasNext())
                                     {
-                                        std::shared_ptr<MessageDispatch> dispatch =
-                                            iter->next();
+                                        std::shared_ptr<MessageDispatch>
+                                            dispatch = iter->next();
                                         previouslyDeliveredMessages->put(
                                             dispatch->getMessage()
                                                 ->getMessageId(),
@@ -304,11 +310,13 @@ namespace core
                 {
                     Set<MapEntry<std::shared_ptr<MessageId>, bool>>& entries =
                         previouslyDeliveredMessages->entrySet();
-                    std::shared_ptr<Iterator<MapEntry<std::shared_ptr<MessageId>, bool>>> iter(
-                        entries.iterator());
+                    std::shared_ptr<
+                        Iterator<MapEntry<std::shared_ptr<MessageId>, bool>>>
+                        iter(entries.iterator());
                     while (iter->hasNext())
                     {
-                        MapEntry<std::shared_ptr<MessageId>, bool> entry = iter->next();
+                        MapEntry<std::shared_ptr<MessageId>, bool> entry =
+                            iter->next();
                         if (!entry.getValue())
                         {
                             removeFromDeliveredMessages(entry.getKey());
@@ -329,11 +337,13 @@ namespace core
                     int numberNotReplayed = 0;
                     Set<MapEntry<std::shared_ptr<MessageId>, bool>>& entries =
                         previouslyDeliveredMessages->entrySet();
-                    std::shared_ptr<Iterator<MapEntry<std::shared_ptr<MessageId>, bool>>> iter(
-                        entries.iterator());
+                    std::shared_ptr<
+                        Iterator<MapEntry<std::shared_ptr<MessageId>, bool>>>
+                        iter(entries.iterator());
                     while (iter->hasNext())
                     {
-                        MapEntry<std::shared_ptr<MessageId>, bool> entry = iter->next();
+                        MapEntry<std::shared_ptr<MessageId>, bool> entry =
+                            iter->next();
                         if (!entry.getValue())
                         {
                             numberNotReplayed++;
@@ -342,7 +352,8 @@ namespace core
                     if (numberNotReplayed > 0)
                     {
                         std::string txId =
-                            previouslyDeliveredMessages->transactionId != nullptr
+                            previouslyDeliveredMessages->transactionId !=
+                                    nullptr
                                 ? previouslyDeliveredMessages->transactionId
                                       ->toString()
                                 : "<None>";
@@ -363,8 +374,11 @@ namespace core
                 if (failoverRedeliveryWaitPeriod > 0 &&
                     previouslyDeliveredMessages != nullptr)
                 {
-                    long long expiry = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count() +
-                                       failoverRedeliveryWaitPeriod;
+                    long long expiry =
+                        std::chrono::duration_cast<std::chrono::milliseconds>(
+                            std::chrono::system_clock::now().time_since_epoch())
+                            .count() +
+                        failoverRedeliveryWaitPeriod;
                     int numberNotReplayed;
                     do
                     {
@@ -373,15 +387,16 @@ namespace core
                         {
                             if (previouslyDeliveredMessages != nullptr)
                             {
-                                Set<MapEntry<std::shared_ptr<MessageId>, bool>>& entries =
-                                    previouslyDeliveredMessages->entrySet();
-                                std::shared_ptr<
-                                    Iterator<MapEntry<std::shared_ptr<MessageId>, bool>>>
+                                Set<MapEntry<std::shared_ptr<MessageId>, bool>>&
+                                    entries =
+                                        previouslyDeliveredMessages->entrySet();
+                                std::shared_ptr<Iterator<
+                                    MapEntry<std::shared_ptr<MessageId>, bool>>>
                                     iter(entries.iterator());
                                 while (iter->hasNext())
                                 {
-                                    MapEntry<std::shared_ptr<MessageId>, bool> entry =
-                                        iter->next();
+                                    MapEntry<std::shared_ptr<MessageId>, bool>
+                                        entry = iter->next();
                                     if (!entry.getValue())
                                     {
                                         numberNotReplayed++;
@@ -403,7 +418,11 @@ namespace core
                             }
                         }
                     } while (numberNotReplayed > 0 &&
-                             expiry < std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count());
+                             expiry < std::chrono::duration_cast<
+                                          std::chrono::milliseconds>(
+                                          std::chrono::system_clock::now()
+                                              .time_since_epoch())
+                                          .count());
                 }
             }
 
@@ -440,15 +459,16 @@ namespace core
                 ArrayList<std::shared_ptr<ActiveMQSessionKernel>> sessions =
                     session->getConnection()->getSessions();
 
-                std::shared_ptr<Iterator<std::shared_ptr<ActiveMQSessionKernel>>> sessionIter(
-                    sessions.iterator());
+                std::shared_ptr<Iterator<std::shared_ptr<ActiveMQSessionKernel>>>
+                    sessionIter(sessions.iterator());
                 while (sessionIter->hasNext())
                 {
                     std::shared_ptr<ActiveMQSessionKernel> sess =
                         sessionIter->next();
-                    ArrayList<std::shared_ptr<ActiveMQConsumerKernel>> consumers =
-                        sess->getConsumers();
-                    std::shared_ptr<Iterator<std::shared_ptr<ActiveMQConsumerKernel>>>
+                    ArrayList<std::shared_ptr<ActiveMQConsumerKernel>>
+                        consumers = sess->getConsumers();
+                    std::shared_ptr<
+                        Iterator<std::shared_ptr<ActiveMQConsumerKernel>>>
                         consumersIter(consumers.iterator());
 
                     while (consumersIter->hasNext())
@@ -464,7 +484,8 @@ namespace core
                 return false;
             }
 
-            bool consumeExpiredMessage(const std::shared_ptr<MessageDispatch> dispatch)
+            bool consumeExpiredMessage(
+                const std::shared_ptr<MessageDispatch> dispatch)
             {
                 if (dispatch->getMessage()->isExpired())
                 {
@@ -552,7 +573,7 @@ namespace core
             }
 
             void posionAck(std::shared_ptr<MessageDispatch> dispatch,
-                           const std::string&                cause)
+                           const std::string&               cause)
             {
                 AMQ_LOG_ERROR(
                     "ActiveMQConsumerKernel",
@@ -580,7 +601,8 @@ namespace core
                         << dispatch->getMessage()->getMessageId()->toString());
             }
 
-            std::shared_ptr<BrokerError> createBrokerError(const std::string& message)
+            std::shared_ptr<BrokerError> createBrokerError(
+                const std::string& message)
             {
                 std::shared_ptr<BrokerError> cause(new BrokerError());
                 cause->setExceptionClass("javax.jms.JMSException");
@@ -773,16 +795,16 @@ public:
 class IndividualAckHandler : public ActiveMQAckHandler
 {
 private:
-    ActiveMQConsumerKernel*                     consumer;
-    std::shared_ptr<commands::MessageDispatch>  dispatch;
+    ActiveMQConsumerKernel*                    consumer;
+    std::shared_ptr<commands::MessageDispatch> dispatch;
 
 private:
     IndividualAckHandler(const IndividualAckHandler&);
     IndividualAckHandler& operator=(const IndividualAckHandler&);
 
 public:
-    IndividualAckHandler(ActiveMQConsumerKernel*                    consumer,
-                         const std::shared_ptr<MessageDispatch>&    dispatch)
+    IndividualAckHandler(ActiveMQConsumerKernel*                 consumer,
+                         const std::shared_ptr<MessageDispatch>& dispatch)
         : consumer(consumer),
           dispatch(dispatch)
     {
@@ -875,8 +897,8 @@ private:
 
 public:
     AsyncMessageAckTask(std::shared_ptr<MessageAck>   ack,
-                        ActiveMQSessionKernel*         session,
-                        ActiveMQConsumerKernelConfig*  impl)
+                        ActiveMQSessionKernel*        session,
+                        ActiveMQConsumerKernelConfig* impl)
         : Runnable(),
           ack(ack),
           session(session),
@@ -950,10 +972,10 @@ public:
 class NonBlockingRedeliveryTask : public Runnable
 {
 private:
-    ActiveMQSessionKernel*                              session;
-    std::shared_ptr<ActiveMQConsumerKernel>             consumer;
-    ActiveMQConsumerKernelConfig*                       impl;
-    ArrayList<std::shared_ptr<MessageDispatch>>         redeliveries;
+    ActiveMQSessionKernel*                      session;
+    std::shared_ptr<ActiveMQConsumerKernel>     consumer;
+    ActiveMQConsumerKernelConfig*               impl;
+    ArrayList<std::shared_ptr<MessageDispatch>> redeliveries;
 
 private:
     NonBlockingRedeliveryTask(const NonBlockingRedeliveryTask&);
@@ -962,7 +984,7 @@ private:
 public:
     NonBlockingRedeliveryTask(ActiveMQSessionKernel*                  session,
                               std::shared_ptr<ActiveMQConsumerKernel> consumer,
-                              ActiveMQConsumerKernelConfig*            impl)
+                              ActiveMQConsumerKernelConfig*           impl)
         : Runnable(),
           session(session),
           consumer(consumer),
@@ -1004,17 +1026,17 @@ public:
 
 ////////////////////////////////////////////////////////////////////////////////
 ActiveMQConsumerKernel::ActiveMQConsumerKernel(
-    ActiveMQSessionKernel*                          session,
-    const std::shared_ptr<ConsumerId>&              id,
-    const std::shared_ptr<ActiveMQDestination>&     destination,
-    const std::string&                              name,
-    const std::string&                              selector,
-    int                                             prefetch,
-    int                                             maxPendingMessageCount,
-    bool                                            noLocal,
-    bool                                            browser,
-    bool                                            dispatchAsync,
-    cms::MessageListener*                           listener)
+    ActiveMQSessionKernel*                      session,
+    const std::shared_ptr<ConsumerId>&          id,
+    const std::shared_ptr<ActiveMQDestination>& destination,
+    const std::string&                          name,
+    const std::string&                          selector,
+    int                                         prefetch,
+    int                                         maxPendingMessageCount,
+    bool                                        noLocal,
+    bool                                        browser,
+    bool                                        dispatchAsync,
+    cms::MessageListener*                       listener)
     : internal(nullptr),
       session(nullptr),
       consumerInfo()
@@ -1216,12 +1238,15 @@ void ActiveMQConsumerKernel::close()
             if (!this->internal->deliveredMessages.isEmpty() &&
                 this->session->getTransactionContext() != nullptr &&
                 this->session->getTransactionContext()->isInTransaction() &&
-                this->internal->closeSyncRegistered.compare_exchange_strong(closeSyncExpected, true))
+                this->internal->closeSyncRegistered.compare_exchange_strong(
+                    closeSyncExpected,
+                    true))
             {
                 std::shared_ptr<ActiveMQConsumerKernel> self =
                     this->session->lookupConsumerKernel(
                         this->consumerInfo->getConsumerId());
-                std::shared_ptr<Synchronization> sync(new CloseSynhcronization(self));
+                std::shared_ptr<Synchronization> sync(
+                    new CloseSynhcronization(self));
                 this->session->getTransactionContext()->addSynchronization(
                     sync);
             }
@@ -1270,7 +1295,9 @@ void ActiveMQConsumerKernel::dispose()
     {
         // Use atomic compare-and-set to ensure only one thread disposes
         bool disposingExpected = false;
-        if (!this->internal->disposing.compare_exchange_strong(disposingExpected, true))
+        if (!this->internal->disposing.compare_exchange_strong(
+                disposingExpected,
+                true))
         {
             return;  // Another thread is already disposing
         }
@@ -1317,8 +1344,9 @@ void ActiveMQConsumerKernel::dispose()
                         {
                             tmp.copy(this->internal->deliveredMessages);
                         }
-                        std::shared_ptr<Iterator<std::shared_ptr<MessageDispatch>>> iter(
-                            tmp.iterator());
+                        std::shared_ptr<
+                            Iterator<std::shared_ptr<MessageDispatch>>>
+                            iter(tmp.iterator());
                         while (iter->hasNext())
                         {
                             std::shared_ptr<MessageDispatch> msg = iter->next();
@@ -1344,8 +1372,9 @@ void ActiveMQConsumerKernel::dispose()
                 {
                     if (this->session->isIndividualAcknowledge())
                     {
-                        std::unique_ptr<Iterator<std::shared_ptr<MessageDispatch>>> iter(
-                            this->internal->deliveredMessages.iterator());
+                        std::unique_ptr<
+                            Iterator<std::shared_ptr<MessageDispatch>>>
+                            iter(this->internal->deliveredMessages.iterator());
                         while (iter->hasNext())
                         {
                             iter->next()->getMessage()->setAckHandler(
@@ -1360,9 +1389,11 @@ void ActiveMQConsumerKernel::dispose()
             this->internal->unconsumedMessages->close();
 
             // Remove this Consumer from the Connections set of Dispatchers
-            // Use aliasing constructor to create a non-owning shared_ptr to pass 'this'
+            // Use aliasing constructor to create a non-owning shared_ptr to
+            // pass 'this'
             std::shared_ptr<ActiveMQConsumerKernel> consumer(
-                std::shared_ptr<ActiveMQConsumerKernel>{}, this);
+                std::shared_ptr<ActiveMQConsumerKernel>{},
+                this);
             try
             {
                 this->session->removeConsumer(consumer);
@@ -1377,8 +1408,8 @@ void ActiveMQConsumerKernel::dispose()
                 this->internal->unconsumedMessages->removeAll();
             if (!this->consumerInfo->isBrowser())
             {
-                std::vector<std::shared_ptr<MessageDispatch>>::const_iterator iter =
-                    list.begin();
+                std::vector<std::shared_ptr<MessageDispatch>>::const_iterator
+                    iter = list.begin();
 
                 for (; iter != list.end(); ++iter)
                 {
@@ -1423,7 +1454,10 @@ std::shared_ptr<MessageDispatch> ActiveMQConsumerKernel::dequeue(
         long long deadline = 0;
         if (timeout > 0)
         {
-            deadline = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count() + timeout;
+            deadline = std::chrono::duration_cast<std::chrono::milliseconds>(
+                           std::chrono::system_clock::now().time_since_epoch())
+                           .count() +
+                       timeout;
         }
 
         // Loop until the time is up or we get a non-expired message
@@ -1436,8 +1470,13 @@ std::shared_ptr<MessageDispatch> ActiveMQConsumerKernel::dequeue(
                 if (timeout > 0 &&
                     !this->internal->unconsumedMessages->isClosed())
                 {
-                    timeout =
-                        Math::max(deadline - std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count(), 0LL);
+                    timeout = Math::max(
+                        deadline -
+                            std::chrono::duration_cast<std::chrono::milliseconds>(
+                                std::chrono::system_clock::now()
+                                    .time_since_epoch())
+                                .count(),
+                        0LL);
                 }
                 else
                 {
@@ -1462,8 +1501,13 @@ std::shared_ptr<MessageDispatch> ActiveMQConsumerKernel::dequeue(
                 afterMessageIsConsumed(dispatch, true);
                 if (timeout > 0)
                 {
-                    timeout =
-                        Math::max(deadline - std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count(), 0LL);
+                    timeout = Math::max(
+                        deadline -
+                            std::chrono::duration_cast<std::chrono::milliseconds>(
+                                std::chrono::system_clock::now()
+                                    .time_since_epoch())
+                                .count(),
+                        0LL);
                 }
 
                 sendPullRequest(timeout);
@@ -1475,11 +1519,16 @@ std::shared_ptr<MessageDispatch> ActiveMQConsumerKernel::dequeue(
                     "dispatch to " + getConsumerId()->toString() +
                         " exceeds RedeliveryPolicy limit: " +
                         std::to_string(internal->redeliveryPolicy
-                                              ->getMaximumRedeliveries()));
+                                           ->getMaximumRedeliveries()));
                 if (timeout > 0)
                 {
-                    timeout =
-                        Math::max(deadline - std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count(), 0LL);
+                    timeout = Math::max(
+                        deadline -
+                            std::chrono::duration_cast<std::chrono::milliseconds>(
+                                std::chrono::system_clock::now()
+                                    .time_since_epoch())
+                                .count(),
+                        0LL);
                 }
 
                 sendPullRequest(timeout);
@@ -1740,7 +1789,9 @@ void ActiveMQConsumerKernel::afterMessageIsConsumed(
         if (isAutoAcknowledgeEach())
         {
             bool deliveringExpected = false;
-            if (this->internal->deliveringAcks.compare_exchange_strong(deliveringExpected, true))
+            if (this->internal->deliveringAcks.compare_exchange_strong(
+                    deliveringExpected,
+                    true))
             {
                 synchronized(&this->internal->deliveredMessages)
                 {
@@ -1761,7 +1812,11 @@ void ActiveMQConsumerKernel::afterMessageIsConsumed(
                                     this->internal->ackCounter = 0;
                                     this->session->sendAck(ack);
                                     this->internal->optimizeAckTimestamp =
-                                        std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+                                        std::chrono::duration_cast<
+                                            std::chrono::milliseconds>(
+                                            std::chrono::system_clock::now()
+                                                .time_since_epoch())
+                                            .count();
                                 }
 
                                 // As further optimization send ack for expired
@@ -1834,8 +1889,10 @@ void ActiveMQConsumerKernel::deliverAcks()
     try
     {
         std::shared_ptr<MessageAck> ack;
-        bool deliverExpected = false;
-        if (this->internal->deliveringAcks.compare_exchange_strong(deliverExpected, true))
+        bool                        deliverExpected = false;
+        if (this->internal->deliveringAcks.compare_exchange_strong(
+                deliverExpected,
+                true))
         {
             if (isAutoAcknowledgeEach())
             {
@@ -1943,8 +2000,8 @@ void ActiveMQConsumerKernel::ackLater(std::shared_ptr<MessageDispatch> dispatch,
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::shared_ptr<MessageAck> ActiveMQConsumerKernel::makeAckForAllDeliveredMessages(
-    int type)
+std::shared_ptr<MessageAck>
+ActiveMQConsumerKernel::makeAckForAllDeliveredMessages(int type)
 {
     synchronized(&this->internal->deliveredMessages)
     {
@@ -2224,8 +2281,8 @@ void ActiveMQConsumerKernel::rollback()
                     // stop the delivery of messages.
                     this->internal->unconsumedMessages->stop();
 
-                    std::unique_ptr<Iterator<std::shared_ptr<MessageDispatch>>> iter(
-                        this->internal->deliveredMessages.iterator());
+                    std::unique_ptr<Iterator<std::shared_ptr<MessageDispatch>>>
+                        iter(this->internal->deliveredMessages.iterator());
                     while (iter->hasNext())
                     {
                         this->internal->unconsumedMessages->enqueueFirst(
@@ -2262,7 +2319,8 @@ void ActiveMQConsumerKernel::rollback()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQConsumerKernel::dispatch(const std::shared_ptr<MessageDispatch>& dispatch)
+void ActiveMQConsumerKernel::dispatch(
+    const std::shared_ptr<MessageDispatch>& dispatch)
 {
     try
     {
@@ -2304,8 +2362,9 @@ void ActiveMQConsumerKernel::dispatch(const std::shared_ptr<MessageDispatch>& di
                         AMQ_LOG_DEBUG(
                             "ActiveMQConsumerKernel",
                             "dispatch(): Acquired listener lock, listener="
-                                << (this->internal->listener != nullptr ? "SET"
-                                                                      : "NULL")
+                                << (this->internal->listener != nullptr
+                                        ? "SET"
+                                        : "NULL")
                                 << ", running="
                                 << (this->internal->unconsumedMessages
                                             ->isRunning()
@@ -2502,7 +2561,8 @@ std::unique_ptr<cms::Message> ActiveMQConsumerKernel::createCMSMessage(
     {
         // Use cloneDataStructure() to get a raw pointer we fully own,
         // then wrap it in unique_ptr to enable release() semantics.
-        std::unique_ptr<Message> message(dispatch->getMessage()->cloneDataStructure());
+        std::unique_ptr<Message> message(
+            dispatch->getMessage()->cloneDataStructure());
         if (this->internal->transformer != nullptr)
         {
             cms::Message* source = dynamic_cast<cms::Message*>(message.get());
@@ -2559,19 +2619,21 @@ std::unique_ptr<cms::Message> ActiveMQConsumerKernel::createCMSMessage(
         }
         else
         {
-            std::shared_ptr<ActiveMQAckHandler> ackHandler(new NoOpAckHandler());
+            std::shared_ptr<ActiveMQAckHandler> ackHandler(
+                new NoOpAckHandler());
             message->setAckHandler(ackHandler);
         }
 
         // Transfer ownership to caller via unique_ptr<cms::Message>.
         // The caller is responsible for deleting the returned message.
-        Message* rawMsg = message.release();
+        Message*      rawMsg = message.release();
         cms::Message* cmsMsg = dynamic_cast<cms::Message*>(rawMsg);
         if (cmsMsg == nullptr)
         {
             delete rawMsg;
-            throw ActiveMQException(__FILE__, __LINE__,
-                "Failed to cast Message to cms::Message");
+            throw ActiveMQException(__FILE__,
+                                    __LINE__,
+                                    "Failed to cast Message to cms::Message");
         }
         return std::unique_ptr<cms::Message>(cmsMsg);
     }
@@ -2682,8 +2744,8 @@ void ActiveMQConsumerKernel::clearMessagesInProgress()
                     this->internal->unconsumedMessages->removeAll();
                 if (!this->consumerInfo->isBrowser())
                 {
-                    std::vector<std::shared_ptr<MessageDispatch>>::const_iterator iter =
-                        list.begin();
+                    std::vector<std::shared_ptr<MessageDispatch>>::const_iterator
+                        iter = list.begin();
 
                     for (; iter != list.end(); ++iter)
                     {
@@ -2728,7 +2790,8 @@ int ActiveMQConsumerKernel::getMessageAvailableCount() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQConsumerKernel::applyDestinationOptions(std::shared_ptr<ConsumerInfo> info)
+void ActiveMQConsumerKernel::applyDestinationOptions(
+    std::shared_ptr<ConsumerInfo> info)
 {
     std::shared_ptr<commands::ActiveMQDestination> amqDestination =
         info->getDestination();
@@ -2843,15 +2906,15 @@ cms::MessageTransformer* ActiveMQConsumerKernel::getMessageTransformer() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::shared_ptr<commands::ConsumerInfo>& ActiveMQConsumerKernel::getConsumerInfo()
-    const
+const std::shared_ptr<commands::ConsumerInfo>&
+ActiveMQConsumerKernel::getConsumerInfo() const
 {
     return this->consumerInfo;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::shared_ptr<commands::ConsumerId>& ActiveMQConsumerKernel::getConsumerId()
-    const
+const std::shared_ptr<commands::ConsumerId>&
+ActiveMQConsumerKernel::getConsumerId() const
 {
     return this->consumerInfo->getConsumerId();
 }

@@ -52,7 +52,8 @@ namespace core
          * functionality.
          */
         ActiveMQProducer(
-            std::shared_ptr<activemq::core::kernels::ActiveMQProducerKernel> kernel);
+            std::shared_ptr<activemq::core::kernels::ActiveMQProducerKernel>
+                kernel);
 
         virtual ~ActiveMQProducer();
 

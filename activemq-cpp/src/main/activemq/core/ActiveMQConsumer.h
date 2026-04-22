@@ -55,8 +55,8 @@ namespace core
          *      This Consumer's functionality kernel.
          */
         ActiveMQConsumer(
-            const std::shared_ptr<activemq::core::kernels::ActiveMQConsumerKernel>&
-                kernel);
+            const std::shared_ptr<
+                activemq::core::kernels::ActiveMQConsumerKernel>& kernel);
 
         virtual ~ActiveMQConsumer();
 

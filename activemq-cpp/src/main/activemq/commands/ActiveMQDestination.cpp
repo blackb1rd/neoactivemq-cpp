@@ -315,7 +315,8 @@ ActiveMQDestination::getCompositeDestinations() const
             components.add(name);
         }
 
-        std::shared_ptr<decaf::util::Iterator<std::string>> iterator(components.iterator());
+        std::shared_ptr<decaf::util::Iterator<std::string>> iterator(
+            components.iterator());
         while (iterator->hasNext())
         {
             compositeDestinations.add(createDestination(iterator->next()));

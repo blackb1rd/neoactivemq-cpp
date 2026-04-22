@@ -47,12 +47,12 @@ namespace commands
     class AMQCPP_API SubscriptionInfo : public BaseDataStructure
     {
     protected:
-        std::string                  clientId;
+        std::string                          clientId;
         std::shared_ptr<ActiveMQDestination> destination;
         std::string                          selector;
         std::string                          subcriptionName;
         std::shared_ptr<ActiveMQDestination> subscribedDestination;
-        bool                         noLocal;
+        bool                                 noLocal;
 
     public:
         const static unsigned char ID_SUBSCRIPTIONINFO = 55;
@@ -80,10 +80,11 @@ namespace commands
         virtual std::string&       getClientId();
         virtual void               setClientId(const std::string& clientId);
 
-        virtual const std::shared_ptr<ActiveMQDestination>& getDestination() const;
-        virtual std::shared_ptr<ActiveMQDestination>&       getDestination();
-        virtual void                                        setDestination(
-                                           const std::shared_ptr<ActiveMQDestination>& destination);
+        virtual const std::shared_ptr<ActiveMQDestination>& getDestination()
+            const;
+        virtual std::shared_ptr<ActiveMQDestination>& getDestination();
+        virtual void                                  setDestination(
+                                             const std::shared_ptr<ActiveMQDestination>& destination);
 
         virtual const std::string& getSelector() const;
         virtual std::string&       getSelector();
@@ -93,11 +94,11 @@ namespace commands
         virtual std::string&       getSubcriptionName();
         virtual void setSubcriptionName(const std::string& subcriptionName);
 
-        virtual const std::shared_ptr<ActiveMQDestination>& getSubscribedDestination()
-            const;
+        virtual const std::shared_ptr<ActiveMQDestination>&
+        getSubscribedDestination() const;
         virtual std::shared_ptr<ActiveMQDestination>& getSubscribedDestination();
-        virtual void                                  setSubscribedDestination(
-                                     const std::shared_ptr<ActiveMQDestination>& subscribedDestination);
+        virtual void setSubscribedDestination(
+            const std::shared_ptr<ActiveMQDestination>& subscribedDestination);
 
         virtual bool isNoLocal() const;
         virtual void setNoLocal(bool noLocal);

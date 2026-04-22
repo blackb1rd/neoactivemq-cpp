@@ -79,7 +79,8 @@ namespace commands
 
         virtual const std::shared_ptr<ConnectionId>& getConnectionId() const;
         virtual std::shared_ptr<ConnectionId>&       getConnectionId();
-        virtual void setConnectionId(const std::shared_ptr<ConnectionId>& connectionId);
+        virtual void                                 setConnectionId(
+                                            const std::shared_ptr<ConnectionId>& connectionId);
 
         /**
          * @return an answer of true to the isConnectionError() query.
@@ -89,7 +90,8 @@ namespace commands
             return true;
         }
 
-        virtual std::shared_ptr<Command> visit(activemq::state::CommandVisitor* visitor);
+        virtual std::shared_ptr<Command> visit(
+            activemq::state::CommandVisitor* visitor);
     };
 
 }  // namespace commands

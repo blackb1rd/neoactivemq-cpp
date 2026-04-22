@@ -66,8 +66,8 @@ void JournalTopicAckMarshaller::tightUnmarshal(OpenWireFormat*  wireFormat,
                                                  bs);
 
         JournalTopicAck* info = dynamic_cast<JournalTopicAck*>(dataStructure);
-        info->setDestination(
-            std::shared_ptr<ActiveMQDestination>(dynamic_cast<ActiveMQDestination*>(
+        info->setDestination(std::shared_ptr<ActiveMQDestination>(
+            dynamic_cast<ActiveMQDestination*>(
                 tightUnmarshalNestedObject(wireFormat, dataIn, bs))));
         info->setMessageId(std::shared_ptr<MessageId>(dynamic_cast<MessageId*>(
             tightUnmarshalNestedObject(wireFormat, dataIn, bs))));
@@ -164,8 +164,8 @@ void JournalTopicAckMarshaller::looseUnmarshal(OpenWireFormat*  wireFormat,
                                                  dataStructure,
                                                  dataIn);
         JournalTopicAck* info = dynamic_cast<JournalTopicAck*>(dataStructure);
-        info->setDestination(
-            std::shared_ptr<ActiveMQDestination>(dynamic_cast<ActiveMQDestination*>(
+        info->setDestination(std::shared_ptr<ActiveMQDestination>(
+            dynamic_cast<ActiveMQDestination*>(
                 looseUnmarshalNestedObject(wireFormat, dataIn))));
         info->setMessageId(std::shared_ptr<MessageId>(dynamic_cast<MessageId*>(
             looseUnmarshalNestedObject(wireFormat, dataIn))));

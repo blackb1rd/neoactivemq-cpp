@@ -502,7 +502,8 @@ commands::DataStructure* BaseDataStreamMarshaller::tightUnmarshalBrokerError(
             if (wireFormat->isStackTraceEnabled())
             {
                 short length = dataIn->readShort();
-                std::vector<std::shared_ptr<BrokerError::StackTraceElement>> stackTrace;
+                std::vector<std::shared_ptr<BrokerError::StackTraceElement>>
+                    stackTrace;
 
                 for (int i = 0; i < length; ++i)
                 {
@@ -564,8 +565,8 @@ int BaseDataStreamMarshaller::tightMarshalBrokerError1(
                      i < error->getStackTraceElements().size();
                      ++i)
                 {
-                    const std::shared_ptr<BrokerError::StackTraceElement> element =
-                        error->getStackTraceElements()[i];
+                    const std::shared_ptr<BrokerError::StackTraceElement>
+                        element = error->getStackTraceElements()[i];
                     rc += tightMarshalString1(element->ClassName, bs);
                     rc += tightMarshalString1(element->MethodName, bs);
                     rc += tightMarshalString1(element->FileName, bs);
@@ -645,7 +646,8 @@ commands::DataStructure* BaseDataStreamMarshaller::looseUnmarshalBrokerError(
             if (wireFormat->isStackTraceEnabled())
             {
                 short length = dataIn->readShort();
-                std::vector<std::shared_ptr<BrokerError::StackTraceElement>> stackTrace;
+                std::vector<std::shared_ptr<BrokerError::StackTraceElement>>
+                    stackTrace;
 
                 for (int i = 0; i < length; ++i)
                 {
@@ -850,8 +852,8 @@ std::string BaseDataStreamMarshaller::toString(
     }
     else if (xaTxnId != NULL)
     {
-        return string("XID:") + std::to_string(xaTxnId->getFormatId()) +
-               ":" + toHexFromBytes(xaTxnId->getGlobalTransactionId()) + ":" +
+        return string("XID:") + std::to_string(xaTxnId->getFormatId()) + ":" +
+               toHexFromBytes(xaTxnId->getGlobalTransactionId()) + ":" +
                toHexFromBytes(xaTxnId->getBranchQualifier());
     }
 

@@ -92,7 +92,8 @@ namespace commands
         virtual std::shared_ptr<SessionId>&       getSessionId();
         virtual void setSessionId(const std::shared_ptr<SessionId>& sessionId);
 
-        virtual std::shared_ptr<Command> visit(activemq::state::CommandVisitor* visitor);
+        virtual std::shared_ptr<Command> visit(
+            activemq::state::CommandVisitor* visitor);
     };
 
 }  // namespace commands

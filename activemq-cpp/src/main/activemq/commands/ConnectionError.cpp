@@ -184,15 +184,13 @@ std::shared_ptr<BrokerError>& ConnectionError::getException()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConnectionError::setException(
-    const std::shared_ptr<BrokerError>& exception)
+void ConnectionError::setException(const std::shared_ptr<BrokerError>& exception)
 {
     this->exception = exception;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::shared_ptr<ConnectionId>& ConnectionError::getConnectionId()
-    const
+const std::shared_ptr<ConnectionId>& ConnectionError::getConnectionId() const
 {
     return connectionId;
 }

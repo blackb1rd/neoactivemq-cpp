@@ -127,10 +127,10 @@ namespace core
             ActiveMQSessionKernel& operator=(const ActiveMQSessionKernel&);
 
         public:
-            ActiveMQSessionKernel(ActiveMQConnection*                          connection,
+            ActiveMQSessionKernel(ActiveMQConnection* connection,
                                   const std::shared_ptr<commands::SessionId>& id,
-                                  cms::Session::AcknowledgeMode                ackMode,
-                                  const decaf::util::Properties&               properties);
+                                  cms::Session::AcknowledgeMode  ackMode,
+                                  const decaf::util::Properties& properties);
 
             virtual ~ActiveMQSessionKernel();
 
@@ -141,7 +141,6 @@ namespace core
              * redelivered.
              */
             virtual void redispatch(MessageDispatchChannel& unconsumedMessages);
-
 
             /**
              * Stops asynchronous message delivery.
@@ -190,7 +189,8 @@ namespace core
              * Dispatches a message to a particular consumer.
              * @param message - the message to be dispatched
              */
-            virtual void dispatch(const std::shared_ptr<MessageDispatch>& message);
+            virtual void dispatch(
+                const std::shared_ptr<MessageDispatch>& message);
 
         public:  // Implements Methods
             virtual void close();
@@ -287,15 +287,15 @@ namespace core
              * @throws CMSException if an error occurs while sending the
              * message.
              */
-            void send(kernels::ActiveMQProducerKernel*                      producer,
-                      std::shared_ptr<commands::ActiveMQDestination>        destination,
-                      cms::Message*                                         message,
-                      int                                                   deliveryMode,
-                      int                                                   priority,
-                      long long                                             timeToLive,
-                      util::MemoryUsage*                                    producerWindow,
-                      long long                                             sendTimeout,
-                      cms::AsyncCallback*                                   onComplete);
+            void send(kernels::ActiveMQProducerKernel* producer,
+                      std::shared_ptr<commands::ActiveMQDestination> destination,
+                      cms::Message*       message,
+                      int                 deliveryMode,
+                      int                 priority,
+                      long long           timeToLive,
+                      util::MemoryUsage*  producerWindow,
+                      long long           sendTimeout,
+                      cms::AsyncCallback* onComplete);
 
             /**
              * This method gets any registered exception listener of this
@@ -407,8 +407,8 @@ namespace core
              *      The time to wait for a response, default is zero or
              * infinite.
              *
-             * @return std::shared_ptr to a Response object that the broker has returned
-             * for the Command sent.
+             * @return std::shared_ptr to a Response object that the broker has
+             * returned for the Command sent.
              *
              * @throws ActiveMQException thrown if an error response was
              * received from the broker, or if any other error occurred.
@@ -439,7 +439,8 @@ namespace core
              *
              * @throw ActiveMQException if an internal error occurs.
              */
-            void removeConsumer(std::shared_ptr<ActiveMQConsumerKernel> consumer);
+            void removeConsumer(
+                std::shared_ptr<ActiveMQConsumerKernel> consumer);
 
             /**
              * Adds a MessageProducer to this session registering it with the
@@ -462,7 +463,8 @@ namespace core
              *
              * @throw ActiveMQException if an internal error occurs.
              */
-            void removeProducer(std::shared_ptr<ActiveMQProducerKernel> producer);
+            void removeProducer(
+                std::shared_ptr<ActiveMQProducerKernel> producer);
 
             /**
              * Starts if not already start a Transaction for this Session.  If
@@ -501,8 +503,7 @@ namespace core
              * all messages that are currently in progress.
              */
             void clearMessagesInProgress(
-                std::shared_ptr<std::atomic<int>>
-                    transportsInterrupted);
+                std::shared_ptr<std::atomic<int>> transportsInterrupted);
 
             /**
              * Causes the Session to wakeup its executer and ensure all messages
@@ -549,7 +550,7 @@ namespace core
              *      The new prefetch value.
              */
             void setPrefetchSize(std::shared_ptr<commands::ConsumerId> id,
-                                 int                                   prefetch);
+                                 int prefetch);
 
             /**
              * Close the specified consumer if present in this Session.
@@ -566,7 +567,8 @@ namespace core
              * @return true if there is a consumer of this destination in this
              * Session.
              */
-            bool isInUse(std::shared_ptr<commands::ActiveMQDestination> destination);
+            bool isInUse(
+                std::shared_ptr<commands::ActiveMQDestination> destination);
 
             /**
              * @return a std::shared_ptr to an ActiveMQProducerKernel using its
@@ -619,7 +621,7 @@ namespace core
              *      True if the command can be sent asynchronously.
              */
             void sendAck(std::shared_ptr<commands::MessageAck> ack,
-                         bool async = false);
+                         bool                                  async = false);
 
             /**
              * Returns true if this session is dispatching messages to its

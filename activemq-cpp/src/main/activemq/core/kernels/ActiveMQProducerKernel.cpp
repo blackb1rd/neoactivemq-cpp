@@ -44,10 +44,10 @@ using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 ActiveMQProducerKernel::ActiveMQProducerKernel(
-    ActiveMQSessionKernel*                              session,
-    const std::shared_ptr<commands::ProducerId>&        producerId,
-    const std::shared_ptr<ActiveMQDestination>&         destination,
-    long long                                           sendTimeout)
+    ActiveMQSessionKernel*                       session,
+    const std::shared_ptr<commands::ProducerId>& producerId,
+    const std::shared_ptr<ActiveMQDestination>&  destination,
+    long long                                    sendTimeout)
     : disableTimestamps(false),
       disableMessageId(false),
       defaultDeliveryMode(cms::Message::DEFAULT_DELIVERY_MODE),
@@ -86,7 +86,8 @@ ActiveMQProducerKernel::ActiveMQProducerKernel(
         this->producerInfo->setDispatchAsync(Boolean::parseBoolean(
             options.getProperty("producer.dispatchAsync", "false")));
 
-        this->destination = std::dynamic_pointer_cast<cms::Destination>(destination);
+        this->destination =
+            std::dynamic_pointer_cast<cms::Destination>(destination);
     }
 
     // Enable producer window flow control if protocol >= 3 and the window
@@ -98,11 +99,12 @@ ActiveMQProducerKernel::ActiveMQProducerKernel(
             new MemoryUsage(session->getConnection()->getProducerWindowSize()));
     }
 
-    AMQ_LOG_DEBUG(
-        "ActiveMQProducerKernel",
-        "Producer created: producerId="
-            << producerId->toString() << ", destination="
-            << (destination != nullptr ? destination->getPhysicalName() : "NULL"));
+    AMQ_LOG_DEBUG("ActiveMQProducerKernel",
+                  "Producer created: producerId="
+                      << producerId->toString() << ", destination="
+                      << (destination != nullptr
+                              ? destination->getPhysicalName()
+                              : "NULL"));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -154,7 +156,8 @@ void ActiveMQProducerKernel::dispose()
         // Use a non-owning shared_ptr (aliasing constructor with null deleter)
         // to pass 'this' to removeProducer without taking ownership.
         std::shared_ptr<ActiveMQProducerKernel> producer(
-            std::shared_ptr<ActiveMQProducerKernel>{}, this);
+            std::shared_ptr<ActiveMQProducerKernel>{},
+            this);
         try
         {
             this->session->removeProducer(producer);
@@ -357,7 +360,7 @@ void ActiveMQProducerKernel::send(const cms::Destination* destination,
             throw cms::CMSException("No destination specified", nullptr);
         }
 
-        cms::Message*              outbound = message;
+        cms::Message*                 outbound = message;
         std::shared_ptr<cms::Message> scopedMessage;
         if (this->transformer != nullptr)
         {

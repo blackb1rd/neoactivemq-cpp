@@ -68,10 +68,11 @@ void MessageDispatchNotificationMarshaller::tightUnmarshal(
 
         MessageDispatchNotification* info =
             dynamic_cast<MessageDispatchNotification*>(dataStructure);
-        info->setConsumerId(std::shared_ptr<ConsumerId>(dynamic_cast<ConsumerId*>(
-            tightUnmarshalCachedObject(wireFormat, dataIn, bs))));
-        info->setDestination(
-            std::shared_ptr<ActiveMQDestination>(dynamic_cast<ActiveMQDestination*>(
+        info->setConsumerId(
+            std::shared_ptr<ConsumerId>(dynamic_cast<ConsumerId*>(
+                tightUnmarshalCachedObject(wireFormat, dataIn, bs))));
+        info->setDestination(std::shared_ptr<ActiveMQDestination>(
+            dynamic_cast<ActiveMQDestination*>(
                 tightUnmarshalCachedObject(wireFormat, dataIn, bs))));
         info->setDeliverySequenceId(tightUnmarshalLong(wireFormat, dataIn, bs));
         info->setMessageId(std::shared_ptr<MessageId>(dynamic_cast<MessageId*>(
@@ -167,10 +168,11 @@ void MessageDispatchNotificationMarshaller::looseUnmarshal(
                                               dataIn);
         MessageDispatchNotification* info =
             dynamic_cast<MessageDispatchNotification*>(dataStructure);
-        info->setConsumerId(std::shared_ptr<ConsumerId>(dynamic_cast<ConsumerId*>(
-            looseUnmarshalCachedObject(wireFormat, dataIn))));
-        info->setDestination(
-            std::shared_ptr<ActiveMQDestination>(dynamic_cast<ActiveMQDestination*>(
+        info->setConsumerId(
+            std::shared_ptr<ConsumerId>(dynamic_cast<ConsumerId*>(
+                looseUnmarshalCachedObject(wireFormat, dataIn))));
+        info->setDestination(std::shared_ptr<ActiveMQDestination>(
+            dynamic_cast<ActiveMQDestination*>(
                 looseUnmarshalCachedObject(wireFormat, dataIn))));
         info->setDeliverySequenceId(looseUnmarshalLong(wireFormat, dataIn));
         info->setMessageId(std::shared_ptr<MessageId>(dynamic_cast<MessageId*>(

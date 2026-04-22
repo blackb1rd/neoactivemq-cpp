@@ -100,7 +100,11 @@ void ActiveMQTempDestination::close()
     {
         if (this->connection != NULL)
         {
-            std::shared_ptr<ActiveMQTempDestination> thisPtr(this, [](ActiveMQTempDestination*){});
+            std::shared_ptr<ActiveMQTempDestination> thisPtr(
+                this,
+                [](ActiveMQTempDestination*)
+                {
+                });
             this->connection->deleteTempDestination(thisPtr);
         }
     }

@@ -25,7 +25,6 @@
 #include <activemq/commands/ActiveMQDestination.h>
 #include <activemq/commands/MessageId.h>
 #include <activemq/core/ActiveMQAckHandler.h>
-#include <decaf/lang/Pointer.h>
 #include <decaf/lang/System.h>
 #include <memory>
 #include <vector>
@@ -42,7 +41,7 @@ class ActiveMQMessageTest : public ::testing::Test
 {
 protected:
     bool                                         readOnlyMessage;
-    decaf::lang::Pointer<commands::MessageId>    cmsMessageId;
+    std::shared_ptr<commands::MessageId>         cmsMessageId;
     std::string                                  cmsCorrelationID;
     std::unique_ptr<commands::ActiveMQTopic>     cmsDestination;
     std::unique_ptr<commands::ActiveMQTempTopic> cmsReplyTo;
@@ -90,12 +89,12 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 void ActiveMQMessageTest::SetUp()
 {
-    Pointer<ProducerId> producerId(new ProducerId());
+    std::shared_ptr<ProducerId> producerId = std::make_shared<ProducerId>();
     producerId->setConnectionId("testConnectionId");
     producerId->setSessionId(11);
     producerId->setValue(1);
 
-    this->cmsMessageId.reset(new MessageId());
+    this->cmsMessageId = std::make_shared<MessageId>();
     this->cmsMessageId->setProducerId(producerId);
     this->cmsMessageId->setProducerSequenceId(12);
 
@@ -120,7 +119,7 @@ void ActiveMQMessageTest::SetUp()
 TEST_F(ActiveMQMessageTest, test)
 {
     ActiveMQMessage       myMessage;
-    Pointer<MyAckHandler> ackHandler(new MyAckHandler());
+    std::shared_ptr<MyAckHandler> ackHandler = std::make_shared<MyAckHandler>();
 
     ASSERT_TRUE(myMessage.getDataStructureType() ==
                 ActiveMQMessage::ID_ACTIVEMQMESSAGE);

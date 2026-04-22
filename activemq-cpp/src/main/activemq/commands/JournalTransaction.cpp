@@ -165,8 +165,8 @@ bool JournalTransaction::equals(const DataStructure* value) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::shared_ptr<TransactionId>&
-JournalTransaction::getTransactionId() const
+const std::shared_ptr<TransactionId>& JournalTransaction::getTransactionId()
+    const
 {
     return transactionId;
 }

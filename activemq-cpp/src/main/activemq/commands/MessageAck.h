@@ -106,10 +106,11 @@ namespace commands
 
         bool isExpiredAck();
 
-        virtual const std::shared_ptr<ActiveMQDestination>& getDestination() const;
-        virtual std::shared_ptr<ActiveMQDestination>&       getDestination();
-        virtual void                                        setDestination(
-                                                   const std::shared_ptr<ActiveMQDestination>& destination);
+        virtual const std::shared_ptr<ActiveMQDestination>& getDestination()
+            const;
+        virtual std::shared_ptr<ActiveMQDestination>& getDestination();
+        virtual void                                  setDestination(
+                                             const std::shared_ptr<ActiveMQDestination>& destination);
 
         virtual const std::shared_ptr<TransactionId>& getTransactionId() const;
         virtual std::shared_ptr<TransactionId>&       getTransactionId();
@@ -118,25 +119,29 @@ namespace commands
 
         virtual const std::shared_ptr<ConsumerId>& getConsumerId() const;
         virtual std::shared_ptr<ConsumerId>&       getConsumerId();
-        virtual void setConsumerId(const std::shared_ptr<ConsumerId>& consumerId);
+        virtual void                               setConsumerId(
+                                          const std::shared_ptr<ConsumerId>& consumerId);
 
         virtual unsigned char getAckType() const;
         virtual void          setAckType(unsigned char ackType);
 
         virtual const std::shared_ptr<MessageId>& getFirstMessageId() const;
         virtual std::shared_ptr<MessageId>&       getFirstMessageId();
-        virtual void setFirstMessageId(const std::shared_ptr<MessageId>& firstMessageId);
+        virtual void                              setFirstMessageId(
+                                         const std::shared_ptr<MessageId>& firstMessageId);
 
         virtual const std::shared_ptr<MessageId>& getLastMessageId() const;
         virtual std::shared_ptr<MessageId>&       getLastMessageId();
-        virtual void setLastMessageId(const std::shared_ptr<MessageId>& lastMessageId);
+        virtual void                              setLastMessageId(
+                                         const std::shared_ptr<MessageId>& lastMessageId);
 
         virtual int  getMessageCount() const;
         virtual void setMessageCount(int messageCount);
 
         virtual const std::shared_ptr<BrokerError>& getPoisonCause() const;
         virtual std::shared_ptr<BrokerError>&       getPoisonCause();
-        virtual void setPoisonCause(const std::shared_ptr<BrokerError>& poisonCause);
+        virtual void                                setPoisonCause(
+                                           const std::shared_ptr<BrokerError>& poisonCause);
 
         /**
          * @return an answer of true to the isMessageAck() query.
@@ -146,7 +151,8 @@ namespace commands
             return true;
         }
 
-        virtual std::shared_ptr<Command> visit(activemq::state::CommandVisitor* visitor);
+        virtual std::shared_ptr<Command> visit(
+            activemq::state::CommandVisitor* visitor);
     };
 
 }  // namespace commands

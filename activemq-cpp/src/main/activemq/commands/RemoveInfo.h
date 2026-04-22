@@ -48,7 +48,7 @@ namespace commands
     {
     protected:
         std::shared_ptr<DataStructure> objectId;
-        long long              lastDeliveredSequenceId;
+        long long                      lastDeliveredSequenceId;
 
     public:
         const static unsigned char ID_REMOVEINFO = 12;
@@ -88,7 +88,8 @@ namespace commands
             return true;
         }
 
-        virtual std::shared_ptr<Command> visit(activemq::state::CommandVisitor* visitor);
+        virtual std::shared_ptr<Command> visit(
+            activemq::state::CommandVisitor* visitor);
     };
 
 }  // namespace commands

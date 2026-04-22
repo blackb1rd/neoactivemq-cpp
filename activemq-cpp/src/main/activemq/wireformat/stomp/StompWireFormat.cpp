@@ -308,7 +308,8 @@ std::shared_ptr<Command> StompWireFormat::unmarshalMessage(
 
     if (frame->hasProperty(StompCommandConstants::HEADER_CONTENTLENGTH))
     {
-        std::shared_ptr<ActiveMQBytesMessage> message(new ActiveMQBytesMessage());
+        std::shared_ptr<ActiveMQBytesMessage> message(
+            new ActiveMQBytesMessage());
         frame->removeProperty(StompCommandConstants::HEADER_CONTENTLENGTH);
         helper->convertProperties(frame, message);
         message->setContent(frame->getBody());
@@ -374,7 +375,8 @@ std::shared_ptr<Command> StompWireFormat::unmarshalConnected(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::shared_ptr<Command> StompWireFormat::unmarshalError(const std::shared_ptr<StompFrame> frame)
+std::shared_ptr<Command> StompWireFormat::unmarshalError(
+    const std::shared_ptr<StompFrame> frame)
 {
     std::shared_ptr<BrokerError> error(new BrokerError());
     error->setMessage(
@@ -395,7 +397,8 @@ std::shared_ptr<Command> StompWireFormat::unmarshalError(const std::shared_ptr<S
         }
         else
         {
-            std::shared_ptr<ExceptionResponse> errorResponse(new ExceptionResponse());
+            std::shared_ptr<ExceptionResponse> errorResponse(
+                new ExceptionResponse());
             errorResponse->setException(error);
             errorResponse->setCorrelationId(std::stoi(responseId));
             return errorResponse;
@@ -411,7 +414,8 @@ std::shared_ptr<Command> StompWireFormat::unmarshalError(const std::shared_ptr<S
 std::shared_ptr<StompFrame> StompWireFormat::marshalMessage(
     const std::shared_ptr<Command> command)
 {
-    std::shared_ptr<Message> message = std::dynamic_pointer_cast<Message>(command);
+    std::shared_ptr<Message> message =
+        std::dynamic_pointer_cast<Message>(command);
 
     std::shared_ptr<StompFrame> frame(new StompFrame());
     frame->setCommand(StompCommandConstants::SEND);
@@ -464,18 +468,20 @@ std::shared_ptr<StompFrame> StompWireFormat::marshalMessage(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::shared_ptr<StompFrame> StompWireFormat::marshalAck(const std::shared_ptr<Command> command)
+std::shared_ptr<StompFrame> StompWireFormat::marshalAck(
+    const std::shared_ptr<Command> command)
 {
-    std::shared_ptr<MessageAck> ack = std::dynamic_pointer_cast<MessageAck>(command);
+    std::shared_ptr<MessageAck> ack =
+        std::dynamic_pointer_cast<MessageAck>(command);
 
     std::shared_ptr<StompFrame> frame(new StompFrame());
     frame->setCommand(StompCommandConstants::ACK);
 
     if (command->isResponseRequired())
     {
-        frame->setProperty(StompCommandConstants::HEADER_RECEIPT_REQUIRED,
-                           std::string("ignore:") +
-                               std::to_string(command->getCommandId()));
+        frame->setProperty(
+            StompCommandConstants::HEADER_RECEIPT_REQUIRED,
+            std::string("ignore:") + std::to_string(command->getCommandId()));
     }
 
     frame->setProperty(StompCommandConstants::HEADER_MESSAGEID,
@@ -495,7 +501,8 @@ std::shared_ptr<StompFrame> StompWireFormat::marshalAck(const std::shared_ptr<Co
 std::shared_ptr<StompFrame> StompWireFormat::marshalConnectionInfo(
     const std::shared_ptr<Command> command)
 {
-    std::shared_ptr<ConnectionInfo> info = std::dynamic_pointer_cast<ConnectionInfo>(command);
+    std::shared_ptr<ConnectionInfo> info =
+        std::dynamic_pointer_cast<ConnectionInfo>(command);
 
     std::shared_ptr<StompFrame> frame(new StompFrame());
     frame->setCommand(StompCommandConstants::CONNECT);
@@ -518,7 +525,8 @@ std::shared_ptr<StompFrame> StompWireFormat::marshalConnectionInfo(
 std::shared_ptr<StompFrame> StompWireFormat::marshalTransactionInfo(
     const std::shared_ptr<Command> command)
 {
-    std::shared_ptr<TransactionInfo>    info = std::dynamic_pointer_cast<TransactionInfo>(command);
+    std::shared_ptr<TransactionInfo> info =
+        std::dynamic_pointer_cast<TransactionInfo>(command);
     std::shared_ptr<LocalTransactionId> id =
         std::dynamic_pointer_cast<LocalTransactionId>(info->getTransactionId());
 
@@ -570,7 +578,8 @@ std::shared_ptr<StompFrame> StompWireFormat::marshalShutdownInfo(
 std::shared_ptr<StompFrame> StompWireFormat::marshalRemoveInfo(
     const std::shared_ptr<Command> command)
 {
-    std::shared_ptr<RemoveInfo> info = std::dynamic_pointer_cast<RemoveInfo>(command);
+    std::shared_ptr<RemoveInfo> info =
+        std::dynamic_pointer_cast<RemoveInfo>(command);
     std::shared_ptr<StompFrame> frame(new StompFrame());
     frame->setCommand(StompCommandConstants::UNSUBSCRIBE);
 
@@ -582,7 +591,8 @@ std::shared_ptr<StompFrame> StompWireFormat::marshalRemoveInfo(
 
     try
     {
-        std::shared_ptr<ConsumerId> id = std::dynamic_pointer_cast<ConsumerId>(info->getObjectId());
+        std::shared_ptr<ConsumerId> id =
+            std::dynamic_pointer_cast<ConsumerId>(info->getObjectId());
         frame->setProperty(StompCommandConstants::HEADER_ID,
                            helper->convertConsumerId(id));
         return frame;
@@ -598,7 +608,8 @@ std::shared_ptr<StompFrame> StompWireFormat::marshalRemoveInfo(
 std::shared_ptr<StompFrame> StompWireFormat::marshalConsumerInfo(
     const std::shared_ptr<Command> command)
 {
-    std::shared_ptr<ConsumerInfo> info = std::dynamic_pointer_cast<ConsumerInfo>(command);
+    std::shared_ptr<ConsumerInfo> info =
+        std::dynamic_pointer_cast<ConsumerInfo>(command);
 
     std::shared_ptr<StompFrame> frame(new StompFrame());
     frame->setCommand(StompCommandConstants::SUBSCRIBE);
@@ -665,9 +676,8 @@ std::shared_ptr<StompFrame> StompWireFormat::marshalConsumerInfo(
         frame->setProperty(StompCommandConstants::HEADER_EXCLUSIVE, "true");
     }
 
-    frame->setProperty(
-        StompCommandConstants::HEADER_MAXPENDINGMSGLIMIT,
-        std::to_string(info->getMaximumPendingMessageLimit()));
+    frame->setProperty(StompCommandConstants::HEADER_MAXPENDINGMSGLIMIT,
+                       std::to_string(info->getMaximumPendingMessageLimit()));
     frame->setProperty(StompCommandConstants::HEADER_PREFETCHSIZE,
                        std::to_string(info->getPrefetchSize()));
     frame->setProperty(StompCommandConstants::HEADER_CONSUMERPRIORITY,
@@ -692,9 +702,9 @@ std::shared_ptr<StompFrame> StompWireFormat::marshalRemoveSubscriptionInfo(
 
     if (command->isResponseRequired())
     {
-        frame->setProperty(StompCommandConstants::HEADER_RECEIPT_REQUIRED,
-                           std::string("ignore:") +
-                               std::to_string(command->getCommandId()));
+        frame->setProperty(
+            StompCommandConstants::HEADER_RECEIPT_REQUIRED,
+            std::string("ignore:") + std::to_string(command->getCommandId()));
     }
 
     frame->setProperty(StompCommandConstants::HEADER_ID, info->getClientId());

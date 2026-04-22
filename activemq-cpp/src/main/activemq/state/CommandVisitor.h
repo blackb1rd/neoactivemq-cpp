@@ -109,11 +109,10 @@ namespace state
         virtual std::shared_ptr<commands::Command> processDestinationInfo(
             commands::DestinationInfo* info) = 0;
 
-        virtual std::shared_ptr<commands::Command>
-        processRemoveDestination(commands::DestinationInfo* info) = 0;
+        virtual std::shared_ptr<commands::Command> processRemoveDestination(
+            commands::DestinationInfo* info) = 0;
 
-        virtual std::shared_ptr<commands::Command>
-        processRemoveSubscriptionInfo(
+        virtual std::shared_ptr<commands::Command> processRemoveSubscriptionInfo(
             commands::RemoveSubscriptionInfo* info) = 0;
 
         virtual std::shared_ptr<commands::Command> processMessage(
@@ -128,8 +127,8 @@ namespace state
         virtual std::shared_ptr<commands::Command> processBeginTransaction(
             commands::TransactionInfo* info) = 0;
 
-        virtual std::shared_ptr<commands::Command>
-        processPrepareTransaction(commands::TransactionInfo* info) = 0;
+        virtual std::shared_ptr<commands::Command> processPrepareTransaction(
+            commands::TransactionInfo* info) = 0;
 
         virtual std::shared_ptr<commands::Command>
         processCommitTransactionOnePhase(commands::TransactionInfo* info) = 0;
@@ -137,8 +136,8 @@ namespace state
         virtual std::shared_ptr<commands::Command>
         processCommitTransactionTwoPhase(commands::TransactionInfo* info) = 0;
 
-        virtual std::shared_ptr<commands::Command>
-        processRollbackTransaction(commands::TransactionInfo* info) = 0;
+        virtual std::shared_ptr<commands::Command> processRollbackTransaction(
+            commands::TransactionInfo* info) = 0;
 
         virtual std::shared_ptr<commands::Command> processWireFormat(
             commands::WireFormatInfo* info) = 0;
@@ -155,11 +154,11 @@ namespace state
         virtual std::shared_ptr<commands::Command> processBrokerInfo(
             commands::BrokerInfo* info) = 0;
 
-        virtual std::shared_ptr<commands::Command>
-        processRecoverTransactions(commands::TransactionInfo* info) = 0;
+        virtual std::shared_ptr<commands::Command> processRecoverTransactions(
+            commands::TransactionInfo* info) = 0;
 
-        virtual std::shared_ptr<commands::Command>
-        processForgetTransaction(commands::TransactionInfo* info) = 0;
+        virtual std::shared_ptr<commands::Command> processForgetTransaction(
+            commands::TransactionInfo* info) = 0;
 
         virtual std::shared_ptr<commands::Command> processEndTransaction(
             commands::TransactionInfo* info) = 0;
@@ -180,8 +179,8 @@ namespace state
         virtual std::shared_ptr<commands::Command> processConnectionError(
             commands::ConnectionError* error) = 0;
 
-        virtual std::shared_ptr<commands::Command>
-        processConnectionControl(commands::ConnectionControl* control) = 0;
+        virtual std::shared_ptr<commands::Command> processConnectionControl(
+            commands::ConnectionControl* control) = 0;
 
         virtual std::shared_ptr<commands::Command> processConsumerControl(
             commands::ConsumerControl* control) = 0;

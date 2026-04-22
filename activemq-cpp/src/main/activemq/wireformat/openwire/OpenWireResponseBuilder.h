@@ -50,8 +50,9 @@ namespace wireformat
                 const std::shared_ptr<commands::Command> command);
 
             virtual void buildIncomingCommands(
-                const std::shared_ptr<commands::Command>                     command,
-                decaf::util::LinkedList<std::shared_ptr<commands::Command>>& queue);
+                const std::shared_ptr<commands::Command> command,
+                decaf::util::LinkedList<std::shared_ptr<commands::Command>>&
+                    queue);
         };
 
     }  // namespace openwire

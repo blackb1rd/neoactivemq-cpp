@@ -62,36 +62,36 @@ namespace commands
     class AMQCPP_API Message : public BaseCommand
     {
     protected:
-        std::shared_ptr<ProducerId>                         producerId;
-        std::shared_ptr<ActiveMQDestination>                destination;
-        std::shared_ptr<TransactionId>                      transactionId;
-        std::shared_ptr<ActiveMQDestination>                originalDestination;
-        std::shared_ptr<MessageId>                          messageId;
-        std::shared_ptr<TransactionId>                      originalTransactionId;
-        std::string                                         groupID;
-        int                                                 groupSequence;
-        std::string                                         correlationId;
-        bool                                                persistent;
-        long long                                           expiration;
-        unsigned char                                       priority;
-        std::shared_ptr<ActiveMQDestination>                replyTo;
-        long long                                           timestamp;
-        std::string                                         type;
-        std::vector<unsigned char>                          content;
-        std::vector<unsigned char>                          marshalledProperties;
-        std::shared_ptr<DataStructure>                      dataStructure;
-        std::shared_ptr<ConsumerId>                         targetConsumerId;
-        bool                                                compressed;
-        int                                                 redeliveryCounter;
-        std::vector<std::shared_ptr<BrokerId>>              brokerPath;
-        long long                                           arrival;
-        std::string                                         userID;
-        bool                                                recievedByDFBridge;
-        bool                                                droppable;
-        std::vector<std::shared_ptr<BrokerId>>              cluster;
-        long long                                           brokerInTime;
-        long long                                           brokerOutTime;
-        bool                                                jMSXGroupFirstForConsumer;
+        std::shared_ptr<ProducerId>            producerId;
+        std::shared_ptr<ActiveMQDestination>   destination;
+        std::shared_ptr<TransactionId>         transactionId;
+        std::shared_ptr<ActiveMQDestination>   originalDestination;
+        std::shared_ptr<MessageId>             messageId;
+        std::shared_ptr<TransactionId>         originalTransactionId;
+        std::string                            groupID;
+        int                                    groupSequence;
+        std::string                            correlationId;
+        bool                                   persistent;
+        long long                              expiration;
+        unsigned char                          priority;
+        std::shared_ptr<ActiveMQDestination>   replyTo;
+        long long                              timestamp;
+        std::string                            type;
+        std::vector<unsigned char>             content;
+        std::vector<unsigned char>             marshalledProperties;
+        std::shared_ptr<DataStructure>         dataStructure;
+        std::shared_ptr<ConsumerId>            targetConsumerId;
+        bool                                   compressed;
+        int                                    redeliveryCounter;
+        std::vector<std::shared_ptr<BrokerId>> brokerPath;
+        long long                              arrival;
+        std::string                            userID;
+        bool                                   recievedByDFBridge;
+        bool                                   droppable;
+        std::vector<std::shared_ptr<BrokerId>> cluster;
+        long long                              brokerInTime;
+        long long                              brokerOutTime;
+        bool                                   jMSXGroupFirstForConsumer;
 
     public:
         const static unsigned char ID_MESSAGE = 0;
@@ -156,11 +156,12 @@ namespace commands
         virtual bool equals(const DataStructure* value) const;
 
         /**
-         * Create a shared_ptr based copy of this message.  Useful for chaining a
-         * clone operation with other operation such as casting to a cms Message
-         * type.
+         * Create a shared_ptr based copy of this message.  Useful for chaining
+         * a clone operation with other operation such as casting to a cms
+         * Message type.
          *
-         * @return a std::shared_ptr<Message> which is a duplicate of this object.
+         * @return a std::shared_ptr<Message> which is a duplicate of this
+         * object.
          */
         std::shared_ptr<Message> copy() const
         {
@@ -319,32 +320,35 @@ namespace commands
 
         virtual const std::shared_ptr<ProducerId>& getProducerId() const;
         virtual std::shared_ptr<ProducerId>&       getProducerId();
-        virtual void setProducerId(const std::shared_ptr<ProducerId>& producerId);
+        virtual void                               setProducerId(
+                                          const std::shared_ptr<ProducerId>& producerId);
 
-        virtual const std::shared_ptr<ActiveMQDestination>& getDestination() const;
-        virtual std::shared_ptr<ActiveMQDestination>&       getDestination();
-        virtual void                                        setDestination(
-                                           const std::shared_ptr<ActiveMQDestination>& destination);
+        virtual const std::shared_ptr<ActiveMQDestination>& getDestination()
+            const;
+        virtual std::shared_ptr<ActiveMQDestination>& getDestination();
+        virtual void                                  setDestination(
+                                             const std::shared_ptr<ActiveMQDestination>& destination);
 
         virtual const std::shared_ptr<TransactionId>& getTransactionId() const;
         virtual std::shared_ptr<TransactionId>&       getTransactionId();
         virtual void                                  setTransactionId(
-                                     const std::shared_ptr<TransactionId>& transactionId);
+                                             const std::shared_ptr<TransactionId>& transactionId);
 
-        virtual const std::shared_ptr<ActiveMQDestination>& getOriginalDestination()
-            const;
+        virtual const std::shared_ptr<ActiveMQDestination>&
+        getOriginalDestination() const;
         virtual std::shared_ptr<ActiveMQDestination>& getOriginalDestination();
         virtual void                                  setOriginalDestination(
-                                     const std::shared_ptr<ActiveMQDestination>& originalDestination);
+                                             const std::shared_ptr<ActiveMQDestination>& originalDestination);
 
         virtual const std::shared_ptr<MessageId>& getMessageId() const;
         virtual std::shared_ptr<MessageId>&       getMessageId();
         virtual void setMessageId(const std::shared_ptr<MessageId>& messageId);
 
-        virtual const std::shared_ptr<TransactionId>& getOriginalTransactionId() const;
-        virtual std::shared_ptr<TransactionId>&       getOriginalTransactionId();
-        virtual void                                  setOriginalTransactionId(
-                                     const std::shared_ptr<TransactionId>& originalTransactionId);
+        virtual const std::shared_ptr<TransactionId>& getOriginalTransactionId()
+            const;
+        virtual std::shared_ptr<TransactionId>& getOriginalTransactionId();
+        virtual void                            setOriginalTransactionId(
+                                       const std::shared_ptr<TransactionId>& originalTransactionId);
 
         virtual const std::string& getGroupID() const;
         virtual std::string&       getGroupID();
@@ -368,7 +372,8 @@ namespace commands
 
         virtual const std::shared_ptr<ActiveMQDestination>& getReplyTo() const;
         virtual std::shared_ptr<ActiveMQDestination>&       getReplyTo();
-        virtual void setReplyTo(const std::shared_ptr<ActiveMQDestination>& replyTo);
+        virtual void                                        setReplyTo(
+                                                   const std::shared_ptr<ActiveMQDestination>& replyTo);
 
         virtual long long getTimestamp() const;
         virtual void      setTimestamp(long long timestamp);
@@ -390,12 +395,12 @@ namespace commands
         virtual const std::shared_ptr<DataStructure>& getDataStructure() const;
         virtual std::shared_ptr<DataStructure>&       getDataStructure();
         virtual void                                  setDataStructure(
-                                     const std::shared_ptr<DataStructure>& dataStructure);
+                                             const std::shared_ptr<DataStructure>& dataStructure);
 
         virtual const std::shared_ptr<ConsumerId>& getTargetConsumerId() const;
         virtual std::shared_ptr<ConsumerId>&       getTargetConsumerId();
         virtual void                               setTargetConsumerId(
-                                  const std::shared_ptr<ConsumerId>& targetConsumerId);
+                                          const std::shared_ptr<ConsumerId>& targetConsumerId);
 
         virtual bool isCompressed() const;
         virtual void setCompressed(bool compressed);
@@ -403,11 +408,11 @@ namespace commands
         virtual int  getRedeliveryCounter() const;
         virtual void setRedeliveryCounter(int redeliveryCounter);
 
-        virtual const std::vector<std::shared_ptr<BrokerId>>&
-        getBrokerPath() const;
+        virtual const std::vector<std::shared_ptr<BrokerId>>& getBrokerPath()
+            const;
         virtual std::vector<std::shared_ptr<BrokerId>>& getBrokerPath();
         virtual void                                    setBrokerPath(
-                                                    const std::vector<std::shared_ptr<BrokerId>>& brokerPath);
+                                               const std::vector<std::shared_ptr<BrokerId>>& brokerPath);
 
         virtual long long getArrival() const;
         virtual void      setArrival(long long arrival);
@@ -422,11 +427,10 @@ namespace commands
         virtual bool isDroppable() const;
         virtual void setDroppable(bool droppable);
 
-        virtual const std::vector<std::shared_ptr<BrokerId>>& getCluster()
-            const;
+        virtual const std::vector<std::shared_ptr<BrokerId>>& getCluster() const;
         virtual std::vector<std::shared_ptr<BrokerId>>& getCluster();
         virtual void                                    setCluster(
-                                                    const std::vector<std::shared_ptr<BrokerId>>& cluster);
+                                               const std::vector<std::shared_ptr<BrokerId>>& cluster);
 
         virtual long long getBrokerInTime() const;
         virtual void      setBrokerInTime(long long brokerInTime);
@@ -446,7 +450,8 @@ namespace commands
             return true;
         }
 
-        virtual std::shared_ptr<Command> visit(activemq::state::CommandVisitor* visitor);
+        virtual std::shared_ptr<Command> visit(
+            activemq::state::CommandVisitor* visitor);
     };
 
 }  // namespace commands

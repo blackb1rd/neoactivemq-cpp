@@ -30,7 +30,8 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQProducer::ActiveMQProducer(std::shared_ptr<ActiveMQProducerKernel> kernel)
+ActiveMQProducer::ActiveMQProducer(
+    std::shared_ptr<ActiveMQProducerKernel> kernel)
     : kernel(kernel)
 {
     if (kernel == nullptr)

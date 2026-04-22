@@ -44,7 +44,7 @@ namespace core
         AdvisoryConsumer& operator=(const AdvisoryConsumer&);
 
     public:
-        AdvisoryConsumer(ActiveMQConnection*                     connection,
+        AdvisoryConsumer(ActiveMQConnection*                   connection,
                          std::shared_ptr<commands::ConsumerId> consumerId);
         virtual ~AdvisoryConsumer();
 

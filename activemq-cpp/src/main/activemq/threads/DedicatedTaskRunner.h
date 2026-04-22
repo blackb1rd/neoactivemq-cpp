@@ -45,8 +45,8 @@ namespace threads
                                            public decaf::lang::Runnable
     {
     private:
-        mutable decaf::util::concurrent::Mutex      mutex;
-        std::shared_ptr<decaf::lang::Thread>        thread;
+        mutable decaf::util::concurrent::Mutex mutex;
+        std::shared_ptr<decaf::lang::Thread>   thread;
 
         std::atomic<DedicatedTaskRunnerState> state;
         std::atomic<bool>                     pending;

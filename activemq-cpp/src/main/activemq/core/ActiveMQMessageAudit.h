@@ -150,8 +150,7 @@ namespace core
          * @return the last sequence Id that we've audited for the given
          * producer.
          */
-        long long getLastSeqId(
-            std::shared_ptr<commands::ProducerId> id) const;
+        long long getLastSeqId(std::shared_ptr<commands::ProducerId> id) const;
 
         /**
          * Clears this Audit.

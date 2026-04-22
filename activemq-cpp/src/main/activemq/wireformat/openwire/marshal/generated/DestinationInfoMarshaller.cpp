@@ -66,10 +66,11 @@ void DestinationInfoMarshaller::tightUnmarshal(OpenWireFormat*  wireFormat,
                                               bs);
 
         DestinationInfo* info = dynamic_cast<DestinationInfo*>(dataStructure);
-        info->setConnectionId(std::shared_ptr<ConnectionId>(dynamic_cast<ConnectionId*>(
-            tightUnmarshalCachedObject(wireFormat, dataIn, bs))));
-        info->setDestination(
-            std::shared_ptr<ActiveMQDestination>(dynamic_cast<ActiveMQDestination*>(
+        info->setConnectionId(
+            std::shared_ptr<ConnectionId>(dynamic_cast<ConnectionId*>(
+                tightUnmarshalCachedObject(wireFormat, dataIn, bs))));
+        info->setDestination(std::shared_ptr<ActiveMQDestination>(
+            dynamic_cast<ActiveMQDestination*>(
                 tightUnmarshalCachedObject(wireFormat, dataIn, bs))));
         info->setOperationType(dataIn->readByte());
         info->setTimeout(tightUnmarshalLong(wireFormat, dataIn, bs));
@@ -167,10 +168,11 @@ void DestinationInfoMarshaller::looseUnmarshal(OpenWireFormat*  wireFormat,
                                               dataStructure,
                                               dataIn);
         DestinationInfo* info = dynamic_cast<DestinationInfo*>(dataStructure);
-        info->setConnectionId(std::shared_ptr<ConnectionId>(dynamic_cast<ConnectionId*>(
-            looseUnmarshalCachedObject(wireFormat, dataIn))));
-        info->setDestination(
-            std::shared_ptr<ActiveMQDestination>(dynamic_cast<ActiveMQDestination*>(
+        info->setConnectionId(
+            std::shared_ptr<ConnectionId>(dynamic_cast<ConnectionId*>(
+                looseUnmarshalCachedObject(wireFormat, dataIn))));
+        info->setDestination(std::shared_ptr<ActiveMQDestination>(
+            dynamic_cast<ActiveMQDestination*>(
                 looseUnmarshalCachedObject(wireFormat, dataIn))));
         info->setOperationType(dataIn->readByte());
         info->setTimeout(looseUnmarshalLong(wireFormat, dataIn));

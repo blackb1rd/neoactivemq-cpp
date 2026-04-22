@@ -66,10 +66,12 @@ void ConnectionErrorMarshaller::tightUnmarshal(OpenWireFormat*  wireFormat,
                                               bs);
 
         ConnectionError* info = dynamic_cast<ConnectionError*>(dataStructure);
-        info->setException(std::shared_ptr<BrokerError>(dynamic_cast<BrokerError*>(
-            tightUnmarshalBrokerError(wireFormat, dataIn, bs))));
-        info->setConnectionId(std::shared_ptr<ConnectionId>(dynamic_cast<ConnectionId*>(
-            tightUnmarshalNestedObject(wireFormat, dataIn, bs))));
+        info->setException(
+            std::shared_ptr<BrokerError>(dynamic_cast<BrokerError*>(
+                tightUnmarshalBrokerError(wireFormat, dataIn, bs))));
+        info->setConnectionId(
+            std::shared_ptr<ConnectionId>(dynamic_cast<ConnectionId*>(
+                tightUnmarshalNestedObject(wireFormat, dataIn, bs))));
     }
     AMQ_CATCH_RETHROW(decaf::io::IOException)
     AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
@@ -143,10 +145,12 @@ void ConnectionErrorMarshaller::looseUnmarshal(OpenWireFormat*  wireFormat,
                                               dataStructure,
                                               dataIn);
         ConnectionError* info = dynamic_cast<ConnectionError*>(dataStructure);
-        info->setException(std::shared_ptr<BrokerError>(dynamic_cast<BrokerError*>(
-            looseUnmarshalBrokerError(wireFormat, dataIn))));
-        info->setConnectionId(std::shared_ptr<ConnectionId>(dynamic_cast<ConnectionId*>(
-            looseUnmarshalNestedObject(wireFormat, dataIn))));
+        info->setException(
+            std::shared_ptr<BrokerError>(dynamic_cast<BrokerError*>(
+                looseUnmarshalBrokerError(wireFormat, dataIn))));
+        info->setConnectionId(
+            std::shared_ptr<ConnectionId>(dynamic_cast<ConnectionId*>(
+                looseUnmarshalNestedObject(wireFormat, dataIn))));
     }
     AMQ_CATCH_RETHROW(decaf::io::IOException)
     AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,

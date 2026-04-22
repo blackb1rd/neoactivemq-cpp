@@ -37,8 +37,9 @@ using namespace decaf::util;
 namespace
 {
 
-std::string doConvertDestination(StompWireFormat*                      wireFormat,
-                                 std::shared_ptr<ActiveMQDestination> destination)
+std::string doConvertDestination(
+    StompWireFormat*                     wireFormat,
+    std::shared_ptr<ActiveMQDestination> destination)
 {
     switch (destination->getDestinationType())
     {
@@ -253,11 +254,12 @@ std::string StompHelper::convertDestination(
             ArrayList<std::shared_ptr<ActiveMQDestination>> destinations =
                 destination->getCompositeDestinations();
 
-            std::shared_ptr<Iterator<std::shared_ptr<ActiveMQDestination>>> destIter(
-                destinations.iterator());
+            std::shared_ptr<Iterator<std::shared_ptr<ActiveMQDestination>>>
+                destIter(destinations.iterator());
             while (destIter->hasNext())
             {
-                std::shared_ptr<ActiveMQDestination> composite = destIter->next();
+                std::shared_ptr<ActiveMQDestination> composite =
+                    destIter->next();
 
                 if (!result.empty())
                 {
@@ -321,7 +323,8 @@ std::shared_ptr<ActiveMQDestination> StompHelper::convertDestination(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string StompHelper::convertMessageId(const std::shared_ptr<MessageId>& messageId)
+std::string StompHelper::convertMessageId(
+    const std::shared_ptr<MessageId>& messageId)
 {
     // The Stomp MessageId is always hidden solely in the Producer Id.
     std::string result = convertProducerId(messageId->getProducerId());
@@ -330,7 +333,8 @@ std::string StompHelper::convertMessageId(const std::shared_ptr<MessageId>& mess
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::shared_ptr<MessageId> StompHelper::convertMessageId(const std::string& messageId)
+std::shared_ptr<MessageId> StompHelper::convertMessageId(
+    const std::string& messageId)
 {
     if (messageId == "")
     {
@@ -346,7 +350,8 @@ std::shared_ptr<MessageId> StompHelper::convertMessageId(const std::string& mess
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string StompHelper::convertConsumerId(const std::shared_ptr<ConsumerId>& consumerId)
+std::string StompHelper::convertConsumerId(
+    const std::shared_ptr<ConsumerId>& consumerId)
 {
     return consumerId->getConnectionId() + ":" +
            std::to_string(consumerId->getSessionId()) + ":" +
@@ -354,7 +359,8 @@ std::string StompHelper::convertConsumerId(const std::shared_ptr<ConsumerId>& co
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::shared_ptr<ConsumerId> StompHelper::convertConsumerId(const std::string& consumerId)
+std::shared_ptr<ConsumerId> StompHelper::convertConsumerId(
+    const std::string& consumerId)
 {
     if (consumerId == "")
     {
@@ -393,13 +399,15 @@ std::shared_ptr<ConsumerId> StompHelper::convertConsumerId(const std::string& co
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::string StompHelper::convertProducerId(const std::shared_ptr<ProducerId>& producerId)
+std::string StompHelper::convertProducerId(
+    const std::shared_ptr<ProducerId>& producerId)
 {
     return producerId->getConnectionId();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::shared_ptr<ProducerId> StompHelper::convertProducerId(const std::string& producerId)
+std::shared_ptr<ProducerId> StompHelper::convertProducerId(
+    const std::string& producerId)
 {
     if (producerId == "")
     {
@@ -436,7 +444,7 @@ std::shared_ptr<TransactionId> StompHelper::convertTransactionId(
     }
 
     std::shared_ptr<LocalTransactionId> id(new LocalTransactionId());
-    StringTokenizer             tokenizer(transactionId, ":");
+    StringTokenizer                     tokenizer(transactionId, ":");
 
     string connectionIdStr;
     connectionIdStr += tokenizer.nextToken();

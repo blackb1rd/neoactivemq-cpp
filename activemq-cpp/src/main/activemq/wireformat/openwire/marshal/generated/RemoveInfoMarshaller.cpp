@@ -69,8 +69,9 @@ void RemoveInfoMarshaller::tightUnmarshal(OpenWireFormat*  wireFormat,
 
         int wireVersion = wireFormat->getVersion();
 
-        info->setObjectId(std::shared_ptr<DataStructure>(dynamic_cast<DataStructure*>(
-            tightUnmarshalCachedObject(wireFormat, dataIn, bs))));
+        info->setObjectId(
+            std::shared_ptr<DataStructure>(dynamic_cast<DataStructure*>(
+                tightUnmarshalCachedObject(wireFormat, dataIn, bs))));
         if (wireVersion >= 5)
         {
             info->setLastDeliveredSequenceId(
@@ -164,8 +165,9 @@ void RemoveInfoMarshaller::looseUnmarshal(OpenWireFormat*  wireFormat,
 
         int wireVersion = wireFormat->getVersion();
 
-        info->setObjectId(std::shared_ptr<DataStructure>(dynamic_cast<DataStructure*>(
-            looseUnmarshalCachedObject(wireFormat, dataIn))));
+        info->setObjectId(
+            std::shared_ptr<DataStructure>(dynamic_cast<DataStructure*>(
+                looseUnmarshalCachedObject(wireFormat, dataIn))));
         if (wireVersion >= 5)
         {
             info->setLastDeliveredSequenceId(

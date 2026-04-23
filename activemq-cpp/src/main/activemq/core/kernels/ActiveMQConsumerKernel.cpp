@@ -965,7 +965,6 @@ public:
         {
             impl->session->getConnection()->onAsyncException(ex);
         }
-        this->consumer.reset();
     }
 };
 

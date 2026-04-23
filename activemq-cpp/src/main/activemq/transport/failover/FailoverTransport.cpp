@@ -1889,9 +1889,13 @@ bool FailoverTransport::iterate()
             // Only if we're transitioning to a different reconnect limit.
             // startupMaxReconnectAttempts == 0 means "fail fast on first
             // connect" — never transition.
+            // maxReconnectAttempts == 0 means "no reconnect after startup" —
+            // don't transition either, or isUriExhausted(uri, 0) is
+            // immediately true for all URIs (0 >= 0) causing a null failure.
             bool transitioningToDifferentLimit =
                 wasFirstConnection &&
                 this->impl->startupMaxReconnectAttempts > 0 &&
+                this->impl->maxReconnectAttempts != 0 &&
                 this->impl->startupMaxReconnectAttempts !=
                     this->impl->maxReconnectAttempts;
 

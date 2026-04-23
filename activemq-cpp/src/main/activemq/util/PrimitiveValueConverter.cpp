@@ -17,13 +17,13 @@
 
 #include "PrimitiveValueConverter.h"
 
-#include <string>
-
 #include <decaf/lang/Boolean.h>
 #include <decaf/lang/Byte.h>
 #include <decaf/lang/Character.h>
 #include <decaf/lang/Double.h>
 #include <decaf/lang/Float.h>
+#include <decaf/lang/Integer.h>
+#include <decaf/lang/Long.h>
 #include <decaf/lang/Short.h>
 
 using namespace activemq;
@@ -160,9 +160,9 @@ int PrimitiveValueConverter::convert<int>(const PrimitiveValueNode& value) const
         {
             try
             {
-                return std::stoi(value.getString());
+                return decaf::lang::Integer::parseInt(value.getString());
             }
-            catch (const std::exception&)
+            catch (decaf::lang::Exception& ex)
             {
             }
         }
@@ -194,9 +194,9 @@ long long PrimitiveValueConverter::convert<long long>(
         {
             try
             {
-                return std::stoll(value.getString());
+                return decaf::lang::Long::parseLong(value.getString());
             }
-            catch (const std::exception&)
+            catch (decaf::lang::Exception& ex)
             {
             }
         }

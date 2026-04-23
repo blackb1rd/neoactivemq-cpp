@@ -20,7 +20,7 @@
 #include <activemq/exceptions/ActiveMQException.h>
 #include <cms/DeliveryMode.h>
 #include <decaf/lang/Boolean.h>
-#include <string>
+#include <decaf/lang/Integer.h>
 
 using namespace std;
 using namespace activemq;
@@ -365,11 +365,11 @@ void MessagePropertyInterceptor::setStringProperty(const std::string& name,
     }
     else if (name == "JMSXDeliveryCount")
     {
-        this->message->setRedeliveryCounter(std::stoi(value));
+        this->message->setRedeliveryCounter(Integer::parseInt(value));
     }
     else if (name == "JMSXGroupSeq")
     {
-        this->message->setGroupSequence(std::stoi(value));
+        this->message->setGroupSequence(Integer::parseInt(value));
     }
     else if (name == "JMSXGroupFirstForConsumer")
     {

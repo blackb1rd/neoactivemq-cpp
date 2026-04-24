@@ -24,7 +24,7 @@ using namespace std;
 using namespace activemq;
 using namespace activemq::exceptions;
 using namespace activemq::commands;
-using namespace decaf::lang;
+
 using namespace decaf::lang::exceptions;
 
 /*
@@ -40,8 +40,8 @@ using namespace decaf::lang::exceptions;
 ////////////////////////////////////////////////////////////////////////////////
 ProducerInfo::ProducerInfo()
     : BaseCommand(),
-      producerId(NULL),
-      destination(NULL),
+      producerId(),
+      destination(),
       brokerPath(),
       dispatchAsync(false),
       windowSize(0)
@@ -109,7 +109,7 @@ std::string ProducerInfo::toString() const
            << "responseRequired = " << boolalpha << this->isResponseRequired();
     stream << ", ";
     stream << "ProducerId = ";
-    if (this->getProducerId() != NULL)
+    if (this->getProducerId())
     {
         stream << this->getProducerId()->toString();
     }
@@ -119,7 +119,7 @@ std::string ProducerInfo::toString() const
     }
     stream << ", ";
     stream << "Destination = ";
-    if (this->getDestination() != NULL)
+    if (this->getDestination())
     {
         stream << this->getDestination()->toString();
     }
@@ -135,7 +135,7 @@ std::string ProducerInfo::toString() const
         for (size_t ibrokerPath = 0; ibrokerPath < this->getBrokerPath().size();
              ++ibrokerPath)
         {
-            if (this->getBrokerPath()[ibrokerPath] != NULL)
+            if (this->getBrokerPath()[ibrokerPath])
             {
                 stream << this->getBrokerPath()[ibrokerPath]->toString()
                        << ", ";
@@ -175,32 +175,32 @@ bool ProducerInfo::equals(const DataStructure* value) const
         return false;
     }
 
-    if (this->getProducerId() != NULL)
+    if (this->getProducerId())
     {
         if (!this->getProducerId()->equals(valuePtr->getProducerId().get()))
         {
             return false;
         }
     }
-    else if (valuePtr->getProducerId() != NULL)
+    else if (valuePtr->getProducerId())
     {
         return false;
     }
-    if (this->getDestination() != NULL)
+    if (this->getDestination())
     {
         if (!this->getDestination()->equals(valuePtr->getDestination().get()))
         {
             return false;
         }
     }
-    else if (valuePtr->getDestination() != NULL)
+    else if (valuePtr->getDestination())
     {
         return false;
     }
     for (size_t ibrokerPath = 0; ibrokerPath < this->getBrokerPath().size();
          ++ibrokerPath)
     {
-        if (this->getBrokerPath()[ibrokerPath] != NULL)
+        if (this->getBrokerPath()[ibrokerPath])
         {
             if (!this->getBrokerPath()[ibrokerPath]->equals(
                     valuePtr->getBrokerPath()[ibrokerPath].get()))
@@ -208,7 +208,7 @@ bool ProducerInfo::equals(const DataStructure* value) const
                 return false;
             }
         }
-        else if (valuePtr->getBrokerPath()[ibrokerPath] != NULL)
+        else if (valuePtr->getBrokerPath()[ibrokerPath])
         {
             return false;
         }
@@ -229,60 +229,57 @@ bool ProducerInfo::equals(const DataStructure* value) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const decaf::lang::Pointer<ProducerId>& ProducerInfo::getProducerId() const
+const std::shared_ptr<ProducerId>& ProducerInfo::getProducerId() const
 {
     return producerId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<ProducerId>& ProducerInfo::getProducerId()
+std::shared_ptr<ProducerId>& ProducerInfo::getProducerId()
 {
     return producerId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ProducerInfo::setProducerId(
-    const decaf::lang::Pointer<ProducerId>& producerId)
+void ProducerInfo::setProducerId(const std::shared_ptr<ProducerId>& producerId)
 {
     this->producerId = producerId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const decaf::lang::Pointer<ActiveMQDestination>& ProducerInfo::getDestination()
-    const
+const std::shared_ptr<ActiveMQDestination>& ProducerInfo::getDestination() const
 {
     return destination;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<ActiveMQDestination>& ProducerInfo::getDestination()
+std::shared_ptr<ActiveMQDestination>& ProducerInfo::getDestination()
 {
     return destination;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void ProducerInfo::setDestination(
-    const decaf::lang::Pointer<ActiveMQDestination>& destination)
+    const std::shared_ptr<ActiveMQDestination>& destination)
 {
     this->destination = destination;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::vector<decaf::lang::Pointer<BrokerId>>& ProducerInfo::getBrokerPath()
-    const
+const std::vector<std::shared_ptr<BrokerId>>& ProducerInfo::getBrokerPath() const
 {
     return brokerPath;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::vector<decaf::lang::Pointer<BrokerId>>& ProducerInfo::getBrokerPath()
+std::vector<std::shared_ptr<BrokerId>>& ProducerInfo::getBrokerPath()
 {
     return brokerPath;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void ProducerInfo::setBrokerPath(
-    const std::vector<decaf::lang::Pointer<BrokerId>>& brokerPath)
+    const std::vector<std::shared_ptr<BrokerId>>& brokerPath)
 {
     this->brokerPath = brokerPath;
 }
@@ -312,16 +309,16 @@ void ProducerInfo::setWindowSize(int windowSize)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<commands::Command> ProducerInfo::visit(
+std::shared_ptr<commands::Command> ProducerInfo::visit(
     activemq::state::CommandVisitor* visitor)
 {
     return visitor->processProducerInfo(this);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<RemoveInfo> ProducerInfo::createRemoveCommand() const
+std::shared_ptr<RemoveInfo> ProducerInfo::createRemoveCommand() const
 {
-    Pointer<RemoveInfo> info(new RemoveInfo());
+    std::shared_ptr<RemoveInfo> info(new RemoveInfo());
     info->setResponseRequired(this->isResponseRequired());
     info->setObjectId(this->getProducerId());
     return info;

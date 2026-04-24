@@ -17,6 +17,8 @@
 
 #include "WireFormatRegistry.h"
 
+#include <memory>
+
 using namespace std;
 using namespace activemq;
 using namespace activemq::wireformat;
@@ -100,7 +102,7 @@ void WireFormatRegistry::unregisterFactory(const std::string& name)
 ////////////////////////////////////////////////////////////////////////////////
 void WireFormatRegistry::unregisterAllFactories()
 {
-    Pointer<Iterator<WireFormatFactory*>> iterator(
+    std::shared_ptr<Iterator<WireFormatFactory*>> iterator(
         this->registry.values().iterator());
     while (iterator->hasNext())
     {

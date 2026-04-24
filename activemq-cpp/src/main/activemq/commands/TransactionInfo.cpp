@@ -24,7 +24,7 @@ using namespace std;
 using namespace activemq;
 using namespace activemq::exceptions;
 using namespace activemq::commands;
-using namespace decaf::lang;
+
 using namespace decaf::lang::exceptions;
 
 /*
@@ -40,8 +40,8 @@ using namespace decaf::lang::exceptions;
 ////////////////////////////////////////////////////////////////////////////////
 TransactionInfo::TransactionInfo()
     : BaseCommand(),
-      connectionId(NULL),
-      transactionId(NULL),
+      connectionId(),
+      transactionId(),
       type(0)
 {
 }
@@ -105,7 +105,7 @@ std::string TransactionInfo::toString() const
            << "responseRequired = " << boolalpha << this->isResponseRequired();
     stream << ", ";
     stream << "ConnectionId = ";
-    if (this->getConnectionId() != NULL)
+    if (this->getConnectionId())
     {
         stream << this->getConnectionId()->toString();
     }
@@ -115,7 +115,7 @@ std::string TransactionInfo::toString() const
     }
     stream << ", ";
     stream << "TransactionId = ";
-    if (this->getTransactionId() != NULL)
+    if (this->getTransactionId())
     {
         stream << this->getTransactionId()->toString();
     }
@@ -146,18 +146,18 @@ bool TransactionInfo::equals(const DataStructure* value) const
         return false;
     }
 
-    if (this->getConnectionId() != NULL)
+    if (this->getConnectionId())
     {
         if (!this->getConnectionId()->equals(valuePtr->getConnectionId().get()))
         {
             return false;
         }
     }
-    else if (valuePtr->getConnectionId() != NULL)
+    else if (valuePtr->getConnectionId())
     {
         return false;
     }
-    if (this->getTransactionId() != NULL)
+    if (this->getTransactionId())
     {
         if (!this->getTransactionId()->equals(
                 valuePtr->getTransactionId().get()))
@@ -165,7 +165,7 @@ bool TransactionInfo::equals(const DataStructure* value) const
             return false;
         }
     }
-    else if (valuePtr->getTransactionId() != NULL)
+    else if (valuePtr->getTransactionId())
     {
         return false;
     }
@@ -181,41 +181,39 @@ bool TransactionInfo::equals(const DataStructure* value) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const decaf::lang::Pointer<ConnectionId>& TransactionInfo::getConnectionId()
-    const
+const std::shared_ptr<ConnectionId>& TransactionInfo::getConnectionId() const
 {
     return connectionId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<ConnectionId>& TransactionInfo::getConnectionId()
+std::shared_ptr<ConnectionId>& TransactionInfo::getConnectionId()
 {
     return connectionId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void TransactionInfo::setConnectionId(
-    const decaf::lang::Pointer<ConnectionId>& connectionId)
+    const std::shared_ptr<ConnectionId>& connectionId)
 {
     this->connectionId = connectionId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const decaf::lang::Pointer<TransactionId>& TransactionInfo::getTransactionId()
-    const
+const std::shared_ptr<TransactionId>& TransactionInfo::getTransactionId() const
 {
     return transactionId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<TransactionId>& TransactionInfo::getTransactionId()
+std::shared_ptr<TransactionId>& TransactionInfo::getTransactionId()
 {
     return transactionId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void TransactionInfo::setTransactionId(
-    const decaf::lang::Pointer<TransactionId>& transactionId)
+    const std::shared_ptr<TransactionId>& transactionId)
 {
     this->transactionId = transactionId;
 }
@@ -233,7 +231,7 @@ void TransactionInfo::setType(unsigned char type)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<commands::Command> TransactionInfo::visit(
+std::shared_ptr<commands::Command> TransactionInfo::visit(
     activemq::state::CommandVisitor* visitor)
 {
     return visitor->processTransactionInfo(this);

@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -46,8 +46,9 @@ TEST_F(OpenWireFormatTest, testProviderInfoInWireFormat)
     OpenWireFormatFactory factory;
     Properties            properties;
 
-    Pointer<OpenWireFormat> myWireFormat =
-        factory.createWireFormat(properties).dynamicCast<OpenWireFormat>();
+    std::shared_ptr<OpenWireFormat> myWireFormat =
+        std::dynamic_pointer_cast<OpenWireFormat>(
+            factory.createWireFormat(properties));
 
     ASSERT_EQ(
         meta.getCMSProviderName(),

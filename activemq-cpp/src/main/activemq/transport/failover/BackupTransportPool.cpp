@@ -55,13 +55,13 @@ namespace transport
             BackupTransportPoolImpl& operator=(const BackupTransportPoolImpl&);
 
         public:
-            BackupTransportPool*                 pool;
-            FailoverTransport*                   parent;
-            LinkedList<Pointer<BackupTransport>> backups;
-            volatile bool                        pending;
-            volatile bool                        closed;
-            volatile int                         priorityBackups;
-            Mutex                                retryMutex;
+            BackupTransportPool*                         pool;
+            FailoverTransport*                           parent;
+            LinkedList<std::shared_ptr<BackupTransport>> backups;
+            volatile bool                                pending;
+            volatile bool                                closed;
+            volatile int                                 priorityBackups;
+            Mutex                                        retryMutex;
 
             BackupTransportPoolImpl(BackupTransportPool* pool,
                                     FailoverTransport*   parent)
@@ -106,12 +106,12 @@ namespace transport
 
 ////////////////////////////////////////////////////////////////////////////////
 BackupTransportPool::BackupTransportPool(
-    FailoverTransport*                 parent,
-    const Pointer<CompositeTaskRunner> taskRunner,
-    const Pointer<CloseTransportsTask> closeTask,
-    const Pointer<URIPool>             uriPool,
-    const Pointer<URIPool>             updates,
-    const Pointer<URIPool>             priorityUriPool)
+    FailoverTransport*                         parent,
+    const std::shared_ptr<CompositeTaskRunner> taskRunner,
+    const std::shared_ptr<CloseTransportsTask> closeTask,
+    const std::shared_ptr<URIPool>             uriPool,
+    const std::shared_ptr<URIPool>             updates,
+    const std::shared_ptr<URIPool>             priorityUriPool)
     : impl(NULL),
       parent(parent),
       taskRunner(taskRunner),
@@ -129,28 +129,28 @@ BackupTransportPool::BackupTransportPool(
                                    "Parent transport passed is NULL");
     }
 
-    if (taskRunner == NULL)
+    if (!taskRunner)
     {
         throw NullPointerException(__FILE__,
                                    __LINE__,
                                    "TaskRunner passed is NULL");
     }
 
-    if (uriPool == NULL)
+    if (!uriPool)
     {
         throw NullPointerException(__FILE__,
                                    __LINE__,
                                    "URIPool passed is NULL");
     }
 
-    if (priorityUriPool == NULL)
+    if (!priorityUriPool)
     {
         throw NullPointerException(__FILE__,
                                    __LINE__,
                                    "Piroirty URIPool passed is NULL");
     }
 
-    if (closeTask == NULL)
+    if (!closeTask)
     {
         throw NullPointerException(__FILE__,
                                    __LINE__,
@@ -166,13 +166,13 @@ BackupTransportPool::BackupTransportPool(
 
 ////////////////////////////////////////////////////////////////////////////////
 BackupTransportPool::BackupTransportPool(
-    FailoverTransport*                 parent,
-    int                                backupPoolSize,
-    const Pointer<CompositeTaskRunner> taskRunner,
-    const Pointer<CloseTransportsTask> closeTask,
-    const Pointer<URIPool>             uriPool,
-    const Pointer<URIPool>             updates,
-    const Pointer<URIPool>             priorityUriPool)
+    FailoverTransport*                         parent,
+    int                                        backupPoolSize,
+    const std::shared_ptr<CompositeTaskRunner> taskRunner,
+    const std::shared_ptr<CloseTransportsTask> closeTask,
+    const std::shared_ptr<URIPool>             uriPool,
+    const std::shared_ptr<URIPool>             updates,
+    const std::shared_ptr<URIPool>             priorityUriPool)
     : impl(NULL),
       parent(parent),
       taskRunner(taskRunner),
@@ -190,28 +190,28 @@ BackupTransportPool::BackupTransportPool(
                                    "Parent transport passed is NULL");
     }
 
-    if (taskRunner == NULL)
+    if (!taskRunner)
     {
         throw NullPointerException(__FILE__,
                                    __LINE__,
                                    "TaskRunner passed is NULL");
     }
 
-    if (uriPool == NULL)
+    if (!uriPool)
     {
         throw NullPointerException(__FILE__,
                                    __LINE__,
                                    "URIPool passed is NULL");
     }
 
-    if (priorityUriPool == NULL)
+    if (!priorityUriPool)
     {
         throw NullPointerException(__FILE__,
                                    __LINE__,
                                    "Piroirty URIPool passed is NULL");
     }
 
-    if (closeTask == NULL)
+    if (!closeTask)
     {
         throw NullPointerException(__FILE__,
                                    __LINE__,
@@ -257,7 +257,7 @@ void BackupTransportPool::close()
     // the lock to prevent deadlock. BackupTransport destructors close their
     // transport, and if the IO thread fires onBackupTransportFailure it tries
     // to acquire the same backups lock - causing deadlock if we hold it.
-    LinkedList<Pointer<BackupTransport>> toClose;
+    LinkedList<std::shared_ptr<BackupTransport>> toClose;
     synchronized(&this->impl->backups)
     {
         this->enabled = false;
@@ -288,7 +288,7 @@ void BackupTransportPool::setEnabled(bool value)
     else
     {
         // Move backups out under lock, destroy outside to prevent deadlock
-        LinkedList<Pointer<BackupTransport>> toClose;
+        LinkedList<std::shared_ptr<BackupTransport>> toClose;
         synchronized(&this->impl->backups)
         {
             while (!this->impl->backups.isEmpty())
@@ -302,7 +302,7 @@ void BackupTransportPool::setEnabled(bool value)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<BackupTransport> BackupTransportPool::getBackup()
+std::shared_ptr<BackupTransport> BackupTransportPool::getBackup()
 {
     if (!isEnabled())
     {
@@ -311,7 +311,7 @@ Pointer<BackupTransport> BackupTransportPool::getBackup()
                                     "The Backup Pool is not enabled.");
     }
 
-    Pointer<BackupTransport> result;
+    std::shared_ptr<BackupTransport> result;
 
     synchronized(&this->impl->backups)
     {
@@ -320,7 +320,7 @@ Pointer<BackupTransport> BackupTransportPool::getBackup()
             result = this->impl->backups.removeAt(0);
 
             // Track priority backup count correctly
-            if (result != NULL && result->isPriority() &&
+            if (result && result->isPriority() &&
                 this->impl->priorityBackups > 0)
             {
                 this->impl->priorityBackups--;
@@ -362,7 +362,7 @@ bool BackupTransportPool::iterate()
     // Determine which URI pool to use.  Prefer broker-pushed updates when
     // available.  URIPool is internally synchronized so no external lock is
     // needed here.
-    Pointer<URIPool> activeUriPool = this->uriPool;
+    std::shared_ptr<URIPool> activeUriPool = this->uriPool;
     if (!this->updates->isEmpty())
     {
         activeUriPool = this->updates;
@@ -403,12 +403,12 @@ bool BackupTransportPool::iterate()
         // which blocked setEnabled(false) (called by close() while holding
         // reconnectMutex) for the full connect-timeout duration, causing a
         // lock-ordering stall of up to 300 s.
-        Pointer<BackupTransport> backup(new BackupTransport(this));
+        std::shared_ptr<BackupTransport> backup(new BackupTransport(this));
         backup->setUri(connectTo);
 
         try
         {
-            Pointer<Transport> transport = createTransport(connectTo);
+            std::shared_ptr<Transport> transport = createTransport(connectTo);
             transport->setTransportListener(backup.get());
             transport->start();  // May block for TCP connect timeout — must NOT
                                  // hold backups lock.
@@ -524,18 +524,18 @@ void BackupTransportPool::onBackupTransportFailure(
 {
     synchronized(&this->impl->backups)
     {
-        // Use a Pointer to keep the BackupTransport alive after iter->remove().
-        // iter->remove() drops the list's Pointer (the only other holder),
-        // which would immediately destroy the BackupTransport and make
-        // failedTransport a dangling pointer before we can read
+        // Use a shared_ptr to keep the BackupTransport alive after
+        // iter->remove(). iter->remove() drops the list's shared_ptr (the only
+        // other holder), which would immediately destroy the BackupTransport
+        // and make failedTransport a dangling pointer before we can read
         // isPriority()/getUri()/getTransport().
-        Pointer<BackupTransport>                            found;
-        std::unique_ptr<Iterator<Pointer<BackupTransport>>> iter(
+        std::shared_ptr<BackupTransport>                            found;
+        std::unique_ptr<Iterator<std::shared_ptr<BackupTransport>>> iter(
             this->impl->backups.iterator());
 
         while (iter->hasNext())
         {
-            Pointer<BackupTransport> next = iter->next();
+            std::shared_ptr<BackupTransport> next = iter->next();
             if (next.get() == failedTransport)
             {
                 iter->remove();
@@ -544,7 +544,7 @@ void BackupTransportPool::onBackupTransportFailure(
             }
         }
 
-        if (found != NULL)
+        if (found)
         {
             if (found->isPriority() && this->impl->priorityBackups > 0)
             {
@@ -556,7 +556,7 @@ void BackupTransportPool::onBackupTransportFailure(
             this->taskRunner->wakeup();
             // Clear the transport so the BackupTransport destructor (when
             // 'found' goes out of scope) doesn't close it a second time.
-            found->setTransport(Pointer<Transport>());
+            found->setTransport(std::shared_ptr<Transport>());
         }
     }
 }
@@ -574,7 +574,7 @@ bool BackupTransportPool::isPriorityBackupAvailable() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Transport> BackupTransportPool::createTransport(
+std::shared_ptr<Transport> BackupTransportPool::createTransport(
     const URI& location) const
 {
     try
@@ -590,7 +590,8 @@ Pointer<Transport> BackupTransportPool::createTransport(
                 "Invalid URI specified, no valid Factory Found.");
         }
 
-        Pointer<Transport> transport(factory->createComposite(location));
+        std::shared_ptr<Transport> transport(
+            factory->createComposite(location));
 
         return transport;
     }

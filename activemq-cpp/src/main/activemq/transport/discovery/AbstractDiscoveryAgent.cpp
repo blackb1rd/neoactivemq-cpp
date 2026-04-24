@@ -27,7 +27,9 @@
 #include <decaf/util/concurrent/Mutex.h>
 #include <decaf/util/concurrent/ThreadPoolExecutor.h>
 #include <decaf/util/concurrent/TimeUnit.h>
-#include <decaf/util/concurrent/atomic/AtomicBoolean.h>
+#include <atomic>
+#include <chrono>
+#include <memory>
 
 using namespace activemq;
 using namespace activemq::commands;
@@ -39,7 +41,6 @@ using namespace decaf::lang::exceptions;
 using namespace decaf::net;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
-using namespace decaf::util::concurrent::atomic;
 
 ////////////////////////////////////////////////////////////////////////////////
 const int AbstractDiscoveryAgent::DEFAULT_INITIAL_RECONNECT_DELAY = 5000;
@@ -72,11 +73,11 @@ namespace transport
             int       maxReconnectAttempts;
             long long keepAliveInterval;
 
-            AtomicBoolean               started;
-            Pointer<Thread>             worker;
-            Pointer<ThreadPoolExecutor> executor;
+            std::atomic<bool>                   started;
+            std::shared_ptr<Thread>             worker;
+            std::shared_ptr<ThreadPoolExecutor> executor;
 
-            HashMap<std::string, Pointer<DiscoveredBrokerData>>
+            HashMap<std::string, std::shared_ptr<DiscoveredBrokerData>>
                   discoveredServices;
             Mutex discoveredServicesLock;
 
@@ -99,7 +100,7 @@ namespace transport
                   maxReconnectAttempts(0),
                   keepAliveInterval(
                       AbstractDiscoveryAgent::DEFAULT_KEEPALIVE_INTERVAL),
-                  started(),
+                  started(false),
                   worker(),
                   executor(),
                   discoveredServices(),
@@ -115,9 +116,10 @@ namespace transport
 
             ~AbstractDiscoveryAgentImpl()
             {
-                if (started.compareAndSet(true, false))
+                bool _e_started = true;
+                if (started.compare_exchange_strong(_e_started, false))
                 {
-                    if (worker == NULL)
+                    if (worker)
                     {
                         worker->join(5000);
 
@@ -127,7 +129,7 @@ namespace transport
                             worker->join(1000);
                         }
 
-                        worker.reset(NULL);
+                        worker.reset();
                     }
 
                     executor->shutdown();
@@ -137,11 +139,11 @@ namespace transport
 
             Executor& getExecutor()
             {
-                if (executor == NULL)
+                if (!executor)
                 {
                     synchronized(&discoveredServicesLock)
                     {
-                        if (executor == NULL)
+                        if (!executor)
                         {
                             executor.reset(new ThreadPoolExecutor(
                                 1,
@@ -159,7 +161,7 @@ namespace transport
              * Returns true if this Broker has been marked as failed and it is
              * now time to start a recovery attempt.
              */
-            bool isTimeForRecovery(Pointer<DiscoveredBrokerData> service)
+            bool isTimeForRecovery(std::shared_ptr<DiscoveredBrokerData> service)
             {
                 synchronized(&discoveredServicesLock)
                 {
@@ -178,8 +180,9 @@ namespace transport
                     }
 
                     // Is it not yet time?
-                    if (System::currentTimeMillis() <
-                        service->getNextRecoveryTime())
+                    if (std::chrono::duration_cast<std::chrono::milliseconds>(
+                            std::chrono::system_clock::now().time_since_epoch())
+                            .count() < service->getNextRecoveryTime())
                     {
                         return false;
                     }
@@ -191,11 +194,14 @@ namespace transport
                 return false;
             }
 
-            void updateHeartBeat(Pointer<DiscoveredBrokerData> service)
+            void updateHeartBeat(std::shared_ptr<DiscoveredBrokerData> service)
             {
                 synchronized(&discoveredServicesLock)
                 {
-                    service->setLastHeartBeatTime(System::currentTimeMillis());
+                    service->setLastHeartBeatTime(
+                        std::chrono::duration_cast<std::chrono::milliseconds>(
+                            std::chrono::system_clock::now().time_since_epoch())
+                            .count());
 
                     // Consider that the broker recovery has succeeded if it has
                     // not failed in 60 seconds.
@@ -207,12 +213,15 @@ namespace transport
                     {
                         service->setFailureCount(0);
                         service->setNextRecoveryTime(
-                            System::currentTimeMillis());
+                            std::chrono::duration_cast<std::chrono::milliseconds>(
+                                std::chrono::system_clock::now()
+                                    .time_since_epoch())
+                                .count());
                     }
                 }
             }
 
-            bool markFailed(Pointer<DiscoveredBrokerData> service)
+            bool markFailed(std::shared_ptr<DiscoveredBrokerData> service)
             {
                 synchronized(&discoveredServicesLock)
                 {
@@ -237,7 +246,11 @@ namespace transport
                         }
 
                         service->setNextRecoveryTime(
-                            System::currentTimeMillis() + reconnectDelay);
+                            std::chrono::duration_cast<std::chrono::milliseconds>(
+                                std::chrono::system_clock::now()
+                                    .time_since_epoch())
+                                .count() +
+                            reconnectDelay);
                         return true;
                     }
                 }
@@ -248,12 +261,12 @@ namespace transport
         class ServiceAddedRunnable : public Runnable
         {
         private:
-            AbstractDiscoveryAgent*       agent;
-            Pointer<DiscoveredBrokerData> event;
+            AbstractDiscoveryAgent*               agent;
+            std::shared_ptr<DiscoveredBrokerData> event;
 
         public:
-            ServiceAddedRunnable(AbstractDiscoveryAgent*       agent,
-                                 Pointer<DiscoveredBrokerData> event)
+            ServiceAddedRunnable(AbstractDiscoveryAgent*               agent,
+                                 std::shared_ptr<DiscoveredBrokerData> event)
                 : Runnable(),
                   agent(agent),
                   event(event)
@@ -277,12 +290,12 @@ namespace transport
         class ServiceRemovedRunnable : public Runnable
         {
         private:
-            AbstractDiscoveryAgent*       agent;
-            Pointer<DiscoveredBrokerData> event;
+            AbstractDiscoveryAgent*               agent;
+            std::shared_ptr<DiscoveredBrokerData> event;
 
         public:
-            ServiceRemovedRunnable(AbstractDiscoveryAgent*       agent,
-                                   Pointer<DiscoveredBrokerData> event)
+            ServiceRemovedRunnable(AbstractDiscoveryAgent*               agent,
+                                   std::shared_ptr<DiscoveredBrokerData> event)
                 : Runnable(),
                   agent(agent),
                   event(event)
@@ -327,17 +340,18 @@ AbstractDiscoveryAgent::~AbstractDiscoveryAgent()
 ////////////////////////////////////////////////////////////////////////////////
 bool AbstractDiscoveryAgent::isStarted() const
 {
-    return impl->started.get();
+    return impl->started.load();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void AbstractDiscoveryAgent::start()
 {
-    if (impl->started.compareAndSet(false, true))
+    bool _e_start = false;
+    if (impl->started.compare_exchange_strong(_e_start, true))
     {
         doStart();
 
-        if (impl->worker == NULL)
+        if (!impl->worker)
         {
             impl->worker.reset(new Thread(this));
             impl->worker->start();
@@ -352,11 +366,12 @@ void AbstractDiscoveryAgent::stop()
 {
     // Changing the isStarted flag will signal the thread that it needs to shut
     // down.
-    if (impl->started.compareAndSet(true, false))
+    bool _e_stop = true;
+    if (impl->started.compare_exchange_strong(_e_stop, false))
     {
         doStop();
 
-        if (impl->worker == NULL)
+        if (impl->worker)
         {
             impl->worker->join(WORKER_KILL_TIME_SECONDS);
 
@@ -366,7 +381,7 @@ void AbstractDiscoveryAgent::stop()
                 impl->worker->join(WORKER_KILL_TIME_SECONDS);
             }
 
-            impl->worker.reset(NULL);
+            impl->worker.reset();
         }
 
         impl->executor->shutdown();
@@ -379,7 +394,7 @@ void AbstractDiscoveryAgent::run()
 {
     Thread::currentThread()->setName("Discovery Agent Thread.");
 
-    while (impl->started.get())
+    while (impl->started.load())
     {
         doTimeKeepingServices();
         try
@@ -400,7 +415,7 @@ void AbstractDiscoveryAgent::run()
 void AbstractDiscoveryAgent::registerService(const std::string& name)
 {
     impl->selfService = name;
-    if (impl->started.get())
+    if (impl->started.load())
     {
         try
         {
@@ -423,7 +438,7 @@ void AbstractDiscoveryAgent::registerService(const std::string& name)
 void AbstractDiscoveryAgent::serviceFailed(
     const activemq::commands::DiscoveryEvent& event)
 {
-    Pointer<DiscoveredBrokerData> service;
+    std::shared_ptr<DiscoveredBrokerData> service;
     synchronized(&impl->discoveredServicesLock)
     {
         try
@@ -435,7 +450,7 @@ void AbstractDiscoveryAgent::serviceFailed(
         }
     }
 
-    if (service != NULL && impl->markFailed(service))
+    if (service && impl->markFailed(service))
     {
         fireServiceRemovedEvent(service);
     }
@@ -564,9 +579,9 @@ std::string AbstractDiscoveryAgent::getGroup() const
 
 ////////////////////////////////////////////////////////////////////////////////
 void AbstractDiscoveryAgent::fireServiceRemovedEvent(
-    Pointer<DiscoveredBrokerData> event)
+    std::shared_ptr<DiscoveredBrokerData> event)
 {
-    if (impl->listener != NULL && impl->started.get())
+    if (impl->listener != NULL && impl->started.load())
     {
         // Have the listener process the event async so that
         // he does not block this thread since we are doing time sensitive
@@ -577,9 +592,9 @@ void AbstractDiscoveryAgent::fireServiceRemovedEvent(
 
 ////////////////////////////////////////////////////////////////////////////////
 void AbstractDiscoveryAgent::fireServiceAddedEvent(
-    Pointer<DiscoveredBrokerData> event)
+    std::shared_ptr<DiscoveredBrokerData> event)
 {
-    if (impl->listener != NULL && impl->started.get())
+    if (impl->listener != NULL && impl->started.load())
     {
         // Have the listener process the event async so that
         // he does not block this thread since we are doing time sensitive
@@ -594,7 +609,7 @@ void AbstractDiscoveryAgent::processLiveService(const std::string& brokerName,
 {
     if (getServiceName().empty() || service != getServiceName())
     {
-        Pointer<DiscoveredBrokerData> remoteBroker;
+        std::shared_ptr<DiscoveredBrokerData> remoteBroker;
         synchronized(&impl->discoveredServicesLock)
         {
             try
@@ -606,7 +621,7 @@ void AbstractDiscoveryAgent::processLiveService(const std::string& brokerName,
             }
         }
 
-        if (remoteBroker == NULL)
+        if (!remoteBroker)
         {
             remoteBroker.reset(new DiscoveredBrokerData(brokerName, service));
             impl->discoveredServices.put(service, remoteBroker);
@@ -629,7 +644,7 @@ void AbstractDiscoveryAgent::processDeadService(const std::string& service)
 {
     if (service != getServiceName())
     {
-        Pointer<DiscoveredBrokerData> remoteBroker;
+        std::shared_ptr<DiscoveredBrokerData> remoteBroker;
         synchronized(&impl->discoveredServicesLock)
         {
             try
@@ -641,7 +656,7 @@ void AbstractDiscoveryAgent::processDeadService(const std::string& service)
             }
         }
 
-        if (remoteBroker != NULL && !remoteBroker->isFailed())
+        if (remoteBroker && !remoteBroker->isFailed())
         {
             fireServiceRemovedEvent(remoteBroker);
         }
@@ -651,9 +666,12 @@ void AbstractDiscoveryAgent::processDeadService(const std::string& service)
 ////////////////////////////////////////////////////////////////////////////////
 void AbstractDiscoveryAgent::doTimeKeepingServices()
 {
-    if (impl->started.get())
+    if (impl->started.load())
     {
-        long long currentTime = System::currentTimeMillis();
+        long long currentTime =
+            std::chrono::duration_cast<std::chrono::milliseconds>(
+                std::chrono::system_clock::now().time_since_epoch())
+                .count();
         if (currentTime < impl->lastAdvertizeTime ||
             ((currentTime - impl->keepAliveInterval) > impl->lastAdvertizeTime))
         {
@@ -668,20 +686,22 @@ void AbstractDiscoveryAgent::doTimeKeepingServices()
 void AbstractDiscoveryAgent::doExpireOldServices()
 {
     long long expireTime =
-        System::currentTimeMillis() -
+        std::chrono::duration_cast<std::chrono::milliseconds>(
+            std::chrono::system_clock::now().time_since_epoch())
+            .count() -
         (impl->keepAliveInterval * HEARTBEAT_MISS_BEFORE_DEATH);
 
-    std::vector<Pointer<DiscoveredBrokerData>> services;
+    std::vector<std::shared_ptr<DiscoveredBrokerData>> services;
     synchronized(&impl->discoveredServicesLock)
     {
         services = impl->discoveredServices.values().toArray();
     }
 
-    std::vector<Pointer<DiscoveredBrokerData>>::iterator iter =
+    std::vector<std::shared_ptr<DiscoveredBrokerData>>::iterator iter =
         services.begin();
     for (; iter != services.end(); ++iter)
     {
-        Pointer<DiscoveredBrokerData> service = *iter;
+        std::shared_ptr<DiscoveredBrokerData> service = *iter;
         if (service->getLastHeartBeatTime() < expireTime)
         {
             processDeadService(service->getServiceName());

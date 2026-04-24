@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -21,13 +21,13 @@
 #include <activemq/exceptions/ActiveMQException.h>
 
 #include <decaf/lang/Integer.h>
-#include <decaf/lang/Pointer.h>
 #include <decaf/lang/Runnable.h>
 #include <decaf/util/Random.h>
 #include <decaf/util/concurrent/CopyOnWriteArrayList.h>
 #include <decaf/util/concurrent/LinkedBlockingQueue.h>
 #include <decaf/util/concurrent/ThreadPoolExecutor.h>
 #include <decaf/util/concurrent/TimeUnit.h>
+#include <memory>
 
 using namespace std;
 using namespace cms;
@@ -59,7 +59,7 @@ void CmsConnectionStartStopTest::SetUp()
 {
     CMSTestFixture::SetUp();
 
-    Pointer<ActiveMQConnectionFactory> factory(
+    std::shared_ptr<ActiveMQConnectionFactory> factory(
         new ActiveMQConnectionFactory(cmsProvider->getBrokerURL()));
 
     startedConnection.reset(factory->createConnection());
@@ -73,8 +73,8 @@ void CmsConnectionStartStopTest::TearDown()
     startedConnection->close();
     stoppedConnection->close();
 
-    startedConnection.reset(NULL);
-    stoppedConnection.reset(NULL);
+    startedConnection.reset();
+    stoppedConnection.reset();
 
     CMSTestFixture::TearDown();
 }
@@ -82,24 +82,25 @@ void CmsConnectionStartStopTest::TearDown()
 ////////////////////////////////////////////////////////////////////////////////
 void CmsConnectionStartStopTest::testStoppedConsumerHoldsMessagesTillStarted()
 {
-    Pointer<Session> startedSession(startedConnection->createSession());
-    Pointer<Session> stoppedSession(stoppedConnection->createSession());
+    std::shared_ptr<Session> startedSession(startedConnection->createSession());
+    std::shared_ptr<Session> stoppedSession(stoppedConnection->createSession());
 
     // Setup the consumers.
-    Pointer<Topic>           topic(startedSession->createTopic("test"));
-    Pointer<MessageConsumer> startedConsumer(
+    std::shared_ptr<Topic>           topic(startedSession->createTopic("test"));
+    std::shared_ptr<MessageConsumer> startedConsumer(
         startedSession->createConsumer(topic.get()));
-    Pointer<MessageConsumer> stoppedConsumer(
+    std::shared_ptr<MessageConsumer> stoppedConsumer(
         stoppedSession->createConsumer(topic.get()));
 
     // Send the message.
-    Pointer<MessageProducer> producer(
+    std::shared_ptr<MessageProducer> producer(
         startedSession->createProducer(topic.get()));
-    Pointer<TextMessage> message(startedSession->createTextMessage("Hello"));
+    std::shared_ptr<TextMessage> message(
+        startedSession->createTextMessage("Hello"));
     producer->send(message.get());
 
     // Test the assertions.
-    Pointer<Message> m(startedConsumer->receive(2000));
+    std::shared_ptr<Message> m(startedConsumer->receive(2000));
     ASSERT_TRUE(m != NULL);
 
     m.reset(stoppedConsumer->receive(2000));
@@ -157,7 +158,7 @@ public:
         try
         {
             TimeUnit::MILLISECONDS.sleep(rand.nextInt(10));
-            Pointer<Session>(connection->createSession());
+            std::shared_ptr<Session>(connection->createSession());
         }
         catch (CMSException& e)
         {

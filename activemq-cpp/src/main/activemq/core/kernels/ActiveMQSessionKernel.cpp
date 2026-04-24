@@ -50,8 +50,6 @@
 #include <activemq/commands/RemoveSubscriptionInfo.h>
 
 #include <decaf/lang/Boolean.h>
-#include <decaf/lang/Integer.h>
-#include <decaf/lang/Long.h>
 #include <decaf/lang/Math.h>
 #include <decaf/lang/Runnable.h>
 #include <decaf/lang/exceptions/InvalidStateException.h>
@@ -59,8 +57,9 @@
 #include <decaf/util/LinkedList.h>
 #include <decaf/util/Queue.h>
 #include <decaf/util/concurrent/Mutex.h>
-#include <decaf/util/concurrent/atomic/AtomicBoolean.h>
 #include <decaf/util/concurrent/locks/ReentrantReadWriteLock.h>
+#include <atomic>
+#include <chrono>
 
 using namespace std;
 using namespace activemq;
@@ -72,7 +71,6 @@ using namespace activemq::exceptions;
 using namespace activemq::threads;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
-using namespace decaf::util::concurrent::atomic;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
@@ -93,17 +91,19 @@ namespace core
             SessionConfig& operator=(const SessionConfig&);
 
         public:
-            AtomicBoolean synchronizationRegistered;
+            std::atomic<bool> synchronizationRegistered;
             decaf::util::concurrent::locks::ReentrantReadWriteLock producerLock;
-            decaf::util::LinkedList<Pointer<ActiveMQProducerKernel>> producers;
+            decaf::util::LinkedList<std::shared_ptr<ActiveMQProducerKernel>>
+                                                                   producers;
             decaf::util::concurrent::locks::ReentrantReadWriteLock consumerLock;
-            decaf::util::LinkedList<Pointer<ActiveMQConsumerKernel>> consumers;
-            Pointer<Scheduler>                                       scheduler;
-            Pointer<CloseSynhcronization>                            closeSync;
-            Mutex                                                    sendMutex;
-            cms::MessageTransformer* transformer;
-            int                      hashCode;
-            bool                     sessionAsyncDispatch;
+            decaf::util::LinkedList<std::shared_ptr<ActiveMQConsumerKernel>>
+                                                  consumers;
+            std::shared_ptr<Scheduler>            scheduler;
+            std::shared_ptr<CloseSynhcronization> closeSync;
+            Mutex                                 sendMutex;
+            cms::MessageTransformer*              transformer;
+            int                                   hashCode;
+            bool                                  sessionAsyncDispatch;
 
         public:
             SessionConfig()
@@ -115,7 +115,7 @@ namespace core
                   scheduler(),
                   closeSync(),
                   sendMutex(),
-                  transformer(NULL),
+                  transformer(nullptr),
                   hashCode(),
                   sessionAsyncDispatch(true)
             {
@@ -133,18 +133,18 @@ namespace core
         class ClearConsumerTask : public Runnable
         {
         private:
-            Pointer<ActiveMQConsumerKernel> consumer;
+            std::shared_ptr<ActiveMQConsumerKernel> consumer;
 
         private:
             ClearConsumerTask(const ClearConsumerTask&);
             ClearConsumerTask& operator=(const ClearConsumerTask&);
 
         public:
-            ClearConsumerTask(Pointer<ActiveMQConsumerKernel> consumer)
+            ClearConsumerTask(std::shared_ptr<ActiveMQConsumerKernel> consumer)
                 : Runnable(),
                   consumer(consumer)
             {
-                if (consumer == NULL)
+                if (consumer == nullptr)
                 {
                     throw NullPointerException(
                         __FILE__,
@@ -186,7 +186,7 @@ namespace core
                   session(session),
                   config(config)
             {
-                if (session == NULL || config == NULL)
+                if (session == nullptr || config == nullptr)
                 {
                     throw NullPointerException(
                         __FILE__,
@@ -205,16 +205,16 @@ namespace core
 
             virtual void afterCommit()
             {
-                config->closeSync.release();
+                config->closeSync.reset();
                 session->doClose();
-                config->synchronizationRegistered.set(false);
+                config->synchronizationRegistered.store(false);
             }
 
             virtual void afterRollback()
             {
-                config->closeSync.release();
+                config->closeSync.reset();
                 session->doClose();
-                config->synchronizationRegistered.set(false);
+                config->synchronizationRegistered.store(false);
             }
         };
 
@@ -224,10 +224,10 @@ namespace core
 
 ////////////////////////////////////////////////////////////////////////////////
 ActiveMQSessionKernel::ActiveMQSessionKernel(
-    ActiveMQConnection*           connection,
-    const Pointer<SessionId>&     id,
-    cms::Session::AcknowledgeMode ackMode,
-    const Properties&             properties)
+    ActiveMQConnection*               connection,
+    const std::shared_ptr<SessionId>& id,
+    cms::Session::AcknowledgeMode     ackMode,
+    const Properties&                 properties)
     : config(new SessionConfig),
       sessionInfo(),
       transaction(),
@@ -240,7 +240,7 @@ ActiveMQSessionKernel::ActiveMQSessionKernel(
       consumerIds(),
       lastDeliveredSequenceId(-2)
 {
-    if (id == NULL || connection == NULL)
+    if (id == nullptr || connection == nullptr)
     {
         throw ActiveMQException(__FILE__,
                                 __LINE__,
@@ -260,7 +260,7 @@ ActiveMQSessionKernel::ActiveMQSessionKernel(
     }
     catch (...)
     {
-        this->sessionInfo.reset(NULL);
+        this->sessionInfo.reset();
         delete this->config;
         throw;
     }
@@ -289,8 +289,8 @@ ActiveMQSessionKernel::ActiveMQSessionKernel(
         }
         catch (...)
         {
-            this->transaction.reset(NULL);
-            this->executor.reset(NULL);
+            this->transaction.reset();
+            this->executor.reset();
             delete this->config;
             throw;
         }
@@ -311,7 +311,7 @@ ActiveMQSessionKernel::~ActiveMQSessionKernel()
         // Free the executor here so that its threads are gone before any of the
         // other member data of this class is destroyed as it might be accessing
         // from its run thread.
-        this->executor.reset(NULL);
+        this->executor.reset();
     }
     AMQ_CATCHALL_NOTHROW()
 
@@ -325,7 +325,7 @@ ActiveMQSessionKernel::~ActiveMQSessionKernel()
 ////////////////////////////////////////////////////////////////////////////////
 void ActiveMQSessionKernel::fire(const ActiveMQException& ex)
 {
-    if (connection != NULL)
+    if (connection != nullptr)
     {
         connection->fire(ex);
     }
@@ -335,7 +335,7 @@ void ActiveMQSessionKernel::fire(const ActiveMQException& ex)
 void ActiveMQSessionKernel::close()
 {
     // If we're already closed, just return.
-    if (this->closed.get())
+    if (this->closed.load())
     {
         return;
     }
@@ -344,8 +344,9 @@ void ActiveMQSessionKernel::close()
     {
         if (this->transaction->isInXATransaction())
         {
-            if (!this->config->synchronizationRegistered.compareAndSet(false,
-                                                                       true))
+            bool syncExpected = false;
+            if (!this->config->synchronizationRegistered
+                     .compare_exchange_strong(syncExpected, true))
             {
                 this->config->closeSync.reset(
                     new CloseSynhcronization(this, this->config));
@@ -371,7 +372,7 @@ void ActiveMQSessionKernel::doClose()
         dispose();
 
         // Remove this session from the Broker.
-        Pointer<RemoveInfo> info(new RemoveInfo());
+        std::shared_ptr<RemoveInfo> info(new RemoveInfo());
         info->setObjectId(this->sessionInfo->getSessionId());
         info->setLastDeliveredSequenceId(this->lastDeliveredSequenceId);
         this->connection->oneway(info);
@@ -386,7 +387,8 @@ void ActiveMQSessionKernel::dispose()
 {
     // Prevent Dispose loop if transaction has a close synchronization
     // registered.
-    if (!closed.compareAndSet(false, true))
+    bool disposedExpected = false;
+    if (!closed.compare_exchange_strong(disposedExpected, true))
     {
         return;
     }
@@ -411,16 +413,18 @@ void ActiveMQSessionKernel::dispose()
 
         ~Finalizer()
         {
-            Pointer<ActiveMQSessionKernel> session(this->session);
+            // Use aliasing constructor to create a non-owning shared_ptr
+            // so we can pass 'this' to removeSession without taking ownership.
+            std::shared_ptr<ActiveMQSessionKernel> session(
+                std::shared_ptr<ActiveMQSessionKernel>{},
+                this->session);
             try
             {
                 this->connection->removeSession(session);
             }
             catch (...)
             {
-                session.release();
             }
-            session.release();
         }
     };
 
@@ -438,15 +442,15 @@ void ActiveMQSessionKernel::dispose()
         {
             // We have to copy all the consumers to another list since we aren't
             // using a CopyOnWriteArrayList right now.
-            ArrayList<Pointer<ActiveMQConsumerKernel>> consumers(
+            ArrayList<std::shared_ptr<ActiveMQConsumerKernel>> consumers(
                 this->config->consumers);
-            Pointer<Iterator<Pointer<ActiveMQConsumerKernel>>> consumerIter(
-                consumers.iterator());
+            std::shared_ptr<Iterator<std::shared_ptr<ActiveMQConsumerKernel>>>
+                consumerIter(consumers.iterator());
             while (consumerIter->hasNext())
             {
                 try
                 {
-                    Pointer<ActiveMQConsumerKernel> consumer =
+                    std::shared_ptr<ActiveMQConsumerKernel> consumer =
                         consumerIter->next();
                     consumer->setFailureError(
                         this->connection->getFirstFailureError());
@@ -476,9 +480,9 @@ void ActiveMQSessionKernel::dispose()
         {
             // We have to copy all the producers to another list since we aren't
             // using a CopyOnWriteArrayList right now.
-            ArrayList<Pointer<ActiveMQProducerKernel>> producers(
+            ArrayList<std::shared_ptr<ActiveMQProducerKernel>> producers(
                 this->config->producers);
-            std::unique_ptr<Iterator<Pointer<ActiveMQProducerKernel>>>
+            std::unique_ptr<Iterator<std::shared_ptr<ActiveMQProducerKernel>>>
                 producerIter(producers.iterator());
 
             while (producerIter->hasNext())
@@ -590,11 +594,11 @@ void ActiveMQSessionKernel::recover()
         this->config->consumerLock.readLock().lock();
         try
         {
-            Pointer<Iterator<Pointer<ActiveMQConsumerKernel>>> iter(
-                this->config->consumers.iterator());
+            std::shared_ptr<Iterator<std::shared_ptr<ActiveMQConsumerKernel>>>
+                iter(this->config->consumers.iterator());
             while (iter->hasNext())
             {
-                Pointer<ActiveMQConsumerKernel> consumer = iter->next();
+                std::shared_ptr<ActiveMQConsumerKernel> consumer = iter->next();
                 consumer->rollback();
             }
             this->config->consumerLock.readLock().unlock();
@@ -610,9 +614,9 @@ void ActiveMQSessionKernel::recover()
 
 ////////////////////////////////////////////////////////////////////////////////
 void ActiveMQSessionKernel::clearMessagesInProgress(
-    Pointer<AtomicInteger> transportsInterrupted)
+    std::shared_ptr<std::atomic<int>> transportsInterrupted)
 {
-    if (this->executor.get() != NULL)
+    if (this->executor.get() != nullptr)
     {
         this->executor->clearMessagesInProgress();
     }
@@ -620,13 +624,13 @@ void ActiveMQSessionKernel::clearMessagesInProgress(
     this->config->consumerLock.readLock().lock();
     try
     {
-        Pointer<Iterator<Pointer<ActiveMQConsumerKernel>>> iter(
+        std::shared_ptr<Iterator<std::shared_ptr<ActiveMQConsumerKernel>>> iter(
             this->config->consumers.iterator());
         while (iter->hasNext())
         {
-            Pointer<ActiveMQConsumerKernel> consumer = iter->next();
+            std::shared_ptr<ActiveMQConsumerKernel> consumer = iter->next();
             consumer->inProgressClearRequired();
-            transportsInterrupted->incrementAndGet();
+            transportsInterrupted->fetch_add(1);
             this->connection->getScheduler()->executeAfterDelay(
                 new ClearConsumerTask(consumer),
                 0LL);
@@ -646,11 +650,11 @@ void ActiveMQSessionKernel::acknowledge()
     this->config->consumerLock.readLock().lock();
     try
     {
-        Pointer<Iterator<Pointer<ActiveMQConsumerKernel>>> iter(
+        std::shared_ptr<Iterator<std::shared_ptr<ActiveMQConsumerKernel>>> iter(
             this->config->consumers.iterator());
         while (iter->hasNext())
         {
-            Pointer<ActiveMQConsumerKernel> consumer = iter->next();
+            std::shared_ptr<ActiveMQConsumerKernel> consumer = iter->next();
             consumer->acknowledge();
         }
         this->config->consumerLock.readLock().unlock();
@@ -668,11 +672,11 @@ void ActiveMQSessionKernel::deliverAcks()
     this->config->consumerLock.readLock().lock();
     try
     {
-        Pointer<Iterator<Pointer<ActiveMQConsumerKernel>>> iter(
+        std::shared_ptr<Iterator<std::shared_ptr<ActiveMQConsumerKernel>>> iter(
             this->config->consumers.iterator());
         while (iter->hasNext())
         {
-            Pointer<ActiveMQConsumerKernel> consumer = iter->next();
+            std::shared_ptr<ActiveMQConsumerKernel> consumer = iter->next();
             consumer->deliverAcks();
         }
         this->config->consumerLock.readLock().unlock();
@@ -724,7 +728,7 @@ cms::MessageConsumer* ActiveMQSessionKernel::createConsumer(
         const ActiveMQDestination* amqDestination =
             dynamic_cast<const ActiveMQDestination*>(destination);
 
-        if (amqDestination == NULL)
+        if (amqDestination == nullptr)
         {
             throw ActiveMQException(__FILE__,
                                     __LINE__,
@@ -732,7 +736,8 @@ cms::MessageConsumer* ActiveMQSessionKernel::createConsumer(
                                     "created by this CMS Client");
         }
 
-        Pointer<ActiveMQDestination> dest(amqDestination->cloneDataStructure());
+        std::shared_ptr<ActiveMQDestination> dest(
+            amqDestination->cloneDataStructure());
 
         int prefetch = 0;
         if (dest->isTopic())
@@ -747,7 +752,7 @@ cms::MessageConsumer* ActiveMQSessionKernel::createConsumer(
         }
 
         // Create the consumer instance.
-        Pointer<ActiveMQConsumerKernel> consumer(
+        std::shared_ptr<ActiveMQConsumerKernel> consumer(
             new ActiveMQConsumerKernel(this,
                                        this->getNextConsumerId(),
                                        dest,
@@ -758,7 +763,7 @@ cms::MessageConsumer* ActiveMQSessionKernel::createConsumer(
                                        noLocal,
                                        false,
                                        this->connection->isDispatchAsync(),
-                                       NULL));
+                                       nullptr));
 
         try
         {
@@ -807,7 +812,7 @@ cms::MessageConsumer* ActiveMQSessionKernel::createDurableConsumer(
         const ActiveMQDestination* amqDestination =
             dynamic_cast<const ActiveMQDestination*>(destination);
 
-        if (amqDestination == NULL)
+        if (amqDestination == nullptr)
         {
             throw ActiveMQException(__FILE__,
                                     __LINE__,
@@ -815,21 +820,23 @@ cms::MessageConsumer* ActiveMQSessionKernel::createDurableConsumer(
                                     "created by this CMS Client");
         }
 
-        Pointer<ActiveMQDestination> dest(amqDestination->cloneDataStructure());
+        std::shared_ptr<ActiveMQDestination> dest(
+            amqDestination->cloneDataStructure());
 
         // Create the consumer instance.
-        Pointer<ActiveMQConsumerKernel> consumer(new ActiveMQConsumerKernel(
-            this,
-            this->getNextConsumerId(),
-            dest,
-            name,
-            selector,
-            this->connection->getPrefetchPolicy()->getDurableTopicPrefetch(),
-            0,
-            noLocal,
-            false,
-            this->connection->isDispatchAsync(),
-            NULL));
+        std::shared_ptr<ActiveMQConsumerKernel> consumer(
+            new ActiveMQConsumerKernel(
+                this,
+                this->getNextConsumerId(),
+                dest,
+                name,
+                selector,
+                this->connection->getPrefetchPolicy()->getDurableTopicPrefetch(),
+                0,
+                noLocal,
+                false,
+                this->connection->isDispatchAsync(),
+                nullptr));
 
         try
         {
@@ -870,16 +877,16 @@ cms::MessageProducer* ActiveMQSessionKernel::createProducer(
     {
         this->checkClosed();
 
-        Pointer<commands::ActiveMQDestination> dest;
+        std::shared_ptr<commands::ActiveMQDestination> dest;
 
         // Producers are allowed to have NULL destinations.  In this case, the
         // destination is specified by the messages as they are sent.
-        if (destination != NULL)
+        if (destination != nullptr)
         {
             const ActiveMQDestination* amqDestination =
                 dynamic_cast<const ActiveMQDestination*>(destination);
 
-            if (amqDestination == NULL)
+            if (amqDestination == nullptr)
             {
                 throw ActiveMQException(__FILE__,
                                         __LINE__,
@@ -893,7 +900,7 @@ cms::MessageProducer* ActiveMQSessionKernel::createProducer(
         }
 
         // Create the producer instance.
-        Pointer<ActiveMQProducerKernel> producer(
+        std::shared_ptr<ActiveMQProducerKernel> producer(
             new ActiveMQProducerKernel(this,
                                        this->getNextProducerId(),
                                        dest,
@@ -906,7 +913,7 @@ cms::MessageProducer* ActiveMQSessionKernel::createProducer(
                 "SessionKernel",
                 "createProducer() sending ProducerInfo cmdId="
                     << producer->getProducerInfo()->getCommandId() << " dest="
-                    << (dest != NULL ? dest->getPhysicalName() : "<null>"));
+                    << (dest != nullptr ? dest->getPhysicalName() : "<null>"));
             this->connection->syncRequest(producer->getProducerInfo());
             AMQ_LOG_DEBUG(
                 "SessionKernel",
@@ -949,7 +956,7 @@ cms::QueueBrowser* ActiveMQSessionKernel::createBrowser(
         const ActiveMQDestination* amqDestination =
             dynamic_cast<const ActiveMQDestination*>(queue);
 
-        if (amqDestination == NULL)
+        if (amqDestination == nullptr)
         {
             throw ActiveMQException(__FILE__,
                                     __LINE__,
@@ -957,7 +964,8 @@ cms::QueueBrowser* ActiveMQSessionKernel::createBrowser(
                                     "created by this CMS Client");
         }
 
-        Pointer<ActiveMQDestination> dest(amqDestination->cloneDataStructure());
+        std::shared_ptr<ActiveMQDestination> dest(
+            amqDestination->cloneDataStructure());
 
         // Create the QueueBrowser instance
         std::unique_ptr<ActiveMQQueueBrowser> browser(
@@ -1176,15 +1184,15 @@ bool ActiveMQSessionKernel::isTransacted() const
 
 ////////////////////////////////////////////////////////////////////////////////
 void ActiveMQSessionKernel::send(
-    kernels::ActiveMQProducerKernel*       producer,
-    Pointer<commands::ActiveMQDestination> destination,
-    cms::Message*                          message,
-    int                                    deliveryMode,
-    int                                    priority,
-    long long                              timeToLive,
-    util::MemoryUsage*                     producerWindow,
-    long long                              sendTimeout,
-    cms::AsyncCallback*                    onComplete)
+    kernels::ActiveMQProducerKernel*               producer,
+    std::shared_ptr<commands::ActiveMQDestination> destination,
+    cms::Message*                                  message,
+    int                                            deliveryMode,
+    int                                            priority,
+    long long                                      timeToLive,
+    util::MemoryUsage*                             producerWindow,
+    long long                                      sendTimeout,
+    cms::AsyncCallback*                            onComplete)
 {
     try
     {
@@ -1192,8 +1200,8 @@ void ActiveMQSessionKernel::send(
 
         if (destination->isTemporary())
         {
-            Pointer<ActiveMQTempDestination> tempDest =
-                destination.dynamicCast<ActiveMQTempDestination>();
+            std::shared_ptr<ActiveMQTempDestination> tempDest =
+                std::dynamic_pointer_cast<ActiveMQTempDestination>(destination);
             if (this->connection->isDeleted(tempDest))
             {
                 throw cms::InvalidDestinationException(
@@ -1209,9 +1217,12 @@ void ActiveMQSessionKernel::send(
             // TX.
             doStartTransaction();
 
-            Pointer<TransactionId> txId = this->transaction->getTransactionId();
-            Pointer<ProducerInfo>  producerInfo = producer->getProducerInfo();
-            Pointer<ProducerId>    producerId   = producerInfo->getProducerId();
+            std::shared_ptr<TransactionId> txId =
+                this->transaction->getTransactionId();
+            std::shared_ptr<ProducerInfo> producerInfo =
+                producer->getProducerInfo();
+            std::shared_ptr<ProducerId> producerId =
+                producerInfo->getProducerId();
             long long sequenceId = producer->getNextMessageSequence();
 
             // Set the "CMS" header fields on the original message, see JMS 1.1
@@ -1220,7 +1231,10 @@ void ActiveMQSessionKernel::send(
             long long expiration = 0LL;
             if (!producer->getDisableMessageTimeStamp())
             {
-                long long timeStamp = System::currentTimeMillis();
+                long long timeStamp =
+                    std::chrono::duration_cast<std::chrono::milliseconds>(
+                        std::chrono::system_clock::now().time_since_epoch())
+                        .count();
                 message->setCMSTimestamp(timeStamp);
                 if (timeToLive > 0)
                 {
@@ -1232,13 +1246,12 @@ void ActiveMQSessionKernel::send(
             message->setCMSRedelivered(false);
 
             // transform to our own message format here
-            commands::Message*         transformed = NULL;
-            Pointer<commands::Message> amqMessage;
+            commands::Message*                 transformed = nullptr;
+            std::shared_ptr<commands::Message> amqMessage;
 
             // Always assign the message ID, regardless of the disable flag.
             // Not adding a message ID will cause an NPE at the broker.
-            decaf::lang::Pointer<commands::MessageId> id(
-                new commands::MessageId());
+            std::shared_ptr<commands::MessageId> id(new commands::MessageId());
             id->setProducerId(producerId);
             id->setProducerSequenceId(sequenceId);
 
@@ -1267,7 +1280,7 @@ void ActiveMQSessionKernel::send(
             // Sets the Message ID on the original message per spec.
             message->setCMSMessageID(id->toString());
             message->setCMSDestination(
-                destination.dynamicCast<cms::Destination>().get());
+                std::dynamic_pointer_cast<cms::Destination>(destination).get());
 
             amqMessage->setMessageId(id);
             amqMessage->getBrokerPath().clear();
@@ -1289,24 +1302,24 @@ void ActiveMQSessionKernel::send(
                               << " priority="
                               << (int)amqMessage->getPriority());
 
-            if (onComplete == NULL && sendTimeout <= 0 &&
+            if (onComplete == nullptr && sendTimeout <= 0 &&
                 !amqMessage->isResponseRequired() &&
                 !this->connection->isAlwaysSyncSend() &&
                 (!amqMessage->isPersistent() ||
                  this->connection->isUseAsyncSend() ||
-                 amqMessage->getTransactionId() != NULL))
+                 amqMessage->getTransactionId() != nullptr))
             {
                 // No Response Required, send is asynchronous.
                 this->connection->oneway(amqMessage);
 
-                if (producerWindow != NULL)
+                if (producerWindow != nullptr)
                 {
                     producerWindow->enqueueUsage(amqMessage->getSize());
                 }
             }
             else
             {
-                if (sendTimeout > 0 && onComplete == NULL)
+                if (sendTimeout > 0 && onComplete == nullptr)
                 {
                     this->connection->syncRequest(amqMessage,
                                                   (unsigned int)sendTimeout);
@@ -1324,12 +1337,12 @@ void ActiveMQSessionKernel::send(
 ////////////////////////////////////////////////////////////////////////////////
 cms::ExceptionListener* ActiveMQSessionKernel::getExceptionListener()
 {
-    if (connection != NULL)
+    if (connection != nullptr)
     {
         return connection->getExceptionListener();
     }
 
-    return NULL;
+    return nullptr;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1346,7 +1359,7 @@ cms::MessageTransformer* ActiveMQSessionKernel::getMessageTransformer() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Scheduler> ActiveMQSessionKernel::getScheduler() const
+std::shared_ptr<Scheduler> ActiveMQSessionKernel::getScheduler() const
 {
     return this->config->scheduler;
 }
@@ -1361,7 +1374,8 @@ void ActiveMQSessionKernel::unsubscribe(const std::string& name)
         AMQ_LOG_INFO("SessionKernel",
                      "Unsubscribing durable subscription, name=" << name);
 
-        Pointer<RemoveSubscriptionInfo> rsi(new RemoveSubscriptionInfo());
+        std::shared_ptr<RemoveSubscriptionInfo> rsi(
+            new RemoveSubscriptionInfo());
 
         rsi->setConnectionId(
             this->connection->getConnectionInfo().getConnectionId());
@@ -1378,9 +1392,10 @@ void ActiveMQSessionKernel::unsubscribe(const std::string& name)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQSessionKernel::dispatch(const Pointer<MessageDispatch>& dispatch)
+void ActiveMQSessionKernel::dispatch(
+    const std::shared_ptr<MessageDispatch>& dispatch)
 {
-    if (this->executor.get() != NULL)
+    if (this->executor.get() != nullptr)
     {
         AMQ_LOG_DEBUG("SessionKernel",
                       "Dispatching message to session executor, cmdId="
@@ -1393,9 +1408,9 @@ void ActiveMQSessionKernel::dispatch(const Pointer<MessageDispatch>& dispatch)
 void ActiveMQSessionKernel::redispatch(
     MessageDispatchChannel& unconsumedMessages)
 {
-    std::vector<Pointer<MessageDispatch>> messages =
+    std::vector<std::shared_ptr<MessageDispatch>> messages =
         unconsumedMessages.removeAll();
-    std::vector<Pointer<MessageDispatch>>::reverse_iterator iter =
+    std::vector<std::shared_ptr<MessageDispatch>>::reverse_iterator iter =
         messages.rbegin();
 
     for (; iter != messages.rend(); ++iter)
@@ -1410,12 +1425,12 @@ void ActiveMQSessionKernel::start()
     this->config->consumerLock.readLock().lock();
     try
     {
-        Pointer<Iterator<Pointer<ActiveMQConsumerKernel>>> iter(
+        std::shared_ptr<Iterator<std::shared_ptr<ActiveMQConsumerKernel>>> iter(
             this->config->consumers.iterator());
 
         while (iter->hasNext())
         {
-            Pointer<ActiveMQConsumerKernel> consumer = iter->next();
+            std::shared_ptr<ActiveMQConsumerKernel> consumer = iter->next();
             consumer->start();
         }
         this->config->consumerLock.readLock().unlock();
@@ -1426,7 +1441,7 @@ void ActiveMQSessionKernel::start()
         throw;
     }
 
-    if (this->executor.get() != NULL)
+    if (this->executor.get() != nullptr)
     {
         this->executor->start();
     }
@@ -1438,12 +1453,12 @@ void ActiveMQSessionKernel::stop()
     this->config->consumerLock.readLock().lock();
     try
     {
-        Pointer<Iterator<Pointer<ActiveMQConsumerKernel>>> iter(
+        std::shared_ptr<Iterator<std::shared_ptr<ActiveMQConsumerKernel>>> iter(
             this->config->consumers.iterator());
 
         while (iter->hasNext())
         {
-            Pointer<ActiveMQConsumerKernel> consumer = iter->next();
+            std::shared_ptr<ActiveMQConsumerKernel> consumer = iter->next();
             consumer->stop();
         }
         this->config->consumerLock.readLock().unlock();
@@ -1454,7 +1469,7 @@ void ActiveMQSessionKernel::stop()
         throw;
     }
 
-    if (this->executor.get() != NULL)
+    if (this->executor.get() != nullptr)
     {
         this->executor->stop();
     }
@@ -1463,7 +1478,7 @@ void ActiveMQSessionKernel::stop()
 ////////////////////////////////////////////////////////////////////////////////
 bool ActiveMQSessionKernel::isStarted() const
 {
-    if (this->executor.get() == NULL)
+    if (this->executor.get() == nullptr)
     {
         return false;
     }
@@ -1477,11 +1492,11 @@ void ActiveMQSessionKernel::createTemporaryDestination(
 {
     try
     {
-        Pointer<DestinationInfo> command(new DestinationInfo());
+        std::shared_ptr<DestinationInfo> command(new DestinationInfo());
         command->setConnectionId(
             this->connection->getConnectionInfo().getConnectionId());
         command->setOperationType(ActiveMQConstants::DESTINATION_ADD_OPERATION);
-        command->setDestination(Pointer<ActiveMQTempDestination>(
+        command->setDestination(std::shared_ptr<ActiveMQTempDestination>(
             tempDestination->cloneDataStructure()));
 
         // Send the message to the broker.
@@ -1489,8 +1504,9 @@ void ActiveMQSessionKernel::createTemporaryDestination(
 
         // Now that its setup, link it to this Connection so it can be closed.
         tempDestination->setConnection(this->connection);
-        this->connection->addTempDestination(Pointer<ActiveMQTempDestination>(
-            tempDestination->cloneDataStructure()));
+        this->connection->addTempDestination(
+            std::shared_ptr<ActiveMQTempDestination>(
+                tempDestination->cloneDataStructure()));
     }
     AMQ_CATCH_RETHROW(ActiveMQException)
     AMQ_CATCH_EXCEPTION_CONVERT(Exception, ActiveMQException)
@@ -1498,17 +1514,18 @@ void ActiveMQSessionKernel::createTemporaryDestination(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool ActiveMQSessionKernel::isInUse(Pointer<ActiveMQDestination> destination)
+bool ActiveMQSessionKernel::isInUse(
+    std::shared_ptr<ActiveMQDestination> destination)
 {
     this->config->consumerLock.readLock().lock();
     try
     {
-        Pointer<Iterator<Pointer<ActiveMQConsumerKernel>>> iter(
+        std::shared_ptr<Iterator<std::shared_ptr<ActiveMQConsumerKernel>>> iter(
             this->config->consumers.iterator());
 
         while (iter->hasNext())
         {
-            Pointer<ActiveMQConsumerKernel> consumer = iter->next();
+            std::shared_ptr<ActiveMQConsumerKernel> consumer = iter->next();
             if (consumer->isInUse(destination))
             {
                 this->config->consumerLock.readLock().unlock();
@@ -1532,13 +1549,13 @@ void ActiveMQSessionKernel::destroyTemporaryDestination(
 {
     try
     {
-        Pointer<DestinationInfo> command(new DestinationInfo());
+        std::shared_ptr<DestinationInfo> command(new DestinationInfo());
 
         command->setConnectionId(
             this->connection->getConnectionInfo().getConnectionId());
         command->setOperationType(
             ActiveMQConstants::DESTINATION_REMOVE_OPERATION);
-        command->setDestination(Pointer<ActiveMQTempDestination>(
+        command->setDestination(std::shared_ptr<ActiveMQTempDestination>(
             tempDestination->cloneDataStructure()));
 
         // Send the message to the broker.
@@ -1555,7 +1572,7 @@ std::string ActiveMQSessionKernel::createTemporaryDestinationName()
     try
     {
         return this->connection->getConnectionId().getValue() + ":" +
-               Long::toString(this->connection->getNextTempDestinationId());
+               std::to_string(this->connection->getNextTempDestinationId());
     }
     AMQ_CATCH_RETHROW(ActiveMQException)
     AMQ_CATCH_EXCEPTION_CONVERT(Exception, ActiveMQException)
@@ -1563,7 +1580,7 @@ std::string ActiveMQSessionKernel::createTemporaryDestinationName()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQSessionKernel::oneway(Pointer<Command> command)
+void ActiveMQSessionKernel::oneway(std::shared_ptr<Command> command)
 {
     try
     {
@@ -1575,8 +1592,9 @@ void ActiveMQSessionKernel::oneway(Pointer<Command> command)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Response> ActiveMQSessionKernel::syncRequest(Pointer<Command> command,
-                                                     unsigned int     timeout)
+std::shared_ptr<Response> ActiveMQSessionKernel::syncRequest(
+    std::shared_ptr<Command> command,
+    unsigned int             timeout)
 {
     try
     {
@@ -1591,7 +1609,7 @@ Pointer<Response> ActiveMQSessionKernel::syncRequest(Pointer<Command> command,
 ////////////////////////////////////////////////////////////////////////////////
 void ActiveMQSessionKernel::checkClosed() const
 {
-    if (this->closed.get())
+    if (this->closed.load())
     {
         throw ActiveMQException(
             __FILE__,
@@ -1601,7 +1619,8 @@ void ActiveMQSessionKernel::checkClosed() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQSessionKernel::addConsumer(Pointer<ActiveMQConsumerKernel> consumer)
+void ActiveMQSessionKernel::addConsumer(
+    std::shared_ptr<ActiveMQConsumerKernel> consumer)
 {
     try
     {
@@ -1631,7 +1650,7 @@ void ActiveMQSessionKernel::addConsumer(Pointer<ActiveMQConsumerKernel> consumer
 
 ////////////////////////////////////////////////////////////////////////////////
 void ActiveMQSessionKernel::removeConsumer(
-    Pointer<ActiveMQConsumerKernel> consumer)
+    std::shared_ptr<ActiveMQConsumerKernel> consumer)
 {
     try
     {
@@ -1667,7 +1686,8 @@ void ActiveMQSessionKernel::removeConsumer(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQSessionKernel::addProducer(Pointer<ActiveMQProducerKernel> producer)
+void ActiveMQSessionKernel::addProducer(
+    std::shared_ptr<ActiveMQProducerKernel> producer)
 {
     try
     {
@@ -1694,7 +1714,7 @@ void ActiveMQSessionKernel::addProducer(Pointer<ActiveMQProducerKernel> producer
 
 ////////////////////////////////////////////////////////////////////////////////
 void ActiveMQSessionKernel::removeProducer(
-    Pointer<ActiveMQProducerKernel> producer)
+    std::shared_ptr<ActiveMQProducerKernel> producer)
 {
     try
     {
@@ -1717,18 +1737,19 @@ void ActiveMQSessionKernel::removeProducer(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<ActiveMQProducerKernel> ActiveMQSessionKernel::lookupProducerKernel(
-    Pointer<ProducerId> id)
+std::shared_ptr<ActiveMQProducerKernel>
+ActiveMQSessionKernel::lookupProducerKernel(std::shared_ptr<ProducerId> id)
 {
     this->config->producerLock.readLock().lock();
     try
     {
-        std::unique_ptr<Iterator<Pointer<ActiveMQProducerKernel>>> producerIter(
-            this->config->producers.iterator());
+        std::unique_ptr<Iterator<std::shared_ptr<ActiveMQProducerKernel>>>
+            producerIter(this->config->producers.iterator());
 
         while (producerIter->hasNext())
         {
-            Pointer<ActiveMQProducerKernel> producer = producerIter->next();
+            std::shared_ptr<ActiveMQProducerKernel> producer =
+                producerIter->next();
             if (producer->getProducerId()->equals(*id))
             {
                 this->config->producerLock.readLock().unlock();
@@ -1744,22 +1765,22 @@ Pointer<ActiveMQProducerKernel> ActiveMQSessionKernel::lookupProducerKernel(
         throw;
     }
 
-    return Pointer<ActiveMQProducerKernel>();
+    return std::shared_ptr<ActiveMQProducerKernel>();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<ActiveMQConsumerKernel> ActiveMQSessionKernel::lookupConsumerKernel(
-    Pointer<ConsumerId> id)
+std::shared_ptr<ActiveMQConsumerKernel>
+ActiveMQSessionKernel::lookupConsumerKernel(std::shared_ptr<ConsumerId> id)
 {
     this->config->consumerLock.readLock().lock();
     try
     {
-        Pointer<Iterator<Pointer<ActiveMQConsumerKernel>>> iter(
+        std::shared_ptr<Iterator<std::shared_ptr<ActiveMQConsumerKernel>>> iter(
             this->config->consumers.iterator());
 
         while (iter->hasNext())
         {
-            Pointer<ActiveMQConsumerKernel> consumer = iter->next();
+            std::shared_ptr<ActiveMQConsumerKernel> consumer = iter->next();
             if (consumer->getConsumerId()->equals(*id))
             {
                 this->config->consumerLock.readLock().unlock();
@@ -1774,13 +1795,13 @@ Pointer<ActiveMQConsumerKernel> ActiveMQSessionKernel::lookupConsumerKernel(
         throw;
     }
 
-    return Pointer<ActiveMQConsumerKernel>();
+    return std::shared_ptr<ActiveMQConsumerKernel>();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 bool ActiveMQSessionKernel::iterateConsumers()
 {
-    if (this->closed.get())
+    if (this->closed.load())
     {
         return false;
     }
@@ -1788,12 +1809,12 @@ bool ActiveMQSessionKernel::iterateConsumers()
     this->config->consumerLock.readLock().lock();
     try
     {
-        Pointer<Iterator<Pointer<ActiveMQConsumerKernel>>> iter(
+        std::shared_ptr<Iterator<std::shared_ptr<ActiveMQConsumerKernel>>> iter(
             this->config->consumers.iterator());
 
         while (iter->hasNext())
         {
-            Pointer<ActiveMQConsumerKernel> consumer = iter->next();
+            std::shared_ptr<ActiveMQConsumerKernel> consumer = iter->next();
             if (consumer->iterate())
             {
                 this->config->consumerLock.readLock().unlock();
@@ -1812,18 +1833,18 @@ bool ActiveMQSessionKernel::iterateConsumers()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQSessionKernel::setPrefetchSize(Pointer<ConsumerId> id,
-                                            int                 prefetch)
+void ActiveMQSessionKernel::setPrefetchSize(std::shared_ptr<ConsumerId> id,
+                                            int prefetch)
 {
     this->config->consumerLock.readLock().lock();
     try
     {
-        Pointer<Iterator<Pointer<ActiveMQConsumerKernel>>> iter(
+        std::shared_ptr<Iterator<std::shared_ptr<ActiveMQConsumerKernel>>> iter(
             this->config->consumers.iterator());
 
         while (iter->hasNext())
         {
-            Pointer<ActiveMQConsumerKernel> consumer = iter->next();
+            std::shared_ptr<ActiveMQConsumerKernel> consumer = iter->next();
             if (consumer->getConsumerId()->equals(*id))
             {
                 consumer->setPrefetchSize(prefetch);
@@ -1839,17 +1860,17 @@ void ActiveMQSessionKernel::setPrefetchSize(Pointer<ConsumerId> id,
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQSessionKernel::close(Pointer<ConsumerId> id)
+void ActiveMQSessionKernel::close(std::shared_ptr<ConsumerId> id)
 {
     this->config->consumerLock.readLock().lock();
     try
     {
-        Pointer<Iterator<Pointer<ActiveMQConsumerKernel>>> iter(
+        std::shared_ptr<Iterator<std::shared_ptr<ActiveMQConsumerKernel>>> iter(
             this->config->consumers.iterator());
 
         while (iter->hasNext())
         {
-            Pointer<ActiveMQConsumerKernel> consumer = iter->next();
+            std::shared_ptr<ActiveMQConsumerKernel> consumer = iter->next();
             if (consumer->getConsumerId()->equals(*id))
             {
                 try
@@ -1882,16 +1903,16 @@ void ActiveMQSessionKernel::doStartTransaction()
 ////////////////////////////////////////////////////////////////////////////////
 void ActiveMQSessionKernel::wakeup()
 {
-    if (this->executor.get() != NULL)
+    if (this->executor.get() != nullptr)
     {
         this->executor->wakeup();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<commands::ConsumerId> ActiveMQSessionKernel::getNextConsumerId()
+std::shared_ptr<commands::ConsumerId> ActiveMQSessionKernel::getNextConsumerId()
 {
-    Pointer<ConsumerId> consumerId(new commands::ConsumerId());
+    std::shared_ptr<ConsumerId> consumerId(new commands::ConsumerId());
 
     consumerId->setConnectionId(this->connection->getConnectionId().getValue());
     consumerId->setSessionId(this->sessionInfo->getSessionId()->getValue());
@@ -1901,9 +1922,9 @@ Pointer<commands::ConsumerId> ActiveMQSessionKernel::getNextConsumerId()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<commands::ProducerId> ActiveMQSessionKernel::getNextProducerId()
+std::shared_ptr<commands::ProducerId> ActiveMQSessionKernel::getNextProducerId()
 {
-    Pointer<ProducerId> producerId(new ProducerId());
+    std::shared_ptr<ProducerId> producerId(new ProducerId());
 
     producerId->setConnectionId(this->connection->getConnectionId().getValue());
     producerId->setSessionId(this->sessionInfo->getSessionId()->getValue());
@@ -1924,12 +1945,12 @@ void ActiveMQSessionKernel::checkMessageListener() const
     this->config->consumerLock.readLock().lock();
     try
     {
-        Pointer<Iterator<Pointer<ActiveMQConsumerKernel>>> iter(
+        std::shared_ptr<Iterator<std::shared_ptr<ActiveMQConsumerKernel>>> iter(
             this->config->consumers.iterator());
         while (iter->hasNext())
         {
-            Pointer<ActiveMQConsumerKernel> consumer = iter->next();
-            if (consumer->getMessageListener() != NULL)
+            std::shared_ptr<ActiveMQConsumerKernel> consumer = iter->next();
+            if (consumer->getMessageListener() != nullptr)
             {
                 throw cms::IllegalStateException(
                     "Cannot synchronously receive a message when a "
@@ -1946,7 +1967,7 @@ void ActiveMQSessionKernel::checkMessageListener() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQSessionKernel::sendAck(Pointer<MessageAck> ack, bool async)
+void ActiveMQSessionKernel::sendAck(std::shared_ptr<MessageAck> ack, bool async)
 {
     if (async || this->connection->isSendAcksAsync() || this->isTransacted())
     {
@@ -1971,10 +1992,10 @@ void ActiveMQSessionKernel::setSessionAsyncDispatch(bool sessionAsyncDispatch)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::util::ArrayList<Pointer<ActiveMQConsumerKernel>>
+decaf::util::ArrayList<std::shared_ptr<ActiveMQConsumerKernel>>
 ActiveMQSessionKernel::getConsumers() const
 {
-    ArrayList<Pointer<ActiveMQConsumerKernel>> result;
+    ArrayList<std::shared_ptr<ActiveMQConsumerKernel>> result;
     this->config->consumerLock.readLock().lock();
     try
     {

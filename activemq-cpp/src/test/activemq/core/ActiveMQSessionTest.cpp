@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -32,7 +32,6 @@
 #include <cms/Connection.h>
 #include <cms/ExceptionListener.h>
 #include <cms/MessageListener.h>
-#include <decaf/lang/Pointer.h>
 #include <decaf/lang/System.h>
 #include <decaf/lang/Thread.h>
 #include <decaf/net/ServerSocket.h>
@@ -93,9 +92,9 @@ protected:
 class MyCMSMessageListener : public cms::MessageListener
 {
 public:
-    std::vector<Pointer<cms::Message>> messages;
-    decaf::util::concurrent::Mutex     mutex;
-    bool                               ack;
+    std::vector<std::shared_ptr<cms::Message>> messages;
+    decaf::util::concurrent::Mutex             mutex;
+    bool                                       ack;
 
 public:
     MyCMSMessageListener(bool ack = false)
@@ -129,7 +128,7 @@ public:
                 message->acknowledge();
             }
 
-            messages.push_back(Pointer<cms::Message>(message->clone()));
+            messages.push_back(std::shared_ptr<cms::Message>(message->clone()));
             mutex.notifyAll();
         }
     }
@@ -201,7 +200,7 @@ void ActiveMQSessionTest::SetUp()
 ////////////////////////////////////////////////////////////////////////////////
 void ActiveMQSessionTest::TearDown()
 {
-    connection.reset(NULL);
+    connection.reset();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -211,14 +210,14 @@ void ActiveMQSessionTest::injectTextMessage(const std::string       message,
                                             const long long timeStamp,
                                             const long long timeToLive)
 {
-    Pointer<ActiveMQTextMessage> msg(new ActiveMQTextMessage());
+    std::shared_ptr<ActiveMQTextMessage> msg(new ActiveMQTextMessage());
 
-    Pointer<ProducerId> producerId(new ProducerId());
+    std::shared_ptr<ProducerId> producerId(new ProducerId());
     producerId->setConnectionId(id.getConnectionId());
     producerId->setSessionId(id.getSessionId());
     producerId->setValue(1);
 
-    Pointer<MessageId> messageId(new MessageId());
+    std::shared_ptr<MessageId> messageId(new MessageId());
     messageId->setProducerId(producerId);
     messageId->setProducerSequenceId(2);
 
@@ -245,9 +244,10 @@ void ActiveMQSessionTest::injectTextMessage(const std::string       message,
     // Send the Message
     ASSERT_TRUE(dTransport != NULL);
 
-    Pointer<MessageDispatch> dispatch(new MessageDispatch());
+    std::shared_ptr<MessageDispatch> dispatch(new MessageDispatch());
     dispatch->setMessage(msg);
-    dispatch->setConsumerId(Pointer<ConsumerId>(id.cloneDataStructure()));
+    dispatch->setConsumerId(
+        std::shared_ptr<ConsumerId>(id.cloneDataStructure()));
 
     dTransport->fireCommand(dispatch);
 }
@@ -339,10 +339,10 @@ TEST_F(ActiveMQSessionTest, testAutoAcking)
 
     ASSERT_TRUE(msgListener2.messages.size() == 1);
 
-    Pointer<cms::TextMessage> msg1 =
-        msgListener1.messages[0].dynamicCast<cms::TextMessage>();
-    Pointer<cms::TextMessage> msg2 =
-        msgListener2.messages[0].dynamicCast<cms::TextMessage>();
+    std::shared_ptr<cms::TextMessage> msg1 =
+        std::dynamic_pointer_cast<cms::TextMessage>(msgListener1.messages[0]);
+    std::shared_ptr<cms::TextMessage> msg2 =
+        std::dynamic_pointer_cast<cms::TextMessage>(msgListener2.messages[0]);
 
     std::string text1 = msg1->getText();
     std::string text2 = msg2->getText();
@@ -410,10 +410,10 @@ TEST_F(ActiveMQSessionTest, testClientAck)
 
     msgListener2.messages[0]->acknowledge();
 
-    Pointer<cms::TextMessage> msg1 =
-        msgListener1.messages[0].dynamicCast<cms::TextMessage>();
-    Pointer<cms::TextMessage> msg2 =
-        msgListener2.messages[0].dynamicCast<cms::TextMessage>();
+    std::shared_ptr<cms::TextMessage> msg1 =
+        std::dynamic_pointer_cast<cms::TextMessage>(msgListener1.messages[0]);
+    std::shared_ptr<cms::TextMessage> msg2 =
+        std::dynamic_pointer_cast<cms::TextMessage>(msgListener2.messages[0]);
 
     std::string text1 = msg1->getText();
     std::string text2 = msg2->getText();
@@ -466,8 +466,8 @@ TEST_F(ActiveMQSessionTest, testTransactionCommitOneConsumer)
 
     session->commit();
 
-    Pointer<cms::TextMessage> msg1 =
-        msgListener1.messages[0].dynamicCast<cms::TextMessage>();
+    std::shared_ptr<cms::TextMessage> msg1 =
+        std::dynamic_pointer_cast<cms::TextMessage>(msgListener1.messages[0]);
 
     std::string text1 = msg1->getText();
 
@@ -533,10 +533,10 @@ TEST_F(ActiveMQSessionTest, testTransactionCommitTwoConsumer)
 
     session->commit();
 
-    Pointer<cms::TextMessage> msg1 =
-        msgListener1.messages[0].dynamicCast<cms::TextMessage>();
-    Pointer<cms::TextMessage> msg2 =
-        msgListener2.messages[0].dynamicCast<cms::TextMessage>();
+    std::shared_ptr<cms::TextMessage> msg1 =
+        std::dynamic_pointer_cast<cms::TextMessage>(msgListener1.messages[0]);
+    std::shared_ptr<cms::TextMessage> msg2 =
+        std::dynamic_pointer_cast<cms::TextMessage>(msgListener2.messages[0]);
 
     std::string text1 = msg1->getText();
     std::string text2 = msg2->getText();
@@ -778,8 +778,8 @@ TEST_F(ActiveMQSessionTest, testExpiration)
 
     ASSERT_TRUE(msgListener2.messages.size() == 0);
 
-    Pointer<cms::TextMessage> msg1 =
-        msgListener1.messages[0].dynamicCast<cms::TextMessage>();
+    std::shared_ptr<cms::TextMessage> msg1 =
+        std::dynamic_pointer_cast<cms::TextMessage>(msgListener1.messages[0]);
 
     std::string text1 = msg1->getText();
 
@@ -828,8 +828,8 @@ TEST_F(ActiveMQSessionTest, testTransactionCommitAfterConsumerClosed)
     consumer1.reset();
     session->commit();
 
-    Pointer<cms::TextMessage> msg1 =
-        msgListener1.messages[0].dynamicCast<cms::TextMessage>();
+    std::shared_ptr<cms::TextMessage> msg1 =
+        std::dynamic_pointer_cast<cms::TextMessage>(msgListener1.messages[0]);
     std::string text1 = msg1->getText();
 
     ASSERT_TRUE(text1 == "This is a Test 1");

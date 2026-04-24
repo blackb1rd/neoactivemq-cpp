@@ -17,10 +17,10 @@
 
 #include "CommandVisitorAdapter.h"
 
+#include <memory>
+
 using namespace activemq;
 using namespace activemq::state;
-using namespace decaf;
-using namespace decaf::lang;
 
 ////////////////////////////////////////////////////////////////////////////////
 CommandVisitorAdapter::~CommandVisitorAdapter()
@@ -28,10 +28,10 @@ CommandVisitorAdapter::~CommandVisitorAdapter()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<commands::Command> CommandVisitorAdapter::processTransactionInfo(
-    commands::TransactionInfo* info)
+std::shared_ptr<commands::Command>
+CommandVisitorAdapter::processTransactionInfo(commands::TransactionInfo* info)
 {
-    if (info != decaf::lang::Pointer<commands::Command>())
+    if (info != nullptr)
     {
         switch (info->getType())
         {
@@ -59,14 +59,14 @@ Pointer<commands::Command> CommandVisitorAdapter::processTransactionInfo(
         }
     }
 
-    return Pointer<commands::Command>();
+    return std::shared_ptr<commands::Command>();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<commands::Command> CommandVisitorAdapter::processRemoveInfo(
+std::shared_ptr<commands::Command> CommandVisitorAdapter::processRemoveInfo(
     commands::RemoveInfo* info)
 {
-    if (info != decaf::lang::Pointer<commands::Command>())
+    if (info != nullptr)
     {
         switch (info->getObjectId()->getDataStructureType())
         {
@@ -94,5 +94,5 @@ Pointer<commands::Command> CommandVisitorAdapter::processRemoveInfo(
         }
     }
 
-    return Pointer<commands::Command>();
+    return std::shared_ptr<commands::Command>();
 }

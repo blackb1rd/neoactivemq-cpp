@@ -26,8 +26,9 @@
 #include <activemq/commands/BaseDataStructure.h>
 #include <activemq/commands/SessionId.h>
 #include <activemq/util/Config.h>
+#include <activemq/util/SharedPtrComparator.h>
 #include <decaf/lang/Comparable.h>
-#include <decaf/lang/Pointer.h>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -35,8 +36,6 @@ namespace activemq
 {
 namespace commands
 {
-
-    using decaf::lang::Pointer;
 
     /*
      *
@@ -58,10 +57,10 @@ namespace commands
     public:
         const static unsigned char ID_CONSUMERID = 122;
 
-        typedef decaf::lang::PointerComparator<ConsumerId> COMPARATOR;
+        typedef SharedPtrComparator<ConsumerId> COMPARATOR;
 
     private:
-        mutable Pointer<SessionId> parentId;
+        mutable std::shared_ptr<SessionId> parentId;
 
     public:
         ConsumerId();
@@ -82,7 +81,7 @@ namespace commands
 
         virtual bool equals(const DataStructure* value) const;
 
-        const Pointer<SessionId>& getParentId() const;
+        const std::shared_ptr<SessionId>& getParentId() const;
 
         virtual const std::string& getConnectionId() const;
         virtual std::string&       getConnectionId();

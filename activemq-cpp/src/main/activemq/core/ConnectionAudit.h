@@ -21,7 +21,7 @@
 #include <activemq/util/Config.h>
 
 #include <activemq/commands/Message.h>
-#include <decaf/lang/Pointer.h>
+#include <memory>
 
 namespace activemq
 {
@@ -60,11 +60,11 @@ namespace core
     public:
         void removeDispatcher(Dispatcher* dispatcher);
 
-        bool isDuplicate(Dispatcher*                             dispatcher,
-                         decaf::lang::Pointer<commands::Message> message);
+        bool isDuplicate(Dispatcher*                        dispatcher,
+                         std::shared_ptr<commands::Message> message);
 
-        void rollbackDuplicate(Dispatcher* dispatcher,
-                               decaf::lang::Pointer<commands::Message> message);
+        void rollbackDuplicate(Dispatcher*                        dispatcher,
+                               std::shared_ptr<commands::Message> message);
 
     public:
         bool isCheckForDuplicates() const

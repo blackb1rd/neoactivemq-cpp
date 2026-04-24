@@ -30,7 +30,7 @@
 #include <activemq/transport/Transport.h>
 #include <activemq/util/Config.h>
 
-#include <decaf/lang/Pointer.h>
+#include <memory>
 
 namespace activemq
 {
@@ -62,70 +62,63 @@ namespace state
 
         virtual ~ConnectionStateTracker();
 
-        Pointer<Tracked> track(Pointer<Command> command);
+        std::shared_ptr<Tracked> track(std::shared_ptr<Command> command);
 
-        void trackBack(decaf::lang::Pointer<Command> command);
+        void trackBack(std::shared_ptr<Command> command);
 
-        void restore(decaf::lang::Pointer<transport::Transport> transport);
+        void restore(std::shared_ptr<transport::Transport> transport);
 
         void connectionInterruptProcessingComplete(
-            transport::Transport*              transport,
-            decaf::lang::Pointer<ConnectionId> connectionId);
+            transport::Transport*         transport,
+            std::shared_ptr<ConnectionId> connectionId);
 
         void transportInterrupted();
 
-        virtual decaf::lang::Pointer<Command> processDestinationInfo(
+        virtual std::shared_ptr<Command> processDestinationInfo(
             DestinationInfo* info);
 
-        virtual decaf::lang::Pointer<Command> processRemoveDestination(
+        virtual std::shared_ptr<Command> processRemoveDestination(
             DestinationInfo* info);
 
-        virtual decaf::lang::Pointer<Command> processProducerInfo(
-            ProducerInfo* info);
+        virtual std::shared_ptr<Command> processProducerInfo(ProducerInfo* info);
 
-        virtual decaf::lang::Pointer<Command> processRemoveProducer(
-            ProducerId* id);
+        virtual std::shared_ptr<Command> processRemoveProducer(ProducerId* id);
 
-        virtual decaf::lang::Pointer<Command> processConsumerInfo(
-            ConsumerInfo* info);
+        virtual std::shared_ptr<Command> processConsumerInfo(ConsumerInfo* info);
 
-        virtual decaf::lang::Pointer<Command> processRemoveConsumer(
-            ConsumerId* id);
+        virtual std::shared_ptr<Command> processRemoveConsumer(ConsumerId* id);
 
-        virtual decaf::lang::Pointer<Command> processSessionInfo(
-            SessionInfo* info);
+        virtual std::shared_ptr<Command> processSessionInfo(SessionInfo* info);
 
-        virtual decaf::lang::Pointer<Command> processRemoveSession(
-            SessionId* id);
+        virtual std::shared_ptr<Command> processRemoveSession(SessionId* id);
 
-        virtual decaf::lang::Pointer<Command> processConnectionInfo(
+        virtual std::shared_ptr<Command> processConnectionInfo(
             ConnectionInfo* info);
 
-        virtual decaf::lang::Pointer<Command> processRemoveConnection(
+        virtual std::shared_ptr<Command> processRemoveConnection(
             ConnectionId* id);
 
-        virtual decaf::lang::Pointer<Command> processMessage(Message* message);
+        virtual std::shared_ptr<Command> processMessage(Message* message);
 
-        virtual decaf::lang::Pointer<Command> processBeginTransaction(
+        virtual std::shared_ptr<Command> processBeginTransaction(
             TransactionInfo* info);
 
-        virtual decaf::lang::Pointer<Command> processPrepareTransaction(
+        virtual std::shared_ptr<Command> processPrepareTransaction(
             TransactionInfo* info);
 
-        virtual decaf::lang::Pointer<Command> processCommitTransactionOnePhase(
+        virtual std::shared_ptr<Command> processCommitTransactionOnePhase(
             TransactionInfo* info);
 
-        virtual decaf::lang::Pointer<Command> processCommitTransactionTwoPhase(
+        virtual std::shared_ptr<Command> processCommitTransactionTwoPhase(
             TransactionInfo* info);
 
-        virtual decaf::lang::Pointer<Command> processRollbackTransaction(
+        virtual std::shared_ptr<Command> processRollbackTransaction(
             TransactionInfo* info);
 
-        virtual decaf::lang::Pointer<Command> processEndTransaction(
+        virtual std::shared_ptr<Command> processEndTransaction(
             TransactionInfo* info);
 
-        virtual decaf::lang::Pointer<Command> processMessagePull(
-            MessagePull* pull);
+        virtual std::shared_ptr<Command> processMessagePull(MessagePull* pull);
 
         bool isRestoreConsumers() const
         {
@@ -219,24 +212,21 @@ namespace state
 
     private:
         void doRestoreTransactions(
-            decaf::lang::Pointer<transport::Transport> transport,
-            decaf::lang::Pointer<ConnectionState>      connectionState);
+            std::shared_ptr<transport::Transport> transport,
+            std::shared_ptr<ConnectionState>      connectionState);
 
-        void doRestoreSessions(
-            decaf::lang::Pointer<transport::Transport> transport,
-            decaf::lang::Pointer<ConnectionState>      connectionState);
+        void doRestoreSessions(std::shared_ptr<transport::Transport> transport,
+                               std::shared_ptr<ConnectionState> connectionState);
 
-        void doRestoreConsumers(
-            decaf::lang::Pointer<transport::Transport> transport,
-            decaf::lang::Pointer<SessionState>         sessionState);
+        void doRestoreConsumers(std::shared_ptr<transport::Transport> transport,
+                                std::shared_ptr<SessionState> sessionState);
 
-        void doRestoreProducers(
-            decaf::lang::Pointer<transport::Transport> transport,
-            decaf::lang::Pointer<SessionState>         sessionState);
+        void doRestoreProducers(std::shared_ptr<transport::Transport> transport,
+                                std::shared_ptr<SessionState> sessionState);
 
         void doRestoreTempDestinations(
-            decaf::lang::Pointer<transport::Transport> transport,
-            decaf::lang::Pointer<ConnectionState>      connectionState);
+            std::shared_ptr<transport::Transport> transport,
+            std::shared_ptr<ConnectionState>      connectionState);
     };
 
 }  // namespace state

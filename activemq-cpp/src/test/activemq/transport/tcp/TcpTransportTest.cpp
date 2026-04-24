@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -26,12 +26,12 @@
 #include <decaf/io/InputStream.h>
 #include <decaf/io/OutputStream.h>
 #include <decaf/lang/Integer.h>
-#include <decaf/lang/Pointer.h>
 #include <decaf/net/ServerSocket.h>
 #include <decaf/net/Socket.h>
 #include <decaf/net/SocketFactory.h>
 #include <decaf/net/SocketTimeoutException.h>
 #include <decaf/util/Random.h>
+#include <memory>
 
 using namespace decaf;
 using namespace decaf::lang;
@@ -59,12 +59,12 @@ namespace
 class TestServer : public lang::Thread
 {
 private:
-    bool                    done;
-    bool                    error;
-    Pointer<ServerSocket>   server;
-    Pointer<OpenWireFormat> wireFormat;
-    CountDownLatch          started;
-    Random                  rand;
+    bool                            done;
+    bool                            error;
+    std::shared_ptr<ServerSocket>   server;
+    std::shared_ptr<OpenWireFormat> wireFormat;
+    CountDownLatch                  started;
+    Random                          rand;
 
 public:
     TestServer()
@@ -124,7 +124,7 @@ public:
                 int port = getLocalPort();
                 if (port > 0 && server.get() != NULL)
                 {
-                    Pointer<Socket> wakeupSocket(
+                    std::shared_ptr<Socket> wakeupSocket(
                         SocketFactory::getDefault()->createSocket());
                     try
                     {
@@ -268,7 +268,7 @@ TEST_F(TcpTransportTest, testTransportCreateWithRadomFailures)
     int port = server->getLocalPort();
     URI connectUri("tcp://localhost:" + Integer::toString(port));
 
-    Pointer<Transport> transport;
+    std::shared_ptr<Transport> transport;
 
     // Test rapid creation with random connect failures.
     for (int i = 0; i < 1000; ++i)

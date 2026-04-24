@@ -20,7 +20,7 @@
 #include <activemq/core/ActiveMQConstants.h>
 #include <activemq/util/AdvisorySupport.h>
 #include <decaf/lang/exceptions/ClassCastException.h>
-#include <decaf/util/concurrent/atomic/AtomicBoolean.h>
+#include <atomic>
 
 using namespace activemq;
 using namespace activemq::core;
@@ -33,7 +33,6 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
-using namespace decaf::util::concurrent::atomic;
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace activemq
@@ -44,10 +43,10 @@ namespace core
     class AdvisoryConsumerConfig
     {
     public:
-        int                   deliveredCounter;
-        Pointer<ConsumerInfo> info;
-        AtomicBoolean         closed;
-        int                   hashCode;
+        int                           deliveredCounter;
+        std::shared_ptr<ConsumerInfo> info;
+        std::atomic<bool>             closed;
+        int                           hashCode;
 
         AdvisoryConsumerConfig()
             : deliveredCounter(0),
@@ -62,13 +61,14 @@ namespace core
 }  // namespace activemq
 
 ////////////////////////////////////////////////////////////////////////////////
-AdvisoryConsumer::AdvisoryConsumer(ActiveMQConnection*           connection,
-                                   Pointer<commands::ConsumerId> consumerId)
+AdvisoryConsumer::AdvisoryConsumer(
+    ActiveMQConnection*                   connection,
+    std::shared_ptr<commands::ConsumerId> consumerId)
     : Dispatcher(),
       config(new AdvisoryConsumerConfig()),
       connection(connection)
 {
-    if (connection == NULL)
+    if (connection == nullptr)
     {
         throw NullPointerException(__FILE__,
                                    __LINE__,
@@ -78,7 +78,7 @@ AdvisoryConsumer::AdvisoryConsumer(ActiveMQConnection*           connection,
     this->config->info.reset(new ConsumerInfo());
 
     this->config->info->setConsumerId(consumerId);
-    this->config->info->setDestination(Pointer<ActiveMQDestination>(
+    this->config->info->setDestination(std::shared_ptr<ActiveMQDestination>(
         AdvisorySupport::getTempDestinationCompositeAdvisoryTopic()));
     this->config->info->setPrefetchSize(1000);
     this->config->info->setNoLocal(true);
@@ -113,7 +113,8 @@ AdvisoryConsumer::~AdvisoryConsumer()
 ////////////////////////////////////////////////////////////////////////////////
 void AdvisoryConsumer::dispose()
 {
-    if (this->config->closed.compareAndSet(false, true))
+    bool expected = false;
+    if (this->config->closed.compare_exchange_strong(expected, true))
     {
         try
         {
@@ -128,7 +129,7 @@ void AdvisoryConsumer::dispose()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void AdvisoryConsumer::dispatch(const Pointer<MessageDispatch>& message)
+void AdvisoryConsumer::dispatch(const std::shared_ptr<MessageDispatch>& message)
 {
     // Auto ack messages when we reach 75% of the prefetch
     this->config->deliveredCounter++;
@@ -137,7 +138,7 @@ void AdvisoryConsumer::dispatch(const Pointer<MessageDispatch>& message)
     {
         try
         {
-            Pointer<MessageAck> ack(new MessageAck());
+            std::shared_ptr<MessageAck> ack(new MessageAck());
 
             ack->setAckType(ActiveMQConstants::ACK_TYPE_CONSUMED);
             ack->setConsumerId(this->config->info->getConsumerId());
@@ -155,14 +156,18 @@ void AdvisoryConsumer::dispatch(const Pointer<MessageDispatch>& message)
         }
     }
 
-    Pointer<DataStructure> object = message->getMessage()->getDataStructure();
-    if (object != NULL)
+    std::shared_ptr<DataStructure> object =
+        message->getMessage()->getDataStructure();
+    if (object != nullptr)
     {
         try
         {
-            Pointer<DestinationInfo> info =
-                object.dynamicCast<DestinationInfo>();
-            processDestinationInfo(info);
+            std::shared_ptr<DestinationInfo> info =
+                std::dynamic_pointer_cast<DestinationInfo>(object);
+            if (info != nullptr)
+            {
+                processDestinationInfo(info);
+            }
         }
         catch (ClassCastException& ex)
         {
@@ -172,16 +177,16 @@ void AdvisoryConsumer::dispatch(const Pointer<MessageDispatch>& message)
 
 ////////////////////////////////////////////////////////////////////////////////
 void AdvisoryConsumer::processDestinationInfo(
-    Pointer<commands::DestinationInfo> info)
+    std::shared_ptr<commands::DestinationInfo> info)
 {
-    Pointer<ActiveMQDestination> dest = info->getDestination();
+    std::shared_ptr<ActiveMQDestination> dest = info->getDestination();
     if (!dest->isTemporary())
     {
         return;
     }
 
-    Pointer<ActiveMQTempDestination> tempDest =
-        dest.dynamicCast<ActiveMQTempDestination>();
+    std::shared_ptr<ActiveMQTempDestination> tempDest =
+        std::dynamic_pointer_cast<ActiveMQTempDestination>(dest);
     if (info->getOperationType() ==
         ActiveMQConstants::DESTINATION_ADD_OPERATION)
     {

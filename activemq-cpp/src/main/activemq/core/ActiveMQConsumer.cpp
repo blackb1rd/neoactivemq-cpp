@@ -48,9 +48,10 @@ namespace core
         ActiveMQConsumerData& operator=(const ActiveMQConsumerData&);
 
     public:
-        Pointer<ActiveMQConsumerKernel> kernel;
+        std::shared_ptr<ActiveMQConsumerKernel> kernel;
 
-        ActiveMQConsumerData(const Pointer<ActiveMQConsumerKernel>& kernel)
+        ActiveMQConsumerData(
+            const std::shared_ptr<ActiveMQConsumerKernel>& kernel)
             : kernel(kernel)
         {
         }
@@ -60,11 +61,12 @@ namespace core
 }  // namespace activemq
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQConsumer::ActiveMQConsumer(const Pointer<ActiveMQConsumerKernel>& kernel)
+ActiveMQConsumer::ActiveMQConsumer(
+    const std::shared_ptr<ActiveMQConsumerKernel>& kernel)
     : MessageConsumer(),
       config(NULL)
 {
-    if (kernel == NULL)
+    if (kernel == nullptr)
     {
         throw ActiveMQException(__FILE__,
                                 __LINE__,
@@ -199,13 +201,15 @@ cms::MessageListener* ActiveMQConsumer::getMessageListener() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const Pointer<commands::ConsumerInfo>& ActiveMQConsumer::getConsumerInfo() const
+const std::shared_ptr<commands::ConsumerInfo>&
+ActiveMQConsumer::getConsumerInfo() const
 {
     return this->config->kernel->getConsumerInfo();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const Pointer<commands::ConsumerId>& ActiveMQConsumer::getConsumerId() const
+const std::shared_ptr<commands::ConsumerId>& ActiveMQConsumer::getConsumerId()
+    const
 {
     return this->config->kernel->getConsumerId();
 }

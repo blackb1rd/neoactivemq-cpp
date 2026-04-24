@@ -17,6 +17,8 @@
 
 #include "DiscoveryTransport.h"
 
+#include <memory>
+
 #include <activemq/exceptions/ActiveMQException.h>
 #include <activemq/util/Suspendable.h>
 #include <activemq/util/URISupport.h>
@@ -56,11 +58,11 @@ namespace transport
         class DiscoveryTransportData
         {
         public:
-            Pointer<CompositeTransport> next;
-            Pointer<DiscoveryAgent>     agent;
-            StlMap<std::string, URI>    serviceURIs;
-            Properties                  parameters;
-            Mutex                       lock;
+            std::shared_ptr<CompositeTransport> next;
+            std::shared_ptr<DiscoveryAgent>     agent;
+            StlMap<std::string, URI>            serviceURIs;
+            Properties                          parameters;
+            Mutex                               lock;
 
         private:
             DiscoveryTransportData(const DiscoveryTransportData&);
@@ -82,7 +84,7 @@ namespace transport
 }  // namespace activemq
 
 ////////////////////////////////////////////////////////////////////////////////
-DiscoveryTransport::DiscoveryTransport(Pointer<CompositeTransport> next)
+DiscoveryTransport::DiscoveryTransport(std::shared_ptr<CompositeTransport> next)
     : TransportFilter(next),
       impl(new DiscoveryTransportData)
 {
@@ -106,7 +108,7 @@ DiscoveryTransport::~DiscoveryTransport()
 ////////////////////////////////////////////////////////////////////////////////
 void DiscoveryTransport::start()
 {
-    if (this->impl->agent == NULL)
+    if (!this->impl->agent)
     {
         throw IllegalStateException(__FILE__,
                                     __LINE__,
@@ -168,7 +170,7 @@ void DiscoveryTransport::doClose()
 {
     try
     {
-        this->impl->next.reset(NULL);
+        this->impl->next.reset();
     }
     AMQ_CATCH_RETHROW(IOException)
     AMQ_CATCH_EXCEPTION_CONVERT(Exception, IOException)
@@ -176,10 +178,9 @@ void DiscoveryTransport::doClose()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void DiscoveryTransport::setDiscoveryAgent(
-    decaf::lang::Pointer<DiscoveryAgent> agent)
+void DiscoveryTransport::setDiscoveryAgent(std::shared_ptr<DiscoveryAgent> agent)
 {
-    if (agent == NULL)
+    if (!agent)
     {
         throw NullPointerException(__FILE__,
                                    __LINE__,
@@ -190,7 +191,7 @@ void DiscoveryTransport::setDiscoveryAgent(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<DiscoveryAgent> DiscoveryTransport::getDiscoveryAgent() const
+std::shared_ptr<DiscoveryAgent> DiscoveryTransport::getDiscoveryAgent() const
 {
     return this->impl->agent;
 }
@@ -255,19 +256,18 @@ void DiscoveryTransport::onServiceRemove(const DiscoveryEvent* event)
 ////////////////////////////////////////////////////////////////////////////////
 void DiscoveryTransport::transportInterrupted()
 {
-    Pointer<Suspendable> suspendable;
-    try
+    std::shared_ptr<Suspendable> suspendable =
+        std::dynamic_pointer_cast<Suspendable>(this->impl->next);
+    if (suspendable)
     {
-        suspendable = this->impl->next.dynamicCast<Suspendable>();
-        suspendable->resume();
-    }
-    catch (ClassCastException& e)
-    {
-        // Not a Suspendable instance.
-    }
-    catch (Exception& e)
-    {
-        // Failed to Resume
+        try
+        {
+            suspendable->resume();
+        }
+        catch (Exception& e)
+        {
+            // Failed to Resume
+        }
     }
 
     TransportFilter::transportInterrupted();
@@ -276,19 +276,18 @@ void DiscoveryTransport::transportInterrupted()
 ////////////////////////////////////////////////////////////////////////////////
 void DiscoveryTransport::transportResumed()
 {
-    Pointer<Suspendable> suspendable;
-    try
+    std::shared_ptr<Suspendable> suspendable =
+        std::dynamic_pointer_cast<Suspendable>(this->impl->next);
+    if (suspendable)
     {
-        suspendable = this->impl->next.dynamicCast<Suspendable>();
-        suspendable->suspend();
-    }
-    catch (ClassCastException& e)
-    {
-        // Not a Suspendable instance.
-    }
-    catch (Exception& e)
-    {
-        // Failed to Suspend
+        try
+        {
+            suspendable->suspend();
+        }
+        catch (Exception& e)
+        {
+            // Failed to Suspend
+        }
     }
 
     TransportFilter::transportResumed();

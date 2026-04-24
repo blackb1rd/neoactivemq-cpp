@@ -21,7 +21,8 @@
 #include <string.h>
 #include <sstream>
 
-#include <decaf/lang/Pointer.h>
+#include <memory>
+
 #include <decaf/util/Set.h>
 
 using namespace activemq;
@@ -65,7 +66,7 @@ std::string PrimitiveMap::toString() const
 
     stream << "Begin Class PrimitiveMap:" << std::endl;
 
-    Pointer<Iterator<MapEntry<std::string, PrimitiveValueNode>>> entries(
+    std::shared_ptr<Iterator<MapEntry<std::string, PrimitiveValueNode>>> entries(
         this->entrySet().iterator());
     while (entries->hasNext())
     {

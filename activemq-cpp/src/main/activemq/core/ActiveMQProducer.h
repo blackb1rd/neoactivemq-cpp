@@ -31,14 +31,12 @@ namespace activemq
 namespace core
 {
 
-    using decaf::lang::Pointer;
-
     class ActiveMQSession;
 
     class AMQCPP_API ActiveMQProducer : public cms::MessageProducer
     {
     private:
-        Pointer<activemq::core::kernels::ActiveMQProducerKernel> kernel;
+        std::shared_ptr<activemq::core::kernels::ActiveMQProducerKernel> kernel;
 
     private:
         ActiveMQProducer(const ActiveMQProducer&);
@@ -54,7 +52,8 @@ namespace core
          * functionality.
          */
         ActiveMQProducer(
-            Pointer<activemq::core::kernels::ActiveMQProducerKernel> kernel);
+            std::shared_ptr<activemq::core::kernels::ActiveMQProducerKernel>
+                kernel);
 
         virtual ~ActiveMQProducer();
 
@@ -228,7 +227,7 @@ namespace core
          * Retries this object ProducerInfo pointer
          * @return ProducerInfo Reference
          */
-        const Pointer<commands::ProducerInfo>& getProducerInfo() const
+        const std::shared_ptr<commands::ProducerInfo>& getProducerInfo() const
         {
             return this->kernel->getProducerInfo();
         }
@@ -237,7 +236,7 @@ namespace core
          * Retries this object ProducerId or NULL if closed.
          * @return ProducerId Reference
          */
-        const Pointer<commands::ProducerId>& getProducerId() const
+        const std::shared_ptr<commands::ProducerId>& getProducerId() const
         {
             return this->kernel->getProducerId();
         }

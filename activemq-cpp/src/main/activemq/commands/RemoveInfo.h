@@ -26,7 +26,7 @@
 #include <activemq/commands/BaseCommand.h>
 #include <activemq/commands/DataStructure.h>
 #include <activemq/util/Config.h>
-#include <decaf/lang/Pointer.h>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -34,8 +34,6 @@ namespace activemq
 {
 namespace commands
 {
-
-    using decaf::lang::Pointer;
 
     /*
      *
@@ -49,8 +47,8 @@ namespace commands
     class AMQCPP_API RemoveInfo : public BaseCommand
     {
     protected:
-        Pointer<DataStructure> objectId;
-        long long              lastDeliveredSequenceId;
+        std::shared_ptr<DataStructure> objectId;
+        long long                      lastDeliveredSequenceId;
 
     public:
         const static unsigned char ID_REMOVEINFO = 12;
@@ -74,9 +72,9 @@ namespace commands
 
         virtual bool equals(const DataStructure* value) const;
 
-        virtual const Pointer<DataStructure>& getObjectId() const;
-        virtual Pointer<DataStructure>&       getObjectId();
-        virtual void setObjectId(const Pointer<DataStructure>& objectId);
+        virtual const std::shared_ptr<DataStructure>& getObjectId() const;
+        virtual std::shared_ptr<DataStructure>&       getObjectId();
+        virtual void setObjectId(const std::shared_ptr<DataStructure>& objectId);
 
         virtual long long getLastDeliveredSequenceId() const;
         virtual void      setLastDeliveredSequenceId(
@@ -90,7 +88,8 @@ namespace commands
             return true;
         }
 
-        virtual Pointer<Command> visit(activemq::state::CommandVisitor* visitor);
+        virtual std::shared_ptr<Command> visit(
+            activemq::state::CommandVisitor* visitor);
     };
 
 }  // namespace commands

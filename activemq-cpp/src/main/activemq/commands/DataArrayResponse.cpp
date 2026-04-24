@@ -24,7 +24,7 @@ using namespace std;
 using namespace activemq;
 using namespace activemq::exceptions;
 using namespace activemq::commands;
-using namespace decaf::lang;
+
 using namespace decaf::lang::exceptions;
 
 /*
@@ -105,7 +105,7 @@ std::string DataArrayResponse::toString() const
         stream << "[";
         for (size_t idata = 0; idata < this->getData().size(); ++idata)
         {
-            if (this->getData()[idata] != NULL)
+            if (this->getData()[idata])
             {
                 stream << this->getData()[idata]->toString() << ", ";
             }
@@ -143,7 +143,7 @@ bool DataArrayResponse::equals(const DataStructure* value) const
 
     for (size_t idata = 0; idata < this->getData().size(); ++idata)
     {
-        if (this->getData()[idata] != NULL)
+        if (this->getData()[idata])
         {
             if (!this->getData()[idata]->equals(
                     valuePtr->getData()[idata].get()))
@@ -151,7 +151,7 @@ bool DataArrayResponse::equals(const DataStructure* value) const
                 return false;
             }
         }
-        else if (valuePtr->getData()[idata] != NULL)
+        else if (valuePtr->getData()[idata])
         {
             return false;
         }
@@ -164,21 +164,21 @@ bool DataArrayResponse::equals(const DataStructure* value) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::vector<decaf::lang::Pointer<DataStructure>>&
-DataArrayResponse::getData() const
+const std::vector<std::shared_ptr<DataStructure>>& DataArrayResponse::getData()
+    const
 {
     return data;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::vector<decaf::lang::Pointer<DataStructure>>& DataArrayResponse::getData()
+std::vector<std::shared_ptr<DataStructure>>& DataArrayResponse::getData()
 {
     return data;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void DataArrayResponse::setData(
-    const std::vector<decaf::lang::Pointer<DataStructure>>& data)
+    const std::vector<std::shared_ptr<DataStructure>>& data)
 {
     this->data = data;
 }

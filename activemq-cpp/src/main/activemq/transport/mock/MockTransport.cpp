@@ -31,8 +31,9 @@ using namespace decaf::lang::exceptions;
 MockTransport* MockTransport::instance = NULL;
 
 ////////////////////////////////////////////////////////////////////////////////
-MockTransport::MockTransport(const Pointer<WireFormat>      wireFormat,
-                             const Pointer<ResponseBuilder> responseBuilder)
+MockTransport::MockTransport(
+    const std::shared_ptr<WireFormat>      wireFormat,
+    const std::shared_ptr<ResponseBuilder> responseBuilder)
     : responseBuilder(responseBuilder),
       wireFormat(wireFormat),
       outgoingListener(),
@@ -61,7 +62,7 @@ MockTransport::MockTransport(const Pointer<WireFormat>      wireFormat,
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MockTransport::oneway(const Pointer<Command> command)
+void MockTransport::oneway(const std::shared_ptr<Command> command)
 {
     try
     {
@@ -107,9 +108,9 @@ void MockTransport::oneway(const Pointer<Command> command)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<FutureResponse> MockTransport::asyncRequest(
-    const Pointer<Command>          command,
-    const Pointer<ResponseCallback> responseCallback)
+std::shared_ptr<FutureResponse> MockTransport::asyncRequest(
+    const std::shared_ptr<Command>          command,
+    const std::shared_ptr<ResponseCallback> responseCallback)
 {
     try
     {
@@ -133,12 +134,13 @@ Pointer<FutureResponse> MockTransport::asyncRequest(
                 outgoingListener->onCommand(command);
             }
 
-            command->setCommandId(this->nextCommandId.incrementAndGet());
+            command->setCommandId(this->nextCommandId.fetch_add(1) + 1);
             command->setResponseRequired(true);
 
-            Pointer<FutureResponse> future(
+            std::shared_ptr<FutureResponse> future(
                 new FutureResponse(responseCallback));
-            Pointer<Response> response(responseBuilder->buildResponse(command));
+            std::shared_ptr<Response> response(
+                responseBuilder->buildResponse(command));
 
             future->setResponse(response);
 
@@ -158,7 +160,8 @@ Pointer<FutureResponse> MockTransport::asyncRequest(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Response> MockTransport::request(const Pointer<Command> command)
+std::shared_ptr<Response> MockTransport::request(
+    const std::shared_ptr<Command> command)
 {
     try
     {
@@ -182,7 +185,7 @@ Pointer<Response> MockTransport::request(const Pointer<Command> command)
                 outgoingListener->onCommand(command);
             }
 
-            command->setCommandId(this->nextCommandId.incrementAndGet());
+            command->setCommandId(this->nextCommandId.fetch_add(1) + 1);
             command->setResponseRequired(true);
             return responseBuilder->buildResponse(command);
         }
@@ -200,8 +203,9 @@ Pointer<Response> MockTransport::request(const Pointer<Command> command)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Response> MockTransport::request(const Pointer<Command> command,
-                                         unsigned int timeout   AMQCPP_UNUSED)
+std::shared_ptr<Response> MockTransport::request(
+    const std::shared_ptr<Command> command,
+    unsigned int timeout           AMQCPP_UNUSED)
 {
     try
     {

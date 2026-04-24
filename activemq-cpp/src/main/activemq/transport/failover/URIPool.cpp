@@ -17,9 +17,10 @@
 
 #include "URIPool.h"
 
-#include <decaf/lang/System.h>
-#include <decaf/util/Random.h>
+#include <chrono>
 #include <memory>
+
+#include <decaf/util/Random.h>
 
 using namespace activemq;
 using namespace activemq::transport;
@@ -103,7 +104,10 @@ URI URIPool::getURI()
             if (isRandomize())
             {
                 Random rand;
-                rand.setSeed(decaf::lang::System::currentTimeMillis());
+                rand.setSeed(
+                    std::chrono::duration_cast<std::chrono::milliseconds>(
+                        std::chrono::system_clock::now().time_since_epoch())
+                        .count());
                 index = rand.nextInt((int)uriPool.size());
             }
 

@@ -45,14 +45,14 @@ SslTransportFactory::~SslTransportFactory()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Transport> SslTransportFactory::doCreateComposite(
-    const decaf::net::URI&                location,
-    const Pointer<wireformat::WireFormat> wireFormat,
-    const decaf::util::Properties&        properties)
+std::shared_ptr<Transport> SslTransportFactory::doCreateComposite(
+    const decaf::net::URI&                        location,
+    const std::shared_ptr<wireformat::WireFormat> wireFormat,
+    const decaf::util::Properties&                properties)
 {
     try
     {
-        Pointer<Transport> transport(new IOTransport(wireFormat));
+        std::shared_ptr<Transport> transport(new IOTransport(wireFormat));
 
         transport.reset(new SslTransport(transport, location, properties));
 

@@ -15,33 +15,31 @@
  * limitations under the License.
  */
 
-#include <gtest/gtest.h>
+#ifndef _ACTIVEMQ_UTIL_SHAREDPTRCOMPARATOR_H_
+#define _ACTIVEMQ_UTIL_SHAREDPTRCOMPARATOR_H_
 
-#include <activemq/commands/ConsumerInfo.h>
-#include <activemq/state/ConsumerState.h>
 #include <memory>
 
-using namespace std;
-using namespace activemq;
-using namespace activemq::state;
-using namespace activemq::commands;
-
-class ConsumerStateTest : public ::testing::Test
+/**
+ * Strict-weak-ordering comparator for std::shared_ptr<T>.
+ * Dereferences both pointers and delegates to T::operator<.
+ * Drop-in replacement for decaf::lang::PointerComparator<T> after Pointer<T>
+ * is replaced by std::shared_ptr<T>.
+ */
+template <typename T>
+struct SharedPtrComparator
 {
+    bool operator()(const std::shared_ptr<T>& left,
+                    const std::shared_ptr<T>& right) const
+    {
+        return *left < *right;
+    }
+
+    int compare(const std::shared_ptr<T>& left,
+                const std::shared_ptr<T>& right) const
+    {
+        return *left < *right ? -1 : *right < *left ? 1 : 0;
+    }
 };
 
-////////////////////////////////////////////////////////////////////////////////
-TEST_F(ConsumerStateTest, test)
-{
-    std::shared_ptr<ConsumerId> id(new ConsumerId);
-    id->setConnectionId("CONNECTION");
-    id->setSessionId(4096);
-    id->setValue(42);
-
-    std::shared_ptr<ConsumerInfo> info(new ConsumerInfo());
-    info->setConsumerId(id);
-    ConsumerState state(info);
-
-    ASSERT_TRUE(state.toString() != "NULL");
-    ASSERT_TRUE(info == state.getInfo());
-}
+#endif /* _ACTIVEMQ_UTIL_SHAREDPTRCOMPARATOR_H_ */

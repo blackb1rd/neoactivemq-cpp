@@ -284,9 +284,9 @@ std::string PrimitiveValueConverter::convert<std::string>(
         case PrimitiveValueNode::SHORT_TYPE:
             return decaf::lang::Short::toString(value.getShort());
         case PrimitiveValueNode::INTEGER_TYPE:
-            return decaf::lang::Integer::toString(value.getInt());
+            return std::to_string(value.getInt());
         case PrimitiveValueNode::LONG_TYPE:
-            return decaf::lang::Long::toString(value.getLong());
+            return std::to_string(value.getLong());
         case PrimitiveValueNode::FLOAT_TYPE:
             return decaf::lang::Float::toString(value.getFloat());
         case PrimitiveValueNode::DOUBLE_TYPE:

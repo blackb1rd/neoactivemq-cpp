@@ -27,7 +27,7 @@
 #include <activemq/commands/BrokerId.h>
 #include <activemq/commands/BrokerInfo.h>
 #include <activemq/util/Config.h>
-#include <decaf/lang/Pointer.h>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -35,8 +35,6 @@ namespace activemq
 {
 namespace commands
 {
-
-    using decaf::lang::Pointer;
 
     /*
      *
@@ -50,18 +48,18 @@ namespace commands
     class AMQCPP_API BrokerInfo : public BaseCommand
     {
     protected:
-        Pointer<BrokerId>                             brokerId;
-        std::string                                   brokerURL;
-        std::vector<decaf::lang::Pointer<BrokerInfo>> peerBrokerInfos;
-        std::string                                   brokerName;
-        bool                                          slaveBroker;
-        bool                                          masterBroker;
-        bool        faultTolerantConfiguration;
-        bool        duplexConnection;
-        bool        networkConnection;
-        long long   connectionId;
-        std::string brokerUploadUrl;
-        std::string networkProperties;
+        std::shared_ptr<BrokerId>                brokerId;
+        std::string                              brokerURL;
+        std::vector<std::shared_ptr<BrokerInfo>> peerBrokerInfos;
+        std::string                              brokerName;
+        bool                                     slaveBroker;
+        bool                                     masterBroker;
+        bool                                     faultTolerantConfiguration;
+        bool                                     duplexConnection;
+        bool                                     networkConnection;
+        long long                                connectionId;
+        std::string                              brokerUploadUrl;
+        std::string                              networkProperties;
 
     public:
         const static unsigned char ID_BROKERINFO = 2;
@@ -85,21 +83,19 @@ namespace commands
 
         virtual bool equals(const DataStructure* value) const;
 
-        virtual const Pointer<BrokerId>& getBrokerId() const;
-        virtual Pointer<BrokerId>&       getBrokerId();
-        virtual void setBrokerId(const Pointer<BrokerId>& brokerId);
+        virtual const std::shared_ptr<BrokerId>& getBrokerId() const;
+        virtual std::shared_ptr<BrokerId>&       getBrokerId();
+        virtual void setBrokerId(const std::shared_ptr<BrokerId>& brokerId);
 
         virtual const std::string& getBrokerURL() const;
         virtual std::string&       getBrokerURL();
         virtual void               setBrokerURL(const std::string& brokerURL);
 
-        virtual const std::vector<decaf::lang::Pointer<BrokerInfo>>&
+        virtual const std::vector<std::shared_ptr<BrokerInfo>>&
         getPeerBrokerInfos() const;
-        virtual std::vector<decaf::lang::Pointer<BrokerInfo>>&
-                     getPeerBrokerInfos();
-        virtual void setPeerBrokerInfos(
-            const std::vector<decaf::lang::Pointer<BrokerInfo>>&
-                peerBrokerInfos);
+        virtual std::vector<std::shared_ptr<BrokerInfo>>& getPeerBrokerInfos();
+        virtual void                                      setPeerBrokerInfos(
+                                                 const std::vector<std::shared_ptr<BrokerInfo>>& peerBrokerInfos);
 
         virtual const std::string& getBrokerName() const;
         virtual std::string&       getBrokerName();
@@ -140,7 +136,8 @@ namespace commands
             return true;
         }
 
-        virtual Pointer<Command> visit(activemq::state::CommandVisitor* visitor);
+        virtual std::shared_ptr<Command> visit(
+            activemq::state::CommandVisitor* visitor);
     };
 
 }  // namespace commands

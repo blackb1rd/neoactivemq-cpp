@@ -79,17 +79,18 @@ ActiveMQSessionExecutor::~ActiveMQSessionExecutor()
     try
     {
         // Ensure that we shutdown the taskRunner Thread before we are done.
-        if (taskRunner != NULL)
+        if (taskRunner != nullptr)
         {
             taskRunner->shutdown();
-            taskRunner.reset(NULL);
+            taskRunner.reset();
         }
     }
     AMQ_CATCHALL_NOTHROW()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQSessionExecutor::execute(const Pointer<MessageDispatch>& dispatch)
+void ActiveMQSessionExecutor::execute(
+    const std::shared_ptr<MessageDispatch>& dispatch)
 {
     if (this->session->isSessionAsyncDispatch())
     {
@@ -104,7 +105,7 @@ void ActiveMQSessionExecutor::execute(const Pointer<MessageDispatch>& dispatch)
 
 ////////////////////////////////////////////////////////////////////////////////
 void ActiveMQSessionExecutor::executeFirst(
-    const Pointer<MessageDispatch>& dispatch)
+    const std::shared_ptr<MessageDispatch>& dispatch)
 {
     // Add the data to the queue.
     this->messageQueue->enqueueFirst(dispatch);
@@ -119,10 +120,10 @@ void ActiveMQSessionExecutor::wakeup()
         return;
     }
 
-    Pointer<TaskRunner> taskRunner;
+    std::shared_ptr<TaskRunner> taskRunner;
     synchronized(messageQueue.get())
     {
-        if (this->taskRunner == NULL)
+        if (this->taskRunner == nullptr)
         {
             if (!messageQueue->isRunning())
             {
@@ -154,7 +155,7 @@ void ActiveMQSessionExecutor::start()
 ////////////////////////////////////////////////////////////////////////////////
 void ActiveMQSessionExecutor::stop()
 {
-    Pointer<TaskRunner> taskRunner;
+    std::shared_ptr<TaskRunner> taskRunner;
     synchronized(messageQueue.get())
     {
         if (messageQueue->isRunning())
@@ -163,30 +164,31 @@ void ActiveMQSessionExecutor::stop()
 
             taskRunner = this->taskRunner;
 
-            if (taskRunner != NULL)
+            if (taskRunner != nullptr)
             {
-                this->taskRunner.reset(NULL);
+                this->taskRunner.reset();
             }
         }
     }
 
-    if (taskRunner != NULL)
+    if (taskRunner != nullptr)
     {
         taskRunner->shutdown();
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ActiveMQSessionExecutor::dispatch(const Pointer<MessageDispatch>& dispatch)
+void ActiveMQSessionExecutor::dispatch(
+    const std::shared_ptr<MessageDispatch>& dispatch)
 {
     try
     {
-        Pointer<ActiveMQConsumerKernel> consumer =
+        std::shared_ptr<ActiveMQConsumerKernel> consumer =
             this->session->lookupConsumerKernel(dispatch->getConsumerId());
 
         // If the consumer is not available, just ignore the message.
         // Otherwise, dispatch the message to the consumer.
-        if (consumer != NULL)
+        if (consumer != nullptr)
         {
             consumer->dispatch(dispatch);
         }
@@ -217,8 +219,9 @@ bool ActiveMQSessionExecutor::iterate()
 
         // No messages left queued on the listeners.. so now dispatch messages
         // queued on the session
-        Pointer<MessageDispatch> message = messageQueue->dequeueNoWait();
-        if (message != NULL)
+        std::shared_ptr<MessageDispatch> message =
+            messageQueue->dequeueNoWait();
+        if (message != nullptr)
         {
             dispatch(message);
             return !messageQueue->isEmpty();

@@ -78,9 +78,9 @@ TEST_F(FifoMessageDispatchChannelTest, testClose)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(FifoMessageDispatchChannelTest, testEnqueue)
 {
-    FifoMessageDispatchChannel channel;
-    Pointer<MessageDispatch>   dispatch1(new MessageDispatch());
-    Pointer<MessageDispatch>   dispatch2(new MessageDispatch());
+    FifoMessageDispatchChannel       channel;
+    std::shared_ptr<MessageDispatch> dispatch1(new MessageDispatch());
+    std::shared_ptr<MessageDispatch> dispatch2(new MessageDispatch());
 
     ASSERT_TRUE(channel.isEmpty() == true);
     ASSERT_TRUE(channel.size() == 0);
@@ -99,9 +99,9 @@ TEST_F(FifoMessageDispatchChannelTest, testEnqueue)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(FifoMessageDispatchChannelTest, testEnqueueFront)
 {
-    FifoMessageDispatchChannel channel;
-    Pointer<MessageDispatch>   dispatch1(new MessageDispatch());
-    Pointer<MessageDispatch>   dispatch2(new MessageDispatch());
+    FifoMessageDispatchChannel       channel;
+    std::shared_ptr<MessageDispatch> dispatch1(new MessageDispatch());
+    std::shared_ptr<MessageDispatch> dispatch2(new MessageDispatch());
 
     channel.start();
 
@@ -125,9 +125,9 @@ TEST_F(FifoMessageDispatchChannelTest, testEnqueueFront)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(FifoMessageDispatchChannelTest, testPeek)
 {
-    FifoMessageDispatchChannel channel;
-    Pointer<MessageDispatch>   dispatch1(new MessageDispatch());
-    Pointer<MessageDispatch>   dispatch2(new MessageDispatch());
+    FifoMessageDispatchChannel       channel;
+    std::shared_ptr<MessageDispatch> dispatch1(new MessageDispatch());
+    std::shared_ptr<MessageDispatch> dispatch2(new MessageDispatch());
 
     ASSERT_TRUE(channel.isEmpty() == true);
     ASSERT_TRUE(channel.size() == 0);
@@ -157,9 +157,9 @@ TEST_F(FifoMessageDispatchChannelTest, testDequeueNoWait)
 {
     FifoMessageDispatchChannel channel;
 
-    Pointer<MessageDispatch> dispatch1(new MessageDispatch());
-    Pointer<MessageDispatch> dispatch2(new MessageDispatch());
-    Pointer<MessageDispatch> dispatch3(new MessageDispatch());
+    std::shared_ptr<MessageDispatch> dispatch1(new MessageDispatch());
+    std::shared_ptr<MessageDispatch> dispatch2(new MessageDispatch());
+    std::shared_ptr<MessageDispatch> dispatch3(new MessageDispatch());
 
     ASSERT_TRUE(channel.isRunning() == false);
     ASSERT_TRUE(channel.dequeueNoWait() == NULL);
@@ -187,9 +187,9 @@ TEST_F(FifoMessageDispatchChannelTest, testDequeue)
 {
     FifoMessageDispatchChannel channel;
 
-    Pointer<MessageDispatch> dispatch1(new MessageDispatch());
-    Pointer<MessageDispatch> dispatch2(new MessageDispatch());
-    Pointer<MessageDispatch> dispatch3(new MessageDispatch());
+    std::shared_ptr<MessageDispatch> dispatch1(new MessageDispatch());
+    std::shared_ptr<MessageDispatch> dispatch2(new MessageDispatch());
+    std::shared_ptr<MessageDispatch> dispatch3(new MessageDispatch());
 
     channel.start();
     ASSERT_TRUE(channel.isRunning() == true);
@@ -218,9 +218,9 @@ TEST_F(FifoMessageDispatchChannelTest, testRemoveAll)
 {
     FifoMessageDispatchChannel channel;
 
-    Pointer<MessageDispatch> dispatch1(new MessageDispatch());
-    Pointer<MessageDispatch> dispatch2(new MessageDispatch());
-    Pointer<MessageDispatch> dispatch3(new MessageDispatch());
+    std::shared_ptr<MessageDispatch> dispatch1(new MessageDispatch());
+    std::shared_ptr<MessageDispatch> dispatch2(new MessageDispatch());
+    std::shared_ptr<MessageDispatch> dispatch3(new MessageDispatch());
 
     channel.enqueue(dispatch1);
     channel.enqueue(dispatch2);

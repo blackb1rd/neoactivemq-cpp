@@ -28,7 +28,7 @@
 #include <activemq/commands/ConnectionId.h>
 #include <activemq/commands/RemoveInfo.h>
 #include <activemq/util/Config.h>
-#include <decaf/lang/Pointer.h>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -36,8 +36,6 @@ namespace activemq
 {
 namespace commands
 {
-
-    using decaf::lang::Pointer;
 
     /*
      *
@@ -51,17 +49,17 @@ namespace commands
     class AMQCPP_API ConnectionInfo : public BaseCommand
     {
     protected:
-        Pointer<ConnectionId>                       connectionId;
-        std::string                                 clientId;
-        std::string                                 password;
-        std::string                                 userName;
-        std::vector<decaf::lang::Pointer<BrokerId>> brokerPath;
-        bool                                        brokerMasterConnector;
-        bool                                        manageable;
-        bool                                        clientMaster;
-        bool                                        faultTolerant;
-        bool                                        failoverReconnect;
-        std::string                                 clientIp;
+        std::shared_ptr<ConnectionId>          connectionId;
+        std::string                            clientId;
+        std::string                            password;
+        std::string                            userName;
+        std::vector<std::shared_ptr<BrokerId>> brokerPath;
+        bool                                   brokerMasterConnector;
+        bool                                   manageable;
+        bool                                   clientMaster;
+        bool                                   faultTolerant;
+        bool                                   failoverReconnect;
+        std::string                            clientIp;
 
     public:
         const static unsigned char ID_CONNECTIONINFO = 3;
@@ -85,11 +83,12 @@ namespace commands
 
         virtual bool equals(const DataStructure* value) const;
 
-        Pointer<RemoveInfo> createRemoveCommand() const;
+        std::shared_ptr<RemoveInfo> createRemoveCommand() const;
 
-        virtual const Pointer<ConnectionId>& getConnectionId() const;
-        virtual Pointer<ConnectionId>&       getConnectionId();
-        virtual void setConnectionId(const Pointer<ConnectionId>& connectionId);
+        virtual const std::shared_ptr<ConnectionId>& getConnectionId() const;
+        virtual std::shared_ptr<ConnectionId>&       getConnectionId();
+        virtual void                                 setConnectionId(
+                                            const std::shared_ptr<ConnectionId>& connectionId);
 
         virtual const std::string& getClientId() const;
         virtual std::string&       getClientId();
@@ -103,11 +102,11 @@ namespace commands
         virtual std::string&       getUserName();
         virtual void               setUserName(const std::string& userName);
 
-        virtual const std::vector<decaf::lang::Pointer<BrokerId>>&
-        getBrokerPath() const;
-        virtual std::vector<decaf::lang::Pointer<BrokerId>>& getBrokerPath();
-        virtual void                                         setBrokerPath(
-                                                    const std::vector<decaf::lang::Pointer<BrokerId>>& brokerPath);
+        virtual const std::vector<std::shared_ptr<BrokerId>>& getBrokerPath()
+            const;
+        virtual std::vector<std::shared_ptr<BrokerId>>& getBrokerPath();
+        virtual void                                    setBrokerPath(
+                                               const std::vector<std::shared_ptr<BrokerId>>& brokerPath);
 
         virtual bool isBrokerMasterConnector() const;
         virtual void setBrokerMasterConnector(bool brokerMasterConnector);
@@ -136,7 +135,8 @@ namespace commands
             return true;
         }
 
-        virtual Pointer<Command> visit(activemq::state::CommandVisitor* visitor);
+        virtual std::shared_ptr<Command> visit(
+            activemq::state::CommandVisitor* visitor);
     };
 
 }  // namespace commands

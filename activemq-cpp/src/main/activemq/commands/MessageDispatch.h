@@ -29,7 +29,7 @@
 #include <activemq/commands/Message.h>
 #include <activemq/util/Config.h>
 #include <decaf/lang/Exception.h>
-#include <decaf/lang/Pointer.h>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -37,8 +37,6 @@ namespace activemq
 {
 namespace commands
 {
-
-    using decaf::lang::Pointer;
 
     /*
      *
@@ -52,10 +50,10 @@ namespace commands
     class AMQCPP_API MessageDispatch : public BaseCommand
     {
     protected:
-        Pointer<ConsumerId>          consumerId;
-        Pointer<ActiveMQDestination> destination;
-        Pointer<Message>             message;
-        int                          redeliveryCounter;
+        std::shared_ptr<ConsumerId>          consumerId;
+        std::shared_ptr<ActiveMQDestination> destination;
+        std::shared_ptr<Message>             message;
+        int                                  redeliveryCounter;
 
     public:
         const static unsigned char ID_MESSAGEDISPATCH = 21;
@@ -86,18 +84,20 @@ namespace commands
 
         decaf::lang::Exception getRollbackCause() const;
 
-        virtual const Pointer<ConsumerId>& getConsumerId() const;
-        virtual Pointer<ConsumerId>&       getConsumerId();
-        virtual void setConsumerId(const Pointer<ConsumerId>& consumerId);
+        virtual const std::shared_ptr<ConsumerId>& getConsumerId() const;
+        virtual std::shared_ptr<ConsumerId>&       getConsumerId();
+        virtual void                               setConsumerId(
+                                          const std::shared_ptr<ConsumerId>& consumerId);
 
-        virtual const Pointer<ActiveMQDestination>& getDestination() const;
-        virtual Pointer<ActiveMQDestination>&       getDestination();
-        virtual void                                setDestination(
-                                           const Pointer<ActiveMQDestination>& destination);
+        virtual const std::shared_ptr<ActiveMQDestination>& getDestination()
+            const;
+        virtual std::shared_ptr<ActiveMQDestination>& getDestination();
+        virtual void                                  setDestination(
+                                             const std::shared_ptr<ActiveMQDestination>& destination);
 
-        virtual const Pointer<Message>& getMessage() const;
-        virtual Pointer<Message>&       getMessage();
-        virtual void setMessage(const Pointer<Message>& message);
+        virtual const std::shared_ptr<Message>& getMessage() const;
+        virtual std::shared_ptr<Message>&       getMessage();
+        virtual void setMessage(const std::shared_ptr<Message>& message);
 
         virtual int  getRedeliveryCounter() const;
         virtual void setRedeliveryCounter(int redeliveryCounter);
@@ -110,7 +110,8 @@ namespace commands
             return true;
         }
 
-        virtual Pointer<Command> visit(activemq::state::CommandVisitor* visitor);
+        virtual std::shared_ptr<Command> visit(
+            activemq::state::CommandVisitor* visitor);
     };
 
 }  // namespace commands

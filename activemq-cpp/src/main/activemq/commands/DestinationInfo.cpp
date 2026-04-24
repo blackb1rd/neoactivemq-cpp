@@ -24,7 +24,7 @@ using namespace std;
 using namespace activemq;
 using namespace activemq::exceptions;
 using namespace activemq::commands;
-using namespace decaf::lang;
+
 using namespace decaf::lang::exceptions;
 
 /*
@@ -40,8 +40,8 @@ using namespace decaf::lang::exceptions;
 ////////////////////////////////////////////////////////////////////////////////
 DestinationInfo::DestinationInfo()
     : BaseCommand(),
-      connectionId(NULL),
-      destination(NULL),
+      connectionId(),
+      destination(),
       operationType(0),
       timeout(0),
       brokerPath()
@@ -109,7 +109,7 @@ std::string DestinationInfo::toString() const
            << "responseRequired = " << boolalpha << this->isResponseRequired();
     stream << ", ";
     stream << "ConnectionId = ";
-    if (this->getConnectionId() != NULL)
+    if (this->getConnectionId())
     {
         stream << this->getConnectionId()->toString();
     }
@@ -119,7 +119,7 @@ std::string DestinationInfo::toString() const
     }
     stream << ", ";
     stream << "Destination = ";
-    if (this->getDestination() != NULL)
+    if (this->getDestination())
     {
         stream << this->getDestination()->toString();
     }
@@ -139,7 +139,7 @@ std::string DestinationInfo::toString() const
         for (size_t ibrokerPath = 0; ibrokerPath < this->getBrokerPath().size();
              ++ibrokerPath)
         {
-            if (this->getBrokerPath()[ibrokerPath] != NULL)
+            if (this->getBrokerPath()[ibrokerPath])
             {
                 stream << this->getBrokerPath()[ibrokerPath]->toString()
                        << ", ";
@@ -176,25 +176,25 @@ bool DestinationInfo::equals(const DataStructure* value) const
         return false;
     }
 
-    if (this->getConnectionId() != NULL)
+    if (this->getConnectionId())
     {
         if (!this->getConnectionId()->equals(valuePtr->getConnectionId().get()))
         {
             return false;
         }
     }
-    else if (valuePtr->getConnectionId() != NULL)
+    else if (valuePtr->getConnectionId())
     {
         return false;
     }
-    if (this->getDestination() != NULL)
+    if (this->getDestination())
     {
         if (!this->getDestination()->equals(valuePtr->getDestination().get()))
         {
             return false;
         }
     }
-    else if (valuePtr->getDestination() != NULL)
+    else if (valuePtr->getDestination())
     {
         return false;
     }
@@ -209,7 +209,7 @@ bool DestinationInfo::equals(const DataStructure* value) const
     for (size_t ibrokerPath = 0; ibrokerPath < this->getBrokerPath().size();
          ++ibrokerPath)
     {
-        if (this->getBrokerPath()[ibrokerPath] != NULL)
+        if (this->getBrokerPath()[ibrokerPath])
         {
             if (!this->getBrokerPath()[ibrokerPath]->equals(
                     valuePtr->getBrokerPath()[ibrokerPath].get()))
@@ -217,7 +217,7 @@ bool DestinationInfo::equals(const DataStructure* value) const
                 return false;
             }
         }
-        else if (valuePtr->getBrokerPath()[ibrokerPath] != NULL)
+        else if (valuePtr->getBrokerPath()[ibrokerPath])
         {
             return false;
         }
@@ -230,41 +230,40 @@ bool DestinationInfo::equals(const DataStructure* value) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const decaf::lang::Pointer<ConnectionId>& DestinationInfo::getConnectionId()
-    const
+const std::shared_ptr<ConnectionId>& DestinationInfo::getConnectionId() const
 {
     return connectionId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<ConnectionId>& DestinationInfo::getConnectionId()
+std::shared_ptr<ConnectionId>& DestinationInfo::getConnectionId()
 {
     return connectionId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void DestinationInfo::setConnectionId(
-    const decaf::lang::Pointer<ConnectionId>& connectionId)
+    const std::shared_ptr<ConnectionId>& connectionId)
 {
     this->connectionId = connectionId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const decaf::lang::Pointer<ActiveMQDestination>&
-DestinationInfo::getDestination() const
+const std::shared_ptr<ActiveMQDestination>& DestinationInfo::getDestination()
+    const
 {
     return destination;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<ActiveMQDestination>& DestinationInfo::getDestination()
+std::shared_ptr<ActiveMQDestination>& DestinationInfo::getDestination()
 {
     return destination;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void DestinationInfo::setDestination(
-    const decaf::lang::Pointer<ActiveMQDestination>& destination)
+    const std::shared_ptr<ActiveMQDestination>& destination)
 {
     this->destination = destination;
 }
@@ -294,27 +293,27 @@ void DestinationInfo::setTimeout(long long timeout)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::vector<decaf::lang::Pointer<BrokerId>>&
-DestinationInfo::getBrokerPath() const
+const std::vector<std::shared_ptr<BrokerId>>& DestinationInfo::getBrokerPath()
+    const
 {
     return brokerPath;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::vector<decaf::lang::Pointer<BrokerId>>& DestinationInfo::getBrokerPath()
+std::vector<std::shared_ptr<BrokerId>>& DestinationInfo::getBrokerPath()
 {
     return brokerPath;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void DestinationInfo::setBrokerPath(
-    const std::vector<decaf::lang::Pointer<BrokerId>>& brokerPath)
+    const std::vector<std::shared_ptr<BrokerId>>& brokerPath)
 {
     this->brokerPath = brokerPath;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<commands::Command> DestinationInfo::visit(
+std::shared_ptr<commands::Command> DestinationInfo::visit(
     activemq::state::CommandVisitor* visitor)
 {
     return visitor->processDestinationInfo(this);

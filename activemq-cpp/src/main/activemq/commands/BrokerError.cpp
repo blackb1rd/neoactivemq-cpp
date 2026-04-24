@@ -19,6 +19,7 @@
 #include <activemq/state/CommandVisitor.h>
 #include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/util/StringTokenizer.h>
+#include <memory>
 #include <string>
 #include <utility>
 
@@ -42,7 +43,6 @@ using namespace activemq;
 using namespace activemq::exceptions;
 using namespace activemq::commands;
 using namespace decaf::util;
-using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -57,7 +57,7 @@ BrokerError::BrokerError()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-BrokerError::BrokerError(decaf::lang::Pointer<decaf::lang::Exception> exCause)
+BrokerError::BrokerError(std::shared_ptr<decaf::lang::Exception> exCause)
     : BaseCommand(),
       message(),
       exceptionClass(),
@@ -94,7 +94,7 @@ void BrokerError::copyDataStructure(const DataStructure* src)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<commands::Command> BrokerError::visit(
+std::shared_ptr<commands::Command> BrokerError::visit(
     activemq::state::CommandVisitor* visitor)
 {
     return visitor->processBrokerError(this);
@@ -113,12 +113,12 @@ ActiveMQException BrokerError::createExceptionObject()
 
     std::vector<std::pair<std::string, int>> cmsStackTrace;
 
-    std::vector<Pointer<StackTraceElement>>::const_iterator stackIter =
+    std::vector<std::shared_ptr<StackTraceElement>>::const_iterator stackIter =
         this->stackTraceElements.begin();
     for (; stackIter != stackTraceElements.end(); ++stackIter)
     {
-        Pointer<StackTraceElement> element = *stackIter;
-        if (element == NULL)
+        std::shared_ptr<StackTraceElement> element = *stackIter;
+        if (!element)
         {
             continue;
         }

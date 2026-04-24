@@ -22,7 +22,7 @@
 
 #include <activemq/commands/DestinationInfo.h>
 #include <activemq/util/Config.h>
-#include <decaf/lang/Pointer.h>
+#include <memory>
 
 namespace activemq
 {
@@ -36,11 +36,11 @@ namespace core
         ActiveMQDestinationEvent& operator=(const ActiveMQDestinationEvent&);
 
     private:
-        decaf::lang::Pointer<commands::DestinationInfo> destination;
+        std::shared_ptr<commands::DestinationInfo> destination;
 
     public:
         ActiveMQDestinationEvent(
-            decaf::lang::Pointer<commands::DestinationInfo> destination);
+            std::shared_ptr<commands::DestinationInfo> destination);
 
         virtual ~ActiveMQDestinationEvent();
 
@@ -56,8 +56,7 @@ namespace core
          *
          * @return the DestinationInfo object that triggered this event.
          */
-        decaf::lang::Pointer<commands::DestinationInfo> getDestinationInfo()
-            const
+        std::shared_ptr<commands::DestinationInfo> getDestinationInfo() const
         {
             return this->destination;
         }

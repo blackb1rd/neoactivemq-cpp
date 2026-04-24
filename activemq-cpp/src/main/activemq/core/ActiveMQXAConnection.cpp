@@ -28,8 +28,8 @@ using namespace activemq::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 ActiveMQXAConnection::ActiveMQXAConnection(
-    const Pointer<transport::Transport>&    transport,
-    const Pointer<decaf::util::Properties>& properties)
+    const std::shared_ptr<transport::Transport>&    transport,
+    const std::shared_ptr<decaf::util::Properties>& properties)
     : ActiveMQConnection(transport, properties)
 {
 }
@@ -55,7 +55,7 @@ cms::Session* ActiveMQXAConnection::createSession(
         checkClosedOrFailed();
         ensureConnectionInfoSent();
 
-        Pointer<ActiveMQXASessionKernel> session(
+        std::shared_ptr<ActiveMQXASessionKernel> session(
             new ActiveMQXASessionKernel(this,
                                         getNextSessionId(),
                                         this->getProperties()));

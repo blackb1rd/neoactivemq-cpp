@@ -18,6 +18,8 @@
 #ifndef _ACTIVEMQ_TRANSPORT_DISCOVERY_DISCOVERYTRANSPORTFACTORY_H_
 #define _ACTIVEMQ_TRANSPORT_DISCOVERY_DISCOVERYTRANSPORTFACTORY_H_
 
+#include <memory>
+
 #include <activemq/transport/AbstractTransportFactory.h>
 #include <activemq/transport/Transport.h>
 #include <activemq/util/Config.h>
@@ -42,13 +44,14 @@ namespace transport
         public:
             virtual ~DiscoveryTransportFactory();
 
-            virtual Pointer<Transport> create(const decaf::net::URI& location);
+            virtual std::shared_ptr<Transport> create(
+                const decaf::net::URI& location);
 
-            virtual Pointer<Transport> createComposite(
+            virtual std::shared_ptr<Transport> createComposite(
                 const decaf::net::URI& location);
 
         protected:
-            virtual Pointer<Transport> doCreateTransport(
+            virtual std::shared_ptr<Transport> doCreateTransport(
                 const decaf::net::URI& location);
         };
 

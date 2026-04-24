@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -183,17 +183,19 @@ TEST_F(OpenwireSslTransactionTest, testSendRollbackCommitRollback)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(OpenwireSslTransactionTest, testSendSessionClose)
 {
-    Pointer<ActiveMQConnectionFactory> connectionFactory(
+    std::shared_ptr<ActiveMQConnectionFactory> connectionFactory(
         new ActiveMQConnectionFactory(getBrokerURL()));
 
-    Pointer<Connection> connection(connectionFactory->createConnection());
-    Pointer<ActiveMQConnection> amqConnection =
-        connection.dynamicCast<ActiveMQConnection>();
+    std::shared_ptr<Connection> connection(
+        connectionFactory->createConnection());
+    std::shared_ptr<ActiveMQConnection> amqConnection =
+        std::dynamic_pointer_cast<ActiveMQConnection>(connection);
 
     connection->start();
-    Pointer<Session> session(
+    std::shared_ptr<Session> session(
         connection->createSession(Session::SESSION_TRANSACTED));
-    Pointer<Queue> destination(session->createQueue("testSendSessionClose"));
+    std::shared_ptr<Queue> destination(
+        session->createQueue("testSendSessionClose"));
 
     // Create the messages used for this test
     std::unique_ptr<TextMessage> outbound1(
@@ -201,9 +203,9 @@ TEST_F(OpenwireSslTransactionTest, testSendSessionClose)
     std::unique_ptr<TextMessage> outbound2(
         session->createTextMessage("Second Message"));
 
-    Pointer<MessageConsumer> consumer(
+    std::shared_ptr<MessageConsumer> consumer(
         session->createConsumer(destination.get()));
-    Pointer<MessageProducer> producer(
+    std::shared_ptr<MessageProducer> producer(
         session->createProducer(destination.get()));
     producer->setDeliveryMode(DeliveryMode::NON_PERSISTENT);
 

@@ -32,11 +32,11 @@ using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 ActiveMQDestinationEvent::ActiveMQDestinationEvent(
-    Pointer<DestinationInfo> destination)
+    std::shared_ptr<DestinationInfo> destination)
     : DestinationEvent(),
       destination(destination)
 {
-    if (destination == NULL)
+    if (destination == nullptr)
     {
         throw NullPointerException(__FILE__,
                                    __LINE__,
@@ -52,8 +52,9 @@ ActiveMQDestinationEvent::~ActiveMQDestinationEvent()
 ////////////////////////////////////////////////////////////////////////////////
 const cms::Destination* ActiveMQDestinationEvent::getDestination() const
 {
-    Pointer<ActiveMQDestination> dest = this->destination->getDestination();
-    if (dest != NULL)
+    std::shared_ptr<ActiveMQDestination> dest =
+        this->destination->getDestination();
+    if (dest != nullptr)
     {
         return dest->getCMSDestination();
     }

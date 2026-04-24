@@ -27,7 +27,8 @@ using namespace decaf;
 using namespace decaf::lang;
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQXASession::ActiveMQXASession(Pointer<ActiveMQXASessionKernel> kernel)
+ActiveMQXASession::ActiveMQXASession(
+    std::shared_ptr<ActiveMQXASessionKernel> kernel)
     : ActiveMQSession(kernel),
       xaKernel(kernel)
 {

@@ -32,9 +32,10 @@
 #include <activemq/exceptions/ActiveMQException.h>
 #include <activemq/util/Config.h>
 
-#include <decaf/lang/Pointer.h>
 #include <decaf/util/concurrent/Mutex.h>
-#include <decaf/util/concurrent/atomic/AtomicBoolean.h>
+
+#include <atomic>
+#include <memory>
 
 namespace activemq
 {
@@ -42,9 +43,6 @@ namespace core
 {
     namespace kernels
     {
-
-        using decaf::lang::Pointer;
-        using decaf::util::concurrent::atomic::AtomicBoolean;
 
         class ActiveMQSessionKernel;
         class ActiveMQConsumerKernelConfig;
@@ -67,7 +65,7 @@ namespace core
             /**
              * The ConsumerInfo object for this class instance.
              */
-            Pointer<commands::ConsumerInfo> consumerInfo;
+            std::shared_ptr<commands::ConsumerInfo> consumerInfo;
 
         private:
             ActiveMQConsumerKernel(const ActiveMQConsumerKernel&);
@@ -75,12 +73,13 @@ namespace core
 
         public:
             ActiveMQConsumerKernel(
-                ActiveMQSessionKernel*                        session,
-                const Pointer<commands::ConsumerId>&          id,
-                const Pointer<commands::ActiveMQDestination>& destination,
-                const std::string&                            name,
-                const std::string&                            selector,
-                int                                           prefetch,
+                ActiveMQSessionKernel*                       session,
+                const std::shared_ptr<commands::ConsumerId>& id,
+                const std::shared_ptr<commands::ActiveMQDestination>&
+                                      destination,
+                const std::string&    name,
+                const std::string&    selector,
+                int                   prefetch,
                 int                   maxPendingMessageCount,
                 bool                  noLocal,
                 bool                  browser,
@@ -120,7 +119,8 @@ namespace core
             virtual cms::MessageTransformer* getMessageTransformer() const;
 
         public:  // Dispatcher Methods
-            virtual void dispatch(const Pointer<MessageDispatch>& message);
+            virtual void dispatch(
+                const std::shared_ptr<MessageDispatch>& message);
 
             virtual int getHashCode() const;
 
@@ -139,7 +139,8 @@ namespace core
              *
              * @throw CMSException if an error occurs while ack'ing the message.
              */
-            void acknowledge(Pointer<commands::MessageDispatch> dispatch);
+            void acknowledge(
+                std::shared_ptr<commands::MessageDispatch> dispatch);
 
             /**
              * Method called to acknowledge the Message contained in the given
@@ -147,8 +148,8 @@ namespace core
              *
              * @throw CMSException if an error occurs while ack'ing the message.
              */
-            void acknowledge(Pointer<commands::MessageDispatch> dispatch,
-                             int                                ackType);
+            void acknowledge(std::shared_ptr<commands::MessageDispatch> dispatch,
+                             int ackType);
 
             /**
              * Called to Commit the current set of messages in this Transaction
@@ -187,13 +188,14 @@ namespace core
              * Get the Consumer information for this consumer
              * @return Reference to a Consumer Info Object
              */
-            const Pointer<commands::ConsumerInfo>& getConsumerInfo() const;
+            const std::shared_ptr<commands::ConsumerInfo>& getConsumerInfo()
+                const;
 
             /**
              * Get the Consumer Id for this consumer
              * @return Reference to a Consumer Id Object
              */
-            const Pointer<commands::ConsumerId>& getConsumerId() const;
+            const std::shared_ptr<commands::ConsumerId>& getConsumerId() const;
 
             /**
              * @return if this Consumer has been closed.
@@ -350,8 +352,8 @@ namespace core
              * @return true if the consumer is subscribed to the given
              * destination.
              */
-            bool isInUse(
-                Pointer<commands::ActiveMQDestination> destination) const;
+            bool isInUse(std::shared_ptr<commands::ActiveMQDestination>
+                             destination) const;
 
             /**
              * Time in Milliseconds before an automatic acknowledge is done for
@@ -414,7 +416,7 @@ namespace core
              * consumer to recover.
              */
             bool isRedeliveryExpectedInCurrentTransaction(
-                Pointer<commands::MessageDispatch> dispatch) const;
+                std::shared_ptr<commands::MessageDispatch> dispatch) const;
 
         protected:
             /**
@@ -433,14 +435,14 @@ namespace core
              * @throws InvalidStateException if this consumer is closed upon
              *         entering this method.
              */
-            Pointer<MessageDispatch> dequeue(long long timeout);
+            std::shared_ptr<MessageDispatch> dequeue(long long timeout);
 
             /**
              * Pre-consume processing
              * @param dispatch - the message being consumed.
              */
             void beforeMessageIsConsumed(
-                Pointer<commands::MessageDispatch> dispatch);
+                std::shared_ptr<commands::MessageDispatch> dispatch);
 
             /**
              * Post-consume processing
@@ -449,14 +451,15 @@ namespace core
              * expired.
              */
             void afterMessageIsConsumed(
-                Pointer<commands::MessageDispatch> dispatch,
-                bool                               messageExpired);
+                std::shared_ptr<commands::MessageDispatch> dispatch,
+                bool                                       messageExpired);
 
         private:
-            Pointer<cms::Message> createCMSMessage(
-                Pointer<commands::MessageDispatch> dispatch);
+            std::unique_ptr<cms::Message> createCMSMessage(
+                std::shared_ptr<commands::MessageDispatch> dispatch);
 
-            void applyDestinationOptions(Pointer<commands::ConsumerInfo> info);
+            void applyDestinationOptions(
+                std::shared_ptr<commands::ConsumerInfo> info);
 
             void sendPullRequest(long long timeout);
 
@@ -464,14 +467,14 @@ namespace core
 
             void checkMessageListener() const;
 
-            void ackLater(Pointer<commands::MessageDispatch> message,
-                          int                                ackType);
+            void ackLater(std::shared_ptr<commands::MessageDispatch> message,
+                          int                                        ackType);
 
             void immediateIndividualTransactedAck(
-                Pointer<commands::MessageDispatch> dispatch);
+                std::shared_ptr<commands::MessageDispatch> dispatch);
 
-            Pointer<commands::MessageAck> makeAckForAllDeliveredMessages(
-                int type);
+            std::shared_ptr<commands::MessageAck>
+            makeAckForAllDeliveredMessages(int type);
 
             bool isAutoAcknowledgeEach() const;
 

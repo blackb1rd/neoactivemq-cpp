@@ -24,7 +24,7 @@
 #include <activemq/core/Dispatcher.h>
 #include <activemq/util/Config.h>
 
-#include <decaf/lang/Pointer.h>
+#include <memory>
 
 namespace activemq
 {
@@ -32,8 +32,6 @@ namespace core
 {
 
     class AdvisoryConsumerConfig;
-
-    using decaf::lang::Pointer;
 
     class AMQCPP_API AdvisoryConsumer : Dispatcher
     {
@@ -46,20 +44,20 @@ namespace core
         AdvisoryConsumer& operator=(const AdvisoryConsumer&);
 
     public:
-        AdvisoryConsumer(ActiveMQConnection*           connection,
-                         Pointer<commands::ConsumerId> consumerId);
+        AdvisoryConsumer(ActiveMQConnection*                   connection,
+                         std::shared_ptr<commands::ConsumerId> consumerId);
         virtual ~AdvisoryConsumer();
 
     public:
         void dispose();
 
-        virtual void dispatch(const Pointer<MessageDispatch>& message);
+        virtual void dispatch(const std::shared_ptr<MessageDispatch>& message);
 
         virtual int getHashCode() const;
 
     private:
         void processDestinationInfo(
-            Pointer<commands::DestinationInfo> destination);
+            std::shared_ptr<commands::DestinationInfo> destination);
     };
 
 }  // namespace core

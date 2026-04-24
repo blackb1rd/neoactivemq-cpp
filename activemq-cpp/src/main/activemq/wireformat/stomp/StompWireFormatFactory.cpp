@@ -26,12 +26,12 @@ using namespace activemq::wireformat::stomp;
 using namespace activemq::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<WireFormat> StompWireFormatFactory::createWireFormat(
+std::shared_ptr<WireFormat> StompWireFormatFactory::createWireFormat(
     const decaf::util::Properties& properties AMQCPP_UNUSED)
 {
     try
     {
-        Pointer<StompWireFormat> wireFormat(new StompWireFormat());
+        std::shared_ptr<StompWireFormat> wireFormat(new StompWireFormat());
 
         wireFormat->setTopicPrefix(
             properties.getProperty("wireFormat.topicPrefix", "/topic/"));

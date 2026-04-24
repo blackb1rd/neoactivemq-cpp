@@ -24,8 +24,6 @@
 #include <decaf/lang/exceptions/IllegalArgumentException.h>
 #include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/net/SocketFactory.h>
-#include <decaf/util/concurrent/atomic/AtomicBoolean.h>
-
 #include <atomic>
 #include <memory>
 #include <mutex>
@@ -40,7 +38,6 @@ using namespace decaf;
 using namespace decaf::net;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
-using namespace decaf::util::concurrent::atomic;
 using namespace decaf::io;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
@@ -102,8 +99,8 @@ namespace transport
 }  // namespace activemq
 
 ////////////////////////////////////////////////////////////////////////////////
-TcpTransport::TcpTransport(const Pointer<Transport> next,
-                           const decaf::net::URI&   location)
+TcpTransport::TcpTransport(const std::shared_ptr<Transport> next,
+                           const decaf::net::URI&           location)
     : TransportFilter(next),
       impl(new TcpTransportImpl(location))
 {
@@ -236,8 +233,8 @@ void TcpTransport::connect()
         InputStream*  socketIStream = impl->socket->getInputStream();
         OutputStream* sokcetOStream = impl->socket->getOutputStream();
 
-        Pointer<InputStream>  inputStream;
-        Pointer<OutputStream> outputStream;
+        std::unique_ptr<InputStream>  inputStream;
+        std::unique_ptr<OutputStream> outputStream;
 
         // If tcp tracing was enabled, wrap the input / output streams with
         // logging streams

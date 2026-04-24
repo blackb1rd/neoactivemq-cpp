@@ -76,7 +76,7 @@ public:
         return this->resumed;
     }
 
-    virtual void onCommand(const Pointer<Command> command)
+    virtual void onCommand(const std::shared_ptr<Command> command)
     {
     }
 

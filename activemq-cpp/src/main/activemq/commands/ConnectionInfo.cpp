@@ -24,7 +24,7 @@ using namespace std;
 using namespace activemq;
 using namespace activemq::exceptions;
 using namespace activemq::commands;
-using namespace decaf::lang;
+
 using namespace decaf::lang::exceptions;
 
 /*
@@ -40,7 +40,7 @@ using namespace decaf::lang::exceptions;
 ////////////////////////////////////////////////////////////////////////////////
 ConnectionInfo::ConnectionInfo()
     : BaseCommand(),
-      connectionId(NULL),
+      connectionId(),
       clientId(""),
       password(""),
       userName(""),
@@ -121,7 +121,7 @@ std::string ConnectionInfo::toString() const
            << "responseRequired = " << boolalpha << this->isResponseRequired();
     stream << ", ";
     stream << "ConnectionId = ";
-    if (this->getConnectionId() != NULL)
+    if (this->getConnectionId())
     {
         stream << this->getConnectionId()->toString();
     }
@@ -143,7 +143,7 @@ std::string ConnectionInfo::toString() const
         for (size_t ibrokerPath = 0; ibrokerPath < this->getBrokerPath().size();
              ++ibrokerPath)
         {
-            if (this->getBrokerPath()[ibrokerPath] != NULL)
+            if (this->getBrokerPath()[ibrokerPath])
             {
                 stream << this->getBrokerPath()[ibrokerPath]->toString()
                        << ", ";
@@ -191,14 +191,14 @@ bool ConnectionInfo::equals(const DataStructure* value) const
         return false;
     }
 
-    if (this->getConnectionId() != NULL)
+    if (this->getConnectionId())
     {
         if (!this->getConnectionId()->equals(valuePtr->getConnectionId().get()))
         {
             return false;
         }
     }
-    else if (valuePtr->getConnectionId() != NULL)
+    else if (valuePtr->getConnectionId())
     {
         return false;
     }
@@ -217,7 +217,7 @@ bool ConnectionInfo::equals(const DataStructure* value) const
     for (size_t ibrokerPath = 0; ibrokerPath < this->getBrokerPath().size();
          ++ibrokerPath)
     {
-        if (this->getBrokerPath()[ibrokerPath] != NULL)
+        if (this->getBrokerPath()[ibrokerPath])
         {
             if (!this->getBrokerPath()[ibrokerPath]->equals(
                     valuePtr->getBrokerPath()[ibrokerPath].get()))
@@ -225,7 +225,7 @@ bool ConnectionInfo::equals(const DataStructure* value) const
                 return false;
             }
         }
-        else if (valuePtr->getBrokerPath()[ibrokerPath] != NULL)
+        else if (valuePtr->getBrokerPath()[ibrokerPath])
         {
             return false;
         }
@@ -262,20 +262,20 @@ bool ConnectionInfo::equals(const DataStructure* value) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const decaf::lang::Pointer<ConnectionId>& ConnectionInfo::getConnectionId() const
+const std::shared_ptr<ConnectionId>& ConnectionInfo::getConnectionId() const
 {
     return connectionId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<ConnectionId>& ConnectionInfo::getConnectionId()
+std::shared_ptr<ConnectionId>& ConnectionInfo::getConnectionId()
 {
     return connectionId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void ConnectionInfo::setConnectionId(
-    const decaf::lang::Pointer<ConnectionId>& connectionId)
+    const std::shared_ptr<ConnectionId>& connectionId)
 {
     this->connectionId = connectionId;
 }
@@ -335,21 +335,21 @@ void ConnectionInfo::setUserName(const std::string& userName)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::vector<decaf::lang::Pointer<BrokerId>>&
-ConnectionInfo::getBrokerPath() const
+const std::vector<std::shared_ptr<BrokerId>>& ConnectionInfo::getBrokerPath()
+    const
 {
     return brokerPath;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::vector<decaf::lang::Pointer<BrokerId>>& ConnectionInfo::getBrokerPath()
+std::vector<std::shared_ptr<BrokerId>>& ConnectionInfo::getBrokerPath()
 {
     return brokerPath;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void ConnectionInfo::setBrokerPath(
-    const std::vector<decaf::lang::Pointer<BrokerId>>& brokerPath)
+    const std::vector<std::shared_ptr<BrokerId>>& brokerPath)
 {
     this->brokerPath = brokerPath;
 }
@@ -433,16 +433,16 @@ void ConnectionInfo::setClientIp(const std::string& clientIp)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<commands::Command> ConnectionInfo::visit(
+std::shared_ptr<commands::Command> ConnectionInfo::visit(
     activemq::state::CommandVisitor* visitor)
 {
     return visitor->processConnectionInfo(this);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<RemoveInfo> ConnectionInfo::createRemoveCommand() const
+std::shared_ptr<RemoveInfo> ConnectionInfo::createRemoveCommand() const
 {
-    Pointer<RemoveInfo> info(new RemoveInfo());
+    std::shared_ptr<RemoveInfo> info(new RemoveInfo());
     info->setResponseRequired(this->isResponseRequired());
     info->setObjectId(this->getConnectionId());
     return info;

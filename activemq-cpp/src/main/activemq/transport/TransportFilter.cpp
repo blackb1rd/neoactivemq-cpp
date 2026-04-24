@@ -18,7 +18,7 @@
 #include "TransportFilter.h"
 #include <decaf/io/IOException.h>
 
-#include <decaf/util/concurrent/atomic/AtomicBoolean.h>
+#include <atomic>
 
 #include <activemq/util/AMQLog.h>
 #include <activemq/wireformat/WireFormat.h>
@@ -28,7 +28,6 @@ using namespace activemq::transport;
 using namespace decaf::lang;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
-using namespace decaf::util::concurrent::atomic;
 using namespace decaf::io;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -43,8 +42,8 @@ namespace transport
         TransportFilterImpl& operator=(const TransportFilterImpl&);
 
     public:
-        AtomicBoolean closed;
-        AtomicBoolean started;
+        std::atomic<bool> closed;
+        std::atomic<bool> started;
 
         TransportFilterImpl()
             : closed(),
@@ -57,7 +56,7 @@ namespace transport
 }  // namespace activemq
 
 ////////////////////////////////////////////////////////////////////////////////
-TransportFilter::TransportFilter(const Pointer<Transport> next)
+TransportFilter::TransportFilter(const std::shared_ptr<Transport> next)
     : impl(new TransportFilterImpl()),
       next(next),
       listener(NULL)
@@ -80,7 +79,7 @@ TransportFilter::~TransportFilter()
         // Force next out here so we can ensure we catch any stray
         // exceptions.  Since we hold the only reference to next it
         // should get deleted.
-        this->next.reset(NULL);
+        this->next.reset();
     }
     AMQ_CATCHALL_NOTHROW()
 
@@ -92,9 +91,9 @@ TransportFilter::~TransportFilter()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void TransportFilter::onCommand(const Pointer<Command> command)
+void TransportFilter::onCommand(const std::shared_ptr<Command> command)
 {
-    if (!this->impl->started.get() || this->impl->closed.get())
+    if (!this->impl->started.load() || this->impl->closed.load())
     {
         return;
     }
@@ -114,7 +113,7 @@ void TransportFilter::onCommand(const Pointer<Command> command)
 ////////////////////////////////////////////////////////////////////////////////
 void TransportFilter::onException(const decaf::lang::Exception& ex)
 {
-    if (!this->impl->started.get() || this->impl->closed.get())
+    if (!this->impl->started.load() || this->impl->closed.load())
     {
         return;
     }
@@ -136,7 +135,7 @@ void TransportFilter::onException(const decaf::lang::Exception& ex)
 ////////////////////////////////////////////////////////////////////////////////
 void TransportFilter::transportInterrupted()
 {
-    if (!this->impl->started.get() || this->impl->closed.get())
+    if (!this->impl->started.load() || this->impl->closed.load())
     {
         return;
     }
@@ -158,7 +157,7 @@ void TransportFilter::transportInterrupted()
 ////////////////////////////////////////////////////////////////////////////////
 void TransportFilter::transportResumed()
 {
-    if (!this->impl->started.get() || this->impl->closed.get())
+    if (!this->impl->started.load() || this->impl->closed.load())
     {
         return;
     }
@@ -180,7 +179,7 @@ void TransportFilter::transportResumed()
 ////////////////////////////////////////////////////////////////////////////////
 void TransportFilter::start()
 {
-    if (this->impl->closed.get())
+    if (this->impl->closed.load())
     {
         return;
     }
@@ -201,7 +200,8 @@ void TransportFilter::start()
 
     try
     {
-        if (this->impl->started.compareAndSet(false, true))
+        bool _e_start = false;
+        if (this->impl->started.compare_exchange_strong(_e_start, true))
         {
             beforeNextIsStarted();
             next->start();
@@ -216,16 +216,17 @@ void TransportFilter::start()
 ////////////////////////////////////////////////////////////////////////////////
 void TransportFilter::stop()
 {
-    if (this->impl->closed.get())
+    if (this->impl->closed.load())
     {
         return;
     }
 
     try
     {
-        if (this->impl->started.compareAndSet(true, false))
+        bool _e_stop = true;
+        if (this->impl->started.compare_exchange_strong(_e_stop, false))
         {
-            if (this->next == NULL)
+            if (!this->next)
             {
                 throw decaf::io::IOException(__FILE__,
                                              __LINE__,
@@ -282,7 +283,7 @@ void TransportFilter::stop()
 ////////////////////////////////////////////////////////////////////////////////
 void TransportFilter::close()
 {
-    if (this->impl->closed.get())
+    if (this->impl->closed.load())
     {
         return;
     }
@@ -303,9 +304,10 @@ void TransportFilter::close()
             hasException = true;
         }
 
-        if (this->impl->closed.compareAndSet(false, true))
+        bool _e_close = false;
+        if (this->impl->closed.compare_exchange_strong(_e_close, true))
         {
-            if (this->next == NULL)
+            if (!this->next)
             {
                 throw decaf::io::IOException(__FILE__,
                                              __LINE__,
@@ -354,7 +356,7 @@ Transport* TransportFilter::narrow(const std::type_info& typeId)
     {
         return this;
     }
-    else if (this->next != NULL)
+    else if (this->next)
     {
         return this->next->narrow(typeId);
     }
@@ -377,7 +379,7 @@ void TransportFilter::reconnect(const decaf::net::URI& uri)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<wireformat::WireFormat> TransportFilter::getWireFormat() const
+std::shared_ptr<wireformat::WireFormat> TransportFilter::getWireFormat() const
 {
     checkClosed();
     return next->getWireFormat();
@@ -385,7 +387,7 @@ Pointer<wireformat::WireFormat> TransportFilter::getWireFormat() const
 
 ////////////////////////////////////////////////////////////////////////////////
 void TransportFilter::setWireFormat(
-    const Pointer<wireformat::WireFormat> wireFormat)
+    const std::shared_ptr<wireformat::WireFormat> wireFormat)
 {
     checkClosed();
     next->setWireFormat(wireFormat);
@@ -394,13 +396,13 @@ void TransportFilter::setWireFormat(
 ////////////////////////////////////////////////////////////////////////////////
 bool TransportFilter::isClosed() const
 {
-    return this->impl->closed.get();
+    return this->impl->closed.load();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void TransportFilter::checkClosed() const
 {
-    if (this->impl->closed.get())
+    if (this->impl->closed.load())
     {
         throw IOException(__FILE__, __LINE__, "Transport is closed");
     }

@@ -22,11 +22,12 @@
 #include <activemq/threads/TaskRunner.h>
 #include <activemq/util/Config.h>
 
-#include <decaf/lang/Pointer.h>
+#include <atomic>
+#include <memory>
+
 #include <decaf/lang/Runnable.h>
 #include <decaf/lang/Thread.h>
 #include <decaf/util/concurrent/Mutex.h>
-#include <atomic>
 
 namespace activemq
 {
@@ -44,8 +45,8 @@ namespace threads
                                            public decaf::lang::Runnable
     {
     private:
-        mutable decaf::util::concurrent::Mutex    mutex;
-        decaf::lang::Pointer<decaf::lang::Thread> thread;
+        mutable decaf::util::concurrent::Mutex mutex;
+        std::shared_ptr<decaf::lang::Thread>   thread;
 
         std::atomic<DedicatedTaskRunnerState> state;
         std::atomic<bool>                     pending;

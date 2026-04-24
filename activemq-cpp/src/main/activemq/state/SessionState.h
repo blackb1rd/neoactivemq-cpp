@@ -26,8 +26,9 @@
 #include <activemq/util/Config.h>
 
 #include <decaf/util/concurrent/ConcurrentStlMap.h>
-#include <decaf/util/concurrent/atomic/AtomicBoolean.h>
 
+#include <atomic>
+#include <memory>
 #include <string>
 
 namespace activemq
@@ -35,70 +36,72 @@ namespace activemq
 namespace state
 {
 
-    using decaf::lang::Pointer;
     using decaf::util::concurrent::ConcurrentStlMap;
-    using decaf::util::concurrent::atomic::AtomicBoolean;
     using namespace activemq::commands;
 
     class AMQCPP_API SessionState
     {
     private:
-        Pointer<SessionInfo> info;
+        std::shared_ptr<SessionInfo> info;
 
-        ConcurrentStlMap<Pointer<ProducerId>,
-                         Pointer<ProducerState>,
+        ConcurrentStlMap<std::shared_ptr<ProducerId>,
+                         std::shared_ptr<ProducerState>,
                          ProducerId::COMPARATOR>
             producers;
 
-        ConcurrentStlMap<Pointer<ConsumerId>,
-                         Pointer<ConsumerState>,
+        ConcurrentStlMap<std::shared_ptr<ConsumerId>,
+                         std::shared_ptr<ConsumerState>,
                          ConsumerId::COMPARATOR>
             consumers;
 
-        AtomicBoolean disposed;
+        std::atomic<bool> disposed;
 
     private:
         SessionState(const SessionState&);
         SessionState& operator=(const SessionState&);
 
     public:
-        SessionState(Pointer<SessionInfo> info);
+        SessionState(std::shared_ptr<SessionInfo> info);
 
         virtual ~SessionState();
 
         std::string toString() const;
 
-        const Pointer<SessionInfo> getInfo() const
+        const std::shared_ptr<SessionInfo> getInfo() const
         {
             return this->info;
         }
 
-        void addProducer(Pointer<ProducerInfo> info);
+        void addProducer(std::shared_ptr<ProducerInfo> info);
 
-        Pointer<ProducerState> removeProducer(Pointer<ProducerId> id);
+        std::shared_ptr<ProducerState> removeProducer(
+            std::shared_ptr<ProducerId> id);
 
-        void addConsumer(Pointer<ConsumerInfo> info);
+        void addConsumer(std::shared_ptr<ConsumerInfo> info);
 
-        Pointer<ConsumerState> removeConsumer(Pointer<ConsumerId> id);
+        std::shared_ptr<ConsumerState> removeConsumer(
+            std::shared_ptr<ConsumerId> id);
 
-        const decaf::util::Collection<Pointer<ProducerState>>&
+        const decaf::util::Collection<std::shared_ptr<ProducerState>>&
         getProducerStates() const
         {
             return producers.values();
         }
 
-        Pointer<ProducerState> getProducerState(Pointer<ProducerId> id)
+        std::shared_ptr<ProducerState> getProducerState(
+            std::shared_ptr<ProducerId> id)
         {
             return producers.get(id);
         }
 
-        const decaf::util::Collection<Pointer<ConsumerState>>&
+        const decaf::util::Collection<std::shared_ptr<ConsumerState>>&
         getConsumerStates() const
         {
             return consumers.values();
         }
 
-        Pointer<ConsumerState> getConsumerState(Pointer<ConsumerId> id)
+        std::shared_ptr<ConsumerState> getConsumerState(
+            std::shared_ptr<ConsumerId> id)
         {
             return consumers.get(id);
         }

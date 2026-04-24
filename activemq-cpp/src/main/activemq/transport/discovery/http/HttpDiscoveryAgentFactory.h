@@ -20,8 +20,9 @@
 
 #include <activemq/util/Config.h>
 
+#include <memory>
+
 #include <activemq/transport/discovery/AbstractDiscoveryAgentFactory.h>
-#include <decaf/lang/Pointer.h>
 
 namespace activemq
 {
@@ -39,12 +40,11 @@ namespace transport
                 virtual ~HttpDiscoveryAgentFactory();
 
             protected:
-                virtual decaf::lang::Pointer<AbstractDiscoveryAgent>
-                doCreateAgent();
+                virtual std::shared_ptr<AbstractDiscoveryAgent> doCreateAgent();
 
                 virtual void doConfigureAgent(
-                    decaf::lang::Pointer<AbstractDiscoveryAgent> agent,
-                    const decaf::util::Properties&               options);
+                    std::shared_ptr<AbstractDiscoveryAgent> agent,
+                    const decaf::util::Properties&          options);
             };
 
         }  // namespace http

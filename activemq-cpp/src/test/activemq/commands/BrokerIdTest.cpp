@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -19,8 +19,9 @@
 
 #include <activemq/commands/BrokerId.h>
 #include <decaf/lang/Comparable.h>
-#include <decaf/lang/Pointer.h>
+#include <decaf/util/Comparator.h>
 #include <decaf/util/StlMap.h>
+#include <memory>
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -86,14 +87,40 @@ TEST_F(BrokerIdTest, test)
     ASSERT_TRUE(keys.at(2)->getValue() == "C");
 }
 
+struct SharedBrokerIdComp
+    : public decaf::util::Comparator<std::shared_ptr<BrokerId>>
+{
+    virtual int compare(const std::shared_ptr<BrokerId>& left,
+                        const std::shared_ptr<BrokerId>& right) const
+    {
+        if (!left && !right)
+        {
+            return 0;
+        }
+        if (!left)
+        {
+            return -1;
+        }
+        if (!right)
+        {
+            return 1;
+        }
+        return left->compareTo(*right);
+    }
+
+    virtual bool operator()(const std::shared_ptr<BrokerId>& left,
+                            const std::shared_ptr<BrokerId>& right) const
+    {
+        return compare(left, right) < 0;
+    }
+};
+
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(BrokerIdTest, test2)
 {
-    typedef PointerComparator<BrokerId> COMPARATOR;
-
-    Pointer<BrokerId> myCommand1(new BrokerId);
-    Pointer<BrokerId> myCommand2(new BrokerId);
-    Pointer<BrokerId> myCommand3(new BrokerId);
+    std::shared_ptr<BrokerId> myCommand1(new BrokerId);
+    std::shared_ptr<BrokerId> myCommand2(new BrokerId);
+    std::shared_ptr<BrokerId> myCommand3(new BrokerId);
 
     myCommand1->setValue("A");
     myCommand2->setValue("A");
@@ -102,7 +129,7 @@ TEST_F(BrokerIdTest, test2)
     ASSERT_TRUE(myCommand1->compareTo(*myCommand2) == 0);
     ASSERT_TRUE(myCommand1->compareTo(*myCommand3) == -1);
 
-    StlMap<Pointer<BrokerId>, int, COMPARATOR> testMap;
+    StlMap<std::shared_ptr<BrokerId>, int, SharedBrokerIdComp> testMap;
 
     testMap.put(myCommand3, 0);
     testMap.put(myCommand1, 0);
@@ -111,7 +138,7 @@ TEST_F(BrokerIdTest, test2)
     testMap.put(myCommand2, 0);
     ASSERT_TRUE(testMap.size() == 2);
 
-    std::vector<Pointer<BrokerId>> keys = testMap.keySet().toArray();
+    std::vector<std::shared_ptr<BrokerId>> keys = testMap.keySet().toArray();
 
     ASSERT_TRUE(keys.at(0)->getValue() == "A");
     ASSERT_TRUE(keys.at(1)->getValue() == "C");

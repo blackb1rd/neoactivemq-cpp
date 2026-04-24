@@ -19,16 +19,17 @@
 #include <activemq/exceptions/ActiveMQException.h>
 #include <activemq/state/CommandVisitor.h>
 #include <decaf/internal/util/StringUtils.h>
-#include <decaf/lang/Long.h>
 #include <decaf/lang/exceptions/NullPointerException.h>
+#include <decaf/lang/exceptions/NumberFormatException.h>
 #include <decaf/util/HashCode.h>
 #include <sstream>
+#include <stdexcept>
+#include <string>
 
 using namespace std;
 using namespace activemq;
 using namespace activemq::exceptions;
 using namespace activemq::commands;
-using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 using namespace decaf::internal::util;
 
@@ -89,7 +90,22 @@ ProducerId::ProducerId(std::string producerKey)
 
     if (p != std::string::npos)
     {
-        value = Long::parseLong(producerKey.substr(p + 1, std::string::npos));
+        try
+        {
+            value = std::stoll(producerKey.substr(p + 1, std::string::npos));
+        }
+        catch (const std::invalid_argument& e)
+        {
+            throw decaf::lang::exceptions::NumberFormatException(__FILE__,
+                                                                 __LINE__,
+                                                                 e.what());
+        }
+        catch (const std::out_of_range& e)
+        {
+            throw decaf::lang::exceptions::NumberFormatException(__FILE__,
+                                                                 __LINE__,
+                                                                 e.what());
+        }
         producerKey = producerKey.substr(0, p);
     }
 
@@ -301,9 +317,9 @@ int ProducerId::getHashCode() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const Pointer<SessionId>& ProducerId::getParentId() const
+const std::shared_ptr<SessionId>& ProducerId::getParentId() const
 {
-    if (this->parentId == NULL)
+    if (!this->parentId)
     {
         this->parentId.reset(new SessionId(this));
     }
@@ -318,8 +334,23 @@ void ProducerId::setProducerSessionKey(std::string sessionKey)
 
     if (p != std::string::npos)
     {
-        this->sessionId =
-            Long::parseLong(sessionKey.substr(p + 1, std::string::npos));
+        try
+        {
+            this->sessionId =
+                std::stoll(sessionKey.substr(p + 1, std::string::npos));
+        }
+        catch (const std::invalid_argument& e)
+        {
+            throw decaf::lang::exceptions::NumberFormatException(__FILE__,
+                                                                 __LINE__,
+                                                                 e.what());
+        }
+        catch (const std::out_of_range& e)
+        {
+            throw decaf::lang::exceptions::NumberFormatException(__FILE__,
+                                                                 __LINE__,
+                                                                 e.what());
+        }
         sessionKey = sessionKey.substr(0, p);
     }
 

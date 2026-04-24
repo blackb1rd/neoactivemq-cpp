@@ -18,6 +18,8 @@
 #ifndef _ACTIVEMQ_TRANSPORT_DISCOVERY_DISCOVERYTRANSPORT_H_
 #define _ACTIVEMQ_TRANSPORT_DISCOVERY_DISCOVERYTRANSPORT_H_
 
+#include <memory>
+
 #include <activemq/transport/CompositeTransport.h>
 #include <activemq/transport/TransportFilter.h>
 #include <activemq/transport/discovery/DiscoveryAgent.h>
@@ -49,7 +51,7 @@ namespace transport
             DiscoveryTransportData* impl;
 
         public:
-            DiscoveryTransport(Pointer<CompositeTransport> next);
+            DiscoveryTransport(std::shared_ptr<CompositeTransport> next);
 
             virtual ~DiscoveryTransport();
 
@@ -64,7 +66,7 @@ namespace transport
              * @param agent
              *      The Discovery Agent to use in this transport.
              */
-            void setDiscoveryAgent(decaf::lang::Pointer<DiscoveryAgent> agent);
+            void setDiscoveryAgent(std::shared_ptr<DiscoveryAgent> agent);
 
             /**
              * Returns the currently configured Discovery Agent
@@ -72,7 +74,7 @@ namespace transport
              * @return the pointer to the currently configured agent or NULL if
              * not set.
              */
-            Pointer<DiscoveryAgent> getDiscoveryAgent() const;
+            std::shared_ptr<DiscoveryAgent> getDiscoveryAgent() const;
 
             /**
              * Sets the properties that are used for configuration of discovered

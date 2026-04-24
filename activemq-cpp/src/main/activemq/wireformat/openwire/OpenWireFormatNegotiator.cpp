@@ -40,8 +40,9 @@ using namespace decaf::lang::exceptions;
 const int OpenWireFormatNegotiator::negotiationTimeout = 15000;
 
 ////////////////////////////////////////////////////////////////////////////////
-OpenWireFormatNegotiator::OpenWireFormatNegotiator(OpenWireFormat* wireFormat,
-                                                   const Pointer<Transport> next)
+OpenWireFormatNegotiator::OpenWireFormatNegotiator(
+    OpenWireFormat*                  wireFormat,
+    const std::shared_ptr<Transport> next)
     : WireFormatNegotiator(next),
       firstTime(true),
       wireInfoSentDownLatch(1),
@@ -61,7 +62,7 @@ OpenWireFormatNegotiator::~OpenWireFormatNegotiator()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenWireFormatNegotiator::oneway(const Pointer<Command> command)
+void OpenWireFormatNegotiator::oneway(const std::shared_ptr<Command> command)
 {
     try
     {
@@ -97,8 +98,8 @@ void OpenWireFormatNegotiator::oneway(const Pointer<Command> command)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Response> OpenWireFormatNegotiator::request(
-    const Pointer<Command> command)
+std::shared_ptr<Response> OpenWireFormatNegotiator::request(
+    const std::shared_ptr<Command> command)
 {
     try
     {
@@ -122,9 +123,9 @@ Pointer<Response> OpenWireFormatNegotiator::request(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Response> OpenWireFormatNegotiator::request(
-    const Pointer<Command> command,
-    unsigned int           timeout)
+std::shared_ptr<Response> OpenWireFormatNegotiator::request(
+    const std::shared_ptr<Command> command,
+    unsigned int                   timeout)
 {
     try
     {
@@ -148,7 +149,7 @@ Pointer<Response> OpenWireFormatNegotiator::request(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void OpenWireFormatNegotiator::onCommand(const Pointer<Command> command)
+void OpenWireFormatNegotiator::onCommand(const std::shared_ptr<Command> command)
 {
     if (command->isWireFormatInfo())
     {
@@ -208,7 +209,8 @@ void OpenWireFormatNegotiator::afterNextIsStopped()
 ////////////////////////////////////////////////////////////////////////////////
 void OpenWireFormatNegotiator::afterNextIsStarted()
 {
-    if (firstTime.compareAndSet(true, false))
+    bool _expected = true;
+    if (firstTime.compare_exchange_strong(_expected, false))
     {
         try
         {

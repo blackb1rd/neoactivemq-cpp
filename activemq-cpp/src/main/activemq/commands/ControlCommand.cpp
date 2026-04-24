@@ -24,7 +24,7 @@ using namespace std;
 using namespace activemq;
 using namespace activemq::exceptions;
 using namespace activemq::commands;
-using namespace decaf::lang;
+
 using namespace decaf::lang::exceptions;
 
 /*
@@ -151,7 +151,7 @@ void ControlCommand::setCommand(const std::string& command)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<commands::Command> ControlCommand::visit(
+std::shared_ptr<commands::Command> ControlCommand::visit(
     activemq::state::CommandVisitor* visitor)
 {
     return visitor->processControlCommand(this);

@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -28,7 +28,6 @@
 #include <activemq/util/AdvisorySupport.h>
 #include <activemq/util/CMSListener.h>
 
-#include <decaf/lang/Pointer.h>
 #include <decaf/lang/Runnable.h>
 #include <decaf/lang/Thread.h>
 #include <decaf/lang/exceptions/ClassCastException.h>
@@ -197,9 +196,9 @@ TEST_F(OpenwireSslAdvisoryTest, testConnectionAdvisories)
         {
             try
             {
-                Pointer<ConnectionInfo> connectionInfo =
-                    amqMessage->getDataStructure()
-                        .dynamicCast<commands::ConnectionInfo>();
+                std::shared_ptr<ConnectionInfo> connectionInfo =
+                    std::dynamic_pointer_cast<commands::ConnectionInfo>(
+                        amqMessage->getDataStructure());
 
                 if (connectionInfo != NULL)
                 {

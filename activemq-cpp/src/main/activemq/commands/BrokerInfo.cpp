@@ -24,7 +24,7 @@ using namespace std;
 using namespace activemq;
 using namespace activemq::exceptions;
 using namespace activemq::commands;
-using namespace decaf::lang;
+
 using namespace decaf::lang::exceptions;
 
 /*
@@ -40,7 +40,7 @@ using namespace decaf::lang::exceptions;
 ////////////////////////////////////////////////////////////////////////////////
 BrokerInfo::BrokerInfo()
     : BaseCommand(),
-      brokerId(NULL),
+      brokerId(),
       brokerURL(""),
       peerBrokerInfos(),
       brokerName(""),
@@ -123,7 +123,7 @@ std::string BrokerInfo::toString() const
            << "responseRequired = " << boolalpha << this->isResponseRequired();
     stream << ", ";
     stream << "BrokerId = ";
-    if (this->getBrokerId() != NULL)
+    if (this->getBrokerId())
     {
         stream << this->getBrokerId()->toString();
     }
@@ -142,7 +142,7 @@ std::string BrokerInfo::toString() const
              ipeerBrokerInfos < this->getPeerBrokerInfos().size();
              ++ipeerBrokerInfos)
         {
-            if (this->getPeerBrokerInfos()[ipeerBrokerInfos] != NULL)
+            if (this->getPeerBrokerInfos()[ipeerBrokerInfos])
             {
                 stream
                     << this->getPeerBrokerInfos()[ipeerBrokerInfos]->toString()
@@ -198,14 +198,14 @@ bool BrokerInfo::equals(const DataStructure* value) const
         return false;
     }
 
-    if (this->getBrokerId() != NULL)
+    if (this->getBrokerId())
     {
         if (!this->getBrokerId()->equals(valuePtr->getBrokerId().get()))
         {
             return false;
         }
     }
-    else if (valuePtr->getBrokerId() != NULL)
+    else if (valuePtr->getBrokerId())
     {
         return false;
     }
@@ -217,7 +217,7 @@ bool BrokerInfo::equals(const DataStructure* value) const
          ipeerBrokerInfos < this->getPeerBrokerInfos().size();
          ++ipeerBrokerInfos)
     {
-        if (this->getPeerBrokerInfos()[ipeerBrokerInfos] != NULL)
+        if (this->getPeerBrokerInfos()[ipeerBrokerInfos])
         {
             if (!this->getPeerBrokerInfos()[ipeerBrokerInfos]->equals(
                     valuePtr->getPeerBrokerInfos()[ipeerBrokerInfos].get()))
@@ -225,7 +225,7 @@ bool BrokerInfo::equals(const DataStructure* value) const
                 return false;
             }
         }
-        else if (valuePtr->getPeerBrokerInfos()[ipeerBrokerInfos] != NULL)
+        else if (valuePtr->getPeerBrokerInfos()[ipeerBrokerInfos])
         {
             return false;
         }
@@ -275,19 +275,19 @@ bool BrokerInfo::equals(const DataStructure* value) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const decaf::lang::Pointer<BrokerId>& BrokerInfo::getBrokerId() const
+const std::shared_ptr<BrokerId>& BrokerInfo::getBrokerId() const
 {
     return brokerId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<BrokerId>& BrokerInfo::getBrokerId()
+std::shared_ptr<BrokerId>& BrokerInfo::getBrokerId()
 {
     return brokerId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void BrokerInfo::setBrokerId(const decaf::lang::Pointer<BrokerId>& brokerId)
+void BrokerInfo::setBrokerId(const std::shared_ptr<BrokerId>& brokerId)
 {
     this->brokerId = brokerId;
 }
@@ -311,21 +311,21 @@ void BrokerInfo::setBrokerURL(const std::string& brokerURL)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::vector<decaf::lang::Pointer<BrokerInfo>>&
-BrokerInfo::getPeerBrokerInfos() const
+const std::vector<std::shared_ptr<BrokerInfo>>& BrokerInfo::getPeerBrokerInfos()
+    const
 {
     return peerBrokerInfos;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::vector<decaf::lang::Pointer<BrokerInfo>>& BrokerInfo::getPeerBrokerInfos()
+std::vector<std::shared_ptr<BrokerInfo>>& BrokerInfo::getPeerBrokerInfos()
 {
     return peerBrokerInfos;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void BrokerInfo::setPeerBrokerInfos(
-    const std::vector<decaf::lang::Pointer<BrokerInfo>>& peerBrokerInfos)
+    const std::vector<std::shared_ptr<BrokerInfo>>& peerBrokerInfos)
 {
     this->peerBrokerInfos = peerBrokerInfos;
 }
@@ -457,7 +457,7 @@ void BrokerInfo::setNetworkProperties(const std::string& networkProperties)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<commands::Command> BrokerInfo::visit(
+std::shared_ptr<commands::Command> BrokerInfo::visit(
     activemq::state::CommandVisitor* visitor)
 {
     return visitor->processBrokerInfo(this);

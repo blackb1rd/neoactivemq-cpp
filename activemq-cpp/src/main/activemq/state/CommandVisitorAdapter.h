@@ -70,236 +70,235 @@ namespace state
     public:
         virtual ~CommandVisitorAdapter();
 
-        virtual decaf::lang::Pointer<commands::Command> processRemoveConnection(
+        virtual std::shared_ptr<commands::Command> processRemoveConnection(
             commands::ConnectionId* id AMQCPP_UNUSED)
         {
-            return decaf::lang::Pointer<commands::Command>();
+            return std::shared_ptr<commands::Command>();
         }
 
-        virtual decaf::lang::Pointer<commands::Command> processRemoveSession(
+        virtual std::shared_ptr<commands::Command> processRemoveSession(
             commands::SessionId* id AMQCPP_UNUSED)
         {
-            return decaf::lang::Pointer<commands::Command>();
+            return std::shared_ptr<commands::Command>();
         }
 
-        virtual decaf::lang::Pointer<commands::Command> processRemoveProducer(
+        virtual std::shared_ptr<commands::Command> processRemoveProducer(
             commands::ProducerId* id AMQCPP_UNUSED)
         {
-            return decaf::lang::Pointer<commands::Command>();
+            return std::shared_ptr<commands::Command>();
         }
 
-        virtual decaf::lang::Pointer<commands::Command> processRemoveConsumer(
+        virtual std::shared_ptr<commands::Command> processRemoveConsumer(
             commands::ConsumerId* id AMQCPP_UNUSED)
         {
-            return decaf::lang::Pointer<commands::Command>();
+            return std::shared_ptr<commands::Command>();
         }
 
-        virtual decaf::lang::Pointer<commands::Command> processDestinationInfo(
+        virtual std::shared_ptr<commands::Command> processDestinationInfo(
             commands::DestinationInfo* info AMQCPP_UNUSED)
         {
-            return decaf::lang::Pointer<commands::Command>();
+            return std::shared_ptr<commands::Command>();
         }
 
-        virtual decaf::lang::Pointer<commands::Command>
-        processRemoveDestination(commands::DestinationInfo* info AMQCPP_UNUSED)
+        virtual std::shared_ptr<commands::Command> processRemoveDestination(
+            commands::DestinationInfo* info AMQCPP_UNUSED)
         {
-            return decaf::lang::Pointer<commands::Command>();
+            return std::shared_ptr<commands::Command>();
         }
 
-        virtual decaf::lang::Pointer<commands::Command>
-        processRemoveSubscriptionInfo(
+        virtual std::shared_ptr<commands::Command> processRemoveSubscriptionInfo(
             commands::RemoveSubscriptionInfo* info AMQCPP_UNUSED)
         {
-            return decaf::lang::Pointer<commands::Command>();
+            return std::shared_ptr<commands::Command>();
         }
 
-        virtual decaf::lang::Pointer<commands::Command> processMessage(
+        virtual std::shared_ptr<commands::Command> processMessage(
             commands::Message* send AMQCPP_UNUSED)
         {
-            return decaf::lang::Pointer<commands::Command>();
+            return std::shared_ptr<commands::Command>();
         }
 
-        virtual decaf::lang::Pointer<commands::Command> processMessageAck(
+        virtual std::shared_ptr<commands::Command> processMessageAck(
             commands::MessageAck* ack AMQCPP_UNUSED)
         {
-            return decaf::lang::Pointer<commands::Command>();
+            return std::shared_ptr<commands::Command>();
         }
 
-        virtual decaf::lang::Pointer<commands::Command> processMessagePull(
+        virtual std::shared_ptr<commands::Command> processMessagePull(
             commands::MessagePull* pull AMQCPP_UNUSED)
         {
-            return decaf::lang::Pointer<commands::Command>();
+            return std::shared_ptr<commands::Command>();
         }
 
-        virtual decaf::lang::Pointer<commands::Command> processBeginTransaction(
+        virtual std::shared_ptr<commands::Command> processBeginTransaction(
             commands::TransactionInfo* info AMQCPP_UNUSED)
         {
-            return decaf::lang::Pointer<commands::Command>();
+            return std::shared_ptr<commands::Command>();
         }
 
-        virtual decaf::lang::Pointer<commands::Command>
-        processPrepareTransaction(commands::TransactionInfo* info AMQCPP_UNUSED)
+        virtual std::shared_ptr<commands::Command> processPrepareTransaction(
+            commands::TransactionInfo* info AMQCPP_UNUSED)
         {
-            return decaf::lang::Pointer<commands::Command>();
+            return std::shared_ptr<commands::Command>();
         }
 
-        virtual decaf::lang::Pointer<commands::Command>
+        virtual std::shared_ptr<commands::Command>
         processCommitTransactionOnePhase(
             commands::TransactionInfo* info AMQCPP_UNUSED)
         {
-            return decaf::lang::Pointer<commands::Command>();
+            return std::shared_ptr<commands::Command>();
         }
 
-        virtual decaf::lang::Pointer<commands::Command>
+        virtual std::shared_ptr<commands::Command>
         processCommitTransactionTwoPhase(
             commands::TransactionInfo* info AMQCPP_UNUSED)
         {
-            return decaf::lang::Pointer<commands::Command>();
+            return std::shared_ptr<commands::Command>();
         }
 
-        virtual decaf::lang::Pointer<commands::Command>
-        processRollbackTransaction(commands::TransactionInfo* info AMQCPP_UNUSED)
-        {
-            return decaf::lang::Pointer<commands::Command>();
-        }
-
-        virtual decaf::lang::Pointer<commands::Command> processWireFormat(
-            commands::WireFormatInfo* info AMQCPP_UNUSED)
-        {
-            return decaf::lang::Pointer<commands::Command>();
-        }
-
-        virtual decaf::lang::Pointer<commands::Command> processKeepAliveInfo(
-            commands::KeepAliveInfo* info AMQCPP_UNUSED)
-        {
-            return decaf::lang::Pointer<commands::Command>();
-        }
-
-        virtual decaf::lang::Pointer<commands::Command> processShutdownInfo(
-            commands::ShutdownInfo* info AMQCPP_UNUSED)
-        {
-            return decaf::lang::Pointer<commands::Command>();
-        }
-
-        virtual decaf::lang::Pointer<commands::Command> processFlushCommand(
-            commands::FlushCommand* command AMQCPP_UNUSED)
-        {
-            return decaf::lang::Pointer<commands::Command>();
-        }
-
-        virtual decaf::lang::Pointer<commands::Command> processBrokerInfo(
-            commands::BrokerInfo* info AMQCPP_UNUSED)
-        {
-            return decaf::lang::Pointer<commands::Command>();
-        }
-
-        virtual decaf::lang::Pointer<commands::Command>
-        processRecoverTransactions(commands::TransactionInfo* info AMQCPP_UNUSED)
-        {
-            return decaf::lang::Pointer<commands::Command>();
-        }
-
-        virtual decaf::lang::Pointer<commands::Command>
-        processForgetTransaction(commands::TransactionInfo* info AMQCPP_UNUSED)
-        {
-            return decaf::lang::Pointer<commands::Command>();
-        }
-
-        virtual decaf::lang::Pointer<commands::Command> processEndTransaction(
+        virtual std::shared_ptr<commands::Command> processRollbackTransaction(
             commands::TransactionInfo* info AMQCPP_UNUSED)
         {
-            return decaf::lang::Pointer<commands::Command>();
+            return std::shared_ptr<commands::Command>();
         }
 
-        virtual decaf::lang::Pointer<commands::Command>
+        virtual std::shared_ptr<commands::Command> processWireFormat(
+            commands::WireFormatInfo* info AMQCPP_UNUSED)
+        {
+            return std::shared_ptr<commands::Command>();
+        }
+
+        virtual std::shared_ptr<commands::Command> processKeepAliveInfo(
+            commands::KeepAliveInfo* info AMQCPP_UNUSED)
+        {
+            return std::shared_ptr<commands::Command>();
+        }
+
+        virtual std::shared_ptr<commands::Command> processShutdownInfo(
+            commands::ShutdownInfo* info AMQCPP_UNUSED)
+        {
+            return std::shared_ptr<commands::Command>();
+        }
+
+        virtual std::shared_ptr<commands::Command> processFlushCommand(
+            commands::FlushCommand* command AMQCPP_UNUSED)
+        {
+            return std::shared_ptr<commands::Command>();
+        }
+
+        virtual std::shared_ptr<commands::Command> processBrokerInfo(
+            commands::BrokerInfo* info AMQCPP_UNUSED)
+        {
+            return std::shared_ptr<commands::Command>();
+        }
+
+        virtual std::shared_ptr<commands::Command> processRecoverTransactions(
+            commands::TransactionInfo* info AMQCPP_UNUSED)
+        {
+            return std::shared_ptr<commands::Command>();
+        }
+
+        virtual std::shared_ptr<commands::Command> processForgetTransaction(
+            commands::TransactionInfo* info AMQCPP_UNUSED)
+        {
+            return std::shared_ptr<commands::Command>();
+        }
+
+        virtual std::shared_ptr<commands::Command> processEndTransaction(
+            commands::TransactionInfo* info AMQCPP_UNUSED)
+        {
+            return std::shared_ptr<commands::Command>();
+        }
+
+        virtual std::shared_ptr<commands::Command>
         processMessageDispatchNotification(
             commands::MessageDispatchNotification* notification AMQCPP_UNUSED)
         {
-            return decaf::lang::Pointer<commands::Command>();
+            return std::shared_ptr<commands::Command>();
         }
 
-        virtual decaf::lang::Pointer<commands::Command> processProducerAck(
+        virtual std::shared_ptr<commands::Command> processProducerAck(
             commands::ProducerAck* ack AMQCPP_UNUSED)
         {
-            return decaf::lang::Pointer<commands::Command>();
+            return std::shared_ptr<commands::Command>();
         }
 
-        virtual decaf::lang::Pointer<commands::Command> processMessageDispatch(
+        virtual std::shared_ptr<commands::Command> processMessageDispatch(
             commands::MessageDispatch* dispatch AMQCPP_UNUSED)
         {
-            return decaf::lang::Pointer<commands::Command>();
+            return std::shared_ptr<commands::Command>();
         }
 
-        virtual decaf::lang::Pointer<commands::Command> processControlCommand(
+        virtual std::shared_ptr<commands::Command> processControlCommand(
             commands::ControlCommand* command AMQCPP_UNUSED)
         {
-            return decaf::lang::Pointer<commands::Command>();
+            return std::shared_ptr<commands::Command>();
         }
 
-        virtual decaf::lang::Pointer<commands::Command> processConnectionError(
+        virtual std::shared_ptr<commands::Command> processConnectionError(
             commands::ConnectionError* error AMQCPP_UNUSED)
         {
-            return decaf::lang::Pointer<commands::Command>();
+            return std::shared_ptr<commands::Command>();
         }
 
-        virtual decaf::lang::Pointer<commands::Command> processConnectionControl(
+        virtual std::shared_ptr<commands::Command> processConnectionControl(
             commands::ConnectionControl* control AMQCPP_UNUSED)
         {
-            return decaf::lang::Pointer<commands::Command>();
+            return std::shared_ptr<commands::Command>();
         }
 
-        virtual decaf::lang::Pointer<commands::Command> processConsumerControl(
+        virtual std::shared_ptr<commands::Command> processConsumerControl(
             commands::ConsumerControl* control AMQCPP_UNUSED)
         {
-            return decaf::lang::Pointer<commands::Command>();
+            return std::shared_ptr<commands::Command>();
         }
 
-        virtual decaf::lang::Pointer<commands::Command> processBrokerError(
+        virtual std::shared_ptr<commands::Command> processBrokerError(
             commands::BrokerError* error AMQCPP_UNUSED)
         {
-            return decaf::lang::Pointer<commands::Command>();
+            return std::shared_ptr<commands::Command>();
         }
 
-        virtual decaf::lang::Pointer<commands::Command> processReplayCommand(
+        virtual std::shared_ptr<commands::Command> processReplayCommand(
             commands::ReplayCommand* replay AMQCPP_UNUSED)
         {
-            return decaf::lang::Pointer<commands::Command>();
+            return std::shared_ptr<commands::Command>();
         }
 
-        virtual decaf::lang::Pointer<commands::Command> processResponse(
+        virtual std::shared_ptr<commands::Command> processResponse(
             commands::Response* response AMQCPP_UNUSED)
         {
-            return decaf::lang::Pointer<commands::Command>();
+            return std::shared_ptr<commands::Command>();
         }
 
-        virtual decaf::lang::Pointer<commands::Command> processConnectionInfo(
+        virtual std::shared_ptr<commands::Command> processConnectionInfo(
             commands::ConnectionInfo* info AMQCPP_UNUSED)
         {
-            return decaf::lang::Pointer<commands::Command>();
+            return std::shared_ptr<commands::Command>();
         }
 
-        virtual decaf::lang::Pointer<commands::Command> processSessionInfo(
+        virtual std::shared_ptr<commands::Command> processSessionInfo(
             commands::SessionInfo* info AMQCPP_UNUSED)
         {
-            return decaf::lang::Pointer<commands::Command>();
+            return std::shared_ptr<commands::Command>();
         }
 
-        virtual decaf::lang::Pointer<commands::Command> processProducerInfo(
+        virtual std::shared_ptr<commands::Command> processProducerInfo(
             commands::ProducerInfo* info AMQCPP_UNUSED)
         {
-            return decaf::lang::Pointer<commands::Command>();
+            return std::shared_ptr<commands::Command>();
         }
 
-        virtual decaf::lang::Pointer<commands::Command> processConsumerInfo(
+        virtual std::shared_ptr<commands::Command> processConsumerInfo(
             commands::ConsumerInfo* info AMQCPP_UNUSED)
         {
-            return decaf::lang::Pointer<commands::Command>();
+            return std::shared_ptr<commands::Command>();
         }
 
-        virtual decaf::lang::Pointer<commands::Command> processTransactionInfo(
+        virtual std::shared_ptr<commands::Command> processTransactionInfo(
             commands::TransactionInfo* info);
 
-        virtual decaf::lang::Pointer<commands::Command> processRemoveInfo(
+        virtual std::shared_ptr<commands::Command> processRemoveInfo(
             commands::RemoveInfo* info);
     };
 

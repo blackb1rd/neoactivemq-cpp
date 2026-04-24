@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -28,7 +28,7 @@
 #include <decaf/net/URI.h>
 
 #include <activemq/util/Config.h>
-#include <decaf/lang/Pointer.h>
+#include <memory>
 #include <typeinfo>
 
 using namespace activemq;
@@ -46,9 +46,9 @@ using namespace decaf::lang::exceptions;
 class InactivityMonitorTest : public ::testing::Test
 {
 protected:
-    decaf::lang::Pointer<mock::MockTransport> transport;
+    std::shared_ptr<mock::MockTransport> transport;
 
-    Pointer<activemq::commands::WireFormatInfo> localWireFormatInfo;
+    std::shared_ptr<activemq::commands::WireFormatInfo> localWireFormatInfo;
 
     void SetUp() override;
     void TearDown() override;
@@ -75,7 +75,7 @@ public:
     {
     }
 
-    virtual void onCommand(const Pointer<Command> command)
+    virtual void onCommand(const std::shared_ptr<Command> command)
     {
         this->commandsReceived++;
     }
@@ -102,7 +102,8 @@ void InactivityMonitorTest::SetUp()
     URI                  uri("mock://mock?wireformat=openwire");
     MockTransportFactory factory;
 
-    this->transport = factory.createComposite(uri).dynamicCast<MockTransport>();
+    this->transport =
+        std::dynamic_pointer_cast<MockTransport>(factory.createComposite(uri));
 
     this->localWireFormatInfo.reset(new WireFormatInfo());
 
@@ -114,7 +115,7 @@ void InactivityMonitorTest::SetUp()
 ////////////////////////////////////////////////////////////////////////////////
 void InactivityMonitorTest::TearDown()
 {
-    this->transport.reset(NULL);
+    this->transport.reset();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -170,7 +171,7 @@ TEST_F(InactivityMonitorTest, testWriteMessageFail)
 
     Thread::sleep(2000);
 
-    Pointer<ActiveMQMessage> message(new ActiveMQMessage());
+    std::shared_ptr<ActiveMQMessage> message(new ActiveMQMessage());
     this->transport->fireCommand(message);
 
     // Should not have timed out on Read yet.
@@ -194,7 +195,7 @@ TEST_F(InactivityMonitorTest, testNonFailureSendCase)
     // Send the local one for the monitor to record.
     monitor.oneway(this->localWireFormatInfo);
 
-    Pointer<ActiveMQMessage> message(new ActiveMQMessage());
+    std::shared_ptr<ActiveMQMessage> message(new ActiveMQMessage());
     for (int ix = 0; ix < 20; ++ix)
     {
         monitor.oneway(message);

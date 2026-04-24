@@ -26,7 +26,7 @@
 #include <activemq/commands/BaseCommand.h>
 #include <activemq/commands/ProducerId.h>
 #include <activemq/util/Config.h>
-#include <decaf/lang/Pointer.h>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -34,8 +34,6 @@ namespace activemq
 {
 namespace commands
 {
-
-    using decaf::lang::Pointer;
 
     /*
      *
@@ -49,8 +47,8 @@ namespace commands
     class AMQCPP_API ProducerAck : public BaseCommand
     {
     protected:
-        Pointer<ProducerId> producerId;
-        int                 size;
+        std::shared_ptr<ProducerId> producerId;
+        int                         size;
 
     public:
         const static unsigned char ID_PRODUCERACK = 19;
@@ -74,9 +72,10 @@ namespace commands
 
         virtual bool equals(const DataStructure* value) const;
 
-        virtual const Pointer<ProducerId>& getProducerId() const;
-        virtual Pointer<ProducerId>&       getProducerId();
-        virtual void setProducerId(const Pointer<ProducerId>& producerId);
+        virtual const std::shared_ptr<ProducerId>& getProducerId() const;
+        virtual std::shared_ptr<ProducerId>&       getProducerId();
+        virtual void                               setProducerId(
+                                          const std::shared_ptr<ProducerId>& producerId);
 
         virtual int  getSize() const;
         virtual void setSize(int size);
@@ -89,7 +88,8 @@ namespace commands
             return true;
         }
 
-        virtual Pointer<Command> visit(activemq::state::CommandVisitor* visitor);
+        virtual std::shared_ptr<Command> visit(
+            activemq::state::CommandVisitor* visitor);
     };
 
 }  // namespace commands

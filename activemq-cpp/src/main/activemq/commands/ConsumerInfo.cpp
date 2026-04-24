@@ -24,7 +24,7 @@ using namespace std;
 using namespace activemq;
 using namespace activemq::exceptions;
 using namespace activemq::commands;
-using namespace decaf::lang;
+
 using namespace decaf::lang::exceptions;
 
 /*
@@ -40,9 +40,9 @@ using namespace decaf::lang::exceptions;
 ////////////////////////////////////////////////////////////////////////////////
 ConsumerInfo::ConsumerInfo()
     : BaseCommand(),
-      consumerId(NULL),
+      consumerId(),
       browser(false),
-      destination(NULL),
+      destination(),
       prefetchSize(0),
       maximumPendingMessageLimit(0),
       dispatchAsync(false),
@@ -54,7 +54,7 @@ ConsumerInfo::ConsumerInfo()
       retroactive(false),
       priority(0),
       brokerPath(),
-      additionalPredicate(NULL),
+      additionalPredicate(),
       networkSubscription(false),
       optimizedAcknowledge(false),
       noRangeAcks(false),
@@ -138,7 +138,7 @@ std::string ConsumerInfo::toString() const
            << "responseRequired = " << boolalpha << this->isResponseRequired();
     stream << ", ";
     stream << "ConsumerId = ";
-    if (this->getConsumerId() != NULL)
+    if (this->getConsumerId())
     {
         stream << this->getConsumerId()->toString();
     }
@@ -150,7 +150,7 @@ std::string ConsumerInfo::toString() const
     stream << "Browser = " << this->isBrowser();
     stream << ", ";
     stream << "Destination = ";
-    if (this->getDestination() != NULL)
+    if (this->getDestination())
     {
         stream << this->getDestination()->toString();
     }
@@ -187,7 +187,7 @@ std::string ConsumerInfo::toString() const
         for (size_t ibrokerPath = 0; ibrokerPath < this->getBrokerPath().size();
              ++ibrokerPath)
         {
-            if (this->getBrokerPath()[ibrokerPath] != NULL)
+            if (this->getBrokerPath()[ibrokerPath])
             {
                 stream << this->getBrokerPath()[ibrokerPath]->toString()
                        << ", ";
@@ -205,7 +205,7 @@ std::string ConsumerInfo::toString() const
     }
     stream << ", ";
     stream << "AdditionalPredicate = ";
-    if (this->getAdditionalPredicate() != NULL)
+    if (this->getAdditionalPredicate())
     {
         stream << this->getAdditionalPredicate()->toString();
     }
@@ -228,7 +228,7 @@ std::string ConsumerInfo::toString() const
              inetworkConsumerPath < this->getNetworkConsumerPath().size();
              ++inetworkConsumerPath)
         {
-            if (this->getNetworkConsumerPath()[inetworkConsumerPath] != NULL)
+            if (this->getNetworkConsumerPath()[inetworkConsumerPath])
             {
                 stream << this->getNetworkConsumerPath()[inetworkConsumerPath]
                               ->toString()
@@ -265,14 +265,14 @@ bool ConsumerInfo::equals(const DataStructure* value) const
         return false;
     }
 
-    if (this->getConsumerId() != NULL)
+    if (this->getConsumerId())
     {
         if (!this->getConsumerId()->equals(valuePtr->getConsumerId().get()))
         {
             return false;
         }
     }
-    else if (valuePtr->getConsumerId() != NULL)
+    else if (valuePtr->getConsumerId())
     {
         return false;
     }
@@ -280,14 +280,14 @@ bool ConsumerInfo::equals(const DataStructure* value) const
     {
         return false;
     }
-    if (this->getDestination() != NULL)
+    if (this->getDestination())
     {
         if (!this->getDestination()->equals(valuePtr->getDestination().get()))
         {
             return false;
         }
     }
-    else if (valuePtr->getDestination() != NULL)
+    else if (valuePtr->getDestination())
     {
         return false;
     }
@@ -335,7 +335,7 @@ bool ConsumerInfo::equals(const DataStructure* value) const
     for (size_t ibrokerPath = 0; ibrokerPath < this->getBrokerPath().size();
          ++ibrokerPath)
     {
-        if (this->getBrokerPath()[ibrokerPath] != NULL)
+        if (this->getBrokerPath()[ibrokerPath])
         {
             if (!this->getBrokerPath()[ibrokerPath]->equals(
                     valuePtr->getBrokerPath()[ibrokerPath].get()))
@@ -343,12 +343,12 @@ bool ConsumerInfo::equals(const DataStructure* value) const
                 return false;
             }
         }
-        else if (valuePtr->getBrokerPath()[ibrokerPath] != NULL)
+        else if (valuePtr->getBrokerPath()[ibrokerPath])
         {
             return false;
         }
     }
-    if (this->getAdditionalPredicate() != NULL)
+    if (this->getAdditionalPredicate())
     {
         if (!this->getAdditionalPredicate()->equals(
                 valuePtr->getAdditionalPredicate().get()))
@@ -356,7 +356,7 @@ bool ConsumerInfo::equals(const DataStructure* value) const
             return false;
         }
     }
-    else if (valuePtr->getAdditionalPredicate() != NULL)
+    else if (valuePtr->getAdditionalPredicate())
     {
         return false;
     }
@@ -376,7 +376,7 @@ bool ConsumerInfo::equals(const DataStructure* value) const
          inetworkConsumerPath < this->getNetworkConsumerPath().size();
          ++inetworkConsumerPath)
     {
-        if (this->getNetworkConsumerPath()[inetworkConsumerPath] != NULL)
+        if (this->getNetworkConsumerPath()[inetworkConsumerPath])
         {
             if (!this->getNetworkConsumerPath()[inetworkConsumerPath]->equals(
                     valuePtr->getNetworkConsumerPath()[inetworkConsumerPath]
@@ -399,20 +399,19 @@ bool ConsumerInfo::equals(const DataStructure* value) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const decaf::lang::Pointer<ConsumerId>& ConsumerInfo::getConsumerId() const
+const std::shared_ptr<ConsumerId>& ConsumerInfo::getConsumerId() const
 {
     return consumerId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<ConsumerId>& ConsumerInfo::getConsumerId()
+std::shared_ptr<ConsumerId>& ConsumerInfo::getConsumerId()
 {
     return consumerId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConsumerInfo::setConsumerId(
-    const decaf::lang::Pointer<ConsumerId>& consumerId)
+void ConsumerInfo::setConsumerId(const std::shared_ptr<ConsumerId>& consumerId)
 {
     this->consumerId = consumerId;
 }
@@ -430,21 +429,20 @@ void ConsumerInfo::setBrowser(bool browser)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const decaf::lang::Pointer<ActiveMQDestination>& ConsumerInfo::getDestination()
-    const
+const std::shared_ptr<ActiveMQDestination>& ConsumerInfo::getDestination() const
 {
     return destination;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<ActiveMQDestination>& ConsumerInfo::getDestination()
+std::shared_ptr<ActiveMQDestination>& ConsumerInfo::getDestination()
 {
     return destination;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void ConsumerInfo::setDestination(
-    const decaf::lang::Pointer<ActiveMQDestination>& destination)
+    const std::shared_ptr<ActiveMQDestination>& destination)
 {
     this->destination = destination;
 }
@@ -588,41 +586,40 @@ void ConsumerInfo::setPriority(unsigned char priority)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::vector<decaf::lang::Pointer<BrokerId>>& ConsumerInfo::getBrokerPath()
-    const
+const std::vector<std::shared_ptr<BrokerId>>& ConsumerInfo::getBrokerPath() const
 {
     return brokerPath;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::vector<decaf::lang::Pointer<BrokerId>>& ConsumerInfo::getBrokerPath()
+std::vector<std::shared_ptr<BrokerId>>& ConsumerInfo::getBrokerPath()
 {
     return brokerPath;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void ConsumerInfo::setBrokerPath(
-    const std::vector<decaf::lang::Pointer<BrokerId>>& brokerPath)
+    const std::vector<std::shared_ptr<BrokerId>>& brokerPath)
 {
     this->brokerPath = brokerPath;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const decaf::lang::Pointer<BooleanExpression>&
-ConsumerInfo::getAdditionalPredicate() const
+const std::shared_ptr<BooleanExpression>& ConsumerInfo::getAdditionalPredicate()
+    const
 {
     return additionalPredicate;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<BooleanExpression>& ConsumerInfo::getAdditionalPredicate()
+std::shared_ptr<BooleanExpression>& ConsumerInfo::getAdditionalPredicate()
 {
     return additionalPredicate;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void ConsumerInfo::setAdditionalPredicate(
-    const decaf::lang::Pointer<BooleanExpression>& additionalPredicate)
+    const std::shared_ptr<BooleanExpression>& additionalPredicate)
 {
     this->additionalPredicate = additionalPredicate;
 }
@@ -664,37 +661,36 @@ void ConsumerInfo::setNoRangeAcks(bool noRangeAcks)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const std::vector<decaf::lang::Pointer<ConsumerId>>&
+const std::vector<std::shared_ptr<ConsumerId>>&
 ConsumerInfo::getNetworkConsumerPath() const
 {
     return networkConsumerPath;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-std::vector<decaf::lang::Pointer<ConsumerId>>&
-ConsumerInfo::getNetworkConsumerPath()
+std::vector<std::shared_ptr<ConsumerId>>& ConsumerInfo::getNetworkConsumerPath()
 {
     return networkConsumerPath;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void ConsumerInfo::setNetworkConsumerPath(
-    const std::vector<decaf::lang::Pointer<ConsumerId>>& networkConsumerPath)
+    const std::vector<std::shared_ptr<ConsumerId>>& networkConsumerPath)
 {
     this->networkConsumerPath = networkConsumerPath;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<commands::Command> ConsumerInfo::visit(
+std::shared_ptr<commands::Command> ConsumerInfo::visit(
     activemq::state::CommandVisitor* visitor)
 {
     return visitor->processConsumerInfo(this);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<RemoveInfo> ConsumerInfo::createRemoveCommand() const
+std::shared_ptr<RemoveInfo> ConsumerInfo::createRemoveCommand() const
 {
-    Pointer<RemoveInfo> info(new RemoveInfo());
+    std::shared_ptr<RemoveInfo> info(new RemoveInfo());
     info->setResponseRequired(this->isResponseRequired());
     info->setObjectId(this->getConsumerId());
     return info;

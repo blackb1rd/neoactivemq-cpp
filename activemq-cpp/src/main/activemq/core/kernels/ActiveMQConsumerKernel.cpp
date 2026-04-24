@@ -52,6 +52,7 @@
 #include <atomic>
 #include <chrono>
 #include <memory>
+#include <stdexcept>
 
 using namespace std;
 using namespace activemq;
@@ -955,6 +956,11 @@ public:
     {
         try
         {
+            if (this->consumer == nullptr || this->impl == nullptr)
+            {
+                return;
+            }
+
             if (impl->optimizeAcknowledge &&
                 !impl->unconsumedMessages->isClosed())
             {
@@ -1002,6 +1008,11 @@ public:
     {
         try
         {
+            if (this->consumer == nullptr || this->impl == nullptr)
+            {
+                return;
+            }
+
             if (!impl->unconsumedMessages->isClosed())
             {
                 std::shared_ptr<Iterator<std::shared_ptr<MessageDispatch>>> iter(
@@ -1708,8 +1719,11 @@ void ActiveMQConsumerKernel::setMessageListener(cms::MessageListener* listener)
 void ActiveMQConsumerKernel::beforeMessageIsConsumed(
     std::shared_ptr<MessageDispatch> dispatch)
 {
-    this->internal->lastDeliveredSequenceId =
-        dispatch->getMessage()->getMessageId()->getBrokerSequenceId();
+    if (dispatch != nullptr && dispatch->getMessage() != nullptr)
+    {
+        this->internal->lastDeliveredSequenceId =
+            dispatch->getMessage()->getMessageId()->getBrokerSequenceId();
+    }
 
     if (!isAutoAcknowledgeBatch())
     {
@@ -2321,13 +2335,31 @@ void ActiveMQConsumerKernel::rollback()
 void ActiveMQConsumerKernel::dispatch(
     const std::shared_ptr<MessageDispatch>& dispatch)
 {
+    if (dispatch == nullptr)
+    {
+        throw std::invalid_argument("dispatch was NULL");
+    }
+    if (dispatch->getMessage() == nullptr)
+    {
+        throw std::invalid_argument("dispatch message was NULL");
+    }
+
     try
     {
-        AMQ_LOG_DEBUG("ActiveMQConsumerKernel",
-                      "dispatch(): Dispatching message id="
-                          << dispatch->getMessage()->getMessageId()->toString()
-                          << ", consumerId="
-                          << consumerInfo->getConsumerId()->toString());
+        if (AMQ_LOG_DEBUG_ENABLED())
+        {
+            std::string messageId =
+                dispatch->getMessage()->getMessageId()->toString();
+            std::string consumerId =
+                (this->consumerInfo != nullptr &&
+                 this->consumerInfo->getConsumerId() != nullptr)
+                    ? this->consumerInfo->getConsumerId()->toString()
+                    : "NULL";
+
+            AMQ_LOG_DEBUG("ActiveMQConsumerKernel",
+                          "dispatch(): Dispatching message id="
+                              << messageId << ", consumerId=" << consumerId);
+        }
 
         AMQ_LOG_DEBUG("ActiveMQConsumerKernel",
                       "dispatch(): Calling clearMessagesInProgress()");

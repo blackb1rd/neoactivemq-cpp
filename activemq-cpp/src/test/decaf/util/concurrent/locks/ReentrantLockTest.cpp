@@ -182,6 +182,86 @@ public:
     }
 };
 
+// Polls a predicate until it returns true or the timeout elapses. Replaces
+// fixed-duration sleep+assert pairs that are racy on slow CI runners --
+// e.g. waiting for a freshly-started thread to make it into the AQS queue.
+template <typename Predicate>
+bool waitUntil(Predicate pred, long long timeoutMs = 2000)
+{
+    const long long stepMs = 10;
+    long long       elapsed = 0;
+    while (elapsed < timeoutMs)
+    {
+        if (pred())
+        {
+            return true;
+        }
+        Thread::sleep(stepMs);
+        elapsed += stepMs;
+    }
+    return pred();
+}
+
+// RAII cleanup for the queue-inspection tests. On scope exit it
+// interrupts the runner threads (so their lockInterruptibly() unblocks)
+// and releases the held lock if any. Without this, an early ASSERT
+// return leaves the test holding the lock and the t1/t2 destructors
+// deadlock in Threading::join().
+class LockReleaseGuard
+{
+public:
+    ReentrantLock* lock;
+    bool           held;
+    Thread*        t1;
+    Thread*        t2;
+
+    LockReleaseGuard(ReentrantLock* lock, Thread* t1, Thread* t2)
+        : lock(lock),
+          held(false),
+          t1(t1),
+          t2(t2)
+    {
+    }
+
+    ~LockReleaseGuard()
+    {
+        if (t1 != NULL)
+        {
+            try
+            {
+                t1->interrupt();
+            }
+            catch (...)
+            {
+            }
+        }
+        if (t2 != NULL)
+        {
+            try
+            {
+                t2->interrupt();
+            }
+            catch (...)
+            {
+            }
+        }
+        if (held)
+        {
+            try
+            {
+                lock->unlock();
+            }
+            catch (...)
+            {
+            }
+        }
+    }
+
+private:
+    LockReleaseGuard(const LockReleaseGuard&);
+    LockReleaseGuard& operator=(const LockReleaseGuard&);
+};
+
 }  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -255,22 +335,22 @@ TEST_F(ReentrantLockTest, testhasQueuedThreads)
     Thread t1(&interrupted);
     Thread t2(&interruptable);
 
+    LockReleaseGuard guard(&lock, &t1, &t2);
+
     try
     {
         ASSERT_TRUE(!lock.hasQueuedThreads());
         lock.lock();
+        guard.held = true;
         t1.start();
-        Thread::sleep(SHORT_DELAY_MS);
-        ASSERT_TRUE(lock.hasQueuedThreads());
+        ASSERT_TRUE(waitUntil([&] { return lock.hasQueuedThreads(); }));
         t2.start();
-        Thread::sleep(SHORT_DELAY_MS);
-        ASSERT_TRUE(lock.hasQueuedThreads());
+        ASSERT_TRUE(waitUntil([&] { return lock.hasQueuedThreads(); }));
         t1.interrupt();
-        Thread::sleep(SHORT_DELAY_MS);
-        ASSERT_TRUE(lock.hasQueuedThreads());
+        ASSERT_TRUE(waitUntil([&] { return lock.hasQueuedThreads(); }));
         lock.unlock();
-        Thread::sleep(SHORT_DELAY_MS);
-        ASSERT_TRUE(!lock.hasQueuedThreads());
+        guard.held = false;
+        ASSERT_TRUE(waitUntil([&] { return !lock.hasQueuedThreads(); }));
         t1.join();
         t2.join();
     }
@@ -291,22 +371,22 @@ TEST_F(ReentrantLockTest, testGetQueueLength)
     Thread t1(&interrupted);
     Thread t2(&interruptable);
 
+    LockReleaseGuard guard(&lock, &t1, &t2);
+
     try
     {
         ASSERT_EQ(0, lock.getQueueLength());
         lock.lock();
+        guard.held = true;
         t1.start();
-        Thread::sleep(SHORT_DELAY_MS);
-        ASSERT_EQ(1, lock.getQueueLength());
+        ASSERT_TRUE(waitUntil([&] { return lock.getQueueLength() == 1; }));
         t2.start();
-        Thread::sleep(SHORT_DELAY_MS);
-        ASSERT_EQ(2, lock.getQueueLength());
+        ASSERT_TRUE(waitUntil([&] { return lock.getQueueLength() == 2; }));
         t1.interrupt();
-        Thread::sleep(SHORT_DELAY_MS);
-        ASSERT_EQ(1, lock.getQueueLength());
+        ASSERT_TRUE(waitUntil([&] { return lock.getQueueLength() == 1; }));
         lock.unlock();
-        Thread::sleep(SHORT_DELAY_MS);
-        ASSERT_EQ(0, lock.getQueueLength());
+        guard.held = false;
+        ASSERT_TRUE(waitUntil([&] { return lock.getQueueLength() == 0; }));
         t1.join();
         t2.join();
     }
@@ -327,22 +407,22 @@ TEST_F(ReentrantLockTest, testGetQueueLengthFair)
     Thread t1(&interrupted);
     Thread t2(&interruptable);
 
+    LockReleaseGuard guard(&lock, &t1, &t2);
+
     try
     {
         ASSERT_EQ(0, lock.getQueueLength());
         lock.lock();
+        guard.held = true;
         t1.start();
-        Thread::sleep(SHORT_DELAY_MS);
-        ASSERT_EQ(1, lock.getQueueLength());
+        ASSERT_TRUE(waitUntil([&] { return lock.getQueueLength() == 1; }));
         t2.start();
-        Thread::sleep(SHORT_DELAY_MS);
-        ASSERT_EQ(2, lock.getQueueLength());
+        ASSERT_TRUE(waitUntil([&] { return lock.getQueueLength() == 2; }));
         t1.interrupt();
-        Thread::sleep(SHORT_DELAY_MS);
-        ASSERT_EQ(1, lock.getQueueLength());
+        ASSERT_TRUE(waitUntil([&] { return lock.getQueueLength() == 1; }));
         lock.unlock();
-        Thread::sleep(SHORT_DELAY_MS);
-        ASSERT_EQ(0, lock.getQueueLength());
+        guard.held = false;
+        ASSERT_TRUE(waitUntil([&] { return lock.getQueueLength() == 0; }));
         t1.join();
         t2.join();
     }
@@ -377,27 +457,26 @@ TEST_F(ReentrantLockTest, testHasQueuedThread)
     Thread t1(&interrupted);
     Thread t2(&interruptable);
 
+    LockReleaseGuard guard(&sync, &t1, &t2);
+
     try
     {
         ASSERT_TRUE(!sync.hasQueuedThread(&t1));
         ASSERT_TRUE(!sync.hasQueuedThread(&t2));
         sync.lock();
+        guard.held = true;
         t1.start();
-        Thread::sleep(SHORT_DELAY_MS);
-        ASSERT_TRUE(sync.hasQueuedThread(&t1));
+        ASSERT_TRUE(waitUntil([&] { return sync.hasQueuedThread(&t1); }));
         t2.start();
-        Thread::sleep(SHORT_DELAY_MS);
+        ASSERT_TRUE(waitUntil([&] { return sync.hasQueuedThread(&t2); }));
         ASSERT_TRUE(sync.hasQueuedThread(&t1));
-        ASSERT_TRUE(sync.hasQueuedThread(&t2));
         t1.interrupt();
-        Thread::sleep(SHORT_DELAY_MS);
-        ASSERT_TRUE(!sync.hasQueuedThread(&t1));
+        ASSERT_TRUE(waitUntil([&] { return !sync.hasQueuedThread(&t1); }));
         ASSERT_TRUE(sync.hasQueuedThread(&t2));
         sync.unlock();
-        Thread::sleep(SHORT_DELAY_MS);
+        guard.held = false;
+        ASSERT_TRUE(waitUntil([&] { return !sync.hasQueuedThread(&t2); }));
         ASSERT_TRUE(!sync.hasQueuedThread(&t1));
-        Thread::sleep(SHORT_DELAY_MS);
-        ASSERT_TRUE(!sync.hasQueuedThread(&t2));
         t1.join();
         t2.join();
     }
@@ -418,41 +497,46 @@ TEST_F(ReentrantLockTest, testGetQueuedThreads)
     Thread t1(&interrupted);
     Thread t2(&interruptable);
 
+    LockReleaseGuard guard(&lock, &t1, &t2);
+
     try
     {
         ASSERT_TRUE(
             std::unique_ptr<Collection<Thread*>>(lock.getQueuedThreads())
                 ->isEmpty());
         lock.lock();
+        guard.held = true;
         ASSERT_TRUE(
             std::unique_ptr<Collection<Thread*>>(lock.getQueuedThreads())
                 ->isEmpty());
         t1.start();
-        Thread::sleep(SHORT_DELAY_MS);
-        ASSERT_TRUE(
-            std::unique_ptr<Collection<Thread*>>(lock.getQueuedThreads())
-                ->contains(&t1));
+        ASSERT_TRUE(waitUntil([&] {
+            return std::unique_ptr<Collection<Thread*>>(lock.getQueuedThreads())
+                ->contains(&t1);
+        }));
         t2.start();
-        Thread::sleep(SHORT_DELAY_MS);
+        ASSERT_TRUE(waitUntil([&] {
+            return std::unique_ptr<Collection<Thread*>>(lock.getQueuedThreads())
+                ->contains(&t2);
+        }));
         ASSERT_TRUE(
             std::unique_ptr<Collection<Thread*>>(lock.getQueuedThreads())
                 ->contains(&t1));
-        ASSERT_TRUE(
-            std::unique_ptr<Collection<Thread*>>(lock.getQueuedThreads())
-                ->contains(&t2));
         t1.interrupt();
-        Thread::sleep(SHORT_DELAY_MS);
-        ASSERT_TRUE(
-            !std::unique_ptr<Collection<Thread*>>(lock.getQueuedThreads())
-                 ->contains(&t1));
+        ASSERT_TRUE(waitUntil([&] {
+            return !std::unique_ptr<Collection<Thread*>>(
+                        lock.getQueuedThreads())
+                        ->contains(&t1);
+        }));
         ASSERT_TRUE(
             std::unique_ptr<Collection<Thread*>>(lock.getQueuedThreads())
                 ->contains(&t2));
         lock.unlock();
-        Thread::sleep(SHORT_DELAY_MS);
-        ASSERT_TRUE(
-            std::unique_ptr<Collection<Thread*>>(lock.getQueuedThreads())
-                ->isEmpty());
+        guard.held = false;
+        ASSERT_TRUE(waitUntil([&] {
+            return std::unique_ptr<Collection<Thread*>>(lock.getQueuedThreads())
+                ->isEmpty();
+        }));
         t1.join();
         t2.join();
     }

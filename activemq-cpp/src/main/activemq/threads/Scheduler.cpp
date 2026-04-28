@@ -152,9 +152,23 @@ void Scheduler::executeAfterDelay(Runnable* task,
 ////////////////////////////////////////////////////////////////////////////////
 void Scheduler::shutdown()
 {
-    if (this->timer != NULL)
+    Timer* timerToWait = NULL;
+    synchronized(&mutex)
     {
-        this->timer->cancel();
+        if (this->timer != NULL)
+        {
+            this->timer->cancel();
+            timerToWait = this->timer;
+        }
+    }
+
+    // Wait for the timer thread to actually exit. cancel() only sets a
+    // flag and notifies; without the wait, Threading::shutdown() can race
+    // and tear down library state while the timer worker is still polling
+    // in Mutex::wait(), causing a UAF in Thread::interrupted().
+    if (timerToWait != NULL)
+    {
+        timerToWait->awaitTermination(10000, TimeUnit::MILLISECONDS);
     }
 }
 
@@ -170,11 +184,21 @@ void Scheduler::doStart()
 ////////////////////////////////////////////////////////////////////////////////
 void Scheduler::doStop(ServiceStopper* stopper AMQCPP_UNUSED)
 {
+    Timer* timerToWait = NULL;
     synchronized(&mutex)
     {
         if (this->timer != NULL)
         {
             this->timer->cancel();
+            timerToWait = this->timer;
         }
+    }
+
+    // awaitTermination outside the synchronized block: a scheduled task
+    // running on the timer thread could call back into Scheduler::cancel()
+    // (which takes mutex), so joining under the lock would deadlock.
+    if (timerToWait != NULL)
+    {
+        timerToWait->awaitTermination(10000, TimeUnit::MILLISECONDS);
     }
 }

@@ -21,7 +21,7 @@
 #include <activemq/commands/ConsumerId.h>
 #include <activemq/commands/Message.h>
 #include <activemq/util/Config.h>
-#include <decaf/lang/Pointer.h>
+#include <memory>
 
 namespace activemq
 {
@@ -37,8 +37,8 @@ namespace core
     class AMQCPP_API DispatchData
     {
     private:
-        decaf::lang::Pointer<commands::ConsumerId> consumerId;
-        decaf::lang::Pointer<commands::Message>    message;
+        std::shared_ptr<commands::ConsumerId> consumerId;
+        std::shared_ptr<commands::Message>    message;
 
     private:
         DispatchData(const DispatchData&);
@@ -47,15 +47,15 @@ namespace core
     public:
         DispatchData();
 
-        DispatchData(const decaf::lang::Pointer<commands::ConsumerId>& consumer,
-                     const decaf::lang::Pointer<commands::Message>&    message);
+        DispatchData(const std::shared_ptr<commands::ConsumerId>& consumer,
+                     const std::shared_ptr<commands::Message>&    message);
 
-        const decaf::lang::Pointer<commands::ConsumerId>& getConsumerId()
+        const std::shared_ptr<commands::ConsumerId>& getConsumerId()
         {
             return consumerId;
         }
 
-        const decaf::lang::Pointer<commands::Message>& getMessage()
+        const std::shared_ptr<commands::Message>& getMessage()
         {
             return message;
         }

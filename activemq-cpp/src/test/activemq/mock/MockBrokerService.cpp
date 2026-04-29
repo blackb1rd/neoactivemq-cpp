@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -29,13 +29,13 @@
 #include <decaf/io/InputStream.h>
 #include <decaf/io/OutputStream.h>
 #include <decaf/lang/Integer.h>
-#include <decaf/lang/Pointer.h>
 #include <decaf/net/ServerSocket.h>
 #include <decaf/net/Socket.h>
 #include <decaf/net/SocketTimeoutException.h>
 #include <decaf/util/Properties.h>
 #include <decaf/util/Random.h>
 #include <decaf/util/concurrent/CountDownLatch.h>
+#include <memory>
 
 #include <atomic>
 #include <condition_variable>
@@ -63,18 +63,18 @@ namespace mock
     class TcpServer : public lang::Thread
     {
     private:
-        std::atomic<bool>                done;
-        std::atomic<bool>                error;
-        const int                        configuredPort;
-        Pointer<ServerSocket>            server;
-        Pointer<Socket>                  clientSocket;
-        std::mutex                       socketMutex;
-        std::mutex                       startedMutex;
-        std::condition_variable          startedCondition;
-        bool                             serverStarted;
-        Pointer<OpenWireFormat>          wireFormat;
-        Pointer<OpenWireResponseBuilder> responeBuilder;
-        Random                           rand;
+        std::atomic<bool>                        done;
+        std::atomic<bool>                        error;
+        const int                                configuredPort;
+        std::shared_ptr<ServerSocket>            server;
+        std::shared_ptr<Socket>                  clientSocket;
+        std::mutex                               socketMutex;
+        std::mutex                               startedMutex;
+        std::condition_variable                  startedCondition;
+        bool                                     serverStarted;
+        std::shared_ptr<OpenWireFormat>          wireFormat;
+        std::shared_ptr<OpenWireResponseBuilder> responeBuilder;
+        Random                                   rand;
 
     public:
         TcpServer()
@@ -91,9 +91,8 @@ namespace mock
         {
             Properties properties;
 
-            this->wireFormat = OpenWireFormatFactory()
-                                   .createWireFormat(properties)
-                                   .dynamicCast<OpenWireFormat>();
+            this->wireFormat = std::dynamic_pointer_cast<OpenWireFormat>(
+                OpenWireFormatFactory().createWireFormat(properties));
             this->responeBuilder.reset(new OpenWireResponseBuilder());
 
             this->rand.setSeed(System::currentTimeMillis());
@@ -112,9 +111,8 @@ namespace mock
               serverStarted(false)
         {
             Properties properties;
-            this->wireFormat = OpenWireFormatFactory()
-                                   .createWireFormat(properties)
-                                   .dynamicCast<OpenWireFormat>();
+            this->wireFormat = std::dynamic_pointer_cast<OpenWireFormat>(
+                OpenWireFormatFactory().createWireFormat(properties));
             this->responeBuilder.reset(new OpenWireResponseBuilder());
 
             this->rand.setSeed(System::currentTimeMillis());
@@ -162,11 +160,11 @@ namespace mock
             std::lock_guard<std::mutex> lock(socketMutex);
             if (server.get() != NULL)
             {
-                server.reset(NULL);
+                server.reset();
             }
             if (clientSocket.get() != NULL)
             {
-                clientSocket.reset(NULL);
+                clientSocket.reset();
             }
         }
 
@@ -191,7 +189,7 @@ namespace mock
                     catch (...)
                     {
                     }
-                    server.reset(NULL);
+                    server.reset();
                 }
             }
             catch (...)
@@ -233,7 +231,7 @@ namespace mock
                     catch (IOException& e)
                     {
                         // Bind failed - could be TIME_WAIT or port in use
-                        server.reset(NULL);
+                        server.reset();
                         if (attempt < maxRetries - 1)
                         {
                             // Wait before retry (increasing delay)
@@ -275,7 +273,7 @@ namespace mock
                         // Check if server socket is still valid before calling
                         // accept Copy to local variable to prevent race
                         // condition with stop()
-                        Pointer<ServerSocket> localServer;
+                        std::shared_ptr<ServerSocket> localServer;
                         {
                             std::lock_guard<std::mutex> lock(socketMutex);
                             if (server.get() == NULL ||
@@ -344,7 +342,7 @@ namespace mock
                     // periodically
                     clientSocket->setSoTimeout(1000);  // 1 second timeout
 
-                    Pointer<WireFormatInfo> preferred =
+                    std::shared_ptr<WireFormatInfo> preferred =
                         wireFormat->getPreferedWireFormatInfo();
 
                     try
@@ -356,7 +354,7 @@ namespace mock
                             InputStream*    is = clientSocket->getInputStream();
                             DataInputStream dataIn(is);
 
-                            Pointer<WireFormatInfo> preferred =
+                            std::shared_ptr<WireFormatInfo> preferred =
                                 wireFormat->getPreferedWireFormatInfo();
 
                             // Send our WireFormatInfo first
@@ -364,7 +362,7 @@ namespace mock
                             dataOut.flush();
 
                             // Then receive the client's WireFormatInfo
-                            Pointer<Command> clientWireFormat =
+                            std::shared_ptr<Command> clientWireFormat =
                                 wireFormat->unmarshal(&mock, &dataIn);
 
                             // Small delay to let client process the
@@ -375,9 +373,9 @@ namespace mock
                             {
                                 try
                                 {
-                                    Pointer<Command> command =
+                                    std::shared_ptr<Command> command =
                                         wireFormat->unmarshal(&mock, &dataIn);
-                                    Pointer<Response> response =
+                                    std::shared_ptr<Response> response =
                                         responeBuilder->buildResponse(command);
 
                                     if (response != NULL)
@@ -425,7 +423,7 @@ namespace mock
                             catch (...)
                             {
                             }
-                            clientSocket.reset(NULL);
+                            clientSocket.reset();
                         }
                     }
                 }
@@ -452,8 +450,8 @@ namespace mock
         MockBrokerServiceImpl& operator=(const MockBrokerServiceImpl&);
 
     public:
-        Pointer<TcpServer> server;
-        int                configuredPort;
+        std::shared_ptr<TcpServer> server;
+        int                        configuredPort;
 
     public:
         MockBrokerServiceImpl()

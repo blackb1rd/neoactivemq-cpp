@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -26,9 +26,9 @@
 #include <activemq/state/SessionState.h>
 #include <activemq/transport/Transport.h>
 #include <activemq/wireformat/WireFormat.h>
-#include <decaf/lang/Pointer.h>
 #include <decaf/lang/exceptions/UnsupportedOperationException.h>
 #include <decaf/util/LinkedList.h>
+#include <memory>
 
 using namespace std;
 using namespace activemq;
@@ -51,12 +51,12 @@ namespace
 class TrackingTransport : public activemq::transport::Transport
 {
 public:
-    LinkedList<Pointer<Command>> connections;
-    LinkedList<Pointer<Command>> sessions;
-    LinkedList<Pointer<Command>> producers;
-    LinkedList<Pointer<Command>> consumers;
-    LinkedList<Pointer<Command>> messages;
-    LinkedList<Pointer<Command>> messagePulls;
+    LinkedList<std::shared_ptr<Command>> connections;
+    LinkedList<std::shared_ptr<Command>> sessions;
+    LinkedList<std::shared_ptr<Command>> producers;
+    LinkedList<std::shared_ptr<Command>> consumers;
+    LinkedList<std::shared_ptr<Command>> messages;
+    LinkedList<std::shared_ptr<Command>> messagePulls;
 
 public:
     virtual ~TrackingTransport()
@@ -75,7 +75,7 @@ public:
     {
     }
 
-    virtual void oneway(const Pointer<Command> command)
+    virtual void oneway(const std::shared_ptr<Command> command)
     {
         if (command->isConnectionInfo())
         {
@@ -103,30 +103,33 @@ public:
         }
     }
 
-    virtual Pointer<FutureResponse> asyncRequest(
-        const Pointer<Command>          command,
-        const Pointer<ResponseCallback> responseCallback)
+    virtual std::shared_ptr<FutureResponse> asyncRequest(
+        const std::shared_ptr<Command>          command,
+        const std::shared_ptr<ResponseCallback> responseCallback)
     {
         throw UnsupportedOperationException();
     }
 
-    virtual Pointer<Response> request(const Pointer<Command> command)
+    virtual std::shared_ptr<Response> request(
+        const std::shared_ptr<Command> command)
     {
         throw UnsupportedOperationException();
     }
 
-    virtual Pointer<Response> request(const Pointer<Command> command,
-                                      unsigned int           timeout)
+    virtual std::shared_ptr<Response> request(
+        const std::shared_ptr<Command> command,
+        unsigned int                   timeout)
     {
         throw UnsupportedOperationException();
     }
 
-    virtual Pointer<wireformat::WireFormat> getWireFormat() const
+    virtual std::shared_ptr<wireformat::WireFormat> getWireFormat() const
     {
-        return Pointer<wireformat::WireFormat>();
+        return std::shared_ptr<wireformat::WireFormat>();
     }
 
-    virtual void setWireFormat(const Pointer<wireformat::WireFormat> wireFormat)
+    virtual void setWireFormat(
+        const std::shared_ptr<wireformat::WireFormat> wireFormat)
     {
     }
 
@@ -187,35 +190,35 @@ public:
 class ConnectionData
 {
 public:
-    Pointer<ConnectionInfo> connection;
-    Pointer<SessionInfo>    session;
-    Pointer<ConsumerInfo>   consumer;
-    Pointer<ProducerInfo>   producer;
+    std::shared_ptr<ConnectionInfo> connection;
+    std::shared_ptr<SessionInfo>    session;
+    std::shared_ptr<ConsumerInfo>   consumer;
+    std::shared_ptr<ProducerInfo>   producer;
 };
 
 ConnectionData createConnectionState(ConnectionStateTracker& tracker)
 {
     ConnectionData conn;
 
-    Pointer<ConnectionId> connectionId(new ConnectionId);
+    std::shared_ptr<ConnectionId> connectionId(new ConnectionId);
     connectionId->setValue("CONNECTION");
     conn.connection.reset(new ConnectionInfo);
     conn.connection->setConnectionId(connectionId);
 
-    Pointer<SessionId> session_id(new SessionId);
+    std::shared_ptr<SessionId> session_id(new SessionId);
     session_id->setConnectionId("CONNECTION");
     session_id->setValue(12345);
     conn.session.reset(new SessionInfo);
     conn.session->setSessionId(session_id);
 
-    Pointer<ConsumerId> consumer_id(new ConsumerId);
+    std::shared_ptr<ConsumerId> consumer_id(new ConsumerId);
     consumer_id->setConnectionId("CONNECTION");
     consumer_id->setSessionId(12345);
     consumer_id->setValue(42);
     conn.consumer.reset(new ConsumerInfo);
     conn.consumer->setConsumerId(consumer_id);
 
-    Pointer<ProducerId> producer_id(new ProducerId);
+    std::shared_ptr<ProducerId> producer_id(new ProducerId);
     producer_id->setConnectionId("CONNECTION");
     producer_id->setSessionId(12345);
     producer_id->setValue(42);
@@ -251,17 +254,17 @@ TEST_F(ConnectionStateTrackerTest, test)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(ConnectionStateTrackerTest, testMessageCache)
 {
-    Pointer<TrackingTransport> transport(new TrackingTransport);
-    ConnectionStateTracker     tracker;
+    std::shared_ptr<TrackingTransport> transport(new TrackingTransport);
+    ConnectionStateTracker             tracker;
     tracker.setTrackMessages(true);
 
     ConnectionData conn = createConnectionState(tracker);
 
     int messageSize;
     {
-        decaf::lang::Pointer<commands::MessageId> id(new commands::MessageId());
+        std::shared_ptr<commands::MessageId> id(new commands::MessageId());
         id->setProducerId(conn.producer->getProducerId());
-        Pointer<Message> message(new Message);
+        std::shared_ptr<Message> message(new Message);
         messageSize = message->getSize();
     }
 
@@ -271,10 +274,10 @@ TEST_F(ConnectionStateTrackerTest, testMessageCache)
 
     for (int i = 0; i < 100; ++i)
     {
-        decaf::lang::Pointer<commands::MessageId> id(new commands::MessageId());
+        std::shared_ptr<commands::MessageId> id(new commands::MessageId());
         id->setProducerId(conn.producer->getProducerId());
         id->setProducerSequenceId(sequenceId++);
-        Pointer<Message> message(new Message);
+        std::shared_ptr<Message> message(new Message);
         message->setMessageId(id);
 
         tracker.processMessage(message.get());
@@ -290,16 +293,17 @@ TEST_F(ConnectionStateTrackerTest, testMessageCache)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(ConnectionStateTrackerTest, testMessagePullCache)
 {
-    Pointer<TrackingTransport> transport(new TrackingTransport);
-    ConnectionStateTracker     tracker;
+    std::shared_ptr<TrackingTransport> transport(new TrackingTransport);
+    ConnectionStateTracker             tracker;
     tracker.setTrackMessages(true);
 
     ConnectionData conn = createConnectionState(tracker);
 
     for (int i = 0; i < 100; ++i)
     {
-        Pointer<commands::MessagePull> pull(new commands::MessagePull());
-        Pointer<ActiveMQDestination>   destination(
+        std::shared_ptr<commands::MessagePull> pull(
+            new commands::MessagePull());
+        std::shared_ptr<ActiveMQDestination> destination(
             new ActiveMQTopic("TEST" + Integer::toString(i)));
         pull->setConsumerId(conn.consumer->getConsumerId());
         pull->setDestination(destination);

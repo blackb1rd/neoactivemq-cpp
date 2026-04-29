@@ -24,7 +24,7 @@ using namespace std;
 using namespace activemq;
 using namespace activemq::exceptions;
 using namespace activemq::commands;
-using namespace decaf::lang;
+
 using namespace decaf::lang::exceptions;
 
 /*
@@ -40,7 +40,7 @@ using namespace decaf::lang::exceptions;
 ////////////////////////////////////////////////////////////////////////////////
 NetworkBridgeFilter::NetworkBridgeFilter()
     : BaseDataStructure(),
-      networkBrokerId(NULL),
+      networkBrokerId(),
       messageTTL(0),
       consumerTTL(0)
 {
@@ -104,7 +104,7 @@ std::string NetworkBridgeFilter::toString() const
 
     stream << "NetworkBridgeFilter { ";
     stream << "NetworkBrokerId = ";
-    if (this->getNetworkBrokerId() != NULL)
+    if (this->getNetworkBrokerId())
     {
         stream << this->getNetworkBrokerId()->toString();
     }
@@ -137,7 +137,7 @@ bool NetworkBridgeFilter::equals(const DataStructure* value) const
         return false;
     }
 
-    if (this->getNetworkBrokerId() != NULL)
+    if (this->getNetworkBrokerId())
     {
         if (!this->getNetworkBrokerId()->equals(
                 valuePtr->getNetworkBrokerId().get()))
@@ -145,7 +145,7 @@ bool NetworkBridgeFilter::equals(const DataStructure* value) const
             return false;
         }
     }
-    else if (valuePtr->getNetworkBrokerId() != NULL)
+    else if (valuePtr->getNetworkBrokerId())
     {
         return false;
     }
@@ -165,21 +165,20 @@ bool NetworkBridgeFilter::equals(const DataStructure* value) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const decaf::lang::Pointer<BrokerId>& NetworkBridgeFilter::getNetworkBrokerId()
-    const
+const std::shared_ptr<BrokerId>& NetworkBridgeFilter::getNetworkBrokerId() const
 {
     return networkBrokerId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<BrokerId>& NetworkBridgeFilter::getNetworkBrokerId()
+std::shared_ptr<BrokerId>& NetworkBridgeFilter::getNetworkBrokerId()
 {
     return networkBrokerId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void NetworkBridgeFilter::setNetworkBrokerId(
-    const decaf::lang::Pointer<BrokerId>& networkBrokerId)
+    const std::shared_ptr<BrokerId>& networkBrokerId)
 {
     this->networkBrokerId = networkBrokerId;
 }

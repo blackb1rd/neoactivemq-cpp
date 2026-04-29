@@ -20,11 +20,11 @@
 
 #include <activemq/util/Config.h>
 
+#include <memory>
+
 #include <activemq/transport/DefaultTransportListener.h>
 #include <activemq/transport/Transport.h>
-#include <decaf/lang/Pointer.h>
 #include <decaf/net/URI.h>
-#include <memory>
 
 namespace activemq
 {
@@ -32,8 +32,6 @@ namespace transport
 {
     namespace failover
     {
-
-        using decaf::lang::Pointer;
 
         class BackupTransportPool;
 
@@ -44,7 +42,7 @@ namespace transport
             BackupTransportPool* parent;
 
             // The Transport this one is managing.
-            Pointer<Transport> transport;
+            std::shared_ptr<Transport> transport;
 
             // The URI of this Backup
             decaf::net::URI uri;
@@ -85,7 +83,7 @@ namespace transport
              * Gets the currently held transport
              * @return pointer to the held transport or NULL if not set.
              */
-            const Pointer<Transport>& getTransport()
+            const std::shared_ptr<Transport>& getTransport()
             {
                 return transport;
             }
@@ -97,11 +95,11 @@ namespace transport
              * @param transport
              *        The transport to hold.
              */
-            void setTransport(const Pointer<Transport> transport)
+            void setTransport(const std::shared_ptr<Transport> transport)
             {
                 this->transport = transport;
 
-                if (this->transport != NULL)
+                if (this->transport)
                 {
                     this->transport->setTransportListener(this);
                 }

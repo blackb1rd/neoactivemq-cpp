@@ -105,10 +105,10 @@ public:
     {
     }
 
-    virtual decaf::lang::Pointer<DiscoveryAgent> createAgent(
+    virtual std::shared_ptr<DiscoveryAgent> createAgent(
         const decaf::net::URI& agentURI)
     {
-        return Pointer<DiscoveryAgent>(new MockDiscoveryAgent);
+        return std::shared_ptr<DiscoveryAgent>(new MockDiscoveryAgent);
     }
 };
 
@@ -169,7 +169,8 @@ void AbstractDiscoveryAgentTest::test()
     DiscoveryAgentFactory* factory = registry.findFactory("mock");
     ASSERT_TRUE(factory != NULL);
 
-    Pointer<DiscoveryAgent> agent(factory->createAgent(URI("mock://default")));
+    std::shared_ptr<DiscoveryAgent> agent(
+        factory->createAgent(URI("mock://default")));
     ASSERT_TRUE(agent != NULL);
 
     agent->setDiscoveryListener(&listener);

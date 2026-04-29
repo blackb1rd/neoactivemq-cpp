@@ -17,6 +17,8 @@
 
 #include "CloseTransportsTask.h"
 
+#include <memory>
+
 #include <activemq/exceptions/ActiveMQException.h>
 
 using namespace activemq;
@@ -41,7 +43,7 @@ CloseTransportsTask::~CloseTransportsTask()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void CloseTransportsTask::add(const Pointer<Transport> transport)
+void CloseTransportsTask::add(const std::shared_ptr<Transport> transport)
 {
     transports.put(transport);
 }
@@ -59,7 +61,7 @@ bool CloseTransportsTask::iterate()
 {
     while (!transports.isEmpty())
     {
-        Pointer<Transport> transport = transports.take();
+        std::shared_ptr<Transport> transport = transports.take();
 
         try
         {
@@ -67,7 +69,7 @@ bool CloseTransportsTask::iterate()
         }
         AMQ_CATCHALL_NOTHROW()
 
-        transport.reset(NULL);
+        transport.reset();
     }
 
     return false;

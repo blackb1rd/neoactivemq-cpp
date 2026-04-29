@@ -54,7 +54,7 @@ namespace threads
         decaf::util::LinkedList<CompositeTask*> tasks;
         mutable decaf::util::concurrent::Mutex  mutex;
 
-        decaf::lang::Pointer<decaf::lang::Thread> thread;
+        std::shared_ptr<decaf::lang::Thread> thread;
 
         std::atomic<TaskRunnerState> state;
         std::atomic<bool>            pending;
@@ -104,7 +104,7 @@ CompositeTaskRunner::~CompositeTaskRunner()
             }
             if (localImpl->thread != NULL)
             {
-                localImpl->thread.reset(NULL);
+                localImpl->thread.reset();
             }
         }
     }

@@ -38,7 +38,7 @@ BackupTransport::~BackupTransport()
 {
     try
     {
-        if (this->transport != NULL)
+        if (this->transport)
         {
             // Detach the listener before closing to prevent the transport's IO
             // thread from calling back into this object while it's being

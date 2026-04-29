@@ -23,6 +23,7 @@
 #include <activemq/util/Config.h>
 #include <activemq/util/PrimitiveMap.h>
 
+#include <memory>
 #include <vector>
 
 namespace activemq
@@ -70,7 +71,7 @@ namespace commands
             return true;
         }
 
-        virtual decaf::lang::Pointer<commands::Command> visit(
+        virtual std::shared_ptr<commands::Command> visit(
             activemq::state::CommandVisitor* visitor);
 
         /**

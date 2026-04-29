@@ -24,7 +24,7 @@ using namespace std;
 using namespace activemq;
 using namespace activemq::exceptions;
 using namespace activemq::commands;
-using namespace decaf::lang;
+
 using namespace decaf::lang::exceptions;
 
 /*
@@ -40,12 +40,12 @@ using namespace decaf::lang::exceptions;
 ////////////////////////////////////////////////////////////////////////////////
 JournalTopicAck::JournalTopicAck()
     : BaseDataStructure(),
-      destination(NULL),
-      messageId(NULL),
+      destination(),
+      messageId(),
       messageSequenceId(0),
       subscritionName(""),
       clientId(""),
-      transactionId(NULL)
+      transactionId()
 {
 }
 
@@ -108,7 +108,7 @@ std::string JournalTopicAck::toString() const
 
     stream << "JournalTopicAck { ";
     stream << "Destination = ";
-    if (this->getDestination() != NULL)
+    if (this->getDestination())
     {
         stream << this->getDestination()->toString();
     }
@@ -118,7 +118,7 @@ std::string JournalTopicAck::toString() const
     }
     stream << ", ";
     stream << "MessageId = ";
-    if (this->getMessageId() != NULL)
+    if (this->getMessageId())
     {
         stream << this->getMessageId()->toString();
     }
@@ -134,7 +134,7 @@ std::string JournalTopicAck::toString() const
     stream << "ClientId = " << this->getClientId();
     stream << ", ";
     stream << "TransactionId = ";
-    if (this->getTransactionId() != NULL)
+    if (this->getTransactionId())
     {
         stream << this->getTransactionId()->toString();
     }
@@ -163,25 +163,25 @@ bool JournalTopicAck::equals(const DataStructure* value) const
         return false;
     }
 
-    if (this->getDestination() != NULL)
+    if (this->getDestination())
     {
         if (!this->getDestination()->equals(valuePtr->getDestination().get()))
         {
             return false;
         }
     }
-    else if (valuePtr->getDestination() != NULL)
+    else if (valuePtr->getDestination())
     {
         return false;
     }
-    if (this->getMessageId() != NULL)
+    if (this->getMessageId())
     {
         if (!this->getMessageId()->equals(valuePtr->getMessageId().get()))
         {
             return false;
         }
     }
-    else if (valuePtr->getMessageId() != NULL)
+    else if (valuePtr->getMessageId())
     {
         return false;
     }
@@ -197,7 +197,7 @@ bool JournalTopicAck::equals(const DataStructure* value) const
     {
         return false;
     }
-    if (this->getTransactionId() != NULL)
+    if (this->getTransactionId())
     {
         if (!this->getTransactionId()->equals(
                 valuePtr->getTransactionId().get()))
@@ -205,7 +205,7 @@ bool JournalTopicAck::equals(const DataStructure* value) const
             return false;
         }
     }
-    else if (valuePtr->getTransactionId() != NULL)
+    else if (valuePtr->getTransactionId())
     {
         return false;
     }
@@ -217,40 +217,39 @@ bool JournalTopicAck::equals(const DataStructure* value) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const decaf::lang::Pointer<ActiveMQDestination>&
-JournalTopicAck::getDestination() const
+const std::shared_ptr<ActiveMQDestination>& JournalTopicAck::getDestination()
+    const
 {
     return destination;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<ActiveMQDestination>& JournalTopicAck::getDestination()
+std::shared_ptr<ActiveMQDestination>& JournalTopicAck::getDestination()
 {
     return destination;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void JournalTopicAck::setDestination(
-    const decaf::lang::Pointer<ActiveMQDestination>& destination)
+    const std::shared_ptr<ActiveMQDestination>& destination)
 {
     this->destination = destination;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const decaf::lang::Pointer<MessageId>& JournalTopicAck::getMessageId() const
+const std::shared_ptr<MessageId>& JournalTopicAck::getMessageId() const
 {
     return messageId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<MessageId>& JournalTopicAck::getMessageId()
+std::shared_ptr<MessageId>& JournalTopicAck::getMessageId()
 {
     return messageId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void JournalTopicAck::setMessageId(
-    const decaf::lang::Pointer<MessageId>& messageId)
+void JournalTopicAck::setMessageId(const std::shared_ptr<MessageId>& messageId)
 {
     this->messageId = messageId;
 }
@@ -304,21 +303,20 @@ void JournalTopicAck::setClientId(const std::string& clientId)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const decaf::lang::Pointer<TransactionId>& JournalTopicAck::getTransactionId()
-    const
+const std::shared_ptr<TransactionId>& JournalTopicAck::getTransactionId() const
 {
     return transactionId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<TransactionId>& JournalTopicAck::getTransactionId()
+std::shared_ptr<TransactionId>& JournalTopicAck::getTransactionId()
 {
     return transactionId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void JournalTopicAck::setTransactionId(
-    const decaf::lang::Pointer<TransactionId>& transactionId)
+    const std::shared_ptr<TransactionId>& transactionId)
 {
     this->transactionId = transactionId;
 }

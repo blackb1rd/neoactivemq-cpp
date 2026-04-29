@@ -31,12 +31,12 @@
 #include <activemq/state/TransactionState.h>
 #include <activemq/util/Config.h>
 
-#include <decaf/lang/Pointer.h>
 #include <decaf/util/LinkedList.h>
 #include <decaf/util/StlMap.h>
 #include <decaf/util/concurrent/ConcurrentStlMap.h>
-#include <decaf/util/concurrent/atomic/AtomicBoolean.h>
 
+#include <atomic>
+#include <memory>
 #include <string>
 
 namespace activemq
@@ -44,37 +44,38 @@ namespace activemq
 namespace state
 {
 
-    using decaf::lang::Pointer;
     using namespace decaf::util;
     using namespace activemq::commands;
 
     class AMQCPP_API ConnectionState
     {
     private:
-        Pointer<ConnectionInfo> info;
-        ConcurrentStlMap<Pointer<LocalTransactionId>,
-                         Pointer<TransactionState>,
+        std::shared_ptr<ConnectionInfo> info;
+        ConcurrentStlMap<std::shared_ptr<LocalTransactionId>,
+                         std::shared_ptr<TransactionState>,
                          LocalTransactionId::COMPARATOR>
             transactions;
-        ConcurrentStlMap<Pointer<SessionId>,
-                         Pointer<SessionState>,
+        ConcurrentStlMap<std::shared_ptr<SessionId>,
+                         std::shared_ptr<SessionState>,
                          SessionId::COMPARATOR>
-                                                       sessions;
-        LinkedList<Pointer<DestinationInfo>>           tempDestinations;
-        decaf::util::concurrent::atomic::AtomicBoolean disposed;
+                                                     sessions;
+        LinkedList<std::shared_ptr<DestinationInfo>> tempDestinations;
+        std::atomic<bool>                            disposed;
 
         bool connectionInterruptProcessingComplete;
-        StlMap<Pointer<ConsumerId>, Pointer<ConsumerInfo>, ConsumerId::COMPARATOR>
+        StlMap<std::shared_ptr<ConsumerId>,
+               std::shared_ptr<ConsumerInfo>,
+               ConsumerId::COMPARATOR>
             recoveringPullConsumers;
 
     public:
-        ConnectionState(Pointer<ConnectionInfo> info);
+        ConnectionState(std::shared_ptr<ConnectionInfo> info);
 
         virtual ~ConnectionState();
 
         std::string toString() const;
 
-        const Pointer<commands::ConnectionInfo> getInfo() const
+        const std::shared_ptr<commands::ConnectionInfo> getInfo() const
         {
             return this->info;
         }
@@ -83,72 +84,77 @@ namespace state
 
         void shutdown();
 
-        void reset(Pointer<ConnectionInfo> info);
+        void reset(std::shared_ptr<ConnectionInfo> info);
 
-        void addTempDestination(Pointer<DestinationInfo> info)
+        void addTempDestination(std::shared_ptr<DestinationInfo> info)
         {
             checkShutdown();
             tempDestinations.add(info);
         }
 
-        void removeTempDestination(Pointer<ActiveMQDestination> destination);
+        void removeTempDestination(
+            std::shared_ptr<ActiveMQDestination> destination);
 
-        void addTransactionState(Pointer<TransactionId> id)
+        void addTransactionState(std::shared_ptr<TransactionId> id)
         {
             checkShutdown();
-            transactions.put(
-                id.dynamicCast<LocalTransactionId>(),
-                Pointer<TransactionState>(new TransactionState(id)));
+            transactions.put(std::dynamic_pointer_cast<LocalTransactionId>(id),
+                             std::make_shared<TransactionState>(id));
         }
 
-        const Pointer<TransactionState>& getTransactionState(
-            Pointer<TransactionId> id) const
+        const std::shared_ptr<TransactionState>& getTransactionState(
+            std::shared_ptr<TransactionId> id) const
         {
-            return transactions.get(id.dynamicCast<LocalTransactionId>());
+            return transactions.get(
+                std::dynamic_pointer_cast<LocalTransactionId>(id));
         }
 
-        const decaf::util::Collection<Pointer<TransactionState>>&
+        const decaf::util::Collection<std::shared_ptr<TransactionState>>&
         getTransactionStates() const
         {
             return transactions.values();
         }
 
-        Pointer<TransactionState> removeTransactionState(
-            Pointer<TransactionId> id)
+        std::shared_ptr<TransactionState> removeTransactionState(
+            std::shared_ptr<TransactionId> id)
         {
-            return transactions.remove(id.dynamicCast<LocalTransactionId>());
+            return transactions.remove(
+                std::dynamic_pointer_cast<LocalTransactionId>(id));
         }
 
-        void addSession(Pointer<SessionInfo> info)
+        void addSession(std::shared_ptr<SessionInfo> info)
         {
             checkShutdown();
             sessions.put(info->getSessionId(),
-                         Pointer<SessionState>(new SessionState(info)));
+                         std::make_shared<SessionState>(info));
         }
 
-        Pointer<SessionState> removeSession(Pointer<SessionId> id)
+        std::shared_ptr<SessionState> removeSession(
+            std::shared_ptr<SessionId> id)
         {
             return sessions.remove(id);
         }
 
-        const Pointer<SessionState> getSessionState(Pointer<SessionId> id) const
+        const std::shared_ptr<SessionState> getSessionState(
+            std::shared_ptr<SessionId> id) const
         {
             return sessions.get(id);
         }
 
-        const LinkedList<Pointer<DestinationInfo>>& getTempDesinations() const
+        const LinkedList<std::shared_ptr<DestinationInfo>>& getTempDesinations()
+            const
         {
             return tempDestinations;
         }
 
-        const decaf::util::Collection<Pointer<SessionState>>& getSessionStates()
-            const
+        const decaf::util::Collection<std::shared_ptr<SessionState>>&
+        getSessionStates() const
         {
             return sessions.values();
         }
 
-        StlMap<Pointer<ConsumerId>,
-               Pointer<ConsumerInfo>,
+        StlMap<std::shared_ptr<ConsumerId>,
+               std::shared_ptr<ConsumerInfo>,
                ConsumerId::COMPARATOR>&
         getRecoveringPullConsumers()
         {

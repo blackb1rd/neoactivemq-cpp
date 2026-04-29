@@ -23,7 +23,8 @@
 #include <activemq/transport/discovery/DiscoveredBrokerData.h>
 #include <activemq/transport/discovery/DiscoveryAgent.h>
 
-#include <decaf/lang/Pointer.h>
+#include <memory>
+
 #include <decaf/lang/Runnable.h>
 
 namespace activemq
@@ -251,9 +252,9 @@ namespace transport
             virtual void processDeadService(const std::string& service);
 
             virtual void fireServiceAddedEvent(
-                decaf::lang::Pointer<DiscoveredBrokerData> event);
+                std::shared_ptr<DiscoveredBrokerData> event);
             virtual void fireServiceRemovedEvent(
-                decaf::lang::Pointer<DiscoveredBrokerData> event);
+                std::shared_ptr<DiscoveredBrokerData> event);
 
         protected:
             /**

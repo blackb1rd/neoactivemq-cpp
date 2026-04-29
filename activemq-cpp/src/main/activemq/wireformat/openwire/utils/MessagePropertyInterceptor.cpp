@@ -212,11 +212,11 @@ std::string MessagePropertyInterceptor::getStringProperty(
     }
     else if (name == "JMSXDeliveryCount")
     {
-        return Integer::toString(this->message->getRedeliveryCounter());
+        return std::to_string(this->message->getRedeliveryCounter());
     }
     else if (name == "JMSXGroupSeq")
     {
-        return Integer::toString(this->message->getGroupSequence());
+        return std::to_string(this->message->getGroupSequence());
     }
     else if (name == "JMSXGroupFirstForConsumer")
     {

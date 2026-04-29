@@ -18,9 +18,10 @@
 #ifndef FAILOVERTRANSPORTLISTENER_H_
 #define FAILOVERTRANSPORTLISTENER_H_
 
+#include <memory>
+
 #include <activemq/transport/TransportListener.h>
 #include <activemq/util/Config.h>
-#include <decaf/lang/Pointer.h>
 
 namespace activemq
 {
@@ -61,7 +62,7 @@ namespace transport
              *
              * @param command the received command object.
              */
-            virtual void onCommand(const Pointer<Command> command);
+            virtual void onCommand(const std::shared_ptr<Command> command);
 
             /**
              * Event handler for an exception from a command transport.

@@ -27,7 +27,7 @@
 #include <activemq/commands/RemoveInfo.h>
 #include <activemq/commands/SessionId.h>
 #include <activemq/util/Config.h>
-#include <decaf/lang/Pointer.h>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -35,8 +35,6 @@ namespace activemq
 {
 namespace commands
 {
-
-    using decaf::lang::Pointer;
 
     /*
      *
@@ -50,7 +48,7 @@ namespace commands
     class AMQCPP_API SessionInfo : public BaseCommand
     {
     protected:
-        Pointer<SessionId> sessionId;
+        std::shared_ptr<SessionId> sessionId;
 
     public:
         const static unsigned char ID_SESSIONINFO = 4;
@@ -88,13 +86,14 @@ namespace commands
             this->ackMode = mode;
         }
 
-        Pointer<RemoveInfo> createRemoveCommand() const;
+        std::shared_ptr<RemoveInfo> createRemoveCommand() const;
 
-        virtual const Pointer<SessionId>& getSessionId() const;
-        virtual Pointer<SessionId>&       getSessionId();
-        virtual void setSessionId(const Pointer<SessionId>& sessionId);
+        virtual const std::shared_ptr<SessionId>& getSessionId() const;
+        virtual std::shared_ptr<SessionId>&       getSessionId();
+        virtual void setSessionId(const std::shared_ptr<SessionId>& sessionId);
 
-        virtual Pointer<Command> visit(activemq::state::CommandVisitor* visitor);
+        virtual std::shared_ptr<Command> visit(
+            activemq::state::CommandVisitor* visitor);
     };
 
 }  // namespace commands

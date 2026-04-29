@@ -20,6 +20,8 @@
 
 #include <activemq/util/Config.h>
 
+#include <memory>
+
 #include <activemq/transport/AbstractTransportFactory.h>
 #include <activemq/transport/Transport.h>
 #include <activemq/wireformat/WireFormat.h>
@@ -32,8 +34,6 @@ namespace transport
 {
     namespace failover
     {
-
-        using decaf::lang::Pointer;
 
         /**
          * Creates an instance of a FailoverTransport.
@@ -48,13 +48,14 @@ namespace transport
             {
             }
 
-            virtual Pointer<Transport> create(const decaf::net::URI& location);
+            virtual std::shared_ptr<Transport> create(
+                const decaf::net::URI& location);
 
-            virtual Pointer<Transport> createComposite(
+            virtual std::shared_ptr<Transport> createComposite(
                 const decaf::net::URI& location);
 
         protected:
-            virtual Pointer<Transport> doCreateComposite(
+            virtual std::shared_ptr<Transport> doCreateComposite(
                 const decaf::net::URI&         location,
                 const decaf::util::Properties& properties);
         };

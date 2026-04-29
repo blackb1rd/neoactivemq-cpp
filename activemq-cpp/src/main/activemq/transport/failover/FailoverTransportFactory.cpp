@@ -17,14 +17,14 @@
 
 #include "FailoverTransportFactory.h"
 
+#include <memory>
+
 #include <activemq/transport/correlator/ResponseCorrelator.h>
 #include <activemq/transport/failover/FailoverTransport.h>
 #include <activemq/util/CompositeData.h>
 #include <activemq/util/URISupport.h>
 
 #include <decaf/lang/Boolean.h>
-#include <decaf/lang/Integer.h>
-#include <decaf/lang/Long.h>
 
 using namespace activemq;
 using namespace activemq::util;
@@ -37,7 +37,7 @@ using namespace decaf::util;
 using namespace decaf::lang;
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Transport> FailoverTransportFactory::create(
+std::shared_ptr<Transport> FailoverTransportFactory::create(
     const decaf::net::URI& location)
 {
     try
@@ -45,7 +45,8 @@ Pointer<Transport> FailoverTransportFactory::create(
         Properties properties;  // unused but necessary for now.
 
         // Create the initial Transport, then wrap it in the normal Filters
-        Pointer<Transport> transport(doCreateComposite(location, properties));
+        std::shared_ptr<Transport> transport(
+            doCreateComposite(location, properties));
 
         // Create the Transport for response correlator
         transport.reset(new ResponseCorrelator(transport));
@@ -58,7 +59,7 @@ Pointer<Transport> FailoverTransportFactory::create(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Transport> FailoverTransportFactory::createComposite(
+std::shared_ptr<Transport> FailoverTransportFactory::createComposite(
     const decaf::net::URI& location)
 {
     try
@@ -74,24 +75,24 @@ Pointer<Transport> FailoverTransportFactory::createComposite(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<Transport> FailoverTransportFactory::doCreateComposite(
+std::shared_ptr<Transport> FailoverTransportFactory::doCreateComposite(
     const decaf::net::URI&                    location,
     const decaf::util::Properties& properties AMQCPP_UNUSED)
 {
     try
     {
-        CompositeData              data = URISupport::parseComposite(location);
-        Pointer<FailoverTransport> transport(new FailoverTransport());
+        CompositeData data = URISupport::parseComposite(location);
+        std::shared_ptr<FailoverTransport> transport(new FailoverTransport());
 
         Properties topLvlProperties = data.getParameters();
 
-        transport->setInitialReconnectDelay(Long::parseLong(
+        transport->setInitialReconnectDelay(std::stoll(
             topLvlProperties.getProperty("initialReconnectDelay", "10")));
-        transport->setMaxReconnectDelay(Long::parseLong(
+        transport->setMaxReconnectDelay(std::stoll(
             topLvlProperties.getProperty("maxReconnectDelay", "30000")));
         transport->setUseExponentialBackOff(Boolean::parseBoolean(
             topLvlProperties.getProperty("useExponentialBackOff", "true")));
-        int maxReconnectAttempts = Integer::parseInt(
+        int maxReconnectAttempts = std::stoi(
             topLvlProperties.getProperty("maxReconnectAttempts", "20"));
         transport->setMaxReconnectAttempts(maxReconnectAttempts);
 
@@ -107,24 +108,24 @@ Pointer<Transport> FailoverTransportFactory::doCreateComposite(
         }
         else
         {
-            startupMaxReconnectAttempts = Integer::parseInt(startupMaxStr);
+            startupMaxReconnectAttempts = std::stoi(startupMaxStr);
         }
         transport->setStartupMaxReconnectAttempts(startupMaxReconnectAttempts);
         transport->setRandomize(Boolean::parseBoolean(
             topLvlProperties.getProperty("randomize", "true")));
         transport->setBackup(Boolean::parseBoolean(
             topLvlProperties.getProperty("backup", "false")));
-        transport->setBackupPoolSize(Integer::parseInt(
-            topLvlProperties.getProperty("backupPoolSize", "1")));
-        transport->setTimeout(Long::parseLong(
+        transport->setBackupPoolSize(
+            std::stoi(topLvlProperties.getProperty("backupPoolSize", "1")));
+        transport->setTimeout(std::stoll(
             topLvlProperties.getProperty("timeout",
                                          "30000")));  // 30 second default
         transport->setTrackMessages(Boolean::parseBoolean(
             topLvlProperties.getProperty("trackMessages", "false")));
-        transport->setMaxCacheSize(Integer::parseInt(
-            topLvlProperties.getProperty("maxCacheSize", "131072")));
-        transport->setMaxPullCacheSize(Integer::parseInt(
-            topLvlProperties.getProperty("maxPullCacheSize", "10")));
+        transport->setMaxCacheSize(
+            std::stoi(topLvlProperties.getProperty("maxCacheSize", "131072")));
+        transport->setMaxPullCacheSize(
+            std::stoi(topLvlProperties.getProperty("maxPullCacheSize", "10")));
         transport->setUpdateURIsSupported(Boolean::parseBoolean(
             topLvlProperties.getProperty("updateURIsSupported", "true")));
         transport->setPriorityBackup(Boolean::parseBoolean(

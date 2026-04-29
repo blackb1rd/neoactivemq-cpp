@@ -25,8 +25,9 @@
 
 #include <activemq/commands/BaseDataStructure.h>
 #include <activemq/util/Config.h>
+#include <activemq/util/SharedPtrComparator.h>
 #include <decaf/lang/Comparable.h>
-#include <decaf/lang/Pointer.h>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -38,8 +39,6 @@ namespace commands
     class SessionId;
     class ProducerId;
     class ConsumerId;
-
-    using decaf::lang::Pointer;
 
     /*
      *
@@ -59,7 +58,7 @@ namespace commands
     public:
         const static unsigned char ID_CONNECTIONID = 120;
 
-        typedef decaf::lang::PointerComparator<ConnectionId> COMPARATOR;
+        typedef SharedPtrComparator<ConnectionId> COMPARATOR;
 
     public:
         ConnectionId();

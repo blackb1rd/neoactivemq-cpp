@@ -35,7 +35,7 @@ using namespace activemq::util;
 using namespace activemq::wireformat;
 using namespace activemq::wireformat::openwire;
 using namespace decaf::io;
-using namespace decaf::lang;
+
 using namespace decaf::util;
 using namespace decaf::util::zip;
 

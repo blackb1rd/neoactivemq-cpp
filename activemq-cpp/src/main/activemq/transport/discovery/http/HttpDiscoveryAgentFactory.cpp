@@ -17,6 +17,8 @@
 
 #include <activemq/transport/discovery/http/HttpDiscoveryAgentFactory.h>
 
+#include <memory>
+
 #include <activemq/exceptions/ActiveMQException.h>
 #include <activemq/transport/discovery/http/HttpDiscoveryAgent.h>
 
@@ -36,15 +38,16 @@ HttpDiscoveryAgentFactory::~HttpDiscoveryAgentFactory()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<AbstractDiscoveryAgent> HttpDiscoveryAgentFactory::doCreateAgent()
+std::shared_ptr<AbstractDiscoveryAgent>
+HttpDiscoveryAgentFactory::doCreateAgent()
 {
-    return Pointer<AbstractDiscoveryAgent>(new HttpDiscoveryAgent);
+    return std::shared_ptr<AbstractDiscoveryAgent>(new HttpDiscoveryAgent);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void HttpDiscoveryAgentFactory::doConfigureAgent(
-    Pointer<AbstractDiscoveryAgent> agent AMQCPP_UNUSED,
-    const Properties& options             AMQCPP_UNUSED)
+    std::shared_ptr<AbstractDiscoveryAgent> agent AMQCPP_UNUSED,
+    const Properties& options                     AMQCPP_UNUSED)
 {
     try
     {

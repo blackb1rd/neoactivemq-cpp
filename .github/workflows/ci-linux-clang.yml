@@ -368,7 +368,7 @@ jobs:
         config:
           - { preset: x64-linux-clang-release-no-ssl-test, build_type: Release }
         artemis:
-          - { name: "Artemis-2.44", image: "apache/activemq-artemis:2.44.0" }
+          - { name: "Artemis-2.53", image: "apache/artemis:2.53.0" }
 
     steps:
     - name: Checkout code
@@ -478,7 +478,7 @@ jobs:
         config:
           - { preset: x64-linux-clang-release-test, build_type: Release }
         artemis:
-          - { name: "Artemis-2.44", image: "apache/activemq-artemis:2.44.0" }
+          - { name: "Artemis-2.53", image: "apache/artemis:2.53.0" }
 
     steps:
     - name: Checkout code

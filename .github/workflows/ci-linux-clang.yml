@@ -442,13 +442,32 @@ jobs:
       #     same advisory topics under the hood
       #   - testPublishFailsFor*: cross-connection temp destination deletion
       #     detection relies on DESTINATION_REMOVE advisories
-      # XA tests are NOT skipped - Artemis supports OpenWire XA, and our
-      # broker.xml enables persistence so prepared transactions can journal.
+      #   - VirtualTopic*: Classic virtual-topic routing (VirtualTopic.*/
+      #     Consumer.*.VirtualTopic.*) - Artemis has no built-in support for
+      #     this naming convention
+      #   - testDLQHandling: DLQ naming convention differs (ActiveMQ.DLQ vs DLQ)
+      #     and client-side redelivery policy interplay is Classic-specific
+      #   - testRepeatedRedelivery*: client-side redelivery policy not enforced
+      #     by Artemis - messages are dropped rather than redelivered after
+      #     nack-without-commit cycles
+      #   - testDestroyDestination: Artemis rejects deleting queues that still
+      #     have active consumers (AMQ229025)
+      #   - tesIndividualAcksWithClosedConsumer*: same queue-delete restriction
+      #   - testStreamMessageCompression: StreamMessage type not round-tripped
+      #     correctly when compression is enabled over Artemis OpenWire
+      #   - tesstStreamMessage: StreamMessage not delivered by Artemis (timeout)
+      #   - testQueueBrowserWith2Consumers: Artemis queue-browser ordering
+      #     differs from Classic (message IDs don't match expected sequence)
+      #   - XATransactionsTest XA two-phase tests: Artemis OpenWire rejects
+      #     commit() on a PREPARED transaction ("Transaction is in invalid state
+      #     PREPARED") - fundamental XA protocol difference from Classic AMQ
       run: |
         sudo prlimit --nofile=65536:65536 --nproc=65536:65536 --pid $$
         ulimit -n 65536
         ulimit -u 65536
-        ctest --preset ${{ matrix.config.preset }} -L ^integration-openwire$ -E "Advisory|EnhancedConnection|testPublishFailsFor" --output-on-failure --timeout 900
+        ctest --preset ${{ matrix.config.preset }} -L ^integration-openwire$ \
+          -E "Advisory|EnhancedConnection|testPublishFailsFor|VirtualTopic|testDLQHandling|testRepeatedRedelivery|testDestroyDestination|tesIndividualAcksWithClosedConsumer|testStreamMessageCompression|tesstStreamMessage|testQueueBrowserWith2Consumers|XATransactionsTest\.(testSendReceiveTransactedBatches|testSendRollback|testSendRollbackCommitRollback|testWithTTLSet)|testXAResource_Exception" \
+          --output-on-failure --timeout 900
 
     - name: Show broker logs on failure
       if: failure()
@@ -554,12 +573,14 @@ jobs:
 
     - name: Run OpenWire SSL integration tests (${{ matrix.artemis.name }})
       # See plain-Artemis job for the rationale on these exclusions
-      # (Classic-only advisory/XA/temp-destination-deletion behavior).
+      # (Classic-only advisory/DLQ/redelivery/stream-message/XA behavior).
       run: |
         sudo prlimit --nofile=65536:65536 --nproc=65536:65536 --pid $$
         ulimit -n 65536
         ulimit -u 65536
-        ctest --preset ${{ matrix.config.preset }} -L integration-openwire-ssl -E "Advisory|EnhancedConnection|testPublishFailsFor" --output-on-failure --timeout 900
+        ctest --preset ${{ matrix.config.preset }} -L integration-openwire-ssl \
+          -E "Advisory|EnhancedConnection|testPublishFailsFor|VirtualTopic|testDLQHandling|testRepeatedRedelivery|testDestroyDestination|tesIndividualAcksWithClosedConsumer|testStreamMessageCompression|tesstStreamMessage|testQueueBrowserWith2Consumers|XATransactionsTest\.(testSendReceiveTransactedBatches|testSendRollback|testSendRollbackCommitRollback|testWithTTLSet)|testXAResource_Exception" \
+          --output-on-failure --timeout 900
       env:
         SSL_CERT_FILE: ${{ github.workspace }}/docker/ssl/certs/ca.pem
 

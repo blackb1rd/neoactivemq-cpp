@@ -30,6 +30,12 @@
     <persistence-enabled>true</persistence-enabled>
     <security-enabled>false</security-enabled>
 
+    <!-- Raise the disk-full threshold so the broker does not block producers
+         when the host filesystem is heavily utilised (Artemis default is 90%).
+         Integration-test messages are tiny so the ephemeral data directory
+         will never actually fill the disk. -->
+    <max-disk-usage>99</max-disk-usage>
+
     <acceptors>
       <!-- OpenWire acceptor on port 61616. This is the only acceptor exposed
            to integration tests; STOMP and Core/AMQP/MQTT are intentionally

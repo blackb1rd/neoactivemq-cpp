@@ -201,7 +201,9 @@ services:
         soft: 65536
         hard: 65536
     healthcheck:
-      test: ["CMD-SHELL", "curl -sf http://localhost:8161/console/ || curl -sf http://localhost:8161/ || exit 1"]
+      # The Artemis image has no curl/wget/nc; use bash /dev/tcp to test
+      # that the OpenWire acceptor on port 61616 is ready to accept connections.
+      test: ["CMD-SHELL", "bash -c 'cat < /dev/null > /dev/tcp/localhost/61616'"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -248,7 +250,9 @@ services:
         soft: 65536
         hard: 65536
     healthcheck:
-      test: ["CMD-SHELL", "curl -sf http://localhost:8161/console/ || curl -sf http://localhost:8161/ || exit 1"]
+      # The Artemis image has no curl/wget/nc; use bash /dev/tcp to test
+      # that the SSL OpenWire acceptor on port 61617 is ready to accept connections.
+      test: ["CMD-SHELL", "bash -c 'cat < /dev/null > /dev/tcp/localhost/61617'"]
       interval: 10s
       timeout: 5s
       retries: 5

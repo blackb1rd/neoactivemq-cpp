@@ -24,6 +24,12 @@
     <persistence-enabled>true</persistence-enabled>
     <security-enabled>false</security-enabled>
 
+    <!-- Raise the disk-full threshold so the broker does not block producers
+         when the host filesystem is heavily utilised (Artemis default is 90%).
+         Integration-test messages are tiny so the ephemeral data directory
+         will never actually fill the disk. -->
+    <max-disk-usage>99</max-disk-usage>
+
     <acceptors>
       <!-- SSL OpenWire acceptor on port 61617 (SSL-only, no plaintext). -->
       <acceptor name="openwire-ssl">tcp://0.0.0.0:61617?protocols=OPENWIRE;sslEnabled=true;keyStorePath=/opt/artemis-certs/broker.p12;keyStorePassword=password;keyStoreType=PKCS12;trustStorePath=/opt/artemis-certs/broker-truststore.p12;trustStorePassword=password;trustStoreType=PKCS12;needClientAuth=false;tcpSendBufferSize=1048576;tcpReceiveBufferSize=1048576;connectionsAllowed=20000</acceptor>

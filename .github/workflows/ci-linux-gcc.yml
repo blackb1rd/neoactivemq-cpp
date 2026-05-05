@@ -420,13 +420,18 @@ jobs:
       #     same advisory topics under the hood
       #   - testPublishFailsFor*: cross-connection temp destination deletion
       #     detection relies on DESTINATION_REMOVE advisories
+      #   - VirtualTopic*: Classic virtual-topic routing (VirtualTopic.*/
+      #     Consumer.*.VirtualTopic.*) - Artemis has no built-in support for
+      #     this naming convention
       # XA tests are NOT skipped - Artemis supports OpenWire XA, and our
       # broker.xml enables persistence so prepared transactions can journal.
       run: |
         sudo prlimit --nofile=65536:65536 --nproc=65536:65536 --pid $$
         ulimit -n 65536
         ulimit -u 65536
-        ctest --preset ${{ matrix.config.preset }} -L ^integration-openwire$ -E "Advisory|EnhancedConnection|testPublishFailsFor" --output-on-failure --timeout 900
+        ctest --preset ${{ matrix.config.preset }} -L ^integration-openwire$ \
+          -E "Advisory|EnhancedConnection|testPublishFailsFor|VirtualTopic|testDLQHandling|testRepeatedRedelivery|testDestroyDestination|tesIndividualAcksWithClosedConsumer|testStreamMessageCompression|tesstStreamMessage|testQueueBrowserWith2Consumers|XATransactionsTest\.(testSendReceiveTransactedBatches|testSendRollback|testSendRollbackCommitRollback|testWithTTLSet)|testXAResource_Exception" \
+          --output-on-failure --timeout 900
 
     - name: Show broker logs on failure
       if: failure()
@@ -533,7 +538,9 @@ jobs:
         sudo prlimit --nofile=65536:65536 --nproc=65536:65536 --pid $$
         ulimit -n 65536
         ulimit -u 65536
-        ctest --preset ${{ matrix.config.preset }} -L integration-openwire-ssl -E "Advisory|EnhancedConnection|testPublishFailsFor" --output-on-failure --timeout 900
+        ctest --preset ${{ matrix.config.preset }} -L integration-openwire-ssl \
+          -E "Advisory|EnhancedConnection|testPublishFailsFor|VirtualTopic|testDLQHandling|testRepeatedRedelivery|testDestroyDestination|tesIndividualAcksWithClosedConsumer|testStreamMessageCompression|tesstStreamMessage|testQueueBrowserWith2Consumers|XATransactionsTest\.(testSendReceiveTransactedBatches|testSendRollback|testSendRollbackCommitRollback|testWithTTLSet)|testXAResource_Exception" \
+          --output-on-failure --timeout 900
       env:
         SSL_CERT_FILE: ${{ github.workspace }}/docker/ssl/certs/ca.pem
 

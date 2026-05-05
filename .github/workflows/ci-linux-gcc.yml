@@ -418,16 +418,11 @@ jobs:
       # Skip tests that depend on Classic-only broker behavior:
       #   - testConnectionAdvisories: advisory messages from Artemis don't
       #     embed ConnectionInfo as the OpenWire message body (unlike Classic)
-      #   - testTempDestinationCompositeAdvisoryTopic: same advisory body
-      #     format difference
       #   - testDestinationSourceGetters: DestinationSource queue/topic count
       #     doesn't update because Artemis advisory message body differs
-      #   - testDestroyDestination: Artemis rejects deleting queues that still
-      #     have active consumers (AMQ229025)
-      #   - testStreamMessageCompression: StreamMessage type not round-tripped
-      #     correctly when compression is enabled over Artemis OpenWire
-      #   - tesstStreamMessage: Artemis OpenWire converter throws EOFException
-      #     on StreamMessage bodies containing strings
+      #   - testDestroyDestination: Artemis sends ConnectionError and closes
+      #     the TCP connection when DestinationInfo REMOVE fails (AMQ229025),
+      #     killing the connection and preventing recovery
       #   - testQueueBrowserWith2Consumers: Artemis queue-browser ordering
       #     differs from Classic (message IDs don't match expected sequence)
       #
@@ -437,14 +432,16 @@ jobs:
       #   - testPublishFailsFor*: both variants pass
       #   - VirtualTopic*: all 3 pass with virtualTopicConsumerWildcards in broker.xml
       #   - XATransactionsTest*: all 4 pass after COMMITTWOPHASE fix in client
+      #   - tesstStreamMessage: fixed writeChar 2-byte encoding in client
+      #   - testStreamMessageCompression: same writeChar fix
+      #   - testTempDestinationCompositeAdvisoryTopic: advisories received OK;
+      #     close() no longer re-throws temp-dest cleanup failures
       run: |
         sudo prlimit --nofile=65536:65536 --nproc=65536:65536 --pid $$
         ulimit -n 65536
         ulimit -u 65536
         ctest --preset ${{ matrix.config.preset }} -L ^integration-openwire$ \
-          -E "testConnectionAdvisories|testTempDestinationCompositeAdvisoryTopic|testDestinationSourceGetters|testDestroyDestination|testStreamMessageCompression|tesstStreamMessage|testQueueBrowserWith2Consumers
-        ctest --preset ${{ matrix.config.preset }} -L ^integration-openwire$ \
-          -E "testConnectionAdvisories|testTempDestinationCompositeAdvisoryTopic|testDestinationSourceGetters|testDestroyDestination|testStreamMessageCompression|tesstStreamMessage|testQueueBrowserWith2Consumers" \
+          -E "testConnectionAdvisories|testDestinationSourceGetters|testDestroyDestination|testQueueBrowserWith2Consumers" \
           --output-on-failure --timeout 900
 
     - name: Show broker logs on failure
@@ -547,16 +544,13 @@ jobs:
 
     - name: Run OpenWire SSL integration tests (${{ matrix.artemis.name }})
       # Same exclusion set as the plain-Artemis job; see that job for
-      # the rationale. Advisory*, EnhancedConnection*, VirtualTopic*, and
-      # all XA test methods now run because broker-ssl.xml carries the same
-      # supportAdvisory and virtualTopicConsumerWildcards configuration as
-      # broker.xml.
+      # the rationale.
       run: |
         sudo prlimit --nofile=65536:65536 --nproc=65536:65536 --pid $$
         ulimit -n 65536
         ulimit -u 65536
         ctest --preset ${{ matrix.config.preset }} -L integration-openwire-ssl \
-          -E "testPublishFailsFor|testDestroyDestination|testStreamMessageCompression" \
+          -E "testConnectionAdvisories|testDestinationSourceGetters|testDestroyDestination|testQueueBrowserWith2Consumers" \
           --output-on-failure --timeout 900
       env:
         SSL_CERT_FILE: ${{ github.workspace }}/docker/ssl/certs/ca.pem

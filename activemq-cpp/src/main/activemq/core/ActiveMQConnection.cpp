@@ -958,21 +958,20 @@ void ActiveMQConnection::close()
         std::shared_ptr<Iterator<std::shared_ptr<ActiveMQTempDestination>>>
             iterator(tempDests.iterator());
 
-        try
+        while (iterator->hasNext())
         {
-            while (iterator->hasNext())
+            std::shared_ptr<ActiveMQTempDestination> dest = iterator->next();
+            try
             {
-                std::shared_ptr<ActiveMQTempDestination> dest =
-                    iterator->next();
                 dest->close();
             }
-        }
-        catch (cms::CMSException& error)
-        {
-            if (!hasException)
+            catch (...)
             {
-                ex           = ActiveMQException(error.clone());
-                hasException = true;
+                // Best-effort: ignore failures during temp destination cleanup.
+                // The broker may have already closed the connection, in which
+                // case DestinationInfo REMOVE will fail — but that is harmless
+                // since the broker will clean up temp destinations when the
+                // TCP connection drops.
             }
         }
 

@@ -21,7 +21,6 @@
 #include <activemq/threads/SchedulerTimerTask.h>
 #include <activemq/util/ServiceStopper.h>
 
-#include <decaf/lang/Pointer.h>
 #include <decaf/lang/Runnable.h>
 #include <decaf/lang/exceptions/IllegalArgumentException.h>
 #include <decaf/lang/exceptions/IllegalStateException.h>

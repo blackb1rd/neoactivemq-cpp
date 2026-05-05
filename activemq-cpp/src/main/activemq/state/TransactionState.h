@@ -23,11 +23,10 @@
 #include <activemq/commands/TransactionId.h>
 #include <activemq/util/Config.h>
 
-#include <decaf/lang/Pointer.h>
 #include <decaf/util/LinkedList.h>
 #include <decaf/util/concurrent/ConcurrentStlMap.h>
-#include <decaf/util/concurrent/atomic/AtomicBoolean.h>
 
+#include <atomic>
 #include <memory>
 #include <string>
 
@@ -36,10 +35,8 @@ namespace activemq
 namespace state
 {
 
-    using decaf::lang::Pointer;
     using decaf::util::LinkedList;
     using decaf::util::concurrent::ConcurrentStlMap;
-    using decaf::util::concurrent::atomic::AtomicBoolean;
     using namespace activemq::commands;
 
     class ProducerState;
@@ -47,13 +44,13 @@ namespace state
     class AMQCPP_API TransactionState
     {
     private:
-        LinkedList<Pointer<Command>> commands;
-        Pointer<TransactionId>       id;
-        AtomicBoolean                disposed;
-        bool                         prepared;
-        int                          preparedResult;
-        ConcurrentStlMap<Pointer<ProducerId>,
-                         Pointer<ProducerState>,
+        LinkedList<std::shared_ptr<Command>> commands;
+        std::shared_ptr<TransactionId>       id;
+        std::atomic<bool>                    disposed;
+        bool                                 prepared;
+        int                                  preparedResult;
+        ConcurrentStlMap<std::shared_ptr<ProducerId>,
+                         std::shared_ptr<ProducerState>,
                          ProducerId::COMPARATOR>
             producers;
 
@@ -62,13 +59,13 @@ namespace state
         TransactionState& operator=(const TransactionState&);
 
     public:
-        TransactionState(Pointer<TransactionId> id);
+        TransactionState(std::shared_ptr<TransactionId> id);
 
         virtual ~TransactionState();
 
         std::string toString() const;
 
-        void addCommand(Pointer<Command> operation);
+        void addCommand(std::shared_ptr<Command> operation);
 
         void checkShutdown() const;
 
@@ -76,12 +73,12 @@ namespace state
 
         void clear();
 
-        const LinkedList<Pointer<Command>>& getCommands() const
+        const LinkedList<std::shared_ptr<Command>>& getCommands() const
         {
             return commands;
         }
 
-        const Pointer<TransactionId> getId() const
+        const std::shared_ptr<TransactionId> getId() const
         {
             return id;
         }
@@ -106,9 +103,9 @@ namespace state
             return this->preparedResult;
         }
 
-        void addProducerState(Pointer<ProducerState> producerState);
+        void addProducerState(std::shared_ptr<ProducerState> producerState);
 
-        const decaf::util::Collection<Pointer<ProducerState>>&
+        const decaf::util::Collection<std::shared_ptr<ProducerState>>&
         getProducerStates();
     };
 

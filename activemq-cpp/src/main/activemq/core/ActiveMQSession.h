@@ -26,8 +26,6 @@
 #include <activemq/core/kernels/ActiveMQSessionKernel.h>
 #include <activemq/util/Config.h>
 
-#include <decaf/lang/Pointer.h>
-
 #include <memory>
 #include <string>
 
@@ -36,15 +34,12 @@ namespace activemq
 namespace core
 {
 
-    using decaf::lang::Pointer;
-    using decaf::util::concurrent::atomic::AtomicBoolean;
-
     class ActiveMQConnection;
 
     class AMQCPP_API ActiveMQSession : public virtual cms::Session
     {
     protected:
-        Pointer<activemq::core::kernels::ActiveMQSessionKernel> kernel;
+        std::shared_ptr<activemq::core::kernels::ActiveMQSessionKernel> kernel;
 
     private:
         ActiveMQSession(const ActiveMQSession&);
@@ -52,7 +47,8 @@ namespace core
 
     public:
         ActiveMQSession(
-            Pointer<activemq::core::kernels::ActiveMQSessionKernel> kernel);
+            std::shared_ptr<activemq::core::kernels::ActiveMQSessionKernel>
+                kernel);
 
         virtual ~ActiveMQSession();
 

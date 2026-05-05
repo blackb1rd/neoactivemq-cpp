@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -90,10 +90,10 @@ public:
     {
     }
 
-    virtual decaf::lang::Pointer<DiscoveryAgent> createAgent(
+    virtual std::shared_ptr<DiscoveryAgent> createAgent(
         const decaf::net::URI& agentURI)
     {
-        return Pointer<DiscoveryAgent>(new MockDiscoveryAgent);
+        return std::shared_ptr<DiscoveryAgent>(new MockDiscoveryAgent);
     }
 };
 
@@ -120,10 +120,12 @@ void DiscoveryAgentRegistryTest::test()
     DiscoveryAgentFactory* factory = registry.findFactory("mock");
     ASSERT_TRUE(factory != NULL);
 
-    Pointer<DiscoveryAgent> agent(factory->createAgent(URI("mock://default")));
+    std::shared_ptr<DiscoveryAgent> agent(
+        factory->createAgent(URI("mock://default")));
     ASSERT_TRUE(agent != NULL);
 
-    Pointer<MockDiscoveryAgent> mock = agent.dynamicCast<MockDiscoveryAgent>();
+    std::shared_ptr<MockDiscoveryAgent> mock =
+        std::dynamic_pointer_cast<MockDiscoveryAgent>(agent);
     ASSERT_TRUE(mock != NULL);
 
     registry.unregisterAllFactories();

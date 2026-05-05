@@ -20,16 +20,14 @@
 
 #include <activemq/util/Config.h>
 #include <activemq/wireformat/WireFormat.h>
-#include <decaf/lang/Pointer.h>
 #include <decaf/lang/exceptions/IllegalStateException.h>
 #include <decaf/util/Properties.h>
+#include <memory>
 
 namespace activemq
 {
 namespace wireformat
 {
-
-    using decaf::lang::Pointer;
 
     /**
      * The WireFormatFactory is the interface that all WireFormatFactory
@@ -54,7 +52,7 @@ namespace wireformat
          * @throws IllegalStateException if the factory has not been
          * initialized.
          */
-        virtual Pointer<WireFormat> createWireFormat(
+        virtual std::shared_ptr<WireFormat> createWireFormat(
             const decaf::util::Properties& properties) = 0;
     };
 

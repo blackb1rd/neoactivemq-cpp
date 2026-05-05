@@ -25,7 +25,7 @@ using namespace std;
 using namespace activemq;
 using namespace activemq::exceptions;
 using namespace activemq::commands;
-using namespace decaf::lang;
+
 using namespace decaf::lang::exceptions;
 
 /*
@@ -41,7 +41,7 @@ using namespace decaf::lang::exceptions;
 ////////////////////////////////////////////////////////////////////////////////
 SessionInfo::SessionInfo()
     : BaseCommand(),
-      sessionId(NULL),
+      sessionId(),
       ackMode((unsigned int)cms::Session::AUTO_ACKNOWLEDGE)
 {
 }
@@ -103,7 +103,7 @@ std::string SessionInfo::toString() const
            << "responseRequired = " << boolalpha << this->isResponseRequired();
     stream << ", ";
     stream << "SessionId = ";
-    if (this->getSessionId() != NULL)
+    if (this->getSessionId())
     {
         stream << this->getSessionId()->toString();
     }
@@ -131,14 +131,14 @@ bool SessionInfo::equals(const DataStructure* value) const
         return false;
     }
 
-    if (this->getSessionId() != NULL)
+    if (this->getSessionId())
     {
         if (!this->getSessionId()->equals(valuePtr->getSessionId().get()))
         {
             return false;
         }
     }
-    else if (valuePtr->getSessionId() != NULL)
+    else if (valuePtr->getSessionId())
     {
         return false;
     }
@@ -150,34 +150,34 @@ bool SessionInfo::equals(const DataStructure* value) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const decaf::lang::Pointer<SessionId>& SessionInfo::getSessionId() const
+const std::shared_ptr<SessionId>& SessionInfo::getSessionId() const
 {
     return sessionId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<SessionId>& SessionInfo::getSessionId()
+std::shared_ptr<SessionId>& SessionInfo::getSessionId()
 {
     return sessionId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void SessionInfo::setSessionId(const decaf::lang::Pointer<SessionId>& sessionId)
+void SessionInfo::setSessionId(const std::shared_ptr<SessionId>& sessionId)
 {
     this->sessionId = sessionId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<commands::Command> SessionInfo::visit(
+std::shared_ptr<commands::Command> SessionInfo::visit(
     activemq::state::CommandVisitor* visitor)
 {
     return visitor->processSessionInfo(this);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<RemoveInfo> SessionInfo::createRemoveCommand() const
+std::shared_ptr<RemoveInfo> SessionInfo::createRemoveCommand() const
 {
-    Pointer<RemoveInfo> info(new RemoveInfo());
+    std::shared_ptr<RemoveInfo> info(new RemoveInfo());
     info->setResponseRequired(this->isResponseRequired());
     info->setObjectId(this->getSessionId());
     return info;

@@ -406,7 +406,7 @@ PHASED REMOVAL
 5 phases. Each is one or more PRs. Tests pass after every phase.
 
 --------------------------------------------------------------------
-PHASE 1: Replace Pointer<T> + primitive wrappers + atomics
+PHASE 1: Replace Pointer<T> + primitive wrappers + atomics   [COMPLETE]
 --------------------------------------------------------------------
 Scope: ~200+ files, mechanical transformation.
 
@@ -431,9 +431,11 @@ Scope: ~200+ files, mechanical transformation.
   Can be split into 2-3 PRs if too large for review.
 
 --------------------------------------------------------------------
-PHASE 2: Replace exceptions
+PHASE 2: Replace exceptions                                  [NOT STARTED]
 --------------------------------------------------------------------
 Scope: ~150 files, mostly catch/throw sites.
+Current state: 974+ uses of decaf::io::IOException, 179 DataInputStream,
+162 DataOutputStream still in activemq/.
 
   - Replace throw sites: change exception types per mapping above
   - Replace catch blocks: catch(const std::exception& e), e.what()
@@ -451,9 +453,12 @@ Scope: ~150 files, mostly catch/throw sites.
   1-2 PRs.
 
 --------------------------------------------------------------------
-PHASE 3: Replace collections + threading + synchronized
+PHASE 3: Replace collections + threading + synchronized      [NOT STARTED]
 --------------------------------------------------------------------
 Scope: ~200 files.
+Current state: 231 synchronized() usages, 38 files with ArrayList/HashMap/
+LinkedList, 18 files with decaf::util::concurrent::Mutex, 6 files with
+decaf::lang::Thread remaining in activemq/.
 
   Collections:
     ArrayList<T>    -> std::vector<T>
@@ -487,9 +492,12 @@ Scope: ~200 files.
   2-3 PRs.
 
 --------------------------------------------------------------------
-PHASE 4: Replace I/O + networking + security + zip + logging
+PHASE 4: Replace I/O + networking + security + zip + logging [NOT STARTED]
 --------------------------------------------------------------------
 Scope: ~100 files.
+Current state: ByteReader/ByteWriter not yet created. 94 uses of decaf::net::URI,
+45+ decaf::util::Properties. No activemq::util::URI, Latch, Semaphore, or
+BlockingQueue replacements exist yet.
 
   I/O:
   - Create ByteReader/ByteWriter (if not already done in Phase 2)
@@ -518,9 +526,11 @@ Scope: ~100 files.
   2-3 PRs (I/O + networking in one, security + zip + logging in another).
 
 --------------------------------------------------------------------
-PHASE 5: Delete decaf/ and clean up
+PHASE 5: Delete decaf/ and clean up                         [NOT STARTED]
 --------------------------------------------------------------------
 Scope: deletion + final sweep.
+Current state: activemq-cpp/src/main/decaf/ (~680 files) still exists.
+284 of 556 activemq/ files still include decaf headers (90 unique headers).
 
   - Delete activemq-cpp/src/main/decaf/  (680 files)
   - Delete activemq-cpp/src/test/decaf/  (122 files)

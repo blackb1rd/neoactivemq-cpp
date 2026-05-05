@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -39,7 +39,7 @@ TEST_F(StompHelperTest, testConvertDestinationFromString)
     wireformat.setTopicPrefix("mytopics://");
     StompHelper helper(&wireformat);
 
-    Pointer<ActiveMQDestination> destination =
+    std::shared_ptr<ActiveMQDestination> destination =
         helper.convertDestination("mytopics://SomeTopic");
 
     ASSERT_EQ(std::string("SomeTopic"), destination->getPhysicalName());
@@ -52,7 +52,8 @@ TEST_F(StompHelperTest, testConvertDestinationFromCommand)
     wireformat.setTopicPrefix("mytopics://");
     StompHelper helper(&wireformat);
 
-    Pointer<ActiveMQDestination> destination(new ActiveMQTopic("SomeTopic"));
+    std::shared_ptr<ActiveMQDestination> destination(
+        new ActiveMQTopic("SomeTopic"));
 
     std::string result = helper.convertDestination(destination);
 

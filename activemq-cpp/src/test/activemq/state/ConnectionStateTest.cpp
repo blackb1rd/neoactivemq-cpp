@@ -20,13 +20,12 @@
 #include <activemq/commands/SessionInfo.h>
 #include <activemq/state/ConnectionState.h>
 #include <activemq/state/SessionState.h>
-#include <decaf/lang/Pointer.h>
+#include <memory>
 
 using namespace std;
 using namespace activemq;
 using namespace activemq::state;
 using namespace activemq::commands;
-using namespace decaf::lang;
 
 class ConnectionStateTest : public ::testing::Test
 {
@@ -36,15 +35,15 @@ class ConnectionStateTest : public ::testing::Test
 TEST_F(ConnectionStateTest, test)
 {
     // Create a Session
-    Pointer<SessionId> sid(new SessionId);
+    std::shared_ptr<SessionId> sid(new SessionId);
     sid->setConnectionId("CONNECTION");
     sid->setValue(42);
-    Pointer<SessionInfo> sinfo(new SessionInfo);
+    std::shared_ptr<SessionInfo> sinfo(new SessionInfo);
     sinfo->setSessionId(sid);
 
-    Pointer<ConnectionId> connectionId(new ConnectionId());
+    std::shared_ptr<ConnectionId> connectionId(new ConnectionId());
     connectionId->setValue("CONNECTION");
-    Pointer<ConnectionInfo> info(new ConnectionInfo);
+    std::shared_ptr<ConnectionInfo> info(new ConnectionInfo);
     info->setConnectionId(connectionId);
 
     ConnectionState state(info);

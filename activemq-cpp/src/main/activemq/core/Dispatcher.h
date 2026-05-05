@@ -20,7 +20,7 @@
 
 #include <activemq/commands/MessageDispatch.h>
 #include <activemq/util/Config.h>
-#include <decaf/lang/Pointer.h>
+#include <memory>
 
 namespace activemq
 {
@@ -43,7 +43,7 @@ namespace core
          *      The message to be dispatched to a waiting consumer.
          */
         virtual void dispatch(
-            const decaf::lang::Pointer<commands::MessageDispatch>& message) = 0;
+            const std::shared_ptr<commands::MessageDispatch>& message) = 0;
 
         /**
          * HashCode method allowing Dispatcher instances to be used in HashMap

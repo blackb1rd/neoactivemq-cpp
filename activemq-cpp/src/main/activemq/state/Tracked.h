@@ -20,8 +20,8 @@
 
 #include <activemq/commands/Response.h>
 #include <activemq/util/Config.h>
-#include <decaf/lang/Pointer.h>
 #include <decaf/lang/Runnable.h>
+#include <memory>
 
 namespace activemq
 {
@@ -31,11 +31,11 @@ namespace state
     class AMQCPP_API Tracked : public commands::Response
     {
     private:
-        decaf::lang::Pointer<decaf::lang::Runnable> runnable;
+        std::shared_ptr<decaf::lang::Runnable> runnable;
 
     public:
         Tracked();
-        Tracked(decaf::lang::Pointer<decaf::lang::Runnable> runnable);
+        Tracked(std::shared_ptr<decaf::lang::Runnable> runnable);
 
         virtual ~Tracked()
         {
@@ -45,7 +45,7 @@ namespace state
 
         bool isWaitingForResponse() const
         {
-            return runnable != NULL;
+            return (bool)runnable;
         }
     };
 

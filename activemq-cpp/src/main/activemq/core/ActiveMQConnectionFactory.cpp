@@ -30,7 +30,6 @@
 #include <decaf/lang/Integer.h>
 #include <decaf/lang/Long.h>
 #include <decaf/lang/Math.h>
-#include <decaf/lang/Pointer.h>
 #include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/net/URI.h>
 #include <decaf/util/Properties.h>
@@ -70,7 +69,7 @@ namespace core
     public:
         Mutex configLock;
 
-        Pointer<Properties> properties;
+        std::shared_ptr<Properties> properties;
 
         std::string username;
         std::string password;
@@ -148,8 +147,8 @@ namespace core
               consumerFailoverRedeliveryWaitPeriod(0),
               consumerExpiryCheckEnabled(true),
               advisoryConsumerDispatchAsync(true),
-              defaultListener(NULL),
-              defaultTransformer(NULL),
+              defaultListener(nullptr),
+              defaultTransformer(nullptr),
               defaultPrefetchPolicy(new DefaultPrefetchPolicy()),
               defaultRedeliveryPolicy(new DefaultRedeliveryPolicy())
         {
@@ -199,9 +198,9 @@ namespace core
                     core::ActiveMQConstants::toString(
                         core::ActiveMQConstants::CONNECTION_USECOMPRESSION),
                     Boolean::toString(useCompression)));
-            this->compressionLevel = Integer::parseInt(
+            this->compressionLevel = std::stoi(
                 properties->getProperty("connection.compressionLevel",
-                                        Integer::toString(compressionLevel)));
+                                        std::to_string(compressionLevel)));
             this->messagePrioritySupported =
                 Boolean::parseBoolean(properties->getProperty(
                     "connection.messagePrioritySupported",
@@ -209,13 +208,13 @@ namespace core
             this->checkForDuplicates = Boolean::parseBoolean(
                 properties->getProperty("connection.checkForDuplicates",
                                         Boolean::toString(checkForDuplicates)));
-            this->auditDepth = Integer::parseInt(
-                properties->getProperty("connection.auditDepth",
-                                        Integer::toString(auditDepth)));
+            this->auditDepth =
+                std::stoi(properties->getProperty("connection.auditDepth",
+                                                  std::to_string(auditDepth)));
             this->auditMaximumProducerNumber =
-                Integer::parseInt(properties->getProperty(
+                std::stoi(properties->getProperty(
                     "connection.auditMaximumProducerNumber",
-                    Integer::toString(auditMaximumProducerNumber)));
+                    std::to_string(auditMaximumProducerNumber)));
             this->dispatchAsync = Boolean::parseBoolean(properties->getProperty(
                 core::ActiveMQConstants::toString(
                     core::ActiveMQConstants::CONNECTION_DISPATCHASYNC),
@@ -230,33 +229,27 @@ namespace core
                         core::ActiveMQConstants::
                             CONNECTION_ADVISORYCONSUMERDISPATCHASYNC),
                     Boolean::toString(advisoryConsumerDispatchAsync)));
-            this->producerWindowSize =
-                Integer::parseInt(properties->getProperty(
-                    core::ActiveMQConstants::toString(
-                        core::ActiveMQConstants::CONNECTION_PRODUCERWINDOWSIZE),
-                    Integer::toString(producerWindowSize)));
-            this->sendTimeout =
-                decaf::lang::Integer::parseInt(properties->getProperty(
-                    core::ActiveMQConstants::toString(
-                        core::ActiveMQConstants::CONNECTION_SENDTIMEOUT),
-                    Integer::toString(sendTimeout)));
-            this->connectResponseTimeout =
-                decaf::lang::Integer::parseInt(properties->getProperty(
-                    core::ActiveMQConstants::toString(
-                        core::ActiveMQConstants::
-                            CONNECTION_CONNECTRESPONSETIMEOUT),
-                    Integer::toString(connectResponseTimeout)));
-            this->closeTimeout =
-                decaf::lang::Integer::parseInt(properties->getProperty(
-                    core::ActiveMQConstants::toString(
-                        core::ActiveMQConstants::CONNECTION_CLOSETIMEOUT),
-                    Integer::toString(closeTimeout)));
-            this->requestTimeout =
-                decaf::lang::Integer::parseInt(properties->getProperty(
-                    core::ActiveMQConstants::toString(
-                        core::ActiveMQConstants::CONNECTION_REQUESTTIMEOUT),
-                    Integer::toString(requestTimeout)));
-            this->clientId = properties->getProperty(
+            this->producerWindowSize     = std::stoi(properties->getProperty(
+                core::ActiveMQConstants::toString(
+                    core::ActiveMQConstants::CONNECTION_PRODUCERWINDOWSIZE),
+                std::to_string(producerWindowSize)));
+            this->sendTimeout            = std::stoi(properties->getProperty(
+                core::ActiveMQConstants::toString(
+                    core::ActiveMQConstants::CONNECTION_SENDTIMEOUT),
+                std::to_string(sendTimeout)));
+            this->connectResponseTimeout = std::stoi(properties->getProperty(
+                core::ActiveMQConstants::toString(
+                    core::ActiveMQConstants::CONNECTION_CONNECTRESPONSETIMEOUT),
+                std::to_string(connectResponseTimeout)));
+            this->closeTimeout           = std::stoi(properties->getProperty(
+                core::ActiveMQConstants::toString(
+                    core::ActiveMQConstants::CONNECTION_CLOSETIMEOUT),
+                std::to_string(closeTimeout)));
+            this->requestTimeout         = std::stoi(properties->getProperty(
+                core::ActiveMQConstants::toString(
+                    core::ActiveMQConstants::CONNECTION_REQUESTTIMEOUT),
+                std::to_string(requestTimeout)));
+            this->clientId               = properties->getProperty(
                 core::ActiveMQConstants::toString(
                     core::ActiveMQConstants::PARAM_CLIENTID),
                 clientId);
@@ -287,17 +280,17 @@ namespace core
                 properties->getProperty("connection.sendAcksAsync",
                                         Boolean::toString(sendAcksAsync)));
             this->optimizeAcknowledgeTimeOut =
-                Long::parseLong(properties->getProperty(
+                std::stoll(properties->getProperty(
                     "connection.optimizeAcknowledgeTimeOut",
-                    Long::toString(optimizeAcknowledgeTimeOut)));
+                    std::to_string(optimizeAcknowledgeTimeOut)));
             this->optimizedAckScheduledAckInterval =
-                Long::parseLong(properties->getProperty(
+                std::stoll(properties->getProperty(
                     "connection.optimizedAckScheduledAckInterval",
-                    Long::toString(optimizedAckScheduledAckInterval)));
+                    std::to_string(optimizedAckScheduledAckInterval)));
             this->consumerFailoverRedeliveryWaitPeriod =
-                Long::parseLong(properties->getProperty(
+                std::stoll(properties->getProperty(
                     "connection.consumerFailoverRedeliveryWaitPeriod",
-                    Long::toString(consumerFailoverRedeliveryWaitPeriod)));
+                    std::to_string(consumerFailoverRedeliveryWaitPeriod)));
             this->nonBlockingRedelivery =
                 Boolean::parseBoolean(properties->getProperty(
                     "connection.nonBlockingRedelivery",
@@ -434,7 +427,7 @@ cms::Connection* ActiveMQConnectionFactory::doCreateConnection(
     const std::string&     password,
     const std::string&     clientId)
 {
-    Pointer<Transport>                  transport;
+    std::shared_ptr<Transport>          transport;
     std::unique_ptr<ActiveMQConnection> connection;
 
     try
@@ -462,7 +455,7 @@ cms::Connection* ActiveMQConnectionFactory::doCreateConnection(
                             .findFactory(uri.getScheme())
                             ->create(uri);
 
-            if (transport == NULL)
+            if (transport == nullptr)
             {
                 throw ActiveMQException(
                     __FILE__,
@@ -471,7 +464,8 @@ cms::Connection* ActiveMQConnectionFactory::doCreateConnection(
                     "failed creating new Transport");
             }
 
-            Pointer<Properties> properties(this->settings->properties->clone());
+            std::shared_ptr<Properties> properties(
+                this->settings->properties->clone());
 
             // Create and Return the new connection object.
             connection.reset(createActiveMQConnection(transport, properties));
@@ -508,18 +502,18 @@ cms::Connection* ActiveMQConnectionFactory::doCreateConnection(
     }
     catch (std::exception& ex)
     {
-        throw cms::CMSException(ex.what(), NULL);
+        throw cms::CMSException(ex.what(), nullptr);
     }
     catch (...)
     {
-        throw cms::CMSException("Caught Unknown Exception", NULL);
+        throw cms::CMSException("Caught Unknown Exception", nullptr);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 ActiveMQConnection* ActiveMQConnectionFactory::createActiveMQConnection(
-    const Pointer<transport::Transport>&    transport,
-    const Pointer<decaf::util::Properties>& properties)
+    const std::shared_ptr<transport::Transport>&    transport,
+    const std::shared_ptr<decaf::util::Properties>& properties)
 {
     return new ActiveMQConnection(transport, properties);
 }

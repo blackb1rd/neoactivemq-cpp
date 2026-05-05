@@ -866,7 +866,7 @@ bool AdvisorySupport::isDestinationAdvisoryTopic(
 
     if (destination->isComposite())
     {
-        ArrayList<Pointer<ActiveMQDestination>> compositeDestinations =
+        ArrayList<std::shared_ptr<ActiveMQDestination>> compositeDestinations =
             destination->getCompositeDestinations();
         for (int i = 0; i < compositeDestinations.size(); i++)
         {
@@ -920,7 +920,7 @@ bool AdvisorySupport::isTempDestinationAdvisoryTopic(
 
     if (destination->isComposite())
     {
-        ArrayList<Pointer<ActiveMQDestination>> compositeDestinations =
+        ArrayList<std::shared_ptr<ActiveMQDestination>> compositeDestinations =
             destination->getCompositeDestinations();
         for (int i = 0; i < compositeDestinations.size(); i++)
         {
@@ -971,7 +971,7 @@ bool AdvisorySupport::isAdvisoryTopic(const ActiveMQDestination* destination)
 
     if (destination->isComposite())
     {
-        ArrayList<Pointer<ActiveMQDestination>> compositeDestinations =
+        ArrayList<std::shared_ptr<ActiveMQDestination>> compositeDestinations =
             destination->getCompositeDestinations();
         for (int i = 0; i < compositeDestinations.size(); i++)
         {
@@ -1024,7 +1024,7 @@ bool AdvisorySupport::isConnectionAdvisoryTopic(
 
     if (destination->isComposite())
     {
-        ArrayList<Pointer<ActiveMQDestination>> compositeDestinations =
+        ArrayList<std::shared_ptr<ActiveMQDestination>> compositeDestinations =
             destination->getCompositeDestinations();
         for (int i = 0; i < compositeDestinations.size(); i++)
         {
@@ -1075,7 +1075,7 @@ bool AdvisorySupport::isProducerAdvisoryTopic(
 
     if (destination->isComposite())
     {
-        ArrayList<Pointer<ActiveMQDestination>> compositeDestinations =
+        ArrayList<std::shared_ptr<ActiveMQDestination>> compositeDestinations =
             destination->getCompositeDestinations();
         for (int i = 0; i < compositeDestinations.size(); i++)
         {
@@ -1127,7 +1127,7 @@ bool AdvisorySupport::isConsumerAdvisoryTopic(
 
     if (destination->isComposite())
     {
-        ArrayList<Pointer<ActiveMQDestination>> compositeDestinations =
+        ArrayList<std::shared_ptr<ActiveMQDestination>> compositeDestinations =
             destination->getCompositeDestinations();
         for (int i = 0; i < compositeDestinations.size(); i++)
         {
@@ -1179,7 +1179,7 @@ bool AdvisorySupport::isSlowConsumerAdvisoryTopic(
 
     if (destination->isComposite())
     {
-        ArrayList<Pointer<ActiveMQDestination>> compositeDestinations =
+        ArrayList<std::shared_ptr<ActiveMQDestination>> compositeDestinations =
             destination->getCompositeDestinations();
         for (int i = 0; i < compositeDestinations.size(); i++)
         {
@@ -1230,7 +1230,7 @@ bool AdvisorySupport::isFastProducerAdvisoryTopic(
 
     if (destination->isComposite())
     {
-        ArrayList<Pointer<ActiveMQDestination>> compositeDestinations =
+        ArrayList<std::shared_ptr<ActiveMQDestination>> compositeDestinations =
             destination->getCompositeDestinations();
         for (int i = 0; i < compositeDestinations.size(); i++)
         {
@@ -1281,7 +1281,7 @@ bool AdvisorySupport::isMessageConsumedAdvisoryTopic(
 
     if (destination->isComposite())
     {
-        ArrayList<Pointer<ActiveMQDestination>> compositeDestinations =
+        ArrayList<std::shared_ptr<ActiveMQDestination>> compositeDestinations =
             destination->getCompositeDestinations();
         for (int i = 0; i < compositeDestinations.size(); i++)
         {
@@ -1334,7 +1334,7 @@ bool AdvisorySupport::isMasterBrokerAdvisoryTopic(
 
     if (destination->isComposite())
     {
-        ArrayList<Pointer<ActiveMQDestination>> compositeDestinations =
+        ArrayList<std::shared_ptr<ActiveMQDestination>> compositeDestinations =
             destination->getCompositeDestinations();
         for (int i = 0; i < compositeDestinations.size(); i++)
         {
@@ -1385,7 +1385,7 @@ bool AdvisorySupport::isMessageDeliveredAdvisoryTopic(
 
     if (destination->isComposite())
     {
-        ArrayList<Pointer<ActiveMQDestination>> compositeDestinations =
+        ArrayList<std::shared_ptr<ActiveMQDestination>> compositeDestinations =
             destination->getCompositeDestinations();
         for (int i = 0; i < compositeDestinations.size(); i++)
         {
@@ -1438,7 +1438,7 @@ bool AdvisorySupport::isMessageDiscardedAdvisoryTopic(
 
     if (destination->isComposite())
     {
-        ArrayList<Pointer<ActiveMQDestination>> compositeDestinations =
+        ArrayList<std::shared_ptr<ActiveMQDestination>> compositeDestinations =
             destination->getCompositeDestinations();
         for (int i = 0; i < compositeDestinations.size(); i++)
         {
@@ -1491,7 +1491,7 @@ bool AdvisorySupport::isMessageDLQdAdvisoryTopic(
 
     if (destination->isComposite())
     {
-        ArrayList<Pointer<ActiveMQDestination>> compositeDestinations =
+        ArrayList<std::shared_ptr<ActiveMQDestination>> compositeDestinations =
             destination->getCompositeDestinations();
         for (int i = 0; i < compositeDestinations.size(); i++)
         {
@@ -1540,7 +1540,7 @@ bool AdvisorySupport::isFullAdvisoryTopic(const ActiveMQDestination* destination
 
     if (destination->isComposite())
     {
-        ArrayList<Pointer<ActiveMQDestination>> compositeDestinations =
+        ArrayList<std::shared_ptr<ActiveMQDestination>> compositeDestinations =
             destination->getCompositeDestinations();
         for (int i = 0; i < compositeDestinations.size(); i++)
         {
@@ -1591,7 +1591,7 @@ bool AdvisorySupport::isNetworkBridgeAdvisoryTopic(
 
     if (destination->isComposite())
     {
-        ArrayList<Pointer<ActiveMQDestination>> compositeDestinations =
+        ArrayList<std::shared_ptr<ActiveMQDestination>> compositeDestinations =
             destination->getCompositeDestinations();
         for (int i = 0; i < compositeDestinations.size(); i++)
         {

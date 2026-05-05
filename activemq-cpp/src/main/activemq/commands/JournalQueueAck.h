@@ -27,7 +27,7 @@
 #include <activemq/commands/BaseDataStructure.h>
 #include <activemq/commands/MessageAck.h>
 #include <activemq/util/Config.h>
-#include <decaf/lang/Pointer.h>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -35,8 +35,6 @@ namespace activemq
 {
 namespace commands
 {
-
-    using decaf::lang::Pointer;
 
     /*
      *
@@ -50,8 +48,8 @@ namespace commands
     class AMQCPP_API JournalQueueAck : public BaseDataStructure
     {
     protected:
-        Pointer<ActiveMQDestination> destination;
-        Pointer<MessageAck>          messageAck;
+        std::shared_ptr<ActiveMQDestination> destination;
+        std::shared_ptr<MessageAck>          messageAck;
 
     public:
         const static unsigned char ID_JOURNALQUEUEACK = 52;
@@ -75,14 +73,16 @@ namespace commands
 
         virtual bool equals(const DataStructure* value) const;
 
-        virtual const Pointer<ActiveMQDestination>& getDestination() const;
-        virtual Pointer<ActiveMQDestination>&       getDestination();
-        virtual void                                setDestination(
-                                           const Pointer<ActiveMQDestination>& destination);
+        virtual const std::shared_ptr<ActiveMQDestination>& getDestination()
+            const;
+        virtual std::shared_ptr<ActiveMQDestination>& getDestination();
+        virtual void                                  setDestination(
+                                             const std::shared_ptr<ActiveMQDestination>& destination);
 
-        virtual const Pointer<MessageAck>& getMessageAck() const;
-        virtual Pointer<MessageAck>&       getMessageAck();
-        virtual void setMessageAck(const Pointer<MessageAck>& messageAck);
+        virtual const std::shared_ptr<MessageAck>& getMessageAck() const;
+        virtual std::shared_ptr<MessageAck>&       getMessageAck();
+        virtual void                               setMessageAck(
+                                          const std::shared_ptr<MessageAck>& messageAck);
     };
 
 }  // namespace commands

@@ -24,7 +24,7 @@ using namespace std;
 using namespace activemq;
 using namespace activemq::exceptions;
 using namespace activemq::commands;
-using namespace decaf::lang;
+
 using namespace decaf::lang::exceptions;
 
 /*
@@ -124,7 +124,7 @@ bool FlushCommand::equals(const DataStructure* value) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<commands::Command> FlushCommand::visit(
+std::shared_ptr<commands::Command> FlushCommand::visit(
     activemq::state::CommandVisitor* visitor)
 {
     return visitor->processFlushCommand(this);

@@ -22,11 +22,11 @@
 #include <activemq/util/Config.h>
 #include <activemq/wireformat/WireFormatNegotiator.h>
 #include <activemq/wireformat/openwire/OpenWireFormat.h>
-#include <decaf/lang/Pointer.h>
 #include <decaf/util/concurrent/Concurrent.h>
 #include <decaf/util/concurrent/CountDownLatch.h>
 #include <decaf/util/concurrent/Mutex.h>
-#include <decaf/util/concurrent/atomic/AtomicBoolean.h>
+#include <atomic>
+#include <memory>
 
 namespace activemq
 {
@@ -34,8 +34,6 @@ namespace wireformat
 {
     namespace openwire
     {
-
-        using decaf::lang::Pointer;
 
         class AMQCPP_API OpenWireFormatNegotiator
             : public wireformat::WireFormatNegotiator
@@ -50,7 +48,7 @@ namespace wireformat
             /**
              * Have we started already?
              */
-            decaf::util::concurrent::atomic::AtomicBoolean firstTime;
+            std::atomic<bool> firstTime;
 
             /**
              * Latch objects to count down till we receive the wireFormat info
@@ -73,22 +71,25 @@ namespace wireformat
              * @param wireFormat - The WireFormat object we use to negotiate
              * @param next - The next transport in the chain
              */
-            OpenWireFormatNegotiator(OpenWireFormat* wireFormat,
-                                     const Pointer<transport::Transport> next);
+            OpenWireFormatNegotiator(
+                OpenWireFormat*                             wireFormat,
+                const std::shared_ptr<transport::Transport> next);
 
             virtual ~OpenWireFormatNegotiator();
 
-            virtual void oneway(const Pointer<commands::Command> command);
+            virtual void oneway(
+                const std::shared_ptr<commands::Command> command);
 
-            virtual Pointer<commands::Response> request(
-                const Pointer<commands::Command> command);
+            virtual std::shared_ptr<commands::Response> request(
+                const std::shared_ptr<commands::Command> command);
 
-            virtual Pointer<commands::Response> request(
-                const Pointer<commands::Command> command,
-                unsigned int                     timeout);
+            virtual std::shared_ptr<commands::Response> request(
+                const std::shared_ptr<commands::Command> command,
+                unsigned int                             timeout);
 
         public:
-            virtual void onCommand(const Pointer<commands::Command> command);
+            virtual void onCommand(
+                const std::shared_ptr<commands::Command> command);
 
             virtual void onException(const decaf::lang::Exception& ex);
 

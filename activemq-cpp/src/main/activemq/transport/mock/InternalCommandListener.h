@@ -22,12 +22,12 @@
 #include <activemq/transport/mock/ResponseBuilder.h>
 #include <activemq/util/Config.h>
 
-#include <decaf/lang/Pointer.h>
+#include <memory>
+
 #include <decaf/lang/Thread.h>
 #include <decaf/util/LinkedList.h>
 #include <decaf/util/concurrent/Concurrent.h>
 #include <decaf/util/concurrent/CountDownLatch.h>
-#include <decaf/util/concurrent/atomic/AtomicInteger.h>
 
 namespace activemq
 {
@@ -50,11 +50,11 @@ namespace transport
               public decaf::lang::Thread
         {
         private:
-            MockTransport*                            transport;
-            Pointer<ResponseBuilder>                  responseBuilder;
-            bool                                      done;
-            decaf::util::concurrent::CountDownLatch   startedLatch;
-            decaf::util::LinkedList<Pointer<Command>> inboundQueue;
+            MockTransport*                                    transport;
+            std::shared_ptr<ResponseBuilder>                  responseBuilder;
+            bool                                              done;
+            decaf::util::concurrent::CountDownLatch           startedLatch;
+            decaf::util::LinkedList<std::shared_ptr<Command>> inboundQueue;
 
         private:
             InternalCommandListener(const InternalCommandListener&);
@@ -71,12 +71,12 @@ namespace transport
             }
 
             void setResponseBuilder(
-                const Pointer<ResponseBuilder> responseBuilder)
+                const std::shared_ptr<ResponseBuilder> responseBuilder)
             {
                 this->responseBuilder = responseBuilder;
             }
 
-            virtual void onCommand(const Pointer<Command> command);
+            virtual void onCommand(const std::shared_ptr<Command> command);
 
             void run();
         };

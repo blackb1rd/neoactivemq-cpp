@@ -26,7 +26,7 @@
 #include <activemq/commands/BrokerError.h>
 #include <activemq/commands/Response.h>
 #include <activemq/util/Config.h>
-#include <decaf/lang/Pointer.h>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -34,8 +34,6 @@ namespace activemq
 {
 namespace commands
 {
-
-    using decaf::lang::Pointer;
 
     /*
      *
@@ -49,7 +47,7 @@ namespace commands
     class AMQCPP_API ExceptionResponse : public Response
     {
     protected:
-        Pointer<BrokerError> exception;
+        std::shared_ptr<BrokerError> exception;
 
     public:
         const static unsigned char ID_EXCEPTIONRESPONSE = 31;
@@ -73,9 +71,9 @@ namespace commands
 
         virtual bool equals(const DataStructure* value) const;
 
-        virtual const Pointer<BrokerError>& getException() const;
-        virtual Pointer<BrokerError>&       getException();
-        virtual void setException(const Pointer<BrokerError>& exception);
+        virtual const std::shared_ptr<BrokerError>& getException() const;
+        virtual std::shared_ptr<BrokerError>&       getException();
+        virtual void setException(const std::shared_ptr<BrokerError>& exception);
     };
 
 }  // namespace commands

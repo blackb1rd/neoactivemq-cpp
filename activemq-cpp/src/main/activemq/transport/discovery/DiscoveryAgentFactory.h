@@ -20,7 +20,8 @@
 
 #include <activemq/util/Config.h>
 
-#include <decaf/lang/Pointer.h>
+#include <memory>
+
 #include <decaf/net/URI.h>
 
 #include <activemq/transport/discovery/DiscoveryAgent.h>
@@ -58,7 +59,7 @@ namespace transport
              *
              * @throws IOException if an error occurs creating the given agent.
              */
-            virtual decaf::lang::Pointer<DiscoveryAgent> createAgent(
+            virtual std::shared_ptr<DiscoveryAgent> createAgent(
                 const decaf::net::URI& agentURI) = 0;
         };
 

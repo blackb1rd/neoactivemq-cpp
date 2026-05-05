@@ -22,7 +22,7 @@
 
 #include <activemq/commands/MessageId.h>
 #include <activemq/commands/ProducerId.h>
-#include <decaf/lang/Pointer.h>
+#include <memory>
 
 namespace activemq
 {
@@ -108,7 +108,7 @@ namespace core
          *
          * @return true if the message is a duplicate
          */
-        bool isDuplicate(decaf::lang::Pointer<commands::MessageId> msgId) const;
+        bool isDuplicate(std::shared_ptr<commands::MessageId> msgId) const;
 
         /**
          * Marks this message as being received.
@@ -124,7 +124,7 @@ namespace core
          * @param msgId
          *      The target MessageId to check.
          */
-        void rollback(decaf::lang::Pointer<commands::MessageId> msgId);
+        void rollback(std::shared_ptr<commands::MessageId> msgId);
 
         /**
          * Check the MessageId is in order
@@ -144,14 +144,13 @@ namespace core
          *
          * @return true if the MessageId is in order.
          */
-        bool isInOrder(decaf::lang::Pointer<commands::MessageId> msgId) const;
+        bool isInOrder(std::shared_ptr<commands::MessageId> msgId) const;
 
         /**
          * @return the last sequence Id that we've audited for the given
          * producer.
          */
-        long long getLastSeqId(
-            decaf::lang::Pointer<commands::ProducerId> id) const;
+        long long getLastSeqId(std::shared_ptr<commands::ProducerId> id) const;
 
         /**
          * Clears this Audit.

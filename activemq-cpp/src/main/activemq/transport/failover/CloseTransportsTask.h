@@ -18,11 +18,12 @@
 #ifndef _ACTIVEMQ_TRANSPORT_FAILOVER_CLOSETRANSPORTSTASK_H_
 #define _ACTIVEMQ_TRANSPORT_FAILOVER_CLOSETRANSPORTSTASK_H_
 
+#include <memory>
+
 #include <activemq/threads/CompositeTask.h>
 #include <activemq/transport/Transport.h>
 #include <activemq/util/Config.h>
 
-#include <decaf/lang/Pointer.h>
 #include <decaf/util/concurrent/LinkedBlockingQueue.h>
 
 namespace activemq
@@ -32,14 +33,12 @@ namespace transport
     namespace failover
     {
 
-        using decaf::lang::Pointer;
-
         class AMQCPP_API CloseTransportsTask
             : public activemq::threads::CompositeTask
         {
         private:
             mutable decaf::util::concurrent::LinkedBlockingQueue<
-                Pointer<Transport>>
+                std::shared_ptr<Transport>>
                 transports;
 
         public:
@@ -50,7 +49,7 @@ namespace transport
             /**
              * Add a new Transport to close.
              */
-            void add(const Pointer<Transport> transport);
+            void add(const std::shared_ptr<Transport> transport);
 
             /**
              * This Task is pending if there are transports in the Queue that

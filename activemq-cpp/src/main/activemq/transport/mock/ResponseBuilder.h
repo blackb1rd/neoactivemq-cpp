@@ -23,7 +23,8 @@
 #include <activemq/commands/Command.h>
 #include <activemq/commands/Response.h>
 
-#include <decaf/lang/Pointer.h>
+#include <memory>
+
 #include <decaf/util/LinkedList.h>
 
 namespace activemq
@@ -35,7 +36,6 @@ namespace transport
 
         using activemq::commands::Command;
         using activemq::commands::Response;
-        using decaf::lang::Pointer;
 
         /**
          * Interface for all Protocols to implement that defines the behavior
@@ -52,8 +52,8 @@ namespace transport
              * @param command - The command to build a response for
              * @return A Response object pointer, or NULL if no response.
              */
-            virtual Pointer<Response> buildResponse(
-                const Pointer<Command> command) = 0;
+            virtual std::shared_ptr<Response> buildResponse(
+                const std::shared_ptr<Command> command) = 0;
 
             /**
              * When called the ResponseBuilder must construct all the
@@ -63,8 +63,8 @@ namespace transport
              * @param queue - Queue of Command sent back from the broker.
              */
             virtual void buildIncomingCommands(
-                const Pointer<Command>                     command,
-                decaf::util::LinkedList<Pointer<Command>>& queue) = 0;
+                const std::shared_ptr<Command>                     command,
+                decaf::util::LinkedList<std::shared_ptr<Command>>& queue) = 0;
         };
 
     }  // namespace mock

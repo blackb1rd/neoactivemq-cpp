@@ -178,12 +178,14 @@ services:
     ports:
       - "127.0.0.1:61616:61616"  # OpenWire (localhost only)
       - "127.0.0.1:8161:8161"    # Web Console (localhost only)
-    # The broker.xml is mounted into etc-override/. The image's entrypoint
-    # copies override files into the broker's etc/ directory AFTER it runs
-    # `artemis create`, so the broker starts with our config but is created
-    # normally (login.config, jolokia, logging, etc. all set up properly).
+    # The broker.xml is mounted into etc-override/. The official Apache
+    # Artemis image's entrypoint (apache/activemq-artemis) copies files from
+    # /var/lib/artemis-instance-init/etc-override/ into the broker's
+    # /var/lib/artemis-instance/etc/ AFTER it runs `artemis create`, so the
+    # broker starts with our config but is created normally (login.config,
+    # jolokia, logging, etc. all set up properly).
     volumes:
-      - ./docker/artemis/broker.xml:/var/lib/artemis-broker-init/etc-override/broker.xml:ro
+      - ./docker/artemis/broker.xml:/var/lib/artemis-instance-init/etc-override/broker.xml:ro
     environment:
       - ANONYMOUS_LOGIN=true
       - ARTEMIS_USER=artemis
@@ -225,8 +227,8 @@ services:
       - "127.0.0.1:61617:61617"  # SSL OpenWire (localhost only)
       - "127.0.0.1:8161:8161"    # Web Console (localhost only)
     volumes:
-      - ./docker/artemis/broker-ssl.xml:/var/lib/artemis-broker-init/etc-override/broker.xml:ro
-      - ./docker/ssl/certs:/var/lib/artemis-broker-init/etc-override/certs:ro
+      - ./docker/artemis/broker-ssl.xml:/var/lib/artemis-instance-init/etc-override/broker.xml:ro
+      - ./docker/ssl/certs:/var/lib/artemis-instance-init/etc-override/certs:ro
     environment:
       - ANONYMOUS_LOGIN=true
       - ARTEMIS_USER=artemis

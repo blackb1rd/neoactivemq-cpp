@@ -411,18 +411,21 @@ jobs:
       run: chmod +x output/build/${{ matrix.config.preset }}/bin/*
 
     - name: Start Artemis broker (${{ matrix.artemis.name }})
+      # Name the service explicitly so the default `activemq` service (which
+      # has no profile and therefore is always selectable) is NOT started -
+      # it would race with Artemis for port 61616 and 8161.
       run: |
         echo "Starting Artemis broker using image: ${{ matrix.artemis.image }}"
-        ACTIVEMQ_ARTEMIS_IMAGE=${{ matrix.artemis.image }} docker compose --profile artemis up -d
+        ACTIVEMQ_ARTEMIS_IMAGE=${{ matrix.artemis.image }} docker compose --profile artemis up -d activemq-artemis
         echo "Waiting for Artemis broker to be ready..."
-        timeout 120 bash -c 'until docker compose --profile artemis ps | grep -q "healthy"; do sleep 2; done' || true
+        timeout 120 bash -c 'until docker compose --profile artemis ps activemq-artemis | grep -q "healthy"; do sleep 2; done' || true
         sleep 10
 
     - name: Show broker status
-      run: docker compose --profile artemis ps
+      run: docker compose --profile artemis ps activemq-artemis
 
     - name: Show broker logs (startup)
-      run: docker compose --profile artemis logs --tail 100
+      run: docker compose --profile artemis logs activemq-artemis --tail 100
 
     - name: Raise system limits for high-fanout integration tests
       run: |
@@ -518,18 +521,21 @@ jobs:
       run: chmod +x output/build/${{ matrix.config.preset }}/bin/*
 
     - name: Start Artemis SSL broker (${{ matrix.artemis.name }})
+      # Name the service explicitly so the default `activemq` service is NOT
+      # started - it would race with Artemis SSL for port 8161. The
+      # ssl-cert-generator dependency runs automatically via depends_on.
       run: |
         echo "Starting SSL-enabled Artemis using image: ${{ matrix.artemis.image }}"
-        ACTIVEMQ_ARTEMIS_IMAGE=${{ matrix.artemis.image }} docker compose --profile artemis-ssl up -d
+        ACTIVEMQ_ARTEMIS_IMAGE=${{ matrix.artemis.image }} docker compose --profile artemis-ssl up -d activemq-artemis-ssl
         echo "Waiting for Artemis SSL broker to be ready..."
-        timeout 120 bash -c 'until docker compose --profile artemis-ssl ps | grep -q "healthy"; do sleep 2; done' || true
+        timeout 120 bash -c 'until docker compose --profile artemis-ssl ps activemq-artemis-ssl | grep -q "healthy"; do sleep 2; done' || true
         sleep 10
 
     - name: Show broker status
-      run: docker compose --profile artemis-ssl ps
+      run: docker compose --profile artemis-ssl ps activemq-artemis-ssl
 
     - name: Show broker logs (startup)
-      run: docker compose --profile artemis-ssl logs --tail 100
+      run: docker compose --profile artemis-ssl logs activemq-artemis-ssl --tail 100
 
     - name: Raise system limits for high-fanout integration tests
       run: |

@@ -329,7 +329,7 @@ TEST_F(ActiveMQConnectionFactoryTest, testWatchTopicAdvisoriesDefaultIsFalse)
     ASSERT_FALSE(factory.isWatchTopicAdvisories());
 
     std::unique_ptr<cms::Connection> connection(factory.createConnection());
-    ActiveMQConnection* amqConnection =
+    ActiveMQConnection*              amqConnection =
         dynamic_cast<ActiveMQConnection*>(connection.get());
     ASSERT_TRUE(amqConnection != NULL);
     ASSERT_FALSE(amqConnection->isWatchTopicAdvisories());
@@ -347,7 +347,7 @@ TEST_F(ActiveMQConnectionFactoryTest, testWatchTopicAdvisoriesURIOption)
     ASSERT_TRUE(factory.isWatchTopicAdvisories());
 
     std::unique_ptr<cms::Connection> connection(factory.createConnection());
-    ActiveMQConnection* amqConnection =
+    ActiveMQConnection*              amqConnection =
         dynamic_cast<ActiveMQConnection*>(connection.get());
     ASSERT_TRUE(amqConnection != NULL);
     ASSERT_TRUE(amqConnection->isWatchTopicAdvisories());
@@ -364,7 +364,7 @@ TEST_F(ActiveMQConnectionFactoryTest, testWatchTopicAdvisoriesSetter)
 
     // The factory's value is propagated to connections it creates.
     std::unique_ptr<cms::Connection> connection(factory.createConnection());
-    ActiveMQConnection* amqConnection =
+    ActiveMQConnection*              amqConnection =
         dynamic_cast<ActiveMQConnection*>(connection.get());
     ASSERT_TRUE(amqConnection != NULL);
     ASSERT_TRUE(amqConnection->isWatchTopicAdvisories());

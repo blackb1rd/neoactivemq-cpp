@@ -420,8 +420,8 @@ TEST_F(OpenwireTempDestinationTest, testPublishFailsForClosedConnection)
     // to throw cms::InvalidDestinationException locally before the send
     // hits the broker. The library default is false; this test exercises
     // the explicit opt-in path.
-    std::string url =
-        cmsProvider->getBrokerURL() + "&connection.watchTopicAdvisories=true";
+    std::string url = cmsProvider->getBrokerURL() +
+                      "&connection.watchTopicAdvisories=true";
 
     std::shared_ptr<ActiveMQConnectionFactory> factory(
         new ActiveMQConnectionFactory(url));
@@ -466,8 +466,8 @@ TEST_F(OpenwireTempDestinationTest, testPublishFailsForDestoryedTempDestination)
 {
     // See testPublishFailsForClosedConnection for the rationale on why the
     // producer connection explicitly opts in to watchTopicAdvisories=true.
-    std::string url =
-        cmsProvider->getBrokerURL() + "&connection.watchTopicAdvisories=true";
+    std::string url = cmsProvider->getBrokerURL() +
+                      "&connection.watchTopicAdvisories=true";
 
     std::shared_ptr<ActiveMQConnectionFactory> factory(
         new ActiveMQConnectionFactory(url));
@@ -514,10 +514,11 @@ TEST_F(OpenwireTempDestinationTest, testWatchTopicAdvisoriesDisabledByDefault)
     // so the client cannot preemptively detect cross-connection temp
     // destination deletion - the broker handles it on the round-trip.
     //
-    // testPublishFailsForClosedConnection / testPublishFailsForDestoryedTempDestination
-    // exercise the opt-in path with ?connection.watchTopicAdvisories=true.
-    // This test guards against regression of the default value at the
-    // factory + connection level when constructed from a plain broker URL.
+    // testPublishFailsForClosedConnection /
+    // testPublishFailsForDestoryedTempDestination exercise the opt-in path with
+    // ?connection.watchTopicAdvisories=true. This test guards against
+    // regression of the default value at the factory + connection level when
+    // constructed from a plain broker URL.
     std::shared_ptr<ActiveMQConnectionFactory> factory(
         new ActiveMQConnectionFactory(cmsProvider->getBrokerURL()));
 
@@ -543,8 +544,8 @@ TEST_F(OpenwireTempDestinationTest, testWatchTopicAdvisoriesURIOptionEnablesIt)
     // opt-in mechanism used by testPublishFailsForClosedConnection and
     // testPublishFailsForDestoryedTempDestination. This test verifies the
     // parameter is honored end-to-end through factory and connection.
-    std::string url =
-        cmsProvider->getBrokerURL() + "&connection.watchTopicAdvisories=true";
+    std::string url = cmsProvider->getBrokerURL() +
+                      "&connection.watchTopicAdvisories=true";
 
     std::shared_ptr<ActiveMQConnectionFactory> factory(
         new ActiveMQConnectionFactory(url));
@@ -560,7 +561,8 @@ TEST_F(OpenwireTempDestinationTest, testWatchTopicAdvisoriesURIOptionEnablesIt)
         dynamic_cast<ActiveMQConnection*>(connection.get());
     ASSERT_TRUE(amqConnection != NULL);
     ASSERT_TRUE(amqConnection->isWatchTopicAdvisories())
-        << "Connection built from URL with connection.watchTopicAdvisories=true "
+        << "Connection built from URL with "
+           "connection.watchTopicAdvisories=true "
         << "should report watchTopicAdvisories=true";
 
     connection->close();

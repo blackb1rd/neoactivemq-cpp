@@ -1,0 +1,70 @@
+<?xml version='1.0'?>
+<!--
+    ActiveMQ Artemis broker configuration for OpenWire integration testing.
+
+    Differs from the stock Artemis image config in two ways:
+      - Replaces the default multi-protocol acceptor with an OpenWire-only
+        acceptor on port 61616. STOMP/AMQP/MQTT/Core are intentionally not
+        exposed (Artemis CI runs the OpenWire integration suite only).
+      - Disables broker-side security (security-enabled=false) so the test
+        suite can connect anonymously like it does against Classic.
+      - Disables persistence (persistence-enabled=false) for fast test resets.
+
+    Maximum connections / frame size are set high to support high-fanout tests
+    (e.g. BulkMessageIntegrationTest.testHighFanout5000Clients).
+-->
+<configuration xmlns="urn:activemq"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:schemaLocation="urn:activemq /schema/artemis-configuration.xsd">
+
+  <core xmlns="urn:activemq:core"
+        xsi:schemaLocation="urn:activemq:core ">
+
+    <name>activemq-artemis-test</name>
+
+    <persistence-enabled>false</persistence-enabled>
+    <journal-pool-files>10</journal-pool-files>
+    <journal-device-block-size>4096</journal-device-block-size>
+
+    <security-enabled>false</security-enabled>
+    <jmx-management-enabled>true</jmx-management-enabled>
+
+    <!-- Connection / resource limits tuned for high-fanout integration tests -->
+    <global-max-size>2Gb</global-max-size>
+    <max-disk-usage>90</max-disk-usage>
+
+    <acceptors>
+      <!-- OpenWire acceptor on port 61616. This is the only acceptor exposed
+           to integration tests; STOMP and Core/AMQP/MQTT are intentionally
+           omitted (Artemis CI runs OpenWire only). -->
+      <acceptor name="openwire">tcp://0.0.0.0:61616?protocols=OPENWIRE;tcpSendBufferSize=1048576;tcpReceiveBufferSize=1048576;amqpMinLargeMessageSize=102400;connectionsAllowed=20000</acceptor>
+    </acceptors>
+
+    <addresses>
+      <address name="DLQ">
+        <anycast>
+          <queue name="DLQ"/>
+        </anycast>
+      </address>
+      <address name="ExpiryQueue">
+        <anycast>
+          <queue name="ExpiryQueue"/>
+        </anycast>
+      </address>
+    </addresses>
+
+    <address-settings>
+      <address-setting match="#">
+        <dead-letter-address>DLQ</dead-letter-address>
+        <expiry-address>ExpiryQueue</expiry-address>
+        <auto-create-queues>true</auto-create-queues>
+        <auto-create-addresses>true</auto-create-addresses>
+        <auto-delete-queues>true</auto-delete-queues>
+        <auto-delete-addresses>true</auto-delete-addresses>
+        <max-size-bytes>-1</max-size-bytes>
+        <message-counter-history-day-limit>10</message-counter-history-day-limit>
+      </address-setting>
+    </address-settings>
+
+  </core>
+</configuration>

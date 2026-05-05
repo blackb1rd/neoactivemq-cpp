@@ -318,6 +318,59 @@ TEST_F(ActiveMQConnectionFactoryTest, testTransportListener)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+TEST_F(ActiveMQConnectionFactoryTest, testWatchTopicAdvisoriesDefaultIsFalse)
+{
+    // The default for watchTopicAdvisories is false. This avoids creating an
+    // internal AdvisoryConsumer per connection and improves compatibility with
+    // brokers that do not implement Classic-style advisory topics (e.g.
+    // ActiveMQ Artemis). Apps that need preemptive client-side detection of
+    // temp-destination deletion must opt in explicitly.
+    ActiveMQConnectionFactory factory("mock://127.0.0.1:23232");
+    ASSERT_FALSE(factory.isWatchTopicAdvisories());
+
+    std::unique_ptr<cms::Connection> connection(factory.createConnection());
+    ActiveMQConnection* amqConnection =
+        dynamic_cast<ActiveMQConnection*>(connection.get());
+    ASSERT_TRUE(amqConnection != NULL);
+    ASSERT_FALSE(amqConnection->isWatchTopicAdvisories());
+}
+
+////////////////////////////////////////////////////////////////////////////////
+TEST_F(ActiveMQConnectionFactoryTest, testWatchTopicAdvisoriesURIOption)
+{
+    // The connection.watchTopicAdvisories=true URI parameter overrides the
+    // default and enables internal advisory tracking on the connection. This
+    // is the opt-in path that apps relying on cross-connection temp
+    // destination deletion detection must take.
+    ActiveMQConnectionFactory factory(
+        "mock://127.0.0.1:23232?connection.watchTopicAdvisories=true");
+    ASSERT_TRUE(factory.isWatchTopicAdvisories());
+
+    std::unique_ptr<cms::Connection> connection(factory.createConnection());
+    ActiveMQConnection* amqConnection =
+        dynamic_cast<ActiveMQConnection*>(connection.get());
+    ASSERT_TRUE(amqConnection != NULL);
+    ASSERT_TRUE(amqConnection->isWatchTopicAdvisories());
+}
+
+////////////////////////////////////////////////////////////////////////////////
+TEST_F(ActiveMQConnectionFactoryTest, testWatchTopicAdvisoriesSetter)
+{
+    ActiveMQConnectionFactory factory("mock://127.0.0.1:23232");
+    ASSERT_FALSE(factory.isWatchTopicAdvisories());
+
+    factory.setWatchTopicAdvisories(true);
+    ASSERT_TRUE(factory.isWatchTopicAdvisories());
+
+    // The factory's value is propagated to connections it creates.
+    std::unique_ptr<cms::Connection> connection(factory.createConnection());
+    ActiveMQConnection* amqConnection =
+        dynamic_cast<ActiveMQConnection*>(connection.get());
+    ASSERT_TRUE(amqConnection != NULL);
+    ASSERT_TRUE(amqConnection->isWatchTopicAdvisories());
+}
+
+////////////////////////////////////////////////////////////////////////////////
 TEST_F(ActiveMQConnectionFactoryTest, testURIOptionsProcessing)
 {
     try

@@ -372,5 +372,6 @@ TEST_F(OpenwireIndividualAckTest, tesIndividualAcksWithClosedConsumerAndAudit)
             << ("Second pass consume failed unexpectedly.");
     }
 
+    consumer->close();
     connection->close();
 }

@@ -44,9 +44,9 @@
     </acceptors>
 
     <addresses>
-      <address name="DLQ">
+      <address name="ActiveMQ.DLQ">
         <anycast>
-          <queue name="DLQ"/>
+          <queue name="ActiveMQ.DLQ"/>
         </anycast>
       </address>
       <address name="ExpiryQueue">
@@ -58,7 +58,7 @@
 
     <address-settings>
       <address-setting match="#">
-        <dead-letter-address>DLQ</dead-letter-address>
+        <dead-letter-address>ActiveMQ.DLQ</dead-letter-address>
         <expiry-address>ExpiryQueue</expiry-address>
         <auto-create-queues>true</auto-create-queues>
         <auto-create-addresses>true</auto-create-addresses>

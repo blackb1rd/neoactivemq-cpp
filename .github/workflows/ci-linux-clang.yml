@@ -445,14 +445,8 @@ jobs:
       #   - VirtualTopic*: Classic virtual-topic routing (VirtualTopic.*/
       #     Consumer.*.VirtualTopic.*) - Artemis has no built-in support for
       #     this naming convention
-      #   - testDLQHandling: DLQ naming convention differs (ActiveMQ.DLQ vs DLQ)
-      #     and client-side redelivery policy interplay is Classic-specific
-      #   - testRepeatedRedelivery*: client-side redelivery policy not enforced
-      #     by Artemis - messages are dropped rather than redelivered after
-      #     nack-without-commit cycles
       #   - testDestroyDestination: Artemis rejects deleting queues that still
       #     have active consumers (AMQ229025)
-      #   - tesIndividualAcksWithClosedConsumer*: same queue-delete restriction
       #   - testStreamMessageCompression: StreamMessage type not round-tripped
       #     correctly when compression is enabled over Artemis OpenWire
       #   - tesstStreamMessage: StreamMessage not delivered by Artemis (timeout)
@@ -466,7 +460,7 @@ jobs:
         ulimit -n 65536
         ulimit -u 65536
         ctest --preset ${{ matrix.config.preset }} -L ^integration-openwire$ \
-          -E "Advisory|EnhancedConnection|testPublishFailsFor|VirtualTopic|testDLQHandling|testRepeatedRedelivery|testDestroyDestination|tesIndividualAcksWithClosedConsumer|testStreamMessageCompression|tesstStreamMessage|testQueueBrowserWith2Consumers|XATransactionsTest\.(testSendReceiveTransactedBatches|testSendRollback|testSendRollbackCommitRollback|testWithTTLSet)|testXAResource_Exception" \
+          -E "Advisory|EnhancedConnection|testPublishFailsFor|VirtualTopic|testDestroyDestination|testStreamMessageCompression|tesstStreamMessage|testQueueBrowserWith2Consumers|XATransactionsTest\.(testSendReceiveTransactedBatches|testSendRollback|testSendRollbackCommitRollback|testWithTTLSet)" \
           --output-on-failure --timeout 900
 
     - name: Show broker logs on failure
@@ -579,7 +573,7 @@ jobs:
         ulimit -n 65536
         ulimit -u 65536
         ctest --preset ${{ matrix.config.preset }} -L integration-openwire-ssl \
-          -E "Advisory|EnhancedConnection|testPublishFailsFor|VirtualTopic|testDLQHandling|testRepeatedRedelivery|testDestroyDestination|tesIndividualAcksWithClosedConsumer|testStreamMessageCompression|tesstStreamMessage|testQueueBrowserWith2Consumers|XATransactionsTest\.(testSendReceiveTransactedBatches|testSendRollback|testSendRollbackCommitRollback|testWithTTLSet)|testXAResource_Exception" \
+          -E "Advisory|EnhancedConnection|testPublishFailsFor|VirtualTopic|testDestroyDestination|testStreamMessageCompression|tesstStreamMessage|testQueueBrowserWith2Consumers|XATransactionsTest\.(testSendReceiveTransactedBatches|testSendRollback|testSendRollbackCommitRollback|testWithTTLSet)" \
           --output-on-failure --timeout 900
       env:
         SSL_CERT_FILE: ${{ github.workspace }}/docker/ssl/certs/ca.pem

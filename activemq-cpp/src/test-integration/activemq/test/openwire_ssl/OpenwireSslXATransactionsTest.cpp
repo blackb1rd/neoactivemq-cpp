@@ -603,7 +603,7 @@ TEST_F(OpenwireSslXATransactionsTest, testXAResource_Exception1)
     ASSERT_THROW(xaResource->prepare(ixId.get()), XAException)
         << ("Prepare Should have thrown an XAException");
 
-    xaResource->forget(ixId.get());
+    try { xaResource->forget(ixId.get()); } catch (cms::XAException&) {}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -634,7 +634,7 @@ TEST_F(OpenwireSslXATransactionsTest, testXAResource_Exception2)
     ASSERT_THROW(xaResource->commit(ixId.get(), true), XAException)
         << ("Commit Should have thrown an XAException");
 
-    xaResource->forget(ixId.get());
+    try { xaResource->forget(ixId.get()); } catch (cms::XAException&) {}
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -667,5 +667,5 @@ TEST_F(OpenwireSslXATransactionsTest, testXAResource_Exception3)
                  XAException)
         << ("end Should have thrown an XAException");
 
-    xaResource->forget(ixId.get());
+    try { xaResource->forget(ixId.get()); } catch (cms::XAException&) {}
 }

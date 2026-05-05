@@ -36,6 +36,7 @@ namespace test
 }  // namespace test
 }  // namespace activemq
 
+#include <activemq/core/ActiveMQConnection.h>
 #include <activemq/core/ActiveMQConnectionFactory.h>
 #include <activemq/exceptions/ActiveMQException.h>
 #include <decaf/lang/Thread.h>

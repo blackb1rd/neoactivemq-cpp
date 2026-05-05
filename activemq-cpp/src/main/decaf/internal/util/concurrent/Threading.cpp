@@ -1005,6 +1005,53 @@ void Threading::shutdown()
     // Threading.
     Executors::shutdown();
 
+    // Defense in depth: any decaf-managed thread that's still alive when we
+    // reach this point will UAF the next time it touches library state (TLS
+    // keys, globalLock) -- e.g. a Timer worker polling Mutex::wait() that
+    // calls Thread::interrupted(). Snapshot the active set under the global
+    // lock, take a reference on each so it can't disappear under us, then
+    // wait for them outside the lock.
+    std::list<ThreadHandle*> stragglers;
+    PlatformThread::lockMutex(library->globalLock);
+    for (std::list<ThreadHandle*>::const_iterator it =
+             library->activeThreads.begin();
+         it != library->activeThreads.end();
+         ++it)
+    {
+        Atomics::incrementAndGet(&((*it)->references));
+        stragglers.push_back(*it);
+    }
+    PlatformThread::unlockMutex(library->globalLock);
+
+    // Don't try to join ourselves. getCurrentThreadHandle() would attach a
+    // new handle for a foreign caller, which we don't want here -- read TLS
+    // directly.
+    ThreadHandle* self =
+        (ThreadHandle*)PlatformThread::getTlsValue(library->selfKey);
+
+    bool allTerminated = true;
+    for (std::list<ThreadHandle*>::iterator it = stragglers.begin();
+         it != stragglers.end();
+         ++it)
+    {
+        ThreadHandle* thread = *it;
+        if (thread != self)
+        {
+            try
+            {
+                Threading::join(thread, 5000, 0);
+            }
+            DECAF_CATCHALL_NOTHROW()
+
+            if (thread->state.load(std::memory_order_acquire) !=
+                Thread::TERMINATED)
+            {
+                allTerminated = false;
+            }
+        }
+        dereferenceThread(thread);
+    }
+
     // Destroy any Foreign Thread Facades that were created during runtime.
     std::vector<Thread*>::iterator iter = library->osThreads.begin();
     for (; iter != library->osThreads.end(); ++iter)
@@ -1013,14 +1060,22 @@ void Threading::shutdown()
     }
     library->osThreads.clear();
 
-    PlatformThread::destroyTlsKey(library->threadKey);
-    PlatformThread::destroyTlsKey(library->selfKey);
-    PlatformThread::destroyMutex(library->globalLock);
-    PlatformThread::destroyMutex(library->tlsLock);
+    // If a straggler refused to terminate, leak the shared library state
+    // rather than free it. The OS reclaims TLS keys / mutex memory at
+    // process exit; meanwhile the still-running thread can keep accessing
+    // valid state instead of dereferencing freed memory.
+    if (allTerminated)
+    {
+        PlatformThread::destroyTlsKey(library->threadKey);
+        PlatformThread::destroyTlsKey(library->selfKey);
+        PlatformThread::destroyMutex(library->globalLock);
+        PlatformThread::destroyMutex(library->tlsLock);
 
-    purgeMonitorsPool(library->monitors);
-    delete library->monitors;
-    delete library;
+        purgeMonitorsPool(library->monitors);
+        delete library->monitors;
+        delete library;
+        library = NULL;
+    }
 
     // Atomics only uses platform Thread primitives when there are no atomic
     // builtins and Atomics are used in thread so make sure this is always last
@@ -1349,6 +1404,13 @@ void Threading::interrupt(ThreadHandle* thread)
 bool Threading::interrupted()
 {
     ThreadHandle* self = Threading::getCurrentThreadHandle();
+    if (self == NULL)
+    {
+        // Library has been torn down. The hot path here is the Mutex::wait
+        // polling loop -- returning false keeps the straggler looping
+        // safely instead of dereferencing freed state.
+        return false;
+    }
     return Threading::isInterrupted(self, true);
 }
 
@@ -1795,6 +1857,16 @@ Thread* Threading::getCurrentThread()
 ////////////////////////////////////////////////////////////////////////////////
 ThreadHandle* Threading::getCurrentThreadHandle()
 {
+    // After Threading::shutdown() has freed library state, any decaf
+    // primitive that calls into here from a still-running thread (e.g. a
+    // straggler we couldn't join) used to UAF on library->selfKey or on
+    // attachToCurrentThread()'s globalLock acquisition. Return NULL and
+    // let callers that can tolerate it handle the no-handle case.
+    if (library == NULL)
+    {
+        return NULL;
+    }
+
     ThreadHandle* self =
         (ThreadHandle*)PlatformThread::getTlsValue(library->selfKey);
 

@@ -188,7 +188,7 @@ public:
 template <typename Predicate>
 bool waitUntil(Predicate pred, long long timeoutMs = 2000)
 {
-    const long long stepMs = 10;
+    const long long stepMs  = 10;
     long long       elapsed = 0;
     while (elapsed < timeoutMs)
     {
@@ -343,14 +343,30 @@ TEST_F(ReentrantLockTest, testhasQueuedThreads)
         lock.lock();
         guard.held = true;
         t1.start();
-        ASSERT_TRUE(waitUntil([&] { return lock.hasQueuedThreads(); }));
+        ASSERT_TRUE(waitUntil(
+            [&]
+            {
+                return lock.hasQueuedThreads();
+            }));
         t2.start();
-        ASSERT_TRUE(waitUntil([&] { return lock.hasQueuedThreads(); }));
+        ASSERT_TRUE(waitUntil(
+            [&]
+            {
+                return lock.hasQueuedThreads();
+            }));
         t1.interrupt();
-        ASSERT_TRUE(waitUntil([&] { return lock.hasQueuedThreads(); }));
+        ASSERT_TRUE(waitUntil(
+            [&]
+            {
+                return lock.hasQueuedThreads();
+            }));
         lock.unlock();
         guard.held = false;
-        ASSERT_TRUE(waitUntil([&] { return !lock.hasQueuedThreads(); }));
+        ASSERT_TRUE(waitUntil(
+            [&]
+            {
+                return !lock.hasQueuedThreads();
+            }));
         t1.join();
         t2.join();
     }
@@ -379,14 +395,30 @@ TEST_F(ReentrantLockTest, testGetQueueLength)
         lock.lock();
         guard.held = true;
         t1.start();
-        ASSERT_TRUE(waitUntil([&] { return lock.getQueueLength() == 1; }));
+        ASSERT_TRUE(waitUntil(
+            [&]
+            {
+                return lock.getQueueLength() == 1;
+            }));
         t2.start();
-        ASSERT_TRUE(waitUntil([&] { return lock.getQueueLength() == 2; }));
+        ASSERT_TRUE(waitUntil(
+            [&]
+            {
+                return lock.getQueueLength() == 2;
+            }));
         t1.interrupt();
-        ASSERT_TRUE(waitUntil([&] { return lock.getQueueLength() == 1; }));
+        ASSERT_TRUE(waitUntil(
+            [&]
+            {
+                return lock.getQueueLength() == 1;
+            }));
         lock.unlock();
         guard.held = false;
-        ASSERT_TRUE(waitUntil([&] { return lock.getQueueLength() == 0; }));
+        ASSERT_TRUE(waitUntil(
+            [&]
+            {
+                return lock.getQueueLength() == 0;
+            }));
         t1.join();
         t2.join();
     }
@@ -415,14 +447,30 @@ TEST_F(ReentrantLockTest, testGetQueueLengthFair)
         lock.lock();
         guard.held = true;
         t1.start();
-        ASSERT_TRUE(waitUntil([&] { return lock.getQueueLength() == 1; }));
+        ASSERT_TRUE(waitUntil(
+            [&]
+            {
+                return lock.getQueueLength() == 1;
+            }));
         t2.start();
-        ASSERT_TRUE(waitUntil([&] { return lock.getQueueLength() == 2; }));
+        ASSERT_TRUE(waitUntil(
+            [&]
+            {
+                return lock.getQueueLength() == 2;
+            }));
         t1.interrupt();
-        ASSERT_TRUE(waitUntil([&] { return lock.getQueueLength() == 1; }));
+        ASSERT_TRUE(waitUntil(
+            [&]
+            {
+                return lock.getQueueLength() == 1;
+            }));
         lock.unlock();
         guard.held = false;
-        ASSERT_TRUE(waitUntil([&] { return lock.getQueueLength() == 0; }));
+        ASSERT_TRUE(waitUntil(
+            [&]
+            {
+                return lock.getQueueLength() == 0;
+            }));
         t1.join();
         t2.join();
     }
@@ -466,16 +514,32 @@ TEST_F(ReentrantLockTest, testHasQueuedThread)
         sync.lock();
         guard.held = true;
         t1.start();
-        ASSERT_TRUE(waitUntil([&] { return sync.hasQueuedThread(&t1); }));
+        ASSERT_TRUE(waitUntil(
+            [&]
+            {
+                return sync.hasQueuedThread(&t1);
+            }));
         t2.start();
-        ASSERT_TRUE(waitUntil([&] { return sync.hasQueuedThread(&t2); }));
+        ASSERT_TRUE(waitUntil(
+            [&]
+            {
+                return sync.hasQueuedThread(&t2);
+            }));
         ASSERT_TRUE(sync.hasQueuedThread(&t1));
         t1.interrupt();
-        ASSERT_TRUE(waitUntil([&] { return !sync.hasQueuedThread(&t1); }));
+        ASSERT_TRUE(waitUntil(
+            [&]
+            {
+                return !sync.hasQueuedThread(&t1);
+            }));
         ASSERT_TRUE(sync.hasQueuedThread(&t2));
         sync.unlock();
         guard.held = false;
-        ASSERT_TRUE(waitUntil([&] { return !sync.hasQueuedThread(&t2); }));
+        ASSERT_TRUE(waitUntil(
+            [&]
+            {
+                return !sync.hasQueuedThread(&t2);
+            }));
         ASSERT_TRUE(!sync.hasQueuedThread(&t1));
         t1.join();
         t2.join();
@@ -510,33 +574,44 @@ TEST_F(ReentrantLockTest, testGetQueuedThreads)
             std::unique_ptr<Collection<Thread*>>(lock.getQueuedThreads())
                 ->isEmpty());
         t1.start();
-        ASSERT_TRUE(waitUntil([&] {
-            return std::unique_ptr<Collection<Thread*>>(lock.getQueuedThreads())
-                ->contains(&t1);
-        }));
+        ASSERT_TRUE(waitUntil(
+            [&]
+            {
+                return std::unique_ptr<Collection<Thread*>>(
+                           lock.getQueuedThreads())
+                    ->contains(&t1);
+            }));
         t2.start();
-        ASSERT_TRUE(waitUntil([&] {
-            return std::unique_ptr<Collection<Thread*>>(lock.getQueuedThreads())
-                ->contains(&t2);
-        }));
+        ASSERT_TRUE(waitUntil(
+            [&]
+            {
+                return std::unique_ptr<Collection<Thread*>>(
+                           lock.getQueuedThreads())
+                    ->contains(&t2);
+            }));
         ASSERT_TRUE(
             std::unique_ptr<Collection<Thread*>>(lock.getQueuedThreads())
                 ->contains(&t1));
         t1.interrupt();
-        ASSERT_TRUE(waitUntil([&] {
-            return !std::unique_ptr<Collection<Thread*>>(
-                        lock.getQueuedThreads())
-                        ->contains(&t1);
-        }));
+        ASSERT_TRUE(waitUntil(
+            [&]
+            {
+                return !std::unique_ptr<Collection<Thread*>>(
+                            lock.getQueuedThreads())
+                            ->contains(&t1);
+            }));
         ASSERT_TRUE(
             std::unique_ptr<Collection<Thread*>>(lock.getQueuedThreads())
                 ->contains(&t2));
         lock.unlock();
         guard.held = false;
-        ASSERT_TRUE(waitUntil([&] {
-            return std::unique_ptr<Collection<Thread*>>(lock.getQueuedThreads())
-                ->isEmpty();
-        }));
+        ASSERT_TRUE(waitUntil(
+            [&]
+            {
+                return std::unique_ptr<Collection<Thread*>>(
+                           lock.getQueuedThreads())
+                    ->isEmpty();
+            }));
         t1.join();
         t2.join();
     }

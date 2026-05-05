@@ -624,7 +624,7 @@ void ActiveMQTransactionContext::commit(const Xid* xid, bool onePhase)
         info->setTransactionId(x);
         info->setType(
             onePhase ? ActiveMQConstants::TRANSACTION_STATE_COMMITONEPHASE
-                     : ActiveMQConstants::TRANSACTION_STATE_COMMITONEPHASE);
+                     : ActiveMQConstants::TRANSACTION_STATE_COMMITTWOPHASE);
 
         this->connection->syncRequest(info,
                                       this->connection->getRequestTimeout());

@@ -8,7 +8,8 @@
         exposed (Artemis CI runs the OpenWire integration suite only).
       - Disables broker-side security (security-enabled=false) so the test
         suite can connect anonymously like it does against Classic.
-      - Disables persistence (persistence-enabled=false) for fast test resets.
+      - Enables persistence (persistence-enabled=true) so XA prepared
+        transactions are journaled (required by XA two-phase commit).
 
     Maximum connections / frame size are set high to support high-fanout tests
     (e.g. BulkMessageIntegrationTest.testHighFanout5000Clients).
@@ -22,7 +23,11 @@
 
     <name>activemq-artemis-test</name>
 
-    <persistence-enabled>false</persistence-enabled>
+    <!-- Persistence enabled so the broker journals XA prepared transactions
+         (XA requires durable storage for two-phase commit recovery). The
+         data dir lives under /var/lib/artemis-instance/data and is ephemeral
+         to the container. -->
+    <persistence-enabled>true</persistence-enabled>
     <security-enabled>false</security-enabled>
 
     <acceptors>

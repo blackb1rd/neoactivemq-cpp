@@ -165,7 +165,8 @@ services:
   #   - Exposes OpenWire only on port 61616 (STOMP/AMQP/MQTT are intentionally
   #     not exposed; Artemis CI runs the OpenWire integration suite only)
   #   - Disables security so existing integration tests can connect anonymously
-  #   - Disables persistence for fast test reset between runs
+  #   - Enables persistence so XA prepared transactions are journaled (XA
+  #     two-phase commit requires durable storage)
   #
   # Note: tests requiring Classic-specific features (kahaDB persistence
   # semantics, advisory topics for connection tracking, broker-specific JMX)

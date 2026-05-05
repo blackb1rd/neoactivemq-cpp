@@ -19,7 +19,9 @@
 
     <name>activemq-artemis-ssl-test</name>
 
-    <persistence-enabled>false</persistence-enabled>
+    <!-- Persistence enabled so the broker journals XA prepared transactions
+         (XA requires durable storage for two-phase commit recovery). -->
+    <persistence-enabled>true</persistence-enabled>
     <security-enabled>false</security-enabled>
 
     <acceptors>

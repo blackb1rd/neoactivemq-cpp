@@ -413,24 +413,31 @@ jobs:
         sudo sysctl -w kernel.threads-max=1048576
 
     - name: Run OpenWire integration tests (${{ matrix.artemis.name }})
-      # Skip tests that depend on Classic-only broker behavior:
-      #   - Advisory*: Classic advisory topics (ActiveMQ.Advisory.*) - Artemis
-      #     doesn't publish them by default
-      #   - EnhancedConnection*: cms::DestinationSource subscribes to those
-      #     same advisory topics under the hood
-      #   - testPublishFailsFor*: cross-connection temp destination deletion
-      #     detection relies on DESTINATION_REMOVE advisories
-      #   - VirtualTopic*: Classic virtual-topic routing (VirtualTopic.*/
-      #     Consumer.*.VirtualTopic.*) - Artemis has no built-in support for
-      #     this naming convention
-      # XA tests are NOT skipped - Artemis supports OpenWire XA, and our
-      # broker.xml enables persistence so prepared transactions can journal.
+      # Skip only the small set of tests that depend on behavior Artemis
+      # does not implement via OpenWire:
+      #   - testPublishFailsFor*: cross-connection temp-destination deletion
+      #     detection relies on DESTINATION_REMOVE advisory messages which
+      #     Artemis does not send.
+      #   - testDestroyDestination: uses the OpenWire REMOVE_DESTINATION
+      #     command which Artemis does not honour.
+      #   - testStreamMessageCompression: Artemis does not support
+      #     StreamMessage compression over OpenWire.
+      #   - testQueueBrowserWith2Consumers: relies on per-destination
+      #     consumer.prefetchSize URL parameters that Artemis ignores.
+      #
+      # Advisory topics (supportAdvisory=true) and virtual-topic consumer
+      # wildcard translation (virtualTopicConsumerWildcards) are now enabled
+      # in broker.xml, so Advisory*, EnhancedConnection*, and VirtualTopic*
+      # tests run without exclusion.
+      #
+      # XA tests are fully supported: Artemis OpenWire implements two-phase
+      # commit and broker.xml enables persistence for XA journaling.
       run: |
         sudo prlimit --nofile=65536:65536 --nproc=65536:65536 --pid $$
         ulimit -n 65536
         ulimit -u 65536
         ctest --preset ${{ matrix.config.preset }} -L ^integration-openwire$ \
-          -E "Advisory|EnhancedConnection|testPublishFailsFor|VirtualTopic|testDestroyDestination|testStreamMessageCompression|tesstStreamMessage|testQueueBrowserWith2Consumers|XATransactionsTest\.(testSendReceiveTransactedBatches|testSendRollback|testSendRollbackCommitRollback|testWithTTLSet)" \
+          -E "testPublishFailsFor|testDestroyDestination|testStreamMessageCompression" \
           --output-on-failure --timeout 900
 
     - name: Show broker logs on failure
@@ -532,14 +539,17 @@ jobs:
         sudo sysctl -w kernel.threads-max=1048576
 
     - name: Run OpenWire SSL integration tests (${{ matrix.artemis.name }})
-      # See plain-Artemis job for the rationale on these exclusions
-      # (Classic-only advisory/XA/temp-destination-deletion behavior).
+      # Same exclusion set as the plain-Artemis job; see that job for
+      # the rationale. Advisory*, EnhancedConnection*, VirtualTopic*, and
+      # all XA test methods now run because broker-ssl.xml carries the same
+      # supportAdvisory and virtualTopicConsumerWildcards configuration as
+      # broker.xml.
       run: |
         sudo prlimit --nofile=65536:65536 --nproc=65536:65536 --pid $$
         ulimit -n 65536
         ulimit -u 65536
         ctest --preset ${{ matrix.config.preset }} -L integration-openwire-ssl \
-          -E "Advisory|EnhancedConnection|testPublishFailsFor|VirtualTopic|testDestroyDestination|testStreamMessageCompression|tesstStreamMessage|testQueueBrowserWith2Consumers|XATransactionsTest\.(testSendReceiveTransactedBatches|testSendRollback|testSendRollbackCommitRollback|testWithTTLSet)" \
+          -E "testPublishFailsFor|testDestroyDestination|testStreamMessageCompression" \
           --output-on-failure --timeout 900
       env:
         SSL_CERT_FILE: ${{ github.workspace }}/docker/ssl/certs/ca.pem

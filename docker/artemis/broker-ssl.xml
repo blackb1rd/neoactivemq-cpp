@@ -9,6 +9,10 @@
     docker/ssl/generate-certs-entrypoint.sh. They are mounted directly at
     /opt/artemis-certs/ in the container (not via etc-override) so the broker
     can read them regardless of how the image's entrypoint handles overrides.
+
+    Advisory topic support and virtual topic consumer wildcard translation are
+    configured identically to broker.xml so the SSL suite exercises the same
+    feature set as the plaintext suite.
 -->
 <configuration xmlns="urn:activemq"
                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -31,8 +35,11 @@
     <max-disk-usage>99</max-disk-usage>
 
     <acceptors>
-      <!-- SSL OpenWire acceptor on port 61617 (SSL-only, no plaintext). -->
-      <acceptor name="openwire-ssl">tcp://0.0.0.0:61617?protocols=OPENWIRE;sslEnabled=true;keyStorePath=/opt/artemis-certs/broker.p12;keyStorePassword=password;keyStoreType=PKCS12;trustStorePath=/opt/artemis-certs/broker-truststore.p12;trustStorePassword=password;trustStoreType=PKCS12;needClientAuth=false;tcpSendBufferSize=1048576;tcpReceiveBufferSize=1048576;connectionsAllowed=20000</acceptor>
+      <!-- SSL OpenWire acceptor on port 61617 (SSL-only, no plaintext).
+           supportAdvisory=true and virtualTopicConsumerWildcards mirror the
+           plain broker.xml configuration so the SSL suite tests the same
+           advisory and virtual-topic features. -->
+      <acceptor name="openwire-ssl">tcp://0.0.0.0:61617?protocols=OPENWIRE;sslEnabled=true;keyStorePath=/opt/artemis-certs/broker.p12;keyStorePassword=password;keyStoreType=PKCS12;trustStorePath=/opt/artemis-certs/broker-truststore.p12;trustStorePassword=password;trustStoreType=PKCS12;needClientAuth=false;supportAdvisory=true;suppressInternalManagementObjects=false;virtualTopicConsumerWildcards=Consumer.*.%3E%3B2;tcpSendBufferSize=1048576;tcpReceiveBufferSize=1048576;connectionsAllowed=20000</acceptor>
     </acceptors>
 
     <addresses>
@@ -54,8 +61,8 @@
         <expiry-address>ExpiryQueue</expiry-address>
         <auto-create-queues>true</auto-create-queues>
         <auto-create-addresses>true</auto-create-addresses>
-        <auto-delete-queues>true</auto-delete-queues>
-        <auto-delete-addresses>true</auto-delete-addresses>
+        <auto-delete-queues>false</auto-delete-queues>
+        <auto-delete-addresses>false</auto-delete-addresses>
         <max-size-bytes>-1</max-size-bytes>
         <message-counter-history-day-limit>10</message-counter-history-day-limit>
       </address-setting>

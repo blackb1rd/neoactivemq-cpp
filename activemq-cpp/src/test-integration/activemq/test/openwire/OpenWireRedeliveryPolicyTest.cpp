@@ -271,7 +271,19 @@ TEST_F(OpenWireRedeliveryPolicyTest, testDLQHandling)
     std::shared_ptr<MessageConsumer> consumer(
         session->createConsumer(destination.get()));
     std::shared_ptr<Queue> dlq(session->createQueue("ActiveMQ.DLQ"));
-    amqConnection->destroyDestination(dlq.get());
+    // Drain any stale DLQ messages left by previous test runs.  Artemis does
+    // not permit destroying statically-configured addresses via OpenWire so
+    // a timed-drain loop is used instead of destroyDestination().
+    {
+        std::shared_ptr<MessageConsumer> dlqDrain(
+            session->createConsumer(dlq.get()));
+        std::shared_ptr<cms::Message> stale;
+        while ((stale.reset(dlqDrain->receive(100))), stale.get() != NULL)
+        {
+            session->commit();
+        }
+        dlqDrain->close();
+    }
     std::shared_ptr<MessageConsumer> dlqConsumer(
         session->createConsumer(dlq.get()));
 
@@ -545,7 +557,17 @@ TEST_F(OpenWireRedeliveryPolicyTest, testRepeatedRedeliveryReceiveNoCommit)
         dlqSession->createQueue("testRepeatedRedeliveryReceiveNoCommit"));
     std::shared_ptr<Queue> dlq(dlqSession->createQueue("ActiveMQ.DLQ"));
     amqConnection->destroyDestination(destination.get());
-    amqConnection->destroyDestination(dlq.get());
+    // Drain any stale DLQ messages.  Artemis does not permit destroying
+    // statically-configured addresses via OpenWire.
+    {
+        std::shared_ptr<MessageConsumer> dlqDrain(
+            dlqSession->createConsumer(dlq.get()));
+        std::shared_ptr<cms::Message> stale;
+        while ((stale.reset(dlqDrain->receive(100))), stale.get() != NULL)
+        {
+        }
+        dlqDrain->close();
+    }
     std::shared_ptr<MessageProducer> producer(
         dlqSession->createProducer(destination.get()));
     std::shared_ptr<MessageConsumer> consumer(
@@ -672,7 +694,17 @@ TEST_F(OpenWireRedeliveryPolicyTest, testRepeatedRedeliveryOnMessageNoCommit)
         dlqSession->createQueue("testRepeatedRedeliveryOnMessageNoCommit"));
     std::shared_ptr<Queue> dlq(dlqSession->createQueue("ActiveMQ.DLQ"));
     amqConnection->destroyDestination(destination.get());
-    amqConnection->destroyDestination(dlq.get());
+    // Drain any stale DLQ messages.  Artemis does not permit destroying
+    // statically-configured addresses via OpenWire.
+    {
+        std::shared_ptr<MessageConsumer> dlqDrain(
+            dlqSession->createConsumer(dlq.get()));
+        std::shared_ptr<cms::Message> stale;
+        while ((stale.reset(dlqDrain->receive(100))), stale.get() != NULL)
+        {
+        }
+        dlqDrain->close();
+    }
     std::shared_ptr<MessageProducer> producer(
         dlqSession->createProducer(destination.get()));
     std::shared_ptr<MessageConsumer> consumer(

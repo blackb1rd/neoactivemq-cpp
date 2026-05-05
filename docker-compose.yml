@@ -226,9 +226,14 @@ services:
     ports:
       - "127.0.0.1:61617:61617"  # SSL OpenWire (localhost only)
       - "127.0.0.1:8161:8161"    # Web Console (localhost only)
+    # broker.xml goes through etc-override (entrypoint copies it AFTER
+    # `artemis create`). Certs are mounted to a separate absolute path -
+    # NOT through etc-override - because some Apache Artemis image versions
+    # don't recursively copy etc-override subdirectories, which would leave
+    # the broker unable to load the SSL keystore/truststore on startup.
     volumes:
       - ./docker/artemis/broker-ssl.xml:/var/lib/artemis-instance-init/etc-override/broker.xml:ro
-      - ./docker/ssl/certs:/var/lib/artemis-instance-init/etc-override/certs:ro
+      - ./docker/ssl/certs:/opt/artemis-certs:ro
     environment:
       - ANONYMOUS_LOGIN=true
       - ARTEMIS_USER=artemis

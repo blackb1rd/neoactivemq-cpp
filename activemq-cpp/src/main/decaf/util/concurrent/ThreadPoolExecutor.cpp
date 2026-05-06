@@ -185,6 +185,10 @@ namespace util
                             "pointer to parent ExecutorKernel");
                     }
 
+                    // Inhibit interrupts until runWorker starts, matching
+                    // Java's ThreadPoolExecutor.Worker initial state of -1.
+                    setState(-1);
+
                     this->thread.reset(kernel->factory->newThread(this));
                 }
 
@@ -223,7 +227,10 @@ namespace util
             protected:
                 virtual bool isHeldExclusively() const
                 {
-                    return getState() == 1;
+                    // State -1 means pre-start (inhibit interrupts),
+                    // state 0 means idle, state 1 means executing a task.
+                    // Both -1 and 1 are considered "locked" / in-use.
+                    return getState() != 0;
                 }
 
                 virtual bool tryAcquire(int unused DECAF_UNUSED)
@@ -846,6 +853,9 @@ namespace util
             {
                 Runnable* task         = w->firstTask;
                 w->firstTask           = NULL;
+                // Transition state from -1 (pre-start) to 0 (idle),
+                // allowing interrupts now that runWorker has begun.
+                w->unlock();
                 bool completedAbruptly = true;
                 try
                 {

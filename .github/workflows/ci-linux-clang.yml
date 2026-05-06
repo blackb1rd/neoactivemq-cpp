@@ -449,7 +449,11 @@ jobs:
       #     differs from Classic (message IDs don't match expected sequence)
       #
       # Tests now passing on Artemis (removed from exclusion list):
-      #   - testConcurrentTempDestCreation: passes (~216s, within 900s timeout)
+      #   - testConcurrentTempDestCreation: passes (~216s) but must run last;
+      #     its 5000-client load leaves Artemis degraded for ~1s, causing
+      #     testTempDestinationCompositeAdvisoryTopic to get EOF on the very
+      #     next connection when both tests run back-to-back in the same suite.
+      #     Run it in a second ctest invocation after all other tests complete.
       #   - testDestinationSource: passes with supportAdvisory=true in broker.xml
       #   - testPublishFailsFor*: both variants pass
       #   - VirtualTopic*: all 3 pass with virtualTopicConsumerWildcards in broker.xml
@@ -463,7 +467,10 @@ jobs:
         ulimit -n 65536
         ulimit -u 65536
         ctest --preset ${{ matrix.config.preset }} -L ^integration-openwire$ \
-          -E "testConnectionAdvisories|testDestinationSourceGetters|testDestroyDestination|testQueueBrowserWith2Consumers" \
+          -E "testConcurrentTempDestCreation|testConnectionAdvisories|testDestinationSourceGetters|testDestroyDestination|testQueueBrowserWith2Consumers" \
+          --output-on-failure --timeout 900
+        ctest --preset ${{ matrix.config.preset }} -L ^integration-openwire$ \
+          -R "testConcurrentTempDestCreation" \
           --output-on-failure --timeout 900
 
     - name: Show broker logs on failure
@@ -575,7 +582,10 @@ jobs:
         ulimit -n 65536
         ulimit -u 65536
         ctest --preset ${{ matrix.config.preset }} -L integration-openwire-ssl \
-          -E "testConnectionAdvisories|testDestinationSourceGetters|testDestroyDestination|testQueueBrowserWith2Consumers" \
+          -E "testConcurrentTempDestCreation|testConnectionAdvisories|testDestinationSourceGetters|testDestroyDestination|testQueueBrowserWith2Consumers" \
+          --output-on-failure --timeout 900
+        ctest --preset ${{ matrix.config.preset }} -L integration-openwire-ssl \
+          -R "testConcurrentTempDestCreation" \
           --output-on-failure --timeout 900
       env:
         SSL_CERT_FILE: ${{ github.workspace }}/docker/ssl/certs/ca.pem

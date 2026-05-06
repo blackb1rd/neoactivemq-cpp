@@ -1627,6 +1627,34 @@ void TcpSocket::write(const unsigned char* buffer,
             }
 
             totalWritten += written;
+
+            // Check for deferred socket errors (e.g., ECONNRESET from an
+            // incoming RST).  On macOS, write_some may succeed even when a RST
+            // is already queued in the receive path because the BSD TCP stack
+            // does not consult so_error inside send().  Reading SO_ERROR forces
+            // the kernel to surface any pending asynchronous socket error so
+            // the next iteration (or the caller) gets a proper IOException
+            // instead of silently writing into a broken connection.
+            {
+                int       pendingError = 0;
+                socklen_t errLen       = sizeof(pendingError);
+                if (::getsockopt(this->impl->socket->native_handle(),
+                                 SOL_SOCKET,
+                                 SO_ERROR,
+                                 reinterpret_cast<char*>(&pendingError),
+                                 &errLen) == 0
+                    && pendingError != 0)
+                {
+                    throw IOException(
+                        __FILE__,
+                        __LINE__,
+                        "TcpSocketOutputStream::write - %s",
+                        asio::error_code(pendingError,
+                                         asio::error::get_system_category())
+                            .message()
+                            .c_str());
+                }
+            }
         }
     }
     DECAF_CATCH_RETHROW(IOException)

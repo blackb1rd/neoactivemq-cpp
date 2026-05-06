@@ -926,8 +926,29 @@ void ActiveMQConnection::close()
                         Math::max(lastDeliveredSequenceId,
                                   session->getLastDeliveredSequenceId());
                 }
-                catch (cms::CMSException& ex)
+                catch (...)
                 {
+                    // Absorb all errors: broker may close the transport
+                    // mid-dispose (e.g. ConnectionError from Artemis),
+                    // which throws IOException, not cms::CMSException.
+                    try
+                    {
+                        throw;
+                    }
+                    catch (Exception& e)
+                    {
+                        AMQ_LOG_WARN(
+                            "ActiveMQConnection",
+                            "session dispose failed during close (ignored): "
+                                << e.getMessage());
+                    }
+                    catch (...)
+                    {
+                        AMQ_LOG_WARN(
+                            "ActiveMQConnection",
+                            "session dispose failed during close (ignored):"
+                            " unknown exception");
+                    }
                 }
             }
 
@@ -950,7 +971,34 @@ void ActiveMQConnection::close()
         // to free up memory
         if (this->config->advisoryConsumer != nullptr)
         {
-            this->config->advisoryConsumer->dispose();
+            try
+            {
+                this->config->advisoryConsumer->dispose();
+            }
+            catch (...)
+            {
+                // Best-effort: ignore failures during advisory consumer
+                // cleanup (e.g. transport already closed by broker).
+                try
+                {
+                    throw;
+                }
+                catch (Exception& e)
+                {
+                    AMQ_LOG_WARN(
+                        "ActiveMQConnection",
+                        "advisory consumer dispose failed during close"
+                        " (ignored): "
+                            << e.getMessage());
+                }
+                catch (...)
+                {
+                    AMQ_LOG_WARN(
+                        "ActiveMQConnection",
+                        "advisory consumer dispose failed during close"
+                        " (ignored): unknown exception");
+                }
+            }
         }
 
         ArrayList<std::shared_ptr<ActiveMQTempDestination>> tempDests(
@@ -972,6 +1020,25 @@ void ActiveMQConnection::close()
                 // case DestinationInfo REMOVE will fail — but that is harmless
                 // since the broker will clean up temp destinations when the
                 // TCP connection drops.
+                try
+                {
+                    throw;
+                }
+                catch (Exception& e)
+                {
+                    AMQ_LOG_WARN(
+                        "ActiveMQConnection",
+                        "temp destination close failed during connection"
+                        " cleanup (ignored): "
+                            << e.getMessage());
+                }
+                catch (...)
+                {
+                    AMQ_LOG_WARN(
+                        "ActiveMQConnection",
+                        "temp destination close failed during connection"
+                        " cleanup (ignored): unknown exception");
+                }
             }
         }
 

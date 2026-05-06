@@ -851,8 +851,8 @@ namespace util
              */
             void runWorker(Worker* w)
             {
-                Runnable* task         = w->firstTask;
-                w->firstTask           = NULL;
+                Runnable* task = w->firstTask;
+                w->firstTask = NULL;
                 // Transition state from -1 (pre-start) to 0 (idle),
                 // allowing interrupts now that runWorker has begun.
                 w->unlock();

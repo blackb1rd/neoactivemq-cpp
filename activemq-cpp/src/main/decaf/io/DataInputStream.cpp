@@ -21,11 +21,14 @@
 #include <decaf/io/PushbackInputStream.h>
 #include <cstring>
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #ifdef HAVE_STRING_H
 #include <string.h>
 #endif
 #ifdef HAVE_STRINGS_H
 #include <strings.h>
+#include <stdexcept>
+#include <string>
 #endif
 
 using namespace std;
@@ -33,7 +36,6 @@ using namespace decaf;
 using namespace decaf::io;
 using namespace decaf::util;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 DataInputStream::DataInputStream(InputStream* inputStream, bool own)
@@ -387,7 +389,6 @@ void DataInputStream::readFully(unsigned char* buffer, int size)
 
         this->readFully(buffer, size, 0, size);
     }
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
     DECAF_CATCH_RETHROW(EOFException)
     DECAF_CATCH_RETHROW(IOException)
     DECAF_CATCHALL_THROW(IOException)
@@ -486,40 +487,40 @@ void DataInputStream::readFully(unsigned char* buffer,
 
         if (buffer == NULL)
         {
-            throw NullPointerException(__FILE__, __LINE__, "Buffer is null");
+            throw activemq::exceptions::NullPointerException(__FILE__,
+                                                             __LINE__,
+                                                             "Buffer is null");
         }
 
         if (inputStream == NULL)
         {
-            throw NullPointerException(__FILE__,
-                                       __LINE__,
-                                       "Base input stream is null");
+            throw activemq::exceptions::NullPointerException(
+                __FILE__,
+                __LINE__,
+                "Base input stream is null");
         }
 
         if (size < 0)
         {
-            throw IndexOutOfBoundsException(__FILE__,
-                                            __LINE__,
-                                            "size parameter out of Bounds: %d.",
-                                            size);
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+                "size parameter out of Bounds: " + std::to_string(size) + ".");
         }
 
         if (offset > size || offset < 0)
         {
-            throw IndexOutOfBoundsException(
-                __FILE__,
-                __LINE__,
-                "offset parameter out of Bounds: %d.",
-                offset);
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+                "offset parameter out of Bounds: " + std::to_string(offset) +
+                ".");
         }
 
         if (length < 0 || length > size - offset)
         {
-            throw IndexOutOfBoundsException(
-                __FILE__,
-                __LINE__,
-                "length parameter out of Bounds: %d.",
-                length);
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+                "length parameter out of Bounds: " + std::to_string(length) +
+                ".");
         }
 
         int n = 0;
@@ -534,8 +535,6 @@ void DataInputStream::readFully(unsigned char* buffer,
             n += count;
         }
     }
-    DECAF_CATCH_RETHROW(NullPointerException)
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
     DECAF_CATCH_RETHROW(EOFException)
     DECAF_CATCH_RETHROW(IOException)
     DECAF_CATCHALL_THROW(IOException)

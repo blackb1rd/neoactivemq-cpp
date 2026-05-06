@@ -21,8 +21,8 @@
 #include <decaf/util/AbstractQueue.h>
 #include <decaf/util/Config.h>
 
-#include <decaf/lang/exceptions/InterruptedException.h>
 #include <decaf/util/concurrent/TimeUnit.h>
+#include <stdexcept>
 
 namespace decaf
 {
@@ -125,7 +125,7 @@ namespace util
          *     virtual void run() {
          *         try {
          *             while( true ) { queue->put( produce() ); }
-         *         } catch( InterruptedException& ex ) { ... handle ...}
+         *         } catch( std::runtime_error& ex ) { ... handle ...}
          *     }
          *
          *     Object produce() { ... }
@@ -143,7 +143,7 @@ namespace util
          *     virtual void run() {
          *         try {
          *             while( true ) { consume( queue->take() ); }
-         *         } catch( InterruptedException& ex ) { ... handle ...}
+         *         } catch( std::runtime_error& ex ) { ... handle ...}
          *     }
          *
          *     void consume( Object& x ) { ... }
@@ -184,9 +184,9 @@ namespace util
              * necessary for space to become available.
              *
              * @param value the element to add
-             * @throws InterruptedException if interrupted while waiting
-             * @throws NullPointerException if the specified element is null
-             * @throws IllegalArgumentException if some property of the
+             * @throws std::runtime_error if interrupted while waiting
+             * @throws std::logic_error if the specified element is null
+             * @throws std::invalid_argument if some property of the
              * specified element prevents it from being added to this queue
              */
             virtual void put(const E& value) = 0;
@@ -205,9 +205,9 @@ namespace util
              *         the specified waiting time elapses before space is
              * available
              *
-             * @throws InterruptedException if interrupted while waiting
-             * @throws NullPointerException if the specified element is null
-             * @throws IllegalArgumentException if some property of the
+             * @throws std::runtime_error if interrupted while waiting
+             * @throws std::logic_error if the specified element is null
+             * @throws std::invalid_argument if some property of the
              * specified element prevents it from being added to this queue
              */
             virtual bool offer(const E&        e,
@@ -219,7 +219,7 @@ namespace util
              * necessary until an element becomes available.
              *
              * @return the head of this queue
-             * @throws InterruptedException if interrupted while waiting
+             * @throws std::runtime_error if interrupted while waiting
              */
             virtual E take() = 0;
 
@@ -237,7 +237,7 @@ namespace util
              *        <tt>timeout</tt> parameter.
              * @return <tt>true</tt> if successful or <tt>false</tt> if the
              * specified waiting time elapses before an element is available.
-             * @throws InterruptedException if interrupted while waiting
+             * @throws std::runtime_error if interrupted while waiting
              */
             virtual bool poll(E&              result,
                               long long       timeout,
@@ -265,15 +265,15 @@ namespace util
              * attempting to add elements to collection <tt>c</tt> may result in
              * elements being in neither, either or both collections when the
              * associated exception is thrown.  Attempts to drain a queue to
-             * itself result in <tt>IllegalArgumentException</tt>. Further, the
+             * itself result in <tt>std::invalid_argument</tt>. Further, the
              * behavior of this operation is undefined if the specified
              * collection is modified while the operation is in progress.
              *
              * @param c the collection to transfer elements into
              * @return the number of elements transferred
-             * @throws UnsupportedOperationException if addition of elements
+             * @throws std::logic_error if addition of elements
              *         is not supported by the specified collection
-             * @throws IllegalArgumentException if the specified collection is
+             * @throws std::invalid_argument if the specified collection is
              * this queue, or some property of an element of this queue prevents
              *         it from being added to the specified collection
              */
@@ -286,16 +286,16 @@ namespace util
              * collection <tt>c</tt> may result in elements being in neither,
              * either or both collections when the associated exception is
              * thrown.  Attempts to drain a queue to itself result in
-             * <tt>IllegalArgumentException</tt>. Further, the behavior of
+             * <tt>std::invalid_argument</tt>. Further, the behavior of
              * this operation is undefined if the specified collection is
              * modified while the operation is in progress.
              *
              * @param c the collection to transfer elements into
              * @param maxElements the maximum number of elements to transfer
              * @return the number of elements transferred
-             * @throws UnsupportedOperationException if addition of elements
+             * @throws std::logic_error if addition of elements
              *         is not supported by the specified collection
-             * @throws IllegalArgumentException if the specified collection is
+             * @throws std::invalid_argument if the specified collection is
              * this queue, or some property of an element of this queue prevents
              *         it from being added to the specified collection
              */

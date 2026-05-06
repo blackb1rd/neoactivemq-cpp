@@ -21,7 +21,7 @@
 #include <activemq/util/Config.h>
 #include <decaf/util/List.h>
 #include <decaf/util/Map.h>
-#include <decaf/util/NoSuchElementException.h>
+#include <stdexcept>
 
 namespace activemq
 {
@@ -241,7 +241,7 @@ namespace util
         /**
          * Gets the Boolean value of this Node.
          * @return value contained at the given index
-         * @throw NoSuchElementException this node cannot be returned as the
+         * @throw std::runtime_error this node cannot be returned as the
          * requested type.
          */
         bool getBool() const;
@@ -257,7 +257,7 @@ namespace util
         /**
          * Gets the Byte value of this Node.
          * @return value contained at the given index
-         * @throw NoSuchElementException this node cannot be returned as the
+         * @throw std::runtime_error this node cannot be returned as the
          * requested type.
          */
         unsigned char getByte() const;
@@ -273,7 +273,7 @@ namespace util
         /**
          * Gets the Character value of this Node.
          * @return value contained at the given index
-         * @throw NoSuchElementException this node cannot be returned as the
+         * @throw std::runtime_error this node cannot be returned as the
          * requested type.
          */
         char getChar() const;
@@ -289,7 +289,7 @@ namespace util
         /**
          * Gets the Short value of this Node.
          * @return value contained at the given index
-         * @throw NoSuchElementException this node cannot be returned as the
+         * @throw std::runtime_error this node cannot be returned as the
          * requested type.
          */
         short getShort() const;
@@ -305,7 +305,7 @@ namespace util
         /**
          * Gets the Integer value of this Node.
          * @return value contained at the given index
-         * @throw NoSuchElementException this node cannot be returned as the
+         * @throw std::runtime_error this node cannot be returned as the
          * requested type.
          */
         int getInt() const;
@@ -321,7 +321,7 @@ namespace util
         /**
          * Gets the Long value of this Node.
          * @return value contained at the given index
-         * @throw NoSuchElementException this node cannot be returned as the
+         * @throw std::runtime_error this node cannot be returned as the
          * requested type.
          */
         long long getLong() const;
@@ -337,7 +337,7 @@ namespace util
         /**
          * Gets the Float value of this Node.
          * @return value contained at the given index
-         * @throw NoSuchElementException this node cannot be returned as the
+         * @throw std::runtime_error this node cannot be returned as the
          * requested type.
          */
         float getFloat() const;
@@ -353,7 +353,7 @@ namespace util
         /**
          * Gets the Double value of this Node.
          * @return value contained at the given index
-         * @throw NoSuchElementException this node cannot be returned as the
+         * @throw std::runtime_error this node cannot be returned as the
          * requested type.
          */
         double getDouble() const;
@@ -369,7 +369,7 @@ namespace util
         /**
          * Gets the String value of this Node.
          * @return value contained at the given index
-         * @throw NoSuchElementException this node cannot be returned as the
+         * @throw std::runtime_error this node cannot be returned as the
          * requested type.
          */
         std::string getString() const;
@@ -385,7 +385,7 @@ namespace util
         /**
          * Gets the Byte Array value of this Node.
          * @return value contained at the given index
-         * @throw NoSuchElementException this node cannot be returned as the
+         * @throw std::runtime_error this node cannot be returned as the
          * requested type.
          */
         std::vector<unsigned char> getByteArray() const;
@@ -401,7 +401,7 @@ namespace util
         /**
          * Gets the Primitive List value of this Node.
          * @return value contained at the given index
-         * @throw NoSuchElementException this node cannot be returned as the
+         * @throw std::runtime_error this node cannot be returned as the
          * requested type.
          */
         const decaf::util::List<PrimitiveValueNode>& getList() const;
@@ -418,7 +418,7 @@ namespace util
         /**
          * Gets the Primitive Map value of this Node.
          * @return value contained at the given index
-         * @throw NoSuchElementException this node cannot be returned as the
+         * @throw std::runtime_error this node cannot be returned as the
          * requested type.
          */
         const decaf::util::Map<std::string, PrimitiveValueNode>& getMap() const;

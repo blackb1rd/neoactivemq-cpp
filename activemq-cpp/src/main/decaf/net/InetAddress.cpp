@@ -18,18 +18,20 @@
 #include "InetAddress.h"
 
 #include <decaf/lang/Byte.h>
+#include <decaf/lang/Exception.h>
 #include <decaf/lang/System.h>
-#include <decaf/lang/exceptions/RuntimeException.h>
 #include <decaf/net/Inet4Address.h>
 #include <decaf/net/Inet6Address.h>
 #include <decaf/net/UnknownHostException.h>
 
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <stdexcept>
+#include <string>
 #include <asio.hpp>
 
 using namespace decaf;
 using namespace decaf::net;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::internal;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -52,18 +54,15 @@ InetAddress::InetAddress(const unsigned char* ipAddress, int numBytes)
 {
     if (ipAddress == NULL)
     {
-        throw NullPointerException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::NullPointerException(
             "InetAddress constructor called with null address array.");
     }
 
     if (numBytes < 0)
     {
-        throw IllegalArgumentException(__FILE__,
-                                       __LINE__,
-                                       "Number of bytes value is invalid: %d",
-                                       numBytes);
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Number of bytes value is invalid: " + std::to_string(numBytes));
     }
 
     unsigned char* copy = new unsigned char[numBytes];
@@ -81,18 +80,15 @@ InetAddress::InetAddress(const std::string&   hostname,
 {
     if (ipAddress == NULL)
     {
-        throw NullPointerException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::NullPointerException(
             "InetAddress constructor called with null address array.");
     }
 
     if (numBytes < 0)
     {
-        throw IllegalArgumentException(__FILE__,
-                                       __LINE__,
-                                       "Number of bytes value is invalid: %d",
-                                       numBytes);
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Number of bytes value is invalid: " + std::to_string(numBytes));
     }
 
     unsigned char* copy = new unsigned char[numBytes];

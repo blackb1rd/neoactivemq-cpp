@@ -20,13 +20,15 @@
 #include <decaf/lang/Math.h>
 #include <decaf/nio/CharBuffer.h>
 
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <stdexcept>
+#include <string>
 #include <vector>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::io;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::nio;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -155,8 +157,6 @@ int Reader::read(decaf::nio::CharBuffer* charBuffer)
         return this->doReadCharBuffer(charBuffer);
     }
     DECAF_CATCH_RETHROW(IOException)
-    DECAF_CATCH_RETHROW(NullPointerException)
-    DECAF_CATCH_RETHROW(ReadOnlyBufferException)
     DECAF_CATCHALL_THROW(IOException)
 }
 
@@ -218,9 +218,10 @@ int Reader::doReadCharBuffer(decaf::nio::CharBuffer* charBuffer)
 {
     if (charBuffer == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "Pointer to CharBuffer cannot be NULL.");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "Pointer to CharBuffer cannot be NULL.");
     }
 
     try
@@ -244,7 +245,5 @@ int Reader::doReadCharBuffer(decaf::nio::CharBuffer* charBuffer)
         return length;
     }
     DECAF_CATCH_RETHROW(IOException)
-    DECAF_CATCH_RETHROW(NullPointerException)
-    DECAF_CATCH_RETHROW(ReadOnlyBufferException)
     DECAF_CATCHALL_THROW(IOException)
 }

@@ -17,19 +17,19 @@
 
 #include <gtest/gtest.h>
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/lang/Integer.h>
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
-#include <decaf/lang/exceptions/IllegalStateException.h>
 #include <decaf/util/ArrayList.h>
 #include <decaf/util/HashMap.h>
 #include <decaf/util/StlMap.h>
+#include <stdexcept>
 #include <string>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
+using namespace activemq::exceptions;
 
 class StlMapTest : public ::testing::Test
 {
@@ -57,8 +57,8 @@ TEST_F(StlMapTest, testConstructor)
     ASSERT_TRUE(map1.isEmpty());
     ASSERT_TRUE(map1.size() == 0);
 
-    ASSERT_THROW(map1.get("TEST"), decaf::util::NoSuchElementException)
-        << ("Should Throw a NoSuchElementException");
+    ASSERT_THROW(map1.get("TEST"), NoSuchElementException)
+        << ("Should Throw NoSuchElementException");
 
     HashMap<string, int> srcMap;
     srcMap.put("A", 1);
@@ -187,7 +187,7 @@ TEST_F(StlMapTest, testGet)
         boolMap.get("mike");
         ASSERT_TRUE(false);
     }
-    catch (decaf::util::NoSuchElementException& e)
+    catch (NoSuchElementException&)
     {
     }
 }
@@ -243,8 +243,8 @@ TEST_F(StlMapTest, testRemove)
     ASSERT_TRUE(boolMap.remove("fred") == true);
     ASSERT_TRUE(boolMap.containsKey("fred") == false);
 
-    ASSERT_THROW(boolMap.remove("fred"), decaf::util::NoSuchElementException)
-        << ("Should throw a NoSuchElementException");
+    ASSERT_THROW(boolMap.remove("fred"), NoSuchElementException)
+        << ("Should throw NoSuchElementException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -390,8 +390,8 @@ TEST_F(StlMapTest, testEntrySetIterator)
         << ("Iterator didn't cover the expected range");
 
     iterator.reset(map.entrySet().iterator());
-    ASSERT_THROW(iterator->remove(), IllegalStateException)
-        << ("Should throw an IllegalStateException");
+    ASSERT_THROW(iterator->remove(), std::logic_error)
+        << ("Should throw an std::logic_error");
 
     count = 0;
     while (iterator->hasNext())
@@ -403,8 +403,8 @@ TEST_F(StlMapTest, testEntrySetIterator)
 
     ASSERT_TRUE(count++ == MAP_SIZE)
         << ("Iterator didn't remove the expected range");
-    ASSERT_THROW(iterator->remove(), IllegalStateException)
-        << ("Should throw an IllegalStateException");
+    ASSERT_THROW(iterator->remove(), std::logic_error)
+        << ("Should throw an std::logic_error");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -426,8 +426,8 @@ TEST_F(StlMapTest, testKeySetIterator)
         << ("Iterator didn't cover the expected range");
 
     iterator.reset(map.keySet().iterator());
-    ASSERT_THROW(iterator->remove(), IllegalStateException)
-        << ("Should throw an IllegalStateException");
+    ASSERT_THROW(iterator->remove(), std::logic_error)
+        << ("Should throw an std::logic_error");
 
     count = 0;
     while (iterator->hasNext())
@@ -439,8 +439,8 @@ TEST_F(StlMapTest, testKeySetIterator)
 
     ASSERT_TRUE(count++ == MAP_SIZE)
         << ("Iterator didn't remove the expected range");
-    ASSERT_THROW(iterator->remove(), IllegalStateException)
-        << ("Should throw an IllegalStateException");
+    ASSERT_THROW(iterator->remove(), std::logic_error)
+        << ("Should throw an std::logic_error");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -462,8 +462,8 @@ TEST_F(StlMapTest, testValuesIterator)
         << ("Iterator didn't cover the expected range");
 
     iterator.reset(map.values().iterator());
-    ASSERT_THROW(iterator->remove(), IllegalStateException)
-        << ("Should throw an IllegalStateException");
+    ASSERT_THROW(iterator->remove(), std::logic_error)
+        << ("Should throw an std::logic_error");
 
     count = 0;
     while (iterator->hasNext())
@@ -475,6 +475,6 @@ TEST_F(StlMapTest, testValuesIterator)
 
     ASSERT_TRUE(count++ == MAP_SIZE)
         << ("Iterator didn't remove the expected range");
-    ASSERT_THROW(iterator->remove(), IllegalStateException)
-        << ("Should throw an IllegalStateException");
+    ASSERT_THROW(iterator->remove(), std::logic_error)
+        << ("Should throw an std::logic_error");
 }

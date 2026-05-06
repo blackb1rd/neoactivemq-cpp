@@ -36,7 +36,6 @@ using namespace activemq::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 AMQCPP_API const int ActiveMQMessageAudit::DEFAULT_WINDOW_SIZE    = 2048;
@@ -162,7 +161,7 @@ bool ActiveMQMessageAudit::isDuplicate(const std::string& id) const
             {
                 bits = this->impl->map.get(seed);
             }
-            catch (NoSuchElementException& ex)
+            catch (NoSuchElementException&)
             {
                 bits.reset(new BitSet(this->impl->auditDepth));
                 this->impl->map.put(seed, bits);
@@ -208,7 +207,7 @@ bool ActiveMQMessageAudit::isDuplicate(std::shared_ptr<MessageId> msgId) const
                     {
                         bits = this->impl->map.get(seed);
                     }
-                    catch (NoSuchElementException& ex)
+                    catch (NoSuchElementException&)
                     {
                         bits.reset(new BitSet(this->impl->auditDepth));
                         this->impl->map.put(seed, bits);
@@ -249,7 +248,7 @@ void ActiveMQMessageAudit::rollback(const std::string& msgId)
             {
                 bits = this->impl->map.get(seed);
             }
-            catch (NoSuchElementException& ex)
+            catch (NoSuchElementException&)
             {
             }
 
@@ -289,7 +288,7 @@ void ActiveMQMessageAudit::rollback(std::shared_ptr<commands::MessageId> msgId)
                     {
                         bits = this->impl->map.get(seed);
                     }
-                    catch (NoSuchElementException& ex)
+                    catch (NoSuchElementException&)
                     {
                     }
 
@@ -330,7 +329,7 @@ bool ActiveMQMessageAudit::isInOrder(const std::string& msgId) const
                 {
                     bits = this->impl->map.get(seed);
                 }
-                catch (NoSuchElementException& ex)
+                catch (NoSuchElementException&)
                 {
                     bits.reset(new BitSet(this->impl->auditDepth));
                     this->impl->map.put(seed, bits);
@@ -374,7 +373,7 @@ bool ActiveMQMessageAudit::isInOrder(
                     {
                         bits = this->impl->map.get(seed);
                     }
-                    catch (NoSuchElementException& ex)
+                    catch (NoSuchElementException&)
                     {
                         bits.reset(new BitSet(this->impl->auditDepth));
                         this->impl->map.put(seed, bits);
@@ -414,7 +413,7 @@ long long ActiveMQMessageAudit::getLastSeqId(
                 {
                     bits = this->impl->map.get(seed);
                 }
-                catch (NoSuchElementException& ex)
+                catch (NoSuchElementException&)
                 {
                 }
 

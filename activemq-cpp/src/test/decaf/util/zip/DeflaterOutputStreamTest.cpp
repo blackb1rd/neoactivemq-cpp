@@ -30,7 +30,7 @@
 
 #include <decaf/lang/Integer.h>
 
-#include <decaf/lang/exceptions/IndexOutOfBoundsException.h>
+#include <stdexcept>
 
 #include <vector>
 
@@ -38,7 +38,6 @@ using namespace std;
 using namespace decaf;
 using namespace decaf::io;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::zip;
 
@@ -159,8 +158,8 @@ TEST_F(DeflaterOutputStreamTest, testConstructorOutputStreamDeflater)
     ByteArrayOutputStream baos;
     Deflater*             nullDeflater = NULL;
 
-    ASSERT_THROW(DeflaterOutputStream(&baos, nullDeflater), NullPointerException)
-        << ("Should have thrown a NullPointerException");
+    ASSERT_THROW(DeflaterOutputStream(&baos, nullDeflater), std::logic_error)
+        << ("Should have thrown std::logic_error");
 
     Deflater               defl;
     MyDeflaterOutputStream dos(&baos, &defl);
@@ -199,14 +198,14 @@ TEST_F(DeflaterOutputStreamTest, testConstructorOutputStreamDeflaterI)
 
     // Test for a null Deflater.
     ASSERT_THROW(DeflaterOutputStream(&baos, nullDeflater, buf),
-                 NullPointerException)
-        << ("Should have thrown a NullPointerException");
+                 std::logic_error)
+        << ("Should have thrown std::logic_error");
 
     Deflater defl;
 
     // Test for a zero buf.
     ASSERT_THROW(DeflaterOutputStream(&baos, &defl, zeroBuf),
-                 IllegalArgumentException)
+                 std::invalid_argument)
         << ("Should have thrown a IllegalArgumentException");
 
     // Test to see if DeflaterOutputStream was created with the correct
@@ -312,13 +311,13 @@ TEST_F(DeflaterOutputStreamTest, testWriteBIII)
     ByteArrayOutputStream baos2;
     DeflaterOutputStream  dos2(&baos2);
 
-    ASSERT_THROW(dos2.write(byteArray, 7, 2, 10), IndexOutOfBoundsException)
-        << ("Should have thrown an IndexOutOfBoundsException");
+    ASSERT_THROW(dos2.write(byteArray, 7, 2, 10), std::out_of_range)
+        << ("Should have thrown an std::out_of_range");
 
     // Test for trying to start writing from a unsigned char > than the array
     // size.
-    ASSERT_THROW(dos2.write(byteArray, 7, 2, 10), IndexOutOfBoundsException)
-        << ("Should have thrown an IndexOutOfBoundsException");
+    ASSERT_THROW(dos2.write(byteArray, 7, 2, 10), std::out_of_range)
+        << ("Should have thrown an std::out_of_range");
 
     dos2.close();
 }

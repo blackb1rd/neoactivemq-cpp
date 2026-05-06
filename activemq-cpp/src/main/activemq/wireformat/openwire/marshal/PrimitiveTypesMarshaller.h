@@ -18,6 +18,7 @@
 #ifndef _ACTIVEMQ_WIREFORMAT_OPENWIRE_MARSHAL_PRIMITIVETYPESMARSHALLER_H_
 #define _ACTIVEMQ_WIREFORMAT_OPENWIRE_MARSHAL_PRIMITIVETYPESMARSHALLER_H_
 
+#include <activemq/exceptions/IoExceptions.h>
 #include <activemq/util/Config.h>
 #include <activemq/util/PrimitiveList.h>
 #include <activemq/util/PrimitiveMap.h>
@@ -25,7 +26,6 @@
 #include <cms/CMSException.h>
 #include <decaf/io/DataInputStream.h>
 #include <decaf/io/DataOutputStream.h>
-#include <decaf/io/IOException.h>
 #include <string>
 
 namespace activemq

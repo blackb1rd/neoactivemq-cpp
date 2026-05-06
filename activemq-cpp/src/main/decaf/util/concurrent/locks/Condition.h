@@ -20,11 +20,10 @@
 
 #include <decaf/util/Config.h>
 
-#include <decaf/lang/exceptions/IllegalMonitorStateException.h>
-#include <decaf/lang/exceptions/InterruptedException.h>
-#include <decaf/lang/exceptions/RuntimeException.h>
+#include <decaf/lang/Exception.h>
 #include <decaf/util/Date.h>
 #include <decaf/util/concurrent/TimeUnit.h>
+#include <stdexcept>
 
 namespace decaf
 {
@@ -183,7 +182,7 @@ namespace util
                  *   * is interrupted while waiting and interruption of thread
                  * suspension is supported,
                  *
-                 * then InterruptedException is thrown and the current thread's
+                 * then std::runtime_error is thrown and the current thread's
                  * interrupted status is cleared. It is not specified, in the
                  * first case, whether or not the test for interruption occurs
                  * before the lock is released.
@@ -194,7 +193,7 @@ namespace util
                  * with this Condition when this method is called. It is up to
                  * the implementation to determine if this is the case and if
                  * not, how to respond. Typically, an exception will be thrown
-                 * (such as IllegalMonitorStateException) and the implementation
+                 * (such as std::logic_error) and the implementation
                  * must document that fact.
                  *
                  * An implementation can favor responding to an interrupt over
@@ -202,15 +201,15 @@ namespace util
                  * the implementation must ensure that the signal is redirected
                  * to another waiting thread, if there is one.
                  *
-                 * @throws RuntimeException
+                 * @throws Exception
                  *         if an unexpected error occurs while trying to wait on
                  * the Condition.
                  *
-                 * @throws InterruptedException
+                 * @throws std::runtime_error
                  *         if the current thread is interrupted (and
                  * interruption of thread suspension is supported)
                  *
-                 * @throws IllegalMonitorStateException
+                 * @throws std::logic_error
                  *         if the caller is not the lock owner.
                  */
                 virtual void await() = 0;
@@ -247,14 +246,14 @@ namespace util
                  * with this Condition when this method is called. It is up to
                  * the implementation to determine if this is the case and if
                  * not, how to respond. Typically, an exception will be thrown
-                 * (such as IllegalMonitorStateException) and the implementation
+                 * (such as std::logic_error) and the implementation
                  * must document that fact.
                  *
-                 * @throws RuntimeException
+                 * @throws Exception
                  *         if an unexpected error occurs while trying to wait on
                  * the Condition.
                  *
-                 * @throws IllegalMonitorStateException
+                 * @throws std::logic_error
                  *         if the caller is not the lock owner.
                  */
                 virtual void awaitUninterruptibly() = 0;
@@ -290,7 +289,7 @@ namespace util
                  *   * is interrupted while waiting and interruption of thread
                  * suspension is supported,
                  *
-                 * then InterruptedException is thrown and the current thread's
+                 * then std::runtime_error is thrown and the current thread's
                  * interrupted status is cleared. It is not specified, in the
                  * first case, whether or not the test for interruption occurs
                  * before the lock is released.
@@ -325,7 +324,7 @@ namespace util
                  * with this Condition when this method is called. It is up to
                  * the implementation to determine if this is the case and if
                  * not, how to respond. Typically, an exception will be thrown
-                 * (such as IllegalMonitorStateException) and the implementation
+                 * (such as std::logic_error) and the implementation
                  * must document that fact.
                  *
                  * An implementation can favor responding to an interrupt over
@@ -343,15 +342,15 @@ namespace util
                  * method to finish waiting out the desired time. A value less
                  * than or equal to zero indicates that no time remains.
                  *
-                 * @throws RuntimeException
+                 * @throws Exception
                  *         if an unexpected error occurs while trying to wait on
                  * the Condition.
                  *
-                 * @throws InterruptedException
+                 * @throws std::runtime_error
                  *         if the current thread is interrupted (and
                  * interruption of thread suspension is supported)
                  *
-                 * @throws IllegalMonitorStateException
+                 * @throws std::logic_error
                  *         if the caller is not the lock owner.
                  */
                 virtual long long awaitNanos(long long nanosTimeout) = 0;
@@ -369,15 +368,15 @@ namespace util
                  * @return false if the waiting time detectably elapsed before
                  * return from the method, else true
                  *
-                 * @throws RuntimeException
+                 * @throws Exception
                  *         if an unexpected error occurs while trying to wait on
                  * the Condition.
                  *
-                 * @throws InterruptedException
+                 * @throws std::runtime_error
                  *         if the current thread is interrupted (and
                  * interruption of thread suspension is supported)
                  *
-                 * @throws IllegalMonitorStateException
+                 * @throws std::logic_error
                  *         if the caller is not the lock owner.
                  */
                 virtual bool await(long long time, const TimeUnit& unit) = 0;
@@ -413,7 +412,7 @@ namespace util
                  *   * is interrupted while waiting and interruption of thread
                  * suspension is supported,
                  *
-                 * then InterruptedException is thrown and the current thread's
+                 * then std::runtime_error is thrown and the current thread's
                  * interrupted status is cleared. It is not specified, in the
                  * first case, whether or not the test for interruption occurs
                  * before the lock is released.
@@ -438,7 +437,7 @@ namespace util
                  * with this Condition when this method is called. It is up to
                  * the implementation to determine if this is the case and if
                  * not, how to respond. Typically, an exception will be thrown
-                 * (such as IllegalMonitorStateException) and the implementation
+                 * (such as std::logic_error) and the implementation
                  * must document that fact.
                  *
                  * An implementation can favor responding to an interrupt over
@@ -452,15 +451,15 @@ namespace util
                  * @return false if the deadline has elapsed upon return, else
                  * true
                  *
-                 * @throws RuntimeException
+                 * @throws Exception
                  *         if an unexpected error occurs while trying to wait on
                  * the Condition.
                  *
-                 * @throws InterruptedException
+                 * @throws std::runtime_error
                  *         if the current thread is interrupted (and
                  * interruption of thread suspension is supported)
                  *
-                 * @throws IllegalMonitorStateException
+                 * @throws std::logic_error
                  *         if the caller is not the lock owner.
                  */
                 virtual bool awaitUntil(const Date& deadline) = 0;
@@ -472,7 +471,7 @@ namespace util
                  * selected for waking up. That thread must then re-acquire the
                  * lock before returning from await.
                  *
-                 * @throws RuntimeException
+                 * @throws Exception
                  *         if an unexpected error occurs while trying to wait on
                  * the Condition.
                  */
@@ -485,7 +484,7 @@ namespace util
                  * all woken up. Each thread must re-acquire the lock before it
                  * can return from await.
                  *
-                 * @throws RuntimeException
+                 * @throws Exception
                  *         if an unexpected error occurs while trying to wait on
                  * the Condition.
                  */

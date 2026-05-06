@@ -20,6 +20,7 @@
 
 #include <decaf/lang/Comparable.h>
 #include <decaf/util/Config.h>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -101,6 +102,9 @@ namespace util
          *      The size of the byte array, or number of bytes to use.
          *
          * @return type 3 UUID
+         *
+         * @throws std::logic_error if name is NULL but size is greater than
+         * zero.
          */
         static UUID nameUUIDFromBytes(const char* name, int size);
 
@@ -113,7 +117,7 @@ namespace util
          *
          * @return type 3 UUID
          *
-         * @throws IllegalArgumentException if the UUID string given is invalid.
+         * @throws std::invalid_argument if the UUID string given is invalid.
          */
         static UUID fromString(const std::string& name);
 
@@ -234,7 +238,7 @@ namespace util
          *
          * @return the node value of this UUID
          *
-         * @throws UnsupportedOperationException if this UUID version does not
+         * @throws std::logic_error if this UUID version does not
          * support this operation.
          */
         long long node();
@@ -253,7 +257,7 @@ namespace util
          *
          * @return the timestamp associated with a V1 UUID
          *
-         * @throws UnsupportedOperationException if this UUID version does not
+         * @throws std::logic_error if this UUID version does not
          * support this operation.
          */
         long long timestamp();
@@ -271,7 +275,7 @@ namespace util
          *
          * @return the clockSequeunce associated with a V1 UUID
          *
-         * @throws UnsupportedOperationException if this UUID version does not
+         * @throws std::logic_error if this UUID version does not
          * support this operation.
          */
         int clockSequence();
@@ -288,7 +292,7 @@ namespace util
          *
          * @return the variant associated with a V1 UUID
          *
-         * @throws UnsupportedOperationException if this UUID version does not
+         * @throws std::logic_error if this UUID version does not
          * support this operation.
          */
         int variant();
@@ -305,7 +309,7 @@ namespace util
          *
          * @return the version associated with a V1 UUID
          *
-         * @throws UnsupportedOperationException if this UUID version does not
+         * @throws std::logic_error if this UUID version does not
          * support this operation.
          */
         int version();

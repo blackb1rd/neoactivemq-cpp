@@ -18,11 +18,9 @@
 #ifndef _DECAF_INTERNAL_NIO_DOUBLEARRAYBUFFER_H_
 #define _DECAF_INTERNAL_NIO_DOUBLEARRAYBUFFER_H_
 
+#include <activemq/exceptions/BufferUnderflowException.h>
 #include <decaf/internal/util/ByteArrayAdapter.h>
-#include <decaf/lang/exceptions/IndexOutOfBoundsException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/nio/BufferOverflowException.h>
-#include <decaf/nio/BufferUnderflowException.h>
 #include <decaf/nio/DoubleBuffer.h>
 #include <decaf/nio/ReadOnlyBufferException.h>
 
@@ -89,8 +87,8 @@ namespace internal
              *      Boolean indicating if this buffer should be read-only,
              * default as false.
              *
-             * @throws NullPointerException if buffer is NULL
-             * @throws IndexOutOfBoundsException if offset is greater than array
+             * @throws std::logic_error if buffer is NULL
+             * @throws std::out_of_range if offset is greater than array
              * capacity.
              */
             DoubleArrayBuffer(double* array,
@@ -116,8 +114,8 @@ namespace internal
              *      Boolean indicating if this buffer should be read-only,
              * default as false.
              *
-             * @throws NullPointerException if array is NULL
-             * @throws IndexOutOfBoundsException if offset + length is greater
+             * @throws std::logic_error if array is NULL
+             * @throws std::out_of_range if offset + length is greater
              * than array size.
              */
             DoubleArrayBuffer(

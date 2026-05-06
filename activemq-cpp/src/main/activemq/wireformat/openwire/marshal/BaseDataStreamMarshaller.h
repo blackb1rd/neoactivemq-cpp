@@ -21,6 +21,7 @@
 #include <activemq/commands/MessageId.h>
 #include <activemq/commands/ProducerId.h>
 #include <activemq/commands/TransactionId.h>
+#include <activemq/exceptions/IoCatchMacros.h>
 #include <activemq/util/Config.h>
 #include <activemq/wireformat/openwire/marshal/DataStreamMarshaller.h>
 #include <activemq/wireformat/openwire/utils/HexTable.h>
@@ -554,10 +555,9 @@ namespace wireformat
                             return 0;
                         }
                     }
-                    AMQ_CATCH_RETHROW(decaf::io::IOException)
-                    AMQ_CATCH_EXCEPTION_CONVERT(decaf::lang::Exception,
-                                                decaf::io::IOException)
-                    AMQ_CATCHALL_THROW(decaf::io::IOException)
+                    AMQ_IOSTREAM_CATCH_RETHROW()
+                    AMQ_IOSTREAM_CATCH_CONVERT_LANG_EXCEPTION()
+                    AMQ_IOSTREAM_CATCHALL_THROW()
                 }
 
                 /**
@@ -591,10 +591,9 @@ namespace wireformat
                             }
                         }
                     }
-                    AMQ_CATCH_RETHROW(decaf::io::IOException)
-                    AMQ_CATCH_EXCEPTION_CONVERT(decaf::lang::Exception,
-                                                decaf::io::IOException)
-                    AMQ_CATCHALL_THROW(decaf::io::IOException)
+                    AMQ_IOSTREAM_CATCH_RETHROW()
+                    AMQ_IOSTREAM_CATCH_CONVERT_LANG_EXCEPTION()
+                    AMQ_IOSTREAM_CATCHALL_THROW()
                 }
 
                 /**
@@ -626,10 +625,9 @@ namespace wireformat
                             }
                         }
                     }
-                    AMQ_CATCH_RETHROW(decaf::io::IOException)
-                    AMQ_CATCH_EXCEPTION_CONVERT(decaf::lang::Exception,
-                                                decaf::io::IOException)
-                    AMQ_CATCHALL_THROW(decaf::io::IOException)
+                    AMQ_IOSTREAM_CATCH_RETHROW()
+                    AMQ_IOSTREAM_CATCH_CONVERT_LANG_EXCEPTION()
+                    AMQ_IOSTREAM_CATCHALL_THROW()
                 }
 
             protected:

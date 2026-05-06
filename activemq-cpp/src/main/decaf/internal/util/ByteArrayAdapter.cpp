@@ -17,18 +17,21 @@
 
 #include "ByteArrayAdapter.h"
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/lang/Double.h>
 #include <decaf/lang/Float.h>
 #include <decaf/lang/Math.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdexcept>
+#include <string>
 
 using namespace decaf;
 using namespace decaf::nio;
 using namespace decaf::internal;
 using namespace decaf::internal::util;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
+using activemq::exceptions::BufferUnderflowException;
 
 ////////////////////////////////////////////////////////////////////////////////
 ByteArrayAdapter::ByteArrayAdapter(int size)
@@ -40,9 +43,8 @@ ByteArrayAdapter::ByteArrayAdapter(int size)
     {
         if (size < 0)
         {
-            throw IndexOutOfBoundsException(
-                __FILE__,
-                __LINE__,
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
                 "Array size given must be greater than zero.");
         }
 
@@ -64,9 +66,8 @@ ByteArrayAdapter::ByteArrayAdapter(unsigned char* array, int size, bool own)
     {
         this->initialize(array, size, own);
     }
-    DECAF_CATCH_RETHROW(NullPointerException)
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCHALL_THROW(NullPointerException)
+    DECAF_CATCH_RETHROW(Exception)
+    DECAF_CATCHALL_THROW(Exception)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -79,9 +80,8 @@ ByteArrayAdapter::ByteArrayAdapter(char* array, int size, bool own)
     {
         this->initialize(reinterpret_cast<unsigned char*>(array), size, own);
     }
-    DECAF_CATCH_RETHROW(NullPointerException)
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCHALL_THROW(NullPointerException)
+    DECAF_CATCH_RETHROW(Exception)
+    DECAF_CATCHALL_THROW(Exception)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -96,9 +96,8 @@ ByteArrayAdapter::ByteArrayAdapter(double* array, int size, bool own)
                          size * (int)sizeof(double),
                          own);
     }
-    DECAF_CATCH_RETHROW(NullPointerException)
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCHALL_THROW(NullPointerException)
+    DECAF_CATCH_RETHROW(Exception)
+    DECAF_CATCHALL_THROW(Exception)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -113,9 +112,8 @@ ByteArrayAdapter::ByteArrayAdapter(float* array, int size, bool own)
                          size * (int)sizeof(float),
                          own);
     }
-    DECAF_CATCH_RETHROW(NullPointerException)
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCHALL_THROW(NullPointerException)
+    DECAF_CATCH_RETHROW(Exception)
+    DECAF_CATCHALL_THROW(Exception)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -130,9 +128,8 @@ ByteArrayAdapter::ByteArrayAdapter(long long* array, int size, bool own)
                          size * (int)sizeof(long long),
                          own);
     }
-    DECAF_CATCH_RETHROW(NullPointerException)
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCHALL_THROW(NullPointerException)
+    DECAF_CATCH_RETHROW(Exception)
+    DECAF_CATCHALL_THROW(Exception)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -147,9 +144,8 @@ ByteArrayAdapter::ByteArrayAdapter(int* array, int size, bool own)
                          size * (int)sizeof(int),
                          own);
     }
-    DECAF_CATCH_RETHROW(NullPointerException)
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCHALL_THROW(NullPointerException)
+    DECAF_CATCH_RETHROW(Exception)
+    DECAF_CATCHALL_THROW(Exception)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -164,9 +160,8 @@ ByteArrayAdapter::ByteArrayAdapter(short* array, int size, bool own)
                          size * (int)sizeof(short),
                          own);
     }
-    DECAF_CATCH_RETHROW(NullPointerException)
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCHALL_THROW(NullPointerException)
+    DECAF_CATCH_RETHROW(Exception)
+    DECAF_CATCHALL_THROW(Exception)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -176,7 +171,7 @@ void ByteArrayAdapter::initialize(unsigned char* array, int size, bool own)
     {
         if (array == NULL)
         {
-            throw NullPointerException(
+            throw activemq::exceptions::NullPointerException(
                 __FILE__,
                 __LINE__,
                 "ByteArrayAdapter::initialize - Passed Buffer is null");
@@ -184,9 +179,8 @@ void ByteArrayAdapter::initialize(unsigned char* array, int size, bool own)
 
         if (size < 0)
         {
-            throw IndexOutOfBoundsException(
-                __FILE__,
-                __LINE__,
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
                 "Array size given must be greater than zero.");
         }
 
@@ -226,36 +220,33 @@ void ByteArrayAdapter::read(unsigned char* buffer,
 
         if (buffer == NULL)
         {
-            throw NullPointerException(
+            throw activemq::exceptions::NullPointerException(
                 __FILE__,
                 __LINE__,
-                "ByteArrayAdapter::write - Passed buffer is null");
+                "ByteArrayAdapter::read - Passed buffer is null");
         }
 
         if (size < 0)
         {
-            throw IndexOutOfBoundsException(__FILE__,
-                                            __LINE__,
-                                            "size parameter out of Bounds: %d.",
-                                            size);
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+                "size parameter out of Bounds: " + std::to_string(size) + ".");
         }
 
         if (offset < 0)
         {
-            throw IndexOutOfBoundsException(
-                __FILE__,
-                __LINE__,
-                "offset parameter out of Bounds: %d.",
-                offset);
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+                "offset parameter out of Bounds: " + std::to_string(offset) +
+                ".");
         }
 
         if (length < 0 || length > size)
         {
-            throw IndexOutOfBoundsException(
-                __FILE__,
-                __LINE__,
-                "length parameter out of Bounds: %d.",
-                length);
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+                "length parameter out of Bounds: " + std::to_string(length) +
+                ".");
         }
 
         if ((offset + length) > this->size)
@@ -268,8 +259,6 @@ void ByteArrayAdapter::read(unsigned char* buffer,
         // Read, starting at offset, length number of bytes to Buffer
         memcpy(buffer, this->array.bytes + offset, length);
     }
-    DECAF_CATCH_RETHROW(NullPointerException)
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
     DECAF_CATCH_RETHROW(BufferUnderflowException)
     DECAF_CATCH_EXCEPTION_CONVERT(Exception, BufferUnderflowException)
     DECAF_CATCHALL_THROW(BufferUnderflowException)
@@ -290,7 +279,7 @@ void ByteArrayAdapter::write(unsigned char* buffer,
 
         if (buffer == NULL)
         {
-            throw NullPointerException(
+            throw activemq::exceptions::NullPointerException(
                 __FILE__,
                 __LINE__,
                 "ByteArrayAdapter::write - Passed buffer is null");
@@ -298,28 +287,25 @@ void ByteArrayAdapter::write(unsigned char* buffer,
 
         if (size < 0)
         {
-            throw IndexOutOfBoundsException(__FILE__,
-                                            __LINE__,
-                                            "size parameter out of Bounds: %d.",
-                                            size);
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+                "size parameter out of Bounds: " + std::to_string(size) + ".");
         }
 
         if (offset < 0)
         {
-            throw IndexOutOfBoundsException(
-                __FILE__,
-                __LINE__,
-                "offset parameter out of Bounds: %d.",
-                offset);
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+                "offset parameter out of Bounds: " + std::to_string(offset) +
+                ".");
         }
 
         if (length < 0 || length > size)
         {
-            throw IndexOutOfBoundsException(
-                __FILE__,
-                __LINE__,
-                "length parameter out of Bounds: %d.",
-                length);
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+                "length parameter out of Bounds: " + std::to_string(length) +
+                ".");
         }
 
         if ((offset + length) > this->size)
@@ -333,8 +319,6 @@ void ByteArrayAdapter::write(unsigned char* buffer,
         // Write, starting at offset, length number of bytes from buffer.
         memcpy(this->array.bytes + offset, buffer, length);
     }
-    DECAF_CATCH_RETHROW(NullPointerException)
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
     DECAF_CATCH_RETHROW(BufferOverflowException)
     DECAF_CATCH_EXCEPTION_CONVERT(Exception, BufferOverflowException)
     DECAF_CATCHALL_THROW(BufferOverflowException)
@@ -347,18 +331,15 @@ void ByteArrayAdapter::resize(int size)
     {
         if (!own)
         {
-            throw InvalidStateException(
-                __FILE__,
-                __LINE__,
+            throw activemq::exceptions::InvalidStateException(
                 "ByteArrayAdapter::resize - Not the array owner, can't resize");
         }
 
         if (size < 0)
         {
-            throw IllegalArgumentException(__FILE__,
-                                           __LINE__,
-                                           "size parameter out of Bounds: %d.",
-                                           size);
+            throw activemq::exceptions::InvalidArgumentException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+                "size parameter out of Bounds: " + std::to_string(size) + ".");
         }
 
         // Save old state
@@ -374,8 +355,27 @@ void ByteArrayAdapter::resize(int size)
                Math::min((int)oldCapacity, (int)size));
         delete[] oldArray;
     }
-    DECAF_CATCH_RETHROW(InvalidStateException)
-    DECAF_CATCHALL_THROW(InvalidStateException)
+    catch (std::invalid_argument&)
+    {
+        throw;
+    }
+    catch (activemq::exceptions::IllegalStateException&)
+    {
+        throw;
+    }
+    catch (Exception& ex)
+    {
+        throw activemq::exceptions::IllegalStateException(__FILE__,
+                                                          __LINE__,
+                                                          ex.what());
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::IllegalStateException(
+            __FILE__,
+            __LINE__,
+            "caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -391,16 +391,23 @@ unsigned char& ByteArrayAdapter::operator[](int index)
     {
         if (index < 0 || index > this->size)
         {
-            throw IndexOutOfBoundsException(__FILE__,
-                                            __LINE__,
-                                            "Index %d is out of bounds",
-                                            index);
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+                "Index " + std::to_string(index) + " is out of bounds");
         }
 
         return this->array.bytes[index];
     }
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCHALL_THROW(IndexOutOfBoundsException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -410,16 +417,23 @@ const unsigned char& ByteArrayAdapter::operator[](int index) const
     {
         if (index < 0 || index > this->size)
         {
-            throw IndexOutOfBoundsException(__FILE__,
-                                            __LINE__,
-                                            "Index %d is out of bounds",
-                                            index);
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+                "Index " + std::to_string(index) + " is out of bounds");
         }
 
         return this->array.bytes[index];
     }
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCHALL_THROW(IndexOutOfBoundsException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -429,17 +443,29 @@ unsigned char ByteArrayAdapter::get(int index) const
     {
         if (index < 0 || index >= this->getCapacity())
         {
-            throw IndexOutOfBoundsException(
-                __FILE__,
-                __LINE__,
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
                 "ByteArrayAdapter::get - Not enough data to fill request.");
         }
 
         return (*this)[index];
     }
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IndexOutOfBoundsException)
-    DECAF_CATCHALL_THROW(IndexOutOfBoundsException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (Exception& ex)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            ex.getMessage());
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -449,9 +475,22 @@ char ByteArrayAdapter::getChar(int index) const
     {
         return (char)this->get(index);
     }
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IndexOutOfBoundsException)
-    DECAF_CATCHALL_THROW(IndexOutOfBoundsException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (Exception& ex)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            ex.getMessage());
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -461,18 +500,30 @@ double ByteArrayAdapter::getDouble(int index) const
     {
         if (index < 0 || index >= this->getDoubleCapacity())
         {
-            throw IndexOutOfBoundsException(
-                __FILE__,
-                __LINE__,
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
                 "ByteArrayAdapter::getDouble(i) - Not enough data to fill a "
                 "long long.");
         }
 
         return this->array.doubles[index];
     }
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IndexOutOfBoundsException)
-    DECAF_CATCHALL_THROW(IndexOutOfBoundsException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (Exception& ex)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            ex.getMessage());
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -483,9 +534,22 @@ double ByteArrayAdapter::getDoubleAt(int index) const
         unsigned long long lvalue = this->getLongAt(index);
         return Double::longBitsToDouble(lvalue);
     }
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IndexOutOfBoundsException)
-    DECAF_CATCHALL_THROW(IndexOutOfBoundsException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (Exception& ex)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            ex.getMessage());
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -495,18 +559,30 @@ float ByteArrayAdapter::getFloat(int index) const
     {
         if (index < 0 || index >= this->getFloatCapacity())
         {
-            throw IndexOutOfBoundsException(
-                __FILE__,
-                __LINE__,
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
                 "ByteArrayAdapter::getFloat(i) - Not enough data to fill a "
                 "long long.");
         }
 
         return this->array.floats[index];
     }
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IndexOutOfBoundsException)
-    DECAF_CATCHALL_THROW(IndexOutOfBoundsException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (Exception& ex)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            ex.getMessage());
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -517,9 +593,22 @@ float ByteArrayAdapter::getFloatAt(int index) const
         unsigned int ivalue = this->getIntAt(index);
         return Float::intBitsToFloat(ivalue);
     }
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IndexOutOfBoundsException)
-    DECAF_CATCHALL_THROW(IndexOutOfBoundsException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (Exception& ex)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            ex.getMessage());
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -529,18 +618,30 @@ long long ByteArrayAdapter::getLong(int index) const
     {
         if (index < 0 || index >= this->getLongCapacity())
         {
-            throw IndexOutOfBoundsException(
-                __FILE__,
-                __LINE__,
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
                 "ByteArrayAdapter::getLong(i) - Not enough data to fill a long "
                 "long.");
         }
 
         return this->array.longs[index];
     }
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IndexOutOfBoundsException)
-    DECAF_CATCHALL_THROW(IndexOutOfBoundsException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (Exception& ex)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            ex.getMessage());
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -550,9 +651,8 @@ long long ByteArrayAdapter::getLongAt(int index) const
     {
         if (index < 0 || (index + (int)sizeof(long long)) > this->getCapacity())
         {
-            throw IndexOutOfBoundsException(
-                __FILE__,
-                __LINE__,
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
                 "ByteArrayAdapter::getLong(i) - Not enough data to fill a long "
                 "long.");
         }
@@ -577,9 +677,22 @@ long long ByteArrayAdapter::getLongAt(int index) const
 
         return value;
     }
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IndexOutOfBoundsException)
-    DECAF_CATCHALL_THROW(IndexOutOfBoundsException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (Exception& ex)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            ex.getMessage());
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -589,17 +702,30 @@ int ByteArrayAdapter::getInt(int index) const
     {
         if (index < 0 || index >= this->getIntCapacity())
         {
-            throw IndexOutOfBoundsException(__FILE__,
-                                            __LINE__,
-                                            "ByteArrayAdapter::getInt(i) - Not "
-                                            "enough data to fill an int.");
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+                "ByteArrayAdapter::getInt(i) - Not "
+                "enough data to fill an int.");
         }
 
         return this->array.ints[index];
     }
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IndexOutOfBoundsException)
-    DECAF_CATCHALL_THROW(IndexOutOfBoundsException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (Exception& ex)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            ex.getMessage());
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -609,10 +735,10 @@ int ByteArrayAdapter::getIntAt(int index) const
     {
         if (index < 0 || (index + (int)sizeof(int)) > this->getCapacity())
         {
-            throw IndexOutOfBoundsException(__FILE__,
-                                            __LINE__,
-                                            "ByteArrayAdapter::getInt(i) - Not "
-                                            "enough data to fill an int.");
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+                "ByteArrayAdapter::getInt(i) - Not "
+                "enough data to fill an int.");
         }
 
         unsigned int  value                 = 0;
@@ -623,9 +749,22 @@ int ByteArrayAdapter::getIntAt(int index) const
 
         return value;
     }
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IndexOutOfBoundsException)
-    DECAF_CATCHALL_THROW(IndexOutOfBoundsException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (Exception& ex)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            ex.getMessage());
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -635,17 +774,30 @@ short ByteArrayAdapter::getShort(int index) const
     {
         if (index < 0 || index >= this->getShortCapacity())
         {
-            throw IndexOutOfBoundsException(__FILE__,
-                                            __LINE__,
-                                            "ByteArrayAdapter::getShort(i) - "
-                                            "Not enough data to fill a short.");
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+                "ByteArrayAdapter::getShort(i) - "
+                "Not enough data to fill a short.");
         }
 
         return this->array.shorts[index];
     }
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IndexOutOfBoundsException)
-    DECAF_CATCHALL_THROW(IndexOutOfBoundsException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (Exception& ex)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            ex.getMessage());
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -655,10 +807,10 @@ short ByteArrayAdapter::getShortAt(int index) const
     {
         if (index < 0 || (index + (int)sizeof(short)) > this->getCapacity())
         {
-            throw IndexOutOfBoundsException(__FILE__,
-                                            __LINE__,
-                                            "ByteArrayAdapter::getShort(i) - "
-                                            "Not enough data to fill a short.");
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+                "ByteArrayAdapter::getShort(i) - "
+                "Not enough data to fill a short.");
         }
 
         short         value                 = 0;
@@ -668,9 +820,22 @@ short ByteArrayAdapter::getShortAt(int index) const
 
         return value;
     }
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IndexOutOfBoundsException)
-    DECAF_CATCHALL_THROW(IndexOutOfBoundsException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (Exception& ex)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            ex.getMessage());
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -680,19 +845,32 @@ ByteArrayAdapter& ByteArrayAdapter::put(int index, unsigned char value)
     {
         if (index < 0 || index >= this->getCapacity())
         {
-            throw IndexOutOfBoundsException(__FILE__,
-                                            __LINE__,
-                                            "ByteArrayAdapter::put(i,i) - Not "
-                                            "enough data to fill request.");
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+                "ByteArrayAdapter::put(i,i) - Not enough "
+                "data to fill request.");
         }
 
         (*this)[index] = value;
 
         return *this;
     }
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IndexOutOfBoundsException)
-    DECAF_CATCHALL_THROW(IndexOutOfBoundsException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (Exception& ex)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            ex.getMessage());
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -703,9 +881,22 @@ ByteArrayAdapter& ByteArrayAdapter::putChar(int index, char value)
         this->put(index, value);
         return *this;
     }
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IndexOutOfBoundsException)
-    DECAF_CATCHALL_THROW(IndexOutOfBoundsException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (Exception& ex)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            ex.getMessage());
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -715,19 +906,31 @@ ByteArrayAdapter& ByteArrayAdapter::putDouble(int index, double value)
     {
         if (index < 0 || index >= this->getDoubleCapacity())
         {
-            throw IndexOutOfBoundsException(
-                __FILE__,
-                __LINE__,
-                "ByteArrayAdapter::putDouble(i,i) - Not enough data to fill "
-                "request.");
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+                "ByteArrayAdapter::putDouble(i,i) - Not "
+                "enough data to fill request.");
         }
 
         this->array.doubles[index] = value;
         return *this;
     }
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IndexOutOfBoundsException)
-    DECAF_CATCHALL_THROW(IndexOutOfBoundsException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (Exception& ex)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            ex.getMessage());
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -738,9 +941,22 @@ ByteArrayAdapter& ByteArrayAdapter::putDoubleAt(int index, double value)
         this->putLongAt(index, Double::doubleToLongBits(value));
         return *this;
     }
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IndexOutOfBoundsException)
-    DECAF_CATCHALL_THROW(IndexOutOfBoundsException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (Exception& ex)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            ex.getMessage());
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -750,18 +966,31 @@ ByteArrayAdapter& ByteArrayAdapter::putFloat(int index, float value)
     {
         if (index < 0 || index >= this->getFloatCapacity())
         {
-            throw IndexOutOfBoundsException(__FILE__,
-                                            __LINE__,
-                                            "ByteArrayAdapter::putFloat(i,i) - "
-                                            "Not enough data to fill request.");
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+                "ByteArrayAdapter::putFloat(i,i) - Not "
+                "enough data to fill request.");
         }
 
         this->array.floats[index] = value;
         return *this;
     }
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IndexOutOfBoundsException)
-    DECAF_CATCHALL_THROW(IndexOutOfBoundsException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (Exception& ex)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            ex.getMessage());
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -772,9 +1001,22 @@ ByteArrayAdapter& ByteArrayAdapter::putFloatAt(int index, float value)
         this->putIntAt(index, Float::floatToIntBits(value));
         return *this;
     }
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IndexOutOfBoundsException)
-    DECAF_CATCHALL_THROW(IndexOutOfBoundsException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (Exception& ex)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            ex.getMessage());
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -784,18 +1026,31 @@ ByteArrayAdapter& ByteArrayAdapter::putLong(int index, long long value)
     {
         if (index < 0 || index >= this->getLongCapacity())
         {
-            throw IndexOutOfBoundsException(__FILE__,
-                                            __LINE__,
-                                            "ByteArrayAdapter::putLong(i,i) - "
-                                            "Not enough data to fill request.");
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+                "ByteArrayAdapter::putLong(i,i) - Not "
+                "enough data to fill request.");
         }
 
         this->array.longs[index] = value;
         return *this;
     }
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IndexOutOfBoundsException)
-    DECAF_CATCHALL_THROW(IndexOutOfBoundsException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (Exception& ex)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            ex.getMessage());
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -818,9 +1073,22 @@ ByteArrayAdapter& ByteArrayAdapter::putLongAt(int index, long long value)
 
         return *this;
     }
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IndexOutOfBoundsException)
-    DECAF_CATCHALL_THROW(IndexOutOfBoundsException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (Exception& ex)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            ex.getMessage());
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -830,18 +1098,31 @@ ByteArrayAdapter& ByteArrayAdapter::putInt(int index, int value)
     {
         if (index < 0 || index >= this->getIntCapacity())
         {
-            throw IndexOutOfBoundsException(__FILE__,
-                                            __LINE__,
-                                            "ByteArrayAdapter::putInt(i,i) - "
-                                            "Not enough data to fill request.");
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+                "ByteArrayAdapter::putInt(i,i) - Not "
+                "enough data to fill request.");
         }
 
         this->array.ints[index] = value;
         return *this;
     }
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IndexOutOfBoundsException)
-    DECAF_CATCHALL_THROW(IndexOutOfBoundsException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (Exception& ex)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            ex.getMessage());
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -860,9 +1141,22 @@ ByteArrayAdapter& ByteArrayAdapter::putIntAt(int index, int value)
 
         return *this;
     }
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IndexOutOfBoundsException)
-    DECAF_CATCHALL_THROW(IndexOutOfBoundsException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (Exception& ex)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            ex.getMessage());
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -872,18 +1166,31 @@ ByteArrayAdapter& ByteArrayAdapter::putShort(int index, short value)
     {
         if (index < 0 || index >= this->getShortCapacity())
         {
-            throw IndexOutOfBoundsException(__FILE__,
-                                            __LINE__,
-                                            "ByteArrayAdapter::putShort(i,i) - "
-                                            "Not enough data to fill request.");
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+                "ByteArrayAdapter::putShort(i,i) - Not "
+                "enough data to fill request.");
         }
 
         this->array.shorts[index] = value;
         return *this;
     }
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IndexOutOfBoundsException)
-    DECAF_CATCHALL_THROW(IndexOutOfBoundsException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (Exception& ex)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            ex.getMessage());
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -900,7 +1207,20 @@ ByteArrayAdapter& ByteArrayAdapter::putShortAt(int index, short value)
 
         return *this;
     }
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IndexOutOfBoundsException)
-    DECAF_CATCHALL_THROW(IndexOutOfBoundsException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (Exception& ex)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            ex.getMessage());
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }

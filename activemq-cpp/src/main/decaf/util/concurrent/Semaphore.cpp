@@ -19,11 +19,13 @@
 
 #include <decaf/lang/Integer.h>
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/util/concurrent/locks/AbstractQueuedSynchronizer.h>
+#include <stdexcept>
+#include <string>
 
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 using namespace decaf::util::concurrent::locks;
@@ -237,9 +239,8 @@ void Semaphore::acquire(int permits)
 {
     if (permits < 0)
     {
-        throw new IllegalArgumentException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
             "Value of acquired permits must be greater than zero.");
     }
 
@@ -251,9 +252,8 @@ void Semaphore::acquireUninterruptibly(int permits DECAF_UNUSED)
 {
     if (permits < 0)
     {
-        throw new IllegalArgumentException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
             "Value of acquired permits must be greater than zero.");
     }
 
@@ -265,9 +265,8 @@ bool Semaphore::tryAcquire(int permits)
 {
     if (permits < 0)
     {
-        throw new IllegalArgumentException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
             "Value of acquired permits must be greater than zero.");
     }
 
@@ -279,9 +278,8 @@ bool Semaphore::tryAcquire(int permits, long long timeout, const TimeUnit& unit)
 {
     if (permits < 0)
     {
-        throw new IllegalArgumentException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
             "Value of acquired permits must be greater than zero.");
     }
 
@@ -293,9 +291,8 @@ void Semaphore::release(int permits)
 {
     if (permits < 0)
     {
-        throw new IllegalArgumentException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
             "Value of acquired permits must be greater than zero.");
     }
 

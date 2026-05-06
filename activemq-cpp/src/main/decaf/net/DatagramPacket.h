@@ -23,11 +23,8 @@
 #include <decaf/net/Inet4Address.h>
 #include <decaf/net/SocketAddress.h>
 
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
-#include <decaf/lang/exceptions/IndexOutOfBoundsException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
-
 #include <decaf/util/concurrent/Mutex.h>
+#include <stdexcept>
 
 namespace decaf
 {
@@ -72,8 +69,8 @@ namespace net
          * @param length
          *      The number of byte to read starting at the supplied offset.
          *
-         * @throws NullPointerException if the pointer to the buffer is NULL.
-         * @throws IndexOutOfBoundsException if the number of bytes to read
+         * @throws std::logic_error if the pointer to the buffer is NULL.
+         * @throws std::out_of_range if the number of bytes to read
          * exceeds the buffer size.
          */
         DatagramPacket(unsigned char* bytes, int size, int length);
@@ -91,8 +88,8 @@ namespace net
          * @param length
          *      The number of byte to read starting at the supplied offset.
          *
-         * @throws NullPointerException if the pointer to the buffer is NULL.
-         * @throws IndexOutOfBoundsException if the number of bytes to copy
+         * @throws std::logic_error if the pointer to the buffer is NULL.
+         * @throws std::out_of_range if the number of bytes to copy
          * exceeds the buffer size.
          */
         DatagramPacket(unsigned char* bytes, int size, int offset, int length);
@@ -115,8 +112,8 @@ namespace net
          * @param port
          *      The port on the destination that is to receive this packet.
          *
-         * @throws NullPointerException if the pointer to the buffer is NULL.
-         * @throws IndexOutOfBoundsException if the number of bytes to copy
+         * @throws std::logic_error if the pointer to the buffer is NULL.
+         * @throws std::out_of_range if the number of bytes to copy
          * exceeds the buffer size.
          */
         DatagramPacket(unsigned char*     bytes,
@@ -141,8 +138,8 @@ namespace net
          * @param port
          *      The port on the destination that is to receive this packet.
          *
-         * @throws NullPointerException if the pointer to the buffer is NULL.
-         * @throws IndexOutOfBoundsException if the number of bytes to copy
+         * @throws std::logic_error if the pointer to the buffer is NULL.
+         * @throws std::out_of_range if the number of bytes to copy
          * exceeds the buffer size.
          */
         DatagramPacket(unsigned char*     bytes,
@@ -164,8 +161,8 @@ namespace net
          * @param address
          *      The Address to send the packet to
          *
-         * @throws NullPointerException if the pointer to the buffer is NULL.
-         * @throws IndexOutOfBoundsException if the number of bytes to copy
+         * @throws std::logic_error if the pointer to the buffer is NULL.
+         * @throws std::out_of_range if the number of bytes to copy
          * exceeds the buffer size.
          */
         DatagramPacket(unsigned char*       bytes,
@@ -189,8 +186,8 @@ namespace net
          * @param address
          *      The Address to send the packet to
          *
-         * @throws NullPointerException if the pointer to the buffer is NULL.
-         * @throws IndexOutOfBoundsException if the number of bytes to copy
+         * @throws std::logic_error if the pointer to the buffer is NULL.
+         * @throws std::out_of_range if the number of bytes to copy
          * exceeds the buffer size.
          */
         DatagramPacket(unsigned char*       bytes,
@@ -232,7 +229,7 @@ namespace net
          * @param address
          *      The SocketAddress (IP + port) for this datagram packet.
          *
-         * @throws IllegalArgumentException if the subclass of address is not
+         * @throws std::invalid_argument if the subclass of address is not
          * supported by this Socket.
          */
         void setSocketAddress(const SocketAddress& address);
@@ -250,7 +247,7 @@ namespace net
          * @param port
          *      The port on the remote host.
          *
-         * @throws IllegalArgumentException if the port value is not in the
+         * @throws std::invalid_argument if the port value is not in the
          * range [0..65535].
          */
         void setPort(int port);
@@ -268,7 +265,7 @@ namespace net
          * @param offset
          *      The buffer offset value.
          *
-         * @throws IllegalArgumentException if the offset value is greater than
+         * @throws std::invalid_argument if the offset value is greater than
          * the buffer size.
          */
         void setOffset(int offset);
@@ -289,7 +286,7 @@ namespace net
          * @param length
          *      The length value to set for this packet.
          *
-         * @throws IllegalArgumentException if the value is negative or exceeds
+         * @throws std::invalid_argument if the value is negative or exceeds
          * the data buffers length.
          */
         void setLength(int length);
@@ -315,7 +312,7 @@ namespace net
          * @param size
          *      The size of the buffer.
          *
-         * @throws NullPointerException if the buffer pointer is NULL.
+         * @throws std::logic_error if the buffer pointer is NULL.
          */
         void setData(unsigned char* buffer, int size);
 
@@ -334,7 +331,7 @@ namespace net
          *      The number of bytes that will be read into the buffer or sent
          * from the buffer.
          *
-         * @throws NullPointerException if the buffer pointer is NULL.
+         * @throws std::logic_error if the buffer pointer is NULL.
          */
         void setData(unsigned char* buffer, int size, int offset, int length);
     };

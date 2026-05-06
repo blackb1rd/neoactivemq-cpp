@@ -18,6 +18,7 @@
 #include "PooledSession.h"
 #include "ResourceLifecycleManager.h"
 #include "SessionPool.h"
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <cms/CMSException.h>
 
 #include <decaf/util/Iterator.h>
@@ -28,6 +29,7 @@
 using namespace cms;
 using namespace decaf::util;
 using namespace activemq::cmsutil;
+using namespace activemq::exceptions;
 
 /**
  * A catch-all that throws an CMSException.
@@ -124,7 +126,7 @@ cms::MessageProducer* PooledSession::createCachedProducer(
         {
             cachedProducer = producerCache.get(key);
         }
-        catch (decaf::util::NoSuchElementException& e)
+        catch (NoSuchElementException&)
         {
             // No producer exists for this destination - start by creating
             // a new producer resource.
@@ -171,7 +173,7 @@ cms::MessageConsumer* PooledSession::createCachedConsumer(
         {
             cachedConsumer = consumerCache.get(key);
         }
-        catch (decaf::util::NoSuchElementException& e)
+        catch (NoSuchElementException&)
         {
             // No producer exists for this destination - start by creating
             // a new consumer resource.

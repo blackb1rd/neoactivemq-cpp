@@ -20,8 +20,8 @@
 
 #include <activemq/util/Config.h>
 
-#include <decaf/io/IOException.h>
-#include <decaf/io/UTFDataFormatException.h>
+#include <activemq/exceptions/IoCatchMacros.h>
+#include <activemq/exceptions/IoExceptions.h>
 
 #include <decaf/io/DataInputStream.h>
 #include <decaf/io/DataOutputStream.h>
@@ -138,8 +138,8 @@ namespace util
          * @return a string containing the Modified UTF-8 encoded form of the
          * provided string.
          *
-         * @throws UTFDataFormatException if the length of the encoded string
-         * would exceed the size of an signed integer.
+         * @throws activemq::exceptions::UTFDataFormatException if the length of
+         * the encoded string would exceed the size of an signed integer.
          */
         static std::string asciiToModifiedUtf8(const std::string& asciiString);
 
@@ -155,9 +155,9 @@ namespace util
          *
          * @return the ASCII encoded version of the provided string.
          *
-         * @throws UTFDataFormatException if the provided string contains
-         * invalid data or the character values encoded in the string exceed
-         * ASCII value 255.
+         * @throws activemq::exceptions::UTFDataFormatException if the provided
+         * string contains invalid data or the character values encoded in the
+         * string exceed ASCII value 255.
          */
         static std::string modifiedUtf8ToAscii(
             const std::string modifiedUtf8String);

@@ -18,8 +18,8 @@
 #ifndef _ACTIVEMQ_WIREFORMAT_MARSHALAWARE_H_
 #define _ACTIVEMQ_WIREFORMAT_MARSHALAWARE_H_
 
+#include <activemq/exceptions/IoExceptions.h>
 #include <activemq/util/Config.h>
-#include <decaf/io/IOException.h>
 #include <vector>
 
 namespace activemq

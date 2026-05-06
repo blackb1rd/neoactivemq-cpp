@@ -24,8 +24,6 @@
 
 #include <decaf/lang/Integer.h>
 
-#include <decaf/lang/exceptions/IndexOutOfBoundsException.h>
-
 #include <cstring>
 
 #ifdef HAVE_STDLIB_H
@@ -38,12 +36,12 @@
 #include <strings.h>
 #endif
 
+#include <stdexcept>
 #include <vector>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::zip;
 
@@ -204,8 +202,8 @@ TEST_F(DeflaterTest, testDeflateArray)
         }
 
         ASSERT_THROW(deflater.deflate(outPutBuf2, SIZE, offSet, length),
-                     IndexOutOfBoundsException)
-            << ("Should have thrown an IndexOutOfBoundsException");
+                     std::out_of_range)
+            << ("Should have thrown an std::out_of_range");
     }
 
     defl.end();
@@ -556,7 +554,7 @@ TEST_F(DeflaterTest, testSetDictionaryBIII)
                        Integer::toString(offSet) + " and length " +
                        Integer::toString(length));
         }
-        catch (IndexOutOfBoundsException& e)
+        catch (std::out_of_range& e)
         {
         }
     }
@@ -676,7 +674,7 @@ TEST_F(DeflaterTest, testSetInputBIII)
                        Integer::toString(offSet) + " and length " +
                        Integer::toString(length));
         }
-        catch (IndexOutOfBoundsException& e)
+        catch (std::out_of_range& e)
         {
         }
     }
@@ -734,11 +732,11 @@ TEST_F(DeflaterTest, testSetLevel)
     Deflater boundDefl;
 
     // testing boundaries
-    ASSERT_THROW(boundDefl.setLevel(-2), IllegalArgumentException)
+    ASSERT_THROW(boundDefl.setLevel(-2), std::invalid_argument)
         << ("IllegalArgumentException not thrown when setting level to a "
             "number < 0.");
 
-    ASSERT_THROW(boundDefl.setLevel(10), IllegalArgumentException)
+    ASSERT_THROW(boundDefl.setLevel(10), std::invalid_argument)
         << ("IllegalArgumentException not thrown when setting level to a "
             "number > 9.");
 }
@@ -806,7 +804,7 @@ TEST_F(DeflaterTest, testSetStrategy)
     Deflater boundDefl;
 
     // testing boundaries
-    ASSERT_THROW(boundDefl.setStrategy(424), IllegalArgumentException)
+    ASSERT_THROW(boundDefl.setStrategy(424), std::invalid_argument)
         << ("IllegalArgumentException not thrown when setting strategy to an "
             "invalid value.");
 }
@@ -956,11 +954,11 @@ TEST_F(DeflaterTest, testConstructorIB)
     Deflater boundDefl;
 
     // testing boundaries
-    ASSERT_THROW(boundDefl.setLevel(-2), IllegalArgumentException)
+    ASSERT_THROW(boundDefl.setLevel(-2), std::invalid_argument)
         << ("IllegalArgumentException not thrown when setting level to a "
             "number < 0.");
 
-    ASSERT_THROW(boundDefl.setLevel(10), IllegalArgumentException)
+    ASSERT_THROW(boundDefl.setLevel(10), std::invalid_argument)
         << ("IllegalArgumentException not thrown when setting level to a "
             "number > 9.");
 }
@@ -1014,11 +1012,11 @@ TEST_F(DeflaterTest, testConstructorI)
     Deflater boundDefl;
 
     // testing boundaries
-    ASSERT_THROW(boundDefl.setLevel(-2), IllegalArgumentException)
+    ASSERT_THROW(boundDefl.setLevel(-2), std::invalid_argument)
         << ("IllegalArgumentException not thrown when setting level to a "
             "number < 0.");
 
-    ASSERT_THROW(boundDefl.setLevel(10), IllegalArgumentException)
+    ASSERT_THROW(boundDefl.setLevel(10), std::invalid_argument)
         << ("IllegalArgumentException not thrown when setting level to a "
             "number > 9.");
 }
@@ -1029,34 +1027,34 @@ void DeflaterTest::helperEndTest(Deflater& defl, const std::string& desc)
     // Help tests for test_end() and test_reset().
     unsigned char byteArray[] = {5, 2, 3, 7, 8};
 
-    // Methods where we expect IllegalStateException or NullPointerException
+    // Methods where we expect std::logic_error or std::logic_error
     // to be thrown
-    ASSERT_THROW(defl.getBytesWritten(), IllegalStateException)
+    ASSERT_THROW(defl.getBytesWritten(), std::logic_error)
         << (std::string() + "defl.getBytesWritten() can still be used after " +
             desc + " is called in test_" + desc);
 
-    ASSERT_THROW(defl.getAdler(), IllegalStateException)
+    ASSERT_THROW(defl.getAdler(), std::logic_error)
         << (std::string() + "defl.getAdler() can still be used after " + desc +
             " is called in test_" + desc);
 
-    ASSERT_THROW(defl.getBytesRead(), IllegalStateException)
+    ASSERT_THROW(defl.getBytesRead(), std::logic_error)
         << (std::string() + "defl.getBytesRead() can still be used after " +
             desc + " is called in test_" + desc);
 
     unsigned char dict[] = {'a', 'b', 'c'};
-    ASSERT_THROW(defl.setDictionary(dict, 3, 0, 3), IllegalStateException)
+    ASSERT_THROW(defl.setDictionary(dict, 3, 0, 3), std::logic_error)
         << (std::string() + "defl.setDictionary() can still be used after " +
             desc + " is called in test_" + desc);
 
-    ASSERT_THROW(defl.deflate(byteArray, 5, 0, 5), IllegalStateException)
+    ASSERT_THROW(defl.deflate(byteArray, 5, 0, 5), std::logic_error)
         << (std::string() + "defl.deflate() can still be used after " + desc +
             " is called in test_" + desc);
 
-    ASSERT_THROW(defl.setInput(byteArray, 5, 0, 5), IllegalStateException)
+    ASSERT_THROW(defl.setInput(byteArray, 5, 0, 5), std::logic_error)
         << (std::string() + "defl.setInput() can still be used after " + desc +
             " is called in test_" + desc);
 
-    ASSERT_THROW(defl.reset(), IllegalStateException)
+    ASSERT_THROW(defl.reset(), std::logic_error)
         << (std::string() + "defl.reset() can still be used after " + desc +
             " is called in test_" + desc);
 

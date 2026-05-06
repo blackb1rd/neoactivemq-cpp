@@ -17,10 +17,12 @@
 
 #include <gtest/gtest.h>
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <activemq/util/PrimitiveMap.h>
 #include <activemq/util/PrimitiveValueNode.h>
 
 using namespace activemq;
+using namespace activemq::exceptions;
 using namespace activemq::util;
 
 class PrimitiveMapTest : public ::testing::Test
@@ -86,7 +88,7 @@ TEST_F(PrimitiveMapTest, testValueNode)
         node.getFloat();
         ASSERT_TRUE(false);
     }
-    catch (decaf::util::NoSuchElementException& e)
+    catch (NoSuchElementException&)
     {
     }
 
@@ -104,7 +106,7 @@ TEST_F(PrimitiveMapTest, testSetGet)
         pmap.getBool("bool");
         ASSERT_TRUE(false);
     }
-    catch (decaf::util::NoSuchElementException& e)
+    catch (NoSuchElementException&)
     {
     }
     pmap.setBool("bool", true);
@@ -117,7 +119,7 @@ TEST_F(PrimitiveMapTest, testSetGet)
         pmap.getByte("byte");
         ASSERT_TRUE(false);
     }
-    catch (decaf::util::NoSuchElementException& e)
+    catch (NoSuchElementException&)
     {
     }
     pmap.setByte("byte", 1);
@@ -129,7 +131,7 @@ TEST_F(PrimitiveMapTest, testSetGet)
         pmap.getChar("char");
         ASSERT_TRUE(false);
     }
-    catch (decaf::util::NoSuchElementException& e)
+    catch (NoSuchElementException&)
     {
     }
     pmap.setChar("char", 'a');
@@ -141,7 +143,7 @@ TEST_F(PrimitiveMapTest, testSetGet)
         pmap.getShort("short");
         ASSERT_TRUE(false);
     }
-    catch (decaf::util::NoSuchElementException& e)
+    catch (NoSuchElementException&)
     {
     }
     pmap.setShort("short", 2);
@@ -153,7 +155,7 @@ TEST_F(PrimitiveMapTest, testSetGet)
         pmap.getInt("int");
         ASSERT_TRUE(false);
     }
-    catch (decaf::util::NoSuchElementException& e)
+    catch (NoSuchElementException&)
     {
     }
     pmap.setInt("int", 3);
@@ -165,7 +167,7 @@ TEST_F(PrimitiveMapTest, testSetGet)
         pmap.getLong("long");
         ASSERT_TRUE(false);
     }
-    catch (decaf::util::NoSuchElementException& e)
+    catch (NoSuchElementException&)
     {
     }
     pmap.setLong("long", 4L);
@@ -177,7 +179,7 @@ TEST_F(PrimitiveMapTest, testSetGet)
         pmap.getDouble("double");
         ASSERT_TRUE(false);
     }
-    catch (decaf::util::NoSuchElementException& e)
+    catch (NoSuchElementException&)
     {
     }
     pmap.setDouble("double", 2.3);
@@ -189,7 +191,7 @@ TEST_F(PrimitiveMapTest, testSetGet)
         pmap.getFloat("float");
         ASSERT_TRUE(false);
     }
-    catch (decaf::util::NoSuchElementException& e)
+    catch (NoSuchElementException&)
     {
     }
     pmap.setFloat("float", 3.2f);
@@ -201,7 +203,7 @@ TEST_F(PrimitiveMapTest, testSetGet)
         pmap.getString("string");
         ASSERT_TRUE(false);
     }
-    catch (decaf::util::NoSuchElementException& e)
+    catch (NoSuchElementException&)
     {
     }
     pmap.setString("string", "hello");
@@ -218,7 +220,7 @@ TEST_F(PrimitiveMapTest, testSetGet)
         pmap.getByteArray("byteArray");
         ASSERT_TRUE(false);
     }
-    catch (decaf::util::NoSuchElementException& e)
+    catch (NoSuchElementException&)
     {
     }
     pmap.setByteArray("byteArray", byteArray);
@@ -238,7 +240,7 @@ TEST_F(PrimitiveMapTest, testRemove)
         pmap.getInt("int");
         ASSERT_TRUE(false);
     }
-    catch (decaf::util::NoSuchElementException& e)
+    catch (NoSuchElementException&)
     {
     }
 }
@@ -292,7 +294,7 @@ TEST_F(PrimitiveMapTest, testClear)
         pmap.getInt("int");
         ASSERT_TRUE(false);
     }
-    catch (decaf::util::NoSuchElementException& e)
+    catch (NoSuchElementException&)
     {
     }
 
@@ -301,7 +303,7 @@ TEST_F(PrimitiveMapTest, testClear)
         pmap.getFloat("float");
         ASSERT_TRUE(false);
     }
-    catch (decaf::util::NoSuchElementException& e)
+    catch (NoSuchElementException&)
     {
     }
 
@@ -310,7 +312,7 @@ TEST_F(PrimitiveMapTest, testClear)
         pmap.getInt("int2");
         ASSERT_TRUE(false);
     }
-    catch (decaf::util::NoSuchElementException& e)
+    catch (NoSuchElementException&)
     {
     }
 }

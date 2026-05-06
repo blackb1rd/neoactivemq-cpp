@@ -69,10 +69,9 @@ void SessionIdMarshaller::tightUnmarshal(OpenWireFormat*  wireFormat,
         info->setConnectionId(tightUnmarshalString(dataIn, bs));
         info->setValue(tightUnmarshalLong(wireFormat, dataIn, bs));
     }
-    AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
-                                decaf::io::IOException)
-    AMQ_CATCHALL_THROW(decaf::io::IOException)
+    AMQ_IOSTREAM_CATCH_RETHROW()
+    AMQ_IOSTREAM_CATCH_CONVERT_ACTIVEMQ_EXCEPTION()
+    AMQ_IOSTREAM_CATCHALL_THROW()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -92,10 +91,9 @@ int SessionIdMarshaller::tightMarshal1(OpenWireFormat* wireFormat,
 
         return rc + 0;
     }
-    AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
-                                decaf::io::IOException)
-    AMQ_CATCHALL_THROW(decaf::io::IOException)
+    AMQ_IOSTREAM_CATCH_RETHROW()
+    AMQ_IOSTREAM_CATCH_CONVERT_ACTIVEMQ_EXCEPTION()
+    AMQ_IOSTREAM_CATCHALL_THROW()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -115,10 +113,9 @@ void SessionIdMarshaller::tightMarshal2(OpenWireFormat*   wireFormat,
         tightMarshalString2(info->getConnectionId(), dataOut, bs);
         tightMarshalLong2(wireFormat, info->getValue(), dataOut, bs);
     }
-    AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
-                                decaf::io::IOException)
-    AMQ_CATCHALL_THROW(decaf::io::IOException)
+    AMQ_IOSTREAM_CATCH_RETHROW()
+    AMQ_IOSTREAM_CATCH_CONVERT_ACTIVEMQ_EXCEPTION()
+    AMQ_IOSTREAM_CATCHALL_THROW()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -135,10 +132,9 @@ void SessionIdMarshaller::looseUnmarshal(OpenWireFormat*  wireFormat,
         info->setConnectionId(looseUnmarshalString(dataIn));
         info->setValue(looseUnmarshalLong(wireFormat, dataIn));
     }
-    AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
-                                decaf::io::IOException)
-    AMQ_CATCHALL_THROW(decaf::io::IOException)
+    AMQ_IOSTREAM_CATCH_RETHROW()
+    AMQ_IOSTREAM_CATCH_CONVERT_ACTIVEMQ_EXCEPTION()
+    AMQ_IOSTREAM_CATCHALL_THROW()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -155,8 +151,7 @@ void SessionIdMarshaller::looseMarshal(OpenWireFormat*   wireFormat,
         looseMarshalString(info->getConnectionId(), dataOut);
         looseMarshalLong(wireFormat, info->getValue(), dataOut);
     }
-    AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
-                                decaf::io::IOException)
-    AMQ_CATCHALL_THROW(decaf::io::IOException)
+    AMQ_IOSTREAM_CATCH_RETHROW()
+    AMQ_IOSTREAM_CATCH_CONVERT_ACTIVEMQ_EXCEPTION()
+    AMQ_IOSTREAM_CATCHALL_THROW()
 }

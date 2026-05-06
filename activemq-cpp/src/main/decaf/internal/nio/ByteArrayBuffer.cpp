@@ -21,12 +21,14 @@
 #include "decaf/lang/Integer.h"
 #include "decaf/lang/Long.h"
 #include "decaf/lang/Short.h"
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <string.h>
+#include <stdexcept>
+#include <string>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::internal::nio;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -55,29 +57,42 @@ ByteArrayBuffer::ByteArrayBuffer(unsigned char* array,
     {
         if (offset < 0 || offset > size)
         {
-            throw IndexOutOfBoundsException(
-                __FILE__,
-                __LINE__,
-                "Offset parameter if out of bounds, %d",
-                offset);
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+                "Offset parameter if out of bounds, " + std::to_string(offset));
         }
 
         if (length < 0 || offset + length > size)
         {
-            throw IndexOutOfBoundsException(
-                __FILE__,
-                __LINE__,
-                "length parameter if out of bounds, %d",
-                length);
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+                "length parameter if out of bounds, " + std::to_string(length));
         }
 
         // Allocate using the ByteArray, not read-only initially.
         this->_array.reset(new ByteArrayAdapter(array, size, false));
     }
-    DECAF_CATCH_RETHROW(NullPointerException)
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception, NullPointerException)
-    DECAF_CATCHALL_THROW(NullPointerException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (activemq::exceptions::NullPointerException&)
+    {
+        throw;
+    }
+    catch (Exception& ex)
+    {
+        throw activemq::exceptions::NullPointerException(__FILE__,
+                                                         __LINE__,
+                                                         ex.what());
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -95,26 +110,39 @@ ByteArrayBuffer::ByteArrayBuffer(const Pointer<ByteArrayAdapter>& array,
     {
         if (offset < 0 || offset > array->getCapacity())
         {
-            throw IndexOutOfBoundsException(
-                __FILE__,
-                __LINE__,
-                "Offset parameter if out of bounds, %d",
-                offset);
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+                "Offset parameter if out of bounds, " + std::to_string(offset));
         }
 
         if (length < 0 || offset + length > array->getCapacity())
         {
-            throw IndexOutOfBoundsException(
-                __FILE__,
-                __LINE__,
-                "length parameter if out of bounds, %d",
-                length);
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+                "length parameter if out of bounds, " + std::to_string(length));
         }
     }
-    DECAF_CATCH_RETHROW(NullPointerException)
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception, NullPointerException)
-    DECAF_CATCHALL_THROW(NullPointerException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (activemq::exceptions::NullPointerException&)
+    {
+        throw;
+    }
+    catch (Exception& ex)
+    {
+        throw activemq::exceptions::NullPointerException(__FILE__,
+                                                         __LINE__,
+                                                         ex.what());
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -139,7 +167,7 @@ unsigned char* ByteArrayBuffer::array()
     {
         if (!this->hasArray())
         {
-            throw UnsupportedOperationException(
+            throw activemq::exceptions::UnsupportedOperationException(
                 __FILE__,
                 __LINE__,
                 "ByteArrayBuffer::arrayOffset() - This Buffer has no backing "
@@ -156,11 +184,24 @@ unsigned char* ByteArrayBuffer::array()
 
         return this->_array->getByteArray();
     }
-    DECAF_CATCH_RETHROW(decaf::nio::ReadOnlyBufferException)
-    DECAF_CATCH_RETHROW(UnsupportedOperationException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception,
-                                  decaf::nio::ReadOnlyBufferException)
-    DECAF_CATCHALL_THROW(decaf::nio::ReadOnlyBufferException)
+    catch (decaf::nio::ReadOnlyBufferException&)
+    {
+        throw;
+    }
+    catch (activemq::exceptions::UnsupportedOperationException&)
+    {
+        throw;
+    }
+    catch (Exception& ex)
+    {
+        throw decaf::nio::ReadOnlyBufferException(ex.getMessage());
+    }
+    catch (...)
+    {
+        throw decaf::nio::ReadOnlyBufferException(__FILE__,
+                                                  __LINE__,
+                                                  "caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -170,7 +211,7 @@ int ByteArrayBuffer::arrayOffset() const
     {
         if (!this->hasArray())
         {
-            throw UnsupportedOperationException(
+            throw activemq::exceptions::UnsupportedOperationException(
                 __FILE__,
                 __LINE__,
                 "ByteArrayBuffer::arrayOffset() - This Buffer has no backing "
@@ -187,11 +228,24 @@ int ByteArrayBuffer::arrayOffset() const
 
         return this->offset;
     }
-    DECAF_CATCH_RETHROW(decaf::nio::ReadOnlyBufferException)
-    DECAF_CATCH_RETHROW(UnsupportedOperationException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception,
-                                  decaf::nio::ReadOnlyBufferException)
-    DECAF_CATCHALL_THROW(decaf::nio::ReadOnlyBufferException)
+    catch (decaf::nio::ReadOnlyBufferException&)
+    {
+        throw;
+    }
+    catch (activemq::exceptions::UnsupportedOperationException&)
+    {
+        throw;
+    }
+    catch (Exception& ex)
+    {
+        throw decaf::nio::ReadOnlyBufferException(ex.getMessage());
+    }
+    catch (...)
+    {
+        throw decaf::nio::ReadOnlyBufferException(__FILE__,
+                                                  __LINE__,
+                                                  "caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -234,10 +288,20 @@ ByteArrayBuffer& ByteArrayBuffer::compact()
 
         return *this;
     }
-    DECAF_CATCH_RETHROW(decaf::nio::ReadOnlyBufferException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception,
-                                  decaf::nio::ReadOnlyBufferException)
-    DECAF_CATCHALL_THROW(decaf::nio::ReadOnlyBufferException)
+    catch (decaf::nio::ReadOnlyBufferException&)
+    {
+        throw;
+    }
+    catch (Exception& ex)
+    {
+        throw decaf::nio::ReadOnlyBufferException(ex.getMessage());
+    }
+    catch (...)
+    {
+        throw decaf::nio::ReadOnlyBufferException(__FILE__,
+                                                  __LINE__,
+                                                  "caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -256,12 +320,22 @@ unsigned char ByteArrayBuffer::get() const
 {
     try
     {
+        if (!this->hasRemaining())
+        {
+            throw activemq::exceptions::BufferUnderflowException(
+                activemq::exceptions::buildSourceMessage(
+                    __FILE__,
+                    __LINE__,
+                    "ByteArrayBuffer::get - Not enough data to fill "
+                    "request."));
+        }
         return this->get(this->_position++);
     }
-    DECAF_CATCH_RETHROW(decaf::nio::BufferUnderflowException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception,
-                                  decaf::nio::BufferUnderflowException)
-    DECAF_CATCHALL_THROW(decaf::nio::BufferUnderflowException)
+    DECAF_CATCH_RETHROW(activemq::exceptions::BufferUnderflowException)
+    DECAF_CATCH_EXCEPTION_CONVERT(
+        Exception,
+        activemq::exceptions::BufferUnderflowException)
+    DECAF_CATCHALL_THROW(activemq::exceptions::BufferUnderflowException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -271,17 +345,34 @@ unsigned char ByteArrayBuffer::get(int index) const
     {
         if ((index) >= this->limit())
         {
-            throw IndexOutOfBoundsException(
-                __FILE__,
-                __LINE__,
-                "ByteArrayBuffer::get - Not enough data to fill request.");
+            throw activemq::exceptions::IndexOutOfBoundsException(
+                activemq::exceptions::buildSourceMessage(
+                    __FILE__,
+                    __LINE__,
+                    "ByteArrayBuffer::get - Not enough data to fill request."));
         }
 
         return this->_array->get(offset + index);
     }
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IndexOutOfBoundsException)
-    DECAF_CATCHALL_THROW(IndexOutOfBoundsException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (Exception& ex)
+    {
+        throw activemq::exceptions::BufferUnderflowException(
+            activemq::exceptions::buildSourceMessage(__FILE__,
+                                                     __LINE__,
+                                                     ex.getMessage()));
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::BufferUnderflowException(
+            activemq::exceptions::buildSourceMessage(
+                __FILE__,
+                __LINE__,
+                "caught unknown exception"));
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -292,10 +383,11 @@ double ByteArrayBuffer::getDouble()
         unsigned long long lvalue = this->getLong();
         return Double::longBitsToDouble(lvalue);
     }
-    DECAF_CATCH_RETHROW(decaf::nio::BufferUnderflowException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception,
-                                  decaf::nio::BufferUnderflowException)
-    DECAF_CATCHALL_THROW(decaf::nio::BufferUnderflowException)
+    DECAF_CATCH_RETHROW(activemq::exceptions::BufferUnderflowException)
+    DECAF_CATCH_EXCEPTION_CONVERT(
+        Exception,
+        activemq::exceptions::BufferUnderflowException)
+    DECAF_CATCHALL_THROW(activemq::exceptions::BufferUnderflowException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -306,9 +398,25 @@ double ByteArrayBuffer::getDouble(int index) const
         unsigned long long lvalue = this->getLong(index);
         return Double::longBitsToDouble(lvalue);
     }
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IndexOutOfBoundsException)
-    DECAF_CATCHALL_THROW(IndexOutOfBoundsException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (Exception& ex)
+    {
+        throw activemq::exceptions::BufferUnderflowException(
+            activemq::exceptions::buildSourceMessage(__FILE__,
+                                                     __LINE__,
+                                                     ex.getMessage()));
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::BufferUnderflowException(
+            activemq::exceptions::buildSourceMessage(
+                __FILE__,
+                __LINE__,
+                "caught unknown exception"));
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -319,10 +427,11 @@ float ByteArrayBuffer::getFloat()
         unsigned int ivalue = this->getInt();
         return Float::intBitsToFloat(ivalue);
     }
-    DECAF_CATCH_RETHROW(decaf::nio::BufferUnderflowException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception,
-                                  decaf::nio::BufferUnderflowException)
-    DECAF_CATCHALL_THROW(decaf::nio::BufferUnderflowException)
+    DECAF_CATCH_RETHROW(activemq::exceptions::BufferUnderflowException)
+    DECAF_CATCH_EXCEPTION_CONVERT(
+        Exception,
+        activemq::exceptions::BufferUnderflowException)
+    DECAF_CATCHALL_THROW(activemq::exceptions::BufferUnderflowException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -333,9 +442,25 @@ float ByteArrayBuffer::getFloat(int index) const
         unsigned int ivalue = this->getInt(index);
         return Float::intBitsToFloat(ivalue);
     }
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IndexOutOfBoundsException)
-    DECAF_CATCHALL_THROW(IndexOutOfBoundsException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (Exception& ex)
+    {
+        throw activemq::exceptions::BufferUnderflowException(
+            activemq::exceptions::buildSourceMessage(__FILE__,
+                                                     __LINE__,
+                                                     ex.getMessage()));
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::BufferUnderflowException(
+            activemq::exceptions::buildSourceMessage(
+                __FILE__,
+                __LINE__,
+                "caught unknown exception"));
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -343,14 +468,24 @@ long long ByteArrayBuffer::getLong()
 {
     try
     {
+        if (this->remaining() < (int)sizeof(long long))
+        {
+            throw activemq::exceptions::BufferUnderflowException(
+                activemq::exceptions::buildSourceMessage(
+                    __FILE__,
+                    __LINE__,
+                    "ByteArrayBuffer::getLong - Not enough data to fill a long "
+                    "long."));
+        }
         long long value = this->getLong(this->_position);
         this->_position += (int)sizeof(value);
         return value;
     }
-    DECAF_CATCH_RETHROW(decaf::nio::BufferUnderflowException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception,
-                                  decaf::nio::BufferUnderflowException)
-    DECAF_CATCHALL_THROW(decaf::nio::BufferUnderflowException)
+    DECAF_CATCH_RETHROW(activemq::exceptions::BufferUnderflowException)
+    DECAF_CATCH_EXCEPTION_CONVERT(
+        Exception,
+        activemq::exceptions::BufferUnderflowException)
+    DECAF_CATCHALL_THROW(activemq::exceptions::BufferUnderflowException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -360,17 +495,35 @@ long long ByteArrayBuffer::getLong(int index) const
     {
         if ((offset + index + (int)sizeof(long long)) > this->limit())
         {
-            throw IndexOutOfBoundsException(__FILE__,
-                                            __LINE__,
-                                            "ByteArrayBuffer::getLong(i) - Not "
-                                            "enough data to fill a long long.");
+            throw activemq::exceptions::IndexOutOfBoundsException(
+                activemq::exceptions::buildSourceMessage(
+                    __FILE__,
+                    __LINE__,
+                    "ByteArrayBuffer::getLong(i) - Not "
+                    "enough data to fill a long long."));
         }
 
         return this->_array->getLongAt(index + offset);
     }
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IndexOutOfBoundsException)
-    DECAF_CATCHALL_THROW(IndexOutOfBoundsException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (Exception& ex)
+    {
+        throw activemq::exceptions::BufferUnderflowException(
+            activemq::exceptions::buildSourceMessage(__FILE__,
+                                                     __LINE__,
+                                                     ex.getMessage()));
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::BufferUnderflowException(
+            activemq::exceptions::buildSourceMessage(
+                __FILE__,
+                __LINE__,
+                "caught unknown exception"));
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -382,10 +535,11 @@ int ByteArrayBuffer::getInt()
         this->_position += (int)sizeof(value);
         return value;
     }
-    DECAF_CATCH_RETHROW(decaf::nio::BufferUnderflowException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception,
-                                  decaf::nio::BufferUnderflowException)
-    DECAF_CATCHALL_THROW(decaf::nio::BufferUnderflowException);
+    DECAF_CATCH_RETHROW(activemq::exceptions::BufferUnderflowException)
+    DECAF_CATCH_EXCEPTION_CONVERT(
+        Exception,
+        activemq::exceptions::BufferUnderflowException)
+    DECAF_CATCHALL_THROW(activemq::exceptions::BufferUnderflowException);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -395,17 +549,35 @@ int ByteArrayBuffer::getInt(int index) const
     {
         if ((offset + index + (int)sizeof(int)) > this->limit())
         {
-            throw IndexOutOfBoundsException(
-                __FILE__,
-                __LINE__,
-                "ByteArrayBuffer::getInt(i) - Not enough data to fill an int.");
+            throw activemq::exceptions::BufferUnderflowException(
+                activemq::exceptions::buildSourceMessage(
+                    __FILE__,
+                    __LINE__,
+                    "ByteArrayBuffer::getInt(i) - Not enough data to fill an "
+                    "int."));
         };
 
         return this->_array->getIntAt(offset + index);
     }
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IndexOutOfBoundsException)
-    DECAF_CATCHALL_THROW(IndexOutOfBoundsException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (Exception& ex)
+    {
+        throw activemq::exceptions::BufferUnderflowException(
+            activemq::exceptions::buildSourceMessage(__FILE__,
+                                                     __LINE__,
+                                                     ex.getMessage()));
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::BufferUnderflowException(
+            activemq::exceptions::buildSourceMessage(
+                __FILE__,
+                __LINE__,
+                "caught unknown exception"));
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -413,14 +585,24 @@ short ByteArrayBuffer::getShort()
 {
     try
     {
+        if (this->remaining() < (int)sizeof(short))
+        {
+            throw activemq::exceptions::BufferUnderflowException(
+                activemq::exceptions::buildSourceMessage(
+                    __FILE__,
+                    __LINE__,
+                    "ByteArrayBuffer::getShort - Not enough data to fill a "
+                    "short."));
+        }
         short value = this->getShort(this->_position);
         this->_position += (int)sizeof(value);
         return value;
     }
-    DECAF_CATCH_RETHROW(decaf::nio::BufferUnderflowException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception,
-                                  decaf::nio::BufferUnderflowException)
-    DECAF_CATCHALL_THROW(decaf::nio::BufferUnderflowException);
+    DECAF_CATCH_RETHROW(activemq::exceptions::BufferUnderflowException)
+    DECAF_CATCH_EXCEPTION_CONVERT(
+        Exception,
+        activemq::exceptions::BufferUnderflowException)
+    DECAF_CATCHALL_THROW(activemq::exceptions::BufferUnderflowException);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -430,17 +612,35 @@ short ByteArrayBuffer::getShort(int index) const
     {
         if ((offset + index + (int)sizeof(short)) > this->limit())
         {
-            throw IndexOutOfBoundsException(__FILE__,
-                                            __LINE__,
-                                            "ByteArrayBuffer::getShort(i) - "
-                                            "Not enough data to fill a short.");
+            throw activemq::exceptions::IndexOutOfBoundsException(
+                activemq::exceptions::buildSourceMessage(
+                    __FILE__,
+                    __LINE__,
+                    "ByteArrayBuffer::getShort(i) - "
+                    "Not enough data to fill a short."));
         }
 
         return this->_array->getShortAt(offset + index);
     }
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IndexOutOfBoundsException)
-    DECAF_CATCHALL_THROW(IndexOutOfBoundsException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (Exception& ex)
+    {
+        throw activemq::exceptions::BufferUnderflowException(
+            activemq::exceptions::buildSourceMessage(__FILE__,
+                                                     __LINE__,
+                                                     ex.getMessage()));
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::BufferUnderflowException(
+            activemq::exceptions::buildSourceMessage(
+                __FILE__,
+                __LINE__,
+                "caught unknown exception"));
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -451,11 +651,22 @@ ByteArrayBuffer& ByteArrayBuffer::put(unsigned char value)
         this->put(this->_position++, value);
         return *this;
     }
-    DECAF_CATCH_RETHROW(decaf::nio::ReadOnlyBufferException)
+    catch (decaf::nio::ReadOnlyBufferException&)
+    {
+        throw;
+    }
+    catch (::activemq::exceptions::OutOfRangeException& ex)
+    {
+        throw decaf::nio::BufferOverflowException(__FILE__,
+                                                  __LINE__,
+                                                  "%s",
+                                                  ex.what());
+    }
     DECAF_CATCH_RETHROW(decaf::nio::BufferOverflowException)
     DECAF_CATCH_EXCEPTION_CONVERT(Exception,
                                   decaf::nio::BufferOverflowException)
-    DECAF_CATCHALL_THROW(decaf::nio::BufferOverflowException)
+    DECAF_CATCHALL_THROW_AFTER_STL_OUT_OF_RANGE_MAP(
+        decaf::nio::BufferOverflowException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -473,9 +684,8 @@ ByteArrayBuffer& ByteArrayBuffer::put(int index, unsigned char value)
 
         if (index >= this->limit())
         {
-            throw IndexOutOfBoundsException(
-                __FILE__,
-                __LINE__,
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
                 "ByteArrayBuffer::put(i,i) - Not enough data to fill request.");
         }
 
@@ -483,10 +693,26 @@ ByteArrayBuffer& ByteArrayBuffer::put(int index, unsigned char value)
 
         return *this;
     }
-    DECAF_CATCH_RETHROW(decaf::nio::ReadOnlyBufferException)
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IndexOutOfBoundsException)
-    DECAF_CATCHALL_THROW(IndexOutOfBoundsException)
+    catch (decaf::nio::ReadOnlyBufferException&)
+    {
+        throw;
+    }
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (Exception& ex)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            ex.getMessage());
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -497,11 +723,22 @@ ByteArrayBuffer& ByteArrayBuffer::putChar(char value)
         this->put(this->_position++, value);
         return *this;
     }
-    DECAF_CATCH_RETHROW(decaf::nio::ReadOnlyBufferException)
+    catch (decaf::nio::ReadOnlyBufferException&)
+    {
+        throw;
+    }
+    catch (::activemq::exceptions::OutOfRangeException& ex)
+    {
+        throw decaf::nio::BufferOverflowException(__FILE__,
+                                                  __LINE__,
+                                                  "%s",
+                                                  ex.what());
+    }
     DECAF_CATCH_RETHROW(decaf::nio::BufferOverflowException)
     DECAF_CATCH_EXCEPTION_CONVERT(Exception,
                                   decaf::nio::BufferOverflowException)
-    DECAF_CATCHALL_THROW(decaf::nio::BufferOverflowException)
+    DECAF_CATCHALL_THROW_AFTER_STL_OUT_OF_RANGE_MAP(
+        decaf::nio::BufferOverflowException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -512,10 +749,26 @@ ByteArrayBuffer& ByteArrayBuffer::putChar(int index, char value)
         this->put(index, value);
         return *this;
     }
-    DECAF_CATCH_RETHROW(decaf::nio::ReadOnlyBufferException)
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IndexOutOfBoundsException)
-    DECAF_CATCHALL_THROW(IndexOutOfBoundsException)
+    catch (decaf::nio::ReadOnlyBufferException&)
+    {
+        throw;
+    }
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (Exception& ex)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            ex.getMessage());
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -527,11 +780,22 @@ ByteArrayBuffer& ByteArrayBuffer::putDouble(double value)
         this->_position += (int)sizeof(value);
         return *this;
     }
-    DECAF_CATCH_RETHROW(decaf::nio::ReadOnlyBufferException)
+    catch (decaf::nio::ReadOnlyBufferException&)
+    {
+        throw;
+    }
+    catch (::activemq::exceptions::OutOfRangeException& ex)
+    {
+        throw decaf::nio::BufferOverflowException(__FILE__,
+                                                  __LINE__,
+                                                  "%s",
+                                                  ex.what());
+    }
     DECAF_CATCH_RETHROW(decaf::nio::BufferOverflowException)
     DECAF_CATCH_EXCEPTION_CONVERT(Exception,
                                   decaf::nio::BufferOverflowException)
-    DECAF_CATCHALL_THROW(decaf::nio::BufferOverflowException)
+    DECAF_CATCHALL_THROW_AFTER_STL_OUT_OF_RANGE_MAP(
+        decaf::nio::BufferOverflowException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -542,10 +806,26 @@ ByteArrayBuffer& ByteArrayBuffer::putDouble(int index, double value)
         this->putLong(index, Double::doubleToLongBits(value));
         return *this;
     }
-    DECAF_CATCH_RETHROW(decaf::nio::ReadOnlyBufferException)
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IndexOutOfBoundsException)
-    DECAF_CATCHALL_THROW(IndexOutOfBoundsException)
+    catch (decaf::nio::ReadOnlyBufferException&)
+    {
+        throw;
+    }
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (Exception& ex)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            ex.getMessage());
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -557,11 +837,22 @@ ByteArrayBuffer& ByteArrayBuffer::putFloat(float value)
         this->_position += (int)sizeof(value);
         return *this;
     }
-    DECAF_CATCH_RETHROW(decaf::nio::ReadOnlyBufferException)
+    catch (decaf::nio::ReadOnlyBufferException&)
+    {
+        throw;
+    }
+    catch (::activemq::exceptions::OutOfRangeException& ex)
+    {
+        throw decaf::nio::BufferOverflowException(__FILE__,
+                                                  __LINE__,
+                                                  "%s",
+                                                  ex.what());
+    }
     DECAF_CATCH_RETHROW(decaf::nio::BufferOverflowException)
     DECAF_CATCH_EXCEPTION_CONVERT(Exception,
                                   decaf::nio::BufferOverflowException)
-    DECAF_CATCHALL_THROW(decaf::nio::BufferOverflowException)
+    DECAF_CATCHALL_THROW_AFTER_STL_OUT_OF_RANGE_MAP(
+        decaf::nio::BufferOverflowException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -572,10 +863,26 @@ ByteArrayBuffer& ByteArrayBuffer::putFloat(int index, float value)
         this->putInt(index, Float::floatToIntBits(value));
         return *this;
     }
-    DECAF_CATCH_RETHROW(decaf::nio::ReadOnlyBufferException)
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IndexOutOfBoundsException)
-    DECAF_CATCHALL_THROW(IndexOutOfBoundsException)
+    catch (decaf::nio::ReadOnlyBufferException&)
+    {
+        throw;
+    }
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (Exception& ex)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            ex.getMessage());
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -587,11 +894,22 @@ ByteArrayBuffer& ByteArrayBuffer::putLong(long long value)
         this->_position += (int)sizeof(value);
         return *this;
     }
-    DECAF_CATCH_RETHROW(decaf::nio::ReadOnlyBufferException)
+    catch (decaf::nio::ReadOnlyBufferException&)
+    {
+        throw;
+    }
+    catch (::activemq::exceptions::OutOfRangeException& ex)
+    {
+        throw decaf::nio::BufferOverflowException(__FILE__,
+                                                  __LINE__,
+                                                  "%s",
+                                                  ex.what());
+    }
     DECAF_CATCH_RETHROW(decaf::nio::BufferOverflowException)
     DECAF_CATCH_EXCEPTION_CONVERT(Exception,
                                   decaf::nio::BufferOverflowException)
-    DECAF_CATCHALL_THROW(decaf::nio::BufferOverflowException)
+    DECAF_CATCHALL_THROW_AFTER_STL_OUT_OF_RANGE_MAP(
+        decaf::nio::BufferOverflowException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -611,10 +929,26 @@ ByteArrayBuffer& ByteArrayBuffer::putLong(int index, long long value)
 
         return *this;
     }
-    DECAF_CATCH_RETHROW(decaf::nio::ReadOnlyBufferException)
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IndexOutOfBoundsException)
-    DECAF_CATCHALL_THROW(IndexOutOfBoundsException)
+    catch (decaf::nio::ReadOnlyBufferException&)
+    {
+        throw;
+    }
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (Exception& ex)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            ex.getMessage());
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -626,11 +960,22 @@ ByteArrayBuffer& ByteArrayBuffer::putInt(int value)
         this->_position += (int)sizeof(value);
         return *this;
     }
-    DECAF_CATCH_RETHROW(decaf::nio::ReadOnlyBufferException)
+    catch (decaf::nio::ReadOnlyBufferException&)
+    {
+        throw;
+    }
+    catch (::activemq::exceptions::OutOfRangeException& ex)
+    {
+        throw decaf::nio::BufferOverflowException(__FILE__,
+                                                  __LINE__,
+                                                  "%s",
+                                                  ex.what());
+    }
     DECAF_CATCH_RETHROW(decaf::nio::BufferOverflowException)
     DECAF_CATCH_EXCEPTION_CONVERT(Exception,
                                   decaf::nio::BufferOverflowException)
-    DECAF_CATCHALL_THROW(decaf::nio::BufferOverflowException)
+    DECAF_CATCHALL_THROW_AFTER_STL_OUT_OF_RANGE_MAP(
+        decaf::nio::BufferOverflowException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -650,10 +995,26 @@ ByteArrayBuffer& ByteArrayBuffer::putInt(int index, int value)
 
         return *this;
     }
-    DECAF_CATCH_RETHROW(decaf::nio::ReadOnlyBufferException)
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IndexOutOfBoundsException)
-    DECAF_CATCHALL_THROW(IndexOutOfBoundsException)
+    catch (decaf::nio::ReadOnlyBufferException&)
+    {
+        throw;
+    }
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (Exception& ex)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            ex.getMessage());
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -665,11 +1026,22 @@ ByteArrayBuffer& ByteArrayBuffer::putShort(short value)
         this->_position += (int)sizeof(value);
         return *this;
     }
-    DECAF_CATCH_RETHROW(decaf::nio::ReadOnlyBufferException)
+    catch (decaf::nio::ReadOnlyBufferException&)
+    {
+        throw;
+    }
+    catch (::activemq::exceptions::OutOfRangeException& ex)
+    {
+        throw decaf::nio::BufferOverflowException(__FILE__,
+                                                  __LINE__,
+                                                  "%s",
+                                                  ex.what());
+    }
     DECAF_CATCH_RETHROW(decaf::nio::BufferOverflowException)
     DECAF_CATCH_EXCEPTION_CONVERT(Exception,
                                   decaf::nio::BufferOverflowException)
-    DECAF_CATCHALL_THROW(decaf::nio::BufferOverflowException)
+    DECAF_CATCHALL_THROW_AFTER_STL_OUT_OF_RANGE_MAP(
+        decaf::nio::BufferOverflowException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -689,10 +1061,26 @@ ByteArrayBuffer& ByteArrayBuffer::putShort(int index, short value)
 
         return *this;
     }
-    DECAF_CATCH_RETHROW(decaf::nio::ReadOnlyBufferException)
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IndexOutOfBoundsException)
-    DECAF_CATCHALL_THROW(IndexOutOfBoundsException)
+    catch (decaf::nio::ReadOnlyBufferException&)
+    {
+        throw;
+    }
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (Exception& ex)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            ex.getMessage());
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -66,7 +66,6 @@ using namespace cms;
 using namespace std;
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 using namespace decaf::util::concurrent::atomic;
@@ -186,7 +185,7 @@ public:
 
         if (++count < maxDeliveries)
         {
-            throw decaf::lang::exceptions::RuntimeException(
+            throw decaf::lang::Exception(
                 __FILE__,
                 __LINE__,
                 testName.append(" forced a redelivery").c_str());
@@ -290,7 +289,7 @@ public:
             e.printStackTrace();
         }
 
-        throw decaf::lang::exceptions::RuntimeException(
+        throw decaf::lang::Exception(
             __FILE__,
             __LINE__,
             (testName + " forced a redelivery").c_str());

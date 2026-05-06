@@ -132,10 +132,9 @@ void ConsumerInfoMarshaller::tightUnmarshal(OpenWireFormat*  wireFormat,
             }
         }
     }
-    AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
-                                decaf::io::IOException)
-    AMQ_CATCHALL_THROW(decaf::io::IOException)
+    AMQ_IOSTREAM_CATCH_RETHROW()
+    AMQ_IOSTREAM_CATCH_CONVERT_ACTIVEMQ_EXCEPTION()
+    AMQ_IOSTREAM_CATCHALL_THROW()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -185,10 +184,9 @@ int ConsumerInfoMarshaller::tightMarshal1(OpenWireFormat* wireFormat,
 
         return rc + 9;
     }
-    AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
-                                decaf::io::IOException)
-    AMQ_CATCHALL_THROW(decaf::io::IOException)
+    AMQ_IOSTREAM_CATCH_RETHROW()
+    AMQ_IOSTREAM_CATCH_CONVERT_ACTIVEMQ_EXCEPTION()
+    AMQ_IOSTREAM_CATCHALL_THROW()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -246,10 +244,9 @@ void ConsumerInfoMarshaller::tightMarshal2(OpenWireFormat*   wireFormat,
                                      bs);
         }
     }
-    AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
-                                decaf::io::IOException)
-    AMQ_CATCHALL_THROW(decaf::io::IOException)
+    AMQ_IOSTREAM_CATCH_RETHROW()
+    AMQ_IOSTREAM_CATCH_CONVERT_ACTIVEMQ_EXCEPTION()
+    AMQ_IOSTREAM_CATCHALL_THROW()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -327,10 +324,9 @@ void ConsumerInfoMarshaller::looseUnmarshal(OpenWireFormat*  wireFormat,
             }
         }
     }
-    AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
-                                decaf::io::IOException)
-    AMQ_CATCHALL_THROW(decaf::io::IOException)
+    AMQ_IOSTREAM_CATCH_RETHROW()
+    AMQ_IOSTREAM_CATCH_CONVERT_ACTIVEMQ_EXCEPTION()
+    AMQ_IOSTREAM_CATCHALL_THROW()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -379,8 +375,7 @@ void ConsumerInfoMarshaller::looseMarshal(OpenWireFormat*   wireFormat,
                                     dataOut);
         }
     }
-    AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
-                                decaf::io::IOException)
-    AMQ_CATCHALL_THROW(decaf::io::IOException)
+    AMQ_IOSTREAM_CATCH_RETHROW()
+    AMQ_IOSTREAM_CATCH_CONVERT_ACTIVEMQ_EXCEPTION()
+    AMQ_IOSTREAM_CATCHALL_THROW()
 }

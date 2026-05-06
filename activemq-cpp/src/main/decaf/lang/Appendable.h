@@ -90,7 +90,7 @@ namespace lang
          * @return a Reference to this Appendable
          *
          * @throws Exception if an error occurs.
-         * @throws IndexOutOfBoundsException start is greater than end, or end
+         * @throws std::out_of_range start is greater than end, or end
          * is greater than csq.length()
          */
         virtual Appendable& append(const CharSequence* csq,

@@ -22,15 +22,12 @@
 #include <decaf/lang/Thread.h>
 #include <decaf/util/BitSet.h>
 
-#include <decaf/lang/exceptions/IndexOutOfBoundsException.h>
-#include <decaf/lang/exceptions/NegativeArraySizeException.h>
-#include <decaf/lang/exceptions/OutOfMemoryError.h>
+#include <stdexcept>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 class BitSetTest : public ::testing::Test
 {
@@ -118,7 +115,7 @@ TEST_F(BitSetTest, testConstructorI)
         FAIL() << ("Failed to throw exception when creating a new BitSet with "
                    "negative elements value");
     }
-    catch (NegativeArraySizeException& e)
+    catch (std::runtime_error& e)
     {
         // Correct behavior
     }
@@ -128,7 +125,7 @@ TEST_F(BitSetTest, testConstructorI)
     {
         BitSet bs(Integer::MAX_VALUE);
     }
-    catch (OutOfMemoryError& e)
+    catch (std::bad_alloc&)
     {
         // Ignore if no room for this size.
     }
@@ -207,7 +204,7 @@ TEST_F(BitSetTest, testClearI)
         eightbs.clear(-1);
         FAIL() << ("Failed to throw expected out of bounds exception");
     }
-    catch (IndexOutOfBoundsException& e)
+    catch (std::out_of_range& e)
     {
         // Correct behaviour
     }
@@ -243,9 +240,9 @@ TEST_F(BitSetTest, testClearI)
     try
     {
         bs1.clear(-1);
-        FAIL() << ("Should throw IndexOutOfBoundsException");
+        FAIL() << ("Should throw std::out_of_range");
     }
-    catch (IndexOutOfBoundsException& e)
+    catch (std::out_of_range& e)
     {
         // expected
     }
@@ -456,7 +453,7 @@ TEST_F(BitSetTest, testClearII)
             FAIL() << ("Test1: Attempt to flip with  negative index "
                        "CPPUNIT_FAILed to generate exception");
         }
-        catch (IndexOutOfBoundsException& e)
+        catch (std::out_of_range& e)
         {
             // excepted
         }
@@ -467,7 +464,7 @@ TEST_F(BitSetTest, testClearII)
             FAIL() << ("Test2: Attempt to flip with negative index "
                        "CPPUNIT_FAILed to generate exception");
         }
-        catch (IndexOutOfBoundsException& e)
+        catch (std::out_of_range& e)
         {
             // excepted
         }
@@ -481,7 +478,7 @@ TEST_F(BitSetTest, testClearII)
             FAIL() << ("Test4: Attempt to flip with illegal args "
                        "CPPUNIT_FAILed to generate exception");
         }
-        catch (IndexOutOfBoundsException& e)
+        catch (std::out_of_range& e)
         {
             // excepted
         }
@@ -541,7 +538,7 @@ TEST_F(BitSetTest, testGetI)
         FAIL() << ("Attempt to get at negative index CPPUNIT_FAILed to "
                    "generate exception");
     }
-    catch (IndexOutOfBoundsException& e)
+    catch (std::out_of_range& e)
     {
         // Correct behaviour
     }
@@ -574,9 +571,9 @@ TEST_F(BitSetTest, testGetI)
     try
     {
         bs4.get(Integer::MIN_VALUE);
-        FAIL() << ("Should throw IndexOutOfBoundsException");
+        FAIL() << ("Should throw std::out_of_range");
     }
-    catch (IndexOutOfBoundsException& e)
+    catch (std::out_of_range& e)
     {
         // expected
     }
@@ -763,7 +760,7 @@ TEST_F(BitSetTest, testFlipI)
         FAIL() << ("Attempt to flip at negative index CPPUNIT_FAILed to "
                    "generate exception");
     }
-    catch (IndexOutOfBoundsException& e)
+    catch (std::out_of_range& e)
     {
         // Correct behaviour
     }
@@ -991,7 +988,7 @@ TEST_F(BitSetTest, testFlipII)
             FAIL() << ("Test1: Attempt to flip with  negative index "
                        "CPPUNIT_FAILed to generate exception");
         }
-        catch (IndexOutOfBoundsException& e)
+        catch (std::out_of_range& e)
         {
             // correct behavior
         }
@@ -1002,7 +999,7 @@ TEST_F(BitSetTest, testFlipII)
             FAIL() << ("Test2: Attempt to flip with negative index "
                        "CPPUNIT_FAILed to generate exception");
         }
-        catch (IndexOutOfBoundsException& e)
+        catch (std::out_of_range& e)
         {
             // correct behavior
         }
@@ -1013,7 +1010,7 @@ TEST_F(BitSetTest, testFlipII)
             FAIL() << ("Test4: Attempt to flip with illegal args "
                        "CPPUNIT_FAILed to generate exception");
         }
-        catch (IndexOutOfBoundsException& e)
+        catch (std::out_of_range& e)
         {
             // correct behavior
         }
@@ -1033,7 +1030,7 @@ TEST_F(BitSetTest, testSetI)
         FAIL() << ("Attempt to set at negative index CPPUNIT_FAILed to "
                    "generate exception");
     }
-    catch (IndexOutOfBoundsException& e)
+    catch (std::out_of_range& e)
     {
         // Correct behavior
     }
@@ -1085,9 +1082,9 @@ TEST_F(BitSetTest, testSetIB)
     {
         BitSet bs;
         bs.set(-2147483648, false);
-        FAIL() << ("Should throw IndexOutOfBoundsException");
+        FAIL() << ("Should throw std::out_of_range");
     }
-    catch (IndexOutOfBoundsException& e)
+    catch (std::out_of_range& e)
     {
         // expected
     }
@@ -1258,7 +1255,7 @@ TEST_F(BitSetTest, testSetII)
             FAIL() << ("Test1: Attempt to flip with  negative index "
                        "CPPUNIT_FAILed to generate exception");
         }
-        catch (IndexOutOfBoundsException& e)
+        catch (std::out_of_range& e)
         {
             // Correct behavior
         }
@@ -1269,7 +1266,7 @@ TEST_F(BitSetTest, testSetII)
             FAIL() << ("Test2: Attempt to flip with negative index "
                        "CPPUNIT_FAILed to generate exception");
         }
-        catch (IndexOutOfBoundsException& e)
+        catch (std::out_of_range& e)
         {
             // Correct behavior
         }
@@ -1283,7 +1280,7 @@ TEST_F(BitSetTest, testSetII)
             FAIL() << ("Test4: Attempt to flip with illegal args "
                        "CPPUNIT_FAILed to generate exception");
         }
-        catch (IndexOutOfBoundsException& e)
+        catch (std::out_of_range& e)
         {
             // Correct behavior
         }
@@ -1322,9 +1319,9 @@ TEST_F(BitSetTest, testNotModified)
         eightbs.clear(3, 3);
         ASSERT_TRUE(eightbs.get(3)) << ("Bit cleared incorrectly ");
     }
-    catch (IndexOutOfBoundsException& e)
+    catch (std::out_of_range& e)
     {
-        FAIL() << ("Unexpected IndexOutOfBoundsException when pos1 ==pos2");
+        FAIL() << ("Unexpected std::out_of_range when pos1 ==pos2");
     }
 }
 
@@ -1561,9 +1558,9 @@ TEST_F(BitSetTest, testNextSetBitI)
     try
     {
         bs.nextSetBit(-1);
-        FAIL() << ("Expected IndexOutOfBoundsException for negative index");
+        FAIL() << ("Expected std::out_of_range for negative index");
     }
-    catch (IndexOutOfBoundsException& e)
+    catch (std::out_of_range& e)
     {
         // correct behavior
     }
@@ -1646,9 +1643,9 @@ TEST_F(BitSetTest, testNextClearBitI)
     try
     {
         bs.nextClearBit(-1);
-        FAIL() << ("Expected IndexOutOfBoundsException for negative index");
+        FAIL() << ("Expected std::out_of_range for negative index");
     }
-    catch (IndexOutOfBoundsException& e)
+    catch (std::out_of_range& e)
     {
         // correct behavior
     }

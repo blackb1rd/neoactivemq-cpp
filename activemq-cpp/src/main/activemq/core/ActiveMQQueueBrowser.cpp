@@ -29,6 +29,7 @@
 #include <memory>
 
 #include <atomic>
+#include <exception>
 
 using namespace std;
 using namespace activemq;
@@ -374,7 +375,7 @@ std::shared_ptr<ActiveMQConsumerKernel> ActiveMQQueueBrowser::createConsumer()
         this->session->addConsumer(consumer);
         this->session->syncRequest(consumer->getConsumerInfo());
     }
-    catch (Exception& ex)
+    catch (const std::exception&)
     {
         this->session->removeConsumer(consumer);
         throw;

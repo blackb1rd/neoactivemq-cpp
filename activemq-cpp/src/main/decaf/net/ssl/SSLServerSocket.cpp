@@ -18,13 +18,11 @@
 #include "SSLServerSocket.h"
 
 #include <decaf/io/IOException.h>
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
 
 using namespace decaf;
 using namespace decaf::net;
 using namespace decaf::net::ssl;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 SSLServerSocket::SSLServerSocket()

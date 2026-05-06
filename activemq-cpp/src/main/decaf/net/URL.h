@@ -22,6 +22,7 @@
 #include <decaf/util/Config.h>
 
 #include <decaf/io/InputStream.h>
+#include <stdexcept>
 #include <string>
 
 namespace decaf
@@ -430,9 +431,9 @@ namespace net
          * @return a new URLConnection instance for this URL.
          *
          * @throws IOException if an error occurs while opening the connection.
-         * @throws IllegalArgumentException if proxy is null, or proxy has the
+         * @throws std::invalid_argument if proxy is null, or proxy has the
          * wrong type.
-         * @throws UnsupportedOperationException if this method is not
+         * @throws std::logic_error if this method is not
          * supported.
          */
         URLConnection* openConnection(const Proxy* proxy);

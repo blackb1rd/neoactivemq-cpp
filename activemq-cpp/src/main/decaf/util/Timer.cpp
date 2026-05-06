@@ -17,13 +17,15 @@
 
 #include "Timer.h"
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/internal/util/TimerTaskHeap.h>
 #include <decaf/internal/util/concurrent/SynchronizableImpl.h>
 #include <decaf/lang/Pointer.h>
 #include <decaf/lang/System.h>
 #include <decaf/lang/Thread.h>
-#include <decaf/lang/exceptions/InterruptedException.h>
 #include <decaf/util/concurrent/Mutex.h>
+#include <stdexcept>
+#include <string>
 
 using namespace decaf;
 using namespace decaf::util;
@@ -32,7 +34,6 @@ using namespace decaf::internal;
 using namespace decaf::internal::util;
 using namespace decaf::internal::util::concurrent;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace decaf
@@ -95,7 +96,7 @@ namespace util
                         {
                             this->wait();
                         }
-                        catch (InterruptedException& e)
+                        catch (activemq::exceptions::InterruptedException& e)
                         {
                         }
                     }
@@ -136,7 +137,7 @@ namespace util
                         {
                             this->wait(timeToSleep);
                         }
-                        catch (InterruptedException& e)
+                        catch (activemq::exceptions::InterruptedException& e)
                         {
                         }
                         // Check if cancelled while waiting
@@ -336,10 +337,10 @@ void Timer::schedule(TimerTask* task, long long delay)
 {
     if (delay < 0)
     {
-        throw IllegalArgumentException(__FILE__,
-                                       __LINE__,
-                                       "Task must be scheduled to start in the "
-                                       "Future but delay was Negative");
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Task must be scheduled to start in the "
+            "Future but delay was Negative");
     }
 
     Pointer<TimerTask> wrapper(task);
@@ -354,6 +355,11 @@ void Timer::schedule(TimerTask* task, long long delay)
         ex.setMark(__FILE__, __LINE__);
         throw;
     }
+    catch (std::exception&)
+    {
+        wrapper.release();
+        throw;
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -361,10 +367,10 @@ void Timer::schedule(const Pointer<TimerTask>& task, long long delay)
 {
     if (delay < 0)
     {
-        throw IllegalArgumentException(__FILE__,
-                                       __LINE__,
-                                       "Task must be scheduled to start in the "
-                                       "Future but delay was Negative");
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Task must be scheduled to start in the "
+            "Future but delay was Negative");
     }
 
     scheduleTask(task, delay, -1, false);
@@ -375,9 +381,8 @@ void Timer::schedule(TimerTask* task, const Date& when)
 {
     if (when.getTime() < 0)
     {
-        throw IllegalArgumentException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
             "Task must be scheduled to start in the Future.");
     }
 
@@ -394,6 +399,11 @@ void Timer::schedule(TimerTask* task, const Date& when)
         ex.setMark(__FILE__, __LINE__);
         throw;
     }
+    catch (std::exception&)
+    {
+        wrapper.release();
+        throw;
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -401,9 +411,8 @@ void Timer::schedule(const Pointer<TimerTask>& task, const Date& when)
 {
     if (when.getTime() < 0)
     {
-        throw IllegalArgumentException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
             "Task must be scheduled to start in the Future.");
     }
 
@@ -416,17 +425,16 @@ void Timer::schedule(TimerTask* task, long long delay, long long period)
 {
     if (delay < 0)
     {
-        throw IllegalArgumentException(__FILE__,
-                                       __LINE__,
-                                       "Task must be scheduled to start in the "
-                                       "Future but delay was Negative");
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Task must be scheduled to start in the "
+            "Future but delay was Negative");
     }
 
     if (period <= 0)
     {
-        throw IllegalArgumentException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
             "Task must be scheduled non-negative or non-zero period.");
     }
 
@@ -442,6 +450,11 @@ void Timer::schedule(TimerTask* task, long long delay, long long period)
         ex.setMark(__FILE__, __LINE__);
         throw;
     }
+    catch (std::exception&)
+    {
+        wrapper.release();
+        throw;
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -451,17 +464,16 @@ void Timer::schedule(const Pointer<TimerTask>& task,
 {
     if (delay < 0)
     {
-        throw IllegalArgumentException(__FILE__,
-                                       __LINE__,
-                                       "Task must be scheduled to start in the "
-                                       "Future but delay was Negative");
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Task must be scheduled to start in the "
+            "Future but delay was Negative");
     }
 
     if (period <= 0)
     {
-        throw IllegalArgumentException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
             "Task must be scheduled non-negative or non-zero period.");
     }
 
@@ -473,17 +485,15 @@ void Timer::schedule(TimerTask* task, const Date& when, long long period)
 {
     if (when.getTime() < 0)
     {
-        throw IllegalArgumentException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
             "Task must be scheduled to start in the Future.");
     }
 
     if (period <= 0)
     {
-        throw IllegalArgumentException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
             "Task must be scheduled non-negative or non-zero period.");
     }
 
@@ -500,6 +510,11 @@ void Timer::schedule(TimerTask* task, const Date& when, long long period)
         ex.setMark(__FILE__, __LINE__);
         throw;
     }
+    catch (std::exception&)
+    {
+        wrapper.release();
+        throw;
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -509,17 +524,15 @@ void Timer::schedule(const Pointer<TimerTask>& task,
 {
     if (when.getTime() < 0)
     {
-        throw IllegalArgumentException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
             "Task must be scheduled to start in the Future.");
     }
 
     if (period <= 0)
     {
-        throw IllegalArgumentException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
             "Task must be scheduled non-negative or non-zero period.");
     }
 
@@ -534,17 +547,16 @@ void Timer::scheduleAtFixedRate(TimerTask* task,
 {
     if (delay < 0)
     {
-        throw IllegalArgumentException(__FILE__,
-                                       __LINE__,
-                                       "Task must be scheduled to start in the "
-                                       "Future but delay was Negative");
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Task must be scheduled to start in the "
+            "Future but delay was Negative");
     }
 
     if (period <= 0)
     {
-        throw IllegalArgumentException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
             "Task must be scheduled non-negative or non-zero period.");
     }
 
@@ -560,6 +572,11 @@ void Timer::scheduleAtFixedRate(TimerTask* task,
         ex.setMark(__FILE__, __LINE__);
         throw;
     }
+    catch (std::exception&)
+    {
+        wrapper.release();
+        throw;
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -569,17 +586,16 @@ void Timer::scheduleAtFixedRate(const Pointer<TimerTask>& task,
 {
     if (delay < 0)
     {
-        throw IllegalArgumentException(__FILE__,
-                                       __LINE__,
-                                       "Task must be scheduled to start in the "
-                                       "Future but delay was Negative");
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Task must be scheduled to start in the "
+            "Future but delay was Negative");
     }
 
     if (period <= 0)
     {
-        throw IllegalArgumentException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
             "Task must be scheduled non-negative or non-zero period.");
     }
 
@@ -593,17 +609,15 @@ void Timer::scheduleAtFixedRate(TimerTask*  task,
 {
     if (when.getTime() < 0)
     {
-        throw IllegalArgumentException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
             "Task must be scheduled to start in the Future.");
     }
 
     if (period <= 0)
     {
-        throw IllegalArgumentException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
             "Task must be scheduled non-negative or non-zero period.");
     }
 
@@ -620,6 +634,11 @@ void Timer::scheduleAtFixedRate(TimerTask*  task,
         ex.setMark(__FILE__, __LINE__);
         throw;
     }
+    catch (std::exception&)
+    {
+        wrapper.release();
+        throw;
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -629,17 +648,15 @@ void Timer::scheduleAtFixedRate(const Pointer<TimerTask>& task,
 {
     if (when.getTime() < 0)
     {
-        throw IllegalArgumentException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
             "Task must be scheduled to start in the Future.");
     }
 
     if (period <= 0)
     {
-        throw IllegalArgumentException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
             "Task must be scheduled non-negative or non-zero period.");
     }
 
@@ -655,46 +672,50 @@ void Timer::scheduleTask(const Pointer<TimerTask>& task,
 {
     if (task == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "Task pointer passed in was Null");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "Task pointer passed in was Null");
     }
 
     synchronized(this->internal)
     {
         if (this->internal->cancelled)
         {
-            throw IllegalStateException(__FILE__,
-                                        __LINE__,
-                                        "Timer was cancelled.");
+            throw activemq::exceptions::IllegalStateException(
+                __FILE__,
+                __LINE__,
+                "Timer was cancelled.");
         }
 
         long long when = delay + System::currentTimeMillis();
 
         if (when < 0)
         {
-            throw IllegalArgumentException(__FILE__,
-                                           __LINE__,
-                                           "Task must be scheduled to start in "
-                                           "the Future but delay was Negative");
+            throw activemq::exceptions::InvalidArgumentException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+                "Task must be scheduled to start in "
+                "the Future but delay was Negative");
         }
 
         synchronized(&(task->lock))
         {
             if (task->isScheduled())
             {
-                throw IllegalStateException(
+                throw activemq::exceptions::IllegalStateException(
                     __FILE__,
                     __LINE__,
-                    "Task is already scheduled in a Timer, cannot add again.");
+                    "Task is already scheduled in a Timer, "
+                    "cannot add again.");
             }
 
             if (task->cancelled)
             {
-                throw IllegalStateException(
+                throw activemq::exceptions::IllegalStateException(
                     __FILE__,
                     __LINE__,
-                    "Task is already has been cancelled cannot be restarted.");
+                    "Task is already has been cancelled "
+                    "cannot be restarted.");
             }
 
             task->when      = when;

@@ -25,16 +25,19 @@
 #include <activemq/core/ActiveMQConnection.h>
 #include <activemq/core/ActiveMQConstants.h>
 #include <activemq/core/kernels/ActiveMQSessionKernel.h>
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <activemq/util/CMSExceptionSupport.h>
 #include <cms/TransactionInProgressException.h>
 #include <cms/TransactionRolledBackException.h>
 #include <cms/XAException.h>
 #include <cms/Xid.h>
+#include <decaf/lang/Exception.h>
 #include <decaf/lang/Integer.h>
 #include <decaf/lang/Long.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/util/Iterator.h>
 #include <decaf/util/concurrent/ConcurrentStlMap.h>
+#include <exception>
+#include <stdexcept>
 
 using namespace std;
 using namespace cms;
@@ -46,7 +49,6 @@ using namespace activemq::exceptions;
 using namespace activemq::util;
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 
@@ -128,7 +130,7 @@ ActiveMQTransactionContext::ActiveMQTransactionContext(
     {
         if (session == nullptr)
         {
-            throw NullPointerException(
+            throw activemq::exceptions::NullPointerException(
                 __FILE__,
                 __LINE__,
                 "ActiveMQTransactionContext::ActiveMQTransactionContext - "
@@ -479,11 +481,11 @@ int ActiveMQTransactionContext::recover(int flag AMQCPP_UNUSED, Xid** recovered)
 
         return size;
     }
-    catch (Exception& e)
+    catch (CMSException& e)
     {
         throw toXAException(e);
     }
-    catch (CMSException& e)
+    catch (std::exception& e)
     {
         throw toXAException(e);
     }
@@ -566,7 +568,7 @@ int ActiveMQTransactionContext::prepare(const Xid* xid)
 
         return intResponse->getResult();
     }
-    catch (Exception& e)
+    catch (CMSException& e)
     {
         try
         {
@@ -578,7 +580,7 @@ int ActiveMQTransactionContext::prepare(const Xid* xid)
 
         throw toXAException(e);
     }
-    catch (CMSException& e)
+    catch (std::exception& e)
     {
         try
         {
@@ -631,18 +633,6 @@ void ActiveMQTransactionContext::commit(const Xid* xid, bool onePhase)
 
         this->afterCommit();
     }
-    catch (Exception& ex)
-    {
-        try
-        {
-            this->afterRollback();
-        }
-        catch (...)
-        {
-        }
-
-        throw toXAException(ex);
-    }
     catch (CMSException& e)
     {
         try
@@ -654,6 +644,18 @@ void ActiveMQTransactionContext::commit(const Xid* xid, bool onePhase)
         }
 
         throw toXAException(e);
+    }
+    catch (std::exception& ex)
+    {
+        try
+        {
+            this->afterRollback();
+        }
+        catch (...)
+        {
+        }
+
+        throw toXAException(ex);
     }
 }
 
@@ -699,13 +701,13 @@ void ActiveMQTransactionContext::rollback(const Xid* xid)
 
         this->afterRollback();
     }
-    catch (Exception& ex)
-    {
-        throw toXAException(ex);
-    }
     catch (CMSException& e)
     {
         throw toXAException(e);
+    }
+    catch (std::exception& ex)
+    {
+        throw toXAException(ex);
     }
 }
 
@@ -729,11 +731,11 @@ void ActiveMQTransactionContext::end(const Xid* xid, int flags)
         {
             this->beforeEnd();
         }
-        catch (Exception& e)
+        catch (CMSException& e)
         {
             throw toXAException(e);
         }
-        catch (CMSException& e)
+        catch (std::exception& e)
         {
             throw toXAException(e);
         }
@@ -750,13 +752,13 @@ void ActiveMQTransactionContext::end(const Xid* xid, int flags)
             {
                 beforeEnd();
             }
-            catch (Exception& ex)
-            {
-                throw toXAException(ex);
-            }
             catch (CMSException& e)
             {
                 throw toXAException(e);
+            }
+            catch (std::exception& ex)
+            {
+                throw toXAException(ex);
             }
 
             setXid(NULL);
@@ -805,13 +807,13 @@ void ActiveMQTransactionContext::forget(const Xid* xid)
         this->connection->syncRequest(info,
                                       this->connection->getRequestTimeout());
     }
-    catch (Exception& ex)
-    {
-        throw toXAException(ex);
-    }
     catch (CMSException& e)
     {
         throw toXAException(e);
+    }
+    catch (std::exception& ex)
+    {
+        throw toXAException(ex);
     }
 }
 
@@ -835,13 +837,13 @@ bool ActiveMQTransactionContext::isSameRM(const XAResource* resource)
     {
         return getResourceManagerId() == cntx->getResourceManagerId();
     }
-    catch (Exception& ex)
-    {
-        throw toXAException(ex);
-    }
     catch (CMSException& ex)
     {
         throw XAException("Could not get the Resource Manager Id.", ex.clone());
+    }
+    catch (std::exception& ex)
+    {
+        throw toXAException(ex);
     }
 }
 
@@ -853,11 +855,11 @@ void ActiveMQTransactionContext::setXid(const Xid* xid)
         this->connection->checkClosedOrFailed();
         this->connection->ensureConnectionInfoSent();
     }
-    catch (Exception& e)
+    catch (CMSException& e)
     {
         throw toXAException(e);
     }
-    catch (CMSException& e)
+    catch (std::exception& e)
     {
         throw toXAException(e);
     }
@@ -883,11 +885,11 @@ void ActiveMQTransactionContext::setXid(const Xid* xid)
         {
             this->connection->oneway(info);
         }
-        catch (Exception& e)
+        catch (CMSException& e)
         {
             throw toXAException(e);
         }
-        catch (CMSException& e)
+        catch (std::exception& e)
         {
             throw toXAException(e);
         }
@@ -981,10 +983,19 @@ std::string ActiveMQTransactionContext::getResourceManagerId() const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-XAException ActiveMQTransactionContext::toXAException(decaf::lang::Exception& ex)
+XAException ActiveMQTransactionContext::toXAException(std::exception& ex)
 {
-    CMSException cmsEx = CMSExceptionSupport::create(ex);
-    XAException  xae(ex.getMessage(), cmsEx.clone());
+    const decaf::lang::Exception* dex =
+        dynamic_cast<const decaf::lang::Exception*>(&ex);
+    CMSException cmsEx = dex != nullptr ? CMSExceptionSupport::create(*dex)
+                                        : CMSExceptionSupport::create(ex);
+    std::string  msg   = dex != nullptr ? dex->getMessage()
+                                        : std::string(ex.what());
+    if (msg.empty())
+    {
+        msg = typeid(ex).name();
+    }
+    XAException xae(msg, cmsEx.clone());
     xae.setErrorCode(XAException::XAER_RMFAIL);
     return xae;
 }

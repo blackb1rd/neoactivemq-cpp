@@ -22,7 +22,6 @@
 #include <vector>
 
 #include <activemq/util/Config.h>
-#include <decaf/lang/exceptions/IndexOutOfBoundsException.h>
 
 namespace activemq
 {
@@ -60,7 +59,7 @@ namespace wireformat
                  *
                  * @return string containing the hex value if the index
                  *
-                 * @throws IndexOutOfBoundsException if the index exceeds the
+                 * @throws std::out_of_range if the index exceeds the
                  * table size.
                  */
                 virtual const std::string& operator[](std::size_t index);

@@ -21,6 +21,7 @@
 #include <decaf/util/Config.h>
 
 #include <decaf/net/ServerSocket.h>
+#include <stdexcept>
 
 namespace decaf
 {
@@ -62,7 +63,7 @@ namespace net
              *
              * @throws IOException if there is an I/O error while performing
              * this operation.
-             * @throws IllegalArgumentException if the port value is negative or
+             * @throws std::invalid_argument if the port value is negative or
              * greater than 65535.
              */
             SSLServerSocket(int port);
@@ -88,7 +89,7 @@ namespace net
              *
              * @throws IOException if there is an I/O error while performing
              * this operation.
-             * @throws IllegalArgumentException if the port value is negative or
+             * @throws std::invalid_argument if the port value is negative or
              * greater than 65535.
              */
             SSLServerSocket(int port, int backlog);
@@ -117,7 +118,7 @@ namespace net
              *
              * @throws IOException if there is an I/O error while performing
              * this operation.
-             * @throws IllegalArgumentException if the port value is negative or
+             * @throws std::invalid_argument if the port value is negative or
              * greater than 65535.
              */
             SSLServerSocket(int                            port,
@@ -165,7 +166,7 @@ namespace net
              *      An Vector of names for all the Cipher Suites that are to be
              * enabled.
              *
-             * @throws IllegalArgumentException if the vector is empty or one of
+             * @throws std::invalid_argument if the vector is empty or one of
              * the names is invalid.
              */
             virtual void setEnabledCipherSuites(
@@ -189,7 +190,7 @@ namespace net
              *      An Vector of names for all the Protocols that are to be
              * enabled.
              *
-             * @throws IllegalArgumentException if the vector is empty or one of
+             * @throws std::invalid_argument if the vector is empty or one of
              * the names is invalid.
              */
             virtual void setEnabledProtocols(

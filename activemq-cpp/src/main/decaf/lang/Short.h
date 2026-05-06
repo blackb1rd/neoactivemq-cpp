@@ -21,7 +21,6 @@
 #include <decaf/lang/Comparable.h>
 #include <decaf/lang/Number.h>
 #include <decaf/lang/String.h>
-#include <decaf/lang/exceptions/NumberFormatException.h>
 #include <decaf/util/Config.h>
 #include <string>
 
@@ -58,7 +57,7 @@ namespace lang
          * @param value
          *      The string value to convert to short and wrap.
          *
-         * @throws NumberFormatException if the string is not well formed number
+         * @throws std::invalid_argument if the string is not well formed number
          * value.
          */
         Short(const String& value);
@@ -216,7 +215,7 @@ namespace lang
          * and/or radix specifier ("0x", "0X", "#", or leading zero) is parsed
          * as by the Short.parseShort method with the indicated radix (10, 16,
          * or 8). This sequence of characters must represent a positive value or
-         * a NumberFormatException will be thrown. The result is negated if
+         * a std::invalid_argument will be thrown. The result is negated if
          * first character of the specified String is the minus sign. No
          * whitespace characters are permitted in the string.
          * @param value - The string to decode
@@ -241,7 +240,7 @@ namespace lang
          * Character.digit(char, int) returns a nonnegative value) except that
          * the first character may be an ASCII minus sign '-' to indicate a
          * negative value. The resulting byte value is returned. <p> An
-         * exception of type NumberFormatException is thrown if any of the
+         * exception of type std::invalid_argument is thrown if any of the
          * following situations occurs:
          *  * The first argument is null or is a string of length zero.
          *  * The radix is either smaller than Character.MIN_RADIX or larger
@@ -259,7 +258,7 @@ namespace lang
          * @return the short represented by the string argument in the specified
          * radix.
          *
-         * @throws NumberFormatException - If String does not contain a parsable
+         * @throws std::invalid_argument - If String does not contain a parsable
          * short.
          */
         static short parseShort(const String& s, int radix);
@@ -277,7 +276,7 @@ namespace lang
          *
          * @return the converted short value
          *
-         * @throws NumberFormatException if the string is not a short.
+         * @throws std::invalid_argument if the string is not a short.
          */
         static short parseShort(const String& s);
 
@@ -300,7 +299,7 @@ namespace lang
          *
          * @return new Short Object wrapping the primitive
          *
-         * @throws NumberFormatException if the string is not a decimal short.
+         * @throws std::invalid_argument if the string is not a decimal short.
          */
         static Short valueOf(const String& value);
 
@@ -320,7 +319,7 @@ namespace lang
          *
          * @return new Short Object wrapping the primitive
          *
-         * @throws NumberFormatException if the string is not a valid short.
+         * @throws std::invalid_argument if the string is not a valid short.
          */
         static Short valueOf(const String& value, int radix);
     };

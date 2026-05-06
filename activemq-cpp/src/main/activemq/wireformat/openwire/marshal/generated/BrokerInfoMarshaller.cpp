@@ -113,10 +113,9 @@ void BrokerInfoMarshaller::tightUnmarshal(OpenWireFormat*  wireFormat,
             info->setNetworkProperties(tightUnmarshalString(dataIn, bs));
         }
     }
-    AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
-                                decaf::io::IOException)
-    AMQ_CATCHALL_THROW(decaf::io::IOException)
+    AMQ_IOSTREAM_CATCH_RETHROW()
+    AMQ_IOSTREAM_CATCH_CONVERT_ACTIVEMQ_EXCEPTION()
+    AMQ_IOSTREAM_CATCHALL_THROW()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -167,10 +166,9 @@ int BrokerInfoMarshaller::tightMarshal1(OpenWireFormat* wireFormat,
 
         return rc + 0;
     }
-    AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
-                                decaf::io::IOException)
-    AMQ_CATCHALL_THROW(decaf::io::IOException)
+    AMQ_IOSTREAM_CATCH_RETHROW()
+    AMQ_IOSTREAM_CATCH_CONVERT_ACTIVEMQ_EXCEPTION()
+    AMQ_IOSTREAM_CATCHALL_THROW()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -224,10 +222,9 @@ void BrokerInfoMarshaller::tightMarshal2(OpenWireFormat*   wireFormat,
             tightMarshalString2(info->getNetworkProperties(), dataOut, bs);
         }
     }
-    AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
-                                decaf::io::IOException)
-    AMQ_CATCHALL_THROW(decaf::io::IOException)
+    AMQ_IOSTREAM_CATCH_RETHROW()
+    AMQ_IOSTREAM_CATCH_CONVERT_ACTIVEMQ_EXCEPTION()
+    AMQ_IOSTREAM_CATCHALL_THROW()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -288,10 +285,9 @@ void BrokerInfoMarshaller::looseUnmarshal(OpenWireFormat*  wireFormat,
             info->setNetworkProperties(looseUnmarshalString(dataIn));
         }
     }
-    AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
-                                decaf::io::IOException)
-    AMQ_CATCHALL_THROW(decaf::io::IOException)
+    AMQ_IOSTREAM_CATCH_RETHROW()
+    AMQ_IOSTREAM_CATCH_CONVERT_ACTIVEMQ_EXCEPTION()
+    AMQ_IOSTREAM_CATCHALL_THROW()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -338,8 +334,7 @@ void BrokerInfoMarshaller::looseMarshal(OpenWireFormat*   wireFormat,
             looseMarshalString(info->getNetworkProperties(), dataOut);
         }
     }
-    AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
-                                decaf::io::IOException)
-    AMQ_CATCHALL_THROW(decaf::io::IOException)
+    AMQ_IOSTREAM_CATCH_RETHROW()
+    AMQ_IOSTREAM_CATCH_CONVERT_ACTIVEMQ_EXCEPTION()
+    AMQ_IOSTREAM_CATCHALL_THROW()
 }

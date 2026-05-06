@@ -20,7 +20,10 @@
 #include <decaf/net/SocketImpl.h>
 #include <decaf/net/SocketImplFactory.h>
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/internal/net/tcp/TcpSocket.h>
+#include <stdexcept>
+#include <string>
 
 using namespace decaf;
 using namespace decaf::net;
@@ -29,7 +32,6 @@ using namespace decaf::internal;
 using namespace decaf::internal::net;
 using namespace decaf::internal::net::tcp;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 SocketImplFactory* Socket::factory = NULL;
@@ -65,9 +67,10 @@ Socket::Socket(SocketImpl* impl)
 {
     if (impl == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "SocketImpl pointer passed was Null.");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "SocketImpl pointer passed was Null.");
     }
 }
 
@@ -83,7 +86,7 @@ Socket::Socket(const InetAddress* address, int port)
 {
     if (address == NULL)
     {
-        throw NullPointerException(
+        throw activemq::exceptions::NullPointerException(
             __FILE__,
             __LINE__,
             "The InetAddress to connect to cannot be NULL");
@@ -91,10 +94,9 @@ Socket::Socket(const InetAddress* address, int port)
 
     if (port < 0 || port > 65535)
     {
-        throw IllegalArgumentException(__FILE__,
-                                       __LINE__,
-                                       "Port specified is out of range: %d",
-                                       port);
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Port specified is out of range: " + std::to_string(port));
     }
 
     try
@@ -131,7 +133,7 @@ Socket::Socket(const InetAddress* address,
 {
     if (address == NULL)
     {
-        throw NullPointerException(
+        throw activemq::exceptions::NullPointerException(
             __FILE__,
             __LINE__,
             "The InetAddress to connect to cannot be NULL");
@@ -139,10 +141,9 @@ Socket::Socket(const InetAddress* address,
 
     if (port < 0 || port > 65535)
     {
-        throw IllegalArgumentException(__FILE__,
-                                       __LINE__,
-                                       "Port specified is out of range: %d",
-                                       port);
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Port specified is out of range: " + std::to_string(port));
     }
 
     try
@@ -179,10 +180,9 @@ Socket::Socket(const std::string& host, int port)
 {
     if (port < 0 || port > 65535)
     {
-        throw IllegalArgumentException(__FILE__,
-                                       __LINE__,
-                                       "Port specified is out of range: %d",
-                                       port);
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Port specified is out of range: " + std::to_string(port));
     }
 
     try
@@ -219,10 +219,9 @@ Socket::Socket(const std::string& host,
 {
     if (port < 0 || port > 65535)
     {
-        throw IllegalArgumentException(__FILE__,
-                                       __LINE__,
-                                       "Port specified is out of range: %d",
-                                       port);
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Port specified is out of range: " + std::to_string(port));
     }
 
     try
@@ -344,7 +343,6 @@ void Socket::bind(const std::string& ipaddress, int port)
         }
     }
     DECAF_CATCH_RETHROW(IOException)
-    DECAF_CATCH_RETHROW(IllegalArgumentException)
     DECAF_CATCH_EXCEPTION_CONVERT(Exception, IOException)
     DECAF_CATCHALL_THROW(IOException)
 }
@@ -366,10 +364,9 @@ void Socket::connect(const std::string& host, int port)
 {
     if (port < 0 || port > 65535)
     {
-        throw IllegalArgumentException(__FILE__,
-                                       __LINE__,
-                                       "Port specified is out of range: %d",
-                                       port);
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Port specified is out of range: " + std::to_string(port));
     }
 
     try
@@ -377,7 +374,6 @@ void Socket::connect(const std::string& host, int port)
         this->connect(host, port, 0);
     }
     DECAF_CATCH_RETHROW(IOException)
-    DECAF_CATCH_RETHROW(IllegalArgumentException)
     DECAF_CATCHALL_THROW(IOException)
 }
 
@@ -388,10 +384,9 @@ void Socket::connect(const std::string& host, int port, int timeout)
 
     if (timeout < 0)
     {
-        throw IllegalArgumentException(__FILE__,
-                                       __LINE__,
-                                       "Timeout value specified is invalid: %d",
-                                       timeout);
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Timeout value specified is invalid: " + std::to_string(timeout));
     }
 
     if (isConnected())
@@ -403,9 +398,9 @@ void Socket::connect(const std::string& host, int port, int timeout)
 
     if (host.empty())
     {
-        throw IllegalArgumentException(__FILE__,
-                                       __LINE__,
-                                       "Host cannot be empty.");
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Host cannot be empty.");
     }
 
     try
@@ -433,7 +428,6 @@ void Socket::connect(const std::string& host, int port, int timeout)
         }
     }
     DECAF_CATCH_RETHROW(IOException)
-    DECAF_CATCH_RETHROW(IllegalArgumentException)
     DECAF_CATCH_EXCEPTION_CONVERT(Exception, IOException)
     DECAF_CATCHALL_THROW(IOException)
 }
@@ -550,18 +544,15 @@ void Socket::setSoLinger(bool state, int timeout)
 
         if (state && timeout < 0)
         {
-            throw IllegalArgumentException(
-                __FILE__,
-                __LINE__,
-                "Timeout value passed is invalid: %d",
-                timeout);
+            throw activemq::exceptions::InvalidArgumentException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+                "Timeout value passed is invalid: " + std::to_string(timeout));
         }
 
         int value = state ? (65535 > timeout ? timeout : 65535) : -1;
         this->impl->setOption(SocketOptions::SOCKET_OPTION_LINGER, value);
     }
     DECAF_CATCH_RETHROW(SocketException)
-    DECAF_CATCH_RETHROW(IllegalArgumentException)
     DECAF_CATCH_EXCEPTION_CONVERT(Exception, SocketException)
     DECAF_CATCHALL_THROW(SocketException)
 }
@@ -622,10 +613,9 @@ void Socket::setReceiveBufferSize(int size)
 
     if (size <= 0)
     {
-        throw IllegalArgumentException(__FILE__,
-                                       __LINE__,
-                                       "Buffer size given was invalid: %d",
-                                       size);
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Buffer size given was invalid: " + std::to_string(size));
     }
 
     try
@@ -634,7 +624,6 @@ void Socket::setReceiveBufferSize(int size)
         this->impl->setOption(SocketOptions::SOCKET_OPTION_RCVBUF, size);
     }
     DECAF_CATCH_RETHROW(SocketException)
-    DECAF_CATCH_RETHROW(IllegalArgumentException)
     DECAF_CATCH_EXCEPTION_CONVERT(Exception, SocketException)
     DECAF_CATCHALL_THROW(SocketException)
 }
@@ -695,10 +684,9 @@ void Socket::setSendBufferSize(int size)
 
     if (size <= 0)
     {
-        throw IllegalArgumentException(__FILE__,
-                                       __LINE__,
-                                       "Buffer size given was invalid: %d",
-                                       size);
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Buffer size given was invalid: " + std::to_string(size));
     }
 
     try
@@ -707,7 +695,6 @@ void Socket::setSendBufferSize(int size)
         this->impl->setOption(SocketOptions::SOCKET_OPTION_SNDBUF, size);
     }
     DECAF_CATCH_RETHROW(SocketException)
-    DECAF_CATCH_RETHROW(IllegalArgumentException)
     DECAF_CATCH_EXCEPTION_CONVERT(Exception, SocketException)
     DECAF_CATCHALL_THROW(SocketException)
 }
@@ -734,10 +721,9 @@ void Socket::setSoTimeout(int timeout)
 
     if (timeout < 0)
     {
-        throw IllegalArgumentException(__FILE__,
-                                       __LINE__,
-                                       "Socket timeout given was invalid: %d",
-                                       timeout);
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Socket timeout given was invalid: " + std::to_string(timeout));
     }
 
     try
@@ -746,7 +732,6 @@ void Socket::setSoTimeout(int timeout)
         this->impl->setOption(SocketOptions::SOCKET_OPTION_TIMEOUT, timeout);
     }
     DECAF_CATCH_RETHROW(SocketException)
-    DECAF_CATCH_RETHROW(IllegalArgumentException)
     DECAF_CATCH_EXCEPTION_CONVERT(Exception, SocketException)
     DECAF_CATCHALL_THROW(SocketException)
 }
@@ -807,11 +792,10 @@ void Socket::setTrafficClass(int value)
 
     if (value < 0 || value > 255)
     {
-        throw IllegalArgumentException(
-            __FILE__,
-            __LINE__,
-            "Value of the Traffic class option was invalid: %d",
-            value);
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Value of the Traffic class option was invalid: " +
+            std::to_string(value));
     }
 
     try
@@ -820,7 +804,6 @@ void Socket::setTrafficClass(int value)
         this->impl->setOption(SocketOptions::SOCKET_OPTION_IP_TOS, value);
     }
     DECAF_CATCH_RETHROW(SocketException)
-    DECAF_CATCH_RETHROW(IllegalArgumentException)
     DECAF_CATCH_EXCEPTION_CONVERT(Exception, SocketException)
     DECAF_CATCHALL_THROW(SocketException)
 }

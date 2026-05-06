@@ -16,8 +16,9 @@
  */
 #include "LogManager.h"
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/io/InputStream.h>
-#include <decaf/lang/exceptions/RuntimeException.h>
+#include <decaf/lang/Exception.h>
 #include <decaf/util/Config.h>
 #include <decaf/util/StlMap.h>
 #include <decaf/util/concurrent/Concurrent.h>
@@ -31,7 +32,6 @@ using namespace std;
 using namespace decaf;
 using namespace decaf::io;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::logging;
 
@@ -135,9 +135,10 @@ LogManager& LogManager::getLogManager()
 {
     if (theManager == NULL)
     {
-        throw RuntimeException(__FILE__,
-                               __LINE__,
-                               "The Logging Subsystem is not initialized.");
+        throw activemq::exceptions::RuntimeException(
+            __FILE__,
+            __LINE__,
+            "The Logging Subsystem is not initialized.");
     }
 
     return *theManager;

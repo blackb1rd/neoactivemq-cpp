@@ -432,7 +432,7 @@ namespace core
              * @return the message, if received within the allotted time.
              * Otherwise NULL.
              *
-             * @throws InvalidStateException if this consumer is closed upon
+             * @throws std::logic_error if this consumer is closed upon
              *         entering this method.
              */
             std::shared_ptr<MessageDispatch> dequeue(long long timeout);

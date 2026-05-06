@@ -18,19 +18,21 @@
 #ifndef _DECAF_UTIL_ABSTRACTSEQUENTIALLIST_H_
 #define _DECAF_UTIL_ABSTRACTSEQUENTIALLIST_H_
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/lang/Iterable.h>
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
-#include <decaf/lang/exceptions/UnsupportedOperationException.h>
 #include <decaf/util/AbstractList.h>
 #include <decaf/util/Config.h>
 #include <decaf/util/Iterator.h>
 #include <memory>
+#include <stdexcept>
+#include <string>
 
 namespace decaf
 {
 namespace util
 {
+
+    using namespace activemq::exceptions;
 
     /**
      * This class provides a skeletal implementation of the List  interface to
@@ -93,7 +95,7 @@ namespace util
 
         virtual ListIterator<E>* listIterator(int index DECAF_UNUSED)
         {
-            throw decaf::lang::exceptions::UnsupportedOperationException(
+            throw activemq::exceptions::UnsupportedOperationException(
                 __FILE__,
                 __LINE__,
                 "Abstract sequential list does not implement the "
@@ -102,7 +104,7 @@ namespace util
 
         virtual ListIterator<E>* listIterator(int index DECAF_UNUSED) const
         {
-            throw decaf::lang::exceptions::UnsupportedOperationException(
+            throw activemq::exceptions::UnsupportedOperationException(
                 __FILE__,
                 __LINE__,
                 "Abstract sequential list does not implement the "
@@ -124,12 +126,17 @@ namespace util
                     this->listIterator(index));
                 return iter->next();
             }
-            catch (decaf::util::NoSuchElementException& ex)
+            catch (NoSuchElementException&)
             {
-                throw decaf::lang::exceptions::IndexOutOfBoundsException(
-                    __FILE__,
-                    __LINE__,
-                    "get called with invalid index.");
+                throw OutOfRangeException(std::string(__FILE__) + ":" +
+                                          std::to_string(__LINE__) + ": " +
+                                          "get called with invalid index.");
+            }
+            catch (ConcurrentModificationException&)
+            {
+                throw OutOfRangeException(std::string(__FILE__) + ":" +
+                                          std::to_string(__LINE__) + ": " +
+                                          "get called with invalid index.");
             }
         }
 
@@ -151,12 +158,17 @@ namespace util
                 iter->set(element);
                 return result;
             }
-            catch (decaf::util::NoSuchElementException& ex)
+            catch (NoSuchElementException&)
             {
-                throw decaf::lang::exceptions::IndexOutOfBoundsException(
-                    __FILE__,
-                    __LINE__,
-                    "set called with invalid index.");
+                throw OutOfRangeException(std::string(__FILE__) + ":" +
+                                          std::to_string(__LINE__) + ": " +
+                                          "set called with invalid index.");
+            }
+            catch (ConcurrentModificationException&)
+            {
+                throw OutOfRangeException(std::string(__FILE__) + ":" +
+                                          std::to_string(__LINE__) + ": " +
+                                          "set called with invalid index.");
             }
         }
 
@@ -175,12 +187,17 @@ namespace util
                     this->listIterator(index));
                 iter->add(element);
             }
-            catch (decaf::util::NoSuchElementException& ex)
+            catch (NoSuchElementException&)
             {
-                throw decaf::lang::exceptions::IndexOutOfBoundsException(
-                    __FILE__,
-                    __LINE__,
-                    "add called with invalid index.");
+                throw OutOfRangeException(std::string(__FILE__) + ":" +
+                                          std::to_string(__LINE__) + ": " +
+                                          "add called with invalid index.");
+            }
+            catch (ConcurrentModificationException&)
+            {
+                throw OutOfRangeException(std::string(__FILE__) + ":" +
+                                          std::to_string(__LINE__) + ": " +
+                                          "add called with invalid index.");
             }
         }
 
@@ -223,12 +240,17 @@ namespace util
                 iter->remove();
                 return result;
             }
-            catch (decaf::util::NoSuchElementException& ex)
+            catch (NoSuchElementException&)
             {
-                throw decaf::lang::exceptions::IndexOutOfBoundsException(
-                    __FILE__,
-                    __LINE__,
-                    "set called with invalid index.");
+                throw OutOfRangeException(
+                    std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+                    ": " + "removeAt called with invalid index.");
+            }
+            catch (ConcurrentModificationException&)
+            {
+                throw OutOfRangeException(
+                    std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+                    ": " + "removeAt called with invalid index.");
             }
         }
     };

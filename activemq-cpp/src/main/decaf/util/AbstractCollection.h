@@ -18,16 +18,16 @@
 #ifndef _DECAF_UTIL_ABSTRACTCOLLECTION_H_
 #define _DECAF_UTIL_ABSTRACTCOLLECTION_H_
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/lang/Iterable.h>
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
-#include <decaf/lang/exceptions/UnsupportedOperationException.h>
 #include <decaf/util/Collection.h>
 #include <decaf/util/Config.h>
 #include <decaf/util/Iterator.h>
 #include <decaf/util/concurrent/Mutex.h>
 #include <decaf/util/concurrent/Synchronizable.h>
 #include <memory>
+#include <stdexcept>
+#include <string>
 
 namespace decaf
 {
@@ -125,11 +125,11 @@ namespace util
          * will probably choose to override this method for efficiency.
          *
          * Note that this implementation will throw an
-         * UnsupportedOperationException if the iterator returned by this
+         * std::logic_error if the iterator returned by this
          * collection's iterator method does not implement the remove method and
          * this collection is non-empty.
          *
-         * @throw UnsupportedOperationException
+         * @throws std::logic_error
          *        if the clear operation is not supported by this collection
          */
         virtual void clear()
@@ -223,7 +223,7 @@ namespace util
          *
          * @throws UnsupportedOperationExceptio if this is an unmodifiable
          * collection.
-         * @throws IllegalStateException if the elements cannot be added at this
+         * @throws std::logic_error if the elements cannot be added at this
          * time due to insertion restrictions.
          */
         virtual void copy(const Collection<E>& collection)
@@ -256,7 +256,7 @@ namespace util
          */
         virtual bool add(const E& value DECAF_UNUSED)
         {
-            throw decaf::lang::exceptions::UnsupportedOperationException(
+            throw activemq::exceptions::UnsupportedOperationException(
                 __FILE__,
                 __LINE__,
                 "AbstractCollection add is not implemented.");
@@ -320,7 +320,7 @@ namespace util
          * this collection with the iterator's remove method.
          *
          * Note that this implementation will throw an
-         * UnsupportedOperationException if the iterator returned by the
+         * std::logic_error if the iterator returned by the
          * iterator method does not implement the remove method and this
          * collection contains one or more elements in common with the specified
          * collection.
@@ -350,7 +350,7 @@ namespace util
          * this collection with the iterator's remove method.
          *
          * Note that this implementation will throw an
-         * UnsupportedOperationException if the iterator returned by the
+         * std::logic_error if the iterator returned by the
          * iterator method does not implement the remove method and this
          * collection contains one or more elements not present in the specified
          * collection.

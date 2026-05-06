@@ -17,6 +17,7 @@
 
 #include "InternalCommandListener.h"
 
+#include <activemq/exceptions/ActiveMQException.h>
 #include <activemq/transport/mock/MockTransport.h>
 
 using namespace activemq;
@@ -24,9 +25,7 @@ using namespace activemq::transport;
 using namespace activemq::transport::mock;
 using namespace activemq::exceptions;
 using namespace activemq::wireformat;
-using namespace decaf::io;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 InternalCommandListener::InternalCommandListener()
@@ -108,9 +107,9 @@ void InternalCommandListener::run()
                             transport->getNumReceivedMessageBeforeFail())
                         {
                             transport->fireException(
-                                IOException(__FILE__,
-                                            __LINE__,
-                                            "Failed to Send Message."));
+                                ActiveMQException(__FILE__,
+                                                  __LINE__,
+                                                  "Failed to Send Message."));
                             ;
                         }
                     }

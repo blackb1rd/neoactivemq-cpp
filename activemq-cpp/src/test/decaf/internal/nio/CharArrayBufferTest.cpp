@@ -15,12 +15,14 @@
  * limitations under the License.
  */
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/lang/Double.h>
 #include <decaf/lang/Float.h>
 #include <decaf/lang/Integer.h>
 #include <decaf/nio/CharBuffer.h>
 #include <gtest/gtest.h>
 #include <string.h>
+#include <stdexcept>
 
 namespace decaf
 {
@@ -37,7 +39,7 @@ using namespace decaf;
 using namespace decaf::nio;
 using namespace decaf::internal::nio;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
+using activemq::exceptions::BufferUnderflowException;
 
 class CharArrayBufferTest : public ::testing::Test
 {
@@ -107,11 +109,10 @@ public:
     {
         if (index > (int)this->value.length())
         {
-            throw decaf::lang::exceptions::IndexOutOfBoundsException(
-                __FILE__,
-                __LINE__,
-                "MyCharSequence::charAt - index is to big: %d",
-                index);
+            throw std::out_of_range(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+                "MyCharSequence::charAt - index is to big: " +
+                std::to_string(index));
         }
 
         return this->value.at(index);
@@ -121,7 +122,7 @@ public:
     {
         if (start > end)
         {
-            throw decaf::lang::exceptions::IndexOutOfBoundsException(
+            throw ::activemq::exceptions::OutOfRangeException(
                 __FILE__,
                 __LINE__,
                 "CharArrayBuffer::subSequence - start > end");
@@ -129,7 +130,7 @@ public:
 
         if (start > this->length() || end > this->length())
         {
-            throw decaf::lang::exceptions::IndexOutOfBoundsException(
+            throw ::activemq::exceptions::OutOfRangeException(
                 __FILE__,
                 __LINE__,
                 "CharArrayBuffer::subSequence - Sequence exceed limit");
@@ -208,10 +209,10 @@ TEST_F(CharArrayBufferTest, testReadOnlyArray)
     ASSERT_TRUE(readOnly != NULL);
     ASSERT_TRUE(readOnly->isReadOnly() == true);
 
-    ASSERT_THROW(readOnly->array(), UnsupportedOperationException)
+    ASSERT_THROW(readOnly->array(), std::logic_error)
         << ("Should throw UnsupportedOperationException");
 
-    ASSERT_THROW(readOnly->arrayOffset(), UnsupportedOperationException)
+    ASSERT_THROW(readOnly->arrayOffset(), std::logic_error)
         << ("Should throw UnsupportedOperationException");
 
     delete readOnly;
@@ -478,44 +479,44 @@ TEST_F(CharArrayBufferTest, testGetbyteArray2)
                                   testBuffer1->capacity(),
                                   -1,
                                   testBuffer1->capacity()),
-                 IndexOutOfBoundsException)
-        << ("Should throw IndexOutOfBoundsException");
+                 std::out_of_range)
+        << ("Should throw std::out_of_range");
 
     ASSERT_THROW(testBuffer1->get(array,
                                   testBuffer1->capacity(),
                                   testBuffer1->capacity() + 1,
                                   1),
-                 IndexOutOfBoundsException)
-        << ("Should throw IndexOutOfBoundsException");
+                 std::out_of_range)
+        << ("Should throw std::out_of_range");
 
     ASSERT_THROW(testBuffer1->get(array, testBuffer1->capacity(), 2, -1),
-                 IndexOutOfBoundsException)
-        << ("Should throw IndexOutOfBoundsException");
+                 std::out_of_range)
+        << ("Should throw std::out_of_range");
 
     ASSERT_THROW(testBuffer1->get(array,
                                   testBuffer1->capacity(),
                                   2,
                                   testBuffer1->capacity()),
-                 IndexOutOfBoundsException)
-        << ("Should throw IndexOutOfBoundsException");
+                 std::out_of_range)
+        << ("Should throw std::out_of_range");
 
     ASSERT_THROW(
         testBuffer1->get(array, testBuffer1->capacity(), 1, Integer::MAX_VALUE),
-        IndexOutOfBoundsException)
-        << ("Should throw IndexOutOfBoundsException");
+        std::out_of_range)
+        << ("Should throw std::out_of_range");
 
     ASSERT_THROW(
         testBuffer1->get(array, testBuffer1->capacity(), Integer::MAX_VALUE, 1),
-        IndexOutOfBoundsException)
-        << ("Should throw IndexOutOfBoundsException");
+        std::out_of_range)
+        << ("Should throw std::out_of_range");
 
     ASSERT_THROW(
         testBuffer1->get(NULL, testBuffer1->capacity(), 1, Integer::MAX_VALUE),
-        NullPointerException)
-        << ("Should throw NullPointerException");
+        std::logic_error)
+        << ("Should throw std::logic_error");
 
-    ASSERT_THROW(testBuffer1->get(NULL, 0, 0, 1), NullPointerException)
-        << ("Should throw a NullPointerException");
+    ASSERT_THROW(testBuffer1->get(NULL, 0, 0, 1), std::logic_error)
+        << ("Should throw a std::logic_error");
 
     ASSERT_TRUE(testBuffer1->position() == 0);
 
@@ -547,12 +548,11 @@ TEST_F(CharArrayBufferTest, testGetWithIndex)
         ASSERT_TRUE(testBuffer1->get() == testBuffer1->get(i));
     }
 
-    ASSERT_THROW(testBuffer1->get(-1), IndexOutOfBoundsException)
-        << ("Should throw a IndexOutOfBoundsException");
+    ASSERT_THROW(testBuffer1->get(-1), std::out_of_range)
+        << ("Should throw a std::out_of_range");
 
-    ASSERT_THROW(testBuffer1->get(testBuffer1->limit()),
-                 IndexOutOfBoundsException)
-        << ("Should throw a IndexOutOfBoundsException");
+    ASSERT_THROW(testBuffer1->get(testBuffer1->limit()), std::out_of_range)
+        << ("Should throw a std::out_of_range");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -644,8 +644,8 @@ TEST_F(CharArrayBufferTest, testPutbyteArray2)
     ASSERT_TRUE(testBuffer1->position() == 0);
 
     ASSERT_THROW(testBuffer1->put(NULL, 0, 2, Integer::MAX_VALUE),
-                 NullPointerException)
-        << ("Should throw a NullPointerException");
+                 std::logic_error)
+        << ("Should throw a std::logic_error");
 
     ASSERT_TRUE(testBuffer1->position() == 0);
 
@@ -680,7 +680,7 @@ TEST_F(CharArrayBufferTest, testPutCharBuffer)
         << ("Should throw a ReadOnlyBufferException");
     delete readOnly;
 
-    ASSERT_THROW(testBuffer1->put(*testBuffer1), IllegalArgumentException)
+    ASSERT_THROW(testBuffer1->put(*testBuffer1), std::invalid_argument)
         << ("Should throw a IllegalArgumentException");
 
     CharBuffer* toBig = testBuffer1->allocate(testBuffer1->capacity() + 1);
@@ -727,12 +727,11 @@ TEST_F(CharArrayBufferTest, testPutIndexed)
         ASSERT_TRUE(&ret == testBuffer1);
     }
 
-    ASSERT_THROW(testBuffer1->put(-1, 0), IndexOutOfBoundsException)
-        << ("Should throw a IndexOutOfBoundsException");
+    ASSERT_THROW(testBuffer1->put(-1, 0), std::out_of_range)
+        << ("Should throw a std::out_of_range");
 
-    ASSERT_THROW(testBuffer1->put(testBuffer1->limit(), 0),
-                 IndexOutOfBoundsException)
-        << ("Should throw a IndexOutOfBoundsException");
+    ASSERT_THROW(testBuffer1->put(testBuffer1->limit(), 0), std::out_of_range)
+        << ("Should throw a std::out_of_range");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -782,8 +781,8 @@ TEST_F(CharArrayBufferTest, testToString)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(CharArrayBufferTest, testWrapNullArray)
 {
-    ASSERT_THROW(testBuffer1->wrap((char*)NULL, 0, 0, 3), NullPointerException)
-        << ("Should throw a NullPointerException");
+    ASSERT_THROW(testBuffer1->wrap((char*)NULL, 0, 0, 3), std::logic_error)
+        << ("Should throw a std::logic_error");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -796,11 +795,11 @@ TEST_F(CharArrayBufferTest, testCharAt)
     }
 
     ASSERT_THROW(testBuffer1->charAt(testBuffer1->remaining()),
-                 IndexOutOfBoundsException)
-        << ("Should throw a IndexOutOfBoundsException");
+                 std::out_of_range)
+        << ("Should throw a std::out_of_range");
 
-    ASSERT_THROW(testBuffer1->charAt(-1), IndexOutOfBoundsException)
-        << ("Should throw a IndexOutOfBoundsException");
+    ASSERT_THROW(testBuffer1->charAt(-1), std::out_of_range)
+        << ("Should throw a std::out_of_range");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -814,20 +813,20 @@ TEST_F(CharArrayBufferTest, testSubSequence)
 {
     ASSERT_THROW(testBuffer1->subSequence(testBuffer1->length() + 1,
                                           testBuffer1->length() + 1),
-                 IndexOutOfBoundsException)
-        << ("Should throw a IndexOutOfBoundsException");
+                 std::out_of_range)
+        << ("Should throw a std::out_of_range");
 
     CharSequence* sub1 =
         testBuffer1->subSequence(testBuffer1->length(), testBuffer1->length());
     ASSERT_TRUE(sub1->length() == 0);
     delete sub1;
 
-    ASSERT_THROW(testBuffer1->subSequence(1, 0), IndexOutOfBoundsException)
-        << ("Should throw a IndexOutOfBoundsException");
+    ASSERT_THROW(testBuffer1->subSequence(1, 0), std::out_of_range)
+        << ("Should throw a std::out_of_range");
 
     ASSERT_THROW(testBuffer1->subSequence(1, testBuffer1->length() + 1),
-                 IndexOutOfBoundsException)
-        << ("Should throw a IndexOutOfBoundsException");
+                 std::out_of_range)
+        << ("Should throw a std::out_of_range");
 
     CharSequence* sub2 = testBuffer1->subSequence(0, testBuffer1->length());
     ASSERT_TRUE(sub2->toString() == testBuffer1->toString());
@@ -873,18 +872,18 @@ TEST_F(CharArrayBufferTest, testPutStringWithArgs)
 
     ASSERT_THROW(
         testBuffer1->put(str, (int)str.length() + 1, (int)str.length() + 2),
-        IndexOutOfBoundsException)
-        << ("Should throw a IndexOutOfBoundsException");
+        std::out_of_range)
+        << ("Should throw a std::out_of_range");
 
     testBuffer1->put(str, (int)str.length(), (int)str.length());
     ASSERT_TRUE(testBuffer1->position() == 0);
 
-    ASSERT_THROW(testBuffer1->put(str, 2, 1), IndexOutOfBoundsException)
-        << ("Should throw a IndexOutOfBoundsException");
+    ASSERT_THROW(testBuffer1->put(str, 2, 1), std::out_of_range)
+        << ("Should throw a std::out_of_range");
 
     ASSERT_THROW(testBuffer1->put(str, 2, (int)str.length() + 1),
-                 IndexOutOfBoundsException)
-        << ("Should throw a IndexOutOfBoundsException");
+                 std::out_of_range)
+        << ("Should throw a std::out_of_range");
 
     ASSERT_TRUE(testBuffer1->position() == 0);
 
@@ -1027,14 +1026,14 @@ TEST_F(CharArrayBufferTest, testAppendCharSequenceII_IllegalArgument)
     cb->append(&cs, 0, 0);
     cb->append(&cs, 2, 2);
 
-    ASSERT_THROW(cb->append(&cs, 3, 2), IndexOutOfBoundsException)
-        << ("Should throw a IndexOutOfBoundsException");
+    ASSERT_THROW(cb->append(&cs, 3, 2), std::out_of_range)
+        << ("Should throw a std::out_of_range");
 
-    ASSERT_THROW(cb->append(&cs, 3, 0), IndexOutOfBoundsException)
-        << ("Should throw a IndexOutOfBoundsException");
+    ASSERT_THROW(cb->append(&cs, 3, 0), std::out_of_range)
+        << ("Should throw a std::out_of_range");
 
-    ASSERT_THROW(cb->append(&cs, 3, 110), IndexOutOfBoundsException)
-        << ("Should throw a IndexOutOfBoundsException");
+    ASSERT_THROW(cb->append(&cs, 3, 110), std::out_of_range)
+        << ("Should throw a std::out_of_range");
 
     delete cb;
 }
@@ -1060,9 +1059,9 @@ TEST_F(CharArrayBufferTest, testReadCharBuffer)
     // return -1 when nothing to read
     ASSERT_TRUE(-1 == source->read(target));
 
-    // NullPointerException
-    ASSERT_THROW(source->read(NULL), NullPointerException)
-        << ("Should throw a NullPointerException");
+    // std::logic_error
+    ASSERT_THROW(source->read(NULL), std::logic_error)
+        << ("Should throw a std::logic_error");
 
     delete source;
     delete target;
@@ -1075,7 +1074,7 @@ TEST_F(CharArrayBufferTest, testReadReadOnly)
         CharBuffer::wrap(testData1, testData1Size, 0, testData1Size);
     CharBuffer* target = testBuffer1->asReadOnlyBuffer();
 
-    // NullPointerException
+    // std::logic_error
     ASSERT_THROW(source->read(target), ReadOnlyBufferException)
         << ("Should throw a ReadOnlyBufferException");
 
@@ -1110,7 +1109,7 @@ TEST_F(CharArrayBufferTest, testReadSelf)
     CharBuffer* source =
         CharBuffer::wrap(testData1, testData1Size, 0, testData1Size);
 
-    ASSERT_THROW(source->read(source), IllegalArgumentException)
+    ASSERT_THROW(source->read(source), std::invalid_argument)
         << ("Should throw a IllegalArgumentException");
 
     delete source;

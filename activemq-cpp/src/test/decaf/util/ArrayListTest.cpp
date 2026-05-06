@@ -17,16 +17,17 @@
 
 #include <gtest/gtest.h>
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/lang/Integer.h>
-#include <decaf/lang/exceptions/UnsupportedOperationException.h>
 #include <decaf/util/ArrayList.h>
 #include <decaf/util/StlList.h>
+#include <stdexcept>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
+using namespace activemq::exceptions;
 
 class ArrayListTest : public ::testing::Test
 {
@@ -190,7 +191,7 @@ TEST_F(ArrayListTest, testAdd1)
     array1.add(25);
     ASSERT_TRUE(array1.get(0) == 25) << ("Failed to add Object");
 
-    ASSERT_THROW(ArrayList<int>(-1), IllegalArgumentException)
+    ASSERT_THROW(ArrayList<int>(-1), std::invalid_argument)
         << ("Should throw an IllegalArgumentException");
 }
 
@@ -223,11 +224,11 @@ TEST_F(ArrayListTest, testAdd2)
     ASSERT_EQ(array.get(1), oldItem)
         << ("Should have returned the old item from slot 0");
 
-    ASSERT_THROW(array.add(-1, 0), IndexOutOfBoundsException)
-        << ("Should throw an IndexOutOfBoundsException");
+    ASSERT_THROW(array.add(-1, 0), std::out_of_range)
+        << ("Should throw an std::out_of_range");
 
-    ASSERT_THROW(array.add(array.size() + 1, 0), IndexOutOfBoundsException)
-        << ("Should throw an IndexOutOfBoundsException");
+    ASSERT_THROW(array.add(array.size() + 1, 0), std::out_of_range)
+        << ("Should throw an std::out_of_range");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -293,9 +294,8 @@ TEST_F(ArrayListTest, testAddAll1)
 TEST_F(ArrayListTest, testAddAll2)
 {
     StlList<int> emptyCollection;
-    ASSERT_THROW(ArrayList<int>().addAll(-1, emptyCollection),
-                 IndexOutOfBoundsException)
-        << ("Should throw an IndexOutOfBoundsException");
+    ASSERT_THROW(ArrayList<int>().addAll(-1, emptyCollection), std::out_of_range)
+        << ("Should throw an std::out_of_range");
 
     {
         std::string data[] = {"1", "2", "3", "4", "5", "6", "7", "8"};
@@ -368,11 +368,11 @@ TEST_F(ArrayListTest, testAddAll3)
     list.addAll(0, list);
     list.addAll(list.size(), list);
 
-    ASSERT_THROW(list.addAll(-1, list), IndexOutOfBoundsException)
-        << ("Should throw an IndexOutOfBoundsException");
+    ASSERT_THROW(list.addAll(-1, list), std::out_of_range)
+        << ("Should throw an std::out_of_range");
 
-    ASSERT_THROW(list.addAll(list.size() + 1, list), IndexOutOfBoundsException)
-        << ("Should throw an IndexOutOfBoundsException");
+    ASSERT_THROW(list.addAll(list.size() + 1, list), std::out_of_range)
+        << ("Should throw an std::out_of_range");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -584,8 +584,8 @@ TEST_F(ArrayListTest, testGet)
     populate(mirror, SIZE);
 
     ASSERT_TRUE(array.get(22) == mirror[22]) << ("Returned incorrect element");
-    ASSERT_THROW(array.get(9999), IndexOutOfBoundsException)
-        << ("Should throw an IndexOutOfBoundsException");
+    ASSERT_THROW(array.get(9999), std::out_of_range)
+        << ("Should throw an std::out_of_range");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -666,8 +666,8 @@ TEST_F(ArrayListTest, testRemoveAt)
     array.removeAt(10);
     ASSERT_EQ(-1, array.indexOf(10)) << ("Failed to remove element");
 
-    ASSERT_THROW(array.removeAt(9999), IndexOutOfBoundsException)
-        << ("Should throw an IndexOutOfBoundsException");
+    ASSERT_THROW(array.removeAt(9999), std::out_of_range)
+        << ("Should throw an std::out_of_range");
 
     ArrayList<int> myArray(array);
     array.add(25, 9999);
@@ -692,11 +692,11 @@ TEST_F(ArrayListTest, testRemoveAt)
     l.removeAt(0);
     l.removeAt(0);
 
-    ASSERT_THROW(l.removeAt(-1), IndexOutOfBoundsException)
-        << ("Should throw an IndexOutOfBoundsException");
+    ASSERT_THROW(l.removeAt(-1), std::out_of_range)
+        << ("Should throw an std::out_of_range");
 
-    ASSERT_THROW(l.removeAt(0), IndexOutOfBoundsException)
-        << ("Should throw an IndexOutOfBoundsException");
+    ASSERT_THROW(l.removeAt(0), std::out_of_range)
+        << ("Should throw an std::out_of_range");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -717,11 +717,11 @@ TEST_F(ArrayListTest, testSet)
     array.set(0, 1);
     ASSERT_TRUE(array.get(0) == 1) << ("Failed to set object");
 
-    ASSERT_THROW(array.set(-1, 10), IndexOutOfBoundsException)
-        << ("Should throw an IndexOutOfBoundsException");
+    ASSERT_THROW(array.set(-1, 10), std::out_of_range)
+        << ("Should throw an std::out_of_range");
 
-    ASSERT_THROW(array.set(array.size(), 10), IndexOutOfBoundsException)
-        << ("Should throw an IndexOutOfBoundsException");
+    ASSERT_THROW(array.set(array.size(), 10), std::out_of_range)
+        << ("Should throw an std::out_of_range");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -801,7 +801,7 @@ TEST_F(ArrayListTest, testTrimToSize)
     array.trimToSize();
 
     ASSERT_THROW(iter->next(), ConcurrentModificationException)
-        << ("Should throw an ConcurrentModificationException");
+        << ("Should throw ConcurrentModificationException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -877,8 +877,8 @@ TEST_F(ArrayListTest, testListIterator1IndexOutOfBoundsException)
     ArrayList<int> list;
 
     ASSERT_THROW(std::unique_ptr<ListIterator<int>> it(list.listIterator(-1)),
-                 IndexOutOfBoundsException)
-        << ("Should throw an IndexOutOfBoundsException");
+                 std::out_of_range)
+        << ("Should throw an std::out_of_range");
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -889,6 +889,6 @@ TEST_F(ArrayListTest, testListIterator2IndexOutOfBoundsException)
     list.add(2);
 
     ASSERT_THROW(std::unique_ptr<ListIterator<int>> it(list.listIterator(100)),
-                 IndexOutOfBoundsException)
-        << ("Should throw an IndexOutOfBoundsException");
+                 std::out_of_range)
+        << ("Should throw an std::out_of_range");
 }

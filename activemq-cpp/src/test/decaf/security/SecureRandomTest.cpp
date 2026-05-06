@@ -21,13 +21,8 @@
 
 #include <decaf/security/SecureRandom.h>
 
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
-
+#include <stdexcept>
 using namespace std;
-using namespace decaf;
-using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::security;
 
 class SecureRandomTest : public ::testing::Test
@@ -113,10 +108,10 @@ TEST_F(SecureRandomTest, testNextBytes2)
     ASSERT_TRUE(std::memcmp(buffer1, buffer3, 255) != 0);
     ASSERT_TRUE(std::memcmp(buffer2, buffer3, 255) != 0);
 
-    ASSERT_THROW(srng.nextBytes(NULL, 255), NullPointerException)
-        << ("Should have thrown a NullPointerException");
+    ASSERT_THROW(srng.nextBytes(NULL, 255), std::logic_error)
+        << ("Should have thrown a std::logic_error");
 
-    ASSERT_THROW(srng.nextBytes(buffer1, -1), IllegalArgumentException)
+    ASSERT_THROW(srng.nextBytes(buffer1, -1), std::invalid_argument)
         << ("Should have thrown a IllegalArgumentException");
 }
 
@@ -148,10 +143,10 @@ TEST_F(SecureRandomTest, testSetSeed2)
     SecureRandom srng;
     ASSERT_NO_THROW(srng.setSeed(seed, 8));
 
-    ASSERT_THROW(srng.setSeed(NULL, 255), NullPointerException)
-        << ("Should have thrown a NullPointerException");
+    ASSERT_THROW(srng.setSeed(NULL, 255), std::logic_error)
+        << ("Should have thrown a std::logic_error");
 
-    ASSERT_THROW(srng.setSeed(seed, -1), IllegalArgumentException)
+    ASSERT_THROW(srng.setSeed(seed, -1), std::invalid_argument)
         << ("Should have thrown a IllegalArgumentException");
 }
 

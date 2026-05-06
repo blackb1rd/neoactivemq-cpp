@@ -36,8 +36,15 @@
 #include <cms/UnsupportedOperationException.h>
 #include <cms/XAException.h>
 
+#include <activemq/exceptions/ActiveMQException.h>
+#include <activemq/exceptions/ExceptionTypes.h>
+
+#include <activemq/exceptions/IoExceptions.h>
+#include <decaf/io/EOFException.h>
+#include <decaf/io/IOException.h>
 #include <decaf/lang/Exception.h>
 
+#include <exception>
 #include <string>
 
 namespace activemq
@@ -57,16 +64,154 @@ namespace util
                                         const decaf::lang::Exception& cause);
 
         static cms::CMSException create(const decaf::lang::Exception& cause);
+        static cms::CMSException create(const exceptions::IOException& cause);
+        static cms::CMSException create(const std::exception& cause);
 
         static cms::MessageEOFException createMessageEOFException(
             const decaf::lang::Exception& cause);
 
+        static cms::MessageEOFException createMessageEOFException(
+            const exceptions::EOFException& cause);
+
         static cms::MessageFormatException createMessageFormatException(
             const decaf::lang::Exception& cause);
+
+        static cms::MessageFormatException createMessageFormatException(
+            const exceptions::IOException& cause);
+
+        static cms::MessageFormatException createMessageFormatException(
+            const std::exception& cause);
     };
 
 }  // namespace util
 }  // namespace activemq
+
+/**
+ * Map AMQ STL-backed property-layer failures to CMS MessageFormatException.
+ * Replaces catch (std::logic_error&) for OpenWire property interceptors.
+ */
+#define AMQ_CATCH_PROPERTY_LAYER_AS_MESSAGE_FORMAT()                     \
+    catch (::activemq::exceptions::IllegalStateException & ex)           \
+    {                                                                    \
+        throw ::activemq::util::CMSExceptionSupport::                    \
+            createMessageFormatException(ex);                            \
+    }                                                                    \
+    catch (::activemq::exceptions::InvalidStateException & ex)           \
+    {                                                                    \
+        throw ::activemq::util::CMSExceptionSupport::                    \
+            createMessageFormatException(ex);                            \
+    }                                                                    \
+    catch (::activemq::exceptions::CloneNotSupportedException & ex)      \
+    {                                                                    \
+        throw ::activemq::util::CMSExceptionSupport::                    \
+            createMessageFormatException(ex);                            \
+    }                                                                    \
+    catch (::activemq::exceptions::NullPointerException & ex)            \
+    {                                                                    \
+        throw ::activemq::util::CMSExceptionSupport::                    \
+            createMessageFormatException(ex);                            \
+    }                                                                    \
+    catch (::activemq::exceptions::UnsupportedOperationException & ex)   \
+    {                                                                    \
+        throw ::activemq::util::CMSExceptionSupport::                    \
+            createMessageFormatException(ex);                            \
+    }                                                                    \
+    catch (::activemq::exceptions::IllegalMonitorStateException & ex)    \
+    {                                                                    \
+        throw ::activemq::util::CMSExceptionSupport::                    \
+            createMessageFormatException(ex);                            \
+    }                                                                    \
+    catch (::activemq::exceptions::TypeMismatchException & ex)           \
+    {                                                                    \
+        throw ::activemq::util::CMSExceptionSupport::                    \
+            createMessageFormatException(ex);                            \
+    }                                                                    \
+    catch (::activemq::exceptions::OutOfRangeException & ex)             \
+    {                                                                    \
+        throw ::activemq::util::CMSExceptionSupport::                    \
+            createMessageFormatException(ex);                            \
+    }                                                                    \
+    catch (::activemq::exceptions::InvalidArgumentException & ex)        \
+    {                                                                    \
+        throw ::activemq::util::CMSExceptionSupport::                    \
+            createMessageFormatException(ex);                            \
+    }                                                                    \
+    catch (::activemq::exceptions::InterruptedException & ex)            \
+    {                                                                    \
+        throw ::activemq::util::CMSExceptionSupport::                    \
+            createMessageFormatException(ex);                            \
+    }                                                                    \
+    catch (::activemq::exceptions::RuntimeException & ex)                \
+    {                                                                    \
+        throw ::activemq::util::CMSExceptionSupport::                    \
+            createMessageFormatException(ex);                            \
+    }                                                                    \
+    catch (::activemq::exceptions::ConcurrentModificationException & ex) \
+    {                                                                    \
+        throw ::activemq::util::CMSExceptionSupport::                    \
+            createMessageFormatException(ex);                            \
+    }                                                                    \
+    catch (::activemq::exceptions::NoSuchElementException & ex)          \
+    {                                                                    \
+        throw ::activemq::util::CMSExceptionSupport::                    \
+            createMessageFormatException(ex);                            \
+    }
+
+/**
+ * Map decaf stream exceptions from message body read/write to CMS types
+ * (MessageEOFException, MessageFormatException, or CMSException).
+ */
+#define AMQ_CATCH_DECAF_IOSTREAM_TO_CMS_MESSAGE()                               \
+    catch (::activemq::exceptions::EOFException & ex)                           \
+    {                                                                           \
+        throw ::activemq::util::CMSExceptionSupport::createMessageEOFException( \
+            ex);                                                                \
+    }                                                                           \
+    catch (::activemq::exceptions::IOException & ex)                            \
+    {                                                                           \
+        throw ::activemq::util::CMSExceptionSupport::                           \
+            createMessageFormatException(ex);                                   \
+    }                                                                           \
+    catch (::decaf::io::EOFException & ex)                                      \
+    {                                                                           \
+        ex.setMark(__FILE__, __LINE__);                                         \
+        throw ::activemq::util::CMSExceptionSupport::createMessageEOFException( \
+            ex);                                                                \
+    }                                                                           \
+    catch (::decaf::io::IOException & ex)                                       \
+    {                                                                           \
+        ex.setMark(__FILE__, __LINE__);                                         \
+        throw ::activemq::util::CMSExceptionSupport::                           \
+            createMessageFormatException(ex);                                   \
+    }                                                                           \
+    catch (::activemq::exceptions::ActiveMQException & ex)                      \
+    {                                                                           \
+        ex.setMark(__FILE__, __LINE__);                                         \
+        throw ::activemq::util::CMSExceptionSupport::create(ex);                \
+    }                                                                           \
+    catch (::decaf::lang::Exception & ex)                                       \
+    {                                                                           \
+        ex.setMark(__FILE__, __LINE__);                                         \
+        throw ::activemq::util::CMSExceptionSupport::create(ex);                \
+    }                                                                           \
+    catch (std::exception & ex)                                                 \
+    {                                                                           \
+        throw ::activemq::util::CMSExceptionSupport::create(ex);                \
+    }
+
+/**
+ * Single IOException from a nested decaf stream operation -> CMSException.
+ */
+#define AMQ_CATCH_DECAF_IOSTREAM_IOEXCEPTION_TO_CMS()            \
+    catch (::activemq::exceptions::IOException & ex)             \
+    {                                                            \
+        throw ::activemq::util::CMSExceptionSupport::create(ex); \
+    }                                                            \
+    catch (::decaf::io::IOException & ex)                        \
+    {                                                            \
+        ex.setMark(__FILE__, __LINE__);                          \
+        throw ::activemq::util::CMSExceptionSupport::create(ex); \
+    }
 
 /**
  * Macro for catching an exception of one type and then re-throwing
@@ -286,15 +431,12 @@ namespace util
         ex.setMark(__FILE__, __LINE__);                                        \
         throw ex.convertToCMSException();                                      \
     }                                                                          \
-    catch (decaf::lang::Exception & ex)                                        \
-    {                                                                          \
-        ex.setMark(__FILE__, __LINE__);                                        \
-        activemq::exceptions::ActiveMQException amqEx(ex);                     \
-        throw amqEx.convertToCMSException();                                   \
-    }                                                                          \
     catch (std::exception & ex)                                                \
     {                                                                          \
-        throw cms::CMSException(ex.what(), NULL);                              \
+        decaf::lang::Exception cause(__FILE__, __LINE__, "%s", ex.what());     \
+        cause.setMark(__FILE__, __LINE__);                                     \
+        activemq::exceptions::ActiveMQException amqEx(cause);                  \
+        throw amqEx.convertToCMSException();                                   \
     }                                                                          \
     catch (...)                                                                \
     {                                                                          \

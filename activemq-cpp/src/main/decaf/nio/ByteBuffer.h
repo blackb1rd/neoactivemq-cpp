@@ -18,13 +18,12 @@
 #ifndef _DECAF_NIO_BYTEBUFFER_H_
 #define _DECAF_NIO_BYTEBUFFER_H_
 
+#include <activemq/exceptions/BufferUnderflowException.h>
 #include <decaf/lang/Comparable.h>
-#include <decaf/lang/exceptions/IndexOutOfBoundsException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/nio/Buffer.h>
 #include <decaf/nio/BufferOverflowException.h>
-#include <decaf/nio/BufferUnderflowException.h>
 #include <decaf/nio/ReadOnlyBufferException.h>
+#include <stdexcept>
 
 namespace decaf
 {
@@ -112,7 +111,7 @@ namespace nio
          * @param capacity
          *      The size of the array, this is the limit we read and write to.
          *
-         * @throws IllegalArgumentException if capacity is negative.
+         * @throws std::invalid_argument if capacity is negative.
          */
         ByteBuffer(int capacity);
 
@@ -168,11 +167,11 @@ namespace nio
          *
          * @return a reference to this Buffer.
          *
-         * @throws IndexOutOfBoundsException if the preconditions of size,
+         * @throws std::out_of_range if the preconditions of size,
          * offset, or length are not met.
          * @throws BufferUnderflowException if there are fewer than length bytes
          *         remaining in this buffer.
-         * @throws NullPointerException if the passed buffer is null.
+         * @throws std::logic_error if the passed buffer is null.
          */
         ByteBuffer& get(unsigned char* buffer, int size, int offset, int length);
 
@@ -194,7 +193,7 @@ namespace nio
          *
          * @throws BufferOverflowException if there is insufficient space in
          * this buffer for the remaining bytes in the source buffer
-         * @throws IllegalArgumentException if the source buffer is this buffer
+         * @throws std::invalid_argument if the source buffer is this buffer
          * @throws ReadOnlyBufferException if this buffer is read-only
          */
         ByteBuffer& put(ByteBuffer& src);
@@ -224,8 +223,8 @@ namespace nio
          * @throws BufferOverflowException if there is insufficient space in
          * this buffer.
          * @throws ReadOnlyBufferException if this buffer is read-only.
-         * @throws NullPointerException if the passed buffer is null.
-         * @throws IndexOutOfBoundsException if the preconditions of size,
+         * @throws std::logic_error if the passed buffer is null.
+         * @throws std::out_of_range if the preconditions of size,
          * offset, or length are not met.
          */
         ByteBuffer& put(const unsigned char* buffer,
@@ -270,7 +269,7 @@ namespace nio
          *
          * @throws ReadOnlyBufferException if this buffer is backed by an array
          * but is read-only
-         * @throws UnsupportedOperationException if this buffer is not backed by
+         * @throws std::logic_error if this buffer is not backed by
          * an accessible array
          */
         virtual unsigned char* array() = 0;
@@ -290,7 +289,7 @@ namespace nio
          *
          * @throws ReadOnlyBufferException if this buffer is backed by an array
          * but is read-only.
-         * @throws UnsupportedOperationException if this buffer is not backed by
+         * @throws std::logic_error if this buffer is not backed by
          * an accessible array.
          */
         virtual int arrayOffset() const = 0;
@@ -485,7 +484,7 @@ namespace nio
          *
          * @return the byte that is located at the given index.
          *
-         * @throws IndexOutOfBoundsException if index is not smaller than the
+         * @throws std::out_of_range if index is not smaller than the
          *         buffer's limit, or index is negative.
          */
         virtual unsigned char get(int index) const = 0;
@@ -509,7 +508,7 @@ namespace nio
          *
          * @return the char at the given index in the buffer
          *
-         * @throws IndexOutOfBoundsException if index is not smaller than the
+         * @throws std::out_of_range if index is not smaller than the
          *         buffer's limit, or index is negative.
          */
         virtual char getChar(int index) const = 0;
@@ -533,7 +532,7 @@ namespace nio
          *
          * @return the double at the given index in the buffer.
          *
-         * @throws IndexOutOfBoundsException if index is not smaller than the
+         * @throws std::out_of_range if index is not smaller than the
          *         buffer's limit, or index is negative.
          */
         virtual double getDouble(int index) const = 0;
@@ -557,7 +556,7 @@ namespace nio
          *
          * @return the float at the given index in the buffer.
          *
-         * @throws IndexOutOfBoundsException if there are not enough bytes
+         * @throws std::out_of_range if there are not enough bytes
          *         remaining to fill the requested Data Type, or index is
          * negative.
          */
@@ -582,7 +581,7 @@ namespace nio
          *
          * @return the long long at the given index in the buffer.
          *
-         * @throws IndexOutOfBoundsException if there are not enough bytes
+         * @throws std::out_of_range if there are not enough bytes
          *         remaining to fill the requested Data Type, or index is
          * negative.
          */
@@ -607,7 +606,7 @@ namespace nio
          *
          * @return the int at the given index in the buffer.
          *
-         * @throws IndexOutOfBoundsException if there are not enough bytes
+         * @throws std::out_of_range if there are not enough bytes
          *         remaining to fill the requested Data Type, or index is
          * negative.
          */
@@ -632,7 +631,7 @@ namespace nio
          *
          * @return the short at the given index in the buffer.
          *
-         * @throws IndexOutOfBoundsException if there are not enough bytes
+         * @throws std::out_of_range if there are not enough bytes
          *         remaining to fill the requested Data Type, or index is
          * negative.
          */
@@ -660,7 +659,7 @@ namespace nio
          *
          * @return a reference to this buffer.
          *
-         * @throw IndexOutOfBoundsException if index greater than the buffer's
+         * @throw std::out_of_range if index greater than the buffer's
          * limit minus the size of the type being written, or index is negative.
          * @throw ReadOnlyBufferException if this buffer is read-only.
          */
@@ -692,7 +691,7 @@ namespace nio
          *
          * @return a reference to this buffer.
          *
-         * @throw IndexOutOfBoundsException if index greater than the buffer's
+         * @throw std::out_of_range if index greater than the buffer's
          * limit minus the size of the type being written, or index is negative.
          * @throw ReadOnlyBufferException if this buffer is read-only
          */
@@ -724,7 +723,7 @@ namespace nio
          *
          * @return a reference to this buffer.
          *
-         * @throw IndexOutOfBoundsException if index greater than the buffer's
+         * @throw std::out_of_range if index greater than the buffer's
          * limit minus the size of the type being written, or index is negative.
          * @throw ReadOnlyBufferException if this buffer is read-only.
          */
@@ -756,7 +755,7 @@ namespace nio
          *
          * @return a reference to this buffer.
          *
-         * @throw IndexOutOfBoundsException if index greater than the buffer's
+         * @throw std::out_of_range if index greater than the buffer's
          * limit minus the size of the type being written, or index is negative.
          * @throw ReadOnlyBufferException if this buffer is read-only.
          */
@@ -788,7 +787,7 @@ namespace nio
          *
          * @return a reference to this buffer.
          *
-         * @throw IndexOutOfBoundsException if index greater than the buffer's
+         * @throw std::out_of_range if index greater than the buffer's
          * limit minus the size of the type being written, or index is negative.
          * @throw ReadOnlyBufferException if this buffer is read-only.
          */
@@ -820,7 +819,7 @@ namespace nio
          *
          * @return a reference to this buffer
          *
-         * @throw IndexOutOfBoundsException if index greater than the buffer's
+         * @throw std::out_of_range if index greater than the buffer's
          * limit minus the size of the type being written, or index is negative.
          * @throw ReadOnlyBufferException if this buffer is read-only
          */
@@ -852,7 +851,7 @@ namespace nio
          *
          * @return a reference to this buffer
          *
-         * @throw IndexOutOfBoundsException if index greater than the buffer's
+         * @throw std::out_of_range if index greater than the buffer's
          * limit minus the size of the type being written, or index is negative.
          * @throw ReadOnlyBufferException if this buffer is read-only.
          */
@@ -907,7 +906,7 @@ namespace nio
          *
          * @return a newly allocated ByteBuffer which the caller owns.
          *
-         * @throws IllegalArgumentException if capacity is negative.
+         * @throws std::invalid_argument if capacity is negative.
          */
         static ByteBuffer* allocate(int capacity);
 
@@ -932,8 +931,8 @@ namespace nio
          *
          * @return a new ByteBuffer that is backed by buffer, caller owns.
          *
-         * @throws NullPointerException if the array passed in is NULL.
-         * @throws IndexOutOfBoundsException if the preconditions of size,
+         * @throws std::logic_error if the array passed in is NULL.
+         * @throws std::out_of_range if the preconditions of size,
          * offset, or length are not met.
          */
         static ByteBuffer* wrap(unsigned char* array,

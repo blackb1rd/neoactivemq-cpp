@@ -16,15 +16,15 @@
  */
 
 #include "LoggingInputStream.h"
-#include <activemq/exceptions/ExceptionDefines.h>
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <iomanip>
 #include <sstream>
+#include <stdexcept>
 
 using namespace std;
 using namespace activemq;
 using namespace activemq::io;
 using namespace decaf::io;
-using namespace decaf::lang::exceptions;
 
 LOGDECAF_INITIALIZE(logger,
                     LoggingInputStream,
@@ -45,14 +45,9 @@ LoggingInputStream::~LoggingInputStream()
 ////////////////////////////////////////////////////////////////////////////////
 int LoggingInputStream::doReadByte()
 {
-    try
-    {
-        unsigned char c = (unsigned char)FilterInputStream::doReadByte();
-        log(&c, 1);
-        return c;
-    }
-    AMQ_CATCH_RETHROW(IOException)
-    AMQ_CATCHALL_THROW(IOException)
+    unsigned char c = (unsigned char)FilterInputStream::doReadByte();
+    log(&c, 1);
+    return c;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -61,43 +56,30 @@ int LoggingInputStream::doReadArrayBounded(unsigned char* buffer,
                                            int            offset,
                                            int            length)
 {
-    try
+    if (length == 0)
     {
-        if (length == 0)
-        {
-            return 0;
-        }
-
-        if (buffer == NULL)
-        {
-            throw NullPointerException(
-                __FILE__,
-                __LINE__,
-                "LoggingInputStream::read - Passed Buffer is Null");
-        }
-
-        if (length > size - offset)
-        {
-            throw IndexOutOfBoundsException(
-                __FILE__,
-                __LINE__,
-                "Given size{%d} - offset{%d} is less than length{%d}.",
-                size,
-                offset,
-                length);
-        }
-
-        int numRead =
-            FilterInputStream::doReadArrayBounded(buffer, size, offset, length);
-
-        log(buffer, numRead);
-
-        return (int)numRead;
+        return 0;
     }
-    AMQ_CATCH_RETHROW(IOException)
-    AMQ_CATCH_RETHROW(IndexOutOfBoundsException)
-    AMQ_CATCH_RETHROW(NullPointerException)
-    AMQ_CATCHALL_THROW(IOException)
+
+    if (buffer == NULL)
+    {
+        throw activemq::exceptions::NullPointerException(
+            "LoggingInputStream::read - Passed Buffer is Null");
+    }
+
+    if (length > size - offset)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            "Given size - offset is less than length for "
+            "LoggingInputStream::read");
+    }
+
+    int numRead =
+        FilterInputStream::doReadArrayBounded(buffer, size, offset, length);
+
+    log(buffer, numRead);
+
+    return numRead;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

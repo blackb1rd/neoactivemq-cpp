@@ -21,8 +21,6 @@
 #include <decaf/io/Flushable.h>
 #include <decaf/io/IOException.h>
 #include <decaf/lang/Appendable.h>
-#include <decaf/lang/exceptions/IndexOutOfBoundsException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
 #include <string>
 #include <vector>
 
@@ -82,7 +80,7 @@ namespace io
          *      The size in bytes of the buffer passed.
          *
          * @throws IOException if an I/O error occurs.
-         * @throws NullPointerException if buffer is NULL.
+         * @throws std::logic_error if buffer is NULL.
          */
         virtual void write(const char* buffer, int size);
 
@@ -99,8 +97,8 @@ namespace io
          *      The number of bytes in the array to write.
          *
          * @throws IOException if an I/O error occurs.
-         * @throws NullPointerException if buffer is NULL.
-         * @throws IndexOutOfBoundsException if offset + length > size of the
+         * @throws std::logic_error if buffer is NULL.
+         * @throws std::out_of_range if offset + length > size of the
          * buffer.
          */
         virtual void write(const char* buffer, int size, int offset, int length);
@@ -126,7 +124,7 @@ namespace io
          *      The number of bytes in the array to write.
          *
          * @throws IOException thrown if an error occurs.
-         * @throws IndexOutOfBoundsException if offset+length is greater than
+         * @throws std::out_of_range if offset+length is greater than
          * the string length.
          */
         virtual void write(const std::string& str, int offset, int length);

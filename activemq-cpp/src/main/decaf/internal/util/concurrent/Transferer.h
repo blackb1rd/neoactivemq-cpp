@@ -18,8 +18,8 @@
 #ifndef _DECAF_INTERNAL_UTIL_CONCURRENT_TRANSFERER_H_
 #define _DECAF_INTERNAL_UTIL_CONCURRENT_TRANSFERER_H_
 
-#include <decaf/lang/exceptions/InterruptedException.h>
 #include <decaf/util/concurrent/TimeoutException.h>
+#include <stdexcept>
 
 namespace decaf
 {
@@ -45,7 +45,7 @@ namespace internal
                  *
                  * @throws TimeoutException if the operation timed out waiting
                  * for the consumer to accept the item offered.
-                 * @throws InterruptedException if the thread was interrupted
+                 * @throws std::runtime_error if the thread was interrupted
                  * while waiting for the consumer to accept the item offered.
                  */
                 virtual void transfer(E* e, bool timed, long long nanos) = 0;
@@ -60,7 +60,7 @@ namespace internal
                  *
                  * @throws TimeoutException if the operation timed out waiting
                  * for the producer to offer an item.
-                 * @throws InterruptedException if the thread was interrupted
+                 * @throws std::runtime_error if the thread was interrupted
                  * while waiting for the producer to offer an item.
                  */
                 virtual E* transfer(bool timed, long long nanos) = 0;

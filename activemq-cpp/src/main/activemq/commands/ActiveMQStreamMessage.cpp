@@ -19,14 +19,19 @@
 #include <activemq/util/MarshallingSupport.h>
 #include <activemq/util/PrimitiveValueNode.h>
 
+#include <cms/CMSException.h>
+#include <cms/IllegalStateException.h>
 #include <cms/MessageEOFException.h>
 #include <cms/MessageFormatException.h>
 #include <cms/MessageNotReadableException.h>
 #include <cms/MessageNotWriteableException.h>
 
 #include <algorithm>
+#include <exception>
+#include <stdexcept>
 #include <string>
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/io/BufferedInputStream.h>
 #include <decaf/io/ByteArrayInputStream.h>
 #include <decaf/io/ByteArrayOutputStream.h>
@@ -39,7 +44,6 @@
 #include <decaf/lang/Long.h>
 #include <decaf/lang/Math.h>
 #include <decaf/lang/Short.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/util/zip/DeflaterOutputStream.h>
 #include <decaf/util/zip/InflaterInputStream.h>
 
@@ -54,7 +58,6 @@ using namespace activemq::wireformat::openwire;
 using namespace decaf;
 using namespace decaf::io;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::zip;
 
@@ -153,9 +156,7 @@ void ActiveMQStreamMessage::copyDataStructure(const DataStructure* src)
 
     if (srcPtr == NULL || src == NULL)
     {
-        throw decaf::lang::exceptions::NullPointerException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::NullPointerException(
             "ActiveMQStreamMessage::copyDataStructure - src is NULL or "
             "invalid");
     }
@@ -240,9 +241,10 @@ bool ActiveMQStreamMessage::readBoolean() const
         if (type == PrimitiveValueNode::NULL_TYPE)
         {
             this->dataIn->reset();
-            throw NullPointerException(__FILE__,
-                                       __LINE__,
-                                       "Cannot convert NULL value to boolean.");
+            throw activemq::exceptions::NullPointerException(
+                __FILE__,
+                __LINE__,
+                "Cannot convert NULL value to boolean.");
         }
         else
         {
@@ -250,15 +252,23 @@ bool ActiveMQStreamMessage::readBoolean() const
             throw MessageFormatException("not a boolean type", NULL);
         }
     }
-    catch (EOFException& e)
+    catch (activemq::exceptions::EOFException& e)
     {
         throw CMSExceptionSupport::createMessageEOFException(e);
     }
-    catch (IOException& e)
+    catch (activemq::exceptions::IOException& e)
     {
         throw CMSExceptionSupport::createMessageFormatException(e);
     }
-    catch (Exception& e)
+    catch (activemq::exceptions::IllegalStateException& e)
+    {
+        throw CMSException(e.what(), NULL);
+    }
+    catch (cms::CMSException&)
+    {
+        throw;
+    }
+    catch (const std::exception& e)
     {
         throw CMSExceptionSupport::create(e);
     }
@@ -301,9 +311,10 @@ unsigned char ActiveMQStreamMessage::readByte() const
         if (type == PrimitiveValueNode::NULL_TYPE)
         {
             this->dataIn->reset();
-            throw NullPointerException(__FILE__,
-                                       __LINE__,
-                                       "Cannot convert NULL value to byte.");
+            throw activemq::exceptions::NullPointerException(
+                __FILE__,
+                __LINE__,
+                "Cannot convert NULL value to byte.");
         }
         else
         {
@@ -311,28 +322,36 @@ unsigned char ActiveMQStreamMessage::readByte() const
             throw MessageFormatException(" not a byte type", NULL);
         }
     }
-    catch (NumberFormatException& ex)
+    catch (std::invalid_argument& ex)
     {
         try
         {
             this->dataIn->reset();
         }
-        catch (IOException& e)
+        catch (activemq::exceptions::IOException& e)
         {
             throw CMSExceptionSupport::create(e);
         }
 
         throw CMSExceptionSupport::createMessageFormatException(ex);
     }
-    catch (EOFException& e)
+    catch (activemq::exceptions::EOFException& e)
     {
         throw CMSExceptionSupport::createMessageEOFException(e);
     }
-    catch (IOException& e)
+    catch (activemq::exceptions::IOException& e)
     {
         throw CMSExceptionSupport::createMessageFormatException(e);
     }
-    catch (Exception& e)
+    catch (activemq::exceptions::IllegalStateException& e)
+    {
+        throw CMSException(e.what(), NULL);
+    }
+    catch (cms::CMSException&)
+    {
+        throw;
+    }
+    catch (const std::exception& e)
     {
         throw CMSExceptionSupport::create(e);
     }
@@ -383,9 +402,10 @@ int ActiveMQStreamMessage::readBytes(unsigned char* buffer, int length) const
     {
         if (buffer == NULL)
         {
-            throw NullPointerException(__FILE__,
-                                       __LINE__,
-                                       "Passed buffer was NULL");
+            throw activemq::exceptions::NullPointerException(
+                __FILE__,
+                __LINE__,
+                "Passed buffer was NULL");
         }
 
         if (this->impl->remainingBytes == -1)
@@ -429,15 +449,23 @@ int ActiveMQStreamMessage::readBytes(unsigned char* buffer, int length) const
             return rc;
         }
     }
-    catch (EOFException& e)
+    catch (activemq::exceptions::EOFException& e)
     {
         throw CMSExceptionSupport::createMessageEOFException(e);
     }
-    catch (IOException& e)
+    catch (activemq::exceptions::IOException& e)
     {
         throw CMSExceptionSupport::createMessageFormatException(e);
     }
-    catch (Exception& e)
+    catch (activemq::exceptions::IllegalStateException& e)
+    {
+        throw CMSException(e.what(), NULL);
+    }
+    catch (cms::CMSException&)
+    {
+        throw;
+    }
+    catch (const std::exception& e)
     {
         throw CMSExceptionSupport::create(e);
     }
@@ -479,9 +507,10 @@ char ActiveMQStreamMessage::readChar() const
         if (type == PrimitiveValueNode::NULL_TYPE)
         {
             this->dataIn->reset();
-            throw NullPointerException(__FILE__,
-                                       __LINE__,
-                                       "Cannot convert NULL value to char.");
+            throw activemq::exceptions::NullPointerException(
+                __FILE__,
+                __LINE__,
+                "Cannot convert NULL value to char.");
         }
         else
         {
@@ -489,29 +518,36 @@ char ActiveMQStreamMessage::readChar() const
             throw MessageFormatException(" not a char type", NULL);
         }
     }
-    catch (NumberFormatException& ex)
+    catch (std::invalid_argument& ex)
     {
         try
         {
             this->dataIn->reset();
         }
-        catch (IOException& ioe)
+        catch (activemq::exceptions::IOException& ioe)
         {
             throw CMSExceptionSupport::create(ioe);
         }
 
-        throw CMSExceptionSupport::create(ex);
-        ;
+        throw CMSExceptionSupport::createMessageFormatException(ex);
     }
-    catch (EOFException& e)
+    catch (activemq::exceptions::EOFException& e)
     {
         throw CMSExceptionSupport::createMessageEOFException(e);
     }
-    catch (IOException& e)
+    catch (activemq::exceptions::IOException& e)
     {
         throw CMSExceptionSupport::createMessageFormatException(e);
     }
-    catch (Exception& e)
+    catch (activemq::exceptions::IllegalStateException& e)
+    {
+        throw CMSException(e.what(), NULL);
+    }
+    catch (cms::CMSException&)
+    {
+        throw;
+    }
+    catch (const std::exception& e)
     {
         throw CMSExceptionSupport::create(e);
     }
@@ -554,9 +590,10 @@ float ActiveMQStreamMessage::readFloat() const
         if (type == PrimitiveValueNode::NULL_TYPE)
         {
             this->dataIn->reset();
-            throw NullPointerException(__FILE__,
-                                       __LINE__,
-                                       "Cannot convert NULL value to float.");
+            throw activemq::exceptions::NullPointerException(
+                __FILE__,
+                __LINE__,
+                "Cannot convert NULL value to float.");
         }
         else
         {
@@ -564,28 +601,36 @@ float ActiveMQStreamMessage::readFloat() const
             throw MessageFormatException(" not a float type", NULL);
         }
     }
-    catch (NumberFormatException& ex)
+    catch (std::invalid_argument& ex)
     {
         try
         {
             this->dataIn->reset();
         }
-        catch (IOException& ioe)
+        catch (activemq::exceptions::IOException& ioe)
         {
             throw CMSExceptionSupport::create(ioe);
         }
 
-        throw CMSExceptionSupport::create(ex);
+        throw CMSExceptionSupport::createMessageFormatException(ex);
     }
-    catch (EOFException& e)
+    catch (activemq::exceptions::EOFException& e)
     {
         throw CMSExceptionSupport::createMessageEOFException(e);
     }
-    catch (IOException& e)
+    catch (activemq::exceptions::IOException& e)
     {
         throw CMSExceptionSupport::createMessageFormatException(e);
     }
-    catch (Exception& e)
+    catch (activemq::exceptions::IllegalStateException& e)
+    {
+        throw CMSException(e.what(), NULL);
+    }
+    catch (cms::CMSException&)
+    {
+        throw;
+    }
+    catch (const std::exception& e)
     {
         throw CMSExceptionSupport::create(e);
     }
@@ -632,9 +677,10 @@ double ActiveMQStreamMessage::readDouble() const
         if (type == PrimitiveValueNode::NULL_TYPE)
         {
             this->dataIn->reset();
-            throw NullPointerException(__FILE__,
-                                       __LINE__,
-                                       "Cannot convert NULL value to double.");
+            throw activemq::exceptions::NullPointerException(
+                __FILE__,
+                __LINE__,
+                "Cannot convert NULL value to double.");
         }
         else
         {
@@ -642,28 +688,36 @@ double ActiveMQStreamMessage::readDouble() const
             throw MessageFormatException(" not a double type", NULL);
         }
     }
-    catch (NumberFormatException& ex)
+    catch (std::invalid_argument& ex)
     {
         try
         {
             this->dataIn->reset();
         }
-        catch (IOException& ioe)
+        catch (activemq::exceptions::IOException& ioe)
         {
             throw CMSExceptionSupport::create(ioe);
         }
 
-        throw CMSExceptionSupport::create(ex);
+        throw CMSExceptionSupport::createMessageFormatException(ex);
     }
-    catch (EOFException& e)
+    catch (activemq::exceptions::EOFException& e)
     {
         throw CMSExceptionSupport::createMessageEOFException(e);
     }
-    catch (IOException& e)
+    catch (activemq::exceptions::IOException& e)
     {
         throw CMSExceptionSupport::createMessageFormatException(e);
     }
-    catch (Exception& e)
+    catch (activemq::exceptions::IllegalStateException& e)
+    {
+        throw CMSException(e.what(), NULL);
+    }
+    catch (cms::CMSException&)
+    {
+        throw;
+    }
+    catch (const std::exception& e)
     {
         throw CMSExceptionSupport::create(e);
     }
@@ -710,9 +764,10 @@ short ActiveMQStreamMessage::readShort() const
         if (type == PrimitiveValueNode::NULL_TYPE)
         {
             this->dataIn->reset();
-            throw NullPointerException(__FILE__,
-                                       __LINE__,
-                                       "Cannot convert NULL value to short.");
+            throw activemq::exceptions::NullPointerException(
+                __FILE__,
+                __LINE__,
+                "Cannot convert NULL value to short.");
         }
         else
         {
@@ -720,28 +775,36 @@ short ActiveMQStreamMessage::readShort() const
             throw MessageFormatException(" not a short type", NULL);
         }
     }
-    catch (NumberFormatException& ex)
+    catch (std::invalid_argument& ex)
     {
         try
         {
             this->dataIn->reset();
         }
-        catch (IOException& e)
+        catch (activemq::exceptions::IOException& e)
         {
             throw CMSExceptionSupport::create(e);
         }
 
-        throw CMSExceptionSupport::create(ex);
+        throw CMSExceptionSupport::createMessageFormatException(ex);
     }
-    catch (EOFException& e)
+    catch (activemq::exceptions::EOFException& e)
     {
         throw CMSExceptionSupport::createMessageEOFException(e);
     }
-    catch (IOException& e)
+    catch (activemq::exceptions::IOException& e)
     {
         throw CMSExceptionSupport::createMessageFormatException(e);
     }
-    catch (Exception& e)
+    catch (activemq::exceptions::IllegalStateException& e)
+    {
+        throw CMSException(e.what(), NULL);
+    }
+    catch (cms::CMSException&)
+    {
+        throw;
+    }
+    catch (const std::exception& e)
     {
         throw CMSExceptionSupport::create(e);
     }
@@ -789,9 +852,10 @@ unsigned short ActiveMQStreamMessage::readUnsignedShort() const
         if (type == PrimitiveValueNode::NULL_TYPE)
         {
             this->dataIn->reset();
-            throw NullPointerException(__FILE__,
-                                       __LINE__,
-                                       "Cannot convert NULL value to short.");
+            throw activemq::exceptions::NullPointerException(
+                __FILE__,
+                __LINE__,
+                "Cannot convert NULL value to short.");
         }
         else
         {
@@ -799,28 +863,36 @@ unsigned short ActiveMQStreamMessage::readUnsignedShort() const
             throw MessageFormatException(" not a short type", NULL);
         }
     }
-    catch (NumberFormatException& ex)
+    catch (std::invalid_argument& ex)
     {
         try
         {
             this->dataIn->reset();
         }
-        catch (IOException& e)
+        catch (activemq::exceptions::IOException& e)
         {
             throw CMSExceptionSupport::create(e);
         }
 
-        throw CMSExceptionSupport::create(ex);
+        throw CMSExceptionSupport::createMessageFormatException(ex);
     }
-    catch (EOFException& e)
+    catch (activemq::exceptions::EOFException& e)
     {
         throw CMSExceptionSupport::createMessageEOFException(e);
     }
-    catch (IOException& e)
+    catch (activemq::exceptions::IOException& e)
     {
         throw CMSExceptionSupport::createMessageFormatException(e);
     }
-    catch (Exception& e)
+    catch (activemq::exceptions::IllegalStateException& e)
+    {
+        throw CMSException(e.what(), NULL);
+    }
+    catch (cms::CMSException&)
+    {
+        throw;
+    }
+    catch (const std::exception& e)
     {
         throw CMSExceptionSupport::create(e);
     }
@@ -871,9 +943,10 @@ int ActiveMQStreamMessage::readInt() const
         if (type == PrimitiveValueNode::NULL_TYPE)
         {
             this->dataIn->reset();
-            throw NullPointerException(__FILE__,
-                                       __LINE__,
-                                       "Cannot convert NULL value to int.");
+            throw activemq::exceptions::NullPointerException(
+                __FILE__,
+                __LINE__,
+                "Cannot convert NULL value to int.");
         }
         else
         {
@@ -881,28 +954,36 @@ int ActiveMQStreamMessage::readInt() const
             throw MessageFormatException(" not a int type", NULL);
         }
     }
-    catch (NumberFormatException& ex)
+    catch (std::invalid_argument& ex)
     {
         try
         {
             this->dataIn->reset();
         }
-        catch (IOException& e)
+        catch (activemq::exceptions::IOException& e)
         {
             throw CMSExceptionSupport::create(e);
         }
 
-        throw CMSExceptionSupport::create(ex);
+        throw CMSExceptionSupport::createMessageFormatException(ex);
     }
-    catch (EOFException& e)
+    catch (activemq::exceptions::EOFException& e)
     {
         throw CMSExceptionSupport::createMessageEOFException(e);
     }
-    catch (IOException& e)
+    catch (activemq::exceptions::IOException& e)
     {
         throw CMSExceptionSupport::createMessageFormatException(e);
     }
-    catch (Exception& e)
+    catch (activemq::exceptions::IllegalStateException& e)
+    {
+        throw CMSException(e.what(), NULL);
+    }
+    catch (cms::CMSException&)
+    {
+        throw;
+    }
+    catch (const std::exception& e)
     {
         throw CMSExceptionSupport::create(e);
     }
@@ -957,9 +1038,10 @@ long long ActiveMQStreamMessage::readLong() const
         if (type == PrimitiveValueNode::NULL_TYPE)
         {
             this->dataIn->reset();
-            throw NullPointerException(__FILE__,
-                                       __LINE__,
-                                       "Cannot convert NULL value to long.");
+            throw activemq::exceptions::NullPointerException(
+                __FILE__,
+                __LINE__,
+                "Cannot convert NULL value to long.");
         }
         else
         {
@@ -967,28 +1049,36 @@ long long ActiveMQStreamMessage::readLong() const
             throw MessageFormatException(" not a long type", NULL);
         }
     }
-    catch (NumberFormatException& ex)
+    catch (std::invalid_argument& ex)
     {
         try
         {
             this->dataIn->reset();
         }
-        catch (IOException& e)
+        catch (activemq::exceptions::IOException& e)
         {
             throw CMSExceptionSupport::create(e);
         }
 
-        throw CMSExceptionSupport::create(ex);
+        throw CMSExceptionSupport::createMessageFormatException(ex);
     }
-    catch (EOFException& e)
+    catch (activemq::exceptions::EOFException& e)
     {
         throw CMSExceptionSupport::createMessageEOFException(e);
     }
-    catch (IOException& e)
+    catch (activemq::exceptions::IOException& e)
     {
         throw CMSExceptionSupport::createMessageFormatException(e);
     }
-    catch (Exception& e)
+    catch (activemq::exceptions::IllegalStateException& e)
+    {
+        throw CMSException(e.what(), NULL);
+    }
+    catch (cms::CMSException&)
+    {
+        throw;
+    }
+    catch (const std::exception& e)
     {
         throw CMSExceptionSupport::create(e);
     }
@@ -1072,28 +1162,32 @@ std::string ActiveMQStreamMessage::readString() const
             throw MessageFormatException(" not a String type", NULL);
         }
     }
-    catch (NumberFormatException& ex)
+    catch (std::invalid_argument& ex)
     {
         try
         {
             this->dataIn->reset();
         }
-        catch (IOException& ioe)
+        catch (activemq::exceptions::IOException& ioe)
         {
             throw CMSExceptionSupport::create(ioe);
         }
 
-        throw CMSExceptionSupport::create(ex);
+        throw CMSExceptionSupport::createMessageFormatException(ex);
     }
-    catch (EOFException& e)
+    catch (activemq::exceptions::EOFException& e)
     {
         throw CMSExceptionSupport::createMessageEOFException(e);
     }
-    catch (IOException& e)
+    catch (activemq::exceptions::IOException& e)
     {
         throw CMSExceptionSupport::createMessageFormatException(e);
     }
-    catch (Exception& e)
+    catch (cms::CMSException&)
+    {
+        throw;
+    }
+    catch (const std::exception& e)
     {
         throw CMSExceptionSupport::create(e);
     }
@@ -1165,15 +1259,19 @@ cms::Message::ValueType ActiveMQStreamMessage::getNextValueType() const
 
         return cms::Message::UNKNOWN_TYPE;
     }
-    catch (EOFException& e)
+    catch (activemq::exceptions::EOFException& e)
     {
         throw CMSExceptionSupport::createMessageEOFException(e);
     }
-    catch (IOException& e)
+    catch (activemq::exceptions::IOException& e)
     {
         throw CMSExceptionSupport::createMessageFormatException(e);
     }
-    catch (Exception& e)
+    catch (cms::CMSException&)
+    {
+        throw;
+    }
+    catch (const std::exception& e)
     {
         throw CMSExceptionSupport::create(e);
     }

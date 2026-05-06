@@ -17,6 +17,8 @@
 
 #include <gtest/gtest.h>
 
+#include <stdexcept>
+
 #include <decaf/io/ByteArrayInputStream.h>
 #include <decaf/io/ByteArrayOutputStream.h>
 #include <decaf/util/Properties.h>
@@ -226,13 +228,11 @@ TEST_F(PropertiesTest, testLoadNPE)
     decaf::io::InputStream* nullStream = NULL;
     decaf::io::Reader*      nullReader = NULL;
 
-    ASSERT_THROW(properties.load(nullStream),
-                 decaf::lang::exceptions::NullPointerException)
-        << ("Should have thrown a NullPointerException");
+    ASSERT_THROW(properties.load(nullStream), std::logic_error)
+        << ("Should have thrown std::logic_error");
 
-    ASSERT_THROW(properties.load(nullReader),
-                 decaf::lang::exceptions::NullPointerException)
-        << ("Should have thrown a NullPointerException");
+    ASSERT_THROW(properties.load(nullReader), std::logic_error)
+        << ("Should have thrown std::logic_error");
 }
 
 ////////////////////////////////////////////////////////////////////////////////

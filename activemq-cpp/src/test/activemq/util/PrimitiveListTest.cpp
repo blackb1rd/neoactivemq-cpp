@@ -20,6 +20,7 @@
 #include <activemq/util/PrimitiveList.h>
 #include <activemq/util/PrimitiveMap.h>
 #include <activemq/util/PrimitiveValueNode.h>
+#include <stdexcept>
 
 using namespace activemq;
 using namespace activemq::util;
@@ -33,9 +34,8 @@ TEST_F(PrimitiveListTest, testSetGet)
 {
     PrimitiveList plist;
 
-    ASSERT_THROW(plist.getBool(0),
-                 decaf::lang::exceptions::IndexOutOfBoundsException)
-        << ("Should Throw IndexOutOfBoundsException");
+    ASSERT_THROW(plist.getBool(0), std::out_of_range)
+        << ("Should Throw std::out_of_range");
 
     plist.add(true);
     ASSERT_TRUE(plist.getBool(0) == true);
@@ -44,59 +44,51 @@ TEST_F(PrimitiveListTest, testSetGet)
     ASSERT_TRUE(plist.getBool(1) == false);
     ASSERT_TRUE(plist.getString(1) == "false");
 
-    ASSERT_THROW(plist.getByte(0),
-                 decaf::lang::exceptions::UnsupportedOperationException)
+    ASSERT_THROW(plist.getByte(0), std::logic_error)
         << ("Should Throw UnsupportedOperationException");
 
     plist.setByte(0, 1);
     ASSERT_TRUE(plist.getByte(0) == 1);
 
-    ASSERT_THROW(plist.getChar(0),
-                 decaf::lang::exceptions::UnsupportedOperationException)
+    ASSERT_THROW(plist.getChar(0), std::logic_error)
         << ("Should Throw UnsupportedOperationException");
 
     plist.setChar(0, 'a');
     ASSERT_TRUE(plist.getChar(0) == 'a');
     ASSERT_TRUE(plist.getString(0) == "a");
 
-    ASSERT_THROW(plist.getShort(0),
-                 decaf::lang::exceptions::UnsupportedOperationException)
+    ASSERT_THROW(plist.getShort(0), std::logic_error)
         << ("Should Throw UnsupportedOperationException");
 
     plist.setShort(0, 2);
     ASSERT_TRUE(plist.getShort(0) == 2);
     ASSERT_TRUE(plist.getInt(0) == 2);
 
-    ASSERT_THROW(plist.getByte(0),
-                 decaf::lang::exceptions::UnsupportedOperationException)
+    ASSERT_THROW(plist.getByte(0), std::logic_error)
         << ("Should Throw UnsupportedOperationException");
 
     plist.setInt(0, 3);
     ASSERT_TRUE(plist.getInt(0) == 3);
 
-    ASSERT_THROW(plist.getShort(0),
-                 decaf::lang::exceptions::UnsupportedOperationException)
+    ASSERT_THROW(plist.getShort(0), std::logic_error)
         << ("Should Throw UnsupportedOperationException");
 
     plist.setLong(0, 4L);
     ASSERT_TRUE(plist.getLong(0) == 4L);
 
-    ASSERT_THROW(plist.getDouble(0),
-                 decaf::lang::exceptions::UnsupportedOperationException)
+    ASSERT_THROW(plist.getDouble(0), std::logic_error)
         << ("Should Throw UnsupportedOperationException");
 
     plist.setDouble(0, 2.3);
     ASSERT_TRUE(plist.getDouble(0) == 2.3);
 
-    ASSERT_THROW(plist.getFloat(0),
-                 decaf::lang::exceptions::UnsupportedOperationException)
+    ASSERT_THROW(plist.getFloat(0), std::logic_error)
         << ("Should Throw UnsupportedOperationException");
 
     plist.setFloat(0, 3.2f);
     ASSERT_TRUE(plist.getFloat(0) == 3.2f);
 
-    ASSERT_THROW(plist.getChar(0),
-                 decaf::lang::exceptions::UnsupportedOperationException)
+    ASSERT_THROW(plist.getChar(0), std::logic_error)
         << ("Should Throw UnsupportedOperationException");
 
     plist.setString(0, "hello");
@@ -108,8 +100,7 @@ TEST_F(PrimitiveListTest, testSetGet)
     byteArray.push_back('c');
     byteArray.push_back('d');
 
-    ASSERT_THROW(plist.getByteArray(0),
-                 decaf::lang::exceptions::UnsupportedOperationException)
+    ASSERT_THROW(plist.getByteArray(0), std::logic_error)
         << ("Should Throw UnsupportedOperationException");
 
     plist.setByteArray(0, byteArray);
@@ -146,13 +137,11 @@ TEST_F(PrimitiveListTest, testAdd)
     plist.add(stringValue);
     plist.add(byteArrayValue);
 
-    ASSERT_THROW(plist.getInt(0),
-                 decaf::lang::exceptions::UnsupportedOperationException)
+    ASSERT_THROW(plist.getInt(0), std::logic_error)
         << ("Should Throw UnsupportedOperationException");
 
-    ASSERT_THROW(plist.getInt(plist.size()),
-                 decaf::lang::exceptions::IndexOutOfBoundsException)
-        << ("Should Throw IndexOutOfBoundsException");
+    ASSERT_THROW(plist.getInt(plist.size()), std::out_of_range)
+        << ("Should Throw std::out_of_range");
 
     ASSERT_TRUE(plist.get(0).getType() == PrimitiveValueNode::BOOLEAN_TYPE);
     ASSERT_TRUE(plist.get(1).getType() == PrimitiveValueNode::BYTE_TYPE);
@@ -175,8 +164,7 @@ TEST_F(PrimitiveListTest, testRemove)
     plist.add(6);
     plist.removeAt(0);
 
-    ASSERT_THROW(plist.getInt(0),
-                 decaf::lang::exceptions::UnsupportedOperationException)
+    ASSERT_THROW(plist.getInt(0), std::logic_error)
         << ("Should Throw UnsupportedOperationException");
 
     plist.removeAt(0);
@@ -229,17 +217,14 @@ TEST_F(PrimitiveListTest, testClear)
     plist.clear();
     ASSERT_TRUE(plist.size() == 0);
 
-    ASSERT_THROW(plist.getInt(0),
-                 decaf::lang::exceptions::IndexOutOfBoundsException)
-        << ("Should Throw IndexOutOfBoundsException");
+    ASSERT_THROW(plist.getInt(0), std::out_of_range)
+        << ("Should Throw std::out_of_range");
 
-    ASSERT_THROW(plist.getFloat(1),
-                 decaf::lang::exceptions::IndexOutOfBoundsException)
-        << ("Should Throw IndexOutOfBoundsException");
+    ASSERT_THROW(plist.getFloat(1), std::out_of_range)
+        << ("Should Throw std::out_of_range");
 
-    ASSERT_THROW(plist.getInt(2),
-                 decaf::lang::exceptions::IndexOutOfBoundsException)
-        << ("Should Throw IndexOutOfBoundsException");
+    ASSERT_THROW(plist.getInt(2), std::out_of_range)
+        << ("Should Throw std::out_of_range");
 }
 
 ////////////////////////////////////////////////////////////////////////////////

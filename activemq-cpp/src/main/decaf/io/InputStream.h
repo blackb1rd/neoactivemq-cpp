@@ -20,12 +20,10 @@
 
 #include <decaf/io/Closeable.h>
 #include <decaf/io/IOException.h>
-#include <decaf/lang/exceptions/IndexOutOfBoundsException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
-#include <decaf/lang/exceptions/UnsupportedOperationException.h>
 #include <decaf/util/Config.h>
 #include <decaf/util/concurrent/Mutex.h>
 #include <decaf/util/concurrent/Synchronizable.h>
+#include <stdexcept>
 
 namespace decaf
 {
@@ -191,7 +189,7 @@ namespace io
          * @return The number of bytes read or -1 if EOF is detected
          *
          * @throws IOException if an I/O error occurs.
-         * @throws NullPointerException if buffer passed is NULL.
+         * @throws std::logic_error if buffer passed is NULL.
          */
         virtual int read(unsigned char* buffer, int size);
 
@@ -242,8 +240,8 @@ namespace io
          * @return The number of bytes read or -1 if EOF is detected
          *
          * @throws IOException if an I/O error occurs.
-         * @throws NullPointerException if buffer passed is NULL.
-         * @throws IndexOutOfBoundsException if length > size - offset.
+         * @throws std::logic_error if buffer passed is NULL.
+         * @throws std::out_of_range if length > size - offset.
          */
         virtual int read(unsigned char* buffer,
                          int            size,
@@ -269,7 +267,7 @@ namespace io
          * @return total bytes skipped
          *
          * @throws IOException if an I/O error occurs.
-         * @throws UnsupportedOperationException if the concrete stream class
+         * @throws std::logic_error if the concrete stream class
          * does not support skipping bytes.
          */
         virtual long long skip(long long num);

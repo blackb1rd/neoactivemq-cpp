@@ -18,14 +18,13 @@
 #ifndef _DECAF_UTIL_LIST_H_
 #define _DECAF_UTIL_LIST_H_
 
-#include <decaf/lang/exceptions/IndexOutOfBoundsException.h>
 #include <decaf/util/AbstractCollection.h>
 #include <decaf/util/Collection.h>
 #include <decaf/util/Config.h>
 #include <decaf/util/Iterator.h>
 #include <decaf/util/ListIterator.h>
-#include <decaf/util/NoSuchElementException.h>
 #include <decaf/util/concurrent/Synchronizable.h>
+#include <stdexcept>
 
 namespace decaf
 {
@@ -82,7 +81,7 @@ namespace util
          * an initial call to next. An initial call to previous would return the
          * element with the specified index minus one.
          *
-         * @throws IndexOutOfBoundsException if the index is out of range
+         * @throws std::out_of_range if the index is out of range
          *         (index < 0 || index > size())
          */
         virtual ListIterator<E>* listIterator(int index)       = 0;
@@ -100,7 +99,7 @@ namespace util
          * @return the index of the first occurrence of the specified element in
          * this list,
          *
-         * @throws NullPointerException if the Collection is a container of
+         * @throws std::logic_error if the Collection is a container of
          * pointers and does not allow NULL values.
          */
         virtual int indexOf(const E& value) const = 0;
@@ -117,7 +116,7 @@ namespace util
          * @return the index of the last occurrence of the specified element in
          * this list.
          *
-         * @throws NullPointerException if the Collection is a container of
+         * @throws std::logic_error if the Collection is a container of
          * pointers and does not allow NULL values.
          */
         virtual int lastIndexOf(const E& value) const = 0;
@@ -130,7 +129,7 @@ namespace util
          *
          * @return value at index specified.
          *
-         * @throws IndexOutOfBoundsException if the index given is less than
+         * @throws std::out_of_range if the index given is less than
          * zero or greater than the List size.
          */
         virtual E get(int index) const = 0;
@@ -146,15 +145,15 @@ namespace util
          *
          * @return the element previously at the specified position.
          *
-         * @throws IndexOutOfBoundsException if the index given is less than
+         * @throws std::out_of_range if the index given is less than
          * zero or greater than the List size.
          * @throws UnsupportedOperationExceptio if this is an unmodifiable
          * collection.
-         * @throws NullPointerException if the Collection is a container of
+         * @throws std::logic_error if the Collection is a container of
          * pointers and does not allow NULL values.
-         * @throws IllegalArgumentException if some property of the element
+         * @throws std::invalid_argument if some property of the element
          * prevents it from being added to this collection
-         * @throws IllegalStateException if the element cannot be added at this
+         * @throws std::logic_error if the element cannot be added at this
          * time due to insertion restrictions.
          */
         virtual E set(int index, const E& element) = 0;
@@ -169,15 +168,15 @@ namespace util
          * @param element
          *      The element to be inserted in this List.
          *
-         * @throws IndexOutOfBoundsException if the index is greater than size
+         * @throws std::out_of_range if the index is greater than size
          * of the List.
          * @throws UnsupportedOperationExceptio if this is an unmodifiable
          * collection.
-         * @throws NullPointerException if the Collection is a container of
+         * @throws std::logic_error if the Collection is a container of
          * pointers and does not allow NULL values.
-         * @throws IllegalArgumentException if some property of the element
+         * @throws std::invalid_argument if some property of the element
          * prevents it from being added to this collection
-         * @throws IllegalStateException if the element cannot be added at this
+         * @throws std::logic_error if the element cannot be added at this
          * time due to insertion restrictions.
          */
         virtual void add(int index, const E& element) = 0;
@@ -201,15 +200,15 @@ namespace util
          *
          * @return true if this list changed as a result of the call
          *
-         * @throws IndexOutOfBoundsException if the index given is less than
+         * @throws std::out_of_range if the index given is less than
          * zero or greater than the List size.
          * @throws UnsupportedOperationExceptio if this is an unmodifiable
          * collection.
-         * @throws NullPointerException if the Collection is a container of
+         * @throws std::logic_error if the Collection is a container of
          * pointers and does not allow NULL values.
-         * @throws IllegalArgumentException if some property of the element
+         * @throws std::invalid_argument if some property of the element
          * prevents it from being added to this collection
-         * @throws IllegalStateException if the element cannot be added at this
+         * @throws std::logic_error if the element cannot be added at this
          * time due to insertion restrictions.
          */
         virtual bool addAll(int index, const Collection<E>& source) = 0;
@@ -223,7 +222,7 @@ namespace util
          *
          * @return the element previously at the specified position.
          *
-         * @throws IndexOutOfBoundsException if the index given is less than
+         * @throws std::out_of_range if the index given is less than
          * zero or greater than the List size.
          * @throws UnsupportedOperationExceptio if this is an unmodifiable
          * collection.

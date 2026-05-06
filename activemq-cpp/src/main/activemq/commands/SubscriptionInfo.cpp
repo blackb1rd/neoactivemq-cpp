@@ -17,15 +17,14 @@
 
 #include <activemq/commands/SubscriptionInfo.h>
 #include <activemq/exceptions/ActiveMQException.h>
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <activemq/state/CommandVisitor.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
+#include <stdexcept>
 
 using namespace std;
 using namespace activemq;
 using namespace activemq::exceptions;
 using namespace activemq::commands;
-
-using namespace decaf::lang::exceptions;
 
 /*
  *
@@ -78,7 +77,7 @@ void SubscriptionInfo::copyDataStructure(const DataStructure* src)
 
     if (srcPtr == NULL || src == NULL)
     {
-        throw decaf::lang::exceptions::NullPointerException(
+        throw activemq::exceptions::NullPointerException(
             __FILE__,
             __LINE__,
             "SubscriptionInfo::copyDataStructure - src is NULL or invalid");

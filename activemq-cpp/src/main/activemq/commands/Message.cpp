@@ -19,18 +19,20 @@
 #include <activemq/core/ActiveMQAckHandler.h>
 #include <activemq/core/ActiveMQConnection.h>
 #include <activemq/exceptions/ActiveMQException.h>
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <activemq/exceptions/IoCatchMacros.h>
 #include <activemq/state/CommandVisitor.h>
 #include <activemq/util/AMQLog.h>
 #include <activemq/wireformat/openwire/marshal/BaseDataStreamMarshaller.h>
 #include <activemq/wireformat/openwire/marshal/PrimitiveTypesMarshaller.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
+#include <decaf/io/IOException.h>
 #include <chrono>
+#include <stdexcept>
 
 using namespace std;
 using namespace activemq;
 using namespace activemq::exceptions;
 using namespace activemq::commands;
-using namespace decaf::lang::exceptions;
 
 /*
  *
@@ -113,7 +115,7 @@ void Message::copyDataStructure(const DataStructure* src)
 
     if (srcPtr == NULL || src == NULL)
     {
-        throw decaf::lang::exceptions::NullPointerException(
+        throw activemq::exceptions::NullPointerException(
             __FILE__,
             __LINE__,
             "Message::copyDataStructure - src is NULL or invalid");
@@ -1161,9 +1163,9 @@ void Message::beforeMarshal(wireformat::WireFormat* wireFormat AMQCPP_UNUSED)
                 marshalledProperties);
         }
     }
-    AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(decaf::lang::Exception, decaf::io::IOException)
-    AMQ_CATCHALL_THROW(decaf::io::IOException)
+    AMQ_IOSTREAM_CATCH_RETHROW()
+    AMQ_IOSTREAM_CATCH_CONVERT_LANG_EXCEPTION()
+    AMQ_IOSTREAM_CATCHALL_THROW()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1211,7 +1213,7 @@ void Message::ensurePropertiesUnmarshaled() const
                 const_cast<std::vector<unsigned char>&>(marshalledProperties));
             propertiesUnmarshaled = true;
         }
-        catch (decaf::io::IOException& e)
+        catch (activemq::exceptions::IOException& e)
         {
             AMQ_LOG_ERROR(
                 "Message",
@@ -1223,8 +1225,7 @@ void Message::ensurePropertiesUnmarshaled() const
                     << ", exception=" << e.getMessage());
             throw;
         }
-        AMQ_CATCH_EXCEPTION_CONVERT(decaf::lang::Exception,
-                                    decaf::io::IOException)
-        AMQ_CATCHALL_THROW(decaf::io::IOException)
+        AMQ_IOSTREAM_CATCH_CONVERT_LANG_EXCEPTION()
+        AMQ_IOSTREAM_CATCHALL_THROW()
     }
 }

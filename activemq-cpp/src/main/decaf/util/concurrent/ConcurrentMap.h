@@ -21,9 +21,7 @@
 #include <decaf/util/Config.h>
 #include <decaf/util/Map.h>
 
-#include <decaf/lang/exceptions/IllegalStateException.h>
-#include <decaf/lang/exceptions/UnsupportedOperationException.h>
-#include <decaf/util/NoSuchElementException.h>
+#include <stdexcept>
 
 namespace decaf
 {
@@ -64,7 +62,7 @@ namespace util
              * @return true if the put operation was performed otherwise return
              * false which indicates there was a value previously mapped to the
              * key.
-             * @throw UnsupportedOperationException
+             * @throws std::logic_error
              *        if the put operation is not supported by this map
              */
             virtual bool putIfAbsent(const K& key, const V& value) = 0;
@@ -117,7 +115,7 @@ namespace util
              * if( ( map.containsKey( key ) ) {
              *     return map.put( key, value );
              * } else {
-             *     throw NoSuchElementException(...);
+             *     throw std::runtime_error(...);
              * };
              * </pre>
              * except that the action is performed atomically.
@@ -126,10 +124,10 @@ namespace util
              * @param value value to be associated with the specified key.
              *
              * @return copy of the previous value associated with specified key,
-             * or throws an NoSuchElementException if there was no mapping for
+             * or throws an std::runtime_error if there was no mapping for
              * key.
              *
-             * @throws NoSuchElementException if there was no previous mapping.
+             * @throws std::runtime_error if there was no previous mapping.
              */
             virtual V replace(const K& key, const V& value) = 0;
 

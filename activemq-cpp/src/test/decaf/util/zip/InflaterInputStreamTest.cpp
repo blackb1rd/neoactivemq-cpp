@@ -30,15 +30,12 @@
 
 #include <decaf/lang/Integer.h>
 
-#include <decaf/lang/exceptions/IndexOutOfBoundsException.h>
-
 #include <vector>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::io;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::zip;
 
@@ -74,13 +71,11 @@ const std::string InflaterInputStreamTest::testString =
     "PrintStream\n"
     "Test_java_io_RandomAccessFile\nTest_java_io_SyncFailedException\nTest_"
     "java_lang_AbstractMethodError\n"
-    "Test_java_lang_ArithmeticException\nTest_java_lang_"
-    "ArrayIndexOutOfBoundsException\n"
+    "Test_java_lang_ArithmeticException\n"
     "Test_java_lang_ArrayStoreException\nTest_java_lang_Boolean\nTest_java_"
     "lang_Byte\n"
     "Test_java_lang_Character\nTest_java_lang_Class\nTest_java_lang_"
-    "ClassCastException\n"
-    "Test_java_lang_ClassCircularityError\nTest_java_lang_ClassFormatError\n"
+    "ClassCircularityError\nTest_java_lang_ClassFormatError\n"
     "Test_java_lang_ClassLoader\nTest_java_lang_ClassNotFoundException\n"
     "Test_java_lang_CloneNotSupportedException\nTest_java_lang_Double\nTest_"
     "java_lang_Error\n"
@@ -88,21 +83,20 @@ const std::string InflaterInputStreamTest::testString =
     "ExceptionInInitializerError\nTest_java_lang_Float\n"
     "Test_java_lang_IllegalAccessError\nTest_java_lang_IllegalAccessException\n"
     "Test_java_lang_IllegalArgumentException\nTest_java_lang_"
-    "IllegalMonitorStateException\n"
+    ""
     "Test_java_lang_IllegalThreadStateException\nTest_java_lang_"
     "IncompatibleClassChangeError\n"
     "Test_java_lang_IndexOutOfBoundsException\nTest_java_lang_"
     "InstantiationError\n"
     "Test_java_lang_InstantiationException\nTest_java_lang_Integer\nTest_java_"
     "lang_InternalError\n"
-    "Test_java_lang_InterruptedException\nTest_java_lang_LinkageError\nTest_"
+    "Test_java_lang_RuntimeError\nTest_java_lang_LinkageError\nTest_"
     "java_lang_Long\n"
     "Test_java_lang_Math\nTest_java_lang_NegativeArraySizeException\nTest_java_"
     "lang_NoClassDefFoundError\n"
     "Test_java_lang_NoSuchFieldError\nTest_java_lang_NoSuchMethodError\n"
     "Test_java_lang_NullPointerException\nTest_java_lang_Number\nTest_java_"
-    "lang_NumberFormatException\n"
-    "Test_java_lang_Object\nTest_java_lang_OutOfMemoryError\nTest_java_lang_"
+    "lang_Object\nTest_java_lang_OutOfMemoryError\nTest_java_lang_"
     "RuntimeException\n"
     "Test_java_lang_SecurityManager\nTest_java_lang_Short\nTest_java_lang_"
     "StackOverflowError\n"

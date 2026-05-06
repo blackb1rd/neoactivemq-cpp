@@ -17,18 +17,17 @@
 
 #include "BitSet.h"
 
-#include <decaf/lang/exceptions/IndexOutOfBoundsException.h>
-#include <decaf/lang/exceptions/NegativeArraySizeException.h>
-#include <decaf/lang/exceptions/OutOfMemoryError.h>
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <stdexcept>
 
 #include <decaf/lang/Integer.h>
 #include <decaf/lang/Math.h>
 #include <decaf/lang/System.h>
+#include <string>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -95,7 +94,10 @@ BitSet::BitSet(int bitCount)
 {
     if (bitCount < 0)
     {
-        throw NegativeArraySizeException(__FILE__, __LINE__, "");
+        throw activemq::exceptions::InterruptedException(
+            __FILE__,
+            __LINE__,
+            "BitSet size cannot be negative");
     }
 
     bitsSize = (bitCount >> OFFSET) + ((bitCount & RIGHT_BITS) > 0 ? 1 : 0);
@@ -103,23 +105,14 @@ BitSet::BitSet(int bitCount)
     {
         bits = new unsigned long long[bitsSize];
 
-        if (bits == NULL)
-        {
-            throw OutOfMemoryError(__FILE__,
-                                   __LINE__,
-                                   "Failed to allocate bit array.");
-        }
-
         for (int i = 0; i < bitsSize; ++i)
         {
             bits[i] = 0ULL;
         }
     }
-    catch (std::bad_alloc& e)
+    catch (std::bad_alloc&)
     {
-        throw OutOfMemoryError(__FILE__,
-                               __LINE__,
-                               "Failed to allocate bit array.");
+        throw activemq::exceptions::OutOfMemoryError();
     }
 }
 
@@ -164,20 +157,11 @@ BitSet::BitSet(const BitSet& set)
     {
         bits = new unsigned long long[bitsSize];
 
-        if (bits == NULL)
-        {
-            throw OutOfMemoryError(__FILE__,
-                                   __LINE__,
-                                   "Failed to allocate bit array.");
-        }
-
         System::arraycopy(set.bits, 0, bits, 0, set.bitsSize);
     }
-    catch (std::bad_alloc& e)
+    catch (std::bad_alloc&)
     {
-        throw OutOfMemoryError(__FILE__,
-                               __LINE__,
-                               "Failed to allocate bit array.");
+        throw activemq::exceptions::OutOfMemoryError();
     }
 }
 
@@ -195,20 +179,11 @@ BitSet& BitSet::operator=(const BitSet& set)
     {
         bits = new unsigned long long[bitsSize];
 
-        if (bits == NULL)
-        {
-            throw OutOfMemoryError(__FILE__,
-                                   __LINE__,
-                                   "Failed to allocate bit array.");
-        }
-
         System::arraycopy(set.bits, 0, bits, 0, set.bitsSize);
     }
-    catch (std::bad_alloc& e)
+    catch (std::bad_alloc&)
     {
-        throw OutOfMemoryError(__FILE__,
-                               __LINE__,
-                               "Failed to allocate bit array.");
+        throw activemq::exceptions::OutOfMemoryError();
     }
 
     return *this;
@@ -314,9 +289,9 @@ void BitSet::clear(int index)
 {
     if (index < 0)
     {
-        throw IndexOutOfBoundsException(__FILE__,
-                                        __LINE__,
-                                        "Index given was negative");
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Index given was negative");
     }
 
     if (!needClear)
@@ -339,9 +314,9 @@ void BitSet::clear(int fromIndex, int toIndex)
 {
     if (fromIndex < 0 || toIndex < 0 || toIndex < fromIndex)
     {
-        throw IndexOutOfBoundsException(__FILE__,
-                                        __LINE__,
-                                        "Invalid from or to index given");
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Invalid from or to index given");
     }
 
     if (!needClear)
@@ -479,9 +454,9 @@ void BitSet::flip(int index)
 {
     if (index < 0)
     {
-        throw IndexOutOfBoundsException(__FILE__,
-                                        __LINE__,
-                                        "Index given was negative");
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Index given was negative");
     }
 
     int len = (index >> OFFSET) + 1;
@@ -504,9 +479,9 @@ void BitSet::flip(int fromIndex, int toIndex)
 {
     if (fromIndex < 0 || toIndex < 0 || toIndex < fromIndex)
     {
-        throw IndexOutOfBoundsException(__FILE__,
-                                        __LINE__,
-                                        "Invalid from or to index given");
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Invalid from or to index given");
     }
 
     if (fromIndex == toIndex)
@@ -552,9 +527,9 @@ bool BitSet::get(int index) const
 {
     if (index < 0)
     {
-        throw IndexOutOfBoundsException(__FILE__,
-                                        __LINE__,
-                                        "Index given was negative");
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Index given was negative");
     }
 
     int arrayPos = index >> OFFSET;
@@ -570,9 +545,9 @@ BitSet BitSet::get(int fromIndex, int toIndex) const
 {
     if (fromIndex < 0 || toIndex < 0 || toIndex < fromIndex)
     {
-        throw IndexOutOfBoundsException(__FILE__,
-                                        __LINE__,
-                                        "Invalid from or to index given");
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Invalid from or to index given");
     }
 
     int last = actualArrayLength << OFFSET;
@@ -725,9 +700,9 @@ int BitSet::nextClearBit(int index) const
 {
     if (index < 0)
     {
-        throw IndexOutOfBoundsException(__FILE__,
-                                        __LINE__,
-                                        "Index given was negative");
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Index given was negative");
     }
 
     int length = actualArrayLength;
@@ -777,9 +752,9 @@ int BitSet::nextSetBit(int index) const
 {
     if (index < 0)
     {
-        throw IndexOutOfBoundsException(__FILE__,
-                                        __LINE__,
-                                        "Index given was negative");
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Index given was negative");
     }
 
     if (index >= actualArrayLength << OFFSET)
@@ -828,9 +803,9 @@ void BitSet::set(int index)
 {
     if (index < 0)
     {
-        throw IndexOutOfBoundsException(__FILE__,
-                                        __LINE__,
-                                        "Index given was negative");
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Index given was negative");
     }
 
     int len = (index >> OFFSET) + 1;
@@ -866,9 +841,9 @@ void BitSet::set(int fromIndex, int toIndex)
 {
     if (fromIndex < 0 || toIndex < 0 || toIndex < fromIndex)
     {
-        throw IndexOutOfBoundsException(__FILE__,
-                                        __LINE__,
-                                        "Invalid from or to index given");
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Invalid from or to index given");
     }
 
     if (fromIndex == toIndex)

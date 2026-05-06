@@ -17,9 +17,8 @@
 
 #include "System.h"
 
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
-#include <decaf/lang/exceptions/RuntimeException.h>
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <decaf/lang/Exception.h>
 #include <decaf/util/Date.h>
 #include <decaf/util/Properties.h>
 #include <decaf/util/StlMap.h>
@@ -27,6 +26,8 @@
 #include <decaf/util/concurrent/TimeUnit.h>
 #include <chrono>
 #include <cstdlib>
+#include <stdexcept>
+#include <string>
 
 #ifdef _WIN32
 #include <stdlib.h>  // For _putenv_s on Windows
@@ -66,6 +67,7 @@
 
 #include <cstdlib>
 #include <cstring>
+#include <stdexcept>
 
 using namespace std;
 using namespace decaf;
@@ -73,7 +75,6 @@ using namespace decaf::lang;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 using namespace decaf::internal;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace decaf
@@ -135,16 +136,18 @@ void System::arraycopy(const char* src,
 {
     if (src == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "Given Source Pointer was null.");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "Given Source Pointer was null.");
     }
 
-    if (src == NULL)
+    if (dest == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "Given Source Pointer was null.");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "Given Source Pointer was null.");
     }
 
     // Now we try and copy, could still segfault.
@@ -167,16 +170,18 @@ void System::arraycopy(const unsigned char* src,
 {
     if (src == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "Given Source Pointer was null.");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "Given Source Pointer was null.");
     }
 
-    if (src == NULL)
+    if (dest == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "Given Source Pointer was null.");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "Given Source Pointer was null.");
     }
 
     // Now we try and copy, could still segfault.
@@ -199,16 +204,18 @@ void System::arraycopy(const short* src,
 {
     if (src == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "Given Source Pointer was null.");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "Given Source Pointer was null.");
     }
 
-    if (src == NULL)
+    if (dest == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "Given Source Pointer was null.");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "Given Source Pointer was null.");
     }
 
     // Now we try and copy, could still segfault.
@@ -231,16 +238,18 @@ void System::arraycopy(const int*  src,
 {
     if (src == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "Given Source Pointer was null.");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "Given Source Pointer was null.");
     }
 
-    if (src == NULL)
+    if (dest == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "Given Source Pointer was null.");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "Given Source Pointer was null.");
     }
 
     // Now we try and copy, could still segfault.
@@ -263,16 +272,18 @@ void System::arraycopy(const long long* src,
 {
     if (src == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "Given Source Pointer was null.");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "Given Source Pointer was null.");
     }
 
-    if (src == NULL)
+    if (dest == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "Given Source Pointer was null.");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "Given Source Pointer was null.");
     }
 
     // Now we try and copy, could still segfault.
@@ -295,16 +306,18 @@ void System::arraycopy(const float* src,
 {
     if (src == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "Given Source Pointer was null.");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "Given Source Pointer was null.");
     }
 
-    if (src == NULL)
+    if (dest == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "Given Source Pointer was null.");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "Given Source Pointer was null.");
     }
 
     // Now we try and copy, could still segfault.
@@ -327,16 +340,18 @@ void System::arraycopy(const double* src,
 {
     if (src == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "Given Source Pointer was null.");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "Given Source Pointer was null.");
     }
 
-    if (src == NULL)
+    if (dest == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "Given Source Pointer was null.");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "Given Source Pointer was null.");
     }
 
     // Now we try and copy, could still segfault.
@@ -357,21 +372,23 @@ void System::unsetenv(const std::string& name)
     // On Windows, setting to empty string effectively unsets the variable
     if (_putenv_s(name.c_str(), "") != 0)
     {
-        throw RuntimeException(
+        throw activemq::exceptions::RuntimeException(
             __FILE__,
             __LINE__,
-            "System::unsetenv - Failed to unset environment variable: %s",
-            name.c_str());
+            std::string(
+                "System::unsetenv - Failed to unset environment variable: ") +
+                name);
     }
 #else
     // POSIX systems have unsetenv
     if (::unsetenv(name.c_str()) != 0)
     {
-        throw RuntimeException(
+        throw activemq::exceptions::RuntimeException(
             __FILE__,
             __LINE__,
-            "System::unsetenv - Failed to unset environment variable: %s",
-            name.c_str());
+            std::string(
+                "System::unsetenv - Failed to unset environment variable: ") +
+                name);
     }
 #endif
 }
@@ -383,11 +400,11 @@ std::string System::getenv(const std::string& name)
 
     if (value == nullptr)
     {
-        throw NullPointerException(
+        throw activemq::exceptions::NullPointerException(
             __FILE__,
             __LINE__,
-            "System::getenv - Environment variable not found: %s",
-            name.c_str());
+            std::string("System::getenv - Environment variable not found: ") +
+                name);
     }
 
     return std::string(value);
@@ -399,21 +416,23 @@ void System::setenv(const std::string& name, const std::string& value)
 #ifdef _WIN32
     if (_putenv_s(name.c_str(), value.c_str()) != 0)
     {
-        throw RuntimeException(
+        throw activemq::exceptions::RuntimeException(
             __FILE__,
             __LINE__,
-            "System::setenv - Failed to set environment variable: %s",
-            name.c_str());
+            std::string(
+                "System::setenv - Failed to set environment variable: ") +
+                name);
     }
 #else
     // POSIX setenv: 1 means overwrite existing value
     if (::setenv(name.c_str(), value.c_str(), 1) != 0)
     {
-        throw RuntimeException(
+        throw activemq::exceptions::RuntimeException(
             __FILE__,
             __LINE__,
-            "System::setenv - Failed to set environment variable: %s",
-            name.c_str());
+            std::string(
+                "System::setenv - Failed to set environment variable: ") +
+                name);
     }
 #endif
 }
@@ -472,11 +491,9 @@ const Map<string, string>& System::getenv()
         else if (tokens == 0)
         {
             // Odd case, got a string with no equals sign.
-            throw IllegalArgumentException(
-                __FILE__,
-                __LINE__,
-                "System::getenv - Invalid env string. %s",
-                env[i].c_str());
+            throw activemq::exceptions::InvalidArgumentException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+                "System::getenv - Invalid env string. " + env[i]);
         }
         else
         {
@@ -533,6 +550,7 @@ std::vector<std::string> System::getEnvArray()
 
 #if defined(__APPLE__)
 #include <crt_externs.h>
+#include <string>
 #define environ (*_NSGetEnviron())
 #else
 extern char** environ;
@@ -604,9 +622,8 @@ std::string System::getProperty(const std::string& key)
 {
     if (key.empty())
     {
-        throw IllegalArgumentException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
             "Cannot pass an empty key to getProperty.");
     }
 
@@ -619,9 +636,8 @@ std::string System::getProperty(const std::string& key,
 {
     if (key.empty())
     {
-        throw IllegalArgumentException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
             "Cannot pass an empty key to getProperty.");
     }
 
@@ -634,9 +650,8 @@ std::string System::setProperty(const std::string& key,
 {
     if (key.empty())
     {
-        throw IllegalArgumentException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
             "Cannot pass an empty key to setProperty.");
     }
 
@@ -653,9 +668,8 @@ std::string System::clearProperty(const std::string& key)
 {
     if (key.empty())
     {
-        throw IllegalArgumentException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
             "Cannot pass an empty key to clearProperty.");
     }
 

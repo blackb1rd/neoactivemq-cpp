@@ -17,14 +17,15 @@
 
 #include <gtest/gtest.h>
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/lang/Integer.h>
 #include <decaf/util/ArrayList.h>
 #include <decaf/util/LinkedList.h>
 
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util;
+using namespace activemq::exceptions;
 
 class LinkedListTest : public ::testing::Test
 {
@@ -143,11 +144,11 @@ TEST_F(LinkedListTest, testGet)
     ASSERT_EQ(SIZE / 2, list.get(SIZE / 2));
     ASSERT_EQ(SIZE - 1, list.get(SIZE - 1));
 
-    ASSERT_THROW(list.get(-1), IndexOutOfBoundsException)
-        << ("Should have thrown an IndexOutOfBoundsException");
+    ASSERT_THROW(list.get(-1), std::out_of_range)
+        << ("Should have thrown an std::out_of_range");
 
-    ASSERT_THROW(list.get(SIZE), IndexOutOfBoundsException)
-        << ("Should have thrown an IndexOutOfBoundsException");
+    ASSERT_THROW(list.get(SIZE), std::out_of_range)
+        << ("Should have thrown an std::out_of_range");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -166,11 +167,11 @@ TEST_F(LinkedListTest, testSet)
     ASSERT_EQ(SIZE - 1, list.set(SIZE - 1, 42));
     ASSERT_EQ(42, list.get(SIZE - 1));
 
-    ASSERT_THROW(list.set(-1, 42), IndexOutOfBoundsException)
-        << ("Should have thrown an IndexOutOfBoundsException");
+    ASSERT_THROW(list.set(-1, 42), std::out_of_range)
+        << ("Should have thrown an std::out_of_range");
 
-    ASSERT_THROW(list.set(SIZE, 42), IndexOutOfBoundsException)
-        << ("Should have thrown an IndexOutOfBoundsException");
+    ASSERT_THROW(list.set(SIZE, 42), std::out_of_range)
+        << ("Should have thrown an std::out_of_range");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -227,7 +228,7 @@ TEST_F(LinkedListTest, testGetFirst)
     LinkedList<int> list;
 
     ASSERT_THROW(list.getFirst(), NoSuchElementException)
-        << ("Should have thrown an NoSuchElementException");
+        << ("Should have thrown NoSuchElementException");
 
     populate(list, SIZE);
     ASSERT_EQ(0, list.getFirst());
@@ -239,7 +240,7 @@ TEST_F(LinkedListTest, testGetLast)
     LinkedList<int> list;
 
     ASSERT_THROW(list.getLast(), NoSuchElementException)
-        << ("Should have thrown an NoSuchElementException");
+        << ("Should have thrown NoSuchElementException");
 
     populate(list, SIZE);
     ASSERT_EQ(SIZE - 1, list.getLast());
@@ -309,11 +310,11 @@ TEST_F(LinkedListTest, testAdd2)
     ASSERT_EQ(168, list.getLast());
     ASSERT_EQ(21, list.getFirst());
 
-    ASSERT_THROW(list.add(-1, 12), IndexOutOfBoundsException)
-        << ("Should have thrown an IndexOutOfBoundsException");
+    ASSERT_THROW(list.add(-1, 12), std::out_of_range)
+        << ("Should have thrown an std::out_of_range");
 
-    ASSERT_THROW(list.add(100, 12), IndexOutOfBoundsException)
-        << ("Should have thrown an IndexOutOfBoundsException");
+    ASSERT_THROW(list.add(100, 12), std::out_of_range)
+        << ("Should have thrown an std::out_of_range");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -359,10 +360,10 @@ TEST_F(LinkedListTest, testAddAll1)
 TEST_F(LinkedListTest, testAddAll2)
 {
     LinkedList<int> list;
-    ASSERT_THROW(list.addAll(-1, ArrayList<int>()), IndexOutOfBoundsException)
-        << ("Should have thrown an IndexOutOfBoundsException");
-    ASSERT_THROW(list.addAll(99, ArrayList<int>()), IndexOutOfBoundsException)
-        << ("Should have thrown an IndexOutOfBoundsException");
+    ASSERT_THROW(list.addAll(-1, ArrayList<int>()), std::out_of_range)
+        << ("Should have thrown an std::out_of_range");
+    ASSERT_THROW(list.addAll(99, ArrayList<int>()), std::out_of_range)
+        << ("Should have thrown an std::out_of_range");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -406,9 +407,8 @@ TEST_F(LinkedListTest, testAddAll3)
 TEST_F(LinkedListTest, testAddAll4)
 {
     ArrayList<int> emptyCollection;
-    ASSERT_THROW(ArrayList<int>().addAll(-1, emptyCollection),
-                 IndexOutOfBoundsException)
-        << ("Should throw an IndexOutOfBoundsException");
+    ASSERT_THROW(ArrayList<int>().addAll(-1, emptyCollection), std::out_of_range)
+        << ("Should throw an std::out_of_range");
 
     {
         std::string data[] = {"1", "2", "3", "4", "5", "6", "7", "8"};
@@ -504,8 +504,8 @@ TEST_F(LinkedListTest, testRemoveAtIndex)
     list.removeAt(10);
 
     ASSERT_EQ(-1, list.indexOf(10)) << ("Failed to remove element");
-    ASSERT_THROW(list.removeAt(999), IndexOutOfBoundsException)
-        << ("Should have thrown an IndexOutOfBoundsException");
+    ASSERT_THROW(list.removeAt(999), std::out_of_range)
+        << ("Should have thrown an std::out_of_range");
 
     list.add(20, 0);
     list.removeAt(20);
@@ -728,7 +728,7 @@ TEST_F(LinkedListTest, testQRemove)
     ASSERT_TRUE(list.size() == 0);
 
     ASSERT_THROW(list.remove(), NoSuchElementException)
-        << ("Should have thrown an NoSuchElementException");
+        << ("Should have thrown NoSuchElementException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -765,7 +765,7 @@ TEST_F(LinkedListTest, testElement)
     ASSERT_TRUE(list.size() == 0);
 
     ASSERT_THROW(list.element(), NoSuchElementException)
-        << ("Should have thrown an NoSuchElementException");
+        << ("Should have thrown NoSuchElementException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -814,7 +814,7 @@ TEST_F(LinkedListTest, testRemoveFirst)
     ASSERT_TRUE(list.size() == 0);
 
     ASSERT_THROW(list.removeFirst(), NoSuchElementException)
-        << ("Should have thrown an NoSuchElementException");
+        << ("Should have thrown NoSuchElementException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -831,7 +831,7 @@ TEST_F(LinkedListTest, testRemoveLast)
     ASSERT_TRUE(list.size() == 0);
 
     ASSERT_THROW(list.removeLast(), NoSuchElementException)
-        << ("Should have thrown an NoSuchElementException");
+        << ("Should have thrown NoSuchElementException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -922,7 +922,7 @@ TEST_F(LinkedListTest, testPop)
     ASSERT_TRUE(list.size() == 0);
 
     ASSERT_THROW(list.pop(), NoSuchElementException)
-        << ("Should have thrown an NoSuchElementException");
+        << ("Should have thrown NoSuchElementException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -948,8 +948,8 @@ TEST_F(LinkedListTest, testListIterator1IndexOutOfBoundsException)
 
     ASSERT_THROW(
         std::unique_ptr<ListIterator<std::string>> it(list.listIterator(-1)),
-        IndexOutOfBoundsException)
-        << ("Should throw an IndexOutOfBoundsException");
+        std::out_of_range)
+        << ("Should throw an std::out_of_range");
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -961,8 +961,8 @@ TEST_F(LinkedListTest, testListIterator2IndexOutOfBoundsException)
 
     ASSERT_THROW(
         std::unique_ptr<ListIterator<std::string>> it(list.listIterator(100)),
-        IndexOutOfBoundsException)
-        << ("Should throw an IndexOutOfBoundsException");
+        std::out_of_range)
+        << ("Should throw an std::out_of_range");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1093,24 +1093,24 @@ TEST_F(LinkedListTest, testListIterator2)
     }
 
     ASSERT_THROW(iter->next(), NoSuchElementException)
-        << ("Should have thrown a NoSuchElementException");
+        << ("Should have thrown NoSuchElementException");
     ASSERT_EQ(list.size(), iter->nextIndex());
 
     list.add(3);
     ASSERT_THROW(iter->next(), ConcurrentModificationException)
-        << ("Should have thrown a ConcurrentModificationException");
+        << ("Should have thrown ConcurrentModificationException");
     ASSERT_THROW(iter->add(42), ConcurrentModificationException)
-        << ("Should have thrown a ConcurrentModificationException");
+        << ("Should have thrown ConcurrentModificationException");
     ASSERT_THROW(iter->remove(), ConcurrentModificationException)
-        << ("Should have thrown a ConcurrentModificationException");
+        << ("Should have thrown ConcurrentModificationException");
     ASSERT_THROW(iter->previous(), ConcurrentModificationException)
-        << ("Should have thrown a ConcurrentModificationException");
+        << ("Should have thrown ConcurrentModificationException");
 
     iter.reset(list.listIterator());
-    ASSERT_THROW(iter->previous(), IllegalStateException)
-        << ("Should have thrown a IllegalStateException");
-    ASSERT_THROW(iter->set(42), IllegalStateException)
-        << ("Should have thrown a IllegalStateException");
+    ASSERT_THROW(iter->previous(), std::logic_error)
+        << ("Should have thrown a std::logic_error");
+    ASSERT_THROW(iter->set(42), std::logic_error)
+        << ("Should have thrown a std::logic_error");
 
     int value = iter->next();
     ASSERT_EQ(1, value) << ("Should have returned first element");
@@ -1124,7 +1124,7 @@ TEST_F(LinkedListTest, testListIterator3)
     ASSERT_EQ(-1, iter->previousIndex());
 
     ASSERT_THROW(iter->next(), NoSuchElementException)
-        << ("Should have thrown a NoSuchElementException");
+        << ("Should have thrown NoSuchElementException");
 
     ASSERT_TRUE(!iter->hasNext()) << ("hasNext() should be false");
     iter->add(42);
@@ -1176,13 +1176,13 @@ TEST_F(LinkedListTest, testDescendingIterator)
     iter.reset(list.descendingIterator());
     ASSERT_EQ(5, list.size());
 
-    ASSERT_THROW(iter->remove(), IllegalStateException)
-        << ("Should have thrown a IllegalStateException");
+    ASSERT_THROW(iter->remove(), std::logic_error)
+        << ("Should have thrown a std::logic_error");
 
     list.add(5);
 
     ASSERT_THROW(iter->remove(), ConcurrentModificationException)
-        << ("Should have thrown a ConcurrentModificationException");
+        << ("Should have thrown ConcurrentModificationException");
 
     iter.reset(list.descendingIterator());
     ASSERT_EQ(5, iter->next());
@@ -1197,7 +1197,7 @@ TEST_F(LinkedListTest, testDescendingIterator)
     ASSERT_TRUE(!iter->hasNext());
 
     ASSERT_THROW(iter->next(), NoSuchElementException)
-        << ("Should have thrown a NoSuchElementException");
+        << ("Should have thrown NoSuchElementException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////

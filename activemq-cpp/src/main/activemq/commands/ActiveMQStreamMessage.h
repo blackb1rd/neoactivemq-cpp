@@ -28,7 +28,6 @@
 #include <cms/StreamMessage.h>
 #include <decaf/io/DataInputStream.h>
 #include <decaf/io/DataOutputStream.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
 #include <memory>
 #include <string>
 

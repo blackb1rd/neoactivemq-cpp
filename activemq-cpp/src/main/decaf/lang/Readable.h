@@ -21,7 +21,6 @@
 #include <decaf/util/Config.h>
 
 #include <decaf/io/IOException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/nio/ReadOnlyBufferException.h>
 
 namespace decaf
@@ -58,7 +57,7 @@ namespace lang
          * source of characters is at its end
          *
          * @throws IOException if an I/O error occurs.
-         * @throws NullPointerException if buffer is NULL.
+         * @throws std::logic_error if buffer is NULL.
          * @throws ReadOnlyBufferException if charBuffer is a read only buffer.
          */
         virtual int read(decaf::nio::CharBuffer* charBuffer) = 0;

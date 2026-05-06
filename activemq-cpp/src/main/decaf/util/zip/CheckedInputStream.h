@@ -60,7 +60,8 @@ namespace util
              *      Indicates if this filer should take ownership of the
              * InputStream.
              *
-             * @throws NullPointerException if the Checksum pointer is NULL.
+             * @throws activemq::exceptions::IllegalStateException if
+             * the Checksum pointer is NULL.
              */
             CheckedInputStream(InputStream* inputStream,
                                Checksum*    sum,

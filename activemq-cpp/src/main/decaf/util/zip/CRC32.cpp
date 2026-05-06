@@ -17,11 +17,13 @@
 
 #include "CRC32.h"
 
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <stdexcept>
+#include <string>
+
 #include <zlib.h>
 
 using namespace decaf;
-using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::zip;
 
@@ -63,9 +65,8 @@ void CRC32::update(const std::vector<unsigned char>& buffer,
 {
     if (offset + length > (int)buffer.size())
     {
-        throw IndexOutOfBoundsException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
             "Given offset + length exceeds the length of the buffer.");
     }
 
@@ -83,9 +84,8 @@ void CRC32::update(const unsigned char* buffer, int size, int offset, int length
 {
     if (offset + length > size)
     {
-        throw IndexOutOfBoundsException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
             "Given offset + length exceeds the length of the buffer.");
     }
 

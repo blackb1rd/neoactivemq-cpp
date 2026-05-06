@@ -18,6 +18,8 @@
 #ifndef _DECAF_IO_EOFEXCEPTION_H_
 #define _DECAF_IO_EOFEXCEPTION_H_
 
+#include <cstdarg>
+
 #include <decaf/io/IOException.h>
 
 namespace decaf
@@ -102,6 +104,61 @@ namespace io
 
         virtual ~EOFException() throw();
     };
+
+    inline EOFException::EOFException()
+        : io::IOException()
+    {
+    }
+
+    inline EOFException::~EOFException() throw()
+    {
+    }
+
+    inline EOFException::EOFException(const lang::Exception& ex)
+        : io::IOException()
+    {
+        *(lang::Exception*)this = ex;
+    }
+
+    inline EOFException::EOFException(const EOFException& ex)
+        : io::IOException()
+    {
+        *(lang::Exception*)this = ex;
+    }
+
+    inline EOFException::EOFException(const char*           file,
+                                      const int             lineNumber,
+                                      const std::exception* cause,
+                                      const char*           msg,
+                                      ...)
+        : io::IOException(cause)
+    {
+        va_list vargs;
+        va_start(vargs, msg);
+        buildMessage(msg, vargs);
+        va_end(vargs);
+
+        setMark(file, lineNumber);
+    }
+
+    inline EOFException::EOFException(const std::exception* cause)
+        : io::IOException(cause)
+    {
+    }
+
+    inline EOFException::EOFException(const char* file,
+                                      const int   lineNumber,
+                                      const char* msg,
+                                      ...)
+        : io::IOException()
+    {
+        va_list vargs;
+        va_start(vargs, msg);
+        buildMessage(msg, vargs);
+        va_end(vargs);
+
+        setMark(file, lineNumber);
+    }
 
 }  // namespace io
 }  // namespace decaf

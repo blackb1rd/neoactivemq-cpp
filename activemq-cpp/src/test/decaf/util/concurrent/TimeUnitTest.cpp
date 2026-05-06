@@ -21,6 +21,7 @@
 #include <decaf/lang/System.h>
 #include <decaf/util/concurrent/Mutex.h>
 #include <decaf/util/concurrent/TimeUnit.h>
+#include <stdexcept>
 #include <string>
 
 using namespace decaf;
@@ -257,7 +258,6 @@ TEST_F(TimeUnitTest, testValueOf)
     ASSERT_TRUE(TimeUnit::DAYS == TimeUnit::valueOf("DAYS"));
     ASSERT_TRUE(TimeUnit::HOURS == TimeUnit::valueOf("HOURS"));
 
-    ASSERT_THROW(TimeUnit::valueOf("FOO"),
-                 decaf::lang::exceptions::IllegalArgumentException)
+    ASSERT_THROW(TimeUnit::valueOf("FOO"), std::invalid_argument)
         << ("Should Throw an IllegalArgumentException");
 }

@@ -22,7 +22,6 @@
 #include <activemq/util/Config.h>
 #include <activemq/util/PrimitiveMap.h>
 #include <cms/MapMessage.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
 #include <memory>
 #include <string>
 #include <vector>
@@ -133,7 +132,7 @@ namespace commands
          *
          * @return reference to a PrimtiveMap;
          *
-         * @throws NullPointerException if the internal Map is Null.
+         * @throws std::logic_error if the internal Map is Null.
          */
         util::PrimitiveMap&       getMap();
         const util::PrimitiveMap& getMap() const;
@@ -141,7 +140,7 @@ namespace commands
         /**
          * Performs the unmarshal on the Map if needed, otherwise just returns
          *
-         * @throws NullPointerException if the internal Map is Null.
+         * @throws std::logic_error if the internal Map is Null.
          */
         virtual void checkMapIsUnmarshalled() const;
     };

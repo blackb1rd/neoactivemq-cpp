@@ -17,6 +17,8 @@
 #ifndef _DECAF_IO_IOEXCEPTION_H_
 #define _DECAF_IO_IOEXCEPTION_H_
 
+#include <cstdarg>
+
 #include <decaf/lang/Exception.h>
 
 namespace decaf
@@ -101,6 +103,61 @@ namespace io
 
         virtual ~IOException() throw();
     };
+
+    inline IOException::IOException()
+        : lang::Exception()
+    {
+    }
+
+    inline IOException::~IOException() throw()
+    {
+    }
+
+    inline IOException::IOException(const lang::Exception& ex)
+        : lang::Exception()
+    {
+        *(lang::Exception*)this = ex;
+    }
+
+    inline IOException::IOException(const IOException& ex)
+        : lang::Exception()
+    {
+        *(lang::Exception*)this = ex;
+    }
+
+    inline IOException::IOException(const std::exception* cause)
+        : lang::Exception(cause)
+    {
+    }
+
+    inline IOException::IOException(const char* file,
+                                    const int   lineNumber,
+                                    const char* msg,
+                                    ...)
+        : lang::Exception()
+    {
+        va_list vargs;
+        va_start(vargs, msg);
+        buildMessage(msg, vargs);
+        va_end(vargs);
+
+        setMark(file, lineNumber);
+    }
+
+    inline IOException::IOException(const char*           file,
+                                    const int             lineNumber,
+                                    const std::exception* cause,
+                                    const char*           msg,
+                                    ...)
+        : lang::Exception(cause)
+    {
+        va_list vargs;
+        va_start(vargs, msg);
+        buildMessage(msg, vargs);
+        va_end(vargs);
+
+        setMark(file, lineNumber);
+    }
 
 }  // namespace io
 }  // namespace decaf

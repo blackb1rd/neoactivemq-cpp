@@ -18,13 +18,12 @@
 #ifndef _DECAF_NIO_INTBUFFER_H_
 #define _DECAF_NIO_INTBUFFER_H_
 
+#include <activemq/exceptions/BufferUnderflowException.h>
 #include <decaf/lang/Comparable.h>
-#include <decaf/lang/exceptions/IndexOutOfBoundsException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/nio/Buffer.h>
 #include <decaf/nio/BufferOverflowException.h>
-#include <decaf/nio/BufferUnderflowException.h>
 #include <decaf/nio/ReadOnlyBufferException.h>
+#include <stdexcept>
 
 namespace decaf
 {
@@ -87,7 +86,7 @@ namespace nio
          * @return the array that backs this Buffer.
          *
          * @throws ReadOnlyBufferException if this Buffer is read only.
-         * @throws UnsupportedOperationException if the underlying store has no
+         * @throws std::logic_error if the underlying store has no
          * array.
          */
         virtual int* array() = 0;
@@ -102,7 +101,7 @@ namespace nio
          * @return The offset into the backing array where index zero starts.
          *
          * @throws ReadOnlyBufferException if this Buffer is read only.
-         * @throws UnsupportedOperationException if the underlying store has no
+         * @throws std::logic_error if the underlying store has no
          * array.
          */
         virtual int arrayOffset() = 0;
@@ -182,7 +181,7 @@ namespace nio
          *
          * @return the int that is located at the given index.
          *
-         * @throws IndexOutOfBoundsException if index is not smaller than the
+         * @throws std::out_of_range if index is not smaller than the
          *         buffer's limit, or index is negative.
          */
         virtual int get(int index) const = 0;
@@ -231,8 +230,8 @@ namespace nio
          *
          * @throws BufferUnderflowException if there are fewer than length ints
          *         remaining in this buffer.
-         * @throws NullPointerException if the passed buffer is null.
-         * @throws IndexOutOfBoundsException if the preconditions of size,
+         * @throws std::logic_error if the passed buffer is null.
+         * @throws std::out_of_range if the preconditions of size,
          * offset, or length are not met.
          */
         IntBuffer& get(int* buffer, int size, int offset, int length);
@@ -267,7 +266,7 @@ namespace nio
          *
          * @throws BufferOverflowException if there is insufficient space in
          * this buffer for the remaining ints in the source buffer.
-         * @throws IllegalArgumentException if the source buffer is this buffer.
+         * @throws std::invalid_argument if the source buffer is this buffer.
          * @throws ReadOnlyBufferException if this buffer is read-only.
          */
         IntBuffer& put(IntBuffer& src);
@@ -297,8 +296,8 @@ namespace nio
          * @throws BufferOverflowException if there is insufficient space in
          * this buffer.
          * @throws ReadOnlyBufferException if this buffer is read-only.
-         * @throws NullPointerException if the passed buffer is null.
-         * @throws IndexOutOfBoundsException if the preconditions of size,
+         * @throws std::logic_error if the passed buffer is null.
+         * @throws std::out_of_range if the preconditions of size,
          * offset, or length are not met.
          */
         IntBuffer& put(const int* buffer, int size, int offset, int length);
@@ -344,7 +343,7 @@ namespace nio
          *
          * @return a reference to this buffer.
          *
-         * @throws IndexOutOfBoundsException - If index greater than the
+         * @throws std::out_of_range - If index greater than the
          * buffer's limit minus the size of the type being written, or the index
          * is negative.
          * @throws ReadOnlyBufferException - If this buffer is read-only.
@@ -424,8 +423,8 @@ namespace nio
          *
          * @return a new IntBuffer that is backed by buffer, caller owns.
          *
-         * @throws NullPointerException if the array pointer is NULL.
-         * @throws IndexOutOfBoundsException if the preconditions of size,
+         * @throws std::logic_error if the array pointer is NULL.
+         * @throws std::out_of_range if the preconditions of size,
          * offset, or length are not met.
          */
         static IntBuffer* wrap(int* array, int size, int offset, int length);

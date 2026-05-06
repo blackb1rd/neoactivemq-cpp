@@ -21,15 +21,15 @@
 #include <decaf/net/ssl/SSLSocket.h>
 #include <decaf/net/ssl/SSLSocketFactory.h>
 
-#include <decaf/lang/exceptions/UnsupportedOperationException.h>
-
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <memory>
+#include <stdexcept>
+#include <string>
 
 using namespace decaf;
 using namespace decaf::net;
 using namespace decaf::net::ssl;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 SSLContextSpi::~SSLContextSpi()
@@ -60,9 +60,32 @@ SSLParameters* SSLContextSpi::providerGetSupportedSSLParameters()
 
         return params.release();
     }
-    DECAF_CATCH_RETHROW(UnsupportedOperationException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception, UnsupportedOperationException)
-    DECAF_CATCHALL_THROW(UnsupportedOperationException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (activemq::exceptions::NullPointerException&)
+    {
+        throw;
+    }
+    catch (activemq::exceptions::UnsupportedOperationException&)
+    {
+        throw;
+    }
+    catch (activemq::exceptions::IllegalStateException&)
+    {
+        throw;
+    }
+    catch (Exception& ex)
+    {
+        throw activemq::exceptions::TypeMismatchException(ex.getMessage());
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::TypeMismatchException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -88,7 +111,30 @@ SSLParameters* SSLContextSpi::providerGetDefaultSSLParameters()
 
         return params.release();
     }
-    DECAF_CATCH_RETHROW(UnsupportedOperationException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception, UnsupportedOperationException)
-    DECAF_CATCHALL_THROW(UnsupportedOperationException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (activemq::exceptions::NullPointerException&)
+    {
+        throw;
+    }
+    catch (activemq::exceptions::UnsupportedOperationException&)
+    {
+        throw;
+    }
+    catch (activemq::exceptions::IllegalStateException&)
+    {
+        throw;
+    }
+    catch (Exception& ex)
+    {
+        throw activemq::exceptions::TypeMismatchException(ex.getMessage());
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::TypeMismatchException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }

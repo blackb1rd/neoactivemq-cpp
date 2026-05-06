@@ -21,6 +21,9 @@
 #include <activemq/commands/Message.h>
 #include <activemq/commands/WireFormatInfo.h>
 #include <activemq/exceptions/ActiveMQException.h>
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <activemq/exceptions/IoCatchMacros.h>
+#include <activemq/exceptions/StdExceptionCatchMacros.h>
 #include <activemq/transport/IOTransport.h>
 #include <activemq/util/AMQLog.h>
 #include <activemq/wireformat/MarshalAware.h>
@@ -29,9 +32,14 @@
 #include <activemq/wireformat/openwire/marshal/generated/MarshallerFactory.h>
 #include <activemq/wireformat/openwire/utils/BooleanStream.h>
 #include <decaf/io/ByteArrayOutputStream.h>
+#include <decaf/io/DataInputStream.h>
+#include <decaf/io/DataOutputStream.h>
 #include <decaf/lang/Boolean.h>
 #include <decaf/lang/Math.h>
 #include <decaf/util/UUID.h>
+#include <exception>
+#include <stdexcept>
+#include <string>
 
 using namespace std;
 using namespace activemq;
@@ -43,11 +51,13 @@ using namespace activemq::wireformat;
 using namespace activemq::wireformat::openwire;
 using namespace activemq::wireformat::openwire::marshal;
 using namespace activemq::wireformat::openwire::utils;
-using namespace decaf::io;
 using namespace decaf::util;
 using namespace decaf::lang;
-using namespace decaf::lang::
-    exceptions;  ////////////////////////////////////////////////////////////////////////////////
+
+using decaf::io::ByteArrayOutputStream;
+using decaf::io::DataInputStream;
+using decaf::io::DataOutputStream;
+
 const unsigned char OpenWireFormat::NULL_TYPE             = 0;
 const int           OpenWireFormat::DEFAULT_VERSION       = 1;
 const int           OpenWireFormat::MAX_SUPPORTED_VERSION = 11;
@@ -98,8 +108,13 @@ std::shared_ptr<Transport> OpenWireFormat::createNegotiator(
         return std::shared_ptr<Transport>(
             new OpenWireFormatNegotiator(this, transport));
     }
-    AMQ_CATCH_RETHROW(UnsupportedOperationException)
-    AMQ_CATCHALL_THROW(UnsupportedOperationException)
+    AMQ_CATCHALL_RETHROW_STL_BACKED_EXCEPTIONS()
+    catch (...)
+    {
+        throw activemq::exceptions::TypeMismatchException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -129,19 +144,25 @@ void OpenWireFormat::setVersion(int version)
 
         if (version > MAX_SUPPORTED_VERSION)
         {
-            throw IllegalArgumentException(
-                __FILE__,
-                __LINE__,
-                "OpenWireFormat::setVersion - "
-                "Given Version: %d , is not yet supported",
-                version);
+            throw activemq::exceptions::InvalidArgumentException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+                "OpenWireFormat::setVersion - Given Version: " +
+                std::to_string(version) + " , is not yet supported");
         }
 
         // Clear old marshalers in preparation for the new set.
         this->version = version;
     }
-    AMQ_CATCH_RETHROW(IllegalArgumentException)
-    AMQ_CATCHALL_THROW(IllegalArgumentException)
+    catch (std::invalid_argument&)
+    {
+        throw;
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -165,16 +186,17 @@ void OpenWireFormat::marshal(const std::shared_ptr<commands::Command> command,
 {
     if (transport == NULL)
     {
-        throw decaf::io::IOException(__FILE__,
-                                     __LINE__,
-                                     "Transport passed is NULL");
+        throw activemq::exceptions::IOException(__FILE__,
+                                                __LINE__,
+                                                "Transport passed is NULL");
     }
 
     if (dataOut == NULL)
     {
-        throw decaf::io::IOException(__FILE__,
-                                     __LINE__,
-                                     "DataOutputStream passed is NULL");
+        throw activemq::exceptions::IOException(
+            __FILE__,
+            __LINE__,
+            "DataOutputStream passed is NULL");
     }
 
     try
@@ -192,7 +214,7 @@ void OpenWireFormat::marshal(const std::shared_ptr<commands::Command> command,
 
             if (dsm == NULL)
             {
-                throw IOException(
+                throw activemq::exceptions::IOException(
                     __FILE__,
                     __LINE__,
                     (string("OpenWireFormat::marshal - Unknown data type: ") +
@@ -244,7 +266,7 @@ void OpenWireFormat::marshal(const std::shared_ptr<commands::Command> command,
                         {
                             dataOut->write(array.first, array.second);
                         }
-                        catch (Exception& ex)
+                        catch (const std::exception&)
                         {
                             delete[] array.first;
                             throw;
@@ -261,10 +283,10 @@ void OpenWireFormat::marshal(const std::shared_ptr<commands::Command> command,
             dataOut->writeByte(NULL_TYPE);
         }
     }
-    AMQ_CATCH_RETHROW(IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(ActiveMQException, IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, IOException)
-    AMQ_CATCHALL_THROW(IOException)
+    AMQ_IOSTREAM_CATCH_RETHROW()
+    AMQ_IOSTREAM_CATCH_CONVERT_ACTIVEMQ_EXCEPTION()
+    AMQ_IOSTREAM_CATCH_CONVERT_LANG_EXCEPTION()
+    AMQ_IOSTREAM_CATCHALL_THROW()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -276,9 +298,10 @@ std::shared_ptr<commands::Command> OpenWireFormat::unmarshal(
     {
         if (dis == NULL)
         {
-            throw decaf::io::IOException(__FILE__,
-                                         __LINE__,
-                                         "DataInputStream passed is NULL");
+            throw activemq::exceptions::IOException(
+                __FILE__,
+                __LINE__,
+                "DataInputStream passed is NULL");
         }
 
         if (!sizePrefixDisabled)
@@ -291,24 +314,25 @@ std::shared_ptr<commands::Command> OpenWireFormat::unmarshal(
 
         if (!data)
         {
-            throw IOException(__FILE__,
-                              __LINE__,
-                              "OpenWireFormat::doUnmarshal - "
-                              "Failed to unmarshal an Object");
+            throw activemq::exceptions::IOException(
+                __FILE__,
+                __LINE__,
+                "OpenWireFormat::doUnmarshal - "
+                "Failed to unmarshal an Object");
         }
 
         // Now all unmarshals from this level should result in an object
-        // that is a commands::Command type, if its not then the cast will
-        // throw an ClassCastException.
+        // that is a commands::Command type; otherwise dynamic_pointer_cast
+        // yields null.
         std::shared_ptr<Command> command =
             std::dynamic_pointer_cast<Command>(data);
 
         return command;
     }
-    AMQ_CATCH_RETHROW(IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(ActiveMQException, IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, IOException)
-    AMQ_CATCHALL_THROW(IOException)
+    AMQ_IOSTREAM_CATCH_RETHROW()
+    AMQ_IOSTREAM_CATCH_CONVERT_ACTIVEMQ_EXCEPTION()
+    AMQ_IOSTREAM_CATCH_CONVERT_LANG_EXCEPTION()
+    AMQ_IOSTREAM_CATCHALL_THROW()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -365,7 +389,7 @@ commands::DataStructure* OpenWireFormat::doUnmarshal(
 
             if (dsm == NULL)
             {
-                throw IOException(
+                throw activemq::exceptions::IOException(
                     __FILE__,
                     __LINE__,
                     (string("OpenWireFormat::marshal - Unknown data type: ") +
@@ -393,10 +417,10 @@ commands::DataStructure* OpenWireFormat::doUnmarshal(
 
         return NULL;
     }
-    AMQ_CATCH_RETHROW(IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(ActiveMQException, IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, IOException)
-    AMQ_CATCHALL_THROW(IOException)
+    AMQ_IOSTREAM_CATCH_RETHROW()
+    AMQ_IOSTREAM_CATCH_CONVERT_ACTIVEMQ_EXCEPTION()
+    AMQ_IOSTREAM_CATCH_CONVERT_LANG_EXCEPTION()
+    AMQ_IOSTREAM_CATCHALL_THROW()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -425,7 +449,7 @@ int OpenWireFormat::tightMarshalNestedObject1(commands::DataStructure* object,
         unsigned char type = object->getDataStructureType();
         if (type == 0)
         {
-            throw IOException(
+            throw activemq::exceptions::IOException(
                 __FILE__,
                 __LINE__,
                 "No valid data structure type for object of this type");
@@ -435,7 +459,7 @@ int OpenWireFormat::tightMarshalNestedObject1(commands::DataStructure* object,
 
         if (dsm == NULL)
         {
-            throw IOException(
+            throw activemq::exceptions::IOException(
                 __FILE__,
                 __LINE__,
                 (string("OpenWireFormat::marshal - Unknown data type: ") +
@@ -445,10 +469,10 @@ int OpenWireFormat::tightMarshalNestedObject1(commands::DataStructure* object,
 
         return 1 + dsm->tightMarshal1(this, object, bs);
     }
-    AMQ_CATCH_RETHROW(IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(ActiveMQException, IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, IOException)
-    AMQ_CATCHALL_THROW(IOException)
+    AMQ_IOSTREAM_CATCH_RETHROW()
+    AMQ_IOSTREAM_CATCH_CONVERT_ACTIVEMQ_EXCEPTION()
+    AMQ_IOSTREAM_CATCH_CONVERT_LANG_EXCEPTION()
+    AMQ_IOSTREAM_CATCHALL_THROW()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -479,7 +503,7 @@ void OpenWireFormat::tightMarshalNestedObject2(DataStructure*    o,
 
             if (dsm == NULL)
             {
-                throw IOException(
+                throw activemq::exceptions::IOException(
                     __FILE__,
                     __LINE__,
                     (string("OpenWireFormat::marshal - Unknown data type: ") +
@@ -490,10 +514,10 @@ void OpenWireFormat::tightMarshalNestedObject2(DataStructure*    o,
             dsm->tightMarshal2(this, o, ds, bs);
         }
     }
-    AMQ_CATCH_RETHROW(IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(ActiveMQException, IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, IOException)
-    AMQ_CATCHALL_THROW(IOException)
+    AMQ_IOSTREAM_CATCH_RETHROW()
+    AMQ_IOSTREAM_CATCH_CONVERT_ACTIVEMQ_EXCEPTION()
+    AMQ_IOSTREAM_CATCH_CONVERT_LANG_EXCEPTION()
+    AMQ_IOSTREAM_CATCHALL_THROW()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -510,7 +534,7 @@ DataStructure* OpenWireFormat::tightUnmarshalNestedObject(DataInputStream* dis,
 
             if (dsm == NULL)
             {
-                throw IOException(
+                throw activemq::exceptions::IOException(
                     __FILE__,
                     __LINE__,
                     (string("OpenWireFormat::marshal - Unknown data type: ") +
@@ -542,10 +566,10 @@ DataStructure* OpenWireFormat::tightUnmarshalNestedObject(DataInputStream* dis,
             return NULL;
         }
     }
-    AMQ_CATCH_RETHROW(IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(ActiveMQException, IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, IOException)
-    AMQ_CATCHALL_THROW(IOException)
+    AMQ_IOSTREAM_CATCH_RETHROW()
+    AMQ_IOSTREAM_CATCH_CONVERT_ACTIVEMQ_EXCEPTION()
+    AMQ_IOSTREAM_CATCH_CONVERT_LANG_EXCEPTION()
+    AMQ_IOSTREAM_CATCHALL_THROW()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -562,7 +586,7 @@ DataStructure* OpenWireFormat::looseUnmarshalNestedObject(
 
             if (dsm == NULL)
             {
-                throw IOException(
+                throw activemq::exceptions::IOException(
                     __FILE__,
                     __LINE__,
                     (string("OpenWireFormat::marshal - Unknown data type: ") +
@@ -579,10 +603,10 @@ DataStructure* OpenWireFormat::looseUnmarshalNestedObject(
             return NULL;
         }
     }
-    AMQ_CATCH_RETHROW(IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(ActiveMQException, IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, IOException)
-    AMQ_CATCHALL_THROW(IOException)
+    AMQ_IOSTREAM_CATCH_RETHROW()
+    AMQ_IOSTREAM_CATCH_CONVERT_ACTIVEMQ_EXCEPTION()
+    AMQ_IOSTREAM_CATCH_CONVERT_LANG_EXCEPTION()
+    AMQ_IOSTREAM_CATCHALL_THROW()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -603,7 +627,7 @@ void OpenWireFormat::looseMarshalNestedObject(
 
             if (dsm == NULL)
             {
-                throw IOException(
+                throw activemq::exceptions::IOException(
                     __FILE__,
                     __LINE__,
                     (string("OpenWireFormat::marshal - Unknown data type: ") +
@@ -614,10 +638,10 @@ void OpenWireFormat::looseMarshalNestedObject(
             dsm->looseMarshal(this, o, dataOut);
         }
     }
-    AMQ_CATCH_RETHROW(IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(ActiveMQException, IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, IOException)
-    AMQ_CATCHALL_THROW(IOException)
+    AMQ_IOSTREAM_CATCH_RETHROW()
+    AMQ_IOSTREAM_CATCH_CONVERT_ACTIVEMQ_EXCEPTION()
+    AMQ_IOSTREAM_CATCH_CONVERT_LANG_EXCEPTION()
+    AMQ_IOSTREAM_CATCHALL_THROW()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -625,10 +649,10 @@ void OpenWireFormat::renegotiateWireFormat(const WireFormatInfo& info)
 {
     if (!preferedWireFormatInfo)
     {
-        throw IllegalStateException(__FILE__,
-                                    __LINE__,
-                                    "OpenWireFormat::renegotiateWireFormat - "
-                                    "Wireformat cannot not be renegotiated.");
+        throw activemq::exceptions::TypeMismatchException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "OpenWireFormat::renegotiateWireFormat - "
+            "Wireformat cannot not be renegotiated.");
     }
 
     this->setVersion(

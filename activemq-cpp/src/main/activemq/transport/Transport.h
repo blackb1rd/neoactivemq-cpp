@@ -20,18 +20,18 @@
 
 #include <activemq/commands/Command.h>
 #include <activemq/commands/Response.h>
+#include <activemq/exceptions/IoExceptions.h>
 #include <activemq/transport/FutureResponse.h>
 #include <activemq/transport/ResponseCallback.h>
 #include <activemq/util/Config.h>
 #include <activemq/util/Service.h>
 #include <decaf/io/Closeable.h>
-#include <decaf/io/IOException.h>
 #include <decaf/io/InputStream.h>
 #include <decaf/io/OutputStream.h>
-#include <decaf/lang/exceptions/UnsupportedOperationException.h>
 #include <decaf/net/URI.h>
 #include <decaf/util/List.h>
 #include <memory>
+#include <stdexcept>
 #include <typeinfo>
 
 namespace activemq
@@ -90,7 +90,7 @@ namespace transport
          *
          * @throws IOException if an exception occurs during writing of the
          * command.
-         * @throws UnsupportedOperationException if this method is not
+         * @throws std::logic_error if this method is not
          * implemented by this transport.
          */
         virtual void oneway(const std::shared_ptr<Command> command) = 0;
@@ -111,7 +111,7 @@ namespace transport
          *
          * @throws IOException if an exception occurs during the read of the
          * command.
-         * @throws UnsupportedOperationException if this method is not
+         * @throws std::logic_error if this method is not
          * implemented by this transport.
          */
         virtual std::shared_ptr<FutureResponse> asyncRequest(
@@ -128,7 +128,7 @@ namespace transport
          *
          * @throws IOException if an exception occurs during the read of the
          * command.
-         * @throws UnsupportedOperationException if this method is not
+         * @throws std::logic_error if this method is not
          * implemented by this transport.
          */
         virtual std::shared_ptr<Response> request(
@@ -147,7 +147,7 @@ namespace transport
          *
          * @throws IOException if an exception occurs during the read of the
          * command.
-         * @throws UnsupportedOperationException if this method is not
+         * @throws std::logic_error if this method is not
          * implemented by this transport.
          */
         virtual std::shared_ptr<Response> request(

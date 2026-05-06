@@ -21,12 +21,12 @@
 #include <decaf/lang/Integer.h>
 #include <decaf/net/URI.h>
 #include <decaf/net/URL.h>
+#include <stdexcept>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::net;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 class URITest : public ::testing::Test
 {
@@ -628,7 +628,7 @@ TEST_F(URITest, testCompareToTwo)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(URITest, testCreate)
 {
-    ASSERT_THROW(URI::create("a scheme://reg/"), IllegalArgumentException)
+    ASSERT_THROW(URI::create("a scheme://reg/"), std::invalid_argument)
         << ("IllegalArgumentException expected but not received.");
 }
 
@@ -1857,7 +1857,7 @@ TEST_F(URITest, testToURL)
             URI(relativeuris[i]).toURL();
             FAIL() << ("Expected IllegalArgumentException not thrown");
         }
-        catch (IllegalArgumentException& e)
+        catch (std::invalid_argument& e)
         {
             // Expected
         }

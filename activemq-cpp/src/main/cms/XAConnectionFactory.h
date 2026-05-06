@@ -22,6 +22,7 @@
 
 #include <cms/XAConnection.h>
 #include <cms/XAException.h>
+#include <stdexcept>
 
 namespace cms
 {

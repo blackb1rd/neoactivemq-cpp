@@ -18,11 +18,10 @@
 #define _DECAF_UTIL_QUEUE_H_
 
 #include <decaf/lang/Exception.h>
-#include <decaf/lang/exceptions/IndexOutOfBoundsException.h>
 #include <decaf/util/AbstractCollection.h>
 #include <decaf/util/Config.h>
 #include <decaf/util/Iterator.h>
-#include <decaf/util/NoSuchElementException.h>
+#include <stdexcept>
 
 namespace decaf
 {
@@ -73,9 +72,9 @@ namespace util
          *
          * @return true if the operation succeeds and false if it fails.
          *
-         * @throws NullPointerException if the Queue implementation does not
+         * @throws std::logic_error if the Queue implementation does not
          * allow Null values to be inserted into the Queue.
-         * @throws IllegalArgumentException if some property of the specified
+         * @throws std::invalid_argument if some property of the specified
          *         element prevents it from being added to this queue
          */
         virtual bool offer(const E& value) = 0;
@@ -98,11 +97,11 @@ namespace util
 
         /**
          * Gets and removes the element in the head of the queue. Throws a
-         * NoSuchElementException if there is no element in the queue.
+         * std::runtime_error if there is no element in the queue.
          *
          * @return the element in the head of the queue.
          *
-         * @throws NoSuchElementException
+         * @throws std::runtime_error
          *         if there is no element in the queue.
          */
         virtual E remove() = 0;
@@ -122,11 +121,11 @@ namespace util
 
         /**
          * Gets but not removes the element in the head of the queue. Throws a
-         * NoSuchElementException if there is no element in the queue.
+         * std::runtime_error if there is no element in the queue.
          *
          * @return the element in the head of the queue.
          *
-         * @throws NoSuchElementException if there is no element in the queue.
+         * @throws std::runtime_error if there is no element in the queue.
          */
         virtual E element() const = 0;
 

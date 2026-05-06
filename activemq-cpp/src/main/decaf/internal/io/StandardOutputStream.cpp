@@ -17,9 +17,11 @@
 
 #include "StandardOutputStream.h"
 
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <stdexcept>
+
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::internal;
 using namespace decaf::internal::io;
 
@@ -52,7 +54,7 @@ void StandardOutputStream::doWriteArrayBounded(const unsigned char* buffer,
 
     if (buffer == NULL)
     {
-        throw lang::exceptions::NullPointerException(
+        throw activemq::exceptions::NullPointerException(
             __FILE__,
             __LINE__,
             "StandardErrorOutputStream::write - Passed buffer is null.");
@@ -60,26 +62,23 @@ void StandardOutputStream::doWriteArrayBounded(const unsigned char* buffer,
 
     if (size < 0)
     {
-        throw IndexOutOfBoundsException(__FILE__,
-                                        __LINE__,
-                                        "size parameter out of Bounds: %d.",
-                                        size);
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "size parameter out of Bounds: " + std::to_string(size) + ".");
     }
 
     if (offset > size || offset < 0)
     {
-        throw IndexOutOfBoundsException(__FILE__,
-                                        __LINE__,
-                                        "offset parameter out of Bounds: %d.",
-                                        offset);
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "offset parameter out of Bounds: " + std::to_string(offset) + ".");
     }
 
     if (length < 0 || length > size - offset)
     {
-        throw IndexOutOfBoundsException(__FILE__,
-                                        __LINE__,
-                                        "length parameter out of Bounds: %d.",
-                                        length);
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "length parameter out of Bounds: " + std::to_string(length) + ".");
     }
 
     for (int i = 0; i < length; ++i)

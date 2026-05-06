@@ -41,14 +41,14 @@
 #include <cms/TemporaryTopic.h>
 #include <cms/Topic.h>
 
-#include <decaf/lang/exceptions/NullPointerException.h>
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <stdexcept>
+#include <string>
 
 using namespace activemq;
 using namespace activemq::util;
 using namespace activemq::core;
 using namespace activemq::commands;
-
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 ActiveMQMessageTransformation::ActiveMQMessageTransformation()
@@ -67,17 +67,13 @@ bool ActiveMQMessageTransformation::transformDestination(
 {
     if (destination == NULL)
     {
-        throw NullPointerException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::NullPointerException(
             "Provided source cms::Destination pointer was NULL");
     }
 
     if (amqDestination == NULL)
     {
-        throw NullPointerException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::NullPointerException(
             "Provided target ActiveMQDestination pointer was NULL");
     }
 
@@ -124,7 +120,7 @@ bool ActiveMQMessageTransformation::transformMessage(
 {
     if (message == NULL)
     {
-        throw NullPointerException(
+        throw activemq::exceptions::NullPointerException(
             __FILE__,
             __LINE__,
             "Provided source cms::Message pointer was NULL");
@@ -132,9 +128,7 @@ bool ActiveMQMessageTransformation::transformMessage(
 
     if (amqMessage == NULL)
     {
-        throw NullPointerException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::NullPointerException(
             "Provided target commands::Message pointer was NULL");
     }
 
@@ -332,7 +326,7 @@ void ActiveMQMessageTransformation::copyProperties(
 {
     if (fromMessage == NULL)
     {
-        throw NullPointerException(
+        throw activemq::exceptions::NullPointerException(
             __FILE__,
             __LINE__,
             "Provided source cms::Message pointer was NULL");
@@ -340,9 +334,7 @@ void ActiveMQMessageTransformation::copyProperties(
 
     if (toMessage == NULL)
     {
-        throw NullPointerException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::NullPointerException(
             "Provided destination cms::Message pointer was NULL");
     }
 

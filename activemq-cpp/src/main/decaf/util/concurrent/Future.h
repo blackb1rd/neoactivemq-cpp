@@ -108,7 +108,7 @@ namespace util
              *
              * @throws CancellationException if the computation was canceled
              * @throws ExecutionException if the computation threw an exception
-             * @throws InterruptedException if the current thread was
+             * @throws std::runtime_error if the current thread was
              * interrupted while waiting
              */
             virtual V get() = 0;
@@ -126,7 +126,7 @@ namespace util
              *
              * @throws CancellationException if the computation was canceled
              * @throws ExecutionException if the computation threw an exception
-             * @throws InterruptedException if the current thread was
+             * @throws std::runtime_error if the current thread was
              * interrupted while waiting
              * @throws TimeoutException if the wait timed out before the future
              * completed.

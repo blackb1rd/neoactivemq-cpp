@@ -23,9 +23,6 @@
 #include <decaf/lang/Readable.h>
 #include <string>
 
-#include <decaf/lang/exceptions/IndexOutOfBoundsException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
-
 namespace decaf
 {
 namespace io
@@ -145,7 +142,7 @@ namespace io
          * reached.
          *
          * @throws IOException thrown if an I/O error occurs.
-         * @throws NullPointerException if buffer is NULL.
+         * @throws std::logic_error if buffer is NULL.
          */
         virtual int read(char* buffer, int size);
 
@@ -167,8 +164,8 @@ namespace io
          * reached.
          *
          * @throws IOException thrown if an I/O error occurs.
-         * @throws NullPointerException if buffer is NULL.
-         * @throws IndexOutOfBoundsException if the offset + length is greater
+         * @throws std::logic_error if buffer is NULL.
+         * @throws std::out_of_range if the offset + length is greater
          * than the array size.
          */
         virtual int read(char* buffer, int size, int offset, int length);

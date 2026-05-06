@@ -17,69 +17,30 @@
 
 #include "InvalidMarkException.h"
 
-using namespace decaf;
 using namespace decaf::nio;
-using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 InvalidMarkException::InvalidMarkException()
-    : lang::exceptions::IllegalStateException()
+    : std::logic_error("InvalidMarkException")
+{
+}
+
+////////////////////////////////////////////////////////////////////////////////
+InvalidMarkException::InvalidMarkException(const std::string& message)
+    : std::logic_error(message)
+{
+}
+
+////////////////////////////////////////////////////////////////////////////////
+InvalidMarkException::InvalidMarkException(const char* file,
+                                           int         lineNumber,
+                                           const char* message)
+    : std::logic_error(std::string(file) + ":" + std::to_string(lineNumber) +
+                       ": " + message)
 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 InvalidMarkException::~InvalidMarkException() throw()
 {
-}
-
-////////////////////////////////////////////////////////////////////////////////
-InvalidMarkException::InvalidMarkException(const lang::Exception& ex)
-    : lang::exceptions::IllegalStateException()
-{
-    *(lang::Exception*)this = ex;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-InvalidMarkException::InvalidMarkException(const InvalidMarkException& ex)
-    : lang::exceptions::IllegalStateException()
-{
-    *(lang::Exception*)this = ex;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-InvalidMarkException::InvalidMarkException(const char*           file,
-                                           const int             lineNumber,
-                                           const std::exception* cause,
-                                           const char*           msg,
-                                           ...)
-    : lang::exceptions::IllegalStateException(cause)
-{
-    va_list vargs;
-    va_start(vargs, msg);
-    buildMessage(msg, vargs);
-
-    // Set the first mark for this exception.
-    setMark(file, lineNumber);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-InvalidMarkException::InvalidMarkException(const std::exception* cause)
-    : lang::exceptions::IllegalStateException(cause)
-{
-}
-
-////////////////////////////////////////////////////////////////////////////////
-InvalidMarkException::InvalidMarkException(const char* file,
-                                           const int   lineNumber,
-                                           const char* msg,
-                                           ...)
-    : lang::exceptions::IllegalStateException()
-{
-    va_list vargs;
-    va_start(vargs, msg);
-    buildMessage(msg, vargs);
-
-    // Set the first mark for this exception.
-    setMark(file, lineNumber);
 }

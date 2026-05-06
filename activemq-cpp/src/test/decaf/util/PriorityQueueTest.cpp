@@ -17,18 +17,20 @@
 
 #include <gtest/gtest.h>
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/util/Comparator.h>
 #include <decaf/util/LinkedList.h>
 #include <decaf/util/PriorityQueue.h>
 
 #include <algorithm>
 #include <memory>
+#include <stdexcept>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::util;
+using namespace activemq::exceptions;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 class PriorityQueueTest : public ::testing::Test
 {
@@ -168,8 +170,8 @@ TEST_F(PriorityQueueTest, testOfferString)
 
     std::string result;
     ASSERT_TRUE(0 == queue.size());
-    ASSERT_THROW(queue.remove(), decaf::util::NoSuchElementException)
-        << ("Should Throw a NoSuchElementException");
+    ASSERT_THROW(queue.remove(), InterruptedException)
+        << ("Should Throw InterruptedException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -394,7 +396,7 @@ TEST_F(PriorityQueueTest, testIterator)
     }
 
     ASSERT_THROW(iter->next(), NoSuchElementException)
-        << ("Should Throw a NoSuchElementException");
+        << ("Should Throw NoSuchElementException");
 
     std::sort(result.begin(), result.end());
 
@@ -411,11 +413,11 @@ TEST_F(PriorityQueueTest, testIteratorEmpty)
     std::unique_ptr<Iterator<int>> iter(intQueue.iterator());
 
     ASSERT_THROW(iter->next(), NoSuchElementException)
-        << ("Should Throw a NoSuchElementException");
+        << ("Should Throw NoSuchElementException");
 
     iter.reset(intQueue.iterator());
-    ASSERT_THROW(iter->remove(), IllegalStateException)
-        << ("Should Throw a IllegalStateException");
+    ASSERT_THROW(iter->remove(), std::logic_error)
+        << ("Should Throw a std::logic_error");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -426,13 +428,13 @@ TEST_F(PriorityQueueTest, testIteratorOutOfBounds)
     std::unique_ptr<Iterator<int>> iter(intQueue.iterator());
     iter->next();
     ASSERT_THROW(iter->next(), NoSuchElementException)
-        << ("Should Throw a NoSuchElementException");
+        << ("Should Throw NoSuchElementException");
 
     iter.reset(intQueue.iterator());
     iter->next();
     iter->remove();
     ASSERT_THROW(iter->next(), NoSuchElementException)
-        << ("Should Throw a NoSuchElementException");
+        << ("Should Throw NoSuchElementException");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -477,7 +479,7 @@ TEST_F(PriorityQueueTest, testIteratorRemove)
 
     std::unique_ptr<Iterator<int>> const_iter(constQueue.iterator());
     const_iter->next();
-    ASSERT_THROW(const_iter->remove(), UnsupportedOperationException)
+    ASSERT_THROW(const_iter->remove(), std::logic_error)
         << ("Should Throw a UnsupportedOperationException");
 }
 
@@ -492,11 +494,11 @@ TEST_F(PriorityQueueTest, testIteratorRemoveIllegalState)
     }
     std::unique_ptr<Iterator<int>> iter(intQueue.iterator());
     ASSERT_TRUE(iter.get() != NULL);
-    ASSERT_THROW(iter->remove(), IllegalStateException)
-        << ("Should Throw a IllegalStateException");
+    ASSERT_THROW(iter->remove(), std::logic_error)
+        << ("Should Throw a std::logic_error");
 
     iter->next();
     iter->remove();
-    ASSERT_THROW(iter->remove(), IllegalStateException)
-        << ("Should Throw a IllegalStateException");
+    ASSERT_THROW(iter->remove(), std::logic_error)
+        << ("Should Throw a std::logic_error");
 }

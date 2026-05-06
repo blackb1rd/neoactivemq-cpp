@@ -20,17 +20,16 @@
 #include <decaf/lang/ArrayPointer.h>
 #include <decaf/lang/Runnable.h>
 #include <decaf/lang/Thread.h>
-#include <decaf/lang/exceptions/ClassCastException.h>
 #include <decaf/util/concurrent/CountDownLatch.h>
 
 #include <map>
 #include <memory>
+#include <stdexcept>
 #include <string>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util::concurrent;
 
 class ArrayPointerTest : public ::testing::Test
@@ -418,13 +417,11 @@ TEST_F(ArrayPointerTest, testOperators)
     ASSERT_TRUE(pointer1[0]->returnHello() == "Hello");
     ASSERT_TRUE(pointer2[0]->returnHello() == "GoodBye");
 
-    ASSERT_THROW(pointer2[1]->returnHello(),
-                 decaf::lang::exceptions::IndexOutOfBoundsException)
+    ASSERT_THROW(pointer2[1]->returnHello(), std::out_of_range)
         << ("operator[] with bigger index than the array size should throw an "
-            "IndexOutOfBoundsException");
-    ASSERT_THROW(pointer3[0].returnHello(),
-                 decaf::lang::exceptions::NullPointerException)
-        << ("operator[] on a NULL Should Throw a NullPointerException");
+            "std::out_of_range");
+    ASSERT_THROW(pointer3[0].returnHello(), std::logic_error)
+        << ("operator[] on a NULL Should Throw a std::logic_error");
 
     delete pointer1[0];
     delete pointer2[0];
@@ -434,9 +431,8 @@ TEST_F(ArrayPointerTest, testOperators)
 
     pointer2.reset(NULL);
 
-    ASSERT_THROW(pointer2[0]->returnHello(),
-                 decaf::lang::exceptions::NullPointerException)
-        << ("operator[] on a NULL Should Throw a NullPointerException");
+    ASSERT_THROW(pointer2[0]->returnHello(), std::logic_error)
+        << ("operator[] on a NULL Should Throw a std::logic_error");
 }
 
 ////////////////////////////////////////////////////////////////////////////////

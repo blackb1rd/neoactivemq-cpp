@@ -22,19 +22,21 @@
 #include <decaf/internal/util/concurrent/ThreadingTypes.h>
 #include <decaf/lang/Integer.h>
 #include <decaf/lang/Thread.h>
-#include <decaf/lang/exceptions/IllegalMonitorStateException.h>
 
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <activemq/exceptions/StdExceptionCatchMacros.h>
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
 #include <mutex>
+#include <stdexcept>
+#include <string>
 #include <thread>
 
 using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using decaf::internal::util::concurrent::CustomReentrantLock;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -211,34 +213,34 @@ void Mutex::wait(long long millisecs, int nanos)
 {
     if (millisecs < 0)
     {
-        throw IllegalArgumentException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
             "Milliseconds value cannot be negative.");
     }
 
     if (nanos < 0 || nanos > 999999)
     {
-        throw IllegalArgumentException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
             "Nanoseconds value must be in the range [0..999999].");
     }
 
     // Check if the current thread has been interrupted before waiting
     if (Thread::interrupted())
     {
-        throw InterruptedException(__FILE__,
-                                   __LINE__,
-                                   "Thread interrupted before wait");
+        throw activemq::exceptions::InterruptedException(
+            __FILE__,
+            __LINE__,
+            "Thread interrupted before wait");
     }
 
     // Verify that we own the lock
     if (!this->properties->reentrantLock.isHeldByCurrentThread())
     {
-        throw IllegalMonitorStateException(__FILE__,
-                                           __LINE__,
-                                           "Thread does not own the mutex");
+        throw activemq::exceptions::IllegalMonitorStateException(
+            __FILE__,
+            __LINE__,
+            "Thread does not own the mutex");
     }
 
     // Get current thread handle to manage state
@@ -305,7 +307,7 @@ void Mutex::wait(long long millisecs, int nanos)
                         savedRecursionCount);
                     // Restore thread state
                     handle->state.store(savedState, std::memory_order_release);
-                    throw InterruptedException(
+                    throw activemq::exceptions::InterruptedException(
                         __FILE__,
                         __LINE__,
                         "Thread interrupted during wait");
@@ -367,11 +369,7 @@ void Mutex::wait(long long millisecs, int nanos)
         // condition variable)
         this->properties->reentrantLock.adoptLock(savedRecursionCount);
     }
-    catch (InterruptedException&)
-    {
-        // InterruptedException is already handled above, just rethrow
-        throw;
-    }
+    AMQ_CATCHALL_RETHROW_STL_BACKED_EXCEPTIONS()
     catch (...)
     {
         // If something goes wrong, restore the lock state
@@ -388,9 +386,10 @@ void Mutex::wait(long long millisecs, int nanos)
     // Check if thread was interrupted during wait
     if (Thread::interrupted())
     {
-        throw InterruptedException(__FILE__,
-                                   __LINE__,
-                                   "Thread interrupted during wait");
+        throw activemq::exceptions::InterruptedException(
+            __FILE__,
+            __LINE__,
+            "Thread interrupted during wait");
     }
 }
 
@@ -399,9 +398,10 @@ void Mutex::notify()
 {
     if (!this->properties->reentrantLock.isHeldByCurrentThread())
     {
-        throw IllegalMonitorStateException(__FILE__,
-                                           __LINE__,
-                                           "Thread does not own the mutex");
+        throw activemq::exceptions::IllegalMonitorStateException(
+            __FILE__,
+            __LINE__,
+            "Thread does not own the mutex");
     }
     // Add one pending notification that will be consumed by exactly one waiting
     // thread
@@ -415,9 +415,10 @@ void Mutex::notifyAll()
 {
     if (!this->properties->reentrantLock.isHeldByCurrentThread())
     {
-        throw IllegalMonitorStateException(__FILE__,
-                                           __LINE__,
-                                           "Thread does not own the mutex");
+        throw activemq::exceptions::IllegalMonitorStateException(
+            __FILE__,
+            __LINE__,
+            "Thread does not own the mutex");
     }
     // Increment the generation counter to signal all waiting threads.
     // Each waiting thread records the generation when entering wait() and

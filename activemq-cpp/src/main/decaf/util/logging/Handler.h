@@ -19,7 +19,6 @@
 
 #include <decaf/io/Closeable.h>
 #include <decaf/lang/Exception.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/util/logging/Level.h>
 #include <decaf/util/logging/LogRecord.h>
 

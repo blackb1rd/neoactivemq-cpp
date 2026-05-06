@@ -27,6 +27,7 @@
 #include <decaf/util/ListIterator.h>
 
 #include <memory>
+#include <stdexcept>
 #include <vector>
 
 namespace decaf
@@ -47,7 +48,7 @@ namespace util
          *
          * @param list
          *      The list to reverse.
-         * @throws UnsupportedOperationException
+         * @throws std::logic_error
          *      when replacing an element in the List is not supported.
          */
         template <typename E>

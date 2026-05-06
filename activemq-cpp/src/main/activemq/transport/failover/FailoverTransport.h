@@ -30,7 +30,7 @@
 #include <activemq/util/Config.h>
 #include <activemq/wireformat/WireFormat.h>
 
-#include <decaf/io/IOException.h>
+#include <activemq/exceptions/IoExceptions.h>
 #include <decaf/net/URI.h>
 #include <decaf/util/List.h>
 #include <decaf/util/Properties.h>
@@ -286,6 +286,13 @@ namespace transport
              * @throw Exception if an error occurs.
              */
             void handleTransportFailure(const decaf::lang::Exception& error);
+
+            /**
+             * Same as {@link handleTransportFailure(const
+             * decaf::lang::Exception&)}, for STL-backed ActiveMQ I/O errors
+             * raised outside decaf/.
+             */
+            void handleTransportFailure(const exceptions::IOException& error);
 
             /**
              * Called when the Broker sends a ConnectionControl command which

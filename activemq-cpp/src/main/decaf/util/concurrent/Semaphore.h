@@ -20,9 +20,8 @@
 
 #include <decaf/util/Config.h>
 
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
-#include <decaf/lang/exceptions/InterruptedException.h>
-#include <decaf/lang/exceptions/RuntimeException.h>
+#include <decaf/lang/Exception.h>
+#include <stdexcept>
 
 #include <decaf/util/Collection.h>
 #include <decaf/util/concurrent/TimeUnit.h>
@@ -65,7 +64,7 @@ namespace util
          *        items.resize( MAX_AVAILABLE );
          *    }
          *
-         *    std::string getItem() throws InterruptedException {
+         *    std::string getItem() throws std::runtime_error {
          *      available.acquire();
          *      return getNextAvailableItem();
          *    }
@@ -210,12 +209,12 @@ namespace util
              *   * has its interrupted status set on entry to this method; or
              *   * is interrupted while waiting for a permit,
              *
-             * then InterruptedException is thrown and the current thread's
+             * then std::runtime_error is thrown and the current thread's
              * interrupted status is cleared.
              *
-             * @throw InterruptedException - if the current thread is
+             * @throw std::runtime_error - if the current thread is
              * interrupted.
-             * @throw RuntimeException if an unexpected error occurs while
+             * @throw Exception if an unexpected error occurs while
              * acquiring the Semaphore.
              */
             void acquire();
@@ -239,7 +238,7 @@ namespace util
              * thread does return from this method its interrupt status will be
              * set.
              *
-             * @throw RuntimeException if an unexpected error occurs while
+             * @throw Exception if an unexpected error occurs while
              * acquiring the Semaphore.
              */
             void acquireUninterruptibly();
@@ -266,7 +265,7 @@ namespace util
              *
              * @return true if a permit was acquired and false otherwise
              *
-             * @throw RuntimeException if an unexpected error occurs while
+             * @throw Exception if an unexpected error occurs while
              * acquiring the Semaphore.
              */
             bool tryAcquire();
@@ -297,7 +296,7 @@ namespace util
              *   * has its interrupted status set on entry to this method; or
              *   * is interrupted while waiting to acquire a permit,
              *
-             * then InterruptedException is thrown and the current thread's
+             * then std::runtime_error is thrown and the current thread's
              * interrupted status is cleared.
              *
              * If the specified waiting time elapses then the value false is
@@ -310,8 +309,8 @@ namespace util
              * @return true if a permit was acquired and false if the waiting
              * time elapsed before a permit was acquired
              *
-             * @throw InterruptedException if the current thread is interrupted.
-             * @throw RuntimeException if an unexpected error occurs while
+             * @throw std::runtime_error if the current thread is interrupted.
+             * @throw Exception if an unexpected error occurs while
              * acquiring the Semaphore.
              */
             bool tryAcquire(long long timeout, const TimeUnit& unit);
@@ -329,7 +328,7 @@ namespace util
              * a semaphore is established by programming convention in the
              * application.
              *
-             * @throw RuntimeException if an unexpected error occurs while
+             * @throw Exception if an unexpected error occurs while
              * releasing the Semaphore.
              */
             void release();
@@ -356,7 +355,7 @@ namespace util
              *   * has its interrupted status set on entry to this method; or
              *   * is interrupted while waiting for a permit,
              *
-             * then InterruptedException is thrown and the current thread's
+             * then std::runtime_error is thrown and the current thread's
              * interrupted status is cleared. Any permits that were to be
              * assigned to this thread are instead assigned to other threads
              * trying to acquire permits, as if permits had been made available
@@ -364,10 +363,10 @@ namespace util
              *
              * @param permits the number of permits to acquire.
              *
-             * @throw InterruptedException if the current thread is interrupted.
-             * @throw IllegalArgumentException if the permits argument is
+             * @throw std::runtime_error if the current thread is interrupted.
+             * @throws std::invalid_argument if the permits argument is
              * negative.
-             * @throw RuntimeException if an unexpected error occurs while
+             * @throw Exception if an unexpected error occurs while
              * acquiring the Semaphore.
              */
             void acquire(int permits);
@@ -393,9 +392,9 @@ namespace util
              *
              * @param permits the number of permits to acquire.
              *
-             * @throw IllegalArgumentException if the permits argument is
+             * @throws std::invalid_argument if the permits argument is
              * negative.
-             * @throw RuntimeException if an unexpected error occurs while
+             * @throw Exception if an unexpected error occurs while
              * acquiring the Semaphore.
              */
             void acquireUninterruptibly(int permits);
@@ -425,9 +424,9 @@ namespace util
              *
              * @return true if the permits were acquired and false otherwise.
              *
-             * @throw IllegalArgumentException if the permits argument is
+             * @throws std::invalid_argument if the permits argument is
              * negative.
-             * @throw RuntimeException if an unexpected error occurs while
+             * @throw Exception if an unexpected error occurs while
              * acquiring the Semaphore.
              */
             bool tryAcquire(int permits);
@@ -458,7 +457,7 @@ namespace util
              *   * has its interrupted status set on entry to this method; or
              *   * is interrupted while waiting to acquire the permits,
              *
-             * then InterruptedException is thrown and the current thread's
+             * then std::runtime_error is thrown and the current thread's
              * interrupted status is cleared. Any permits that were to be
              * assigned to this thread, are instead assigned to other threads
              * trying to acquire permits, as if the permits had been made
@@ -479,9 +478,9 @@ namespace util
              * @return true if all permits were acquired and false if the
              * waiting time elapsed before all permits were acquired
              *
-             * @throw IllegalArgumentException if the permits argument is
+             * @throws std::invalid_argument if the permits argument is
              * negative.
-             * @throw RuntimeException if an unexpected error occurs while
+             * @throw Exception if an unexpected error occurs while
              * acquiring the Semaphore.
              */
             bool tryAcquire(int             permits,
@@ -505,9 +504,9 @@ namespace util
              *
              * @param permits the number of permits to release
              *
-             * @throw IllegalArgumentException if the permits argument is
+             * @throws std::invalid_argument if the permits argument is
              * negative.
-             * @throw RuntimeException if an unexpected error occurs while
+             * @throw Exception if an unexpected error occurs while
              * releasing the Semaphore.
              */
             void release(int permits);
@@ -527,7 +526,7 @@ namespace util
              *
              * @return the number of permits acquired
              *
-             * @throw RuntimeException if an unexpected error occurs while
+             * @throw Exception if an unexpected error occurs while
              * draining the Semaphore.
              */
             int drainPermits();
@@ -575,7 +574,7 @@ namespace util
              *      The number of permits to remove from the current available
              * set.
              *
-             * @throws IllegalArgumentException if the param passed in negative.
+             * @throws std::invalid_argument if the param passed in negative.
              */
             void reducePermits(int reduceBy);
 

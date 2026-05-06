@@ -26,10 +26,9 @@
 #include <decaf/util/Config.h>
 
 #include <decaf/io/IOException.h>
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/net/SocketTimeoutException.h>
 #include <decaf/net/UnknownHostException.h>
+#include <stdexcept>
 
 namespace decaf
 {
@@ -83,7 +82,7 @@ namespace net
          * @param impl
          *      The SocketImpl instance to wrap.
          *
-         * @throws NullPointerException if the passed SocketImpl is Null.
+         * @throws std::logic_error if the passed SocketImpl is Null.
          */
         Socket(SocketImpl* impl);
 
@@ -103,8 +102,8 @@ namespace net
          * @throws UnknownHostException if the host cannot be resolved.
          * @throws IOException if an I/O error occurs while connecting the
          * Socket.
-         * @throws NullPointerException if the InetAddress instance in NULL.
-         * @throws IllegalArgumentException if the port if not in range
+         * @throws std::logic_error if the InetAddress instance in NULL.
+         * @throws std::invalid_argument if the port if not in range
          * [0...65535]
          */
         Socket(const InetAddress* address, int port);
@@ -128,8 +127,8 @@ namespace net
          * @throws UnknownHostException if the host cannot be resolved.
          * @throws IOException if an I/O error occurs while connecting the
          * Socket.
-         * @throws NullPointerException if the InetAddress instance in NULL.
-         * @throws IllegalArgumentException if the port if not in range
+         * @throws std::logic_error if the InetAddress instance in NULL.
+         * @throws std::invalid_argument if the port if not in range
          * [0...65535]
          */
         Socket(const InetAddress* address,
@@ -154,7 +153,7 @@ namespace net
          * @throws UnknownHostException if the host cannot be resolved.
          * @throws IOException if an I/O error occurs while connecting the
          * Socket.
-         * @throws IllegalArgumentException if the port if not in range
+         * @throws std::invalid_argument if the port if not in range
          * [0...65535]
          */
         Socket(const std::string& host, int port);
@@ -180,7 +179,7 @@ namespace net
          * @throws UnknownHostException if the host cannot be resolved.
          * @throws IOException if an I/O error occurs while connecting the
          * Socket.
-         * @throws IllegalArgumentException if the port if not in range
+         * @throws std::invalid_argument if the port if not in range
          * [0...65535]
          */
         Socket(const std::string& host,
@@ -201,7 +200,7 @@ namespace net
          *      The port on the local machine to bind to.
          *
          * @throws IOException if an error occurs during the bind operation.
-         * @throws IllegalArgumentException if the Socket can't process the
+         * @throws std::invalid_argument if the Socket can't process the
          * subclass of SocketAddress that has been provided.
          */
         virtual void bind(const std::string& ipaddress, int port);
@@ -398,7 +397,7 @@ namespace net
          *      The linger time in seconds, must be non-negative.
          *
          * @throws SocketException if the operation fails.
-         * @throws IllegalArgumentException if state is true and timeout is
+         * @throws std::invalid_argument if state is true and timeout is
          * negative.
          */
         virtual void setSoLinger(bool state, int timeout);
@@ -440,7 +439,7 @@ namespace net
          *      Number of bytes to set the receive buffer to.
          *
          * @throws SocketException if the operation fails.
-         * @throws IllegalArgumentException if the value is zero or negative.
+         * @throws std::invalid_argument if the value is zero or negative.
          */
         virtual void setReceiveBufferSize(int size);
 
@@ -482,7 +481,7 @@ namespace net
          * than zero.
          *
          * @throws SocketException if the operation fails.
-         * @throws IllegalArgumentException if the value is zero or negative.
+         * @throws std::invalid_argument if the value is zero or negative.
          */
         virtual void setSendBufferSize(int size);
 
@@ -503,7 +502,7 @@ namespace net
          *      The timeout in milliseconds for socket operations.
          *
          * @throws SocketException Thrown if unable to set the information.
-         * @throws IllegalArgumentException if the timeout value is negative.
+         * @throws std::invalid_argument if the timeout value is negative.
          */
         virtual void setSoTimeout(int timeout);
 
@@ -557,7 +556,7 @@ namespace net
          *
          * @throws SocketException if an error is encountered while performing
          * this operation.
-         * @throws IllegalArgumentException if the value is not in the range
+         * @throws std::invalid_argument if the value is not in the range
          * [0..255].
          */
         virtual void setTrafficClass(int value);

@@ -22,13 +22,13 @@
 #include <decaf/lang/Float.h>
 #include <decaf/lang/Integer.h>
 #include <decaf/lang/Long.h>
-#include <decaf/lang/exceptions/NumberFormatException.h>
 #include <decaf/util/StringTokenizer.h>
+
+#include <stdexcept>
 
 using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::internal;
 using namespace decaf::internal::util;
 
@@ -134,7 +134,7 @@ void HexStringParser::parseExponent(const std::string& exponentStr)
         exponent = expSign * Long::parseLong(exponentStr);
         checkedAddExponent(EXPONENT_BASE);
     }
-    catch (exceptions::NumberFormatException& e)
+    catch (std::invalid_argument&)
     {
         exponent = expSign * Long::MAX_VALUE;
     }

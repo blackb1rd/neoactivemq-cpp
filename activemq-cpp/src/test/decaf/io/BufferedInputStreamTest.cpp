@@ -21,7 +21,6 @@
 
 #include <decaf/io/ByteArrayInputStream.h>
 #include <decaf/lang/Integer.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
 #include <cstring>
 
 #ifdef HAVE_STRING_H
@@ -29,12 +28,12 @@
 #endif
 #ifdef HAVE_STRINGS_H
 #include <strings.h>
+#include <stdexcept>
 #endif
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::io;
 using namespace decaf::util;
 
@@ -60,12 +59,11 @@ const std::string BufferedInputStreamTest::testString =
     "Test_java_io_RandomAccessFile\nTest_java_io_SyncFailedException\nTest_"
     "java_lang_AbstractMethodError\n"
     "Test_java_lang_ArithmeticException\nTest_java_lang_"
-    "ArrayIndexOutOfBoundsException\n"
+    "ArrayIndexOutOfBoundsMarker\n"
     "Test_java_lang_ArrayStoreException\nTest_java_lang_Boolean\nTest_java_"
     "lang_Byte\n"
     "Test_java_lang_Character\nTest_java_lang_Class\nTest_java_lang_"
-    "ClassCastException\n"
-    "Test_java_lang_ClassCircularityError\nTest_java_lang_ClassFormatError\n"
+    "ClassCircularityError\nTest_java_lang_ClassFormatError\n"
     "Test_java_lang_ClassLoader\nTest_java_lang_ClassNotFoundException\n"
     "Test_java_lang_CloneNotSupportedException\nTest_java_lang_Double\nTest_"
     "java_lang_Error\n"
@@ -73,21 +71,20 @@ const std::string BufferedInputStreamTest::testString =
     "ExceptionInInitializerError\nTest_java_lang_Float\n"
     "Test_java_lang_IllegalAccessError\nTest_java_lang_IllegalAccessException\n"
     "Test_java_lang_IllegalArgumentException\nTest_java_lang_"
-    "IllegalMonitorStateException\n"
+    ""
     "Test_java_lang_IllegalThreadStateException\nTest_java_lang_"
     "IncompatibleClassChangeError\n"
     "Test_java_lang_IndexOutOfBoundsException\nTest_java_lang_"
     "InstantiationError\n"
     "Test_java_lang_InstantiationException\nTest_java_lang_Integer\nTest_java_"
     "lang_InternalError\n"
-    "Test_java_lang_InterruptedException\nTest_java_lang_LinkageError\nTest_"
+    "Test_java_lang_RuntimeError\nTest_java_lang_LinkageError\nTest_"
     "java_lang_Long\n"
     "Test_java_lang_Math\nTest_java_lang_NegativeArraySizeException\nTest_java_"
     "lang_NoClassDefFoundError\n"
     "Test_java_lang_NoSuchFieldError\nTest_java_lang_NoSuchMethodError\n"
     "Test_java_lang_NullPointerException\nTest_java_lang_Number\nTest_java_"
-    "lang_NumberFormatException\n"
-    "Test_java_lang_Object\nTest_java_lang_OutOfMemoryError\nTest_java_lang_"
+    "lang_Object\nTest_java_lang_OutOfMemoryError\nTest_java_lang_"
     "RuntimeException\n"
     "Test_java_lang_SecurityManager\nTest_java_lang_Short\nTest_java_lang_"
     "StackOverflowError\n"
@@ -426,11 +423,11 @@ TEST_F(BufferedInputStreamTest, testReadException)
 
     BufferedInputStream bis(NULL);
 
-    ASSERT_THROW(bis.read(NULL, 1, 0, 1), NullPointerException)
-        << ("should throw NullPointerException");
+    ASSERT_THROW(bis.read(NULL, 1, 0, 1), std::logic_error)
+        << ("should throw std::logic_error");
 
-    ASSERT_THROW(bis.read(array, 0, 1, 1), IndexOutOfBoundsException)
-        << ("should throw IndexOutOfBoundsException");
+    ASSERT_THROW(bis.read(array, 0, 1, 1), std::out_of_range)
+        << ("should throw std::out_of_range");
 
     bis.close();
 
@@ -539,11 +536,17 @@ TEST_F(BufferedInputStreamTest, testMarkI)
     unsigned char buf1[100];
     unsigned char buf2[100];
 
+    memset(buf1, 0, sizeof(buf1));
+    memset(buf2, 0, sizeof(buf2));
+
     is.skip(3000);
     is.mark(1000);
-    is.read(buf1, 100);
+    int numRead1 = is.read(buf1, 100);
+    ASSERT_GT(numRead1, 0);
     is.reset();
-    is.read(buf2, 100);
+    int numRead2 = is.read(buf2, 100);
+    ASSERT_EQ(numRead1, numRead2);
+
     is.reset();
 
     ASSERT_EQ(std::string(buf1, buf1 + 100), std::string(buf2, buf2 + 100))

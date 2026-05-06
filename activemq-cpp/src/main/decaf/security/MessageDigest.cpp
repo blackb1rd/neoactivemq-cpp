@@ -17,16 +17,17 @@
 
 #include "MessageDigest.h"
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/internal/security/Engine.h>
 #include <decaf/lang/Pointer.h>
-#include <decaf/lang/exceptions/CloneNotSupportedException.h>
 #include <decaf/security/MessageDigestSpi.h>
 #include <decaf/security/NoSuchAlgorithmException.h>
 #include <decaf/security/Provider.h>
+#include <stdexcept>
+#include <string>
 
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::security;
 using namespace decaf::internal::security;
 
@@ -188,7 +189,7 @@ MessageDigest* MessageDigest::clone()
 {
     if (!this->spi->isCloneable())
     {
-        throw CloneNotSupportedException(
+        throw activemq::exceptions::CloneNotSupportedException(
             __FILE__,
             __LINE__,
             "MessageDigestSpi in use not cloneable.");

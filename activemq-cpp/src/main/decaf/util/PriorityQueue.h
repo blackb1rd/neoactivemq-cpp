@@ -15,6 +15,7 @@
  * limitations under the License.
  */
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #ifndef _DECAF_UTIL_PRIORITYQUEUE_H_
 #define _DECAF_UTIL_PRIORITYQUEUE_H_
 
@@ -27,10 +28,10 @@
 
 #include <decaf/lang/Math.h>
 #include <decaf/lang/Pointer.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
-#include <decaf/lang/exceptions/UnsupportedOperationException.h>
 
 #include <memory>
+#include <stdexcept>
+#include <string>
 
 namespace decaf
 {
@@ -119,7 +120,7 @@ namespace util
             {
                 if (!hasNext())
                 {
-                    throw NoSuchElementException(
+                    throw activemq::exceptions::NoSuchElementException(
                         __FILE__,
                         __LINE__,
                         "No more elements to Iterate over.");
@@ -138,10 +139,11 @@ namespace util
             {
                 if (!allowRemove)
                 {
-                    throw lang::exceptions::IllegalStateException(
+                    throw activemq::exceptions::IllegalStateException(
                         __FILE__,
                         __LINE__,
-                        "No more elements to Iterate over.");
+                        "Iterator remove called without a "
+                        "prior next().");
                 }
 
                 allowRemove = false;
@@ -164,9 +166,9 @@ namespace util
 
             virtual void remove()
             {
-                throw lang::exceptions::UnsupportedOperationException(
-                    __FILE__,
-                    __LINE__,
+                throw activemq::exceptions::IllegalStateException(
+                    std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+                    ": " +
                     "PriorityQueue::Iterator::remove - Not Valid on a Const "
                     "Iterator");
             }
@@ -215,7 +217,8 @@ namespace util
          *      The Comparator instance to use in sorting the elements in the
          * Queue.
          *
-         * @throws NullPointerException if the passed Comparator is NULL.
+         * @throws activemq::exceptions::IllegalStateException if the
+         * passed Comparator is NULL.
          */
         PriorityQueue(int initialCapacity, Comparator<E>* comparator)
             : AbstractQueue<E>(),
@@ -226,7 +229,7 @@ namespace util
         {
             if (comparator == NULL)
             {
-                throw decaf::lang::exceptions::NullPointerException(
+                throw activemq::exceptions::NullPointerException(
                     __FILE__,
                     __LINE__,
                     "Passed Comparator Cannot be NULL.");
@@ -374,9 +377,7 @@ namespace util
                 return result;
             }
 
-            throw decaf::util::NoSuchElementException(
-                __FILE__,
-                __LINE__,
+            throw activemq::exceptions::InterruptedException(
                 "Unable to remove specified element from the Queue.");
         }
 
@@ -406,14 +407,32 @@ namespace util
             {
                 return offer(value);
             }
-            DECAF_CATCH_RETHROW(lang::exceptions::UnsupportedOperationException)
-            DECAF_CATCH_RETHROW(lang::exceptions::IllegalArgumentException)
-            DECAF_CATCH_RETHROW(lang::exceptions::IllegalStateException)
-            DECAF_CATCH_EXCEPTION_CONVERT(
-                lang::exceptions::NullPointerException,
-                lang::exceptions::UnsupportedOperationException)
-            DECAF_CATCHALL_THROW(
-                lang::exceptions::UnsupportedOperationException)
+            catch (std::invalid_argument&)
+            {
+                throw;
+            }
+            catch (activemq::exceptions::UnsupportedOperationException&)
+            {
+                throw;
+            }
+            catch (activemq::exceptions::IllegalStateException&)
+            {
+                throw;
+            }
+            catch (activemq::exceptions::NullPointerException& ex)
+            {
+                throw activemq::exceptions::UnsupportedOperationException(
+                    __FILE__,
+                    __LINE__,
+                    ex.what());
+            }
+            catch (...)
+            {
+                throw activemq::exceptions::UnsupportedOperationException(
+                    __FILE__,
+                    __LINE__,
+                    "caught unknown exception");
+            }
         }
 
         /**

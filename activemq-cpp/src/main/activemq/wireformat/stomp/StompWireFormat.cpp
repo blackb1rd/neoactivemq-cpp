@@ -39,13 +39,19 @@
 #include <activemq/wireformat/stomp/StompFrame.h>
 #include <activemq/wireformat/stomp/StompHelper.h>
 
+#include <typeinfo>
+
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <activemq/exceptions/IoCatchMacros.h>
+#include <activemq/exceptions/IoExceptions.h>
 #include <decaf/io/ByteArrayOutputStream.h>
+#include <decaf/io/DataInputStream.h>
 #include <decaf/io/DataOutputStream.h>
-#include <decaf/io/IOException.h>
 #include <decaf/lang/Boolean.h>
 #include <decaf/lang/Character.h>
-#include <decaf/lang/exceptions/ClassCastException.h>
 #include <memory>
+#include <stdexcept>
+#include <string>
 
 using namespace std;
 using namespace activemq;
@@ -53,10 +59,9 @@ using namespace activemq::commands;
 using namespace activemq::core;
 using namespace activemq::wireformat;
 using namespace activemq::wireformat::stomp;
+using namespace activemq::exceptions;
 using namespace decaf;
-using namespace decaf::io;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace activemq
@@ -129,10 +134,11 @@ void StompWireFormat::marshal(const std::shared_ptr<Command>        command,
     {
         if (out == NULL)
         {
-            throw decaf::io::IOException(__FILE__,
-                                         __LINE__,
-                                         "StompCommandWriter::writeCommand - "
-                                         "output stream is NULL");
+            throw activemq::exceptions::IOException(
+                __FILE__,
+                __LINE__,
+                "StompCommandWriter::writeCommand - "
+                "output stream is NULL");
         }
 
         std::shared_ptr<StompFrame> frame;
@@ -193,9 +199,9 @@ void StompWireFormat::marshal(const std::shared_ptr<Command>        command,
         // Let the Frame write itself to the output stream
         frame->toStream(out);
     }
-    AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(decaf::lang::Exception, decaf::io::IOException)
-    AMQ_CATCHALL_THROW(decaf::io::IOException)
+    AMQ_IOSTREAM_CATCH_RETHROW()
+    AMQ_IOSTREAM_CATCH_CONVERT_LANG_EXCEPTION()
+    AMQ_IOSTREAM_CATCHALL_THROW()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -205,16 +211,17 @@ std::shared_ptr<Command> StompWireFormat::unmarshal(
 {
     if (transport == NULL)
     {
-        throw decaf::io::IOException(__FILE__,
-                                     __LINE__,
-                                     "Transport passed is NULL");
+        throw activemq::exceptions::IOException(__FILE__,
+                                                __LINE__,
+                                                "Transport passed is NULL");
     }
 
     if (in == NULL)
     {
-        throw decaf::io::IOException(__FILE__,
-                                     __LINE__,
-                                     "DataInputStream passed is NULL");
+        throw activemq::exceptions::IOException(
+            __FILE__,
+            __LINE__,
+            "DataInputStream passed is NULL");
     }
 
     std::shared_ptr<StompFrame> frame;
@@ -270,21 +277,21 @@ std::shared_ptr<Command> StompWireFormat::unmarshal(
         }
 
         // We didn't seem to know what it was we got, so throw an exception.
-        throw decaf::io::IOException(
+        throw activemq::exceptions::IOException(
             __FILE__,
             __LINE__,
             "StompWireFormat::marshal - No Command Created from frame");
     }
-    AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(decaf::lang::Exception, decaf::io::IOException)
-    AMQ_CATCHALL_THROW(decaf::io::IOException)
+    AMQ_IOSTREAM_CATCH_RETHROW()
+    AMQ_IOSTREAM_CATCH_CONVERT_LANG_EXCEPTION()
+    AMQ_IOSTREAM_CATCHALL_THROW()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 std::shared_ptr<transport::Transport> StompWireFormat::createNegotiator(
     const std::shared_ptr<transport::Transport> transport AMQCPP_UNUSED)
 {
-    throw UnsupportedOperationException(
+    throw activemq::exceptions::UnsupportedOperationException(
         __FILE__,
         __LINE__,
         "No Negotiator is required to use this WireFormat.");
@@ -346,9 +353,10 @@ std::shared_ptr<Command> StompWireFormat::unmarshalReceipt(
     }
     else
     {
-        throw IOException(__FILE__,
-                          __LINE__,
-                          "Error, Connected Command has no Response ID.");
+        throw activemq::exceptions::IOException(
+            __FILE__,
+            __LINE__,
+            "Error, Connected Command has no Response ID.");
     }
 
     return response;
@@ -366,9 +374,10 @@ std::shared_ptr<Command> StompWireFormat::unmarshalConnected(
     }
     else
     {
-        throw IOException(__FILE__,
-                          __LINE__,
-                          "Error, Connected Command has no Response ID.");
+        throw activemq::exceptions::IOException(
+            __FILE__,
+            __LINE__,
+            "Error, Connected Command has no Response ID.");
     }
 
     return response;
@@ -430,22 +439,19 @@ std::shared_ptr<StompFrame> StompWireFormat::marshalMessage(
     helper->convertProperties(message, frame);
 
     // Convert the Content
-    try
+    std::shared_ptr<ActiveMQTextMessage> txtMessage =
+        std::dynamic_pointer_cast<ActiveMQTextMessage>(message);
+    if (txtMessage)
     {
-        std::shared_ptr<ActiveMQTextMessage> txtMessage =
-            std::dynamic_pointer_cast<ActiveMQTextMessage>(message);
         std::string text = txtMessage->getText();
         frame->setBody((unsigned char*)text.c_str(), text.length() + 1);
         return frame;
     }
-    catch (ClassCastException& ex)
-    {
-    }
 
-    try
+    std::shared_ptr<ActiveMQBytesMessage> bytesMessage =
+        std::dynamic_pointer_cast<ActiveMQBytesMessage>(message);
+    if (bytesMessage)
     {
-        std::shared_ptr<ActiveMQBytesMessage> bytesMessage =
-            std::dynamic_pointer_cast<ActiveMQBytesMessage>(message);
         unsigned char* bodyBytes = bytesMessage->getBodyBytes();
         frame->setBody(bodyBytes, bytesMessage->getBodyLength());
         frame->setProperty(StompCommandConstants::HEADER_CONTENTLENGTH,
@@ -456,15 +462,12 @@ std::shared_ptr<StompFrame> StompWireFormat::marshalMessage(
         }
         return frame;
     }
-    catch (ClassCastException& ex)
-    {
-    }
 
-    throw UnsupportedOperationException(
+    throw activemq::exceptions::UnsupportedOperationException(
         __FILE__,
         __LINE__,
-        "Stomp StompWireFormat can't marshal message of type: %s",
-        typeid(message.get()).name());
+        std::string("Stomp StompWireFormat can't marshal message of type: ") +
+            typeid(message.get()).name());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -589,16 +592,13 @@ std::shared_ptr<StompFrame> StompWireFormat::marshalRemoveInfo(
                            std::to_string(command->getCommandId()));
     }
 
-    try
+    std::shared_ptr<ConsumerId> id =
+        std::dynamic_pointer_cast<ConsumerId>(info->getObjectId());
+    if (id)
     {
-        std::shared_ptr<ConsumerId> id =
-            std::dynamic_pointer_cast<ConsumerId>(info->getObjectId());
         frame->setProperty(StompCommandConstants::HEADER_ID,
                            helper->convertConsumerId(id));
         return frame;
-    }
-    catch (ClassCastException& ex)
-    {
     }
 
     return std::shared_ptr<StompFrame>();
@@ -633,14 +633,14 @@ std::shared_ptr<StompFrame> StompWireFormat::marshalConsumerInfo(
     {
         if (this->clientId != info->getSubscriptionName())
         {
-            throw UnsupportedOperationException(
+            throw activemq::exceptions::UnsupportedOperationException(
                 __FILE__,
                 __LINE__,
-                "Stomp Durable Subscriptions require that the ClientId and the "
-                "Subscription "
-                "Name match, clientId = {%s} : subscription name = {%s}.",
-                this->clientId.c_str(),
-                info->getSubscriptionName().c_str());
+                std::string("Stomp Durable Subscriptions require that the "
+                            "ClientId and the Subscription Name match, "
+                            "clientId = {") +
+                    this->clientId + "} : subscription name = {" +
+                    info->getSubscriptionName() + "}.");
         }
 
         frame->setProperty(StompCommandConstants::HEADER_SUBSCRIPTIONNAME,

@@ -24,10 +24,8 @@
 #include <string>
 #include <vector>
 
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
-#include <decaf/util/NoSuchElementException.h>
 #include <decaf/util/StlMap.h>
+#include <stdexcept>
 
 namespace activemq
 {
@@ -69,7 +67,7 @@ namespace transport
          *
          * @return the Factory registered under the given name.
          *
-         * @throws NoSuchElementException if no factory is registered with that
+         * @throws std::runtime_error if no factory is registered with that
          * name.
          */
         TransportFactory* findFactory(const std::string& name) const;
@@ -86,8 +84,8 @@ namespace transport
          * @param factory
          *        The new Factory to add to the Registry.
          *
-         * @throws IllegalArgumentException is name is the empty string.
-         * @throws NullPointerException if the Factory is Null.
+         * @throws std::invalid_argument is name is the empty string.
+         * @throws std::logic_error if the Factory is Null.
          */
         void registerFactory(const std::string& name,
                              TransportFactory*  factory);

@@ -22,6 +22,7 @@
 #endif
 
 #include <activemq/exceptions/ExceptionDefines.h>
+#include <activemq/exceptions/IoExceptions.h>
 #include <activemq/util/Config.h>
 #include <cms/CMSException.h>
 #include <decaf/lang/Exception.h>
@@ -57,6 +58,11 @@ namespace exceptions
          *      The Exception whose internal data is copied into this instance.
          */
         ActiveMQException(const decaf::lang::Exception& ex);
+
+        /**
+         * Wrap AMQ STL-backed stream errors as a decaf Exception-derived type.
+         */
+        ActiveMQException(const IOException& ex);
 
         /**
          * Constructor - Initializes the file name and line number where

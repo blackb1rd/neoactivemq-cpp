@@ -17,6 +17,7 @@
 
 #include <gtest/gtest.h>
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <activemq/transport/discovery/AbstractDiscoveryAgent.h>
 #include <activemq/transport/discovery/DiscoveryAgentFactory.h>
 #include <activemq/transport/discovery/DiscoveryAgentRegistry.h>
@@ -26,6 +27,7 @@
 #include <decaf/util/concurrent/CountDownLatch.h>
 
 using namespace activemq;
+using namespace activemq::exceptions;
 using namespace activemq::transport;
 using namespace activemq::transport::discovery;
 using namespace decaf;
@@ -33,7 +35,6 @@ using namespace decaf::util;
 using namespace decaf::util::concurrent;
 using namespace decaf::net;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 class AbstractDiscoveryAgentTest : public ::testing::Test
 {
@@ -92,7 +93,7 @@ protected:
                 Thread::sleep(500);
             }
         }
-        catch (InterruptedException& ex)
+        catch (InterruptedException&)
         {
         }
     }

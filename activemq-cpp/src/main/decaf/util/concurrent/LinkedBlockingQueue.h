@@ -20,17 +20,17 @@
 
 #include <decaf/util/Config.h>
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/lang/Integer.h>
 #include <decaf/lang/Math.h>
 #include <decaf/lang/Pointer.h>
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
-#include <decaf/lang/exceptions/IllegalStateException.h>
 #include <decaf/util/AbstractQueue.h>
 #include <decaf/util/Iterator.h>
-#include <decaf/util/NoSuchElementException.h>
 #include <decaf/util/concurrent/BlockingQueue.h>
 #include <decaf/util/concurrent/atomic/AtomicInteger.h>
 #include <decaf/util/concurrent/locks/ReentrantLock.h>
+#include <stdexcept>
+#include <string>
 
 namespace decaf
 {
@@ -197,7 +197,7 @@ namespace util
              * @param capacity
              *      The initial capacity value to assign to this Queue.
              *
-             * @throws IllegalArgumentException if the specified capacity is not
+             * @throws std::invalid_argument if the specified capacity is not
              * greater than zero.
              */
             LinkedBlockingQueue(int capacity)
@@ -213,10 +213,9 @@ namespace util
             {
                 if (capacity <= 0)
                 {
-                    throw decaf::lang::exceptions::IllegalArgumentException(
-                        __FILE__,
-                        __LINE__,
-                        "Capacity value must be greater than zero.");
+                    throw activemq::exceptions::InvalidArgumentException(
+                        std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+                        ": " + "Capacity value must be greater than zero.");
                 }
 
                 this->tail = this->head;
@@ -233,7 +232,7 @@ namespace util
              *      The Collection whose elements are to be copied to this
              * Queue.
              *
-             * @throws IllegalStateException if the number of elements in the
+             * @throws std::logic_error if the number of elements in the
              * collection exceeds this Queue's capacity.
              */
             LinkedBlockingQueue(const Collection<E>& collection)
@@ -261,7 +260,7 @@ namespace util
                     {
                         if (count == this->capacity)
                         {
-                            throw decaf::lang::exceptions::IllegalStateException(
+                            throw activemq::exceptions::IllegalStateException(
                                 __FILE__,
                                 __LINE__,
                                 "Number of elements in the Collection exceeds "
@@ -274,8 +273,6 @@ namespace util
 
                     this->count.set(count);
                 }
-                DECAF_CATCH_RETHROW(
-                    decaf::lang::exceptions::IllegalStateException)
                 DECAF_CATCH_RETHROW(decaf::lang::Exception)
                 DECAF_CATCHALL_THROW(decaf::lang::Exception)
             }
@@ -289,8 +286,9 @@ namespace util
              *      The LinkedBlockingQueue whose elements are to be copied to
              * this Queue.
              *
-             * @throws IllegalStateException if the number of elements in the
-             * collection exceeds this Queue's capacity.
+             * @throws activemq::exceptions::IllegalStateException if
+             * the number of elements in the collection exceeds this Queue's
+             * capacity.
              */
             LinkedBlockingQueue(const LinkedBlockingQueue& queue)
                 : BlockingQueue<E>(),
@@ -317,7 +315,7 @@ namespace util
                     {
                         if (count == this->capacity)
                         {
-                            throw decaf::lang::exceptions::IllegalStateException(
+                            throw activemq::exceptions::IllegalStateException(
                                 __FILE__,
                                 __LINE__,
                                 "Number of elements in the Collection exceeds "
@@ -330,8 +328,6 @@ namespace util
 
                     this->count.set(count);
                 }
-                DECAF_CATCH_RETHROW(
-                    decaf::lang::exceptions::IllegalStateException)
                 DECAF_CATCH_RETHROW(decaf::lang::Exception)
                 DECAF_CATCHALL_THROW(decaf::lang::Exception)
             }
@@ -418,7 +414,7 @@ namespace util
                         this->notFull->signal();
                     }
                 }
-                catch (decaf::lang::Exception& ex)
+                catch (...)
                 {
                     this->putLock.unlock();
                     throw;
@@ -449,6 +445,7 @@ namespace util
                     {
                         if (nanos <= 0)
                         {
+                            this->putLock.unlock();
                             return false;
                         }
 
@@ -463,7 +460,7 @@ namespace util
                         this->notFull->signal();
                     }
                 }
-                catch (decaf::lang::Exception& ex)
+                catch (...)
                 {
                     this->putLock.unlock();
                     throw;
@@ -501,7 +498,7 @@ namespace util
                         }
                     }
                 }
-                catch (decaf::lang::Exception& ex)
+                catch (...)
                 {
                     this->putLock.unlock();
                     throw;
@@ -542,7 +539,7 @@ namespace util
                         this->notEmpty->signal();
                     }
                 }
-                catch (decaf::lang::Exception& ex)
+                catch (...)
                 {
                     this->takeLock.unlock();
                     throw;
@@ -575,6 +572,7 @@ namespace util
                     {
                         if (nanos <= 0)
                         {
+                            this->takeLock.unlock();
                             return false;
                         }
 
@@ -589,7 +587,7 @@ namespace util
                         this->notEmpty->signal();
                     }
                 }
-                catch (decaf::lang::Exception& ex)
+                catch (...)
                 {
                     this->takeLock.unlock();
                     throw;
@@ -632,6 +630,11 @@ namespace util
                     this->takeLock.unlock();
                     throw;
                 }
+                catch (std::exception&)
+                {
+                    this->takeLock.unlock();
+                    throw;
+                }
 
                 this->takeLock.unlock();
 
@@ -664,6 +667,11 @@ namespace util
                     }
                 }
                 catch (decaf::lang::Exception& ex)
+                {
+                    this->takeLock.unlock();
+                    throw;
+                }
+                catch (std::exception&)
                 {
                     this->takeLock.unlock();
                     throw;
@@ -727,10 +735,9 @@ namespace util
             {
                 if (&sink == this)
                 {
-                    throw decaf::lang::exceptions::IllegalArgumentException(
-                        __FILE__,
-                        __LINE__,
-                        "Cannot drain this Collection to itself.");
+                    throw activemq::exceptions::InvalidArgumentException(
+                        std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+                        ": " + "Cannot drain this Collection to itself.");
                 }
 
                 bool                   signalNotFull = false;
@@ -764,6 +771,14 @@ namespace util
                         delayed     = e;
                         shouldThrow = true;
                     }
+                    catch (std::exception& e)
+                    {
+                        delayed     = decaf::lang::Exception(__FILE__,
+                                                         __LINE__,
+                                                         "%s",
+                                                         e.what());
+                        shouldThrow = true;
+                    }
 
                     if (i > 0)
                     {
@@ -773,6 +788,11 @@ namespace util
                     }
                 }
                 catch (decaf::lang::Exception& ex)
+                {
+                    this->takeLock.unlock();
+                    throw;
+                }
+                catch (std::exception&)
                 {
                     this->takeLock.unlock();
                     throw;
@@ -833,9 +853,7 @@ namespace util
 
                     if (this->current == NULL)
                     {
-                        throw decaf::util::NoSuchElementException(
-                            __FILE__,
-                            __LINE__,
+                        throw activemq::exceptions::NoSuchElementException(
                             "Iterator next called with no matching next "
                             "element.");
                     }
@@ -853,7 +871,7 @@ namespace util
                 {
                     if (this->last == NULL)
                     {
-                        throw decaf::lang::exceptions::IllegalStateException(
+                        throw activemq::exceptions::IllegalStateException(
                             __FILE__,
                             __LINE__,
                             "Iterator remove called without having called "
@@ -943,9 +961,7 @@ namespace util
 
                     if (this->current == NULL)
                     {
-                        throw decaf::util::NoSuchElementException(
-                            __FILE__,
-                            __LINE__,
+                        throw activemq::exceptions::NoSuchElementException(
                             "Iterator next called with no matching next "
                             "element.");
                     }
@@ -961,7 +977,7 @@ namespace util
 
                 virtual void remove()
                 {
-                    throw lang::exceptions::UnsupportedOperationException(
+                    throw activemq::exceptions::UnsupportedOperationException(
                         __FILE__,
                         __LINE__,
                         "Cannot write to a const ListIterator.");
@@ -1035,6 +1051,11 @@ namespace util
                     this->notEmpty->signal();
                 }
                 catch (decaf::lang::Exception& ex)
+                {
+                    this->takeLock.unlock();
+                    throw;
+                }
+                catch (std::exception&)
                 {
                     this->takeLock.unlock();
                     throw;

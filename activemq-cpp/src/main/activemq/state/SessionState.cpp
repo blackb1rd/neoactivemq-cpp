@@ -19,7 +19,9 @@
 
 #include <activemq/state/TransactionState.h>
 
-#include <decaf/lang/exceptions/IllegalStateException.h>
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <stdexcept>
+#include <string>
 
 #include <memory>
 
@@ -70,7 +72,7 @@ void SessionState::checkShutdown() const
 {
     if (this->disposed.load())
     {
-        throw decaf::lang::exceptions::IllegalStateException(
+        throw activemq::exceptions::IllegalStateException(
             __FILE__,
             __LINE__,
             "Session already Disposed");

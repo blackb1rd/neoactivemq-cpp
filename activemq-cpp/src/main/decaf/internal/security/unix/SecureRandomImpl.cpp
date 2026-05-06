@@ -18,17 +18,16 @@
 #include "SecureRandomImpl.h"
 
 #include <decaf/lang/Exception.h>
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
-#include <decaf/lang/exceptions/RuntimeException.h>
 #include <decaf/util/Random.h>
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <fstream>
 #include <memory>
+#include <stdexcept>
+#include <string>
 
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::security;
 using namespace decaf::internal;
@@ -121,18 +120,18 @@ void SecureRandomImpl::providerNextBytes(unsigned char* bytes, int numBytes)
 {
     if (bytes == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "Byte Buffer passed cannot be NULL.");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "Byte Buffer passed cannot be NULL.");
     }
 
     if (numBytes < 0)
     {
-        throw IllegalArgumentException(
-            __FILE__,
-            __LINE__,
-            "Number of bytes to read was negative: %d",
-            numBytes);
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Number of bytes to read was negative: " +
+            std::to_string(numBytes));
     }
 
     if (this->config->randFile && this->config->randFile->is_open())
@@ -143,17 +142,18 @@ void SecureRandomImpl::providerNextBytes(unsigned char* bytes, int numBytes)
         // never get an EOF or other error, if so its bad.
         if (!this->config->randFile->good() && !this->config->randFile->eof())
         {
-            throw RuntimeException(__FILE__,
-                                   __LINE__,
-                                   "Unexpected error while reading random "
-                                   "bytes from system resources.");
+            throw activemq::exceptions::RuntimeException(
+                __FILE__,
+                __LINE__,
+                "Unexpected error while reading random "
+                "bytes from system resources.");
         }
 
         // Check if we got all the bytes we asked for
         std::streamsize bytesRead = this->config->randFile->gcount();
         if (bytesRead != numBytes)
         {
-            throw RuntimeException(
+            throw activemq::exceptions::RuntimeException(
                 __FILE__,
                 __LINE__,
                 "Could not read requested number of random bytes.");

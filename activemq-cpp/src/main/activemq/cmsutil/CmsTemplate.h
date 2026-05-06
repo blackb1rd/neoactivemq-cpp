@@ -716,7 +716,7 @@ namespace cmsutil
         /**
          * Checks that the default destination is valid, if not throws
          * an exception.
-         * @throws decaf::lang::exceptions::IllegalStateException thrown
+         * @throws cms::IllegalStateException
          * if the default destination is invalid.
          */
         void checkDefaultDestination();

@@ -645,9 +645,9 @@ out.println("        info->afterUnmarshal( wireFormat );");
     }
 
 out.println("    }");
-out.println("    AMQ_CATCH_RETHROW(decaf::io::IOException)" );
-out.println("    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException, decaf::io::IOException)" );
-out.println("    AMQ_CATCHALL_THROW(decaf::io::IOException)" );
+out.println("    AMQ_IOSTREAM_CATCH_RETHROW()" );
+out.println("    AMQ_IOSTREAM_CATCH_CONVERT_ACTIVEMQ_EXCEPTION()" );
+out.println("    AMQ_IOSTREAM_CATCHALL_THROW()" );
 out.println("}");
 out.println("");
 out.println("///////////////////////////////////////////////////////////////////////////////");
@@ -680,9 +680,9 @@ out.println("        int rc = "+baseClass+"::tightMarshal1(wireFormat, dataStruc
 out.println("");
 out.println("        return rc + "+baseSize+";");
 out.println("    }");
-out.println("    AMQ_CATCH_RETHROW(decaf::io::IOException)" );
-out.println("    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException, decaf::io::IOException)" );
-out.println("    AMQ_CATCHALL_THROW(decaf::io::IOException)" );
+out.println("    AMQ_IOSTREAM_CATCH_RETHROW()" );
+out.println("    AMQ_IOSTREAM_CATCH_CONVERT_ACTIVEMQ_EXCEPTION()" );
+out.println("    AMQ_IOSTREAM_CATCHALL_THROW()" );
 out.println("}");
 out.println("");
 out.println("///////////////////////////////////////////////////////////////////////////////");
@@ -712,9 +712,9 @@ out.println("        info->afterMarshal(wireFormat);");
     }
 
 out.println("    }");
-out.println("    AMQ_CATCH_RETHROW(decaf::io::IOException)" );
-out.println("    AMQ_CATCH_EXCEPTION_CONVERT( exceptions::ActiveMQException, decaf::io::IOException)" );
-out.println("    AMQ_CATCHALL_THROW(decaf::io::IOException)" );
+out.println("    AMQ_IOSTREAM_CATCH_RETHROW()" );
+out.println("    AMQ_IOSTREAM_CATCH_CONVERT_ACTIVEMQ_EXCEPTION()" );
+out.println("    AMQ_IOSTREAM_CATCHALL_THROW()" );
 out.println("}");
 out.println("");
 out.println("///////////////////////////////////////////////////////////////////////////////");
@@ -747,9 +747,9 @@ out.println("        info->afterUnmarshal(wireFormat);");
     }
 
 out.println("    }");
-out.println("    AMQ_CATCH_RETHROW(decaf::io::IOException)" );
-out.println("    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException, decaf::io::IOException)" );
-out.println("    AMQ_CATCHALL_THROW(decaf::io::IOException)" );
+out.println("    AMQ_IOSTREAM_CATCH_RETHROW()" );
+out.println("    AMQ_IOSTREAM_CATCH_CONVERT_ACTIVEMQ_EXCEPTION()" );
+out.println("    AMQ_IOSTREAM_CATCHALL_THROW()" );
 out.println("}");
 out.println("");
 out.println("///////////////////////////////////////////////////////////////////////////////");
@@ -783,9 +783,9 @@ out.println("        info->afterMarshal(wireFormat);");
     }
 
 out.println("    }");
-out.println("    AMQ_CATCH_RETHROW(decaf::io::IOException)" );
-out.println("    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException, decaf::io::IOException)" );
-out.println("    AMQ_CATCHALL_THROW(decaf::io::IOException)" );
+out.println("    AMQ_IOSTREAM_CATCH_RETHROW()" );
+out.println("    AMQ_IOSTREAM_CATCH_CONVERT_ACTIVEMQ_EXCEPTION()" );
+out.println("    AMQ_IOSTREAM_CATCHALL_THROW()" );
 out.println("}");
 out.println("");
 }

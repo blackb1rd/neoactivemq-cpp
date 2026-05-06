@@ -24,15 +24,12 @@
 #include <activemq/commands/ActiveMQTopic.h>
 #include <activemq/util/AdvisorySupport.h>
 
-#include <decaf/lang/exceptions/NullPointerException.h>
 #include <memory>
+#include <stdexcept>
 
 using namespace activemq;
 using namespace activemq::util;
 using namespace activemq::commands;
-using namespace decaf;
-using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 class AdvisorySupportTest : public ::testing::Test
 {
@@ -117,13 +114,13 @@ TEST_F(AdvisorySupportTest, testGetAllDestinationAdvisoryTopics)
 
     ASSERT_THROW(AdvisorySupport::getAllDestinationAdvisoryTopics(
                      (ActiveMQDestination*)NULL),
-                 NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+                 std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
     ASSERT_THROW(AdvisorySupport::getAllDestinationAdvisoryTopics(
                      (cms::Destination*)NULL),
-                 NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+                 std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
 }
 
@@ -240,13 +237,13 @@ TEST_F(AdvisorySupportTest, testGetConsumerAdvisoryTopic)
 
     ASSERT_THROW(
         AdvisorySupport::getConsumerAdvisoryTopic((ActiveMQDestination*)NULL),
-        NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+        std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
     ASSERT_THROW(
         AdvisorySupport::getConsumerAdvisoryTopic((cms::Destination*)NULL),
-        NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+        std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
 }
 
@@ -285,13 +282,13 @@ TEST_F(AdvisorySupportTest, testGetProducerAdvisoryTopic)
 
     ASSERT_THROW(
         AdvisorySupport::getProducerAdvisoryTopic((ActiveMQDestination*)NULL),
-        NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+        std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
     ASSERT_THROW(
         AdvisorySupport::getProducerAdvisoryTopic((cms::Destination*)NULL),
-        NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+        std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
 }
 
@@ -367,13 +364,13 @@ TEST_F(AdvisorySupportTest, testGetExpiredMessageTopic)
 
     ASSERT_THROW(
         AdvisorySupport::getExpiredMessageTopic((ActiveMQDestination*)NULL),
-        NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+        std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
     ASSERT_THROW(
         AdvisorySupport::getExpiredMessageTopic((cms::Destination*)NULL),
-        NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+        std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
 }
 
@@ -412,13 +409,13 @@ TEST_F(AdvisorySupportTest, testGetExpiredTopicMessageAdvisoryTopic)
 
     ASSERT_THROW(AdvisorySupport::getExpiredTopicMessageAdvisoryTopic(
                      (ActiveMQDestination*)NULL),
-                 NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+                 std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
     ASSERT_THROW(AdvisorySupport::getExpiredTopicMessageAdvisoryTopic(
                      (cms::Destination*)NULL),
-                 NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+                 std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
 }
 
@@ -457,13 +454,13 @@ TEST_F(AdvisorySupportTest, testGetExpiredQueueMessageAdvisoryTopic)
 
     ASSERT_THROW(AdvisorySupport::getExpiredQueueMessageAdvisoryTopic(
                      (ActiveMQDestination*)NULL),
-                 NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+                 std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
     ASSERT_THROW(AdvisorySupport::getExpiredQueueMessageAdvisoryTopic(
                      (cms::Destination*)NULL),
-                 NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+                 std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
 }
 
@@ -535,13 +532,13 @@ TEST_F(AdvisorySupportTest, testGetNoConsumersAdvisoryTopic)
 
     ASSERT_THROW(AdvisorySupport::getNoConsumersAdvisoryTopic(
                      (ActiveMQDestination*)NULL),
-                 NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+                 std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
     ASSERT_THROW(
         AdvisorySupport::getNoConsumersAdvisoryTopic((cms::Destination*)NULL),
-        NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+        std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
 }
 
@@ -580,13 +577,13 @@ TEST_F(AdvisorySupportTest, testGetNoTopicConsumersAdvisoryTopic)
 
     ASSERT_THROW(AdvisorySupport::getNoTopicConsumersAdvisoryTopic(
                      (ActiveMQDestination*)NULL),
-                 NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+                 std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
     ASSERT_THROW(AdvisorySupport::getNoTopicConsumersAdvisoryTopic(
                      (cms::Destination*)NULL),
-                 NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+                 std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
 }
 
@@ -625,13 +622,13 @@ TEST_F(AdvisorySupportTest, testGetNoQueueConsumersAdvisoryTopic)
 
     ASSERT_THROW(AdvisorySupport::getNoQueueConsumersAdvisoryTopic(
                      (ActiveMQDestination*)NULL),
-                 NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+                 std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
     ASSERT_THROW(AdvisorySupport::getNoQueueConsumersAdvisoryTopic(
                      (cms::Destination*)NULL),
-                 NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+                 std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
 }
 
@@ -670,13 +667,13 @@ TEST_F(AdvisorySupportTest, testGetSlowConsumerAdvisoryTopic)
 
     ASSERT_THROW(AdvisorySupport::getSlowConsumerAdvisoryTopic(
                      (ActiveMQDestination*)NULL),
-                 NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+                 std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
     ASSERT_THROW(
         AdvisorySupport::getSlowConsumerAdvisoryTopic((cms::Destination*)NULL),
-        NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+        std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
 }
 
@@ -715,13 +712,13 @@ TEST_F(AdvisorySupportTest, testGetFastProducerAdvisoryTopic)
 
     ASSERT_THROW(AdvisorySupport::getFastProducerAdvisoryTopic(
                      (ActiveMQDestination*)NULL),
-                 NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+                 std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
     ASSERT_THROW(
         AdvisorySupport::getFastProducerAdvisoryTopic((cms::Destination*)NULL),
-        NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+        std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
 }
 
@@ -760,13 +757,13 @@ TEST_F(AdvisorySupportTest, testGetMessageDiscardedAdvisoryTopic)
 
     ASSERT_THROW(AdvisorySupport::getMessageDiscardedAdvisoryTopic(
                      (ActiveMQDestination*)NULL),
-                 NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+                 std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
     ASSERT_THROW(AdvisorySupport::getMessageDiscardedAdvisoryTopic(
                      (cms::Destination*)NULL),
-                 NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+                 std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
 }
 
@@ -805,13 +802,13 @@ TEST_F(AdvisorySupportTest, testGetMessageDeliveredAdvisoryTopic)
 
     ASSERT_THROW(AdvisorySupport::getMessageDeliveredAdvisoryTopic(
                      (ActiveMQDestination*)NULL),
-                 NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+                 std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
     ASSERT_THROW(AdvisorySupport::getMessageDeliveredAdvisoryTopic(
                      (cms::Destination*)NULL),
-                 NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+                 std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
 }
 
@@ -850,13 +847,13 @@ TEST_F(AdvisorySupportTest, testGetMessageConsumedAdvisoryTopic)
 
     ASSERT_THROW(AdvisorySupport::getMessageConsumedAdvisoryTopic(
                      (ActiveMQDestination*)NULL),
-                 NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+                 std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
     ASSERT_THROW(AdvisorySupport::getMessageConsumedAdvisoryTopic(
                      (cms::Destination*)NULL),
-                 NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+                 std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
 }
 
@@ -895,13 +892,13 @@ TEST_F(AdvisorySupportTest, testGetMessageDLQdAdvisoryTopic)
 
     ASSERT_THROW(AdvisorySupport::getMessageDLQdAdvisoryTopic(
                      (ActiveMQDestination*)NULL),
-                 NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+                 std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
     ASSERT_THROW(
         AdvisorySupport::getMessageDLQdAdvisoryTopic((cms::Destination*)NULL),
-        NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+        std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
 }
 
@@ -968,12 +965,12 @@ TEST_F(AdvisorySupportTest, testGetFullAdvisoryTopic)
 
     ASSERT_THROW(
         AdvisorySupport::getFullAdvisoryTopic((ActiveMQDestination*)NULL),
-        NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+        std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
     ASSERT_THROW(AdvisorySupport::getFullAdvisoryTopic((cms::Destination*)NULL),
-                 NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+                 std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
 }
 
@@ -1011,13 +1008,13 @@ TEST_F(AdvisorySupportTest, testGetDestinationAdvisoryTopic)
 
     ASSERT_THROW(AdvisorySupport::getDestinationAdvisoryTopic(
                      (ActiveMQDestination*)NULL),
-                 NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+                 std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
     ASSERT_THROW(
         AdvisorySupport::getDestinationAdvisoryTopic((cms::Destination*)NULL),
-        NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+        std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
 }
 
@@ -1040,13 +1037,13 @@ TEST_F(AdvisorySupportTest, testIsDestinationAdvisoryTopic)
 
     ASSERT_THROW(
         AdvisorySupport::isDestinationAdvisoryTopic((ActiveMQDestination*)NULL),
-        NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+        std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
     ASSERT_THROW(
         AdvisorySupport::isDestinationAdvisoryTopic((cms::Destination*)NULL),
-        NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+        std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
 }
 
@@ -1071,13 +1068,13 @@ TEST_F(AdvisorySupportTest, testIsTempDestinationAdvisoryTopic)
 
     ASSERT_THROW(AdvisorySupport::isTempDestinationAdvisoryTopic(
                      (ActiveMQDestination*)NULL),
-                 NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+                 std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
     ASSERT_THROW(AdvisorySupport::isTempDestinationAdvisoryTopic(
                      (cms::Destination*)NULL),
-                 NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+                 std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
 }
 
@@ -1099,12 +1096,12 @@ TEST_F(AdvisorySupportTest, testIsAdvisoryTopic)
     ASSERT_TRUE(AdvisorySupport::isAdvisoryTopic(cmstopic.get()));
 
     ASSERT_THROW(AdvisorySupport::isAdvisoryTopic((ActiveMQDestination*)NULL),
-                 NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+                 std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
     ASSERT_THROW(AdvisorySupport::isAdvisoryTopic((cms::Destination*)NULL),
-                 NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+                 std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
 }
 
@@ -1127,13 +1124,13 @@ TEST_F(AdvisorySupportTest, testIsConnectionAdvisoryTopic)
 
     ASSERT_THROW(
         AdvisorySupport::isConnectionAdvisoryTopic((ActiveMQDestination*)NULL),
-        NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+        std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
     ASSERT_THROW(
         AdvisorySupport::isConnectionAdvisoryTopic((cms::Destination*)NULL),
-        NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+        std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
 }
 
@@ -1156,13 +1153,13 @@ TEST_F(AdvisorySupportTest, testIsProducerAdvisoryTopic)
 
     ASSERT_THROW(
         AdvisorySupport::isProducerAdvisoryTopic((ActiveMQDestination*)NULL),
-        NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+        std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
     ASSERT_THROW(
         AdvisorySupport::isProducerAdvisoryTopic((cms::Destination*)NULL),
-        NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+        std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
 }
 
@@ -1185,13 +1182,13 @@ TEST_F(AdvisorySupportTest, testIsConsumerAdvisoryTopic)
 
     ASSERT_THROW(
         AdvisorySupport::isConsumerAdvisoryTopic((ActiveMQDestination*)NULL),
-        NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+        std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
     ASSERT_THROW(
         AdvisorySupport::isConsumerAdvisoryTopic((cms::Destination*)NULL),
-        NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+        std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
 }
 
@@ -1214,13 +1211,13 @@ TEST_F(AdvisorySupportTest, testIsSlowConsumerAdvisoryTopic)
 
     ASSERT_THROW(AdvisorySupport::isSlowConsumerAdvisoryTopic(
                      (ActiveMQDestination*)NULL),
-                 NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+                 std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
     ASSERT_THROW(
         AdvisorySupport::isSlowConsumerAdvisoryTopic((cms::Destination*)NULL),
-        NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+        std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
 }
 
@@ -1243,13 +1240,13 @@ TEST_F(AdvisorySupportTest, testIsFastProducerAdvisoryTopic)
 
     ASSERT_THROW(AdvisorySupport::isFastProducerAdvisoryTopic(
                      (ActiveMQDestination*)NULL),
-                 NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+                 std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
     ASSERT_THROW(
         AdvisorySupport::isFastProducerAdvisoryTopic((cms::Destination*)NULL),
-        NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+        std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
 }
 
@@ -1274,13 +1271,13 @@ TEST_F(AdvisorySupportTest, testIsMessageConsumedAdvisoryTopic)
 
     ASSERT_THROW(AdvisorySupport::isMessageConsumedAdvisoryTopic(
                      (ActiveMQDestination*)NULL),
-                 NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+                 std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
     ASSERT_THROW(AdvisorySupport::isMessageConsumedAdvisoryTopic(
                      (cms::Destination*)NULL),
-                 NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+                 std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
 }
 
@@ -1303,13 +1300,13 @@ TEST_F(AdvisorySupportTest, testIsMasterBrokerAdvisoryTopic)
 
     ASSERT_THROW(AdvisorySupport::isMasterBrokerAdvisoryTopic(
                      (ActiveMQDestination*)NULL),
-                 NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+                 std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
     ASSERT_THROW(
         AdvisorySupport::isMasterBrokerAdvisoryTopic((cms::Destination*)NULL),
-        NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+        std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
 }
 
@@ -1335,13 +1332,13 @@ TEST_F(AdvisorySupportTest, testIsMessageDeliveredAdvisoryTopic)
 
     ASSERT_THROW(AdvisorySupport::isMessageDeliveredAdvisoryTopic(
                      (ActiveMQDestination*)NULL),
-                 NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+                 std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
     ASSERT_THROW(AdvisorySupport::isMessageDeliveredAdvisoryTopic(
                      (cms::Destination*)NULL),
-                 NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+                 std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
 }
 
@@ -1367,13 +1364,13 @@ TEST_F(AdvisorySupportTest, testIsMessageDiscardedAdvisoryTopic)
 
     ASSERT_THROW(AdvisorySupport::isMessageDiscardedAdvisoryTopic(
                      (ActiveMQDestination*)NULL),
-                 NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+                 std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
     ASSERT_THROW(AdvisorySupport::isMessageDiscardedAdvisoryTopic(
                      (cms::Destination*)NULL),
-                 NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+                 std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
 }
 
@@ -1396,13 +1393,13 @@ TEST_F(AdvisorySupportTest, testIsMessageDLQdAdvisoryTopic)
 
     ASSERT_THROW(
         AdvisorySupport::isMessageDLQdAdvisoryTopic((ActiveMQDestination*)NULL),
-        NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+        std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
     ASSERT_THROW(
         AdvisorySupport::isMessageDLQdAdvisoryTopic((cms::Destination*)NULL),
-        NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+        std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
 }
 
@@ -1425,12 +1422,12 @@ TEST_F(AdvisorySupportTest, testIsFullAdvisoryTopic)
 
     ASSERT_THROW(
         AdvisorySupport::isFullAdvisoryTopic((ActiveMQDestination*)NULL),
-        NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+        std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
     ASSERT_THROW(AdvisorySupport::isFullAdvisoryTopic((cms::Destination*)NULL),
-                 NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+                 std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
 }
 
@@ -1453,12 +1450,12 @@ TEST_F(AdvisorySupportTest, testIsNetworkBridgeAdvisoryTopic)
 
     ASSERT_THROW(AdvisorySupport::isNetworkBridgeAdvisoryTopic(
                      (ActiveMQDestination*)NULL),
-                 NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+                 std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
     ASSERT_THROW(
         AdvisorySupport::isNetworkBridgeAdvisoryTopic((cms::Destination*)NULL),
-        NullPointerException)
-        << ("Should throw a NullPointerException when passed a NULL "
+        std::logic_error)
+        << ("Should throw std::logic_error when passed a NULL "
             "destination");
 }

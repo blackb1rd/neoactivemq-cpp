@@ -17,9 +17,11 @@
 
 #include <gtest/gtest.h>
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <activemq/util/PrimitiveValueNode.h>
 
 using namespace activemq;
+using namespace activemq::exceptions;
 using namespace activemq::util;
 
 class PrimitiveValueNodeTest : public ::testing::Test
@@ -85,7 +87,7 @@ TEST_F(PrimitiveValueNodeTest, testValueNode)
         node.getFloat();
         ASSERT_TRUE(false);
     }
-    catch (decaf::util::NoSuchElementException& e)
+    catch (NoSuchElementException&)
     {
     }
 

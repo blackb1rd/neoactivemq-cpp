@@ -21,13 +21,15 @@
 #include <decaf/lang/Integer.h>
 #include <decaf/lang/Thread.h>
 #include <decaf/lang/ThreadLocal.h>
-#include <decaf/lang/exceptions/IllegalMonitorStateException.h>
 #include <decaf/util/concurrent/atomic/AtomicReference.h>
 #include <decaf/util/concurrent/locks/AbstractQueuedSynchronizer.h>
 
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <stdexcept>
+#include <string>
+
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 using namespace decaf::util::concurrent::locks;
@@ -145,7 +147,7 @@ public:
     {
         if (!this->isHeldExclusively())
         {
-            throw IllegalMonitorStateException(
+            throw activemq::exceptions::IllegalMonitorStateException(
                 __FILE__,
                 __LINE__,
                 "Sync lock not held exclusively");
@@ -186,9 +188,10 @@ public:
             }
             if (w + exclusiveCount(acquires) > MAX_COUNT)
             {
-                throw new RuntimeException(__FILE__,
-                                           __LINE__,
-                                           "Maximum lock count exceeded");
+                throw activemq::exceptions::RuntimeException(__FILE__,
+                                                             __LINE__,
+                                                             "Maximum lock "
+                                                             "count exceeded");
             }
             // Reentrant acquire
             setState(c + acquires);
@@ -227,10 +230,11 @@ public:
                 readHolds.remove();
                 if (count <= 0)
                 {
-                    throw IllegalMonitorStateException(
+                    throw activemq::exceptions::IllegalMonitorStateException(
                         __FILE__,
                         __LINE__,
-                        "attempt to unlock read lock, not locked by current "
+                        "attempt to unlock read lock, not locked by "
+                        "current "
                         "thread");
                 }
             }
@@ -324,7 +328,7 @@ public:
                 {
                     if (firstReaderHoldCount > 0)
                     {
-                        throw Exception(
+                        throw activemq::exceptions::RuntimeException(
                             __FILE__,
                             __LINE__,
                             "Read lock should not be aquired reentrantlly.");
@@ -346,9 +350,10 @@ public:
             }
             if (sharedCount(c) == MAX_COUNT)
             {
-                throw Exception(__FILE__,
-                                __LINE__,
-                                "Maximum lock count exceeded");
+                throw activemq::exceptions::RuntimeException(__FILE__,
+                                                             __LINE__,
+                                                             "Maximum lock "
+                                                             "count exceeded");
             }
             if (compareAndSetState(c, c + SHARED_UNIT))
             {
@@ -390,9 +395,10 @@ public:
             }
             if (w == MAX_COUNT)
             {
-                throw new Exception(__FILE__,
-                                    __LINE__,
-                                    "Maximum lock count exceeded");
+                throw activemq::exceptions::RuntimeException(__FILE__,
+                                                             __LINE__,
+                                                             "Maximum lock "
+                                                             "count exceeded");
             }
         }
         if (!compareAndSetState(c, c + 1))
@@ -421,9 +427,10 @@ public:
             int r = sharedCount(c);
             if (r == MAX_COUNT)
             {
-                throw Exception(__FILE__,
-                                __LINE__,
-                                "Maximum lock count exceeded");
+                throw activemq::exceptions::RuntimeException(__FILE__,
+                                                             __LINE__,
+                                                             "Maximum lock "
+                                                             "count exceeded");
             }
             if (compareAndSetState(c, c + SHARED_UNIT))
             {
@@ -638,7 +645,8 @@ public:
      * point, preference is given to responding to the interrupt over normal
      * or reentrant acquisition of the lock.
      *
-     * @throws InterruptedException if the current thread is interrupted
+     * @throws activemq::exceptions::InterruptedException if the current
+     * thread is interrupted
      */
     void lockInterruptibly()
     {
@@ -707,8 +715,8 @@ public:
      * <ul>
      *   <li>has its interrupted status set on entry to this method; or
      *   <li>is interrupted while acquiring the read lock,
-     * </ul> then InterruptedException is thrown and the current thread's
-     * interrupted status is cleared.
+     * </ul> then activemq::exceptions::InterruptedException is thrown
+     * and the current thread's interrupted status is cleared.
      *
      * <p>If the specified waiting time elapses then the value
      * {@code false} is returned.  If the time is less than or
@@ -724,7 +732,8 @@ public:
      *
      * @return {@code true} if the read lock was acquired
      *
-     * @throws InterruptedException if the current thread is interrupted
+     * @throws activemq::exceptions::InterruptedException if the current
+     * thread is interrupted
      */
     virtual bool tryLock(long long timeout, const TimeUnit& unit)
     {
@@ -743,13 +752,13 @@ public:
     }
 
     /**
-     * Throws UnsupportedOperationException because ReadLocks do not support
-     * conditions.
-     * @throws UnsupportedOperationException always
+     * Throws activemq::exceptions::IllegalStateException because
+     * ReadLocks do not support conditions.
+     * @throws activemq::exceptions::IllegalStateException always
      */
     virtual Condition* newCondition()
     {
-        throw new UnsupportedOperationException();
+        throw activemq::exceptions::UnsupportedOperationException();
     }
 
     /**
@@ -837,14 +846,15 @@ public:
      *   <li>is interrupted while acquiring the write lock,
      * </ul>
      *
-     * then InterruptedException is thrown and the current thread's
-     * interrupted status is cleared.
+     * then activemq::exceptions::InterruptedException is thrown and the
+     * current thread's interrupted status is cleared.
      *
      * <p>In this implementation, as this method is an explicit interruption
      * point, preference is given to responding to the interrupt over normal or
      * reentrant acquisition of the lock.
      *
-     * @throws InterruptedException if the current thread is interrupted
+     * @throws activemq::exceptions::InterruptedException if the current
+     * thread is interrupted
      */
     virtual void lockInterruptibly()
     {
@@ -924,8 +934,8 @@ public:
      *   <li>is interrupted while acquiring the write lock,
      * </ul>
      *
-     * then InterruptedException is thrown and the current
-     * thread's interrupted status is cleared.
+     * then activemq::exceptions::InterruptedException is thrown and the
+     * current thread's interrupted status is cleared.
      *
      * <p>If the specified waiting time elapses then the value
      * false is returned.  If the time is less than or
@@ -944,7 +954,8 @@ public:
      * current thread; and false if the waiting time
      * elapsed before the lock could be acquired.
      *
-     * @throws InterruptedException if the current thread is interrupted
+     * @throws activemq::exceptions::InterruptedException if the current
+     * thread is interrupted
      */
     virtual bool tryLock(long long timeout, const TimeUnit& unit)
     {
@@ -957,10 +968,10 @@ public:
      * <p>If the current thread is the holder of this lock then the hold
      * count is decremented. If the hold count is now zero then the lock
      * is released.  If the current thread is not the holder of this lock
-     * then IllegalMonitorStateException is thrown.
+     * then activemq::exceptions::IllegalStateException is thrown.
      *
-     * @throws IllegalMonitorStateException if the current thread does not
-     *         hold this lock.
+     * @throws activemq::exceptions::IllegalStateException if the
+     * current thread does not hold this lock.
      */
     virtual void unlock()
     {
@@ -976,22 +987,22 @@ public:
      *
      * <ul>
      *   <li>If this write lock is not held when any Condition method is called
-     *   then an IllegalMonitorStateException is thrown.  (Read locks are
-     *   held independently of write locks, so are not checked or affected.
-     *   However it is essentially always an error to invoke a condition waiting
-     *   method when the current thread has also acquired read locks, since
-     * other threads that could unblock it will not be able to acquire the write
-     *   lock.)
-     *   <li>When the condition waiting methods are called the write lock is
-     *   released and, before they return, the write lock is reacquired and the
-     *   lock hold count restored to what it was when the method was called.
-     *   <li>If a thread is interrupted while waiting then the wait will
-     * terminate, an InterruptedException will be thrown, and the thread's
-     * interrupted status will be cleared. <li> Waiting threads are signalled in
-     * FIFO order. <li>The ordering of lock reacquisition for threads returning
-     * from waiting methods is the same as for threads initially acquiring the
-     * lock, which is in the default case not specified, but for <em>fair</em>
-     * locks favors those threads that have been waiting the longest.
+     *   then an activemq::exceptions::IllegalStateException is thrown.
+     * (Read locks are held independently of write locks, so are not checked or
+     * affected. However it is essentially always an error to invoke a condition
+     * waiting method when the current thread has also acquired read locks,
+     * since other threads that could unblock it will not be able to acquire the
+     * write lock.) <li>When the condition waiting methods are called the write
+     * lock is released and, before they return, the write lock is reacquired
+     * and the lock hold count restored to what it was when the method was
+     * called. <li>If a thread is interrupted while waiting then the wait will
+     * terminate, an activemq::exceptions::InterruptedException will be
+     * thrown, and the thread's interrupted status will be cleared. <li> Waiting
+     * threads are signalled in FIFO order. <li>The ordering of lock
+     * reacquisition for threads returning from waiting methods is the same as
+     * for threads initially acquiring the lock, which is in the default case
+     * not specified, but for <em>fair</em> locks favors those threads that have
+     * been waiting the longest.
      * </ul>
      *
      * @return the Condition object
@@ -1214,9 +1225,10 @@ bool ReentrantReadWriteLock::hasWaiters(Condition* condition) const
 {
     if (condition == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "The Condition to check was NULL");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "The Condition to check was NULL");
     }
 
     const AbstractQueuedSynchronizer::ConditionObject* cond =
@@ -1225,9 +1237,8 @@ bool ReentrantReadWriteLock::hasWaiters(Condition* condition) const
 
     if (cond == NULL)
     {
-        throw IllegalArgumentException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
             "Condition is not associated with this Lock");
     }
 
@@ -1239,9 +1250,10 @@ int ReentrantReadWriteLock::getWaitQueueLength(Condition* condition) const
 {
     if (condition == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "The Condition to check was NULL");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "The Condition to check was NULL");
     }
 
     const AbstractQueuedSynchronizer::ConditionObject* cond =
@@ -1250,9 +1262,8 @@ int ReentrantReadWriteLock::getWaitQueueLength(Condition* condition) const
 
     if (cond == NULL)
     {
-        throw IllegalArgumentException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
             "Condition is not associated with this Lock");
     }
 
@@ -1265,9 +1276,10 @@ Collection<decaf::lang::Thread*>* ReentrantReadWriteLock::getWaitingThreads(
 {
     if (condition == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "The Condition to check was NULL");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "The Condition to check was NULL");
     }
 
     const AbstractQueuedSynchronizer::ConditionObject* cond =
@@ -1276,9 +1288,8 @@ Collection<decaf::lang::Thread*>* ReentrantReadWriteLock::getWaitingThreads(
 
     if (cond == NULL)
     {
-        throw IllegalArgumentException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
             "Condition is not associated with this Lock");
     }
 

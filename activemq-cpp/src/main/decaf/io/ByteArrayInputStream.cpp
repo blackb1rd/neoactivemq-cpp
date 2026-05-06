@@ -17,13 +17,15 @@
 
 #include "ByteArrayInputStream.h"
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/lang/System.h>
+#include <stdexcept>
+#include <string>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::io;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 ByteArrayInputStream::ByteArrayInputStream()
@@ -122,33 +124,31 @@ void ByteArrayInputStream::setByteArray(const unsigned char* buffer,
 {
     if (buffer == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "Input Buffer cannot be NULL.");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "Input Buffer cannot be NULL.");
     }
 
     if (bufferSize < 0)
     {
-        throw IllegalArgumentException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
             "Size given for input buffer was negative.");
     }
 
     if (offset < 0)
     {
-        throw IllegalArgumentException(__FILE__,
-                                       __LINE__,
-                                       "Offset given was negative: %d.",
-                                       offset);
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Offset given was negative: " + std::to_string(offset) + ".");
     }
 
     if (length < 0)
     {
-        throw IllegalArgumentException(__FILE__,
-                                       __LINE__,
-                                       "Length given was negative: %d.",
-                                       offset);
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Length given was negative: " + std::to_string(length) + ".");
     }
 
     // We're using the default buffer.
@@ -212,7 +212,7 @@ int ByteArrayInputStream::doReadArrayBounded(unsigned char* buffer,
 
         if (buffer == NULL)
         {
-            throw NullPointerException(
+            throw activemq::exceptions::NullPointerException(
                 __FILE__,
                 __LINE__,
                 "ByteArrayInputStream::read - Buffer passed is Null");
@@ -220,28 +220,25 @@ int ByteArrayInputStream::doReadArrayBounded(unsigned char* buffer,
 
         if (size < 0)
         {
-            throw IndexOutOfBoundsException(__FILE__,
-                                            __LINE__,
-                                            "size parameter out of Bounds: %d.",
-                                            size);
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+                "size parameter out of Bounds: " + std::to_string(size) + ".");
         }
 
         if (offset > size || offset < 0)
         {
-            throw IndexOutOfBoundsException(
-                __FILE__,
-                __LINE__,
-                "offset parameter out of Bounds: %d.",
-                offset);
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+                "offset parameter out of Bounds: " + std::to_string(offset) +
+                ".");
         }
 
         if (length < 0 || length > size - offset)
         {
-            throw IndexOutOfBoundsException(
-                __FILE__,
-                __LINE__,
-                "length parameter out of Bounds: %d.",
-                length);
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+                "length parameter out of Bounds: " + std::to_string(length) +
+                ".");
         }
 
         if (this->pos >= this->count)
@@ -256,8 +253,6 @@ int ByteArrayInputStream::doReadArrayBounded(unsigned char* buffer,
         return copylen;
     }
     DECAF_CATCH_RETHROW(IOException)
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCH_RETHROW(NullPointerException)
     DECAF_CATCHALL_THROW(IOException)
 }
 

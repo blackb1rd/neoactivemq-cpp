@@ -17,10 +17,13 @@
 
 #include "AbstractTransportFactory.h"
 
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <activemq/exceptions/StdExceptionCatchMacros.h>
 #include <activemq/transport/logging/LoggingTransport.h>
 #include <activemq/util/URISupport.h>
 #include <activemq/wireformat/WireFormat.h>
 #include <activemq/wireformat/WireFormatRegistry.h>
+#include <exception>
 #include <memory>
 #include <string>
 
@@ -32,7 +35,6 @@ using namespace activemq::wireformat;
 using namespace activemq::exceptions;
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::net;
 using namespace decaf::util;
 
@@ -53,7 +55,16 @@ std::shared_ptr<WireFormat> AbstractTransportFactory::createWireFormat(
             WireFormatRegistry::getInstance().findFactory(wireFormat);
         return factory->createWireFormat(properties);
     }
-    AMQ_CATCH_RETHROW(NoSuchElementException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, NoSuchElementException)
-    AMQ_CATCHALL_THROW(NoSuchElementException)
+    AMQ_CATCHALL_RETHROW_STL_BACKED_EXCEPTIONS()
+    catch (const std::exception& ex)
+    {
+        throw activemq::exceptions::InterruptedException(ex.what());
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::InterruptedException(
+            __FILE__,
+            __LINE__,
+            "caught unknown exception");
+    }
 }

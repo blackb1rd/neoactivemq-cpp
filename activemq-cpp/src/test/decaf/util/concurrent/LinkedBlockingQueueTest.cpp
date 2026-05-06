@@ -17,18 +17,19 @@
 
 #include <gtest/gtest.h>
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/lang/Integer.h>
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
 #include <decaf/util/LinkedList.h>
 #include <decaf/util/concurrent/Executors.h>
 #include <decaf/util/concurrent/ExecutorsTestSupport.h>
 #include <decaf/util/concurrent/LinkedBlockingQueue.h>
+#include <stdexcept>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util;
+using namespace activemq::exceptions;
 using namespace decaf::util::concurrent;
 
 class LinkedBlockingQueueTest : public ExecutorsTestSupport
@@ -150,7 +151,7 @@ TEST_F(LinkedBlockingQueueTest, testConstructor3)
 ///////////////////////////////////////////////////////////////////////////////
 TEST_F(LinkedBlockingQueueTest, testConstructor4)
 {
-    ASSERT_THROW(LinkedBlockingQueue<int>(-1), IllegalArgumentException)
+    ASSERT_THROW(LinkedBlockingQueue<int>(-1), std::invalid_argument)
         << ("Should have thrown an IllegalArgumentException");
 }
 
@@ -225,8 +226,8 @@ TEST_F(LinkedBlockingQueueTest, testAdd)
     }
     ASSERT_EQ(0, q.remainingCapacity());
 
-    ASSERT_THROW(q.add(SIZE), IllegalStateException)
-        << ("Should have thrown an IllegalStateException");
+    ASSERT_THROW(q.add(SIZE), std::logic_error)
+        << ("Should have thrown an std::logic_error");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -235,7 +236,7 @@ TEST_F(LinkedBlockingQueueTest, testAddAllSelf)
     LinkedBlockingQueue<int> q(SIZE);
     populate(q, SIZE);
 
-    ASSERT_THROW(q.addAll(q), IllegalArgumentException)
+    ASSERT_THROW(q.addAll(q), std::invalid_argument)
         << ("Should have thrown an IllegalArgumentException");
 }
 
@@ -247,8 +248,8 @@ TEST_F(LinkedBlockingQueueTest, testAddAll1)
 
     populate(list, SIZE);
 
-    ASSERT_THROW(q.addAll(list), IllegalStateException)
-        << ("Should have thrown an IllegalStateException");
+    ASSERT_THROW(q.addAll(list), std::logic_error)
+        << ("Should have thrown an std::logic_error");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -374,7 +375,7 @@ TEST_F(LinkedBlockingQueueTest, testElement)
     }
 
     ASSERT_THROW(q.element(), NoSuchElementException)
-        << ("Should have thrown an NoSuchElementException");
+        << ("Should have thrown NoSuchElementException");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -389,7 +390,7 @@ TEST_F(LinkedBlockingQueueTest, testRemove)
     }
 
     ASSERT_THROW(q.remove(), NoSuchElementException)
-        << ("Should have thrown an NoSuchElementException");
+        << ("Should have thrown NoSuchElementException");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -552,7 +553,7 @@ TEST_F(LinkedBlockingQueueTest, testDrainToSelf)
     LinkedBlockingQueue<int> q(SIZE);
     populate(q, SIZE);
 
-    ASSERT_THROW(q.drainTo(q), IllegalArgumentException)
+    ASSERT_THROW(q.drainTo(q), std::invalid_argument)
         << ("Should have thrown an IllegalArgumentException");
 }
 
@@ -596,7 +597,7 @@ TEST_F(LinkedBlockingQueueTest, testDrainToSelfN)
     LinkedBlockingQueue<int> q(SIZE);
     populate(q, SIZE);
 
-    ASSERT_THROW(q.drainTo(q, SIZE), IllegalArgumentException)
+    ASSERT_THROW(q.drainTo(q, SIZE), std::invalid_argument)
         << ("Should have thrown an IllegalArgumentException");
 }
 
@@ -654,7 +655,7 @@ public:
         {
             theQ->put(putValue);
         }
-        catch (InterruptedException& ie)
+        catch (std::runtime_error& ie)
         {
             // TODO deal with exceptions in threads.
         }
@@ -795,7 +796,7 @@ public:
                 Thread::sleep(1);
             }
         }
-        catch (InterruptedException& ie)
+        catch (std::runtime_error& ie)
         {
             // TODO deal with exceptions in threads.
         }
@@ -836,7 +837,7 @@ public:
                 Thread::sleep(1);
             }
         }
-        catch (InterruptedException& ie)
+        catch (std::runtime_error& ie)
         {
             // TODO deal with exceptions in threads.
         }
@@ -1059,7 +1060,7 @@ public:
             q.put(LinkedBlockingQueueTest::SIZE);
             test->threadShouldThrow();
         }
-        catch (InterruptedException& ie)
+        catch (std::runtime_error& ie)
         {
             test->threadAssertEquals(added, LinkedBlockingQueueTest::SIZE);
         }
@@ -1080,7 +1081,7 @@ TEST_F(LinkedBlockingQueueTest, testBlockingPut)
         t.interrupt();
         t.join();
     }
-    catch (InterruptedException& ie)
+    catch (std::runtime_error& ie)
     {
         unexpectedException();
     }
@@ -1128,7 +1129,7 @@ public:
                          TimeUnit::MILLISECONDS);
             test->threadShouldThrow();
         }
-        catch (InterruptedException& success)
+        catch (std::runtime_error& success)
         {
         }
     }
@@ -1189,7 +1190,7 @@ public:
             queue->take();
             test->threadShouldThrow();
         }
-        catch (InterruptedException& success)
+        catch (std::runtime_error& success)
         {
         }
     }
@@ -1254,7 +1255,7 @@ public:
             queue.take();
             test->threadShouldThrow();
         }
-        catch (InterruptedException& success)
+        catch (std::runtime_error& success)
         {
         }
     }
@@ -1274,9 +1275,9 @@ TEST_F(LinkedBlockingQueueTest, testBlockingTake)
         t.interrupt();
         t.join();
     }
-    catch (InterruptedException& ie)
+    catch (std::runtime_error& ie)
     {
-        unexpectedException(ie);
+        unexpectedException();
     }
 }
 
@@ -1324,7 +1325,7 @@ public:
                            TimeUnit::MILLISECONDS));
             test->threadShouldThrow();
         }
-        catch (InterruptedException& success)
+        catch (std::runtime_error& success)
         {
         }
     }
@@ -1344,7 +1345,7 @@ TEST_F(LinkedBlockingQueueTest, testInterruptedTimedPoll)
         t.interrupt();
         t.join();
     }
-    catch (InterruptedException& ie)
+    catch (std::runtime_error& ie)
     {
         unexpectedException();
     }
@@ -1396,7 +1397,7 @@ public:
                         TimeUnit::MILLISECONDS);
             test->threadShouldThrow();
         }
-        catch (InterruptedException& success)
+        catch (std::runtime_error& success)
         {
         }
     }
@@ -1462,9 +1463,9 @@ public:
                              TimeUnit::MILLISECONDS));
             test->threadAssertEquals(0, queue->remainingCapacity());
         }
-        catch (InterruptedException& e)
+        catch (std::runtime_error& e)
         {
-            test->threadUnexpectedException(e);
+            test->threadUnexpectedException();
         }
     }
 };
@@ -1500,9 +1501,9 @@ public:
             Thread::sleep(LinkedBlockingQueueTest::SMALL_DELAY_MS);
             test->threadAssertEquals(1, queue->take());
         }
-        catch (InterruptedException& e)
+        catch (std::runtime_error& e)
         {
-            test->threadUnexpectedException(e);
+            test->threadUnexpectedException();
         }
     }
 };
@@ -1562,9 +1563,9 @@ public:
                             TimeUnit::MILLISECONDS));
             test->threadAssertTrue(queue->isEmpty());
         }
-        catch (InterruptedException& e)
+        catch (std::runtime_error& e)
         {
-            test->threadUnexpectedException(e);
+            test->threadUnexpectedException();
         }
     }
 };
@@ -1599,9 +1600,9 @@ public:
             Thread::sleep(LinkedBlockingQueueTest::SMALL_DELAY_MS);
             queue->put(1);
         }
-        catch (InterruptedException& e)
+        catch (std::runtime_error& e)
         {
-            test->threadUnexpectedException(e);
+            test->threadUnexpectedException();
         }
     }
 };

@@ -17,6 +17,8 @@
 
 #include <activemq/transport/discovery/http/HttpDiscoveryAgent.h>
 
+#include <activemq/exceptions/ExceptionTypes.h>
+
 #include <memory>
 
 #include <decaf/io/BufferedInputStream.h>
@@ -31,8 +33,10 @@
 #include <decaf/net/URI.h>
 #include <decaf/util/HashSet.h>
 #include <decaf/util/concurrent/Mutex.h>
+#include <stdexcept>
 
 using namespace activemq;
+using namespace activemq::exceptions;
 using namespace activemq::util;
 using namespace activemq::transport;
 using namespace activemq::transport::discovery;
@@ -41,7 +45,6 @@ using namespace decaf;
 using namespace decaf::io;
 using namespace decaf::net;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 
@@ -214,7 +217,7 @@ void HttpDiscoveryAgent::doDiscovery()
             } while (impl->updateState == SUSPENDED && isStarted());
         }
     }
-    catch (InterruptedException& e)
+    catch (InterruptedException&)
     {
         return;
     }

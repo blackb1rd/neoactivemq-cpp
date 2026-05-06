@@ -20,7 +20,6 @@
 #include <decaf/lang/Integer.h>
 #include <decaf/lang/System.h>
 #include <decaf/lang/Thread.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/util/concurrent/Executors.h>
 
 #include <decaf/internal/util/concurrent/Atomics.h>
@@ -29,18 +28,20 @@
 #include <decaf/internal/util/concurrent/ThreadingTypes.h>
 #include <decaf/util/concurrent/atomic/AtomicInteger.h>
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <atomic>
 #include <cstring>
 #include <list>
+#include <stdexcept>
 #include <vector>
 
 #ifdef __SUNPRO_CC
 #include <stdlib.h>
+#include <string>
 #endif
 
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 using namespace decaf::util::concurrent::atomic;
@@ -304,7 +305,7 @@ void runCallback(void* arg)
     {
         thread->parent->run();
     }
-    catch (decaf::lang::Throwable& error)
+    catch (decaf::lang::Exception& error)
     {
         if (thread->parent->getUncaughtExceptionHandler() != NULL)
         {
@@ -320,7 +321,7 @@ void runCallback(void* arg)
     }
     catch (std::exception& stdEx)
     {
-        const RuntimeException error(__FILE__, __LINE__, stdEx.what());
+        const Exception error(__FILE__, __LINE__, stdEx.what());
 
         if (thread->parent->getUncaughtExceptionHandler() != NULL)
         {
@@ -336,10 +337,10 @@ void runCallback(void* arg)
     }
     catch (...)
     {
-        const RuntimeException error(__FILE__,
-                                     __LINE__,
-                                     "Uncaught exception bubbled up to "
-                                     "Thread::run, Thread Terminating.");
+        const Exception error(__FILE__,
+                              __LINE__,
+                              "Uncaught exception bubbled up to "
+                              "Thread::run, Thread Terminating.");
 
         if (thread->parent->getUncaughtExceptionHandler() != NULL)
         {
@@ -462,7 +463,7 @@ ThreadHandle* initThreadHandle(ThreadHandle* thread)
     {
         PlatformThread::createMutex(&thread->mutex);
     }
-    catch (RuntimeException& ex)
+    catch (Exception& ex)
     {
         throw ex;
     }
@@ -471,7 +472,7 @@ ThreadHandle* initThreadHandle(ThreadHandle* thread)
     {
         PlatformThread::createCondition(&thread->condition);
     }
-    catch (RuntimeException& ex)
+    catch (Exception& ex)
     {
         PlatformThread::destroyMutex(thread->mutex);
         throw ex;
@@ -577,9 +578,10 @@ void enqueueThread(ThreadHandle** queue, ThreadHandle* thread)
 
     if (thread->next != NULL)
     {
-        throw RuntimeException(__FILE__,
-                               __LINE__,
-                               "Thread was on a monitor queue already");
+        throw activemq::exceptions::RuntimeException(
+            __FILE__,
+            __LINE__,
+            "Thread was on a monitor queue already");
     }
 
     if (qThread != NULL)
@@ -839,7 +841,7 @@ bool doWaitOnMonitor(MonitorHandle* monitor,
 
     if (monitor->owner != thread)
     {
-        throw IllegalMonitorStateException(
+        throw activemq::exceptions::IllegalMonitorStateException(
             __FILE__,
             __LINE__,
             "Current Thread is not the lock holder.");
@@ -854,7 +856,9 @@ bool doWaitOnMonitor(MonitorHandle* monitor,
     {
         thread->interrupted = false;
         PlatformThread::unlockMutex(thread->mutex);
-        throw InterruptedException(__FILE__, __LINE__, "Thread interrupted");
+        throw activemq::exceptions::InterruptedException(__FILE__,
+                                                         __LINE__,
+                                                         "Thread interrupted");
     }
 
     thread->waiting       = true;
@@ -950,14 +954,17 @@ bool doWaitOnMonitor(MonitorHandle* monitor,
 
     if (interrupted)
     {
-        throw InterruptedException(__FILE__, __LINE__, "Thread interrupted");
+        throw activemq::exceptions::InterruptedException(__FILE__,
+                                                         __LINE__,
+                                                         "Thread interrupted");
     }
 
     if (!timedOut)
     {
-        throw RuntimeException(__FILE__,
-                               __LINE__,
-                               "Invalid state detected at end of Monitor Wait");
+        throw activemq::exceptions::RuntimeException(
+            __FILE__,
+            __LINE__,
+            "Invalid state detected at end of Monitor Wait");
     }
 
     return true;
@@ -1090,9 +1097,10 @@ ThreadHandle* Threading::createNewThread(Thread*     parent,
 {
     if (parent == NULL || name == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "One or more arguments was NULL");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "One or more arguments was NULL");
     }
 
     Pointer<ThreadHandle> thread(new ThreadHandle());
@@ -1148,7 +1156,7 @@ void Threading::destroyThread(ThreadHandle* thread)
             {
                 Threading::join(thread, 0, 0);
             }
-            catch (InterruptedException& ex)
+            catch (activemq::exceptions::InterruptedException&)
             {
             }
         }
@@ -1215,9 +1223,10 @@ void Threading::start(ThreadHandle* thread)
     {
         if (thread->state.load(std::memory_order_acquire) > Thread::NEW)
         {
-            throw IllegalThreadStateException(__FILE__,
-                                              __LINE__,
-                                              "Thread already started");
+            throw activemq::exceptions::IllegalStateException(
+                __FILE__,
+                __LINE__,
+                "Thread already started");
         }
 
         PlatformThread::lockMutex(thread->mutex);
@@ -1232,10 +1241,8 @@ void Threading::start(ThreadHandle* thread)
 
         PlatformThread::unlockMutex(thread->mutex);
     }
-    DECAF_CATCH_RETHROW(IllegalThreadStateException)
-    DECAF_CATCH_RETHROW(RuntimeException)
-    DECAF_CATCH_EXCEPTION_CONVERT(NullPointerException, RuntimeException)
-    DECAF_CATCHALL_THROW(RuntimeException)
+    DECAF_CATCH_RETHROW(Exception)
+    DECAF_CATCHALL_THROW(Exception)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1245,9 +1252,7 @@ void Threading::reinitialize(ThreadHandle* thread)
     {
         if (thread->state.load(std::memory_order_acquire) != Thread::TERMINATED)
         {
-            throw IllegalThreadStateException(
-                __FILE__,
-                __LINE__,
+            throw activemq::exceptions::IllegalStateException(
                 "Thread must be terminated before reinitializing");
         }
 
@@ -1288,10 +1293,8 @@ void Threading::reinitialize(ThreadHandle* thread)
                              runCallback,
                              thread);
     }
-    DECAF_CATCH_RETHROW(IllegalThreadStateException)
-    DECAF_CATCH_RETHROW(RuntimeException)
-    DECAF_CATCH_EXCEPTION_CONVERT(NullPointerException, RuntimeException)
-    DECAF_CATCHALL_THROW(RuntimeException)
+    DECAF_CATCH_RETHROW(Exception)
+    DECAF_CATCHALL_THROW(Exception)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1444,9 +1447,9 @@ bool Threading::join(ThreadHandle* thread, long long mills, int nanos)
 {
     if ((mills < 0) || (nanos < 0) || (nanos >= 1000000))
     {
-        throw IllegalArgumentException(__FILE__,
-                                       __LINE__,
-                                       "Timeout arguments out of range.");
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Timeout arguments out of range.");
     }
 
     bool timedOut    = false;
@@ -1634,9 +1637,10 @@ bool Threading::join(ThreadHandle* thread, long long mills, int nanos)
 
     if (interrupted)
     {
-        throw InterruptedException(__FILE__,
-                                   __LINE__,
-                                   "Sleeping Thread interrupted");
+        throw activemq::exceptions::InterruptedException(
+            __FILE__,
+            __LINE__,
+            "Sleeping Thread interrupted");
     }
 
     return timedOut;
@@ -1680,9 +1684,9 @@ bool Threading::sleep(long long mills, int nanos)
 {
     if ((mills < 0) || (nanos < 0) || (nanos >= 1000000))
     {
-        throw IllegalArgumentException(__FILE__,
-                                       __LINE__,
-                                       "Timeout arguments out of range.");
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Timeout arguments out of range.");
     }
 
     bool timedOut    = false;
@@ -1727,9 +1731,10 @@ bool Threading::sleep(long long mills, int nanos)
 
     if (interrupted)
     {
-        throw InterruptedException(__FILE__,
-                                   __LINE__,
-                                   "Sleeping Thread interrupted");
+        throw activemq::exceptions::InterruptedException(
+            __FILE__,
+            __LINE__,
+            "Sleeping Thread interrupted");
     }
 
     return timedOut;
@@ -1811,9 +1816,10 @@ void Threading::park(Thread* thread)
 {
     if (thread == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "Null Thread Pointer Passed.");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "Null Thread Pointer Passed.");
     }
 
     Threading::park(thread, 0LL, 0LL);
@@ -1862,9 +1868,10 @@ bool Threading::park(Thread* thread, long long mills, int nanos)
 {
     if (thread == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "Null Thread Pointer Passed.");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "Null Thread Pointer Passed.");
     }
 
     bool timedOut    = false;
@@ -1930,9 +1937,10 @@ void Threading::unpark(Thread* thread)
 {
     if (thread == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "Null Thread Pointer Passed.");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "Null Thread Pointer Passed.");
     }
 
     ThreadHandle* handle = thread->getHandle();
@@ -1998,7 +2006,10 @@ void Threading::returnMonitor(MonitorHandle* monitor, bool alreadyLocked)
 {
     if (monitor == NULL)
     {
-        throw RuntimeException(__FILE__, __LINE__, "Monitor pointer was null");
+        throw activemq::exceptions::RuntimeException(
+            __FILE__,
+            __LINE__,
+            "Monitor pointer was null");
     }
 
     // The own can return the Monitor in a locked state if its held by the
@@ -2009,9 +2020,10 @@ void Threading::returnMonitor(MonitorHandle* monitor, bool alreadyLocked)
     if ((monitor->owner && monitor->owner != getCurrentThreadHandle()) ||
         monitor->waiting)
     {
-        throw IllegalMonitorStateException(__FILE__,
-                                           __LINE__,
-                                           "Monitor is still in use!");
+        throw activemq::exceptions::IllegalMonitorStateException(
+            __FILE__,
+            __LINE__,
+            "Monitor is still in use!");
     }
 
     if (monitor->owner)
@@ -2115,7 +2127,7 @@ void Threading::monitorExitUsingThreadId(MonitorHandle* monitor,
 {
     if (monitor->owner != thread)
     {
-        throw IllegalMonitorStateException(
+        throw activemq::exceptions::IllegalMonitorStateException(
             __FILE__,
             __LINE__,
             "Specified thread is not the monitor owner.");
@@ -2162,9 +2174,10 @@ int Threading::createThreadLocalSlot(ThreadLocalImpl* threadLocal)
 {
     if (threadLocal == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "Null ThreadLocalImpl Pointer Passed.");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "Null ThreadLocalImpl Pointer Passed.");
     }
 
     int index = -1;

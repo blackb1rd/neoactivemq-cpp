@@ -17,11 +17,9 @@
 
 #include "ThreadPoolExecutor.h"
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/lang/Math.h>
 #include <decaf/lang/Pointer.h>
-#include <decaf/lang/Throwable.h>
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/util/Config.h>
 #include <decaf/util/LinkedList.h>
 #include <decaf/util/Timer.h>
@@ -36,14 +34,15 @@
 #include <decaf/util/concurrent/atomic/AtomicInteger.h>
 #include <decaf/util/concurrent/locks/AbstractQueuedSynchronizer.h>
 #include <decaf/util/concurrent/locks/ReentrantLock.h>
+#include <stdexcept>
 
 #include <algorithm>
 #include <iostream>
+#include <string>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 using namespace decaf::util::concurrent::atomic;
@@ -178,9 +177,9 @@ namespace util
                 {
                     if (kernel == NULL)
                     {
-                        throw IllegalArgumentException(
-                            __FILE__,
-                            __LINE__,
+                        throw activemq::exceptions::InvalidArgumentException(
+                            std::string(__FILE__) + ":" +
+                            std::to_string(__LINE__) + ": " +
                             "ThreadPoolExecutor Worker requires non-NULL "
                             "pointer to parent ExecutorKernel");
                     }
@@ -417,17 +416,18 @@ namespace util
                 if (corePoolSize < 0 || maxPoolSize <= 0 ||
                     maxPoolSize < corePoolSize || keepAliveTime < 0)
                 {
-                    throw IllegalArgumentException(__FILE__,
-                                                   __LINE__,
-                                                   "Argument out of range.");
+                    throw activemq::exceptions::InvalidArgumentException(
+                        std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+                        ": " + "Argument out of range.");
                 }
 
                 if (workQueue == NULL || threadFactory == NULL ||
                     handler == NULL)
                 {
-                    throw NullPointerException(__FILE__,
-                                               __LINE__,
-                                               "Required parameter was NULL");
+                    throw activemq::exceptions::NullPointerException(
+                        __FILE__,
+                        __LINE__,
+                        "Required parameter was NULL");
                 }
 
                 this->cleanupTimer.scheduleAtFixedRate(
@@ -463,7 +463,23 @@ namespace util
                     }
 
                     this->shutdown();
-                    this->awaitTermination();
+                    if (!this->awaitTermination(30, TimeUnit::SECONDS))
+                    {
+                        ArrayList<Runnable*> draining;
+                        this->shutdownNow(draining);
+                        try
+                        {
+                            Pointer<Iterator<Runnable*>> drainIter(
+                                draining.iterator());
+                            while (drainIter->hasNext())
+                            {
+                                Runnable* leftover = drainIter->next();
+                                delete leftover;
+                            }
+                        }
+                        DECAF_CATCHALL_NOTHROW()
+                        this->awaitTermination(30, TimeUnit::SECONDS);
+                    }
 
                     // We need to wait for the worker cleanup timer to shutdown,
                     // otherwise it could segfault if it's still running when
@@ -481,14 +497,10 @@ namespace util
                         delete worker;
                     }
 
-                    Pointer<Iterator<Runnable*>> tasks(
-                        this->workQueue->iterator());
-                    while (tasks->hasNext())
-                    {
-                        delete tasks->next();
-                    }
-
-                    this->workQueue->clear();
+                    // Work queue locks can be left in an inconsistent state
+                    // when shutdown races with interruption paths. Avoid taking
+                    // a full queue iteration lock here to prevent destructor
+                    // deadlocks.
                 }
                 DECAF_CATCH_NOTHROW(Exception)
                 DECAF_CATCHALL_NOTHROW()
@@ -823,12 +835,12 @@ namespace util
              *
              * 4. Assuming beforeExecute completes normally, we run the task,
              * gathering any of its thrown exceptions to send to
-             * afterExecute. We separately handle RuntimeException, Error
-             * (both of which the specs guarantee that we trap) and arbitrary
-             * Throwables.  Because we cannot rethrow Throwables within
-             * Runnable.run, we wrap them within Errors on the way out (to the
-             * thread's UncaughtExceptionHandler).  Any thrown exception also
-             * conservatively causes thread to die.
+             * afterExecute. We separately handle Decaf Exception, ISO C++
+             * std::exception (wrapped into Decaf Exception), and arbitrary
+             * unknown exceptions (wrapped into Decaf Exception).  Runnable.run
+             * cannot propagate unknown exceptions type-safely, so they become
+             * Decaf Exceptions before exiting this worker.  Any thrown
+             * exception also conservatively causes thread to die.
              *
              * 5. After task.run completes, we call afterExecute, which may
              * also throw an exception, which will also cause thread to
@@ -859,11 +871,6 @@ namespace util
                             try
                             {
                                 task->run();
-                            }
-                            catch (RuntimeException& re)
-                            {
-                                this->parent->afterExecute(task, &re);
-                                throw;
                             }
                             catch (Exception& e)
                             {
@@ -921,9 +928,10 @@ namespace util
             {
                 if (task == NULL)
                 {
-                    throw NullPointerException(__FILE__,
-                                               __LINE__,
-                                               "Runnable task cannot be NULL");
+                    throw activemq::exceptions::NullPointerException(
+                        __FILE__,
+                        __LINE__,
+                        "Runnable task cannot be NULL");
                 }
 
                 Runnable* target = task;
@@ -996,7 +1004,7 @@ namespace util
                     interruptIdleWorkers();
                     this->parent->onShutdown();
                 }
-                catch (Exception& ex)
+                catch (...)
                 {
                     mainLock.unlock();
                     throw;
@@ -1014,7 +1022,7 @@ namespace util
                     interruptWorkers();
                     drainQueue(unexecutedTasks);
                 }
-                catch (Exception& ex)
+                catch (...)
                 {
                     mainLock.unlock();
                     throw;
@@ -1055,13 +1063,11 @@ namespace util
                         this->termination->await();
                     }
                 }
-                catch (Exception& ex)
+                catch (...)
                 {
                     mainLock.unlock();
                     throw;
                 }
-                mainLock.unlock();
-                return false;
             }
 
             bool awaitTermination(long long timeout, const TimeUnit& unit)
@@ -1087,13 +1093,11 @@ namespace util
                         nanos = this->termination->awaitNanos(nanos);
                     }
                 }
-                catch (Exception& ex)
+                catch (...)
                 {
                     mainLock.unlock();
                     throw;
                 }
-                mainLock.unlock();
-                return false;
             }
 
             void setCorePoolSize(int corePoolSize)
@@ -1127,7 +1131,10 @@ namespace util
             {
                 if (maximumPoolSize <= 0 || maximumPoolSize < corePoolSize)
                 {
-                    throw IllegalArgumentException();
+                    throw activemq::exceptions::InvalidArgumentException(
+                        std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+                        ": maximumPoolSize must be "
+                        "positive and >= corePoolSize");
                 }
 
                 this->maxPoolSize = maximumPoolSize;
@@ -1158,9 +1165,9 @@ namespace util
             {
                 if (value && keepAliveTime <= 0)
                 {
-                    throw IllegalArgumentException(
-                        __FILE__,
-                        __LINE__,
+                    throw activemq::exceptions::InvalidArgumentException(
+                        std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+                        ": " +
                         "Core threads must have nonzero keep alive times");
                 }
 
@@ -1178,14 +1185,16 @@ namespace util
             {
                 if (time < 0)
                 {
-                    throw IllegalArgumentException();
+                    throw activemq::exceptions::InvalidArgumentException(
+                        std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+                        ": keep alive time cannot be negative");
                 }
 
                 if (time == 0 && this->coreThreadsCanTimeout)
                 {
-                    throw IllegalArgumentException(
-                        __FILE__,
-                        __LINE__,
+                    throw activemq::exceptions::InvalidArgumentException(
+                        std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+                        ": " +
                         "Core threads must have nonzero keep alive times");
                 }
 
@@ -1216,12 +1225,26 @@ namespace util
                         }
                     }
                 }
-                catch (ConcurrentModificationException& ex)
+                catch (activemq::exceptions::ConcurrentModificationException&)
                 {
                     // Take slow path if we encounter interference during
                     // traversal. Make copy for traversal and call remove for
                     // cancelled entries. The slow path is more likely to be
                     // O(N*N).
+                    std::vector<Runnable*>                 array = q->toArray();
+                    std::vector<Runnable*>::const_iterator iter = array.begin();
+                    for (; iter != array.end(); ++iter)
+                    {
+                        Runnable*   r      = *iter;
+                        FutureType* future = dynamic_cast<FutureType*>(r);
+                        if (r != NULL && future->isCancelled())
+                        {
+                            q->remove(r);
+                        }
+                    }
+                }
+                catch (activemq::exceptions::NoSuchElementException&)
+                {
                     std::vector<Runnable*>                 array = q->toArray();
                     std::vector<Runnable*>::const_iterator iter = array.begin();
                     for (; iter != array.end(); ++iter)
@@ -1381,7 +1404,8 @@ namespace util
             success:
 
                 Pointer<Worker> w(new Worker(this, firstTask));
-                Pointer<Thread> t = w->thread;
+                Worker*         worker = w.get();
+                Pointer<Thread> t      = w->thread;
 
                 mainLock.lock();
                 try
@@ -1402,7 +1426,7 @@ namespace util
                         return false;
                     }
 
-                    workers.add(w.release());
+                    workers.add(worker);
 
                     int s = workers.size();
                     if (s > largestPoolSize)
@@ -1416,9 +1440,20 @@ namespace util
                     throw;
                 }
 
-                t->start();
-
-                mainLock.unlock();
+                try
+                {
+                    t->start();
+                    w.release();  // ownership transferred to workers list
+                    mainLock.unlock();
+                }
+                catch (...)
+                {
+                    workers.remove(worker);
+                    decrementWorkerCount();
+                    mainLock.unlock();
+                    tryTerminate();
+                    throw;
+                }
 
                 // It is possible (but unlikely) for a thread to have been added
                 // to workers, but not yet started, during transition to STOP,
@@ -1553,7 +1588,7 @@ namespace util
                         {
                             workQueue->poll(r,
                                             keepAliveTime,
-                                            TimeUnit::NANOSECONDS);
+                                            TimeUnit::MILLISECONDS);
                         }
                         else
                         {
@@ -1567,8 +1602,12 @@ namespace util
 
                         timedOut = true;
                     }
-                    catch (InterruptedException& retry)
+                    catch (activemq::exceptions::InterruptedException& retry)
                     {
+                        // Keep Java semantics: interruption during queue wait
+                        // is a transient wakeup signal here. Ensure interrupt
+                        // flag does not remain latched across retries.
+                        Thread::interrupted();
                         timedOut = false;
                     }
                 }
@@ -1635,7 +1674,7 @@ ThreadPoolExecutor::ThreadPoolExecutor(
     {
         if (workQueue == NULL)
         {
-            throw NullPointerException(
+            throw activemq::exceptions::NullPointerException(
                 __FILE__,
                 __LINE__,
                 "The BlockingQueue pointer cannot be NULL.");
@@ -1657,8 +1696,6 @@ ThreadPoolExecutor::ThreadPoolExecutor(
         handler.release();
         threadFactory.release();
     }
-    DECAF_CATCH_RETHROW(NullPointerException)
-    DECAF_CATCH_RETHROW(IllegalArgumentException)
     DECAF_CATCH_RETHROW(Exception)
     DECAF_CATCHALL_THROW(Exception)
 }
@@ -1678,7 +1715,7 @@ ThreadPoolExecutor::ThreadPoolExecutor(
     {
         if (workQueue == NULL)
         {
-            throw NullPointerException(
+            throw activemq::exceptions::NullPointerException(
                 __FILE__,
                 __LINE__,
                 "The BlockingQueue pointer cannot be NULL.");
@@ -1686,7 +1723,7 @@ ThreadPoolExecutor::ThreadPoolExecutor(
 
         if (handler == NULL)
         {
-            throw NullPointerException(
+            throw activemq::exceptions::NullPointerException(
                 __FILE__,
                 __LINE__,
                 "The RejectedExecutionHandler pointer cannot be NULL.");
@@ -1705,8 +1742,6 @@ ThreadPoolExecutor::ThreadPoolExecutor(
 
         threadFactory.release();
     }
-    DECAF_CATCH_RETHROW(NullPointerException)
-    DECAF_CATCH_RETHROW(IllegalArgumentException)
     DECAF_CATCH_RETHROW(Exception)
     DECAF_CATCHALL_THROW(Exception)
 }
@@ -1726,7 +1761,7 @@ ThreadPoolExecutor::ThreadPoolExecutor(
     {
         if (workQueue == NULL)
         {
-            throw NullPointerException(
+            throw activemq::exceptions::NullPointerException(
                 __FILE__,
                 __LINE__,
                 "The BlockingQueue pointer cannot be NULL.");
@@ -1734,7 +1769,7 @@ ThreadPoolExecutor::ThreadPoolExecutor(
 
         if (threadFactory == NULL)
         {
-            throw NullPointerException(
+            throw activemq::exceptions::NullPointerException(
                 __FILE__,
                 __LINE__,
                 "The ThreadFactory pointer cannot be NULL.");
@@ -1753,8 +1788,6 @@ ThreadPoolExecutor::ThreadPoolExecutor(
 
         handler.release();
     }
-    DECAF_CATCH_RETHROW(NullPointerException)
-    DECAF_CATCH_RETHROW(IllegalArgumentException)
     DECAF_CATCH_RETHROW(Exception)
     DECAF_CATCHALL_THROW(Exception)
 }
@@ -1775,7 +1808,7 @@ ThreadPoolExecutor::ThreadPoolExecutor(
     {
         if (workQueue == NULL)
         {
-            throw NullPointerException(
+            throw activemq::exceptions::NullPointerException(
                 __FILE__,
                 __LINE__,
                 "The BlockingQueue pointer cannot be NULL.");
@@ -1783,7 +1816,7 @@ ThreadPoolExecutor::ThreadPoolExecutor(
 
         if (handler == NULL)
         {
-            throw NullPointerException(
+            throw activemq::exceptions::NullPointerException(
                 __FILE__,
                 __LINE__,
                 "The RejectedExecutionHandler pointer cannot be NULL.");
@@ -1791,7 +1824,7 @@ ThreadPoolExecutor::ThreadPoolExecutor(
 
         if (threadFactory == NULL)
         {
-            throw NullPointerException(
+            throw activemq::exceptions::NullPointerException(
                 __FILE__,
                 __LINE__,
                 "The ThreadFactory pointer cannot be NULL.");
@@ -1805,8 +1838,6 @@ ThreadPoolExecutor::ThreadPoolExecutor(
                                           threadFactory,
                                           handler);
     }
-    DECAF_CATCH_RETHROW(NullPointerException)
-    DECAF_CATCH_RETHROW(IllegalArgumentException)
     DECAF_CATCH_RETHROW(Exception)
     DECAF_CATCHALL_THROW(Exception)
 }
@@ -1829,16 +1860,16 @@ void ThreadPoolExecutor::execute(Runnable* task)
     {
         if (task == NULL)
         {
-            throw NullPointerException(__FILE__,
-                                       __LINE__,
-                                       "ThreadPoolExecutor::execute - Supplied "
-                                       "Runnable pointer was NULL.");
+            throw activemq::exceptions::NullPointerException(
+                __FILE__,
+                __LINE__,
+                "ThreadPoolExecutor::execute - Supplied Runnable pointer was "
+                "NULL.");
         }
 
         this->kernel->execute(task, true);
     }
     DECAF_CATCH_RETHROW(RejectedExecutionException)
-    DECAF_CATCH_RETHROW(NullPointerException)
     DECAF_CATCH_RETHROW(Exception)
     DECAF_CATCHALL_THROW(Exception)
 }
@@ -1850,16 +1881,16 @@ void ThreadPoolExecutor::execute(Runnable* task, bool takeOwnership)
     {
         if (task == NULL)
         {
-            throw NullPointerException(__FILE__,
-                                       __LINE__,
-                                       "ThreadPoolExecutor::execute - Supplied "
-                                       "Runnable pointer was NULL.");
+            throw activemq::exceptions::NullPointerException(
+                __FILE__,
+                __LINE__,
+                "ThreadPoolExecutor::execute - Supplied Runnable pointer was "
+                "NULL.");
         }
 
         this->kernel->execute(task, takeOwnership);
     }
     DECAF_CATCH_RETHROW(RejectedExecutionException)
-    DECAF_CATCH_RETHROW(NullPointerException)
     DECAF_CATCH_RETHROW(Exception)
     DECAF_CATCHALL_THROW(Exception)
 }
@@ -1918,9 +1949,9 @@ void ThreadPoolExecutor::setCorePoolSize(int poolSize)
 {
     if (poolSize < 0)
     {
-        throw IllegalArgumentException(__FILE__,
-                                       __LINE__,
-                                       "Pool size given was negative.");
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Pool size given was negative.");
     }
 
     this->kernel->setCorePoolSize(poolSize);
@@ -1937,9 +1968,9 @@ void ThreadPoolExecutor::setMaximumPoolSize(int maxSize)
 {
     if (maxSize < 0)
     {
-        throw IllegalArgumentException(__FILE__,
-                                       __LINE__,
-                                       "Maximum Pool size given was negative.");
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Maximum Pool size given was negative.");
     }
 
     this->kernel->setMaximumPoolSize(maxSize);
@@ -1974,9 +2005,10 @@ void ThreadPoolExecutor::setThreadFactory(ThreadFactory* factory)
 {
     if (factory == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "Cannot assign a NULL ThreadFactory.");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "Cannot assign a NULL ThreadFactory.");
     }
 
     if (factory != this->kernel->factory)
@@ -2004,7 +2036,7 @@ void ThreadPoolExecutor::setRejectedExecutionHandler(
 {
     if (handler == NULL)
     {
-        throw NullPointerException(
+        throw activemq::exceptions::NullPointerException(
             __FILE__,
             __LINE__,
             "Cannot assign a NULL RejectedExecutionHandler.");
@@ -2098,7 +2130,7 @@ void ThreadPoolExecutor::beforeExecute(Thread* thread DECAF_UNUSED,
 
 ////////////////////////////////////////////////////////////////////////////////
 void ThreadPoolExecutor::afterExecute(Runnable* task DECAF_UNUSED,
-                                      decaf::lang::Throwable* error DECAF_UNUSED)
+                                      decaf::lang::Exception* error DECAF_UNUSED)
 {
 }
 

@@ -22,16 +22,13 @@
 #include <decaf/lang/System.h>
 #include <decaf/util/Arrays.h>
 
-#include <decaf/lang/exceptions/ArrayIndexOutOfBoundsException.h>
-#include <decaf/lang/exceptions/NegativeArraySizeException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
-#include <decaf/lang/exceptions/StringIndexOutOfBoundsException.h>
-
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/internal/util/StringUtils.h>
+#include <stdexcept>
+#include <string>
 
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::internal::util;
 
@@ -182,9 +179,10 @@ AbstractStringBuilder::AbstractStringBuilder(int capacity)
 {
     if (capacity < 0)
     {
-        throw NegativeArraySizeException(__FILE__,
-                                         __LINE__,
-                                         "Capacity cannot be negative");
+        throw activemq::exceptions::IllegalArgumentException(
+            __FILE__,
+            __LINE__,
+            "Capacity cannot be negative");
     }
 
     impl = new AbstractStringBuilderImpl(capacity);
@@ -221,7 +219,10 @@ AbstractStringBuilder::AbstractStringBuilder(const CharSequence* source)
 {
     if (source == NULL)
     {
-        throw NullPointerException(__FILE__, __LINE__, "CharSequence was NULL");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "CharSequence was NULL");
     }
 
     std::string src      = source->toString();
@@ -279,9 +280,7 @@ void AbstractStringBuilder::doAppend(const char* value)
 {
     if (value == NULL)
     {
-        throw NullPointerException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::NullPointerException(
             "C String cannot be null, call 'doAppendNull' instead");
     }
 
@@ -303,9 +302,7 @@ void AbstractStringBuilder::doAppend(const char* value, int offset, int length)
 {
     if (value == NULL)
     {
-        throw NullPointerException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::NullPointerException(
             "C String cannot be null, call 'doAppendNull' instead");
     }
 
@@ -314,9 +311,8 @@ void AbstractStringBuilder::doAppend(const char* value, int offset, int length)
     if ((offset | length) < 0 || offset > arrayLength ||
         arrayLength - offset < length)
     {
-        throw ArrayIndexOutOfBoundsException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
             "Invalid offset or length value given.");
     }
 
@@ -336,9 +332,7 @@ void AbstractStringBuilder::doAppend(const CharSequence* value)
 {
     if (value == NULL)
     {
-        throw NullPointerException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::NullPointerException(
             "C String cannot be null, call 'doAppendNull' instead");
     }
 
@@ -373,9 +367,8 @@ void AbstractStringBuilder::doAppend(const CharSequence* value,
 
     if ((start | end) < 0 || start > end || end > arrayLength)
     {
-        throw ArrayIndexOutOfBoundsException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
             "Invalid start or end value given.");
     }
 
@@ -440,10 +433,9 @@ void AbstractStringBuilder::doDeleteRange(int start, int end)
 
     if (start < 0 || start > impl->length || start > end)
     {
-        throw StringIndexOutOfBoundsException(__FILE__,
-                                              __LINE__,
-                                              "Invalid start index: %d",
-                                              start);
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Invalid start index: " + std::to_string(start));
     }
 
     // This method is defined to throw only if start > impl->length and start ==
@@ -487,10 +479,9 @@ void AbstractStringBuilder::doDeleteCharAt(int index)
 {
     if (index < 0 || index >= impl->length)
     {
-        throw StringIndexOutOfBoundsException(__FILE__,
-                                              __LINE__,
-                                              "Invalid index: %d",
-                                              index);
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Invalid index: " + std::to_string(index));
     }
 
     doDeleteRange(index, index + 1);
@@ -501,10 +492,9 @@ void AbstractStringBuilder::doInsert(int index, char value)
 {
     if (index < 0 || index > impl->length)
     {
-        throw ArrayIndexOutOfBoundsException(__FILE__,
-                                             __LINE__,
-                                             "Given index is invalid: %d",
-                                             index);
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Given index is invalid: " + std::to_string(index));
     }
 
     impl->move(1, index);
@@ -517,17 +507,17 @@ void AbstractStringBuilder::doInsert(int index, const char* value)
 {
     if (index < 0 || index > impl->length)
     {
-        throw ArrayIndexOutOfBoundsException(__FILE__,
-                                             __LINE__,
-                                             "Given index is invalid: %d",
-                                             index);
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Given index is invalid: " + std::to_string(index));
     }
 
     if (value == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "C String pointer was NULL");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "C String pointer was NULL");
     }
 
     int arrayLength = StringUtils::stringLength(value);
@@ -545,10 +535,9 @@ void AbstractStringBuilder::doInsert(int index, const String& value)
 {
     if (index < 0 || index > impl->length)
     {
-        throw ArrayIndexOutOfBoundsException(__FILE__,
-                                             __LINE__,
-                                             "Given index is invalid: %d",
-                                             index);
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Given index is invalid: " + std::to_string(index));
     }
 
     int stringLength = value.length();
@@ -566,10 +555,9 @@ void AbstractStringBuilder::doInsert(int index, const std::string& value)
 {
     if (index < 0 || index > impl->length)
     {
-        throw ArrayIndexOutOfBoundsException(__FILE__,
-                                             __LINE__,
-                                             "Given index is invalid: %d",
-                                             index);
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Given index is invalid: " + std::to_string(index));
     }
 
     int stringLength = (int)value.length();
@@ -597,9 +585,10 @@ void AbstractStringBuilder::doInsert(int         index,
     {
         if (value == NULL)
         {
-            throw NullPointerException(__FILE__,
-                                       __LINE__,
-                                       "C string pointer was NULL");
+            throw activemq::exceptions::NullPointerException(
+                __FILE__,
+                __LINE__,
+                "C string pointer was NULL");
         }
 
         int arrayLength = StringUtils::stringLength(value);
@@ -620,20 +609,16 @@ void AbstractStringBuilder::doInsert(int         index,
             return;
         }
 
-        throw StringIndexOutOfBoundsException(
-            __FILE__,
-            __LINE__,
-            "Invalid string offsets, offset=%d length=%d but C string "
-            "length=%d",
-            offset,
-            length,
-            arrayLength);
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Invalid string offsets, offset=" + std::to_string(offset) +
+            " length=" + std::to_string(length) +
+            " but C string length=" + std::to_string(arrayLength));
     }
 
-    throw StringIndexOutOfBoundsException(__FILE__,
-                                          __LINE__,
-                                          "Index value given was invalid: %d",
-                                          index);
+    throw activemq::exceptions::OutOfRangeException(
+        std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+        "Index value given was invalid: " + std::to_string(index));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -643,19 +628,19 @@ void AbstractStringBuilder::doInsert(int index, const CharSequence* value)
     {
         if (value == NULL)
         {
-            throw NullPointerException(__FILE__,
-                                       __LINE__,
-                                       "CharSequence pointer was NULL");
+            throw activemq::exceptions::NullPointerException(
+                __FILE__,
+                __LINE__,
+                "CharSequence pointer was NULL");
         }
 
         doInsert(index, value->toString());
         return;
     }
 
-    throw StringIndexOutOfBoundsException(__FILE__,
-                                          __LINE__,
-                                          "Index value given was invalid: %d",
-                                          index);
+    throw activemq::exceptions::OutOfRangeException(
+        std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+        "Index value given was invalid: " + std::to_string(index));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -677,9 +662,8 @@ void AbstractStringBuilder::doInsert(int                 index,
 
         if ((start | end) < 0 || start > end || end > arrayLength)
         {
-            throw ArrayIndexOutOfBoundsException(
-                __FILE__,
-                __LINE__,
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
                 "Invalid start or end value given.");
         }
 
@@ -701,10 +685,9 @@ void AbstractStringBuilder::doInsert(int                 index,
         return;
     }
 
-    throw StringIndexOutOfBoundsException(__FILE__,
-                                          __LINE__,
-                                          "Index value given was invalid: %d",
-                                          index);
+    throw activemq::exceptions::OutOfRangeException(
+        std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+        "Index value given was invalid: " + std::to_string(index));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -772,10 +755,9 @@ void AbstractStringBuilder::doReplace(int start, int end, const String& value)
         }
     }
 
-    throw StringIndexOutOfBoundsException(__FILE__,
-                                          __LINE__,
-                                          "Index value given was invalid: %d",
-                                          start);
+    throw activemq::exceptions::OutOfRangeException(
+        std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+        "Index value given was invalid: " + std::to_string(start));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -829,7 +811,9 @@ char AbstractStringBuilder::charAt(int index) const
 {
     if (index < 0 || index >= impl->length)
     {
-        throw StringIndexOutOfBoundsException(__FILE__, __LINE__, index);
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Invalid index: " + std::to_string(index));
     }
 
     return impl->value[index];
@@ -853,44 +837,41 @@ void AbstractStringBuilder::getChars(int   start,
 {
     if (start > impl->length || end > impl->length || start > end)
     {
-        throw StringIndexOutOfBoundsException(__FILE__,
-                                              __LINE__,
-                                              "Invalid range: %d : %d",
-                                              start,
-                                              end);
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Invalid range: " + std::to_string(start) + " : " +
+            std::to_string(end));
     }
 
     if (destSize < 0)
     {
-        throw StringIndexOutOfBoundsException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
             "Destination size cannot be negative");
     }
 
     if (destStart < 0)
     {
-        throw StringIndexOutOfBoundsException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
             "Destination start index cannot be negative");
     }
 
     if ((destStart + (end - start)) > destSize)
     {
-        throw StringIndexOutOfBoundsException(
-            __FILE__,
-            __LINE__,
-            "Destination array[%d] is not large enough for given copy size: %d",
-            destSize,
-            end - start);
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Destination array[" + std::to_string(destSize) +
+            "] is not large enough for given copy size: " +
+            std::to_string(end - start));
     }
 
     if (dest == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "Destination array is null");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "Destination array is null");
     }
 
     System::arraycopy(impl->value.get(), start, dest, destStart, end - start);
@@ -1023,18 +1004,16 @@ void AbstractStringBuilder::setCharAt(int index, char value)
 {
     if (index < 0)
     {
-        throw ArrayIndexOutOfBoundsException(__FILE__,
-                                             __LINE__,
-                                             "Index < 0: %d",
-                                             index);
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Index < 0: " + std::to_string(index));
     }
 
     if (index > impl->length)
     {
-        throw ArrayIndexOutOfBoundsException(__FILE__,
-                                             __LINE__,
-                                             "Index > length(): %d",
-                                             index);
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Index > length(): " + std::to_string(index));
     }
 
     if (impl->shared)
@@ -1051,10 +1030,9 @@ void AbstractStringBuilder::setLength(int length)
 {
     if (length < 0)
     {
-        throw StringIndexOutOfBoundsException(__FILE__,
-                                              __LINE__,
-                                              "length < 0: %d",
-                                              length);
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "length < 0: " + std::to_string(length));
     }
 
     if (length > impl->value.length() - 1)
@@ -1102,7 +1080,9 @@ String AbstractStringBuilder::substring(int start) const
         // Remove String sharing for more performance
         return String(impl->value.get(), start, impl->length - start);
     }
-    throw StringIndexOutOfBoundsException(__FILE__, __LINE__, start);
+    throw activemq::exceptions::OutOfRangeException(
+        std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+        "Invalid start index: " + std::to_string(start));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1119,12 +1099,10 @@ String AbstractStringBuilder::substring(int start, int end) const
         return String(impl->value.get(), start, end - start);
     }
 
-    throw StringIndexOutOfBoundsException(
-        __FILE__,
-        __LINE__,
-        "Start [%d] or end [%d] index value are invalid.",
-        start,
-        end);
+    throw activemq::exceptions::OutOfRangeException(
+        std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+        "Start [" + std::to_string(start) + "] or end [" + std::to_string(end) +
+        "] index value are invalid.");
 }
 
 ////////////////////////////////////////////////////////////////////////////////

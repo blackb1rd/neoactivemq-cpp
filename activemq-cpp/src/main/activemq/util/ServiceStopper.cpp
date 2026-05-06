@@ -20,6 +20,8 @@
 #include <activemq/exceptions/ActiveMQException.h>
 #include <activemq/util/Service.h>
 
+#include <exception>
+
 using namespace activemq;
 using namespace activemq::util;
 using namespace activemq::exceptions;
@@ -50,14 +52,19 @@ void ServiceStopper::stop(Service* service)
     {
         service->stop();
     }
-    catch (Exception& ex)
+    catch (const std::exception& stdex)
     {
-        this->onException(service, ex);
-    }
-    catch (std::exception& stdex)
-    {
-        ActiveMQException wrapper(__FILE__, __LINE__, stdex.what());
-        this->onException(service, wrapper);
+        const Exception* dex = dynamic_cast<const Exception*>(&stdex);
+        if (dex != nullptr)
+        {
+            Exception copy(*dex);
+            this->onException(service, copy);
+        }
+        else
+        {
+            ActiveMQException wrapper(__FILE__, __LINE__, stdex.what());
+            this->onException(service, wrapper);
+        }
     }
     catch (...)
     {

@@ -17,15 +17,15 @@
 
 #include "WireFormatRegistry.h"
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <memory>
+#include <stdexcept>
 
 using namespace std;
 using namespace activemq;
 using namespace activemq::wireformat;
 using namespace decaf;
 using namespace decaf::util;
-using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace
@@ -56,11 +56,11 @@ WireFormatFactory* WireFormatRegistry::findFactory(const std::string& name) cons
 {
     if (!this->registry.containsKey(name))
     {
-        throw NoSuchElementException(
+        throw activemq::exceptions::NoSuchElementException(
             __FILE__,
             __LINE__,
-            "No Matching Factory Registered for format := %s",
-            name.c_str());
+            std::string("No Matching Factory Registered for format := ") +
+                name);
     }
 
     return this->registry.get(name);
@@ -72,17 +72,13 @@ void WireFormatRegistry::registerFactory(const std::string& name,
 {
     if (name == "")
     {
-        throw IllegalArgumentException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::IllegalArgumentException(
             "WireFormatFactory name cannot be the empty string");
     }
 
     if (factory == NULL)
     {
-        throw NullPointerException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::NullPointerException(
             "Supplied WireFormatFactory pointer was NULL");
     }
 

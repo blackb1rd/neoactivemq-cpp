@@ -20,7 +20,6 @@
 
 #include <activemq/util/Config.h>
 #include <activemq/wireformat/WireFormat.h>
-#include <decaf/lang/exceptions/IllegalStateException.h>
 #include <decaf/util/Properties.h>
 #include <memory>
 
@@ -49,7 +48,7 @@ namespace wireformat
          *
          * @return Pointer to a new instance of a WireFormat object.
          *
-         * @throws IllegalStateException if the factory has not been
+         * @throws std::logic_error if the factory has not been
          * initialized.
          */
         virtual std::shared_ptr<WireFormat> createWireFormat(

@@ -19,8 +19,6 @@
 
 #include <decaf/lang/Integer.h>
 #include <decaf/lang/Pointer.h>
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/security/MessageDigest.h>
 #include <decaf/security/NoSuchAlgorithmException.h>
 #include <decaf/security/Provider.h>
@@ -28,7 +26,6 @@
 using namespace std;
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::security;
 
 class MessageDigestTest : public ::testing::Test

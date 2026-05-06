@@ -22,19 +22,18 @@
 #include <openssl/x509.h>
 #include <openssl/x509v3.h>
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/internal/net/SocketFileDescriptor.h>
 #include <decaf/internal/net/ssl/openssl/OpenSSLParameters.h>
 #include <decaf/internal/net/ssl/openssl/OpenSSLSocket.h>
 #include <decaf/internal/net/ssl/openssl/OpenSSLSocketException.h>
 #include <decaf/io/IOException.h>
-#include <decaf/lang/exceptions/IndexOutOfBoundsException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/net/SocketException.h>
 #include <decaf/net/SocketImpl.h>
+#include <stdexcept>
 
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::io;
 using namespace decaf::net;
 using namespace decaf::net::ssl;
@@ -87,7 +86,7 @@ OpenSSLServerSocket::OpenSSLServerSocket(OpenSSLParameters* parameters)
 {
     if (parameters == NULL)
     {
-        throw NullPointerException(
+        throw activemq::exceptions::NullPointerException(
             __FILE__,
             __LINE__,
             "The OpenSSL Parameters object instance passed was NULL.");

@@ -78,7 +78,7 @@ namespace internal
             /**
              * Gets the one and only instance of the Security class, if this is
              * called before the Security layer has been initialized or after it
-             * has been shutdown then an IllegalStateException is thrown.
+             * has been shutdown then std::logic_error is thrown.
              *
              * @return pointer to the Security runtime for the Decaf library.
              */

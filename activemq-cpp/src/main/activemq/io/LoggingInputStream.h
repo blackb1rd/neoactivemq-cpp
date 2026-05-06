@@ -20,7 +20,6 @@
 
 #include <activemq/util/Config.h>
 #include <decaf/io/FilterInputStream.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/util/logging/LoggerDefines.h>
 
 namespace activemq

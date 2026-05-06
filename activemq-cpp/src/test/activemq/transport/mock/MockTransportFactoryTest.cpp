@@ -29,7 +29,6 @@ using namespace activemq::transport::mock;
 using namespace decaf;
 using namespace decaf::net;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 class MockTransportFactoryTest : public ::testing::Test
 {

@@ -20,12 +20,11 @@
 #include <activemq/commands/ActiveMQMessage.h>
 #include <activemq/commands/DestinationInfo.h>
 #include <activemq/core/ActiveMQConstants.h>
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <cms/Message.h>
 #include <cms/TextMessage.h>
 #include <cms/Topic.h>
-#include <decaf/lang/Integer.h>
-#include <decaf/lang/exceptions/ClassCastException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
+#include <stdexcept>
 
 using namespace std;
 using namespace activemqcpp;
@@ -34,9 +33,7 @@ using namespace activemqcpp::examples::advisories;
 using namespace activemq;
 using namespace activemq::commands;
 using namespace activemq::core;
-using namespace decaf;
-using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
+using namespace activemq::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 TempDestinationAdvisoryConsumer::TempDestinationAdvisoryConsumer(
@@ -78,12 +75,18 @@ void TempDestinationAdvisoryConsumer::onMessage(const cms::Message* message)
             std::cout << "Advisory Message contains a Command Object!"
                       << std::endl;
 
-            try
-            {
-                std::shared_ptr<DestinationInfo> info =
-                    std::dynamic_pointer_cast<DestinationInfo>(
-                        amqMessage->getDataStructure());
+            std::shared_ptr<DestinationInfo> info =
+                std::dynamic_pointer_cast<DestinationInfo>(
+                    amqMessage->getDataStructure());
 
+            if (!info)
+            {
+                std::cout << "ERROR: Expected the Command to be a "
+                             "DestinationInfo, "
+                          << "it wasn't so PANIC!!" << std::endl;
+            }
+            else
+            {
                 unsigned char operationType = info->getOperationType();
 
                 if (operationType ==
@@ -105,12 +108,6 @@ void TempDestinationAdvisoryConsumer::onMessage(const cms::Message* message)
                     std::cout << "ERROR: I have no Idea what just happened!"
                               << std::endl;
                 }
-            }
-            catch (ClassCastException& ex)
-            {
-                std::cout << "ERROR: Expected the Command to be a "
-                             "DestinationInfo, "
-                          << "it wasn't so PANIC!!" << std::endl;
             }
         }
     }

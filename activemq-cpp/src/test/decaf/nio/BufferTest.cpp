@@ -17,11 +17,10 @@
 
 #include <decaf/nio/Buffer.h>
 #include <gtest/gtest.h>
+#include <stdexcept>
 
 using namespace decaf;
 using namespace decaf::nio;
-using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 class BufferTest : public ::testing::Test
 {
@@ -166,7 +165,7 @@ TEST_F(BufferTest, testLimitInt)
     ASSERT_THROW(buffer->reset(), InvalidMarkException)
         << ("Should throw InvalidMarkException");
 
-    ASSERT_THROW(buffer->limit(buffer->capacity() + 1), IllegalArgumentException)
+    ASSERT_THROW(buffer->limit(buffer->capacity() + 1), std::invalid_argument)
         << ("Should throw IllegalArgumentException");
 }
 
@@ -201,7 +200,7 @@ TEST_F(BufferTest, testPositionInt)
 {
     int oldPosition = buffer->position();
 
-    ASSERT_THROW(buffer->position(buffer->limit() + 1), IllegalArgumentException)
+    ASSERT_THROW(buffer->position(buffer->limit() + 1), std::invalid_argument)
         << ("Should throw IllegalArgumentException");
 
     buffer->mark();

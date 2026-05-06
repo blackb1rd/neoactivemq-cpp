@@ -17,12 +17,14 @@
 
 #include <gtest/gtest.h>
 
+#include <stdexcept>
+
 #include <decaf/util/Random.h>
 #include <decaf/util/concurrent/LinkedBlockingQueue.h>
 #include <decaf/util/concurrent/ThreadPoolExecutor.h>
 
+#include <decaf/lang/Exception.h>
 #include <decaf/lang/Thread.h>
-#include <decaf/lang/exceptions/RuntimeException.h>
 #include <decaf/util/Config.h>
 #include <decaf/util/concurrent/Concurrent.h>
 #include <decaf/util/concurrent/CountDownLatch.h>
@@ -32,7 +34,6 @@
 using namespace std;
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 
@@ -102,7 +103,7 @@ public:
 
     virtual void run()
     {
-        throw RuntimeException();
+        throw Exception();
     }
 };
 
@@ -211,7 +212,7 @@ protected:
         beforeCalled = true;
     }
 
-    void afterExecute(Runnable* r, Throwable* t)
+    void afterExecute(Runnable* r, Exception* t)
     {
         afterCalled = true;
     }
@@ -627,8 +628,8 @@ TEST_F(ThreadPoolExecutorTest, testSetRejectedExecutionHandlerNull)
                          TimeUnit::MILLISECONDS,
                          new LinkedBlockingQueue<Runnable*>());
 
-    ASSERT_THROW(p.setRejectedExecutionHandler(NULL), NullPointerException)
-        << ("Should have thrown a NullPointerException");
+    ASSERT_THROW(p.setRejectedExecutionHandler(NULL), std::logic_error)
+        << ("Should have thrown std::logic_error");
 
     joinPool(p);
 }
@@ -890,7 +891,7 @@ TEST_F(ThreadPoolExecutorTest, testConstructor1)
                                         LONG_DELAY_MS,
                                         TimeUnit::MILLISECONDS,
                                         queue.get()),
-                 IllegalArgumentException)
+                 std::invalid_argument)
         << ("Should have thrown a IllegalArgumentException");
 }
 
@@ -905,7 +906,7 @@ TEST_F(ThreadPoolExecutorTest, testConstructor2)
                                         LONG_DELAY_MS,
                                         TimeUnit::MILLISECONDS,
                                         queue.get()),
-                 IllegalArgumentException)
+                 std::invalid_argument)
         << ("Should have thrown a IllegalArgumentException");
 }
 
@@ -920,7 +921,7 @@ TEST_F(ThreadPoolExecutorTest, testConstructor3)
                                         LONG_DELAY_MS,
                                         TimeUnit::MILLISECONDS,
                                         queue.get()),
-                 IllegalArgumentException)
+                 std::invalid_argument)
         << ("Should have thrown a IllegalArgumentException");
 }
 
@@ -932,7 +933,7 @@ TEST_F(ThreadPoolExecutorTest, testConstructor4)
 
     ASSERT_THROW(
         new ThreadPoolExecutor(1, 2, -1LL, TimeUnit::MILLISECONDS, queue.get()),
-        IllegalArgumentException)
+        std::invalid_argument)
         << ("Should have thrown a IllegalArgumentException");
 }
 
@@ -947,7 +948,7 @@ TEST_F(ThreadPoolExecutorTest, testConstructor5)
                                         LONG_DELAY_MS,
                                         TimeUnit::MILLISECONDS,
                                         queue.get()),
-                 IllegalArgumentException)
+                 std::invalid_argument)
         << ("Should have thrown a IllegalArgumentException");
 }
 
@@ -964,7 +965,7 @@ TEST_F(ThreadPoolExecutorTest, testConstructor6)
                                         TimeUnit::MILLISECONDS,
                                         queue.get(),
                                         factory.get()),
-                 IllegalArgumentException)
+                 std::invalid_argument)
         << ("Should have thrown a IllegalArgumentException");
 }
 
@@ -981,7 +982,7 @@ TEST_F(ThreadPoolExecutorTest, testConstructor7)
                                         TimeUnit::MILLISECONDS,
                                         queue.get(),
                                         factory.get()),
-                 IllegalArgumentException)
+                 std::invalid_argument)
         << ("Should have thrown a IllegalArgumentException");
 }
 
@@ -998,7 +999,7 @@ TEST_F(ThreadPoolExecutorTest, testConstructor8)
                                         TimeUnit::MILLISECONDS,
                                         queue.get(),
                                         factory.get()),
-                 IllegalArgumentException)
+                 std::invalid_argument)
         << ("Should have thrown a IllegalArgumentException");
 }
 
@@ -1015,7 +1016,7 @@ TEST_F(ThreadPoolExecutorTest, testConstructor9)
                                         TimeUnit::MILLISECONDS,
                                         queue.get(),
                                         factory.get()),
-                 IllegalArgumentException)
+                 std::invalid_argument)
         << ("Should have thrown a IllegalArgumentException");
 }
 
@@ -1032,7 +1033,7 @@ TEST_F(ThreadPoolExecutorTest, testConstructor10)
                                         TimeUnit::MILLISECONDS,
                                         queue.get(),
                                         factory.get()),
-                 IllegalArgumentException)
+                 std::invalid_argument)
         << ("Should have thrown a IllegalArgumentException");
 }
 
@@ -1049,7 +1050,7 @@ TEST_F(ThreadPoolExecutorTest, testConstructor11)
                                         TimeUnit::MILLISECONDS,
                                         queue.get(),
                                         handler.get()),
-                 IllegalArgumentException)
+                 std::invalid_argument)
         << ("Should have thrown a IllegalArgumentException");
 }
 
@@ -1066,7 +1067,7 @@ TEST_F(ThreadPoolExecutorTest, testConstructor12)
                                         TimeUnit::MILLISECONDS,
                                         queue.get(),
                                         handler.get()),
-                 IllegalArgumentException)
+                 std::invalid_argument)
         << ("Should have thrown a IllegalArgumentException");
 }
 
@@ -1083,7 +1084,7 @@ TEST_F(ThreadPoolExecutorTest, testConstructor13)
                                         TimeUnit::MILLISECONDS,
                                         queue.get(),
                                         handler.get()),
-                 IllegalArgumentException)
+                 std::invalid_argument)
         << ("Should have thrown a IllegalArgumentException");
 }
 
@@ -1100,7 +1101,7 @@ TEST_F(ThreadPoolExecutorTest, testConstructor14)
                                         TimeUnit::MILLISECONDS,
                                         queue.get(),
                                         handler.get()),
-                 IllegalArgumentException)
+                 std::invalid_argument)
         << ("Should have thrown a IllegalArgumentException");
 }
 
@@ -1117,7 +1118,7 @@ TEST_F(ThreadPoolExecutorTest, testConstructor15)
                                         TimeUnit::MILLISECONDS,
                                         queue.get(),
                                         handler.get()),
-                 IllegalArgumentException)
+                 std::invalid_argument)
         << ("Should have thrown a IllegalArgumentException");
 }
 
@@ -1136,7 +1137,7 @@ TEST_F(ThreadPoolExecutorTest, testConstructor16)
                                         queue.get(),
                                         factory.get(),
                                         handler.get()),
-                 IllegalArgumentException)
+                 std::invalid_argument)
         << ("Should have thrown a IllegalArgumentException");
 }
 
@@ -1155,7 +1156,7 @@ TEST_F(ThreadPoolExecutorTest, testConstructor17)
                                         queue.get(),
                                         factory.get(),
                                         handler.get()),
-                 IllegalArgumentException)
+                 std::invalid_argument)
         << ("Should have thrown a IllegalArgumentException");
 }
 
@@ -1174,7 +1175,7 @@ TEST_F(ThreadPoolExecutorTest, testConstructor18)
                                         queue.get(),
                                         factory.get(),
                                         handler.get()),
-                 IllegalArgumentException)
+                 std::invalid_argument)
         << ("Should have thrown a IllegalArgumentException");
 }
 
@@ -1193,7 +1194,7 @@ TEST_F(ThreadPoolExecutorTest, testConstructor19)
                                         queue.get(),
                                         factory.get(),
                                         handler.get()),
-                 IllegalArgumentException)
+                 std::invalid_argument)
         << ("Should have thrown a IllegalArgumentException");
 }
 
@@ -1212,12 +1213,12 @@ TEST_F(ThreadPoolExecutorTest, testConstructor20)
                                         queue.get(),
                                         factory.get(),
                                         handler.get()),
-                 IllegalArgumentException)
+                 std::invalid_argument)
         << ("Should have thrown a IllegalArgumentException");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-TEST_F(ThreadPoolExecutorTest, testConstructorNullPointerException1)
+TEST_F(ThreadPoolExecutorTest, testConstructorStdLogicError1)
 {
     Pointer<BlockingQueue<Runnable*>> queue(
         new LinkedBlockingQueue<Runnable*>());
@@ -1227,12 +1228,12 @@ TEST_F(ThreadPoolExecutorTest, testConstructorNullPointerException1)
                                         LONG_DELAY_MS,
                                         TimeUnit::MILLISECONDS,
                                         NULL),
-                 NullPointerException)
-        << ("Should have thrown a NullPointerException");
+                 std::logic_error)
+        << ("Should have thrown std::logic_error");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-TEST_F(ThreadPoolExecutorTest, testConstructorNullPointerException2)
+TEST_F(ThreadPoolExecutorTest, testConstructorStdLogicError2)
 {
     Pointer<BlockingQueue<Runnable*>> queue(
         new LinkedBlockingQueue<Runnable*>());
@@ -1244,12 +1245,12 @@ TEST_F(ThreadPoolExecutorTest, testConstructorNullPointerException2)
                                         TimeUnit::MILLISECONDS,
                                         NULL,
                                         factory.get()),
-                 NullPointerException)
-        << ("Should have thrown a NullPointerException");
+                 std::logic_error)
+        << ("Should have thrown std::logic_error");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-TEST_F(ThreadPoolExecutorTest, testConstructorNullPointerException3)
+TEST_F(ThreadPoolExecutorTest, testConstructorStdLogicError3)
 {
     Pointer<BlockingQueue<Runnable*>> queue(
         new LinkedBlockingQueue<Runnable*>());
@@ -1260,12 +1261,12 @@ TEST_F(ThreadPoolExecutorTest, testConstructorNullPointerException3)
                                         TimeUnit::MILLISECONDS,
                                         queue.get(),
                                         (ThreadFactory*)NULL),
-                 NullPointerException)
-        << ("Should have thrown a NullPointerException");
+                 std::logic_error)
+        << ("Should have thrown std::logic_error");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-TEST_F(ThreadPoolExecutorTest, testConstructorNullPointerException4)
+TEST_F(ThreadPoolExecutorTest, testConstructorStdLogicError4)
 {
     Pointer<RejectedExecutionHandler> handler(new NoOpREHandler());
 
@@ -1275,12 +1276,12 @@ TEST_F(ThreadPoolExecutorTest, testConstructorNullPointerException4)
                                         TimeUnit::MILLISECONDS,
                                         NULL,
                                         handler.get()),
-                 NullPointerException)
-        << ("Should have thrown a NullPointerException");
+                 std::logic_error)
+        << ("Should have thrown std::logic_error");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-TEST_F(ThreadPoolExecutorTest, testConstructorNullPointerException5)
+TEST_F(ThreadPoolExecutorTest, testConstructorStdLogicError5)
 {
     Pointer<BlockingQueue<Runnable*>> queue(
         new LinkedBlockingQueue<Runnable*>());
@@ -1291,12 +1292,12 @@ TEST_F(ThreadPoolExecutorTest, testConstructorNullPointerException5)
                                         TimeUnit::MILLISECONDS,
                                         queue.get(),
                                         (RejectedExecutionHandler*)NULL),
-                 NullPointerException)
-        << ("Should have thrown a NullPointerException");
+                 std::logic_error)
+        << ("Should have thrown std::logic_error");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-TEST_F(ThreadPoolExecutorTest, testConstructorNullPointerException6)
+TEST_F(ThreadPoolExecutorTest, testConstructorStdLogicError6)
 {
     Pointer<ThreadFactory>            factory(new SimpleThreadFactory());
     Pointer<RejectedExecutionHandler> handler(new NoOpREHandler());
@@ -1308,12 +1309,12 @@ TEST_F(ThreadPoolExecutorTest, testConstructorNullPointerException6)
                                         NULL,
                                         factory.get(),
                                         handler.get()),
-                 NullPointerException)
-        << ("Should have thrown a NullPointerException");
+                 std::logic_error)
+        << ("Should have thrown std::logic_error");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-TEST_F(ThreadPoolExecutorTest, testConstructorNullPointerException7)
+TEST_F(ThreadPoolExecutorTest, testConstructorStdLogicError7)
 {
     Pointer<BlockingQueue<Runnable*>> queue(
         new LinkedBlockingQueue<Runnable*>());
@@ -1326,12 +1327,12 @@ TEST_F(ThreadPoolExecutorTest, testConstructorNullPointerException7)
                                         queue.get(),
                                         factory.get(),
                                         (RejectedExecutionHandler*)NULL),
-                 NullPointerException)
-        << ("Should have thrown a NullPointerException");
+                 std::logic_error)
+        << ("Should have thrown std::logic_error");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-TEST_F(ThreadPoolExecutorTest, testConstructorNullPointerException8)
+TEST_F(ThreadPoolExecutorTest, testConstructorStdLogicError8)
 {
     Pointer<BlockingQueue<Runnable*>> queue(
         new LinkedBlockingQueue<Runnable*>());
@@ -1344,8 +1345,8 @@ TEST_F(ThreadPoolExecutorTest, testConstructorNullPointerException8)
                                         queue.get(),
                                         (ThreadFactory*)NULL,
                                         handler.get()),
-                 NullPointerException)
-        << ("Should have thrown a NullPointerException");
+                 std::logic_error)
+        << ("Should have thrown std::logic_error");
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1607,8 +1608,8 @@ TEST_F(ThreadPoolExecutorTest, testExecuteNull)
                            TimeUnit::MILLISECONDS,
                            new LinkedBlockingQueue<Runnable*>());
 
-    ASSERT_THROW(tpe.execute(NULL), NullPointerException)
-        << ("Should have thrown a NullPointerException");
+    ASSERT_THROW(tpe.execute(NULL), std::logic_error)
+        << ("Should have thrown std::logic_error");
 
     tpe.shutdown();
 
@@ -1624,7 +1625,7 @@ TEST_F(ThreadPoolExecutorTest, testCorePoolSizeIllegalArgumentException)
                            TimeUnit::MILLISECONDS,
                            new LinkedBlockingQueue<Runnable*>());
 
-    ASSERT_THROW(tpe.setCorePoolSize(-1), IllegalArgumentException)
+    ASSERT_THROW(tpe.setCorePoolSize(-1), std::invalid_argument)
         << ("Should have thrown a IllegalArgumentException");
 
     tpe.shutdown();
@@ -1641,7 +1642,7 @@ TEST_F(ThreadPoolExecutorTest, testMaximumPoolSizeIllegalArgumentException1)
                            TimeUnit::MILLISECONDS,
                            new LinkedBlockingQueue<Runnable*>());
 
-    ASSERT_THROW(tpe.setMaximumPoolSize(1), IllegalArgumentException)
+    ASSERT_THROW(tpe.setMaximumPoolSize(1), std::invalid_argument)
         << ("Should have thrown a IllegalArgumentException");
 
     tpe.shutdown();
@@ -1658,7 +1659,7 @@ TEST_F(ThreadPoolExecutorTest, testMaximumPoolSizeIllegalArgumentException2)
                            TimeUnit::MILLISECONDS,
                            new LinkedBlockingQueue<Runnable*>());
 
-    ASSERT_THROW(tpe.setMaximumPoolSize(-1), IllegalArgumentException)
+    ASSERT_THROW(tpe.setMaximumPoolSize(-1), std::invalid_argument)
         << ("Should have thrown a IllegalArgumentException");
 
     tpe.shutdown();
@@ -1676,7 +1677,7 @@ TEST_F(ThreadPoolExecutorTest, testKeepAliveTimeIllegalArgumentException)
                            new LinkedBlockingQueue<Runnable*>());
 
     ASSERT_THROW(tpe.setKeepAliveTime(-1, TimeUnit::MILLISECONDS),
-                 IllegalArgumentException)
+                 std::invalid_argument)
         << ("Should have thrown a IllegalArgumentException");
 
     tpe.shutdown();

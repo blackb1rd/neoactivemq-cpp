@@ -23,6 +23,7 @@
 #include <decaf/nio/ByteBuffer.h>
 #include <decaf/security/SecuritySpi.h>
 
+#include <stdexcept>
 #include <vector>
 
 namespace decaf
@@ -44,7 +45,7 @@ namespace security
      * a particular message digest algorithm.
      *
      * Implementations are free to implement clone method or throw a
-     * CloneNotSupportedException..
+     * std::logic_error.
      *
      * @since 1.0
      */
@@ -68,9 +69,8 @@ namespace security
          *
          * @return a new pointer that is a copy of this object.
          *
-         * @throws CloneNotSupportedException
-         *      if this is called on an implementation that does not support
-         * cloning.
+         * @throws std::logic_error if this is called on an implementation that
+         *      does not support cloning.
          */
         virtual MessageDigestSpi* clone();
 
@@ -103,7 +103,7 @@ namespace security
          * @param length
          *      The number of bytes to use, starting at offset.
          *
-         * @throws NullPointerException if the input array pointer is NULL.
+         * @throws std::logic_error if the input array pointer is NULL.
          */
         virtual void engineUpdate(const unsigned char* input,
                                   int                  size,
@@ -168,7 +168,7 @@ namespace security
          * @return the length of the digest stored in the output buffer.
          *
          * @throws DigestException if an error occurs.
-         * @throws NullPointerException if the buffer pointer is NULL.
+         * @throws std::logic_error if the buffer pointer is NULL.
          */
         virtual int engineDigest(unsigned char* buffer,
                                  int            size,

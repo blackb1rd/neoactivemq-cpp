@@ -20,6 +20,7 @@
 #include <activemq/commands/RemoveInfo.h>
 #include <activemq/core/ActiveMQConnection.h>
 #include <activemq/core/kernels/ActiveMQSessionKernel.h>
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <activemq/util/AMQLog.h>
 #include <activemq/util/ActiveMQMessageTransformation.h>
 #include <activemq/util/ActiveMQProperties.h>
@@ -27,9 +28,7 @@
 #include <cms/Message.h>
 #include <decaf/lang/Boolean.h>
 #include <decaf/lang/System.h>
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
-#include <decaf/lang/exceptions/InvalidStateException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
+#include <stdexcept>
 
 using namespace std;
 using namespace activemq;
@@ -40,7 +39,6 @@ using namespace activemq::commands;
 using namespace activemq::exceptions;
 using namespace decaf::util;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 ActiveMQProducerKernel::ActiveMQProducerKernel(
@@ -377,7 +375,7 @@ void ActiveMQProducerKernel::send(const cms::Destination* destination,
             }
             if (outbound == nullptr)
             {
-                throw NullPointerException(
+                throw activemq::exceptions::NullPointerException(
                     __FILE__,
                     __LINE__,
                     "MessageTransformer set transformed message to NULL");
@@ -390,7 +388,7 @@ void ActiveMQProducerKernel::send(const cms::Destination* destination,
             {
                 this->memoryUsage->waitForSpace();
             }
-            catch (InterruptedException& e)
+            catch (activemq::exceptions::InterruptedException&)
             {
                 AMQ_LOG_ERROR("ActiveMQProducerKernel",
                               "send(): Thread interrupted while waiting for "

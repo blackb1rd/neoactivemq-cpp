@@ -67,7 +67,7 @@ namespace io
          * @param own
          *      Does this object own the passed InputStream (defaults to false).
          *
-         * @throw NullPointerException if the passed InputStream is NULL.
+         * @throw std::logic_error if the passed InputStream is NULL.
          */
         InputStreamReader(InputStream* stream, bool own = false);
 

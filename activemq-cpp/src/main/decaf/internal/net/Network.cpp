@@ -20,7 +20,6 @@
 #include <decaf/internal/util/ResourceLifecycleManager.h>
 #include <decaf/lang/Exception.h>
 #include <decaf/lang/Runnable.h>
-#include <decaf/lang/exceptions/IllegalStateException.h>
 #include <decaf/util/LinkedList.h>
 #include <decaf/util/concurrent/Mutex.h>
 
@@ -28,12 +27,15 @@
 #include <signal.h>
 #endif
 
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <stdexcept>
+#include <string>
+
 using namespace decaf;
 using namespace decaf::internal;
 using namespace decaf::internal::net;
 using namespace decaf::internal::util;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 
@@ -123,9 +125,10 @@ Network* Network::getNetworkRuntime()
 {
     if (Network::networkRuntime == NULL)
     {
-        throw IllegalStateException(__FILE__,
-                                    __LINE__,
-                                    "Network Runtime is not Initialized.");
+        throw activemq::exceptions::IllegalStateException(
+            __FILE__,
+            __LINE__,
+            "Network Runtime is not Initialized.");
     }
 
     return Network::networkRuntime;

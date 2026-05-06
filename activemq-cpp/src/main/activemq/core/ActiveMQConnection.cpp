@@ -985,18 +985,16 @@ void ActiveMQConnection::close()
                 }
                 catch (Exception& e)
                 {
-                    AMQ_LOG_WARN(
-                        "ActiveMQConnection",
-                        "advisory consumer dispose failed during close"
-                        " (ignored): "
-                            << e.getMessage());
+                    AMQ_LOG_WARN("ActiveMQConnection",
+                                 "advisory consumer dispose failed during close"
+                                 " (ignored): "
+                                     << e.getMessage());
                 }
                 catch (...)
                 {
-                    AMQ_LOG_WARN(
-                        "ActiveMQConnection",
-                        "advisory consumer dispose failed during close"
-                        " (ignored): unknown exception");
+                    AMQ_LOG_WARN("ActiveMQConnection",
+                                 "advisory consumer dispose failed during close"
+                                 " (ignored): unknown exception");
                 }
             }
         }

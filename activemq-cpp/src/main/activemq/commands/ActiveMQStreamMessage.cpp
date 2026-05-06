@@ -473,7 +473,7 @@ char ActiveMQStreamMessage::readChar() const
         }
         if (type == PrimitiveValueNode::CHAR_TYPE)
         {
-            // Java Char is two bytes (UTF-16); discard high byte, return low byte.
+            // Java char is 2 bytes; discard high byte, return low.
             this->dataIn->readByte();
             return this->dataIn->readChar();
         }
@@ -526,7 +526,7 @@ void ActiveMQStreamMessage::writeChar(char value)
     try
     {
         this->dataOut->write(PrimitiveValueNode::CHAR_TYPE);
-        // Java Char is two bytes (UTF-16); write high byte then low byte.
+        // Java char is 2 bytes; write high byte then low byte.
         // C++ char fits in one byte, so high byte is always zero.
         this->dataOut->write(0);
         this->dataOut->write((unsigned char)value);
@@ -1069,7 +1069,7 @@ std::string ActiveMQStreamMessage::readString() const
 
         if (type == PrimitiveValueNode::CHAR_TYPE)
         {
-            // Java Char is two bytes (UTF-16); discard high byte, use low byte.
+            // Java char is 2 bytes; discard high byte, use low.
             this->dataIn->readByte();
             return Character(this->dataIn->readChar()).toString();
         }

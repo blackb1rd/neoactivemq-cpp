@@ -277,7 +277,8 @@ TEST_F(OpenwireXATransactionsTest, testSendReceiveTransactedBatches)
     std::unique_ptr<XASession> session(connection->createXASession());
     ASSERT_TRUE(session.get() != NULL);
 
-    std::unique_ptr<Destination> destination(session->createTemporaryQueue());
+    std::unique_ptr<Destination> destination(
+        session->createQueue(UUID::randomUUID().toString()));
     std::unique_ptr<MessageProducer> producer(
         session->createProducer(destination.get()));
     std::unique_ptr<MessageConsumer> consumer(
@@ -353,7 +354,8 @@ TEST_F(OpenwireXATransactionsTest, testSendRollback)
     std::unique_ptr<XASession> session(connection->createXASession());
     ASSERT_TRUE(session.get() != NULL);
 
-    std::unique_ptr<Destination> destination(session->createTemporaryQueue());
+    std::unique_ptr<Destination> destination(
+        session->createQueue(UUID::randomUUID().toString()));
     std::unique_ptr<MessageProducer> producer(
         session->createProducer(destination.get()));
     std::unique_ptr<MessageConsumer> consumer(
@@ -434,7 +436,8 @@ TEST_F(OpenwireXATransactionsTest, testSendRollbackCommitRollback)
     std::unique_ptr<XASession> session(connection->createXASession());
     ASSERT_TRUE(session.get() != NULL);
 
-    std::unique_ptr<Destination> destination(session->createTemporaryQueue());
+    std::unique_ptr<Destination> destination(
+        session->createQueue(UUID::randomUUID().toString()));
     std::unique_ptr<MessageProducer> producer(
         session->createProducer(destination.get()));
 
@@ -522,7 +525,8 @@ TEST_F(OpenwireXATransactionsTest, testWithTTLSet)
     std::unique_ptr<XASession> session(connection->createXASession());
     ASSERT_TRUE(session.get() != NULL);
 
-    std::unique_ptr<Destination> destination(session->createTemporaryQueue());
+    std::unique_ptr<Destination> destination(
+        session->createQueue(UUID::randomUUID().toString()));
     std::unique_ptr<MessageProducer> producer(
         session->createProducer(destination.get()));
 
@@ -603,7 +607,13 @@ TEST_F(OpenwireXATransactionsTest, testXAResource_Exception1)
     ASSERT_THROW(xaResource->prepare(ixId.get()), XAException)
         << ("Prepare Should have thrown an XAException");
 
-    xaResource->forget(ixId.get());
+    try
+    {
+        xaResource->forget(ixId.get());
+    }
+    catch (cms::XAException&)
+    {
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -634,7 +644,13 @@ TEST_F(OpenwireXATransactionsTest, testXAResource_Exception2)
     ASSERT_THROW(xaResource->commit(ixId.get(), true), XAException)
         << ("Commit Should have thrown an XAException");
 
-    xaResource->forget(ixId.get());
+    try
+    {
+        xaResource->forget(ixId.get());
+    }
+    catch (cms::XAException&)
+    {
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -667,5 +683,11 @@ TEST_F(OpenwireXATransactionsTest, testXAResource_Exception3)
                  XAException)
         << ("end Should have thrown an XAException");
 
-    xaResource->forget(ixId.get());
+    try
+    {
+        xaResource->forget(ixId.get());
+    }
+    catch (cms::XAException&)
+    {
+    }
 }

@@ -46,6 +46,8 @@ jobs:
 
     - name: Setup sccache
       uses: mozilla-actions/sccache-action@v0.0.10
+      with:
+        sccache_version: "v0.15.0"
 
     - name: Setup MSVC Developer Command Prompt
       uses: ilammy/msvc-dev-cmd@v1
@@ -268,6 +270,8 @@ jobs:
 
     - name: Setup sccache
       uses: mozilla-actions/sccache-action@v0.0.10
+      with:
+        sccache_version: "v0.15.0"
 
     - name: Setup MSVC Developer Command Prompt
       uses: ilammy/msvc-dev-cmd@v1
@@ -334,6 +338,8 @@ jobs:
 
     - name: Setup sccache
       uses: mozilla-actions/sccache-action@v0.0.10
+      with:
+        sccache_version: "v0.15.0"
 
     - name: Setup MSVC Developer Command Prompt
       uses: ilammy/msvc-dev-cmd@v1

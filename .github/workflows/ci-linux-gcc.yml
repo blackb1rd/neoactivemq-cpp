@@ -49,6 +49,8 @@ jobs:
 
     - name: Setup sccache
       uses: mozilla-actions/sccache-action@v0.0.10
+      with:
+        sccache_version: "v0.15.0"
 
     - name: Create vcpkg cache directories
       run: |
@@ -238,7 +240,8 @@ jobs:
           - { preset: x64-linux-gcc-release-no-ssl-test, build_type: Release }
         activemq:
           - { name: "AMQ-5.18", image: "apache/activemq-classic:5.18.7" }
-          - { name: "AMQ-6.2", image: "apache/activemq-classic:6.2.0" }
+          - { name: "AMQ-5.19", image: "apache/activemq:5.19.6" }
+          - { name: "AMQ-6.2", image: "apache/activemq:6.2.5" }
 
     steps:
     - name: Checkout code
@@ -331,6 +334,250 @@ jobs:
           output/build/${{ matrix.config.preset }}/Testing/Temporary/
           output/build/${{ matrix.config.preset }}/**/*.log
 
+  # Linux GCC integration tests against ActiveMQ Artemis
+  # Artemis uses a different broker (broker.xml) and is started with the
+  # 'artemis' docker-compose profile. We run the same OpenWire and STOMP
+  # integration suites to verify the library works against Artemis.
+  linux-gcc-artemis-integration-test:
+    name: Linux GCC Integration Test (Artemis)
+    runs-on: ubuntu-latest
+    needs: linux-gcc-build-test
+
+    env:
+      VCPKG_BINARY_SOURCES: "clear;files,${{ github.workspace }}/.cache/vcpkg/archives,read"
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - { preset: x64-linux-gcc-release-no-ssl-test, build_type: Release }
+        artemis:
+          - { name: "Artemis-2.53", image: "apache/artemis:2.53.0" }
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+
+
+    - name: Set VCPKG_ROOT environment variable
+      run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
+
+    - name: Create vcpkg cache directories
+      run: |
+        mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
+        mkdir -p "${{ github.workspace }}/.cache/vcpkg/downloads"
+
+    - name: Cache vcpkg binary packages
+      uses: actions/cache@v5
+      with:
+        path: |
+          ${{ github.workspace }}/.cache/vcpkg/archives
+          ${{ github.workspace }}/.cache/vcpkg/downloads
+        key: vcpkg-binary-${{ runner.os }}-no-ssl-${{ hashFiles('vcpkg.json') }}
+        restore-keys: |
+          vcpkg-binary-${{ runner.os }}-no-ssl-
+          vcpkg-binary-${{ runner.os }}-
+
+    - name: Configure CMake (for CTest)
+      run: cmake --preset ${{ matrix.config.preset }}
+
+    - name: Download build artifacts
+      uses: actions/download-artifact@v8
+      with:
+        name: linux-build-${{ matrix.config.preset }}
+        path: output/build/${{ matrix.config.preset }}/
+
+    - name: Make test executables runnable
+      run: chmod +x output/build/${{ matrix.config.preset }}/bin/*
+
+    - name: Start Artemis broker (${{ matrix.artemis.name }})
+      # Name the service explicitly so the default `activemq` service (which
+      # has no profile and therefore is always selectable) is NOT started -
+      # it would race with Artemis for port 61616 and 8161.
+      run: |
+        echo "Starting Artemis broker using image: ${{ matrix.artemis.image }}"
+        ACTIVEMQ_ARTEMIS_IMAGE=${{ matrix.artemis.image }} docker compose --profile artemis up -d activemq-artemis
+        echo "Waiting for Artemis broker to be ready..."
+        timeout 120 bash -c 'until docker compose --profile artemis ps activemq-artemis | grep -q "healthy"; do sleep 2; done' || true
+        sleep 10
+
+    - name: Show broker status
+      run: docker compose --profile artemis ps activemq-artemis
+
+    - name: Show broker logs (startup)
+      run: docker compose --profile artemis logs activemq-artemis --tail 100
+
+    - name: Raise system limits for high-fanout integration tests
+      run: |
+        sudo sysctl -w fs.file-max=1048576
+        sudo sysctl -w net.core.somaxconn=65536
+        sudo sysctl -w net.ipv4.tcp_max_syn_backlog=65536
+        sudo sysctl -w kernel.threads-max=1048576
+
+    - name: Run OpenWire integration tests (${{ matrix.artemis.name }})
+      # Skip tests that depend on Classic-only broker behavior:
+      #   - testConnectionAdvisories: advisory messages from Artemis don't
+      #     embed ConnectionInfo as the OpenWire message body (unlike Classic)
+      #   - testDestinationSourceGetters: DestinationSource queue/topic count
+      #     doesn't update because Artemis advisory message body differs
+      #   - testDestroyDestination: Artemis sends ConnectionError and closes
+      #     the TCP connection when DestinationInfo REMOVE fails (AMQ229025),
+      #     killing the connection and preventing recovery
+      #   - testQueueBrowserWith2Consumers: Artemis queue-browser ordering
+      #     differs from Classic (message IDs don't match expected sequence)
+      #
+      # Tests now passing on Artemis (removed from exclusion list):
+      #   - testConcurrentTempDestCreation: passes (~216s, within 900s timeout)
+      #   - testDestinationSource: passes with supportAdvisory=true in broker.xml
+      #   - testPublishFailsFor*: both variants pass
+      #   - VirtualTopic*: all 3 pass with virtualTopicConsumerWildcards in broker.xml
+      #   - XATransactionsTest*: all 4 pass after COMMITTWOPHASE fix in client
+      #   - tesstStreamMessage: fixed writeChar 2-byte encoding in client
+      #   - testStreamMessageCompression: same writeChar fix
+      #
+      # testTempDestinationCompositeAdvisoryTopic: excluded because it uses a
+      # Classic composite advisory destination
+      # (ActiveMQ.Advisory.TempTopic,ActiveMQ.Advisory.TempQueue). Artemis does
+      # not reliably handle composite destination subscriptions and drops the
+      # TCP connection mid-receive, causing an intermittent EOF in the test body.
+      run: |
+        sudo prlimit --nofile=65536:65536 --nproc=65536:65536 --pid $$
+        ulimit -n 65536
+        ulimit -u 65536
+        ctest --preset ${{ matrix.config.preset }} -L ^integration-openwire$ \
+          -E "testTempDestinationCompositeAdvisoryTopic|testConnectionAdvisories|testDestinationSourceGetters|testDestroyDestination|testQueueBrowserWith2Consumers" \
+          --output-on-failure --timeout 900
+
+    - name: Show broker logs on failure
+      if: failure()
+      run: |
+        echo "=== Artemis broker logs ==="
+        docker compose --profile artemis logs --tail 200 || true
+
+    - name: Stop Artemis broker
+      if: always()
+      run: docker compose --profile artemis down
+
+    - name: Upload test results
+      if: failure()
+      uses: actions/upload-artifact@v7
+      with:
+        name: test-results-gcc-integration-${{ matrix.artemis.name }}
+        path: |
+          output/build/${{ matrix.config.preset }}/Testing/Temporary/
+          output/build/${{ matrix.config.preset }}/**/*.log
+
+  # Linux GCC SSL integration tests against ActiveMQ Artemis
+  # Runs the OpenWire SSL integration suite against an SSL-enabled Artemis
+  # broker (see docker/artemis/broker-ssl.xml). Re-uses the same PKCS12
+  # keystore/truststore that Classic SSL uses (generated by ssl-cert-generator).
+  linux-gcc-artemis-ssl-integration-test:
+    name: Linux GCC SSL Integration Test (Artemis)
+    runs-on: ubuntu-latest
+    needs: linux-gcc-build-test
+
+    env:
+      VCPKG_BINARY_SOURCES: "clear;files,${{ github.workspace }}/.cache/vcpkg/archives,read"
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - { preset: x64-linux-gcc-release-test, build_type: Release }
+        artemis:
+          - { name: "Artemis-2.53", image: "apache/artemis:2.53.0" }
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+
+
+    - name: Set VCPKG_ROOT environment variable
+      run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
+
+    - name: Create vcpkg cache directories
+      run: |
+        mkdir -p "${{ github.workspace }}/.cache/vcpkg/archives"
+        mkdir -p "${{ github.workspace }}/.cache/vcpkg/downloads"
+
+    - name: Cache vcpkg binary packages
+      uses: actions/cache@v5
+      with:
+        path: |
+          ${{ github.workspace }}/.cache/vcpkg/archives
+          ${{ github.workspace }}/.cache/vcpkg/downloads
+        key: vcpkg-binary-${{ runner.os }}-ssl-${{ hashFiles('vcpkg.json') }}
+        restore-keys: |
+          vcpkg-binary-${{ runner.os }}-ssl-
+          vcpkg-binary-${{ runner.os }}-
+
+    - name: Configure CMake (for CTest)
+      run: cmake --preset ${{ matrix.config.preset }}
+
+    - name: Download build artifacts
+      uses: actions/download-artifact@v8
+      with:
+        name: linux-build-${{ matrix.config.preset }}
+        path: output/build/${{ matrix.config.preset }}/
+
+    - name: Make test executables runnable
+      run: chmod +x output/build/${{ matrix.config.preset }}/bin/*
+
+    - name: Start Artemis SSL broker (${{ matrix.artemis.name }})
+      # Name the service explicitly so the default `activemq` service is NOT
+      # started - it would race with Artemis SSL for port 8161. The
+      # ssl-cert-generator dependency runs automatically via depends_on.
+      run: |
+        echo "Starting SSL-enabled Artemis using image: ${{ matrix.artemis.image }}"
+        ACTIVEMQ_ARTEMIS_IMAGE=${{ matrix.artemis.image }} docker compose --profile artemis-ssl up -d activemq-artemis-ssl
+        echo "Waiting for Artemis SSL broker to be ready..."
+        timeout 120 bash -c 'until docker compose --profile artemis-ssl ps activemq-artemis-ssl | grep -q "healthy"; do sleep 2; done' || true
+        sleep 10
+
+    - name: Show broker status
+      run: docker compose --profile artemis-ssl ps activemq-artemis-ssl
+
+    - name: Show broker logs (startup)
+      run: docker compose --profile artemis-ssl logs activemq-artemis-ssl --tail 100
+
+    - name: Raise system limits for high-fanout integration tests
+      run: |
+        sudo sysctl -w fs.file-max=1048576
+        sudo sysctl -w net.core.somaxconn=65536
+        sudo sysctl -w kernel.threads-max=1048576
+
+    - name: Run OpenWire SSL integration tests (${{ matrix.artemis.name }})
+      # Same exclusion set as the plain-Artemis job; see that job for
+      # the rationale.
+      run: |
+        sudo prlimit --nofile=65536:65536 --nproc=65536:65536 --pid $$
+        ulimit -n 65536
+        ulimit -u 65536
+        ctest --preset ${{ matrix.config.preset }} -L integration-openwire-ssl \
+          -E "testTempDestinationCompositeAdvisoryTopic|testConnectionAdvisories|testDestinationSourceGetters|testDestroyDestination|testQueueBrowserWith2Consumers" \
+          --output-on-failure --timeout 900
+      env:
+        SSL_CERT_FILE: ${{ github.workspace }}/docker/ssl/certs/ca.pem
+
+    - name: Show broker logs on failure
+      if: failure()
+      run: |
+        echo "=== Artemis SSL broker logs ==="
+        docker compose --profile artemis-ssl logs --tail 200 || true
+
+    - name: Stop Artemis SSL broker
+      if: always()
+      run: docker compose --profile artemis-ssl down
+
+    - name: Upload test results
+      if: failure()
+      uses: actions/upload-artifact@v7
+      with:
+        name: test-results-gcc-ssl-integration-${{ matrix.artemis.name }}
+        path: |
+          output/build/${{ matrix.config.preset }}/Testing/Temporary/
+          output/build/${{ matrix.config.preset }}/**/*.log
+
   # Linux GCC SSL integration tests
   linux-gcc-ssl-integration-test:
     name: Linux GCC SSL Integration Test
@@ -347,7 +594,8 @@ jobs:
           - { preset: x64-linux-gcc-release-test, build_type: Release }
         activemq:
           - { name: "AMQ-5.18", image: "apache/activemq-classic:5.18.7" }
-          - { name: "AMQ-6.2", image: "apache/activemq-classic:6.2.0" }
+          - { name: "AMQ-5.19", image: "apache/activemq:5.19.6" }
+          - { name: "AMQ-6.2", image: "apache/activemq:6.2.5" }
 
     steps:
     - name: Checkout code
@@ -449,7 +697,8 @@ jobs:
           - { preset: x64-linux-gcc-release-test, build_type: Release }
         activemq:
           - { name: "AMQ-5.18", image: "apache/activemq-classic:5.18.7" }
-          - { name: "AMQ-6.2", image: "apache/activemq-classic:6.2.0" }
+          - { name: "AMQ-5.19", image: "apache/activemq:5.19.6" }
+          - { name: "AMQ-6.2", image: "apache/activemq:6.2.5" }
 
     steps:
     - name: Checkout code

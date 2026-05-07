@@ -125,7 +125,7 @@ namespace core
               messagePrioritySupported(false),
               useCompression(false),
               useRetroactiveConsumer(false),
-              watchTopicAdvisories(true),
+              watchTopicAdvisories(false),
               checkForDuplicates(true),
               optimizeAcknowledge(false),
               exclusiveConsumer(false),

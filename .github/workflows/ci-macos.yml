@@ -49,6 +49,8 @@ jobs:
 
     - name: Setup sccache
       uses: mozilla-actions/sccache-action@v0.0.10
+      with:
+        sccache_version: "v0.15.0"
 
     - name: Create vcpkg cache directories
       run: |
@@ -252,6 +254,8 @@ jobs:
 
     - name: Setup sccache
       uses: mozilla-actions/sccache-action@v0.0.10
+      with:
+        sccache_version: "v0.15.0"
 
     - name: Create vcpkg cache directories
       run: |

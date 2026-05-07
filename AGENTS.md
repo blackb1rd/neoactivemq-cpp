@@ -103,4 +103,5 @@ public:
 - **DO NOT** perform `git checkout` or switch branches without explicit user confirmation
 - **DO NOT** delete large files or entire directories without explicit user confirmation
 - **DO NOT** run destructive git operations (reset, rebase, force push) without user approval
+- **DO NOT** run `git commit` or `git push` without explicit user confirmation
 - **ALWAYS** ask before making changes that could result in data loss

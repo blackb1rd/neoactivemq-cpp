@@ -36,6 +36,7 @@ namespace test
 }  // namespace test
 }  // namespace activemq
 
+#include <activemq/core/ActiveMQConnection.h>
 #include <activemq/core/ActiveMQConnectionFactory.h>
 #include <activemq/exceptions/ActiveMQException.h>
 #include <decaf/lang/Thread.h>
@@ -414,25 +415,39 @@ TEST_F(OpenwireTempDestinationTest, testTmpQueueWorksUnderLoad)
 ///////////////////////////////////////////////////////////////////////////////
 TEST_F(OpenwireTempDestinationTest, testPublishFailsForClosedConnection)
 {
+    // The producer connection opts in to watchTopicAdvisories=true so it
+    // receives DESTINATION_REMOVE advisories when the broker deletes the
+    // temp queue (after its owning connection closes), allowing the client
+    // to throw cms::InvalidDestinationException locally before the send
+    // hits the broker. The library default is false; this test exercises
+    // the explicit opt-in path.
+    std::string url = cmsProvider->getBrokerURL() +
+                      "&connection.watchTopicAdvisories=true";
+
     std::shared_ptr<ActiveMQConnectionFactory> factory(
-        new ActiveMQConnectionFactory(cmsProvider->getBrokerURL()));
+        new ActiveMQConnectionFactory(url));
     factory->setAlwaysSyncSend(true);
 
     std::unique_ptr<Connection> tempConnection(factory->createConnection());
     tempConnection->start();
-
     std::unique_ptr<Session> tempSession(tempConnection->createSession());
     std::unique_ptr<TemporaryQueue> queue(tempSession->createTemporaryQueue());
+
+    // Producer uses a separate connection (also with advisories enabled).
+    std::unique_ptr<Connection> producerConnection(factory->createConnection());
+    producerConnection->start();
+    std::unique_ptr<Session> producerSession(
+        producerConnection->createSession());
 
     Thread::sleep(2000);
 
     // This message delivery should work since the temp connection is still
     // open.
     std::unique_ptr<MessageProducer> producer(
-        cmsProvider->getSession()->createProducer(queue.get()));
+        producerSession->createProducer(queue.get()));
     producer->setDeliveryMode(DeliveryMode::NON_PERSISTENT);
     std::unique_ptr<TextMessage> message(
-        cmsProvider->getSession()->createTextMessage("First"));
+        producerSession->createTextMessage("First"));
     producer->send(message.get());
     Thread::sleep(2000);
 
@@ -440,7 +455,7 @@ TEST_F(OpenwireTempDestinationTest, testPublishFailsForClosedConnection)
     tempConnection->close();
     Thread::sleep(5000);
 
-    message.reset(cmsProvider->getSession()->createTextMessage("Hello"));
+    message.reset(producerSession->createTextMessage("Hello"));
 
     ASSERT_THROW(producer->send(message.get()), cms::InvalidDestinationException)
         << ("Should throw a InvalidDestinationException since temp destination "
@@ -450,25 +465,34 @@ TEST_F(OpenwireTempDestinationTest, testPublishFailsForClosedConnection)
 ///////////////////////////////////////////////////////////////////////////////
 TEST_F(OpenwireTempDestinationTest, testPublishFailsForDestoryedTempDestination)
 {
+    // See testPublishFailsForClosedConnection for the rationale on why the
+    // producer connection explicitly opts in to watchTopicAdvisories=true.
+    std::string url = cmsProvider->getBrokerURL() +
+                      "&connection.watchTopicAdvisories=true";
+
     std::shared_ptr<ActiveMQConnectionFactory> factory(
-        new ActiveMQConnectionFactory(cmsProvider->getBrokerURL()));
+        new ActiveMQConnectionFactory(url));
     factory->setAlwaysSyncSend(true);
 
     std::unique_ptr<Connection> tempConnection(factory->createConnection());
     tempConnection->start();
-
     std::unique_ptr<Session> tempSession(tempConnection->createSession());
     std::unique_ptr<TemporaryQueue> queue(tempSession->createTemporaryQueue());
+
+    std::unique_ptr<Connection> producerConnection(factory->createConnection());
+    producerConnection->start();
+    std::unique_ptr<Session> producerSession(
+        producerConnection->createSession());
 
     Thread::sleep(2000);
 
     // This message delivery should work since the temp connection is still
     // open.
     std::unique_ptr<MessageProducer> producer(
-        cmsProvider->getSession()->createProducer(queue.get()));
+        producerSession->createProducer(queue.get()));
     producer->setDeliveryMode(DeliveryMode::NON_PERSISTENT);
     std::unique_ptr<TextMessage> message(
-        cmsProvider->getSession()->createTextMessage("First"));
+        producerSession->createTextMessage("First"));
     producer->send(message.get());
     Thread::sleep(2000);
 
@@ -476,11 +500,73 @@ TEST_F(OpenwireTempDestinationTest, testPublishFailsForDestoryedTempDestination)
     queue->destroy();
     Thread::sleep(5000);  // Wait a little bit to let the delete take effect.
 
-    message.reset(cmsProvider->getSession()->createTextMessage("Hello"));
+    message.reset(producerSession->createTextMessage("Hello"));
 
     ASSERT_THROW(producer->send(message.get()), InvalidDestinationException)
         << ("Should throw a InvalidDestinationException since temp destination "
             "should not exist anymore.");
+}
+
+///////////////////////////////////////////////////////////////////////////////
+TEST_F(OpenwireTempDestinationTest, testWatchTopicAdvisoriesDisabledByDefault)
+{
+    // The library default for watchTopicAdvisories is false. With this
+    // default, no internal AdvisoryConsumer is created on the connection,
+    // so the client cannot preemptively detect cross-connection temp
+    // destination deletion - the broker handles it on the round-trip.
+    //
+    // testPublishFailsForClosedConnection /
+    // testPublishFailsForDestoryedTempDestination exercise the opt-in path with
+    // ?connection.watchTopicAdvisories=true. This test guards against
+    // regression of the default value at the factory + connection level when
+    // constructed from a plain broker URL.
+    std::shared_ptr<ActiveMQConnectionFactory> factory(
+        new ActiveMQConnectionFactory(cmsProvider->getBrokerURL()));
+
+    ASSERT_FALSE(factory->isWatchTopicAdvisories())
+        << "Default factory should report watchTopicAdvisories=false";
+
+    std::unique_ptr<Connection> connection(factory->createConnection());
+    connection->start();
+
+    ActiveMQConnection* amqConnection =
+        dynamic_cast<ActiveMQConnection*>(connection.get());
+    ASSERT_TRUE(amqConnection != NULL);
+    ASSERT_FALSE(amqConnection->isWatchTopicAdvisories())
+        << "Default connection should report watchTopicAdvisories=false";
+
+    connection->close();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+TEST_F(OpenwireTempDestinationTest, testWatchTopicAdvisoriesURIOptionEnablesIt)
+{
+    // The connection.watchTopicAdvisories=true URI parameter is the
+    // opt-in mechanism used by testPublishFailsForClosedConnection and
+    // testPublishFailsForDestoryedTempDestination. This test verifies the
+    // parameter is honored end-to-end through factory and connection.
+    std::string url = cmsProvider->getBrokerURL() +
+                      "&connection.watchTopicAdvisories=true";
+
+    std::shared_ptr<ActiveMQConnectionFactory> factory(
+        new ActiveMQConnectionFactory(url));
+
+    ASSERT_TRUE(factory->isWatchTopicAdvisories())
+        << "Factory built from URL with connection.watchTopicAdvisories=true "
+        << "should report watchTopicAdvisories=true";
+
+    std::unique_ptr<Connection> connection(factory->createConnection());
+    connection->start();
+
+    ActiveMQConnection* amqConnection =
+        dynamic_cast<ActiveMQConnection*>(connection.get());
+    ASSERT_TRUE(amqConnection != NULL);
+    ASSERT_TRUE(amqConnection->isWatchTopicAdvisories())
+        << "Connection built from URL with "
+           "connection.watchTopicAdvisories=true "
+        << "should report watchTopicAdvisories=true";
+
+    connection->close();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

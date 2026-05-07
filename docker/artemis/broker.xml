@@ -1,0 +1,97 @@
+<?xml version='1.0'?>
+<!--
+    ActiveMQ Artemis broker configuration for OpenWire integration testing.
+
+    Differs from the stock Artemis image config in the following ways:
+      - Replaces the default multi-protocol acceptor with an OpenWire-only
+        acceptor on port 61616. STOMP/AMQP/MQTT/Core are intentionally not
+        exposed (Artemis CI runs the OpenWire integration suite only).
+      - Disables broker-side security (security-enabled=false) so the test
+        suite can connect anonymously like it does against Classic.
+      - Enables persistence (persistence-enabled=true) so XA prepared
+        transactions are journaled (required by XA two-phase commit).
+      - Enables advisory topic support (supportAdvisory=true) so that advisory
+        messages are published for temp-destination creation/deletion, allowing
+        AdvisoryTest and EnhancedConnectionTest to pass.
+      - Configures virtual topic consumer wildcard translation so that
+        Consumer.A.VirtualTopic.X queues are mapped to multicast bindings on
+        VirtualTopic.X, enabling VirtualTopicTest to pass.
+      - Disables auto-delete-queues and auto-delete-addresses so that durable
+        subscription queues are not deleted when the subscriber disconnects and
+        the queue is temporarily empty (which would lose messages sent while
+        offline and break OpenwireDurableTest).
+
+    Maximum connections / frame size are set high to support high-fanout tests
+    (e.g. BulkMessageIntegrationTest.testHighFanout5000Clients).
+-->
+<configuration xmlns="urn:activemq"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:schemaLocation="urn:activemq /schema/artemis-configuration.xsd">
+
+  <core xmlns="urn:activemq:core"
+        xsi:schemaLocation="urn:activemq:core ">
+
+    <name>activemq-artemis-test</name>
+
+    <!-- Persistence enabled so the broker journals XA prepared transactions
+         (XA requires durable storage for two-phase commit recovery). The
+         data dir lives under /var/lib/artemis-instance/data and is ephemeral
+         to the container. -->
+    <persistence-enabled>true</persistence-enabled>
+    <security-enabled>false</security-enabled>
+
+    <!-- Raise the disk-full threshold so the broker does not block producers
+         when the host filesystem is heavily utilised (Artemis default is 90%).
+         Integration-test messages are tiny so the ephemeral data directory
+         will never actually fill the disk. -->
+    <max-disk-usage>99</max-disk-usage>
+
+    <acceptors>
+      <!-- OpenWire acceptor on port 61616. This is the only acceptor exposed
+           to integration tests; STOMP and Core/AMQP/MQTT are intentionally
+           omitted (Artemis CI runs OpenWire only).
+
+           supportAdvisory=true (default) - enables ActiveMQ.Advisory.* topics
+           so that advisory-dependent tests (AdvisoryTest, EnhancedConnection)
+           work against Artemis.
+
+           suppressInternalManagementObjects=false - registers advisory addresses
+           in the management view so they appear alongside user destinations;
+           useful for test debugging.
+
+           virtualTopicConsumerWildcards - maps Consumer.*.VirtualTopic.# style
+           OpenWire destinations to multicast bindings on the underlying topic
+           address. The filter Consumer.*.%3E (URL-encoded Consumer.*. >) with
+           depth 2 matches Consumer.A.VirtualTopic.Orders and treats the first
+           two path segments as the consumer queue identifier. -->
+      <acceptor name="openwire">tcp://0.0.0.0:61616?protocols=OPENWIRE;supportAdvisory=true;suppressInternalManagementObjects=false;virtualTopicConsumerWildcards=Consumer.*.%3E%3B2;tcpSendBufferSize=1048576;tcpReceiveBufferSize=1048576;connectionsAllowed=20000</acceptor>
+    </acceptors>
+
+    <addresses>
+      <address name="ActiveMQ.DLQ">
+        <anycast>
+          <queue name="ActiveMQ.DLQ"/>
+        </anycast>
+      </address>
+      <address name="ExpiryQueue">
+        <anycast>
+          <queue name="ExpiryQueue"/>
+        </anycast>
+      </address>
+    </addresses>
+
+    <address-settings>
+      <address-setting match="#">
+        <dead-letter-address>ActiveMQ.DLQ</dead-letter-address>
+        <expiry-address>ExpiryQueue</expiry-address>
+        <auto-create-queues>true</auto-create-queues>
+        <auto-create-addresses>true</auto-create-addresses>
+        <auto-delete-queues>false</auto-delete-queues>
+        <auto-delete-addresses>false</auto-delete-addresses>
+        <max-size-bytes>-1</max-size-bytes>
+        <message-counter-history-day-limit>10</message-counter-history-day-limit>
+      </address-setting>
+    </address-settings>
+
+  </core>
+</configuration>

@@ -17,9 +17,14 @@
         <property name="locations">
             <value>file:${activemq.conf}/credentials.properties</value>
         </property>
+        <!-- The apache/activemq image (5.19+, 6.x) doesn't always ship a
+             credentials.properties file. Don't fail bean-factory init when
+             it's missing - the broker doesn't need it for our test config. -->
+        <property name="ignoreResourceNotFound" value="true"/>
     </bean>
 
-    <broker xmlns="http://activemq.apache.org/schema/core"
+    <broker id="broker"
+            xmlns="http://activemq.apache.org/schema/core"
             brokerName="localhost"
             dataDirectory="${activemq.data}">
 

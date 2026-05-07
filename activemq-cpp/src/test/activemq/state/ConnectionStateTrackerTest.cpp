@@ -236,39 +236,86 @@ ConnectionData createConnectionState(ConnectionStateTracker& tracker)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(ConnectionStateTrackerTest, testStalledConsumersAreCleared)
 {
-    class TestWireFormat : public wireformat::WireFormat {
+    class TestWireFormat : public wireformat::WireFormat
+    {
     public:
-        TestWireFormat() {}
-        virtual ~TestWireFormat() {}
-        virtual void marshal(const std::shared_ptr<commands::Command> command, const activemq::transport::Transport* transport, decaf::io::DataOutputStream* out) {}
-        virtual std::shared_ptr<commands::Command> unmarshal(const activemq::transport::Transport* transport, decaf::io::DataInputStream* in) { return std::shared_ptr<commands::Command>(); }
-        virtual void setVersion(int version) {}
-        virtual int getVersion() const { return 6; }
-        virtual bool hasNegotiator() const { return false; }
-        virtual std::shared_ptr<activemq::transport::Transport> createNegotiator(const std::shared_ptr<activemq::transport::Transport> transport) { return std::shared_ptr<activemq::transport::Transport>(); }
-        virtual bool inReceive() const { return false; }
+        TestWireFormat()
+        {
+        }
+
+        virtual ~TestWireFormat()
+        {
+        }
+
+        virtual void marshal(const std::shared_ptr<commands::Command> command,
+                             const activemq::transport::Transport*    transport,
+                             decaf::io::DataOutputStream*             out)
+        {
+        }
+
+        virtual std::shared_ptr<commands::Command> unmarshal(
+            const activemq::transport::Transport* transport,
+            decaf::io::DataInputStream*           in)
+        {
+            return std::shared_ptr<commands::Command>();
+        }
+
+        virtual void setVersion(int version)
+        {
+        }
+
+        virtual int getVersion() const
+        {
+            return 6;
+        }
+
+        virtual bool hasNegotiator() const
+        {
+            return false;
+        }
+
+        virtual std::shared_ptr<activemq::transport::Transport> createNegotiator(
+            const std::shared_ptr<activemq::transport::Transport> transport)
+        {
+            return std::shared_ptr<activemq::transport::Transport>();
+        }
+
+        virtual bool inReceive() const
+        {
+            return false;
+        }
     };
 
-    class WireFormatTrackingTransport : public TrackingTransport {
+    class WireFormatTrackingTransport : public TrackingTransport
+    {
     private:
         std::shared_ptr<wireformat::WireFormat> wireFormat;
+
     public:
         LinkedList<std::shared_ptr<Command>> consumerControls;
 
-        WireFormatTrackingTransport() : wireFormat(new TestWireFormat()) {}
-        virtual std::shared_ptr<wireformat::WireFormat> getWireFormat() const {
+        WireFormatTrackingTransport()
+            : wireFormat(new TestWireFormat())
+        {
+        }
+
+        virtual std::shared_ptr<wireformat::WireFormat> getWireFormat() const
+        {
             return wireFormat;
         }
 
-        virtual void oneway(const std::shared_ptr<Command> command) {
+        virtual void oneway(const std::shared_ptr<Command> command)
+        {
             TrackingTransport::oneway(command);
-            if (command->isConsumerControl()) {
+            if (command->isConsumerControl())
+            {
                 consumerControls.add(command);
             }
         }
     };
 
-    std::shared_ptr<WireFormatTrackingTransport> transport(new WireFormatTrackingTransport);
+    std::shared_ptr<WireFormatTrackingTransport> transport(
+        new WireFormatTrackingTransport);
     ConnectionStateTracker tracker;
 
     ConnectionData conn = createConnectionState(tracker);
@@ -278,16 +325,22 @@ TEST_F(ConnectionStateTrackerTest, testStalledConsumersAreCleared)
     tracker.transportInterrupted();
     tracker.restore(transport);
 
-    // After restore and interrupt complete, stalled consumers should be notified
-    tracker.connectionInterruptProcessingComplete(transport.get(), conn.connection->getConnectionId());
+    // After restore and interrupt complete, stalled consumers should be
+    // notified
+    tracker.connectionInterruptProcessingComplete(
+        transport.get(),
+        conn.connection->getConnectionId());
 
     // We expect one ConsumerControl message sent
     ASSERT_EQ(1, transport->consumerControls.size());
     transport->consumerControls.clear();
 
     // Now call connectionInterruptProcessingComplete again.
-    // Since stalledConsumers should be cleared, no new ConsumerControl should be sent.
-    tracker.connectionInterruptProcessingComplete(transport.get(), conn.connection->getConnectionId());
+    // Since stalledConsumers should be cleared, no new ConsumerControl should
+    // be sent.
+    tracker.connectionInterruptProcessingComplete(
+        transport.get(),
+        conn.connection->getConnectionId());
     ASSERT_EQ(0, transport->consumerControls.size());
 }
 

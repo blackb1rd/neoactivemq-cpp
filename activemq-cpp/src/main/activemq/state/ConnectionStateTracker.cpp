@@ -1126,8 +1126,8 @@ void ConnectionStateTracker::connectionInterruptProcessingComplete(
 
         StlMap<std::shared_ptr<ConsumerId>,
                std::shared_ptr<ConsumerInfo>,
-               ConsumerId::COMPARATOR>&
-            stalledConsumers = connectionState->getRecoveringPullConsumers();
+               ConsumerId::COMPARATOR>& stalledConsumers =
+            connectionState->getRecoveringPullConsumers();
 
         std::shared_ptr<Iterator<std::shared_ptr<ConsumerId>>> key(
             stalledConsumers.keySet().iterator());

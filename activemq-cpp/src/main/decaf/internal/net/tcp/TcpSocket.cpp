@@ -1642,8 +1642,8 @@ void TcpSocket::write(const unsigned char* buffer,
                                  SOL_SOCKET,
                                  SO_ERROR,
                                  reinterpret_cast<char*>(&pendingError),
-                                 &errLen) == 0
-                    && pendingError != 0)
+                                 &errLen) == 0 &&
+                    pendingError != 0)
                 {
                     throw IOException(
                         __FILE__,

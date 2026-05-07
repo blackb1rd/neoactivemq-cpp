@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -105,9 +105,9 @@ TEST_F(CompositeTaskRunnerTest, test)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(CompositeTaskRunnerTest, testCreateButNotStarted)
 {
-    Pointer<CompositeTaskRunner> runner(new CompositeTaskRunner);
+    std::shared_ptr<CompositeTaskRunner> runner(new CompositeTaskRunner);
     ASSERT_TRUE(!runner->isStarted());
     runner->start();
     runner->shutdown();
-    runner.reset(NULL);
+    runner.reset();
 }

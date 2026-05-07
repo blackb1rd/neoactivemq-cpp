@@ -25,7 +25,7 @@
 
 #include <activemq/commands/BaseCommand.h>
 #include <activemq/util/Config.h>
-#include <decaf/lang/Pointer.h>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -33,8 +33,6 @@ namespace activemq
 {
 namespace commands
 {
-
-    using decaf::lang::Pointer;
 
     /*
      *
@@ -84,7 +82,8 @@ namespace commands
             return true;
         }
 
-        virtual Pointer<Command> visit(activemq::state::CommandVisitor* visitor);
+        virtual std::shared_ptr<Command> visit(
+            activemq::state::CommandVisitor* visitor);
     };
 
 }  // namespace commands

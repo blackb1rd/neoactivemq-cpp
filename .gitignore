@@ -33,5 +33,11 @@ output/
 # Generated SSL certificates for integration testing
 docker/ssl/certs/
 
+# Debug and test output files
+.gdb_history
+*.log
+test_output.txt
 
 
+
+vcpkg_installed/

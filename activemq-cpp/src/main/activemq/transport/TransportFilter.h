@@ -23,7 +23,7 @@
 #include <activemq/transport/Transport.h>
 #include <activemq/transport/TransportListener.h>
 #include <activemq/util/Config.h>
-#include <decaf/lang/Pointer.h>
+#include <memory>
 #include <typeinfo>
 
 namespace activemq
@@ -33,7 +33,6 @@ namespace transport
 
     using activemq::commands::Command;
     using activemq::commands::Response;
-    using decaf::lang::Pointer;
 
     class TransportFilterImpl;
 
@@ -54,7 +53,7 @@ namespace transport
         /**
          * The transport that this filter wraps around.
          */
-        Pointer<Transport> next;
+        std::shared_ptr<Transport> next;
 
         /**
          * Listener of this transport.
@@ -70,7 +69,7 @@ namespace transport
          * Constructor.
          * @param next - the next Transport in the chain
          */
-        TransportFilter(const Pointer<Transport> next);
+        TransportFilter(const std::shared_ptr<Transport> next);
 
         virtual ~TransportFilter();
 
@@ -91,7 +90,7 @@ namespace transport
          * Event handler for the receipt of a command.
          * @param command - the received command object.
          */
-        virtual void onCommand(const Pointer<Command> command);
+        virtual void onCommand(const std::shared_ptr<Command> command);
 
         /**
          * Event handler for an exception from a command transport.
@@ -112,28 +111,30 @@ namespace transport
         virtual void transportResumed();
 
     public:
-        virtual void oneway(const Pointer<Command> command)
+        virtual void oneway(const std::shared_ptr<Command> command)
         {
             checkClosed();
             next->oneway(command);
         }
 
-        virtual Pointer<FutureResponse> asyncRequest(
-            const Pointer<Command>          command,
-            const Pointer<ResponseCallback> responseCallback)
+        virtual std::shared_ptr<FutureResponse> asyncRequest(
+            const std::shared_ptr<Command>          command,
+            const std::shared_ptr<ResponseCallback> responseCallback)
         {
             checkClosed();
             return next->asyncRequest(command, responseCallback);
         }
 
-        virtual Pointer<Response> request(const Pointer<Command> command)
+        virtual std::shared_ptr<Response> request(
+            const std::shared_ptr<Command> command)
         {
             checkClosed();
             return next->request(command);
         }
 
-        virtual Pointer<Response> request(const Pointer<Command> command,
-                                          unsigned int           timeout)
+        virtual std::shared_ptr<Response> request(
+            const std::shared_ptr<Command> command,
+            unsigned int                   timeout)
         {
             checkClosed();
             return next->request(command, timeout);
@@ -142,7 +143,7 @@ namespace transport
         virtual void setTransportListener(TransportListener* listener)
         {
             this->listener = listener;
-            if (next != NULL)
+            if (next)
             {
                 next->setTransportListener(this);
             }
@@ -153,10 +154,10 @@ namespace transport
             return this->listener;
         }
 
-        virtual Pointer<wireformat::WireFormat> getWireFormat() const;
+        virtual std::shared_ptr<wireformat::WireFormat> getWireFormat() const;
 
         virtual void setWireFormat(
-            const Pointer<wireformat::WireFormat> wireFormat);
+            const std::shared_ptr<wireformat::WireFormat> wireFormat);
 
         virtual Transport* narrow(const std::type_info& typeId);
 

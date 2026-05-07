@@ -24,7 +24,7 @@ using namespace std;
 using namespace activemq;
 using namespace activemq::exceptions;
 using namespace activemq::commands;
-using namespace decaf::lang;
+
 using namespace decaf::lang::exceptions;
 
 /*
@@ -40,8 +40,8 @@ using namespace decaf::lang::exceptions;
 ////////////////////////////////////////////////////////////////////////////////
 JournalQueueAck::JournalQueueAck()
     : BaseDataStructure(),
-      destination(NULL),
-      messageAck(NULL)
+      destination(),
+      messageAck()
 {
 }
 
@@ -100,7 +100,7 @@ std::string JournalQueueAck::toString() const
 
     stream << "JournalQueueAck { ";
     stream << "Destination = ";
-    if (this->getDestination() != NULL)
+    if (this->getDestination())
     {
         stream << this->getDestination()->toString();
     }
@@ -110,7 +110,7 @@ std::string JournalQueueAck::toString() const
     }
     stream << ", ";
     stream << "MessageAck = ";
-    if (this->getMessageAck() != NULL)
+    if (this->getMessageAck())
     {
         stream << this->getMessageAck()->toString();
     }
@@ -139,25 +139,25 @@ bool JournalQueueAck::equals(const DataStructure* value) const
         return false;
     }
 
-    if (this->getDestination() != NULL)
+    if (this->getDestination())
     {
         if (!this->getDestination()->equals(valuePtr->getDestination().get()))
         {
             return false;
         }
     }
-    else if (valuePtr->getDestination() != NULL)
+    else if (valuePtr->getDestination())
     {
         return false;
     }
-    if (this->getMessageAck() != NULL)
+    if (this->getMessageAck())
     {
         if (!this->getMessageAck()->equals(valuePtr->getMessageAck().get()))
         {
             return false;
         }
     }
-    else if (valuePtr->getMessageAck() != NULL)
+    else if (valuePtr->getMessageAck())
     {
         return false;
     }
@@ -169,40 +169,40 @@ bool JournalQueueAck::equals(const DataStructure* value) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const decaf::lang::Pointer<ActiveMQDestination>&
-JournalQueueAck::getDestination() const
+const std::shared_ptr<ActiveMQDestination>& JournalQueueAck::getDestination()
+    const
 {
     return destination;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<ActiveMQDestination>& JournalQueueAck::getDestination()
+std::shared_ptr<ActiveMQDestination>& JournalQueueAck::getDestination()
 {
     return destination;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void JournalQueueAck::setDestination(
-    const decaf::lang::Pointer<ActiveMQDestination>& destination)
+    const std::shared_ptr<ActiveMQDestination>& destination)
 {
     this->destination = destination;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const decaf::lang::Pointer<MessageAck>& JournalQueueAck::getMessageAck() const
+const std::shared_ptr<MessageAck>& JournalQueueAck::getMessageAck() const
 {
     return messageAck;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<MessageAck>& JournalQueueAck::getMessageAck()
+std::shared_ptr<MessageAck>& JournalQueueAck::getMessageAck()
 {
     return messageAck;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void JournalQueueAck::setMessageAck(
-    const decaf::lang::Pointer<MessageAck>& messageAck)
+    const std::shared_ptr<MessageAck>& messageAck)
 {
     this->messageAck = messageAck;
 }

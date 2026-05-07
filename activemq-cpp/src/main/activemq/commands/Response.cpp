@@ -24,7 +24,7 @@ using namespace std;
 using namespace activemq;
 using namespace activemq::exceptions;
 using namespace activemq::commands;
-using namespace decaf::lang;
+
 using namespace decaf::lang::exceptions;
 
 /*
@@ -145,7 +145,7 @@ void Response::setCorrelationId(int correlationId)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<commands::Command> Response::visit(
+std::shared_ptr<commands::Command> Response::visit(
     activemq::state::CommandVisitor* visitor)
 {
     return visitor->processResponse(this);

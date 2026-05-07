@@ -22,16 +22,14 @@
 #include <activemq/transport/TransportFactory.h>
 #include <activemq/util/Config.h>
 #include <activemq/wireformat/WireFormat.h>
-#include <decaf/lang/Pointer.h>
 #include <decaf/util/NoSuchElementException.h>
 #include <decaf/util/Properties.h>
+#include <memory>
 
 namespace activemq
 {
 namespace transport
 {
-
-    using decaf::lang::Pointer;
 
     /**
      * Abstract implementation of the TransportFactory interface, providing
@@ -58,7 +56,7 @@ namespace transport
          * @throws NoSuchElementException if the configured WireFormat is not
          * found.
          */
-        virtual Pointer<wireformat::WireFormat> createWireFormat(
+        virtual std::shared_ptr<wireformat::WireFormat> createWireFormat(
             const decaf::util::Properties& properties);
     };
 

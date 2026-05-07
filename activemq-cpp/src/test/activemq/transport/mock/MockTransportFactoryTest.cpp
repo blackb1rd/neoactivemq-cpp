@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -42,7 +42,7 @@ TEST_F(MockTransportFactoryTest, test)
 
     MockTransportFactory factory;
 
-    Pointer<Transport> transport(factory.create(uri));
+    std::shared_ptr<Transport> transport(factory.create(uri));
 
     ASSERT_TRUE(transport.get() != NULL);
 
@@ -50,5 +50,5 @@ TEST_F(MockTransportFactoryTest, test)
 
     ASSERT_TRUE(transport.get() != NULL);
 
-    transport.reset(NULL);
+    transport.reset();
 }

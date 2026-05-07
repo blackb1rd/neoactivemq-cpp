@@ -24,7 +24,7 @@ using namespace std;
 using namespace activemq;
 using namespace activemq::exceptions;
 using namespace activemq::commands;
-using namespace decaf::lang;
+
 using namespace decaf::lang::exceptions;
 
 /*
@@ -40,9 +40,9 @@ using namespace decaf::lang::exceptions;
 ////////////////////////////////////////////////////////////////////////////////
 ConsumerControl::ConsumerControl()
     : BaseCommand(),
-      destination(NULL),
+      destination(),
       close(false),
-      consumerId(NULL),
+      consumerId(),
       prefetch(0),
       flush(false),
       start(false),
@@ -113,7 +113,7 @@ std::string ConsumerControl::toString() const
            << "responseRequired = " << boolalpha << this->isResponseRequired();
     stream << ", ";
     stream << "Destination = ";
-    if (this->getDestination() != NULL)
+    if (this->getDestination())
     {
         stream << this->getDestination()->toString();
     }
@@ -125,7 +125,7 @@ std::string ConsumerControl::toString() const
     stream << "Close = " << this->isClose();
     stream << ", ";
     stream << "ConsumerId = ";
-    if (this->getConsumerId() != NULL)
+    if (this->getConsumerId())
     {
         stream << this->getConsumerId()->toString();
     }
@@ -162,14 +162,14 @@ bool ConsumerControl::equals(const DataStructure* value) const
         return false;
     }
 
-    if (this->getDestination() != NULL)
+    if (this->getDestination())
     {
         if (!this->getDestination()->equals(valuePtr->getDestination().get()))
         {
             return false;
         }
     }
-    else if (valuePtr->getDestination() != NULL)
+    else if (valuePtr->getDestination())
     {
         return false;
     }
@@ -177,14 +177,14 @@ bool ConsumerControl::equals(const DataStructure* value) const
     {
         return false;
     }
-    if (this->getConsumerId() != NULL)
+    if (this->getConsumerId())
     {
         if (!this->getConsumerId()->equals(valuePtr->getConsumerId().get()))
         {
             return false;
         }
     }
-    else if (valuePtr->getConsumerId() != NULL)
+    else if (valuePtr->getConsumerId())
     {
         return false;
     }
@@ -212,21 +212,21 @@ bool ConsumerControl::equals(const DataStructure* value) const
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const decaf::lang::Pointer<ActiveMQDestination>&
-ConsumerControl::getDestination() const
+const std::shared_ptr<ActiveMQDestination>& ConsumerControl::getDestination()
+    const
 {
     return destination;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<ActiveMQDestination>& ConsumerControl::getDestination()
+std::shared_ptr<ActiveMQDestination>& ConsumerControl::getDestination()
 {
     return destination;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void ConsumerControl::setDestination(
-    const decaf::lang::Pointer<ActiveMQDestination>& destination)
+    const std::shared_ptr<ActiveMQDestination>& destination)
 {
     this->destination = destination;
 }
@@ -244,20 +244,20 @@ void ConsumerControl::setClose(bool close)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const decaf::lang::Pointer<ConsumerId>& ConsumerControl::getConsumerId() const
+const std::shared_ptr<ConsumerId>& ConsumerControl::getConsumerId() const
 {
     return consumerId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<ConsumerId>& ConsumerControl::getConsumerId()
+std::shared_ptr<ConsumerId>& ConsumerControl::getConsumerId()
 {
     return consumerId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void ConsumerControl::setConsumerId(
-    const decaf::lang::Pointer<ConsumerId>& consumerId)
+    const std::shared_ptr<ConsumerId>& consumerId)
 {
     this->consumerId = consumerId;
 }
@@ -311,7 +311,7 @@ void ConsumerControl::setStop(bool stop)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<commands::Command> ConsumerControl::visit(
+std::shared_ptr<commands::Command> ConsumerControl::visit(
     activemq::state::CommandVisitor* visitor)
 {
     return visitor->processConsumerControl(this);

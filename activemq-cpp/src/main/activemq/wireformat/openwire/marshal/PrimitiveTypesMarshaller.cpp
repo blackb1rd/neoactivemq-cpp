@@ -219,7 +219,7 @@ void PrimitiveTypesMarshaller::marshalPrimitiveMap(
     {
         dataOut.writeInt((int)map.size());
 
-        Pointer<Iterator<std::string>> keys(map.keySet().iterator());
+        std::shared_ptr<Iterator<std::string>> keys(map.keySet().iterator());
         while (keys->hasNext())
         {
             std::string key = keys->next();

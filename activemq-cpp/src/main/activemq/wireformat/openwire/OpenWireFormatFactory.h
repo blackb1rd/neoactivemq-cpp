@@ -21,9 +21,9 @@
 #include <activemq/commands/WireFormatInfo.h>
 #include <activemq/util/Config.h>
 #include <activemq/wireformat/WireFormatFactory.h>
-#include <decaf/lang/Pointer.h>
 #include <decaf/lang/exceptions/IllegalStateException.h>
 #include <decaf/util/Properties.h>
+#include <memory>
 
 namespace activemq
 {
@@ -31,8 +31,6 @@ namespace wireformat
 {
     namespace openwire
     {
-
-        using decaf::lang::Pointer;
 
         class AMQCPP_API OpenWireFormatFactory
             : public wireformat::WireFormatFactory
@@ -61,7 +59,7 @@ namespace wireformat
             {
             }
 
-            virtual Pointer<wireformat::WireFormat> createWireFormat(
+            virtual std::shared_ptr<wireformat::WireFormat> createWireFormat(
                 const decaf::util::Properties& properties);
         };
 

@@ -22,8 +22,8 @@
 #include <activemq/wireformat/WireFormat.h>
 #include <activemq/wireformat/stomp/StompFrame.h>
 #include <decaf/io/IOException.h>
-#include <decaf/lang/Pointer.h>
-#include <decaf/util/concurrent/atomic/AtomicBoolean.h>
+#include <atomic>
+#include <memory>
 
 namespace activemq
 {
@@ -33,7 +33,6 @@ namespace wireformat
     {
 
         using activemq::commands::Command;
-        using decaf::lang::Pointer;
 
         class StompHelper;
         class StompWireformatProperties;
@@ -51,7 +50,7 @@ namespace wireformat
             std::string clientId;
 
             // Indicates when we are in the doUnmarshal call
-            decaf::util::concurrent::atomic::AtomicBoolean receiving;
+            std::atomic<bool> receiving;
 
             // Internal structure for holding class internal data that can
             // change without affecting binary compatibility.
@@ -80,9 +79,10 @@ namespace wireformat
              *
              * @throws IOException
              */
-            virtual void marshal(const Pointer<commands::Command> command,
-                                 const activemq::transport::Transport* transport,
-                                 decaf::io::DataOutputStream* out);
+            virtual void marshal(
+                const std::shared_ptr<commands::Command> command,
+                const activemq::transport::Transport*    transport,
+                decaf::io::DataOutputStream*             out);
 
             /**
              * Stream based un-marshaling, blocks on reads on the input stream
@@ -96,7 +96,7 @@ namespace wireformat
              * @return the newly marshaled Command, caller owns the pointer
              * @throws IOException
              */
-            virtual Pointer<commands::Command> unmarshal(
+            virtual std::shared_ptr<commands::Command> unmarshal(
                 const activemq::transport::Transport* transport,
                 decaf::io::DataInputStream*           in);
 
@@ -184,7 +184,7 @@ namespace wireformat
              */
             virtual bool inReceive() const
             {
-                return this->receiving.get();
+                return this->receiving.load();
             }
 
             /**
@@ -204,29 +204,35 @@ namespace wireformat
              * @throws UnsupportedOperationException if the WireFormat doesn't
              * have a Negotiator.
              */
-            virtual Pointer<transport::Transport> createNegotiator(
-                const Pointer<transport::Transport> transport);
+            virtual std::shared_ptr<transport::Transport> createNegotiator(
+                const std::shared_ptr<transport::Transport> transport);
 
         private:
-            Pointer<Command> unmarshalMessage(const Pointer<StompFrame> frame);
-            Pointer<Command> unmarshalReceipt(const Pointer<StompFrame> frame);
-            Pointer<Command> unmarshalConnected(const Pointer<StompFrame> frame);
-            Pointer<Command> unmarshalError(const Pointer<StompFrame> frame);
+            std::shared_ptr<Command> unmarshalMessage(
+                const std::shared_ptr<StompFrame> frame);
+            std::shared_ptr<Command> unmarshalReceipt(
+                const std::shared_ptr<StompFrame> frame);
+            std::shared_ptr<Command> unmarshalConnected(
+                const std::shared_ptr<StompFrame> frame);
+            std::shared_ptr<Command> unmarshalError(
+                const std::shared_ptr<StompFrame> frame);
 
-            Pointer<StompFrame> marshalMessage(const Pointer<Command> command);
-            Pointer<StompFrame> marshalAck(const Pointer<Command> command);
-            Pointer<StompFrame> marshalConnectionInfo(
-                const Pointer<Command> command);
-            Pointer<StompFrame> marshalTransactionInfo(
-                const Pointer<Command> command);
-            Pointer<StompFrame> marshalShutdownInfo(
-                const Pointer<Command> command);
-            Pointer<StompFrame> marshalRemoveInfo(
-                const Pointer<Command> command);
-            Pointer<StompFrame> marshalConsumerInfo(
-                const Pointer<Command> command);
-            Pointer<StompFrame> marshalRemoveSubscriptionInfo(
-                const Pointer<Command> command);
+            std::shared_ptr<StompFrame> marshalMessage(
+                const std::shared_ptr<Command> command);
+            std::shared_ptr<StompFrame> marshalAck(
+                const std::shared_ptr<Command> command);
+            std::shared_ptr<StompFrame> marshalConnectionInfo(
+                const std::shared_ptr<Command> command);
+            std::shared_ptr<StompFrame> marshalTransactionInfo(
+                const std::shared_ptr<Command> command);
+            std::shared_ptr<StompFrame> marshalShutdownInfo(
+                const std::shared_ptr<Command> command);
+            std::shared_ptr<StompFrame> marshalRemoveInfo(
+                const std::shared_ptr<Command> command);
+            std::shared_ptr<StompFrame> marshalConsumerInfo(
+                const std::shared_ptr<Command> command);
+            std::shared_ptr<StompFrame> marshalRemoveSubscriptionInfo(
+                const std::shared_ptr<Command> command);
         };
 
     }  // namespace stomp

@@ -30,6 +30,7 @@
 #include <decaf/lang/Runnable.h>
 #include <decaf/lang/Thread.h>
 #include <decaf/util/logging/LoggerDefines.h>
+#include <memory>
 
 namespace activemq
 {
@@ -47,7 +48,6 @@ namespace transport
     using activemq::commands::Command;
     using activemq::commands::Message;
     using activemq::commands::Response;
-    using decaf::lang::Pointer;
 
     class IOTransportImpl;
 
@@ -96,7 +96,7 @@ namespace transport
          * @param command
          *      The command to log (should be a MessageDispatch)
          */
-        void logMessageDispatchDetails(const Pointer<Command>& command);
+        void logMessageDispatchDetails(const std::shared_ptr<Command>& command);
 
         /**
          * Notify the command listener.
@@ -104,7 +104,7 @@ namespace transport
          * @param
          *      The command the command the send to any registered listener.
          */
-        void fire(const Pointer<Command> command);
+        void fire(const std::shared_ptr<Command> command);
 
     public:
         /**
@@ -119,7 +119,7 @@ namespace transport
          * @param wireFormat
          *        Data encoder / decoder to use when reading and writing.
          */
-        IOTransport(const Pointer<wireformat::WireFormat> wireFormat);
+        IOTransport(const std::shared_ptr<wireformat::WireFormat> wireFormat);
 
         virtual ~IOTransport();
 
@@ -142,36 +142,38 @@ namespace transport
         virtual void setOutputStream(decaf::io::DataOutputStream* os);
 
     public:  // Transport methods
-        virtual void oneway(const Pointer<Command> command);
+        virtual void oneway(const std::shared_ptr<Command> command);
 
         /**
          * {@inheritDoc}
          *
          * This method always thrown an UnsupportedOperationException.
          */
-        virtual Pointer<FutureResponse> asyncRequest(
-            const Pointer<Command>          command,
-            const Pointer<ResponseCallback> responseCallback);
+        virtual std::shared_ptr<FutureResponse> asyncRequest(
+            const std::shared_ptr<Command>          command,
+            const std::shared_ptr<ResponseCallback> responseCallback);
 
         /**
          * {@inheritDoc}
          *
          * This method always thrown an UnsupportedOperationException.
          */
-        virtual Pointer<Response> request(const Pointer<Command> command);
+        virtual std::shared_ptr<Response> request(
+            const std::shared_ptr<Command> command);
 
         /**
          * {@inheritDoc}
          *
          * This method always thrown an UnsupportedOperationException.
          */
-        virtual Pointer<Response> request(const Pointer<Command> command,
-                                          unsigned int           timeout);
+        virtual std::shared_ptr<Response> request(
+            const std::shared_ptr<Command> command,
+            unsigned int                   timeout);
 
-        virtual Pointer<wireformat::WireFormat> getWireFormat() const;
+        virtual std::shared_ptr<wireformat::WireFormat> getWireFormat() const;
 
         virtual void setWireFormat(
-            const Pointer<wireformat::WireFormat> wireFormat);
+            const std::shared_ptr<wireformat::WireFormat> wireFormat);
 
         virtual void setTransportListener(TransportListener* listener);
 

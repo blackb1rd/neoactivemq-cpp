@@ -51,11 +51,12 @@ namespace core
     public:
         Mutex mutex;
 
-        StlMap<Pointer<ActiveMQDestination>,
-               Pointer<ActiveMQMessageAudit>,
+        StlMap<std::shared_ptr<ActiveMQDestination>,
+               std::shared_ptr<ActiveMQMessageAudit>,
                ActiveMQDestination::COMPARATOR>
-                                                                  destinations;
-        LinkedHashMap<Dispatcher*, Pointer<ActiveMQMessageAudit>> dispatchers;
+            destinations;
+        LinkedHashMap<Dispatcher*, std::shared_ptr<ActiveMQMessageAudit>>
+            dispatchers;
 
         ConnectionAuditImpl()
             : mutex(),
@@ -111,20 +112,20 @@ void ConnectionAudit::removeDispatcher(Dispatcher* dispatcher)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-bool ConnectionAudit::isDuplicate(Dispatcher*                dispatcher,
-                                  Pointer<commands::Message> message)
+bool ConnectionAudit::isDuplicate(Dispatcher*                        dispatcher,
+                                  std::shared_ptr<commands::Message> message)
 {
     synchronized(&this->impl->mutex)
     {
-        if (checkForDuplicates && message != NULL)
+        if (checkForDuplicates && message != nullptr)
         {
-            Pointer<ActiveMQDestination> destination =
+            std::shared_ptr<ActiveMQDestination> destination =
                 message->getDestination();
-            if (destination != NULL)
+            if (destination != nullptr)
             {
                 if (destination->isQueue())
                 {
-                    Pointer<ActiveMQMessageAudit> audit;
+                    std::shared_ptr<ActiveMQMessageAudit> audit;
                     try
                     {
                         audit = this->impl->destinations.get(destination);
@@ -139,7 +140,7 @@ bool ConnectionAudit::isDuplicate(Dispatcher*                dispatcher,
                     bool result = audit->isDuplicate(message->getMessageId());
                     return result;
                 }
-                Pointer<ActiveMQMessageAudit> audit;
+                std::shared_ptr<ActiveMQMessageAudit> audit;
                 try
                 {
                     audit = this->impl->dispatchers.get(dispatcher);
@@ -160,22 +161,23 @@ bool ConnectionAudit::isDuplicate(Dispatcher*                dispatcher,
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ConnectionAudit::rollbackDuplicate(Dispatcher*                dispatcher,
-                                        Pointer<commands::Message> message)
+void ConnectionAudit::rollbackDuplicate(
+    Dispatcher*                        dispatcher,
+    std::shared_ptr<commands::Message> message)
 {
     synchronized(&this->impl->mutex)
     {
-        if (checkForDuplicates && message != NULL)
+        if (checkForDuplicates && message != nullptr)
         {
-            Pointer<ActiveMQDestination> destination =
+            std::shared_ptr<ActiveMQDestination> destination =
                 message->getDestination();
-            if (destination != NULL)
+            if (destination != nullptr)
             {
                 if (destination->isQueue())
                 {
                     try
                     {
-                        Pointer<ActiveMQMessageAudit> audit =
+                        std::shared_ptr<ActiveMQMessageAudit> audit =
                             this->impl->destinations.get(destination);
                         audit->rollback(message->getMessageId());
                     }
@@ -187,7 +189,7 @@ void ConnectionAudit::rollbackDuplicate(Dispatcher*                dispatcher,
                 {
                     try
                     {
-                        Pointer<ActiveMQMessageAudit> audit =
+                        std::shared_ptr<ActiveMQMessageAudit> audit =
                             this->impl->dispatchers.get(dispatcher);
                         audit->rollback(message->getMessageId());
                     }

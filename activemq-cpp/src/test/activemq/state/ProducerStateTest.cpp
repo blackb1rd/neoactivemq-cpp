@@ -19,13 +19,12 @@
 
 #include <activemq/commands/ProducerInfo.h>
 #include <activemq/state/ProducerState.h>
-#include <decaf/lang/Pointer.h>
+#include <memory>
 
 using namespace std;
 using namespace activemq;
 using namespace activemq::state;
 using namespace activemq::commands;
-using namespace decaf::lang;
 
 class ProducerStateTest : public ::testing::Test
 {
@@ -34,12 +33,12 @@ class ProducerStateTest : public ::testing::Test
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(ProducerStateTest, test)
 {
-    Pointer<ProducerId> id(new ProducerId);
+    std::shared_ptr<ProducerId> id(new ProducerId);
     id->setConnectionId("CONNECTION");
     id->setSessionId(42);
     id->setValue(4096);
 
-    Pointer<ProducerInfo> info(new ProducerInfo());
+    std::shared_ptr<ProducerInfo> info(new ProducerInfo());
     info->setProducerId(id);
     ProducerState state(info);
 

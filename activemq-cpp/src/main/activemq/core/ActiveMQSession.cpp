@@ -39,11 +39,11 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-ActiveMQSession::ActiveMQSession(Pointer<ActiveMQSessionKernel> kernel)
+ActiveMQSession::ActiveMQSession(std::shared_ptr<ActiveMQSessionKernel> kernel)
     : cms::Session(),
       kernel(kernel)
 {
-    if (kernel == NULL)
+    if (kernel == nullptr)
     {
         throw ActiveMQException(__FILE__,
                                 __LINE__,

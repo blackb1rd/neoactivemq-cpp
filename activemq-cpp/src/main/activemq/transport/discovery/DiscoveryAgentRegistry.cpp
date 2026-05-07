@@ -17,6 +17,8 @@
 
 #include "DiscoveryAgentRegistry.h"
 
+#include <memory>
+
 #include <activemq/exceptions/ActiveMQException.h>
 #include <activemq/transport/discovery/DiscoveryAgentFactory.h>
 
@@ -104,7 +106,7 @@ void DiscoveryAgentRegistry::unregisterFactory(const std::string& name)
 ////////////////////////////////////////////////////////////////////////////////
 void DiscoveryAgentRegistry::unregisterAllFactories()
 {
-    Pointer<Iterator<DiscoveryAgentFactory*>> iterator(
+    std::shared_ptr<Iterator<DiscoveryAgentFactory*>> iterator(
         this->registry.values().iterator());
     while (iterator->hasNext())
     {

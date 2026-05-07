@@ -42,7 +42,7 @@ AbstractTransportFactory::~AbstractTransportFactory()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<WireFormat> AbstractTransportFactory::createWireFormat(
+std::shared_ptr<WireFormat> AbstractTransportFactory::createWireFormat(
     const decaf::util::Properties& properties)
 {
     try

@@ -20,13 +20,12 @@
 #include <activemq/commands/LocalTransactionId.h>
 #include <activemq/commands/TransactionInfo.h>
 #include <activemq/state/TransactionState.h>
-#include <decaf/lang/Pointer.h>
+#include <memory>
 
 using namespace std;
 using namespace activemq;
 using namespace activemq::state;
 using namespace activemq::commands;
-using namespace decaf::lang;
 
 class TransactionStateTest : public ::testing::Test
 {
@@ -35,10 +34,10 @@ class TransactionStateTest : public ::testing::Test
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(TransactionStateTest, test)
 {
-    Pointer<ConnectionId> connectionId(new ConnectionId);
+    std::shared_ptr<ConnectionId> connectionId(new ConnectionId);
     connectionId->setValue("CONNECTION");
 
-    Pointer<LocalTransactionId> id(new LocalTransactionId());
+    std::shared_ptr<LocalTransactionId> id(new LocalTransactionId());
     id->setConnectionId(connectionId);
     id->setValue(42);
     TransactionState state(id);
@@ -46,7 +45,8 @@ TEST_F(TransactionStateTest, test)
     ASSERT_TRUE(state.toString() != "NULL");
     ASSERT_TRUE(state.getId() != NULL);
 
-    Pointer<LocalTransactionId> temp;
-    ASSERT_NO_THROW(temp = state.getId().dynamicCast<LocalTransactionId>());
+    std::shared_ptr<LocalTransactionId> temp;
+    ASSERT_NO_THROW(
+        temp = std::dynamic_pointer_cast<LocalTransactionId>(state.getId()));
     ASSERT_TRUE(temp->getValue() == id->getValue());
 }

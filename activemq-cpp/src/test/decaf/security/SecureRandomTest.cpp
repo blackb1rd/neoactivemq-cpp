@@ -17,6 +17,8 @@
 
 #include <gtest/gtest.h>
 
+#include <cstring>
+
 #include <decaf/security/SecureRandom.h>
 
 #include <decaf/lang/exceptions/IllegalArgumentException.h>
@@ -82,31 +84,14 @@ TEST_F(SecureRandomTest, testNextBytes1)
     std::vector<unsigned char> buffer2(255, 0);
     std::vector<unsigned char> buffer3(255, 0);
 
-    long long buffer1Sum = 0LL;
-    long long buffer2Sum = 0LL;
-    long long buffer3Sum = 0LL;
-
     SecureRandom srng;
     srng.nextBytes(buffer1);
     srng.nextBytes(buffer2);
     srng.nextBytes(buffer3);
 
-    for (std::size_t i = 0; i < buffer1.size(); ++i)
-    {
-        buffer1Sum += buffer1[i];
-    }
-    for (std::size_t i = 0; i < buffer2.size(); ++i)
-    {
-        buffer2Sum += buffer2[i];
-    }
-    for (std::size_t i = 0; i < buffer3.size(); ++i)
-    {
-        buffer3Sum += buffer3[i];
-    }
-
-    ASSERT_TRUE(buffer1Sum != buffer2Sum);
-    ASSERT_TRUE(buffer1Sum != buffer3Sum);
-    ASSERT_TRUE(buffer2Sum != buffer3Sum);
+    ASSERT_TRUE(std::memcmp(&buffer1[0], &buffer2[0], buffer1.size()) != 0);
+    ASSERT_TRUE(std::memcmp(&buffer1[0], &buffer3[0], buffer1.size()) != 0);
+    ASSERT_TRUE(std::memcmp(&buffer2[0], &buffer3[0], buffer2.size()) != 0);
 
     std::vector<unsigned char> emptyBuffer;
     ASSERT_NO_THROW(srng.nextBytes(emptyBuffer));
@@ -119,31 +104,14 @@ TEST_F(SecureRandomTest, testNextBytes2)
     unsigned char buffer2[255] = {0};
     unsigned char buffer3[255] = {0};
 
-    long long buffer1Sum = 0LL;
-    long long buffer2Sum = 0LL;
-    long long buffer3Sum = 0LL;
-
     SecureRandom srng;
     srng.nextBytes(buffer1, 255);
     srng.nextBytes(buffer2, 255);
     srng.nextBytes(buffer3, 255);
 
-    for (std::size_t i = 0; i < 255; ++i)
-    {
-        buffer1Sum += buffer1[i];
-    }
-    for (std::size_t i = 0; i < 255; ++i)
-    {
-        buffer2Sum += buffer2[i];
-    }
-    for (std::size_t i = 0; i < 255; ++i)
-    {
-        buffer3Sum += buffer3[i];
-    }
-
-    ASSERT_TRUE(buffer1Sum != buffer2Sum);
-    ASSERT_TRUE(buffer1Sum != buffer3Sum);
-    ASSERT_TRUE(buffer2Sum != buffer3Sum);
+    ASSERT_TRUE(std::memcmp(buffer1, buffer2, 255) != 0);
+    ASSERT_TRUE(std::memcmp(buffer1, buffer3, 255) != 0);
+    ASSERT_TRUE(std::memcmp(buffer2, buffer3, 255) != 0);
 
     ASSERT_THROW(srng.nextBytes(NULL, 255), NullPointerException)
         << ("Should have thrown a NullPointerException");

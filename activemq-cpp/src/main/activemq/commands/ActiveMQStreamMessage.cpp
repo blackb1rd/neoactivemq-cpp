@@ -25,6 +25,7 @@
 #include <cms/MessageNotWriteableException.h>
 
 #include <algorithm>
+#include <string>
 
 #include <decaf/io/BufferedInputStream.h>
 #include <decaf/io/ByteArrayInputStream.h>
@@ -472,6 +473,8 @@ char ActiveMQStreamMessage::readChar() const
         }
         if (type == PrimitiveValueNode::CHAR_TYPE)
         {
+            // Java char is 2 bytes; discard high byte, return low.
+            this->dataIn->readByte();
             return this->dataIn->readChar();
         }
 
@@ -523,7 +526,10 @@ void ActiveMQStreamMessage::writeChar(char value)
     try
     {
         this->dataOut->write(PrimitiveValueNode::CHAR_TYPE);
-        this->dataOut->writeChar(value);
+        // Java char is 2 bytes; write high byte then low byte.
+        // C++ char fits in one byte, so high byte is always zero.
+        this->dataOut->write(0);
+        this->dataOut->write((unsigned char)value);
     }
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
 }
@@ -864,7 +870,7 @@ int ActiveMQStreamMessage::readInt() const
         }
         if (type == PrimitiveValueNode::STRING_TYPE)
         {
-            return Integer::valueOf(this->dataIn->readUTF()).intValue();
+            return std::stoi(this->dataIn->readUTF());
         }
 
         if (type == PrimitiveValueNode::NULL_TYPE)
@@ -950,7 +956,7 @@ long long ActiveMQStreamMessage::readLong() const
         }
         if (type == PrimitiveValueNode::STRING_TYPE)
         {
-            return Long::valueOf(this->dataIn->readUTF()).longValue();
+            return std::stoll(this->dataIn->readUTF());
         }
 
         if (type == PrimitiveValueNode::NULL_TYPE)
@@ -1063,6 +1069,8 @@ std::string ActiveMQStreamMessage::readString() const
 
         if (type == PrimitiveValueNode::CHAR_TYPE)
         {
+            // Java char is 2 bytes; discard high byte, use low.
+            this->dataIn->readByte();
             return Character(this->dataIn->readChar()).toString();
         }
         else

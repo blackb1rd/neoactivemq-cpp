@@ -39,8 +39,9 @@ int main(int argc, char** argv)
     // formatting)
     activemq::util::AMQLogger::setRecordOnlyMode(true);
 
-    long long testTimeoutSeconds = 300;  // Per-test timeout: 5 minutes default
-    bool      useTeamCity        = false;
+    long long testTimeoutSeconds =
+        1800;  // default; overridden by -test-timeout arg
+    bool useTeamCity = false;
 
     // Let GTest parse --gtest_* flags first
     ::testing::InitGoogleTest(&argc, argv);

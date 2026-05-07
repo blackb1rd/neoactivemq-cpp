@@ -20,14 +20,12 @@
 
 #include <activemq/transport/TransportFilter.h>
 #include <activemq/util/Config.h>
-#include <decaf/lang/Pointer.h>
+#include <memory>
 
 namespace activemq
 {
 namespace wireformat
 {
-
-    using decaf::lang::Pointer;
 
     /**
      * Defines a WireFormatNegotiator which allows a WireFormat to
@@ -43,7 +41,7 @@ namespace wireformat
          * @param next
          *      The next Transport in the chain
          */
-        WireFormatNegotiator(const Pointer<transport::Transport> next)
+        WireFormatNegotiator(const std::shared_ptr<transport::Transport> next)
             : transport::TransportFilter(next)
         {
         }

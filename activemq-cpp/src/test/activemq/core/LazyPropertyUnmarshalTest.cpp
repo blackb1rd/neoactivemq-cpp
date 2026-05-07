@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -103,7 +103,7 @@ LazyPropertyUnmarshalTest::~LazyPropertyUnmarshalTest()
 void LazyPropertyUnmarshalTest::testPropertiesLazilyUnmarshaled()
 {
     // Create a message with valid marshalled properties
-    Pointer<ActiveMQTextMessage> message(new ActiveMQTextMessage());
+    std::shared_ptr<ActiveMQTextMessage> message(new ActiveMQTextMessage());
     message->setText("Test Message");
 
     // Marshal some properties
@@ -129,7 +129,7 @@ void LazyPropertyUnmarshalTest::testPropertiesLazilyUnmarshaled()
 void LazyPropertyUnmarshalTest::testCorruptedPropertiesThrowIOException()
 {
     // Create a message with corrupted marshalled properties
-    Pointer<ActiveMQTextMessage> message(new ActiveMQTextMessage());
+    std::shared_ptr<ActiveMQTextMessage> message(new ActiveMQTextMessage());
     message->setText("Test Message");
 
     // Set corrupted property data (invalid bytes)
@@ -186,8 +186,8 @@ void LazyPropertyUnmarshalTest::testRedeliveryExceededAfterMaxAttempts()
     policy.setMaximumRedeliveries(6);
 
     // Simulate message dispatch with redelivery counter
-    Pointer<MessageDispatch>     dispatch(new MessageDispatch());
-    Pointer<ActiveMQTextMessage> message(new ActiveMQTextMessage());
+    std::shared_ptr<MessageDispatch>     dispatch(new MessageDispatch());
+    std::shared_ptr<ActiveMQTextMessage> message(new ActiveMQTextMessage());
     message->setText("Test");
     dispatch->setMessage(message);
 
@@ -229,7 +229,7 @@ void LazyPropertyUnmarshalTest::testCorruptedMessageDoesNotCloseConnection()
     // - Connection/transport remain active
 
     // Create message with corrupted properties
-    Pointer<ActiveMQTextMessage> message(new ActiveMQTextMessage());
+    std::shared_ptr<ActiveMQTextMessage> message(new ActiveMQTextMessage());
     message->setText("Corrupted Message");
 
     std::vector<unsigned char> corruptedData;
@@ -242,12 +242,12 @@ void LazyPropertyUnmarshalTest::testCorruptedMessageDoesNotCloseConnection()
     DefaultRedeliveryPolicy policy;
     policy.setMaximumRedeliveries(6);
 
-    Pointer<MessageDispatch> dispatch(new MessageDispatch());
+    std::shared_ptr<MessageDispatch> dispatch(new MessageDispatch());
     dispatch->setMessage(message);
     dispatch->setDestination(
-        Pointer<ActiveMQQueue>(new ActiveMQQueue("TEST.QUEUE")));
+        std::shared_ptr<ActiveMQQueue>(new ActiveMQQueue("TEST.QUEUE")));
 
-    Pointer<MessageId> msgId(new MessageId());
+    std::shared_ptr<MessageId> msgId(new MessageId());
     msgId->setProducerSequenceId(1);
     message->setMessageId(msgId);
 

@@ -10,6 +10,50 @@ ASSUMES: Plan 01 (decaf removal) is complete.
   - No decaf:: references remain
   - C++17 standard
 
+NOTE: Plan 01 is NOT yet complete. Full decaf removal is not a prerequisite
+for this plan. The async refactor replaces the specific decaf usages inline:
+  - IOTransport's decaf::lang::Thread/Runnable is deleted (no replacement)
+  - InactivityMonitor's decaf::util::Timer threads are replaced with
+    asio::steady_timer (Phase 6)
+All other decaf usage elsewhere in the codebase is out of scope here.
+
+
+================================================================================
+CURRENT STATE (as of 2026-04)
+================================================================================
+
+Threads spawned per connection today:
+
+  Component            Threads  Type
+  -------------------  -------  -----------------------------------------
+  IOTransport reader       1    decaf::lang::Thread (blocks on unmarshal)
+  InactivityMonitor        1    decaf::util::Timer  (read-check)
+  InactivityMonitor        1    decaf::util::Timer  (write-check)
+  CompositeTaskRunner      1    decaf::lang::Thread (async task executor)
+  TOTAL per connection     4
+
+  With 3000 connections: 12,000 threads on 2-4 CI cores.
+  Thread saturation -> client TCP buffers fill -> TCP flow control -> broker
+  dispatch stalls (5-minute silent gap observed in CI logs).
+
+IoContextManager (already exists):
+  File: decaf/internal/net/tcp/IoContextManager.h/.cpp
+  A SHARED SINGLETON asio::io_context with a worker thread pool
+  (default: hardware_concurrency, capped at 8). All TcpSocket instances
+  already share this context.
+
+  The original plan below says "one io_context per connection". This should
+  be revised to use the SHARED IoContextManager instead. For fanout workloads
+  (3000+ connections) this is strictly better: 8 threads serve all connections
+  rather than N threads, eliminating the thread saturation problem.
+
+TcpSocket (already partially async):
+  File: decaf/internal/net/tcp/TcpSocket.cpp
+  Already calls asio::async_read_some, but immediately blocks the IOTransport
+  reader thread via condition_variable::wait_for(100ms) polling. This produces
+  the "[IOTransport] async blocking (polling)" log messages. Phases 2 and 4
+  of this plan replace this with a true fire-and-forget callback pattern.
+
 
 GOAL
 ----
@@ -290,10 +334,12 @@ PUBLIC API for custom channels:
       return std::make_unique<QtAsyncChannel>();
   });
 
-The library manages an asio::io_context internally (one per connection,
-with a single worker thread running io_context::run()). The io_context
-is passed to the channel factory. For AsioAsyncChannel, this is the
-event loop. For Qt/libuv channels, they ignore it and use their own.
+The library uses the shared IoContextManager singleton (already exists at
+decaf/internal/net/tcp/IoContextManager.h). Its io_context is passed to
+the AsioAsyncChannel at construction. For Qt/libuv custom channels, the
+channel ignores the io_context and drives its own event loop instead.
+This avoids creating any new threads: all async completions run on the
+shared pool (2-8 threads total regardless of connection count).
 
 
 ================================================================================

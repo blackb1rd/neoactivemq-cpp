@@ -24,7 +24,7 @@ using namespace std;
 using namespace activemq;
 using namespace activemq::exceptions;
 using namespace activemq::commands;
-using namespace decaf::lang;
+
 using namespace decaf::lang::exceptions;
 
 /*
@@ -342,7 +342,7 @@ void ConnectionControl::setToken(const std::vector<unsigned char>& token)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<commands::Command> ConnectionControl::visit(
+std::shared_ptr<commands::Command> ConnectionControl::visit(
     activemq::state::CommandVisitor* visitor)
 {
     return visitor->processConnectionControl(this);

@@ -28,7 +28,7 @@
 #include <activemq/commands/MessageId.h>
 #include <activemq/commands/TransactionId.h>
 #include <activemq/util/Config.h>
-#include <decaf/lang/Pointer.h>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -36,8 +36,6 @@ namespace activemq
 {
 namespace commands
 {
-
-    using decaf::lang::Pointer;
 
     /*
      *
@@ -51,12 +49,12 @@ namespace commands
     class AMQCPP_API JournalTopicAck : public BaseDataStructure
     {
     protected:
-        Pointer<ActiveMQDestination> destination;
-        Pointer<MessageId>           messageId;
-        long long                    messageSequenceId;
-        std::string                  subscritionName;
-        std::string                  clientId;
-        Pointer<TransactionId>       transactionId;
+        std::shared_ptr<ActiveMQDestination> destination;
+        std::shared_ptr<MessageId>           messageId;
+        long long                            messageSequenceId;
+        std::string                          subscritionName;
+        std::string                          clientId;
+        std::shared_ptr<TransactionId>       transactionId;
 
     public:
         const static unsigned char ID_JOURNALTOPICACK = 50;
@@ -80,14 +78,15 @@ namespace commands
 
         virtual bool equals(const DataStructure* value) const;
 
-        virtual const Pointer<ActiveMQDestination>& getDestination() const;
-        virtual Pointer<ActiveMQDestination>&       getDestination();
-        virtual void                                setDestination(
-                                           const Pointer<ActiveMQDestination>& destination);
+        virtual const std::shared_ptr<ActiveMQDestination>& getDestination()
+            const;
+        virtual std::shared_ptr<ActiveMQDestination>& getDestination();
+        virtual void                                  setDestination(
+                                             const std::shared_ptr<ActiveMQDestination>& destination);
 
-        virtual const Pointer<MessageId>& getMessageId() const;
-        virtual Pointer<MessageId>&       getMessageId();
-        virtual void setMessageId(const Pointer<MessageId>& messageId);
+        virtual const std::shared_ptr<MessageId>& getMessageId() const;
+        virtual std::shared_ptr<MessageId>&       getMessageId();
+        virtual void setMessageId(const std::shared_ptr<MessageId>& messageId);
 
         virtual long long getMessageSequenceId() const;
         virtual void      setMessageSequenceId(long long messageSequenceId);
@@ -100,10 +99,10 @@ namespace commands
         virtual std::string&       getClientId();
         virtual void               setClientId(const std::string& clientId);
 
-        virtual const Pointer<TransactionId>& getTransactionId() const;
-        virtual Pointer<TransactionId>&       getTransactionId();
-        virtual void                          setTransactionId(
-                                     const Pointer<TransactionId>& transactionId);
+        virtual const std::shared_ptr<TransactionId>& getTransactionId() const;
+        virtual std::shared_ptr<TransactionId>&       getTransactionId();
+        virtual void                                  setTransactionId(
+                                             const std::shared_ptr<TransactionId>& transactionId);
     };
 
 }  // namespace commands

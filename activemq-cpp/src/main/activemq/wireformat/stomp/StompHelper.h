@@ -27,7 +27,7 @@
 #include <activemq/util/Config.h>
 #include <activemq/util/LongSequenceGenerator.h>
 #include <activemq/wireformat/stomp/StompFrame.h>
-#include <decaf/lang/Pointer.h>
+#include <memory>
 
 namespace activemq
 {
@@ -44,7 +44,6 @@ namespace wireformat
         using activemq::commands::MessageId;
         using activemq::commands::ProducerId;
         using activemq::commands::TransactionId;
-        using decaf::lang::Pointer;
 
         /**
          * Utility Methods used when marshaling to and from StompFrame's.
@@ -74,8 +73,8 @@ namespace wireformat
              * @param frame - The frame to extract headers from.
              * @param message - The message to move the Headers to.
              */
-            void convertProperties(const Pointer<StompFrame>& frame,
-                                   const Pointer<Message>&    message);
+            void convertProperties(const std::shared_ptr<StompFrame>& frame,
+                                   const std::shared_ptr<Message>&    message);
 
             /**
              * Converts the Properties in a Message Command to Valid Headers and
@@ -84,8 +83,8 @@ namespace wireformat
              * @param message - The message to move the Headers to.
              * @param frame - The frame to extract headers from.
              */
-            void convertProperties(const Pointer<Message>&    message,
-                                   const Pointer<StompFrame>& frame);
+            void convertProperties(const std::shared_ptr<Message>&    message,
+                                   const std::shared_ptr<StompFrame>& frame);
 
             /**
              * Converts from a Stomp Destination to an ActiveMQDestination
@@ -93,7 +92,7 @@ namespace wireformat
              * @param destination - The Stomp Destination name string.
              * @return Pointer to a new ActiveMQDestination.
              */
-            Pointer<ActiveMQDestination> convertDestination(
+            std::shared_ptr<ActiveMQDestination> convertDestination(
                 const std::string& destination);
 
             /**
@@ -103,7 +102,7 @@ namespace wireformat
              * @return the Stomp String name that defines the destination.
              */
             std::string convertDestination(
-                const Pointer<ActiveMQDestination>& destination);
+                const std::shared_ptr<ActiveMQDestination>& destination);
 
             /**
              * Converts a MessageId instance to a Stomp MessageId String.
@@ -111,7 +110,8 @@ namespace wireformat
              * @param messageId - the MessageId instance to convert.
              * @return a Stomp Message Id String.
              */
-            std::string convertMessageId(const Pointer<MessageId>& messageId);
+            std::string convertMessageId(
+                const std::shared_ptr<MessageId>& messageId);
 
             /**
              * Converts a Stomp MessageId string to a MessageId
@@ -119,7 +119,8 @@ namespace wireformat
              * @param messageId - the String message Id to convert.
              * @return Pointer to a new MessageId.
              */
-            Pointer<MessageId> convertMessageId(const std::string& messageId);
+            std::shared_ptr<MessageId> convertMessageId(
+                const std::string& messageId);
 
             /**
              * Converts a ConsumerId instance to a Stomp ConsumerId String.
@@ -127,7 +128,8 @@ namespace wireformat
              * @param consumerId - the Consumer instance to convert.
              * @return a Stomp Consumer Id String.
              */
-            std::string convertConsumerId(const Pointer<ConsumerId>& consumerId);
+            std::string convertConsumerId(
+                const std::shared_ptr<ConsumerId>& consumerId);
 
             /**
              * Converts a Stomp ConsumerId string to a ConsumerId
@@ -135,7 +137,8 @@ namespace wireformat
              * @param consumerId - the String Consumer Id to convert.
              * @return Pointer to a new ConsumerId.
              */
-            Pointer<ConsumerId> convertConsumerId(const std::string& consumerId);
+            std::shared_ptr<ConsumerId> convertConsumerId(
+                const std::string& consumerId);
 
             /**
              * Converts a ProducerId instance to a Stomp ProducerId String.
@@ -143,7 +146,8 @@ namespace wireformat
              * @param producerId - the Producer instance to convert.
              * @return a Stomp Producer Id String.
              */
-            std::string convertProducerId(const Pointer<ProducerId>& producerId);
+            std::string convertProducerId(
+                const std::shared_ptr<ProducerId>& producerId);
 
             /**
              * Converts a Stomp ProducerId string to a ProducerId
@@ -151,7 +155,8 @@ namespace wireformat
              * @param producerId - the String Producer Id to convert.
              * @return Pointer to a new ProducerId.
              */
-            Pointer<ProducerId> convertProducerId(const std::string& producerId);
+            std::shared_ptr<ProducerId> convertProducerId(
+                const std::string& producerId);
 
             /**
              * Converts a TransactionId instance to a Stomp TransactionId
@@ -161,7 +166,7 @@ namespace wireformat
              * @return a Stomp Transaction Id String.
              */
             std::string convertTransactionId(
-                const Pointer<TransactionId>& transactionId);
+                const std::shared_ptr<TransactionId>& transactionId);
 
             /**
              * Converts a Stomp TransactionId string to a TransactionId
@@ -169,7 +174,7 @@ namespace wireformat
              * @param transactionId - the String Transaction Id to convert.
              * @return Pointer to a new TransactionId.
              */
-            Pointer<TransactionId> convertTransactionId(
+            std::shared_ptr<TransactionId> convertTransactionId(
                 const std::string& transactionId);
         };
 

@@ -27,8 +27,9 @@
 #include <activemq/commands/ProducerId.h>
 #include <activemq/commands/ProducerInfo.h>
 #include <activemq/util/Config.h>
+#include <activemq/util/SharedPtrComparator.h>
 #include <decaf/lang/Comparable.h>
-#include <decaf/lang/Pointer.h>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -36,8 +37,6 @@ namespace activemq
 {
 namespace commands
 {
-
-    using decaf::lang::Pointer;
 
     /*
      *
@@ -52,15 +51,15 @@ namespace commands
                                  public decaf::lang::Comparable<MessageId>
     {
     protected:
-        std::string         textView;
-        Pointer<ProducerId> producerId;
-        long long           producerSequenceId;
-        long long           brokerSequenceId;
+        std::string                 textView;
+        std::shared_ptr<ProducerId> producerId;
+        long long                   producerSequenceId;
+        long long                   brokerSequenceId;
 
     public:
         const static unsigned char ID_MESSAGEID = 110;
 
-        typedef decaf::lang::PointerComparator<MessageId> COMPARATOR;
+        typedef SharedPtrComparator<MessageId> COMPARATOR;
 
     private:
         mutable std::string key;
@@ -72,11 +71,11 @@ namespace commands
 
         MessageId(const std::string& messageKey);
 
-        MessageId(const Pointer<ProducerInfo>& producerInfo,
-                  long long                    producerSequenceId);
+        MessageId(const std::shared_ptr<ProducerInfo>& producerInfo,
+                  long long                            producerSequenceId);
 
-        MessageId(const Pointer<ProducerId>& producerId,
-                  long long                  producerSequenceId);
+        MessageId(const std::shared_ptr<ProducerId>& producerId,
+                  long long                          producerSequenceId);
 
         MessageId(const std::string& producerId, long long producerSequenceId);
 
@@ -98,9 +97,10 @@ namespace commands
         virtual std::string&       getTextView();
         virtual void               setTextView(const std::string& textView);
 
-        virtual const Pointer<ProducerId>& getProducerId() const;
-        virtual Pointer<ProducerId>&       getProducerId();
-        virtual void setProducerId(const Pointer<ProducerId>& producerId);
+        virtual const std::shared_ptr<ProducerId>& getProducerId() const;
+        virtual std::shared_ptr<ProducerId>&       getProducerId();
+        virtual void                               setProducerId(
+                                          const std::shared_ptr<ProducerId>& producerId);
 
         virtual long long getProducerSequenceId() const;
         virtual void      setProducerSequenceId(long long producerSequenceId);

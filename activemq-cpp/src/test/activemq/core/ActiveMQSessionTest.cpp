@@ -880,7 +880,7 @@ TEST_F(ActiveMQSessionTest, testClearMessagesInProgressFlag)
     ASSERT_TRUE(connection.get() != NULL);
 
     std::unique_ptr<cms::Session> session(connection->createSession());
-    std::unique_ptr<cms::Topic> topic(session->createTopic("TestTopic"));
+    std::unique_ptr<cms::Topic>   topic(session->createTopic("TestTopic"));
     ASSERT_TRUE(topic.get() != NULL);
 
     std::unique_ptr<ActiveMQConsumer> consumer(
@@ -895,9 +895,7 @@ TEST_F(ActiveMQSessionTest, testClearMessagesInProgressFlag)
 
     connection->transportResumed();
 
-    injectTextMessage("This is a Test",
-                      *topic,
-                      *(consumer->getConsumerId()));
+    injectTextMessage("This is a Test", *topic, *(consumer->getConsumerId()));
 
     msgListener.asyncWaitForMessages(1);
 

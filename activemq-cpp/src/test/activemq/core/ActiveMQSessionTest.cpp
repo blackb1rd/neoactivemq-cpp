@@ -873,3 +873,36 @@ TEST_F(ActiveMQSessionTest, testCreateTempTopicByName)
     ASSERT_TRUE(topic->getDestinationType() ==
                 cms::Destination::TEMPORARY_TOPIC);
 }
+
+////////////////////////////////////////////////////////////////////////////////
+TEST_F(ActiveMQSessionTest, testClearMessagesInProgressFlag)
+{
+    ASSERT_TRUE(connection.get() != NULL);
+
+    std::unique_ptr<cms::Session> session(connection->createSession());
+    std::unique_ptr<cms::Topic> topic(session->createTopic("TestTopic"));
+    ASSERT_TRUE(topic.get() != NULL);
+
+    std::unique_ptr<ActiveMQConsumer> consumer(
+        dynamic_cast<ActiveMQConsumer*>(session->createConsumer(topic.get())));
+    ASSERT_TRUE(consumer.get() != NULL);
+
+    MyCMSMessageListener msgListener;
+    consumer->setMessageListener(&msgListener);
+
+    connection->transportInterrupted();
+    connection->transportInterrupted();
+
+    connection->transportResumed();
+
+    injectTextMessage("This is a Test",
+                      *topic,
+                      *(consumer->getConsumerId()));
+
+    msgListener.asyncWaitForMessages(1);
+
+    ASSERT_EQ(1, (int)msgListener.messages.size());
+
+    consumer->close();
+    session->close();
+}

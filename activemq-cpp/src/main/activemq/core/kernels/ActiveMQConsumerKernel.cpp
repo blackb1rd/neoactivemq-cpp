@@ -2790,12 +2790,14 @@ void ActiveMQConsumerKernel::clearMessagesInProgress()
                 // allow dispatch on this connection to resume
                 this->session->getConnection()
                     ->setTransportInterruptionProcessingComplete();
-                this->internal->inProgressClearRequiredFlag.fetch_sub(1);
+                this->internal->inProgressClearRequiredFlag.store(0);
 
                 // Wake up any blockers and allow them to recheck state.
                 this->internal->unconsumedMessages->notifyAll();
             }
         }
+
+        clearDeliveredList();
     }
 }
 

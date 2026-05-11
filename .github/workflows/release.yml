@@ -220,7 +220,7 @@ jobs:
       run: ls -R release-artifacts
 
     - name: Create GitHub Release
-      uses: softprops/action-gh-release@v2
+      uses: softprops/action-gh-release@v3
       with:
         tag_name: ${{ needs.create-release.outputs.new_tag }}
         name: Release ${{ needs.create-release.outputs.new_version }}

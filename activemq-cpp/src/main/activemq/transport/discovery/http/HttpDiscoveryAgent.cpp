@@ -17,6 +17,8 @@
 
 #include <activemq/transport/discovery/http/HttpDiscoveryAgent.h>
 
+#include <memory>
+
 #include <decaf/io/BufferedInputStream.h>
 #include <decaf/io/BufferedOutputStream.h>
 #include <decaf/io/DataInputStream.h>
@@ -227,7 +229,7 @@ void HttpDiscoveryAgent::updateServices()
         HashSet<std::string> activeServices = impl->doLookup();
         if (activeServices.isEmpty())
         {
-            Pointer<Iterator<std::string>> discovered(
+            std::shared_ptr<Iterator<std::string>> discovered(
                 activeServices.iterator());
             while (discovered->hasNext())
             {

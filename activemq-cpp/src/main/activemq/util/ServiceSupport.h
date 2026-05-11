@@ -21,8 +21,9 @@
 #include <activemq/util/Config.h>
 #include <activemq/util/Service.h>
 
+#include <atomic>
+
 #include <decaf/util/ArrayList.h>
-#include <decaf/util/concurrent/atomic/AtomicBoolean.h>
 
 namespace activemq
 {
@@ -40,10 +41,10 @@ namespace util
     class AMQCPP_API ServiceSupport : public Service
     {
     private:
-        decaf::util::concurrent::atomic::AtomicBoolean started;
-        decaf::util::concurrent::atomic::AtomicBoolean stopping;
-        decaf::util::concurrent::atomic::AtomicBoolean stopped;
-        decaf::util::ArrayList<ServiceListener*>       listeners;
+        std::atomic<bool>                        started;
+        std::atomic<bool>                        stopping;
+        std::atomic<bool>                        stopped;
+        decaf::util::ArrayList<ServiceListener*> listeners;
 
     public:
         ServiceSupport(const ServiceSupport&);

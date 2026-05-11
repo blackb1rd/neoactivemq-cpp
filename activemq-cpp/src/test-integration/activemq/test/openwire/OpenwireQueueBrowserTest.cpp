@@ -19,6 +19,7 @@
 
 #include <activemq/core/ActiveMQConnection.h>
 #include <activemq/core/ActiveMQConnectionFactory.h>
+#include <activemq/core/PrefetchPolicy.h>
 #include <activemq/exceptions/ActiveMQException.h>
 #include <activemq/util/CMSListener.h>
 
@@ -189,21 +190,18 @@ TEST_F(OpenwireQueueBrowserTest, testQueueBrowserWith2Consumers)
         dynamic_cast<ActiveMQConnection*>(cmsProvider->getConnection());
     ASSERT_TRUE(connection != NULL);
     connection->setAlwaysSyncSend(false);
+    connection->getPrefetchPolicy()->setQueuePrefetch(10);
 
     std::unique_ptr<cms::Session> session(
         connection->createSession(cms::Session::CLIENT_ACKNOWLEDGE));
     std::unique_ptr<cms::Queue> queue(
         session->createQueue("testQueueBrowserWith2Consumers"));
 
-    std::unique_ptr<cms::Queue> queuePrefetch10(session->createQueue(
-        "testQueueBrowserWith2Consumers?consumer.prefetchSize=10"));
-    std::unique_ptr<cms::Queue> queuePrefetch1(session->createQueue(
-        "testQueueBrowserWith2Consumers?consumer.prefetchSize=1"));
-
     std::unique_ptr<ActiveMQConnectionFactory> factory(
         new ActiveMQConnectionFactory(cmsProvider->getBrokerURL()));
     std::unique_ptr<ActiveMQConnection> connection2(
         dynamic_cast<ActiveMQConnection*>(factory->createConnection()));
+    connection2->getPrefetchPolicy()->setQueuePrefetch(1);
     connection2->start();
 
     std::unique_ptr<cms::Session> session2(
@@ -212,7 +210,7 @@ TEST_F(OpenwireQueueBrowserTest, testQueueBrowserWith2Consumers)
     std::unique_ptr<cms::MessageProducer> producer(
         session->createProducer(queue.get()));
     std::unique_ptr<cms::MessageConsumer> consumer(
-        session->createConsumer(queuePrefetch10.get()));
+        session->createConsumer(queue.get()));
 
     producer->setDeliveryMode(cms::DeliveryMode::NON_PERSISTENT);
 
@@ -224,7 +222,7 @@ TEST_F(OpenwireQueueBrowserTest, testQueueBrowserWith2Consumers)
     }
 
     std::unique_ptr<cms::QueueBrowser> browser(
-        session2->createBrowser(queuePrefetch1.get()));
+        session2->createBrowser(queue.get()));
     cms::MessageEnumeration* browserView = browser->getEnumeration();
 
     std::vector<cms::Message*> messages;

@@ -19,11 +19,11 @@
 
 #include <activemq/exceptions/ActiveMQException.h>
 
+#include <memory>
+
 using namespace activemq;
 using namespace activemq::state;
 using namespace activemq::exceptions;
-using namespace decaf;
-using namespace decaf::lang;
 
 ////////////////////////////////////////////////////////////////////////////////
 Tracked::Tracked()
@@ -33,7 +33,7 @@ Tracked::Tracked()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-Tracked::Tracked(Pointer<Runnable> runnable)
+Tracked::Tracked(std::shared_ptr<decaf::lang::Runnable> runnable)
     : commands::Response(),
       runnable(runnable)
 {
@@ -44,10 +44,10 @@ void Tracked::onResponse()
 {
     try
     {
-        if (this->runnable != NULL)
+        if (this->runnable)
         {
             this->runnable->run();
-            this->runnable.reset(NULL);
+            this->runnable.reset();
         }
     }
     AMQ_CATCH_RETHROW(ActiveMQException)

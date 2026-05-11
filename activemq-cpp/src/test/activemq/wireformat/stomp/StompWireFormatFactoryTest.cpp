@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -44,9 +44,10 @@ TEST_F(StompWireFormatFactoryTest, testCreateWireFormat)
     properties.setProperty("wireFormat.tempTopicPrefix", "/test-temp-topic/");
     properties.setProperty("wireFormat.tempQueuePrefix", "/test-temp-queue/");
 
-    Pointer<WireFormat> format(factory.createWireFormat(properties));
+    std::shared_ptr<WireFormat> format(factory.createWireFormat(properties));
 
-    Pointer<StompWireFormat> stomp = format.dynamicCast<StompWireFormat>();
+    std::shared_ptr<StompWireFormat> stomp =
+        std::dynamic_pointer_cast<StompWireFormat>(format);
 
     ASSERT_EQ(std::string("/test-topic/"), stomp->getTopicPrefix());
     ASSERT_EQ(std::string("/test-queue/"), stomp->getQueuePrefix());

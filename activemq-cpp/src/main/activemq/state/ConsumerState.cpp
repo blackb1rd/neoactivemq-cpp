@@ -17,13 +17,14 @@
 
 #include "ConsumerState.h"
 
+#include <memory>
+
 using namespace activemq;
 using namespace activemq::state;
 using namespace activemq::commands;
-using namespace decaf::lang;
 
 ////////////////////////////////////////////////////////////////////////////////
-ConsumerState::ConsumerState(Pointer<ConsumerInfo> info)
+ConsumerState::ConsumerState(std::shared_ptr<ConsumerInfo> info)
     : info(info)
 {
 }
@@ -36,7 +37,7 @@ ConsumerState::~ConsumerState()
 ////////////////////////////////////////////////////////////////////////////////
 std::string ConsumerState::toString() const
 {
-    if (this->info != NULL)
+    if (this->info)
     {
         return this->info->toString();
     }

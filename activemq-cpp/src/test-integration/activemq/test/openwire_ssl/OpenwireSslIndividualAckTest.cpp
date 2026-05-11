@@ -374,5 +374,6 @@ TEST_F(OpenwireSslIndividualAckTest,
             << ("Second pass consume failed unexpectedly.");
     }
 
+    consumer->close();
     connection->close();
 }

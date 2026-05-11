@@ -1,0 +1,457 @@
+================================================================================
+STATIC ANALYSIS
+Add cppcheck and clang-tidy to build system and CI
+================================================================================
+
+ASSUMES: Plan 01 (decaf removal) is complete.
+  - Codebase is ~400 files (not ~1100)
+  - No decaf:: types to suppress or special-case
+  - All code is idiomatic C++17
+
+Run static analysis AFTER decaf removal. Analyzing ~700 files that will
+be deleted is wasted triage effort.
+
+
+GOAL
+----
+Catch bugs, undefined behavior, and code quality issues automatically.
+
+After this change:
+  - cppcheck and clang-tidy run on every PR
+  - Developers can run both locally via CMake targets
+  - Zero-noise CI: all findings are either fixed or explicitly suppressed
+
+
+================================================================================
+PART 1: CPPCHECK
+================================================================================
+
+cppcheck is compiler-independent. Good at: buffer overflows, null deref,
+memory leaks, uninitialized variables, dead code, value flow analysis.
+
+--------------------------------------------------------------------
+1A. Create suppressions file
+--------------------------------------------------------------------
+
+New file: cppcheck-suppressions.txt (project root)
+
+Initial content (minimal, expand only as needed):
+
+  // cppcheck does not resolve system/vcpkg headers
+  missingIncludeSystem
+
+Add specific suppressions only after triage. Document WHY for each.
+
+--------------------------------------------------------------------
+1B. Create CMake module
+--------------------------------------------------------------------
+
+New file: cmake/Cppcheck.cmake
+
+  option(AMQCPP_ENABLE_CPPCHECK "Add cppcheck-check target" OFF)
+
+  if(NOT AMQCPP_ENABLE_CPPCHECK)
+      return()
+  endif()
+
+  find_program(CPPCHECK_EXE NAMES cppcheck)
+  if(NOT CPPCHECK_EXE)
+      message(STATUS "cppcheck not found, target unavailable")
+      return()
+  endif()
+
+  add_custom_target(cppcheck-check
+      COMMAND "${CPPCHECK_EXE}"
+          --project=${CMAKE_BINARY_DIR}/compile_commands.json
+          --enable=warning,performance,portability
+          --std=c++17
+          --error-exitcode=1
+          --inline-suppr
+          --suppressions-list=${CMAKE_SOURCE_DIR}/cppcheck-suppressions.txt
+          --quiet
+          --template="{file}:{line}: [{severity}] {id}: {message}"
+      WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+      COMMENT "Running cppcheck..."
+      DEPENDS ${CMAKE_BINARY_DIR}/compile_commands.json)
+
+  # Ensure compile_commands.json is generated
+  if(NOT CMAKE_EXPORT_COMPILE_COMMANDS)
+      set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+  endif()
+
+Key decisions:
+  - Uses --project=compile_commands.json from the start (not -I flags).
+    This gives cppcheck exact include paths, defines, and file list.
+    More accurate, fewer false positives.
+  - --enable=warning,performance,portability (not --enable=all which
+    includes noisy style/information checks).
+  - OFF by default. CI enables it explicitly.
+  - --std=c++17 matches project standard.
+
+--------------------------------------------------------------------
+1C. Add to root CMakeLists.txt
+--------------------------------------------------------------------
+
+After the existing include(cmake/ClangFormat.cmake):
+
+  include(cmake/Cppcheck.cmake)
+
+--------------------------------------------------------------------
+1D. CI workflow
+--------------------------------------------------------------------
+
+New file: .github/workflows/ci-cppcheck.yml
+
+  name: CI cppcheck
+  on:
+    push:
+      branches: [main]
+      paths-ignore: ['**.md', 'docs/**', '.gitignore', 'LICENSE']
+    pull_request:
+      branches: [main]
+      paths-ignore: ['**.md', 'docs/**', '.gitignore', 'LICENSE']
+    workflow_dispatch:
+
+  concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+  jobs:
+    cppcheck:
+      runs-on: ubuntu-latest
+      env:
+        VCPKG_FORCE_SYSTEM_BINARIES: 1
+      steps:
+        - uses: actions/checkout@v6
+          with:
+            submodules: true
+
+        - name: Install cppcheck
+          run: sudo apt-get update && sudo apt-get install -y cppcheck
+
+        - name: Setup vcpkg
+          uses: lukka/run-vcpkg@v11
+
+        - name: Configure (generate compile_commands.json)
+          run: |
+            cmake --preset x64-linux-gcc-debug \
+              -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+
+        - name: Run cppcheck
+          run: |
+            cppcheck \
+              --project=output/build/x64-linux-gcc-debug/compile_commands.json \
+              --enable=warning,performance,portability \
+              --std=c++17 \
+              --error-exitcode=1 \
+              --inline-suppr \
+              --suppressions-list=cppcheck-suppressions.txt \
+              --quiet \
+              --template="{file}:{line}: [{severity}] {id}: {message}"
+
+NOTE: Unlike the clang-format CI job which skips CMake configure, cppcheck
+CI needs configure to generate compile_commands.json. This adds ~2 min
+but gives much more accurate results.
+
+
+================================================================================
+PART 2: CLANG-TIDY
+================================================================================
+
+clang-tidy operates on the Clang AST. Good at: type-aware bugs, bug-prone
+patterns, concurrency issues, performance, modernization enforcement.
+
+--------------------------------------------------------------------
+2A. Create .clang-tidy configuration
+--------------------------------------------------------------------
+
+New file: .clang-tidy (project root)
+
+---
+# .clang-tidy for neoactivemq-cpp
+# See AGENTS.md for coding rules enforced here:
+#   - No auto (modernize-use-auto is NOT enabled)
+#   - No static storage
+
+Checks: >
+  -*,
+  bugprone-*,
+  -bugprone-easily-swappable-parameters,
+  clang-analyzer-*,
+  concurrency-*,
+  misc-const-correctness,
+  misc-misplaced-const,
+  misc-redundant-expression,
+  misc-static-assert,
+  misc-throw-by-value-catch-by-reference,
+  misc-unconventional-assign-operator,
+  misc-unused-using-decls,
+  performance-*,
+  -performance-avoid-endl,
+  readability-braces-around-statements,
+  readability-container-size-empty,
+  readability-duplicate-include,
+  readability-else-after-return,
+  readability-implicit-bool-conversion,
+  readability-inconsistent-declaration-parameter-name,
+  readability-misleading-indentation,
+  readability-non-const-parameter,
+  readability-redundant-casting,
+  readability-redundant-smartptr-get,
+  readability-redundant-string-cstr,
+  readability-simplify-boolean-expr,
+  readability-string-compare,
+
+# WHY checks are excluded:
+# modernize-use-auto: Forbidden by AGENTS.md
+# modernize-use-trailing-return-type: Style, not a bug
+# bugprone-easily-swappable-parameters: Too noisy with (int, int) pairs
+# performance-avoid-endl: Logging intentionally flushes
+# readability-identifier-naming: Enable later after a naming pass
+
+WarningsAsErrors: >
+  bugprone-*,
+  -bugprone-easily-swappable-parameters,
+  clang-analyzer-*,
+  concurrency-*,
+  performance-*,
+  -performance-avoid-endl
+
+# bugprone/analyzer/concurrency/performance = hard errors
+# readability/misc = advisory warnings (not blocking)
+
+HeaderFilterRegex: 'activemq-cpp/src/main/.*'
+FormatStyle: file
+UseColor: true
+
+CheckOptions:
+  - key: bugprone-argument-comment.StrictMode
+    value: true
+  - key: bugprone-sizeof-expression.WarnOnSizeOfPointerToAggregate
+    value: true
+  - key: misc-const-correctness.WarnPointersAsValues
+    value: false
+  - key: readability-implicit-bool-conversion.AllowPointerConditions
+    value: true
+  - key: readability-implicit-bool-conversion.AllowIntegerConditions
+    value: false
+...
+
+Key decisions vs. previous plan:
+  - No bugprone-exception-escape exclusion (decaf exception hierarchy gone)
+  - No clang-analyzer-cplusplus.NewDeleteLeaks exclusion (using std::shared_ptr,
+    not custom Pointer<T> -- analyzer understands std:: types)
+  - No CPPUNIT_ASSERT in AssertMacros (migrated to GTest)
+  - No decaf::lang::Pointer in AllowedTypes (gone)
+
+--------------------------------------------------------------------
+2B. Create CMake module
+--------------------------------------------------------------------
+
+New file: cmake/ClangTidy.cmake
+
+  option(AMQCPP_ENABLE_CLANG_TIDY "Add clang-tidy-check target" OFF)
+
+  if(NOT AMQCPP_ENABLE_CLANG_TIDY)
+      return()
+  endif()
+
+  find_program(CLANG_TIDY_EXE
+      NAMES clang-tidy-21 clang-tidy-20 clang-tidy-19 clang-tidy-18 clang-tidy)
+
+  if(NOT CLANG_TIDY_EXE)
+      message(STATUS "clang-tidy not found, target unavailable")
+      return()
+  endif()
+
+  if(NOT CMAKE_EXPORT_COMPILE_COMMANDS)
+      set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+  endif()
+
+  find_program(RUN_CLANG_TIDY_EXE
+      NAMES run-clang-tidy-21 run-clang-tidy-20 run-clang-tidy-19
+            run-clang-tidy-18 run-clang-tidy)
+
+  if(RUN_CLANG_TIDY_EXE)
+      add_custom_target(clang-tidy-check
+          COMMAND "${RUN_CLANG_TIDY_EXE}"
+              -clang-tidy-binary "${CLANG_TIDY_EXE}"
+              -p "${CMAKE_BINARY_DIR}"
+              -header-filter "activemq-cpp/src/main/.*"
+              -quiet
+              "activemq-cpp/src/main/.*\\.cpp$$"
+          WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+          COMMENT "Running clang-tidy (parallel)..."
+          DEPENDS ${CMAKE_BINARY_DIR}/compile_commands.json)
+  else()
+      file(GLOB_RECURSE _tidy_sources
+          "${CMAKE_SOURCE_DIR}/activemq-cpp/src/main/*.cpp")
+
+      add_custom_target(clang-tidy-check
+          COMMAND "${CLANG_TIDY_EXE}"
+              -p "${CMAKE_BINARY_DIR}"
+              -header-filter "activemq-cpp/src/main/.*"
+              --quiet
+              ${_tidy_sources}
+          WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+          COMMENT "Running clang-tidy (sequential)..."
+          DEPENDS ${CMAKE_BINARY_DIR}/compile_commands.json)
+  endif()
+
+Key decisions:
+  - No AMQCPP_CLANG_TIDY_AS_COMPILER_STEP option (removed). It slows
+    every build and is rarely used. Developers who want it can set
+    CMAKE_CXX_CLANG_TIDY manually.
+  - run-clang-tidy preferred for parallel execution.
+  - compile_commands.json required.
+
+--------------------------------------------------------------------
+2C. Add to root CMakeLists.txt
+--------------------------------------------------------------------
+
+After include(cmake/Cppcheck.cmake):
+
+  include(cmake/ClangTidy.cmake)
+
+--------------------------------------------------------------------
+2D. CI workflow
+--------------------------------------------------------------------
+
+New file: .github/workflows/ci-clang-tidy.yml
+
+  name: CI clang-tidy
+  on:
+    push:
+      branches: [main]
+      paths-ignore: ['**.md', 'docs/**', '.gitignore', 'LICENSE']
+    pull_request:
+      branches: [main]
+      paths-ignore: ['**.md', 'docs/**', '.gitignore', 'LICENSE']
+    workflow_dispatch:
+
+  concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+  jobs:
+    clang-tidy:
+      runs-on: ubuntu-latest
+      env:
+        VCPKG_FORCE_SYSTEM_BINARIES: 1
+      steps:
+        - uses: actions/checkout@v6
+          with:
+            submodules: true
+
+        - name: Install LLVM 21
+          run: |
+            wget -qO- https://apt.llvm.org/llvm-snapshot.gpg.key \
+              | sudo tee /etc/apt/trusted.gpg.d/apt.llvm.org.asc
+            echo "deb http://apt.llvm.org/$(lsb_release -cs)/ \
+              llvm-toolchain-$(lsb_release -cs)-21 main" \
+              | sudo tee /etc/apt/sources.list.d/llvm-21.list
+            sudo apt-get update
+            sudo apt-get install -y clang-tidy-21 clang-21
+
+        - name: Setup vcpkg
+          uses: lukka/run-vcpkg@v11
+
+        - name: Configure
+          run: |
+            cmake --preset x64-linux-clang-debug \
+              -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+              -DCMAKE_CXX_COMPILER=clang++-21 \
+              -DCMAKE_C_COMPILER=clang-21
+
+        - name: Run clang-tidy
+          run: |
+            run-clang-tidy-21 \
+              -clang-tidy-binary clang-tidy-21 \
+              -p output/build/x64-linux-clang-debug \
+              -header-filter 'activemq-cpp/src/main/.*' \
+              -quiet \
+              'activemq-cpp/src/main/.*\.cpp$'
+
+Uses Clang as compiler so compile_commands.json is accurate for
+clang-tidy. vcpkg provides dependency headers.
+
+
+================================================================================
+TRIAGE PROCESS (both tools)
+================================================================================
+
+Run after both tools are configured. One triage pass for both.
+
+Step 1: Run cppcheck locally
+  cmake --preset x64-linux-gcc-debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+  cmake --build --preset x64-linux-gcc-debug
+  cppcheck --project=output/build/.../compile_commands.json \
+    --enable=warning,performance,portability --std=c++17 \
+    --template="{file}:{line}: [{severity}] {id}: {message}"
+
+Step 2: Run clang-tidy on a subset first
+  clang-tidy -p output/build/... activemq-cpp/src/main/activemq/core/*.cpp
+
+Step 3: Review and categorize findings
+  - Real bugs: fix immediately
+  - False positives: suppress with comment explaining why
+  - Style: fix low-hanging fruit, suppress the rest
+
+Step 4: Expand clang-tidy to full codebase
+  run-clang-tidy -p output/build/... 'activemq-cpp/src/main/.*\.cpp$'
+
+Step 5: Verify clean run of both tools
+
+NOLINT policy:
+  Always specify the check name and reason:
+    // NOLINT(bugprone-narrowing-conversions) - value < INT_MAX per protocol spec
+  Never use bare // NOLINT or // NOLINT(*).
+
+
+================================================================================
+FILE CHANGE SUMMARY
+================================================================================
+
+NEW FILES:
+  cppcheck-suppressions.txt
+  .clang-tidy
+  cmake/Cppcheck.cmake
+  cmake/ClangTidy.cmake
+  .github/workflows/ci-cppcheck.yml
+  .github/workflows/ci-clang-tidy.yml
+
+MODIFIED FILES:
+  CMakeLists.txt  (add two include() lines)
+
+IMPLEMENTATION ORDER:
+  1. Create config files (.clang-tidy, cppcheck-suppressions.txt)
+  2. Create CMake modules (Cppcheck.cmake, ClangTidy.cmake)
+  3. Add include() to CMakeLists.txt
+  4. Triage (fix bugs, add suppressions)
+  5. Create CI workflows
+  6. PR, verify CI passes
+
+
+================================================================================
+RISKS
+================================================================================
+
+RISK 1: CI runtime
+  cppcheck: ~5-10 min on ~400 files (post-decaf).
+  clang-tidy: ~10-20 min (AST analysis is expensive).
+  Both run as separate CI jobs in parallel with builds.
+  Acceptable for PR checks.
+
+RISK 2: Clang version drift
+  Pin the Clang version in CI (currently 21). Document in .clang-tidy.
+  When upgrading, re-triage new findings from improved analysis.
+
+RISK 3: compile_commands.json accuracy
+  Use Clang as compiler for the clang-tidy CI job. GCC-generated
+  compile_commands.json may reference GCC-specific system headers
+  that Clang can't parse.
+
+
+================================================================================
+END OF PLAN
+================================================================================

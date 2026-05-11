@@ -30,16 +30,14 @@ namespace core
     namespace kernels
     {
 
-        using decaf::lang::Pointer;
-
         class AMQCPP_API ActiveMQXASessionKernel : public cms::XASession,
                                                    public ActiveMQSessionKernel
         {
         public:
             ActiveMQXASessionKernel(
-                ActiveMQConnection*                 connection,
-                const Pointer<commands::SessionId>& sessionId,
-                const decaf::util::Properties&      properties);
+                ActiveMQConnection*                         connection,
+                const std::shared_ptr<commands::SessionId>& sessionId,
+                const decaf::util::Properties&              properties);
 
             virtual ~ActiveMQXASessionKernel();
 

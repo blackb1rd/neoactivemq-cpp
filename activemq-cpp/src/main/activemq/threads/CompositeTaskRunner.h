@@ -21,7 +21,6 @@
 #include <activemq/threads/CompositeTask.h>
 #include <activemq/threads/TaskRunner.h>
 #include <activemq/util/Config.h>
-#include <decaf/lang/Pointer.h>
 #include <decaf/lang/Runnable.h>
 #include <decaf/lang/Thread.h>
 #include <decaf/util/LinkedList.h>

@@ -25,6 +25,7 @@
 #include <decaf/lang/Thread.h>
 #include <decaf/lang/exceptions/UnsupportedOperationException.h>
 #include <decaf/util/concurrent/Concurrent.h>
+#include <memory>
 #include <queue>
 #include <vector>
 
@@ -63,10 +64,10 @@ public:
         return 1;
     }
 
-    virtual decaf::lang::Pointer<commands::Command> visit(
+    virtual std::shared_ptr<commands::Command> visit(
         activemq::state::CommandVisitor* visitor)
     {
-        return decaf::lang::Pointer<commands::Command>();
+        return std::shared_ptr<commands::Command>();
     }
 
     virtual MyCommand* cloneDataStructure() const
@@ -81,12 +82,12 @@ public:
 class MyTransport : public Transport, public decaf::lang::Runnable
 {
 public:
-    TransportListener*                     listener;
-    decaf::lang::Thread*                   thread;
-    decaf::util::concurrent::Mutex         mutex;
-    decaf::util::concurrent::Mutex         startedMutex;
-    bool                                   done;
-    std::queue<Pointer<commands::Command>> requests;
+    TransportListener*                             listener;
+    decaf::lang::Thread*                           thread;
+    decaf::util::concurrent::Mutex                 mutex;
+    decaf::util::concurrent::Mutex                 startedMutex;
+    bool                                           done;
+    std::queue<std::shared_ptr<commands::Command>> requests;
 
 private:
     MyTransport(const MyTransport&);
@@ -108,7 +109,7 @@ public:
         close();
     }
 
-    virtual void oneway(const Pointer<Command> command)
+    virtual void oneway(const std::shared_ptr<Command> command)
     {
         synchronized(&mutex)
         {
@@ -117,39 +118,39 @@ public:
         }
     }
 
-    virtual Pointer<FutureResponse> asyncRequest(
-        const Pointer<Command>          command,
-        const Pointer<ResponseCallback> responseCallback)
+    virtual std::shared_ptr<FutureResponse> asyncRequest(
+        const std::shared_ptr<Command>          command,
+        const std::shared_ptr<ResponseCallback> responseCallback)
     {
         throw decaf::lang::exceptions::UnsupportedOperationException(__FILE__,
                                                                      __LINE__,
                                                                      "stuff");
     }
 
-    virtual Pointer<Response> request(
-        const Pointer<Command> command AMQCPP_UNUSED)
+    virtual std::shared_ptr<Response> request(
+        const std::shared_ptr<Command> command AMQCPP_UNUSED)
     {
         throw decaf::lang::exceptions::UnsupportedOperationException(__FILE__,
                                                                      __LINE__,
                                                                      "stuff");
     }
 
-    virtual Pointer<Response> request(const Pointer<Command> command
-                                                           AMQCPP_UNUSED,
-                                      unsigned int timeout AMQCPP_UNUSED)
+    virtual std::shared_ptr<Response> request(
+        const std::shared_ptr<Command> command AMQCPP_UNUSED,
+        unsigned int timeout                   AMQCPP_UNUSED)
     {
         throw decaf::lang::exceptions::UnsupportedOperationException(__FILE__,
                                                                      __LINE__,
                                                                      "stuff");
     }
 
-    virtual Pointer<wireformat::WireFormat> getWireFormat() const
+    virtual std::shared_ptr<wireformat::WireFormat> getWireFormat() const
     {
-        return Pointer<wireformat::WireFormat>();
+        return std::shared_ptr<wireformat::WireFormat>();
     }
 
     virtual void setWireFormat(
-        const Pointer<wireformat::WireFormat> wireFormat AMQCPP_UNUSED)
+        const std::shared_ptr<wireformat::WireFormat> wireFormat AMQCPP_UNUSED)
     {
     }
 
@@ -192,9 +193,10 @@ public:
         }
     }
 
-    virtual Pointer<Response> createResponse(const Pointer<Command> command)
+    virtual std::shared_ptr<Response> createResponse(
+        const std::shared_ptr<Command> command)
     {
-        Pointer<Response> resp(new commands::Response());
+        std::shared_ptr<Response> resp(new commands::Response());
         resp->setCorrelationId(command->getCommandId());
         resp->setResponseRequired(false);
         return resp;
@@ -219,7 +221,7 @@ public:
                     }
                     else
                     {
-                        Pointer<Command> cmd = requests.front();
+                        std::shared_ptr<Command> cmd = requests.front();
                         requests.pop();
 
                         mutex.unlock();
@@ -229,10 +231,9 @@ public:
                         if (listener != NULL)
                         {
                             // Only send a response if one is required.
-                            // Avoid constructing a null Pointer<Response> to
-                            // prevent unnecessary AtomicInteger heap
-                            // allocation/deallocation racing with the test
-                            // thread on macOS.
+                            // Avoid constructing a null shared_ptr<Response> to
+                            // prevent unnecessary heap allocation/deallocation
+                            // racing with the test thread on macOS.
                             if (cmd->isResponseRequired())
                             {
                                 listener->onCommand(createResponse(cmd));
@@ -325,7 +326,8 @@ public:
     {
     }
 
-    virtual Pointer<Response> createResponse(const Pointer<Command> command)
+    virtual std::shared_ptr<Response> createResponse(
+        const std::shared_ptr<Command> command)
     {
         throw exceptions::ActiveMQException(__FILE__, __LINE__, "bad stuff");
     }
@@ -350,7 +352,7 @@ public:
     {
     }
 
-    virtual void onCommand(const Pointer<Command> command)
+    virtual void onCommand(const std::shared_ptr<Command> command)
     {
         synchronized(&mutex)
         {
@@ -372,9 +374,9 @@ public:
 class RequestThread : public decaf::lang::Thread
 {
 public:
-    Transport*         transport;
-    Pointer<MyCommand> cmd;
-    Pointer<Response>  resp;
+    Transport*                 transport;
+    std::shared_ptr<MyCommand> cmd;
+    std::shared_ptr<Response>  resp;
 
 private:
     RequestThread(const RequestThread&);
@@ -416,10 +418,10 @@ public:
 TEST_F(ResponseCorrelatorTest, testBasics)
 {
     // Use heap-allocated objects to control destruction order and avoid
-    // MSVC debug runtime hang when destroying Pointer<MyCommand>.
-    MyListener*          listener = new MyListener();
-    Pointer<MyTransport> transport(new MyTransport());
-    ResponseCorrelator*  correlator = new ResponseCorrelator(transport);
+    // MSVC debug runtime hang when destroying shared_ptr<MyCommand>.
+    MyListener*                  listener = new MyListener();
+    std::shared_ptr<MyTransport> transport(new MyTransport());
+    ResponseCorrelator*          correlator = new ResponseCorrelator(transport);
     correlator->setTransportListener(listener);
     ASSERT_TRUE(transport->listener == correlator);
 
@@ -431,8 +433,8 @@ TEST_F(ResponseCorrelatorTest, testBasics)
     }
 
     // Send one request.
-    Pointer<MyCommand> cmd(new MyCommand);
-    Pointer<Response>  resp = correlator->request(cmd);
+    std::shared_ptr<MyCommand> cmd(new MyCommand);
+    std::shared_ptr<Response>  resp = correlator->request(cmd);
 
     ASSERT_TRUE(resp != NULL);
     ASSERT_TRUE(resp->getCorrelationId() == cmd->getCommandId());
@@ -448,12 +450,10 @@ TEST_F(ResponseCorrelatorTest, testBasics)
 
     correlator->close();
 
-    // Explicit cleanup: release cmd to avoid MSVC debug runtime hang
-    // when deleting BaseCommand-derived objects.
-    resp.reset(NULL);
-    (void)cmd.release();
+    resp.reset();
+    cmd.reset();
     delete correlator;
-    transport.reset(NULL);
+    transport.reset();
     delete listener;
 }
 
@@ -461,10 +461,10 @@ TEST_F(ResponseCorrelatorTest, testBasics)
 TEST_F(ResponseCorrelatorTest, testOneway)
 {
     // Use heap-allocated objects to control destruction order and avoid
-    // MSVC debug runtime hang when destroying Pointer<MyCommand>.
-    MyListener*          listener = new MyListener();
-    Pointer<MyTransport> transport(new MyTransport());
-    ResponseCorrelator*  correlator = new ResponseCorrelator(transport);
+    // MSVC debug runtime hang when destroying shared_ptr<MyCommand>.
+    MyListener*                  listener = new MyListener();
+    std::shared_ptr<MyTransport> transport(new MyTransport());
+    ResponseCorrelator*          correlator = new ResponseCorrelator(transport);
     correlator->setTransportListener(listener);
     ASSERT_TRUE(transport->listener == correlator);
 
@@ -476,15 +476,12 @@ TEST_F(ResponseCorrelatorTest, testOneway)
     }
 
     // Send many oneway requests (we'll get them back asynchronously).
-    // Keep all command Pointers alive in a vector so the transport thread
-    // is never the last owner (which would trigger delete and MSVC debug
-    // runtime hang).
-    const unsigned int              numCommands = 1000;
-    std::vector<Pointer<MyCommand>> commands;
+    const unsigned int                      numCommands = 1000;
+    std::vector<std::shared_ptr<MyCommand>> commands;
     commands.reserve(numCommands);
     for (unsigned int ix = 0; ix < numCommands; ++ix)
     {
-        Pointer<MyCommand> command(new MyCommand());
+        std::shared_ptr<MyCommand> command(new MyCommand());
         commands.push_back(command);
         correlator->oneway(command);
     }
@@ -498,16 +495,10 @@ TEST_F(ResponseCorrelatorTest, testOneway)
 
     correlator->close();
 
-    // Release all command pointers to prevent delete of MyCommand (MSVC debug
-    // hang).
-    for (unsigned int ix = 0; ix < commands.size(); ++ix)
-    {
-        (void)commands[ix].release();
-    }
     commands.clear();
 
     delete correlator;
-    transport.reset(NULL);
+    transport.reset();
     delete listener;
 }
 
@@ -515,10 +506,10 @@ TEST_F(ResponseCorrelatorTest, testOneway)
 TEST_F(ResponseCorrelatorTest, testTransportException)
 {
     // Use heap-allocated objects to control destruction order and avoid
-    // MSVC debug runtime hang when destroying Pointer<MyCommand>.
-    MyListener*                listener = new MyListener();
-    Pointer<MyBrokenTransport> transport(new MyBrokenTransport());
-    ResponseCorrelator*        correlator = new ResponseCorrelator(transport);
+    // MSVC debug runtime hang when destroying shared_ptr<MyCommand>.
+    MyListener*                        listener = new MyListener();
+    std::shared_ptr<MyBrokenTransport> transport(new MyBrokenTransport());
+    ResponseCorrelator* correlator = new ResponseCorrelator(transport);
     correlator->setTransportListener(listener);
     ASSERT_TRUE(transport->listener == correlator);
 
@@ -530,7 +521,7 @@ TEST_F(ResponseCorrelatorTest, testTransportException)
     }
 
     // Send one request.
-    Pointer<MyCommand> cmd(new MyCommand);
+    std::shared_ptr<MyCommand> cmd(new MyCommand);
     try
     {
         correlator->request(cmd, 1000);
@@ -551,10 +542,9 @@ TEST_F(ResponseCorrelatorTest, testTransportException)
 
     correlator->close();
 
-    // Explicit cleanup: release cmd to avoid MSVC debug runtime hang.
-    (void)cmd.release();
+    cmd.reset();
     delete correlator;
-    transport.reset(NULL);
+    transport.reset();
     delete listener;
 }
 
@@ -562,10 +552,10 @@ TEST_F(ResponseCorrelatorTest, testTransportException)
 TEST_F(ResponseCorrelatorTest, testMultiRequests)
 {
     // Use heap-allocated objects to control destruction order and avoid
-    // MSVC debug runtime hang when destroying Pointer<MyCommand>.
-    MyListener*          listener = new MyListener();
-    Pointer<MyTransport> transport(new MyTransport());
-    ResponseCorrelator*  correlator = new ResponseCorrelator(transport);
+    // MSVC debug runtime hang when destroying shared_ptr<MyCommand>.
+    MyListener*                  listener = new MyListener();
+    std::shared_ptr<MyTransport> transport(new MyTransport());
+    ResponseCorrelator*          correlator = new ResponseCorrelator(transport);
     correlator->setTransportListener(listener);
     ASSERT_TRUE(transport->listener == correlator);
 
@@ -599,9 +589,8 @@ TEST_F(ResponseCorrelatorTest, testMultiRequests)
         ASSERT_TRUE(requesters[ix].cmd->getCommandId() ==
                     requesters[ix].resp->getCorrelationId());
 
-        // Release cmd pointers to avoid MSVC debug runtime hang.
-        (void)requesters[ix].cmd.release();
-        requesters[ix].resp.reset(NULL);
+        requesters[ix].cmd.reset();
+        requesters[ix].resp.reset();
     }
 
     decaf::lang::Thread::sleep(60);
@@ -631,25 +620,25 @@ TEST_F(ResponseCorrelatorTest, testMultiRequests)
     correlator->close();
 
     delete correlator;
-    transport.reset(NULL);
+    transport.reset();
     delete listener;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(ResponseCorrelatorTest, testNarrow)
 {
-    Pointer<MyTransport> transport(new MyTransport());
-    ResponseCorrelator   correlator(transport);
+    std::shared_ptr<MyTransport> transport(new MyTransport());
+    ResponseCorrelator           correlator(transport);
 
     MyTransport& transportRef = *transport;
     Transport*   narrowed     = correlator.narrow(typeid(transportRef));
-    ASSERT_TRUE(narrowed == transport);
+    ASSERT_TRUE(narrowed == transport.get());
 
     narrowed = correlator.narrow(typeid(std::string()));
     ASSERT_TRUE(narrowed == NULL);
 
     narrowed = correlator.narrow(typeid(MyTransport));
-    ASSERT_TRUE(narrowed == transport);
+    ASSERT_TRUE(narrowed == transport.get());
 
     narrowed =
         correlator.narrow(typeid(transport::correlator::ResponseCorrelator));

@@ -26,7 +26,7 @@
 #       ENVIRONMENT "CTEST_OUTPUT_ON_FAILURE=1"
 #   )
 function(static_discover_tests TARGET)
-    cmake_parse_arguments(ARG "" "TEST_PREFIX;GROUP_MODE;GROUPS_OUTPUT_FILE" "SOURCES;PROPERTIES;LABELS" ${ARGN})
+    cmake_parse_arguments(ARG "" "TEST_PREFIX;GROUP_MODE;GROUPS_OUTPUT_FILE" "SOURCES;PROPERTIES;LABELS;EXTRA_ARGS" ${ARGN})
 
     if(NOT ARG_SOURCES)
         message(FATAL_ERROR "static_discover_tests: SOURCES is required")
@@ -116,7 +116,7 @@ function(static_discover_tests TARGET)
                     set(test_name "${ARG_TEST_PREFIX}${_suite}.${_name}")
                 endif()
 
-                add_test(NAME "${test_name}" COMMAND ${TARGET} "--gtest_filter=${_suite}.${_name}")
+                add_test(NAME "${test_name}" COMMAND ${TARGET} "--gtest_filter=${_suite}.${_name}" ${ARG_EXTRA_ARGS})
 
                 if(ARG_PROPERTIES)
                     set_tests_properties("${test_name}" PROPERTIES ${ARG_PROPERTIES})
@@ -153,7 +153,7 @@ function(static_discover_tests TARGET)
                 set(suite_class "${suite_key}")
             endif()
 
-            add_test(NAME "${test_name}" COMMAND ${TARGET} "--gtest_filter=${suite_class}.*")
+            add_test(NAME "${test_name}" COMMAND ${TARGET} "--gtest_filter=${suite_class}.*" ${ARG_EXTRA_ARGS})
 
             if(ARG_PROPERTIES)
                 set_tests_properties("${test_name}" PROPERTIES ${ARG_PROPERTIES})

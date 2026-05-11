@@ -81,6 +81,14 @@ rm -f "${CERT_DIR}/broker.csr" \
       "${CERT_DIR}/ca.srl" \
       "${CERT_DIR}/broker-ext.cnf"
 
+# Make the PKCS12 keystores readable by non-root broker users (e.g. the
+# `artemis` UID 1001 user that the apache/artemis image runs as). Without
+# this, openssl pkcs12 -export creates files mode 600 owned by root which
+# the artemis broker cannot read, causing SSL acceptor startup failure.
+# The private key PEM files stay mode 600 - they are not read directly by
+# the broker (the secrets are inside the PKCS12 keystore).
+chmod 644 "${CERT_DIR}/broker.p12" "${CERT_DIR}/broker-truststore.p12"
+
 echo "=== Certificate generation complete ==="
 echo "Generated files:"
 ls -lah "${CERT_DIR}/"

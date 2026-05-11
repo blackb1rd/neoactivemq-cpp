@@ -58,7 +58,7 @@ InternalCommandListener::~InternalCommandListener()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void InternalCommandListener::onCommand(const Pointer<Command> command)
+void InternalCommandListener::onCommand(const std::shared_ptr<Command> command)
 {
     synchronized(&inboundQueue)
     {
@@ -96,7 +96,7 @@ void InternalCommandListener::run()
                 // If we created a response then send it.
                 while (!inboundQueue.isEmpty())
                 {
-                    Pointer<Command> command = inboundQueue.pop();
+                    std::shared_ptr<Command> command = inboundQueue.pop();
 
                     if (command->isMessage() &&
                         transport->isFailOnReceiveMessage())

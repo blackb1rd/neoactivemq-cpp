@@ -80,9 +80,9 @@ void TempDestinationAdvisoryConsumer::onMessage(const cms::Message* message)
 
             try
             {
-                Pointer<DestinationInfo> info =
-                    amqMessage->getDataStructure()
-                        .dynamicCast<DestinationInfo>();
+                std::shared_ptr<DestinationInfo> info =
+                    std::dynamic_pointer_cast<DestinationInfo>(
+                        amqMessage->getDataStructure());
 
                 unsigned char operationType = info->getOperationType();
 

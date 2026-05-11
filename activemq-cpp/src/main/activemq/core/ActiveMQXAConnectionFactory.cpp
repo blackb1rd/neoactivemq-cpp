@@ -75,8 +75,8 @@ cms::XAConnection* ActiveMQXAConnectionFactory::createXAConnection(
 
 ////////////////////////////////////////////////////////////////////////////////
 ActiveMQConnection* ActiveMQXAConnectionFactory::createActiveMQConnection(
-    const Pointer<transport::Transport>&    transport,
-    const Pointer<decaf::util::Properties>& properties)
+    const std::shared_ptr<transport::Transport>&    transport,
+    const std::shared_ptr<decaf::util::Properties>& properties)
 {
     return new ActiveMQXAConnection(transport, properties);
 }

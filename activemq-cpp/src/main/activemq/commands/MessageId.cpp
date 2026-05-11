@@ -19,16 +19,17 @@
 #include <activemq/exceptions/ActiveMQException.h>
 #include <activemq/state/CommandVisitor.h>
 #include <decaf/internal/util/StringUtils.h>
-#include <decaf/lang/Long.h>
 #include <decaf/lang/exceptions/NullPointerException.h>
+#include <decaf/lang/exceptions/NumberFormatException.h>
 #include <decaf/util/HashCode.h>
 #include <sstream>
+#include <stdexcept>
+#include <string>
 
 using namespace std;
 using namespace activemq;
 using namespace activemq::exceptions;
 using namespace activemq::commands;
-using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 using namespace decaf::internal::util;
 
@@ -46,7 +47,7 @@ using namespace decaf::internal::util;
 MessageId::MessageId()
     : BaseDataStructure(),
       textView(""),
-      producerId(NULL),
+      producerId(),
       producerSequenceId(0),
       brokerSequenceId(0),
       key("")
@@ -57,7 +58,7 @@ MessageId::MessageId()
 MessageId::MessageId(const MessageId& other)
     : BaseDataStructure(),
       textView(""),
-      producerId(NULL),
+      producerId(),
       producerSequenceId(0),
       brokerSequenceId(0),
       key("")
@@ -69,7 +70,7 @@ MessageId::MessageId(const MessageId& other)
 MessageId::MessageId(const std::string& messageKey)
     : BaseDataStructure(),
       textView(""),
-      producerId(NULL),
+      producerId(),
       producerSequenceId(0),
       brokerSequenceId(0),
       key("")
@@ -78,11 +79,11 @@ MessageId::MessageId(const std::string& messageKey)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-MessageId::MessageId(const Pointer<ProducerInfo>& producerInfo,
-                     long long                    producerSequenceId)
+MessageId::MessageId(const std::shared_ptr<ProducerInfo>& producerInfo,
+                     long long                            producerSequenceId)
     : BaseDataStructure(),
       textView(""),
-      producerId(NULL),
+      producerId(),
       producerSequenceId(0),
       brokerSequenceId(0),
       key("")
@@ -92,11 +93,11 @@ MessageId::MessageId(const Pointer<ProducerInfo>& producerInfo,
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-MessageId::MessageId(const Pointer<ProducerId>& producerId,
-                     long long                  producerSequenceId)
+MessageId::MessageId(const std::shared_ptr<ProducerId>& producerId,
+                     long long                          producerSequenceId)
     : BaseDataStructure(),
       textView(""),
-      producerId(NULL),
+      producerId(),
       producerSequenceId(0),
       brokerSequenceId(0),
       key("")
@@ -110,7 +111,7 @@ MessageId::MessageId(const std::string& producerId,
                      long long          producerSequenceId)
     : BaseDataStructure(),
       textView(""),
-      producerId(NULL),
+      producerId(),
       producerSequenceId(0),
       brokerSequenceId(0),
       key("")
@@ -188,7 +189,7 @@ std::string MessageId::toString() const
         else
         {
             this->key = this->producerId->toString() + ":" +
-                        Long::toString(this->producerSequenceId);
+                        std::to_string(this->producerSequenceId);
         }
     }
 
@@ -214,14 +215,14 @@ bool MessageId::equals(const DataStructure* value) const
     {
         return false;
     }
-    if (this->getProducerId() != NULL)
+    if (this->getProducerId())
     {
         if (!this->getProducerId()->equals(valuePtr->getProducerId().get()))
         {
             return false;
         }
     }
-    else if (valuePtr->getProducerId() != NULL)
+    else if (valuePtr->getProducerId())
     {
         return false;
     }
@@ -259,19 +260,19 @@ void MessageId::setTextView(const std::string& textView)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-const decaf::lang::Pointer<ProducerId>& MessageId::getProducerId() const
+const std::shared_ptr<ProducerId>& MessageId::getProducerId() const
 {
     return producerId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-decaf::lang::Pointer<ProducerId>& MessageId::getProducerId()
+std::shared_ptr<ProducerId>& MessageId::getProducerId()
 {
     return producerId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void MessageId::setProducerId(const decaf::lang::Pointer<ProducerId>& producerId)
+void MessageId::setProducerId(const std::shared_ptr<ProducerId>& producerId)
 {
     this->producerId = producerId;
 }
@@ -383,8 +384,23 @@ void MessageId::setValue(const std::string& key)
 
     if (p != std::string::npos)
     {
-        producerSequenceId =
-            Long::parseLong(messageKey.substr(p + 1, std::string::npos));
+        try
+        {
+            producerSequenceId =
+                std::stoll(messageKey.substr(p + 1, std::string::npos));
+        }
+        catch (const std::invalid_argument& e)
+        {
+            throw decaf::lang::exceptions::NumberFormatException(__FILE__,
+                                                                 __LINE__,
+                                                                 e.what());
+        }
+        catch (const std::out_of_range& e)
+        {
+            throw decaf::lang::exceptions::NumberFormatException(__FILE__,
+                                                                 __LINE__,
+                                                                 e.what());
+        }
         messageKey = messageKey.substr(0, p);
     }
 

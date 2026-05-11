@@ -19,13 +19,12 @@
 
 #include <activemq/commands/ConsumerInfo.h>
 #include <activemq/state/ConsumerState.h>
-#include <decaf/lang/Pointer.h>
+#include <memory>
 
 using namespace std;
 using namespace activemq;
 using namespace activemq::state;
 using namespace activemq::commands;
-using namespace decaf::lang;
 
 class ConsumerStateTest : public ::testing::Test
 {
@@ -34,12 +33,12 @@ class ConsumerStateTest : public ::testing::Test
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(ConsumerStateTest, test)
 {
-    Pointer<ConsumerId> id(new ConsumerId);
+    std::shared_ptr<ConsumerId> id(new ConsumerId);
     id->setConnectionId("CONNECTION");
     id->setSessionId(4096);
     id->setValue(42);
 
-    Pointer<ConsumerInfo> info(new ConsumerInfo());
+    std::shared_ptr<ConsumerInfo> info(new ConsumerInfo());
     info->setConsumerId(id);
     ConsumerState state(info);
 

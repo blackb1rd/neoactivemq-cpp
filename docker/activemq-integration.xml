@@ -1,0 +1,82 @@
+<!--
+    ActiveMQ broker configuration for integration testing.
+
+    Differs from the stock image config in two ways:
+      - OpenWire and STOMP transportConnectors set maximumConnections=20000 so
+        high-fanout tests (e.g. BulkMessageIntegrationTest.testHighFanout5000Clients)
+        do not hit the stock default of 1000.
+      - Exposes the same ports/protocols as the default image config so existing
+        integration tests (OpenWire on 61616, STOMP on 61613) are unaffected.
+-->
+<beans
+  xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans
+                       http://www.springframework.org/schema/beans/spring-beans.xsd
+                       http://activemq.apache.org/schema/core
+                       http://activemq.apache.org/schema/core/activemq-core.xsd">
+
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <value>file:${activemq.conf}/credentials.properties</value>
+        </property>
+        <!-- The apache/activemq image (5.19+, 6.x) doesn't always ship a
+             credentials.properties file. Don't fail bean-factory init when
+             it's missing - the broker doesn't need it for our test config. -->
+        <property name="ignoreResourceNotFound" value="true"/>
+    </bean>
+
+    <broker id="broker"
+            xmlns="http://activemq.apache.org/schema/core"
+            brokerName="localhost"
+            dataDirectory="${activemq.data}">
+
+        <destinationPolicy>
+            <policyMap>
+                <policyEntries>
+                    <policyEntry topic=">" >
+                        <pendingMessageLimitStrategy>
+                            <constantPendingMessageLimitStrategy limit="1000"/>
+                        </pendingMessageLimitStrategy>
+                    </policyEntry>
+                </policyEntries>
+            </policyMap>
+        </destinationPolicy>
+
+        <managementContext>
+            <managementContext createConnector="false"/>
+        </managementContext>
+
+        <persistenceAdapter>
+            <kahaDB directory="${activemq.data}/kahadb"/>
+        </persistenceAdapter>
+
+        <systemUsage>
+            <systemUsage>
+                <memoryUsage>
+                    <memoryUsage percentOfJvmHeap="70" />
+                </memoryUsage>
+                <storeUsage>
+                    <storeUsage limit="1 gb"/>
+                </storeUsage>
+                <tempUsage>
+                    <tempUsage limit="500 mb"/>
+                </tempUsage>
+            </systemUsage>
+        </systemUsage>
+
+        <transportConnectors>
+            <transportConnector name="openwire" uri="tcp://0.0.0.0:61616?maximumConnections=20000&amp;wireFormat.maxFrameSize=104857600"/>
+            <transportConnector name="stomp"    uri="stomp://0.0.0.0:61613?maximumConnections=20000&amp;wireFormat.maxFrameSize=104857600"/>
+        </transportConnectors>
+
+        <shutdownHooks>
+            <bean xmlns="http://www.springframework.org/schema/beans"
+                  class="org.apache.activemq.hooks.SpringContextHook" />
+        </shutdownHooks>
+
+    </broker>
+
+    <import resource="jetty.xml"/>
+
+</beans>

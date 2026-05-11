@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -36,6 +36,7 @@ namespace test
 }  // namespace test
 }  // namespace activemq
 
+#include <activemq/core/ActiveMQConnection.h>
 #include <activemq/core/ActiveMQConnectionFactory.h>
 #include <activemq/exceptions/ActiveMQException.h>
 #include <decaf/lang/Thread.h>
@@ -375,8 +376,8 @@ TEST_F(OpenwireSslTempDestinationTest, testTmpQueueWorksUnderLoad)
     int count    = 500;
     int dataSize = 1024;
 
-    ArrayList<Pointer<BytesMessage>> list(count);
-    std::unique_ptr<TemporaryQueue>  queue(
+    ArrayList<std::shared_ptr<BytesMessage>> list(count);
+    std::unique_ptr<TemporaryQueue>          queue(
         cmsProvider->getSession()->createTemporaryQueue());
     std::unique_ptr<MessageProducer> producer(
         cmsProvider->getSession()->createProducer(queue.get()));
@@ -390,7 +391,7 @@ TEST_F(OpenwireSslTempDestinationTest, testTmpQueueWorksUnderLoad)
 
     for (int i = 0; i < count; i++)
     {
-        Pointer<BytesMessage> message(
+        std::shared_ptr<BytesMessage> message(
             cmsProvider->getSession()->createBytesMessage());
         message->writeBytes(data, 0, dataSize);
         message->setIntProperty("c", i);
@@ -402,7 +403,7 @@ TEST_F(OpenwireSslTempDestinationTest, testTmpQueueWorksUnderLoad)
         cmsProvider->getSession()->createConsumer(queue.get()));
     for (int i = 0; i < count; i++)
     {
-        Pointer<Message> message2(consumer->receive(2000));
+        std::shared_ptr<Message> message2(consumer->receive(2000));
         ASSERT_TRUE(message2 != NULL);
         ASSERT_EQ(i, message2->getIntProperty("c"));
         ASSERT_TRUE(dynamic_cast<BytesMessage*>(message2.get()) != NULL)
@@ -415,25 +416,39 @@ TEST_F(OpenwireSslTempDestinationTest, testTmpQueueWorksUnderLoad)
 ///////////////////////////////////////////////////////////////////////////////
 TEST_F(OpenwireSslTempDestinationTest, testPublishFailsForClosedConnection)
 {
-    Pointer<ActiveMQConnectionFactory> factory(
-        new ActiveMQConnectionFactory(cmsProvider->getBrokerURL()));
+    // The producer connection opts in to watchTopicAdvisories=true so it
+    // receives DESTINATION_REMOVE advisories when the broker deletes the
+    // temp queue (after its owning connection closes), allowing the client
+    // to throw cms::InvalidDestinationException locally before the send
+    // hits the broker. The library default is false; this test exercises
+    // the explicit opt-in path.
+    std::string url = cmsProvider->getBrokerURL() +
+                      "&connection.watchTopicAdvisories=true";
+
+    std::shared_ptr<ActiveMQConnectionFactory> factory(
+        new ActiveMQConnectionFactory(url));
     factory->setAlwaysSyncSend(true);
 
     std::unique_ptr<Connection> tempConnection(factory->createConnection());
     tempConnection->start();
-
     std::unique_ptr<Session> tempSession(tempConnection->createSession());
     std::unique_ptr<TemporaryQueue> queue(tempSession->createTemporaryQueue());
+
+    // Producer uses a separate connection (also with advisories enabled).
+    std::unique_ptr<Connection> producerConnection(factory->createConnection());
+    producerConnection->start();
+    std::unique_ptr<Session> producerSession(
+        producerConnection->createSession());
 
     Thread::sleep(2000);
 
     // This message delivery should work since the temp connection is still
     // open.
     std::unique_ptr<MessageProducer> producer(
-        cmsProvider->getSession()->createProducer(queue.get()));
+        producerSession->createProducer(queue.get()));
     producer->setDeliveryMode(DeliveryMode::NON_PERSISTENT);
     std::unique_ptr<TextMessage> message(
-        cmsProvider->getSession()->createTextMessage("First"));
+        producerSession->createTextMessage("First"));
     producer->send(message.get());
     Thread::sleep(2000);
 
@@ -441,7 +456,7 @@ TEST_F(OpenwireSslTempDestinationTest, testPublishFailsForClosedConnection)
     tempConnection->close();
     Thread::sleep(5000);
 
-    message.reset(cmsProvider->getSession()->createTextMessage("Hello"));
+    message.reset(producerSession->createTextMessage("Hello"));
 
     ASSERT_THROW(producer->send(message.get()), cms::InvalidDestinationException)
         << ("Should throw a InvalidDestinationException since temp destination "
@@ -452,25 +467,34 @@ TEST_F(OpenwireSslTempDestinationTest, testPublishFailsForClosedConnection)
 TEST_F(OpenwireSslTempDestinationTest,
        testPublishFailsForDestoryedTempDestination)
 {
-    Pointer<ActiveMQConnectionFactory> factory(
-        new ActiveMQConnectionFactory(cmsProvider->getBrokerURL()));
+    // See testPublishFailsForClosedConnection for the rationale on why the
+    // producer connection explicitly opts in to watchTopicAdvisories=true.
+    std::string url = cmsProvider->getBrokerURL() +
+                      "&connection.watchTopicAdvisories=true";
+
+    std::shared_ptr<ActiveMQConnectionFactory> factory(
+        new ActiveMQConnectionFactory(url));
     factory->setAlwaysSyncSend(true);
 
     std::unique_ptr<Connection> tempConnection(factory->createConnection());
     tempConnection->start();
-
     std::unique_ptr<Session> tempSession(tempConnection->createSession());
     std::unique_ptr<TemporaryQueue> queue(tempSession->createTemporaryQueue());
+
+    std::unique_ptr<Connection> producerConnection(factory->createConnection());
+    producerConnection->start();
+    std::unique_ptr<Session> producerSession(
+        producerConnection->createSession());
 
     Thread::sleep(2000);
 
     // This message delivery should work since the temp connection is still
     // open.
     std::unique_ptr<MessageProducer> producer(
-        cmsProvider->getSession()->createProducer(queue.get()));
+        producerSession->createProducer(queue.get()));
     producer->setDeliveryMode(DeliveryMode::NON_PERSISTENT);
     std::unique_ptr<TextMessage> message(
-        cmsProvider->getSession()->createTextMessage("First"));
+        producerSession->createTextMessage("First"));
     producer->send(message.get());
     Thread::sleep(2000);
 
@@ -478,7 +502,7 @@ TEST_F(OpenwireSslTempDestinationTest,
     queue->destroy();
     Thread::sleep(5000);  // Wait a little bit to let the delete take effect.
 
-    message.reset(cmsProvider->getSession()->createTextMessage("Hello"));
+    message.reset(producerSession->createTextMessage("Hello"));
 
     ASSERT_THROW(producer->send(message.get()), InvalidDestinationException)
         << ("Should throw a InvalidDestinationException since temp destination "
@@ -503,15 +527,15 @@ TEST_F(OpenwireSslTempDestinationTest,
 ///////////////////////////////////////////////////////////////////////////////
 TEST_F(OpenwireSslTempDestinationTest, testCloseConnectionWithManyTempDests)
 {
-    ArrayList<Pointer<TemporaryQueue>>  tempQueues;
-    ArrayList<Pointer<MessageProducer>> producers;
+    ArrayList<std::shared_ptr<TemporaryQueue>>  tempQueues;
+    ArrayList<std::shared_ptr<MessageProducer>> producers;
 
     for (int i = 0; i < 25; ++i)
     {
-        Pointer<TemporaryQueue> tempQueue(
+        std::shared_ptr<TemporaryQueue> tempQueue(
             cmsProvider->getSession()->createTemporaryQueue());
         tempQueues.add(tempQueue);
-        Pointer<MessageProducer> producer(
+        std::shared_ptr<MessageProducer> producer(
             cmsProvider->getSession()->createProducer(tempQueue.get()));
         producers.add(producer);
     }

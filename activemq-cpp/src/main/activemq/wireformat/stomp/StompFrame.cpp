@@ -20,7 +20,6 @@
 #include <string>
 
 #include <decaf/lang/Character.h>
-#include <decaf/lang/Integer.h>
 #include <decaf/lang/exceptions/NullPointerException.h>
 
 #include <activemq/exceptions/ActiveMQException.h>
@@ -313,7 +312,7 @@ void StompFrame::readBody(decaf::io::DataInputStream* in)
         {
             string length =
                 this->getProperty(StompCommandConstants::HEADER_CONTENTLENGTH);
-            content_length = (unsigned int)Integer::parseInt(length);
+            content_length = (unsigned int)std::stoi(length);
         }
 
         if (content_length != 0)

@@ -21,9 +21,7 @@
 #include <activemq/core/ActiveMQConnectionMetaData.h>
 
 #include <decaf/lang/Boolean.h>
-#include <decaf/lang/Integer.h>
-#include <decaf/lang/Long.h>
-#include <decaf/lang/Pointer.h>
+#include <memory>
 
 using namespace std;
 using namespace activemq;
@@ -38,37 +36,37 @@ using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
-Pointer<WireFormat> OpenWireFormatFactory::createWireFormat(
+std::shared_ptr<WireFormat> OpenWireFormatFactory::createWireFormat(
     const decaf::util::Properties& properties)
 {
     try
     {
         ActiveMQConnectionMetaData meta;
 
-        Pointer<WireFormatInfo> info(new WireFormatInfo());
+        std::shared_ptr<WireFormatInfo> info(new WireFormatInfo());
 
         // Configure the version to use
-        info->setVersion(Integer::parseInt(
-            properties.getProperty("wireFormat.version", "11")));
+        info->setVersion(
+            std::stoi(properties.getProperty("wireFormat.version", "11")));
 
         // parse params out of the properties
         info->setStackTraceEnabled(Boolean::parseBoolean(
             properties.getProperty("wireFormat.stackTraceEnabled", "true")));
         info->setCacheEnabled(Boolean::parseBoolean(
             properties.getProperty("wireFormat.cacheEnabled", "false")));
-        info->setCacheSize(Integer::parseInt(
-            properties.getProperty("wireFormat.cacheSize", "1024")));
+        info->setCacheSize(
+            std::stoi(properties.getProperty("wireFormat.cacheSize", "1024")));
         info->setTcpNoDelayEnabled(Boolean::parseBoolean(
             properties.getProperty("wireFormat.tcpNoDelayEnabled", "true")));
         info->setTightEncodingEnabled(Boolean::parseBoolean(
             properties.getProperty("wireFormat.tightEncodingEnabled", "true")));
         info->setSizePrefixDisabled(Boolean::parseBoolean(
             properties.getProperty("wireFormat.sizePrefixDisabled", "false")));
-        info->setMaxInactivityDuration(Long::parseLong(
+        info->setMaxInactivityDuration(std::stoll(
             properties.getProperty("wireFormat.MaxInactivityDuration",
                                    "30000")));
         info->setMaxInactivityDurationInitalDelay(
-            Long::parseLong(properties.getProperty(
+            std::stoll(properties.getProperty(
                 "wireFormat.MaxInactivityDurationInitalDelay",
                 "10000")));
 
@@ -79,7 +77,8 @@ Pointer<WireFormat> OpenWireFormatFactory::createWireFormat(
         info->getProperties().setString("PlatformDetails", "C++");
 
         // Create the Openwire Format Object
-        Pointer<OpenWireFormat> wireFormat(new OpenWireFormat(properties));
+        std::shared_ptr<OpenWireFormat> wireFormat(
+            new OpenWireFormat(properties));
 
         // give the format object the ownership
         wireFormat->setPreferedWireFormatInfo(info);

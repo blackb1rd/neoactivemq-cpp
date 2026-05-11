@@ -18,10 +18,11 @@
 #ifndef _ACTIVEMQ_TRANSPORT_TRANSPORTLISTENER_H_
 #define _ACTIVEMQ_TRANSPORT_TRANSPORTLISTENER_H_
 
+#include <memory>
+
 #include <activemq/commands/Command.h>
 #include <activemq/util/Config.h>
 #include <decaf/lang/Exception.h>
-#include <decaf/lang/Pointer.h>
 
 namespace activemq
 {
@@ -32,7 +33,6 @@ namespace transport
     class Transport;
 
     using activemq::commands::Command;
-    using decaf::lang::Pointer;
 
     /**
      * A listener of asynchronous exceptions from a command transport object.
@@ -53,7 +53,7 @@ namespace transport
          * @param command
          *      The received command object.
          */
-        virtual void onCommand(const Pointer<Command> command) = 0;
+        virtual void onCommand(const std::shared_ptr<Command> command) = 0;
 
         /**
          * Event handler for an exception from a command transport.

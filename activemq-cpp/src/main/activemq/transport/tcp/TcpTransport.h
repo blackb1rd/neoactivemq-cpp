@@ -26,11 +26,11 @@
 #include <decaf/io/BufferedOutputStream.h>
 #include <decaf/io/DataInputStream.h>
 #include <decaf/io/DataOutputStream.h>
-#include <decaf/lang/Pointer.h>
+#include <memory>
+
 #include <decaf/net/Socket.h>
 #include <decaf/net/URI.h>
 #include <decaf/util/Properties.h>
-#include <memory>
 
 namespace activemq
 {
@@ -38,8 +38,6 @@ namespace transport
 {
     namespace tcp
     {
-
-        using decaf::lang::Pointer;
 
         class TcpTransportImpl;
 
@@ -68,8 +66,8 @@ namespace transport
              * @param location
              *      The URI of the host this transport is to connect to.
              */
-            TcpTransport(const Pointer<Transport> next,
-                         const decaf::net::URI&   location);
+            TcpTransport(const std::shared_ptr<Transport> next,
+                         const decaf::net::URI&           location);
 
             virtual ~TcpTransport();
 

@@ -30,8 +30,6 @@ namespace activemq
 namespace core
 {
 
-    using decaf::lang::Pointer;
-
     class AMQCPP_API ActiveMQXAConnectionFactory
         : public cms::XAConnectionFactory,
           public ActiveMQConnectionFactory
@@ -74,8 +72,8 @@ namespace core
 
     protected:
         virtual ActiveMQConnection* createActiveMQConnection(
-            const Pointer<transport::Transport>&    transport,
-            const Pointer<decaf::util::Properties>& properties);
+            const std::shared_ptr<transport::Transport>&    transport,
+            const std::shared_ptr<decaf::util::Properties>& properties);
     };
 
 }  // namespace core

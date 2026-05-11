@@ -21,7 +21,7 @@
 #include <activemq/commands/Response.h>
 #include <activemq/util/Config.h>
 
-#include <decaf/lang/Pointer.h>
+#include <memory>
 
 namespace activemq
 {
@@ -53,7 +53,7 @@ namespace transport
          * call-back.
          */
         virtual void onComplete(
-            decaf::lang::Pointer<commands::Response> response) = 0;
+            std::shared_ptr<commands::Response> response) = 0;
     };
 
 }  // namespace transport

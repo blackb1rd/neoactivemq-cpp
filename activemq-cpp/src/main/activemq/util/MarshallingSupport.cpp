@@ -194,7 +194,7 @@ std::string MarshallingSupport::asciiToModifiedUtf8(
                                  "Cannot marshall ") +
                      "string utf8 encoding longer than: 2^31 bytes, supplied "
                      "string utf8 encoding was: " +
-                     Integer::toString((int)utfLength) + " bytes long.")
+                     std::to_string((int)utfLength) + " bytes long.")
                         .c_str());
             }
 

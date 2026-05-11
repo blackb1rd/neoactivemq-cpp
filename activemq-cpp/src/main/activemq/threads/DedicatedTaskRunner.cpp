@@ -18,6 +18,7 @@
 #include "DedicatedTaskRunner.h"
 
 #include <activemq/exceptions/ActiveMQException.h>
+#include <decaf/lang/exceptions/NullPointerException.h>
 
 using namespace activemq;
 using namespace activemq::threads;

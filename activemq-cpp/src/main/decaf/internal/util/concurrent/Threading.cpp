@@ -458,8 +458,6 @@ ThreadHandle* initThreadHandle(ThreadHandle* thread)
     thread->monitor            = NULL;
     thread->joiningThread      = NULL;
 
-    ::memset(thread->tls, 0, sizeof(thread->tls));
-
     try
     {
         PlatformThread::createMutex(&thread->mutex);
@@ -538,7 +536,7 @@ bool interruptWaitingThread(ThreadHandle* self DECAF_UNUSED,
 
 void threadExitTlsCleanup(ThreadHandle* thread)
 {
-    for (int index = 0; index < DECAF_MAX_TLS_SLOTS; ++index)
+    for (int index = 0; index < static_cast<int>(thread->tls.size()); ++index)
     {
         if (thread->tls[index] != NULL)
         {
@@ -990,8 +988,6 @@ void Threading::initialize()
     library->monitors->head  = batchAllocateMonitors();
     library->monitors->count = MONITOR_POOL_BLOCK_SIZE;
 
-    library->tlsSlots.resize(DECAF_MAX_TLS_SLOTS);
-
     // We mark the thread where Decaf's Init routine is called from as our Main
     // Thread.
     library->mainThread = PlatformThread::getCurrentThread();
@@ -1009,6 +1005,53 @@ void Threading::shutdown()
     // Threading.
     Executors::shutdown();
 
+    // Defense in depth: any decaf-managed thread that's still alive when we
+    // reach this point will UAF the next time it touches library state (TLS
+    // keys, globalLock) -- e.g. a Timer worker polling Mutex::wait() that
+    // calls Thread::interrupted(). Snapshot the active set under the global
+    // lock, take a reference on each so it can't disappear under us, then
+    // wait for them outside the lock.
+    std::list<ThreadHandle*> stragglers;
+    PlatformThread::lockMutex(library->globalLock);
+    for (std::list<ThreadHandle*>::const_iterator it =
+             library->activeThreads.begin();
+         it != library->activeThreads.end();
+         ++it)
+    {
+        Atomics::incrementAndGet(&((*it)->references));
+        stragglers.push_back(*it);
+    }
+    PlatformThread::unlockMutex(library->globalLock);
+
+    // Don't try to join ourselves. getCurrentThreadHandle() would attach a
+    // new handle for a foreign caller, which we don't want here -- read TLS
+    // directly.
+    ThreadHandle* self =
+        (ThreadHandle*)PlatformThread::getTlsValue(library->selfKey);
+
+    bool allTerminated = true;
+    for (std::list<ThreadHandle*>::iterator it = stragglers.begin();
+         it != stragglers.end();
+         ++it)
+    {
+        ThreadHandle* thread = *it;
+        if (thread != self)
+        {
+            try
+            {
+                Threading::join(thread, 5000, 0);
+            }
+            DECAF_CATCHALL_NOTHROW()
+
+            if (thread->state.load(std::memory_order_acquire) !=
+                Thread::TERMINATED)
+            {
+                allTerminated = false;
+            }
+        }
+        dereferenceThread(thread);
+    }
+
     // Destroy any Foreign Thread Facades that were created during runtime.
     std::vector<Thread*>::iterator iter = library->osThreads.begin();
     for (; iter != library->osThreads.end(); ++iter)
@@ -1017,14 +1060,22 @@ void Threading::shutdown()
     }
     library->osThreads.clear();
 
-    PlatformThread::destroyTlsKey(library->threadKey);
-    PlatformThread::destroyTlsKey(library->selfKey);
-    PlatformThread::destroyMutex(library->globalLock);
-    PlatformThread::destroyMutex(library->tlsLock);
+    // If a straggler refused to terminate, leak the shared library state
+    // rather than free it. The OS reclaims TLS keys / mutex memory at
+    // process exit; meanwhile the still-running thread can keep accessing
+    // valid state instead of dereferencing freed memory.
+    if (allTerminated)
+    {
+        PlatformThread::destroyTlsKey(library->threadKey);
+        PlatformThread::destroyTlsKey(library->selfKey);
+        PlatformThread::destroyMutex(library->globalLock);
+        PlatformThread::destroyMutex(library->tlsLock);
 
-    purgeMonitorsPool(library->monitors);
-    delete library->monitors;
-    delete library;
+        purgeMonitorsPool(library->monitors);
+        delete library->monitors;
+        delete library;
+        library = NULL;
+    }
 
     // Atomics only uses platform Thread primitives when there are no atomic
     // builtins and Atomics are used in thread so make sure this is always last
@@ -1353,6 +1404,13 @@ void Threading::interrupt(ThreadHandle* thread)
 bool Threading::interrupted()
 {
     ThreadHandle* self = Threading::getCurrentThreadHandle();
+    if (self == NULL)
+    {
+        // Library has been torn down. The hot path here is the Mutex::wait
+        // polling loop -- returning false keeps the straggler looping
+        // safely instead of dereferencing freed state.
+        return false;
+    }
     return Threading::isInterrupted(self, true);
 }
 
@@ -1799,6 +1857,16 @@ Thread* Threading::getCurrentThread()
 ////////////////////////////////////////////////////////////////////////////////
 ThreadHandle* Threading::getCurrentThreadHandle()
 {
+    // After Threading::shutdown() has freed library state, any decaf
+    // primitive that calls into here from a still-running thread (e.g. a
+    // straggler we couldn't join) used to UAF on library->selfKey or on
+    // attachToCurrentThread()'s globalLock acquisition. Return NULL and
+    // let callers that can tolerate it handle the no-handle case.
+    if (library == NULL)
+    {
+        return NULL;
+    }
+
     ThreadHandle* self =
         (ThreadHandle*)PlatformThread::getTlsValue(library->selfKey);
 
@@ -2171,28 +2239,39 @@ int Threading::createThreadLocalSlot(ThreadLocalImpl* threadLocal)
                                    "Null ThreadLocalImpl Pointer Passed.");
     }
 
-    int index;
+    int index = -1;
 
     PlatformThread::lockMutex(library->tlsLock);
 
-    for (index = 0; index < DECAF_MAX_TLS_SLOTS; index++)
+    for (int i = 0; i < static_cast<int>(library->tlsSlots.size()); i++)
     {
-        if (library->tlsSlots[index] == NULL)
+        if (library->tlsSlots[i] == NULL)
         {
-            library->tlsSlots[index] = threadLocal;
+            library->tlsSlots[i] = threadLocal;
+            index                = i;
             break;
         }
     }
 
+    if (index == -1)
+    {
+        index = static_cast<int>(library->tlsSlots.size());
+        library->tlsSlots.push_back(threadLocal);
+    }
+
     PlatformThread::unlockMutex(library->tlsLock);
 
-    return index < DECAF_MAX_TLS_SLOTS ? index : -1;
+    return index;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void* Threading::getThreadLocalValue(int slot)
 {
     ThreadHandle* thisThread = getCurrentThreadHandle();
+    if (slot < 0 || slot >= static_cast<int>(thisThread->tls.size()))
+    {
+        return NULL;
+    }
     return thisThread->tls[slot];
 }
 
@@ -2200,7 +2279,11 @@ void* Threading::getThreadLocalValue(int slot)
 void Threading::setThreadLocalValue(int slot, void* value)
 {
     ThreadHandle* thisThread = getCurrentThreadHandle();
-    thisThread->tls[slot]    = value;
+    if (slot >= static_cast<int>(thisThread->tls.size()))
+    {
+        thisThread->tls.resize(slot + 1, NULL);
+    }
+    thisThread->tls[slot] = value;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -2218,7 +2301,9 @@ void Threading::destoryThreadLocalSlot(int slot)
     while (iter != library->activeThreads.end())
     {
         current     = *(iter++);
-        void* value = current->tls[slot];
+        void* value = (slot < static_cast<int>(current->tls.size()))
+                          ? current->tls[slot]
+                          : NULL;
         if (value != NULL)
         {
             local->doDelete(value);
@@ -2231,7 +2316,9 @@ void Threading::destoryThreadLocalSlot(int slot)
     while (osIter != library->osThreads.end())
     {
         current     = (*(osIter++))->getHandle();
-        void* value = current->tls[slot];
+        void* value = (slot < static_cast<int>(current->tls.size()))
+                          ? current->tls[slot]
+                          : NULL;
         if (value != NULL)
         {
             local->doDelete(value);

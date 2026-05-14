@@ -19,6 +19,7 @@
 
 #include <activemq/commands/XATransactionId.h>
 #include <activemq/exceptions/ActiveMQException.h>
+#include <activemq/wireformat/openwire/marshal/OpenWireMarshalCatchMacros.h>
 #include <memory>
 
 //
@@ -70,9 +71,10 @@ void XATransactionIdMarshaller::tightUnmarshal(OpenWireFormat*  wireFormat,
         info->setGlobalTransactionId(tightUnmarshalByteArray(dataIn, bs));
         info->setBranchQualifier(tightUnmarshalByteArray(dataIn, bs));
     }
-    AMQ_IOSTREAM_CATCH_RETHROW()
-    AMQ_IOSTREAM_CATCH_CONVERT_ACTIVEMQ_EXCEPTION()
-    AMQ_IOSTREAM_CATCHALL_THROW()
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(activemq::exceptions::ActiveMQException,
+                                activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -98,9 +100,10 @@ int XATransactionIdMarshaller::tightMarshal1(OpenWireFormat* wireFormat,
 
         return rc + 4;
     }
-    AMQ_IOSTREAM_CATCH_RETHROW()
-    AMQ_IOSTREAM_CATCH_CONVERT_ACTIVEMQ_EXCEPTION()
-    AMQ_IOSTREAM_CATCHALL_THROW()
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(activemq::exceptions::ActiveMQException,
+                                activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -137,9 +140,10 @@ void XATransactionIdMarshaller::tightMarshal2(OpenWireFormat*   wireFormat,
                 (int)info->getBranchQualifier().size());
         }
     }
-    AMQ_IOSTREAM_CATCH_RETHROW()
-    AMQ_IOSTREAM_CATCH_CONVERT_ACTIVEMQ_EXCEPTION()
-    AMQ_IOSTREAM_CATCHALL_THROW()
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(activemq::exceptions::ActiveMQException,
+                                activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -157,9 +161,10 @@ void XATransactionIdMarshaller::looseUnmarshal(OpenWireFormat*  wireFormat,
         info->setGlobalTransactionId(looseUnmarshalByteArray(dataIn));
         info->setBranchQualifier(looseUnmarshalByteArray(dataIn));
     }
-    AMQ_IOSTREAM_CATCH_RETHROW()
-    AMQ_IOSTREAM_CATCH_CONVERT_ACTIVEMQ_EXCEPTION()
-    AMQ_IOSTREAM_CATCHALL_THROW()
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(activemq::exceptions::ActiveMQException,
+                                activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -195,7 +200,8 @@ void XATransactionIdMarshaller::looseMarshal(OpenWireFormat*   wireFormat,
                 (int)info->getBranchQualifier().size());
         }
     }
-    AMQ_IOSTREAM_CATCH_RETHROW()
-    AMQ_IOSTREAM_CATCH_CONVERT_ACTIVEMQ_EXCEPTION()
-    AMQ_IOSTREAM_CATCHALL_THROW()
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(activemq::exceptions::ActiveMQException,
+                                activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }

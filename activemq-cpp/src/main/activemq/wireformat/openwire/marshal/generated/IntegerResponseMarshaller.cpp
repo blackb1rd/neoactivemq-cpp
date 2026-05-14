@@ -19,6 +19,7 @@
 
 #include <activemq/commands/IntegerResponse.h>
 #include <activemq/exceptions/ActiveMQException.h>
+#include <activemq/wireformat/openwire/marshal/OpenWireMarshalCatchMacros.h>
 #include <memory>
 
 //
@@ -68,9 +69,10 @@ void IntegerResponseMarshaller::tightUnmarshal(OpenWireFormat*  wireFormat,
         IntegerResponse* info = dynamic_cast<IntegerResponse*>(dataStructure);
         info->setResult(dataIn->readInt());
     }
-    AMQ_IOSTREAM_CATCH_RETHROW()
-    AMQ_IOSTREAM_CATCH_CONVERT_ACTIVEMQ_EXCEPTION()
-    AMQ_IOSTREAM_CATCHALL_THROW()
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(activemq::exceptions::ActiveMQException,
+                                activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -85,9 +87,10 @@ int IntegerResponseMarshaller::tightMarshal1(OpenWireFormat* wireFormat,
 
         return rc + 4;
     }
-    AMQ_IOSTREAM_CATCH_RETHROW()
-    AMQ_IOSTREAM_CATCH_CONVERT_ACTIVEMQ_EXCEPTION()
-    AMQ_IOSTREAM_CATCHALL_THROW()
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(activemq::exceptions::ActiveMQException,
+                                activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -106,9 +109,10 @@ void IntegerResponseMarshaller::tightMarshal2(OpenWireFormat*   wireFormat,
         IntegerResponse* info = dynamic_cast<IntegerResponse*>(dataStructure);
         dataOut->writeInt(info->getResult());
     }
-    AMQ_IOSTREAM_CATCH_RETHROW()
-    AMQ_IOSTREAM_CATCH_CONVERT_ACTIVEMQ_EXCEPTION()
-    AMQ_IOSTREAM_CATCHALL_THROW()
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(activemq::exceptions::ActiveMQException,
+                                activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -122,9 +126,10 @@ void IntegerResponseMarshaller::looseUnmarshal(OpenWireFormat*  wireFormat,
         IntegerResponse* info = dynamic_cast<IntegerResponse*>(dataStructure);
         info->setResult(dataIn->readInt());
     }
-    AMQ_IOSTREAM_CATCH_RETHROW()
-    AMQ_IOSTREAM_CATCH_CONVERT_ACTIVEMQ_EXCEPTION()
-    AMQ_IOSTREAM_CATCHALL_THROW()
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(activemq::exceptions::ActiveMQException,
+                                activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -138,7 +143,8 @@ void IntegerResponseMarshaller::looseMarshal(OpenWireFormat*   wireFormat,
         ResponseMarshaller::looseMarshal(wireFormat, dataStructure, dataOut);
         dataOut->writeInt(info->getResult());
     }
-    AMQ_IOSTREAM_CATCH_RETHROW()
-    AMQ_IOSTREAM_CATCH_CONVERT_ACTIVEMQ_EXCEPTION()
-    AMQ_IOSTREAM_CATCHALL_THROW()
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(activemq::exceptions::ActiveMQException,
+                                activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }

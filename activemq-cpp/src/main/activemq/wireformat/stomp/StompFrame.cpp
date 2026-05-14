@@ -25,8 +25,8 @@
 
 #include <activemq/exceptions/ActiveMQException.h>
 #include <activemq/exceptions/ExceptionTypes.h>
-#include <activemq/exceptions/IoCatchMacros.h>
 #include <activemq/exceptions/IoExceptions.h>
+#include <activemq/wireformat/openwire/marshal/OpenWireMarshalCatchMacros.h>
 #include <activemq/wireformat/stomp/StompCommandConstants.h>
 
 using namespace std;
@@ -159,9 +159,10 @@ void StompFrame::fromStream(decaf::io::DataInputStream* in)
         // Read the body.
         readBody(in);
     }
-    AMQ_IOSTREAM_CATCH_RETHROW()
-    AMQ_IOSTREAM_CATCH_CONVERT_LANG_EXCEPTION()
-    AMQ_IOSTREAM_CATCHALL_THROW()
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(decaf::lang::Exception,
+                                activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -197,9 +198,10 @@ void StompFrame::readCommandHeader(decaf::io::DataInputStream* in)
             }
         }
     }
-    AMQ_IOSTREAM_CATCH_RETHROW()
-    AMQ_IOSTREAM_CATCH_CONVERT_LANG_EXCEPTION()
-    AMQ_IOSTREAM_CATCHALL_THROW()
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(decaf::lang::Exception,
+                                activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -259,9 +261,10 @@ void StompFrame::readHeaders(decaf::io::DataInputStream* in)
             }
         }
     }
-    AMQ_IOSTREAM_CATCH_RETHROW()
-    AMQ_IOSTREAM_CATCH_CONVERT_LANG_EXCEPTION()
-    AMQ_IOSTREAM_CATCHALL_THROW()
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(decaf::lang::Exception,
+                                activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -300,9 +303,10 @@ std::size_t StompFrame::readHeaderLine(std::vector<unsigned char>& buffer,
             "StompWireFormat::readStompHeaderLine: "
             "Unrecoverable, error condition");
     }
-    AMQ_IOSTREAM_CATCH_RETHROW()
-    AMQ_IOSTREAM_CATCH_CONVERT_LANG_EXCEPTION()
-    AMQ_IOSTREAM_CATCHALL_THROW()
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(decaf::lang::Exception,
+                                activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -371,7 +375,8 @@ void StompFrame::readBody(decaf::io::DataInputStream* in)
             }
         }
     }
-    AMQ_IOSTREAM_CATCH_RETHROW()
-    AMQ_IOSTREAM_CATCH_CONVERT_LANG_EXCEPTION()
-    AMQ_IOSTREAM_CATCHALL_THROW()
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(decaf::lang::Exception,
+                                activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }

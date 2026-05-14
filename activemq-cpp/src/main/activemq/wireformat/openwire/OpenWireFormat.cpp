@@ -22,13 +22,13 @@
 #include <activemq/commands/WireFormatInfo.h>
 #include <activemq/exceptions/ActiveMQException.h>
 #include <activemq/exceptions/ExceptionTypes.h>
-#include <activemq/exceptions/IoCatchMacros.h>
 #include <activemq/exceptions/StdExceptionCatchMacros.h>
 #include <activemq/transport/IOTransport.h>
 #include <activemq/util/AMQLog.h>
 #include <activemq/wireformat/MarshalAware.h>
 #include <activemq/wireformat/openwire/OpenWireFormatNegotiator.h>
 #include <activemq/wireformat/openwire/marshal/DataStreamMarshaller.h>
+#include <activemq/wireformat/openwire/marshal/OpenWireMarshalCatchMacros.h>
 #include <activemq/wireformat/openwire/marshal/generated/MarshallerFactory.h>
 #include <activemq/wireformat/openwire/utils/BooleanStream.h>
 #include <decaf/io/ByteArrayOutputStream.h>
@@ -283,10 +283,10 @@ void OpenWireFormat::marshal(const std::shared_ptr<commands::Command> command,
             dataOut->writeByte(NULL_TYPE);
         }
     }
-    AMQ_IOSTREAM_CATCH_RETHROW()
-    AMQ_IOSTREAM_CATCH_CONVERT_ACTIVEMQ_EXCEPTION()
-    AMQ_IOSTREAM_CATCH_CONVERT_LANG_EXCEPTION()
-    AMQ_IOSTREAM_CATCHALL_THROW()
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(activemq::exceptions::ActiveMQException,
+                                activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -329,10 +329,10 @@ std::shared_ptr<commands::Command> OpenWireFormat::unmarshal(
 
         return command;
     }
-    AMQ_IOSTREAM_CATCH_RETHROW()
-    AMQ_IOSTREAM_CATCH_CONVERT_ACTIVEMQ_EXCEPTION()
-    AMQ_IOSTREAM_CATCH_CONVERT_LANG_EXCEPTION()
-    AMQ_IOSTREAM_CATCHALL_THROW()
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(activemq::exceptions::ActiveMQException,
+                                activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -417,10 +417,10 @@ commands::DataStructure* OpenWireFormat::doUnmarshal(
 
         return NULL;
     }
-    AMQ_IOSTREAM_CATCH_RETHROW()
-    AMQ_IOSTREAM_CATCH_CONVERT_ACTIVEMQ_EXCEPTION()
-    AMQ_IOSTREAM_CATCH_CONVERT_LANG_EXCEPTION()
-    AMQ_IOSTREAM_CATCHALL_THROW()
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(activemq::exceptions::ActiveMQException,
+                                activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -469,10 +469,10 @@ int OpenWireFormat::tightMarshalNestedObject1(commands::DataStructure* object,
 
         return 1 + dsm->tightMarshal1(this, object, bs);
     }
-    AMQ_IOSTREAM_CATCH_RETHROW()
-    AMQ_IOSTREAM_CATCH_CONVERT_ACTIVEMQ_EXCEPTION()
-    AMQ_IOSTREAM_CATCH_CONVERT_LANG_EXCEPTION()
-    AMQ_IOSTREAM_CATCHALL_THROW()
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(activemq::exceptions::ActiveMQException,
+                                activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -514,10 +514,10 @@ void OpenWireFormat::tightMarshalNestedObject2(DataStructure*    o,
             dsm->tightMarshal2(this, o, ds, bs);
         }
     }
-    AMQ_IOSTREAM_CATCH_RETHROW()
-    AMQ_IOSTREAM_CATCH_CONVERT_ACTIVEMQ_EXCEPTION()
-    AMQ_IOSTREAM_CATCH_CONVERT_LANG_EXCEPTION()
-    AMQ_IOSTREAM_CATCHALL_THROW()
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(activemq::exceptions::ActiveMQException,
+                                activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -566,10 +566,10 @@ DataStructure* OpenWireFormat::tightUnmarshalNestedObject(DataInputStream* dis,
             return NULL;
         }
     }
-    AMQ_IOSTREAM_CATCH_RETHROW()
-    AMQ_IOSTREAM_CATCH_CONVERT_ACTIVEMQ_EXCEPTION()
-    AMQ_IOSTREAM_CATCH_CONVERT_LANG_EXCEPTION()
-    AMQ_IOSTREAM_CATCHALL_THROW()
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(activemq::exceptions::ActiveMQException,
+                                activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -603,10 +603,10 @@ DataStructure* OpenWireFormat::looseUnmarshalNestedObject(
             return NULL;
         }
     }
-    AMQ_IOSTREAM_CATCH_RETHROW()
-    AMQ_IOSTREAM_CATCH_CONVERT_ACTIVEMQ_EXCEPTION()
-    AMQ_IOSTREAM_CATCH_CONVERT_LANG_EXCEPTION()
-    AMQ_IOSTREAM_CATCHALL_THROW()
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(activemq::exceptions::ActiveMQException,
+                                activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -638,10 +638,10 @@ void OpenWireFormat::looseMarshalNestedObject(
             dsm->looseMarshal(this, o, dataOut);
         }
     }
-    AMQ_IOSTREAM_CATCH_RETHROW()
-    AMQ_IOSTREAM_CATCH_CONVERT_ACTIVEMQ_EXCEPTION()
-    AMQ_IOSTREAM_CATCH_CONVERT_LANG_EXCEPTION()
-    AMQ_IOSTREAM_CATCHALL_THROW()
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(activemq::exceptions::ActiveMQException,
+                                activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -661,8 +661,8 @@ void OpenWireFormat::renegotiateWireFormat(const WireFormatInfo& info)
                               preferedWireFormatInfo->isStackTraceEnabled();
     this->tcpNoDelayEnabled = info.isTcpNoDelayEnabled() &&
                               preferedWireFormatInfo->isTcpNoDelayEnabled();
-    this->cacheEnabled = info.isCacheEnabled() &&
-                         preferedWireFormatInfo->isCacheEnabled();
+    this->cacheEnabled      = info.isCacheEnabled() &&
+                              preferedWireFormatInfo->isCacheEnabled();
     this->tightEncodingEnabled =
         info.isTightEncodingEnabled() &&
         preferedWireFormatInfo->isTightEncodingEnabled();

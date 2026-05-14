@@ -19,6 +19,7 @@
 
 #include <activemq/commands/ActiveMQStreamMessage.h>
 #include <activemq/exceptions/ActiveMQException.h>
+#include <activemq/wireformat/openwire/marshal/OpenWireMarshalCatchMacros.h>
 #include <memory>
 
 //
@@ -69,9 +70,10 @@ void ActiveMQStreamMessageMarshaller::tightUnmarshal(
 
         info->afterUnmarshal(wireFormat);
     }
-    AMQ_IOSTREAM_CATCH_RETHROW()
-    AMQ_IOSTREAM_CATCH_CONVERT_ACTIVEMQ_EXCEPTION()
-    AMQ_IOSTREAM_CATCHALL_THROW()
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(activemq::exceptions::ActiveMQException,
+                                activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -90,9 +92,10 @@ int ActiveMQStreamMessageMarshaller::tightMarshal1(OpenWireFormat* wireFormat,
 
         return rc + 0;
     }
-    AMQ_IOSTREAM_CATCH_RETHROW()
-    AMQ_IOSTREAM_CATCH_CONVERT_ACTIVEMQ_EXCEPTION()
-    AMQ_IOSTREAM_CATCHALL_THROW()
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(activemq::exceptions::ActiveMQException,
+                                activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -109,9 +112,10 @@ void ActiveMQStreamMessageMarshaller::tightMarshal2(OpenWireFormat* wireFormat,
             dynamic_cast<ActiveMQStreamMessage*>(dataStructure);
         info->afterMarshal(wireFormat);
     }
-    AMQ_IOSTREAM_CATCH_RETHROW()
-    AMQ_IOSTREAM_CATCH_CONVERT_ACTIVEMQ_EXCEPTION()
-    AMQ_IOSTREAM_CATCHALL_THROW()
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(activemq::exceptions::ActiveMQException,
+                                activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -128,9 +132,10 @@ void ActiveMQStreamMessageMarshaller::looseUnmarshal(
         info->beforeUnmarshal(wireFormat);
         info->afterUnmarshal(wireFormat);
     }
-    AMQ_IOSTREAM_CATCH_RETHROW()
-    AMQ_IOSTREAM_CATCH_CONVERT_ACTIVEMQ_EXCEPTION()
-    AMQ_IOSTREAM_CATCHALL_THROW()
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(activemq::exceptions::ActiveMQException,
+                                activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -146,7 +151,8 @@ void ActiveMQStreamMessageMarshaller::looseMarshal(OpenWireFormat* wireFormat,
         MessageMarshaller::looseMarshal(wireFormat, dataStructure, dataOut);
         info->afterMarshal(wireFormat);
     }
-    AMQ_IOSTREAM_CATCH_RETHROW()
-    AMQ_IOSTREAM_CATCH_CONVERT_ACTIVEMQ_EXCEPTION()
-    AMQ_IOSTREAM_CATCHALL_THROW()
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(activemq::exceptions::ActiveMQException,
+                                activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }

@@ -262,7 +262,7 @@ bool ActiveMQStreamMessage::readBoolean() const
     }
     catch (activemq::exceptions::IllegalStateException& e)
     {
-        throw CMSException(e.what(), NULL);
+        throw cms::IllegalStateException(e.what());
     }
     catch (cms::CMSException&)
     {
@@ -345,7 +345,7 @@ unsigned char ActiveMQStreamMessage::readByte() const
     }
     catch (activemq::exceptions::IllegalStateException& e)
     {
-        throw CMSException(e.what(), NULL);
+        throw cms::IllegalStateException(e.what());
     }
     catch (cms::CMSException&)
     {
@@ -441,7 +441,7 @@ int ActiveMQStreamMessage::readBytes(unsigned char* buffer, int length) const
         else
         {
             // big buffer
-            int rc                     = this->dataIn->read(buffer,
+            int rc = this->dataIn->read(buffer,
                                         length,
                                         0,
                                         this->impl->remainingBytes);
@@ -459,7 +459,7 @@ int ActiveMQStreamMessage::readBytes(unsigned char* buffer, int length) const
     }
     catch (activemq::exceptions::IllegalStateException& e)
     {
-        throw CMSException(e.what(), NULL);
+        throw cms::IllegalStateException(e.what());
     }
     catch (cms::CMSException&)
     {
@@ -541,7 +541,7 @@ char ActiveMQStreamMessage::readChar() const
     }
     catch (activemq::exceptions::IllegalStateException& e)
     {
-        throw CMSException(e.what(), NULL);
+        throw cms::IllegalStateException(e.what());
     }
     catch (cms::CMSException&)
     {
@@ -624,7 +624,7 @@ float ActiveMQStreamMessage::readFloat() const
     }
     catch (activemq::exceptions::IllegalStateException& e)
     {
-        throw CMSException(e.what(), NULL);
+        throw cms::IllegalStateException(e.what());
     }
     catch (cms::CMSException&)
     {
@@ -711,7 +711,7 @@ double ActiveMQStreamMessage::readDouble() const
     }
     catch (activemq::exceptions::IllegalStateException& e)
     {
-        throw CMSException(e.what(), NULL);
+        throw cms::IllegalStateException(e.what());
     }
     catch (cms::CMSException&)
     {
@@ -798,7 +798,7 @@ short ActiveMQStreamMessage::readShort() const
     }
     catch (activemq::exceptions::IllegalStateException& e)
     {
-        throw CMSException(e.what(), NULL);
+        throw cms::IllegalStateException(e.what());
     }
     catch (cms::CMSException&)
     {
@@ -886,7 +886,7 @@ unsigned short ActiveMQStreamMessage::readUnsignedShort() const
     }
     catch (activemq::exceptions::IllegalStateException& e)
     {
-        throw CMSException(e.what(), NULL);
+        throw cms::IllegalStateException(e.what());
     }
     catch (cms::CMSException&)
     {
@@ -977,7 +977,7 @@ int ActiveMQStreamMessage::readInt() const
     }
     catch (activemq::exceptions::IllegalStateException& e)
     {
-        throw CMSException(e.what(), NULL);
+        throw cms::IllegalStateException(e.what());
     }
     catch (cms::CMSException&)
     {
@@ -1072,7 +1072,7 @@ long long ActiveMQStreamMessage::readLong() const
     }
     catch (activemq::exceptions::IllegalStateException& e)
     {
-        throw CMSException(e.what(), NULL);
+        throw cms::IllegalStateException(e.what());
     }
     catch (cms::CMSException&)
     {

@@ -250,7 +250,8 @@ void CmsTemplate::checkDefaultDestination()
     {
         throw IllegalStateException(
             "No defaultDestination or defaultDestinationName specified."
-            "Check configuration of CmsTemplate.");
+            "Check configuration of CmsTemplate.",
+            NULL);
     }
 }
 

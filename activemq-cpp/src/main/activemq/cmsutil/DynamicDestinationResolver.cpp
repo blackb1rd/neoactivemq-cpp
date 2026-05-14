@@ -21,7 +21,6 @@
 #include <cms/CMSException.h>
 
 using namespace activemq::cmsutil;
-using namespace activemq::exceptions;
 using namespace decaf::util;
 using namespace cms;
 using namespace std;
@@ -36,7 +35,7 @@ cms::Topic* DynamicDestinationResolver::SessionResolver::getTopic(
         // See if we already have a topic with this name.
         topic = topicMap.get(topicName);
     }
-    catch (NoSuchElementException&)
+    catch (activemq::exceptions::NoSuchElementException&)
     {
         // Create a new topic.
         topic = session->createTopic(topicName);
@@ -60,7 +59,7 @@ cms::Queue* DynamicDestinationResolver::SessionResolver::getQueue(
         // See if we already have a queue with this name.
         queue = queueMap.get(queueName);
     }
-    catch (NoSuchElementException&)
+    catch (activemq::exceptions::NoSuchElementException&)
     {
         // Create a new queue.
         queue = session->createQueue(queueName);
@@ -119,7 +118,7 @@ cms::Destination* DynamicDestinationResolver::resolveDestinationName(
     {
         resolver = sessionResolverMap.get(session);
     }
-    catch (NoSuchElementException&)
+    catch (activemq::exceptions::NoSuchElementException&)
     {
         resolver = new SessionResolver(session, resourceLifecycleManager);
         sessionResolverMap.put(session, resolver);

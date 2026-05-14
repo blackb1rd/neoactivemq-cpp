@@ -19,7 +19,7 @@
 #include <activemq/wireformat/openwire/marshal/PrimitiveTypesMarshaller.h>
 
 #include <activemq/exceptions/ExceptionTypes.h>
-#include <activemq/exceptions/IoCatchMacros.h>
+#include <activemq/wireformat/openwire/marshal/OpenWireMarshalCatchMacros.h>
 #include <decaf/io/BufferedInputStream.h>
 #include <decaf/io/ByteArrayInputStream.h>
 #include <decaf/io/ByteArrayOutputStream.h>
@@ -155,9 +155,10 @@ void ActiveMQMapMessage::beforeMarshal(WireFormat* wireFormat)
             clearBody();
         }
     }
-    AMQ_IOSTREAM_CATCH_RETHROW()
-    AMQ_IOSTREAM_CATCH_CONVERT_LANG_EXCEPTION()
-    AMQ_IOSTREAM_CATCHALL_THROW()
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(decaf::lang::Exception,
+                                activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -20,10 +20,10 @@
 #include <activemq/core/ActiveMQConnection.h>
 #include <activemq/exceptions/ActiveMQException.h>
 #include <activemq/exceptions/ExceptionTypes.h>
-#include <activemq/exceptions/IoCatchMacros.h>
 #include <activemq/state/CommandVisitor.h>
 #include <activemq/util/AMQLog.h>
 #include <activemq/wireformat/openwire/marshal/BaseDataStreamMarshaller.h>
+#include <activemq/wireformat/openwire/marshal/OpenWireMarshalCatchMacros.h>
 #include <activemq/wireformat/openwire/marshal/PrimitiveTypesMarshaller.h>
 #include <decaf/io/IOException.h>
 #include <chrono>
@@ -1163,9 +1163,10 @@ void Message::beforeMarshal(wireformat::WireFormat* wireFormat AMQCPP_UNUSED)
                 marshalledProperties);
         }
     }
-    AMQ_IOSTREAM_CATCH_RETHROW()
-    AMQ_IOSTREAM_CATCH_CONVERT_LANG_EXCEPTION()
-    AMQ_IOSTREAM_CATCHALL_THROW()
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(decaf::lang::Exception,
+                                activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1225,7 +1226,5 @@ void Message::ensurePropertiesUnmarshaled() const
                     << ", exception=" << e.getMessage());
             throw;
         }
-        AMQ_IOSTREAM_CATCH_CONVERT_LANG_EXCEPTION()
-        AMQ_IOSTREAM_CATCHALL_THROW()
     }
 }

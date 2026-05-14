@@ -118,9 +118,10 @@ public class MessageSourceGenerator extends CommandSourceGenerator {
         out.println("                &properties, marshalledProperties );");
         out.println("        }");
         out.println("    }");
-        out.println("    AMQ_IOSTREAM_CATCH_RETHROW()");
-        out.println("    AMQ_IOSTREAM_CATCH_CONVERT_LANG_EXCEPTION()");
-        out.println("    AMQ_IOSTREAM_CATCHALL_THROW()");
+        out.println("    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)");
+        out.println("    AMQ_CATCH_EXCEPTION_CONVERT(decaf::lang::Exception,");
+        out.println("                                    activemq::exceptions::IOException)");
+        out.println("    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)");
         out.println("}");
         out.println("");
         out.println("////////////////////////////////////////////////////////////////////////////////");
@@ -130,9 +131,10 @@ public class MessageSourceGenerator extends CommandSourceGenerator {
         out.println("        wireformat::openwire::marshal::PrimitiveTypesMarshaller::unmarshal(");
         out.println("            &properties, marshalledProperties);");
         out.println("    }");
-        out.println("    AMQ_IOSTREAM_CATCH_RETHROW()");
-        out.println("    AMQ_IOSTREAM_CATCH_CONVERT_LANG_EXCEPTION()");
-        out.println("    AMQ_IOSTREAM_CATCHALL_THROW()");
+        out.println("    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)");
+        out.println("    AMQ_CATCH_EXCEPTION_CONVERT(decaf::lang::Exception,");
+        out.println("                                    activemq::exceptions::IOException)");
+        out.println("    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)");
         out.println("}");
         out.println("");
     }

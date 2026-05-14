@@ -572,6 +572,7 @@ out.println("#include <activemq/wireformat/openwire/marshal/generated/"+classNam
 out.println("");
 out.println("#include <activemq/commands/"+jclass.getSimpleName()+".h>");
 out.println("#include <activemq/exceptions/ActiveMQException.h>");
+out.println("#include <activemq/wireformat/openwire/marshal/OpenWireMarshalCatchMacros.h>");
 out.println("#include <decaf/lang/Pointer.h>");
 out.println("");
 out.println("//");
@@ -645,9 +646,10 @@ out.println("        info->afterUnmarshal( wireFormat );");
     }
 
 out.println("    }");
-out.println("    AMQ_IOSTREAM_CATCH_RETHROW()" );
-out.println("    AMQ_IOSTREAM_CATCH_CONVERT_ACTIVEMQ_EXCEPTION()" );
-out.println("    AMQ_IOSTREAM_CATCHALL_THROW()" );
+out.println("    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)" );
+out.println("    AMQ_CATCH_EXCEPTION_CONVERT(activemq::exceptions::ActiveMQException," );
+out.println("                                    activemq::exceptions::IOException)" );
+out.println("    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)" );
 out.println("}");
 out.println("");
 out.println("///////////////////////////////////////////////////////////////////////////////");
@@ -680,9 +682,10 @@ out.println("        int rc = "+baseClass+"::tightMarshal1(wireFormat, dataStruc
 out.println("");
 out.println("        return rc + "+baseSize+";");
 out.println("    }");
-out.println("    AMQ_IOSTREAM_CATCH_RETHROW()" );
-out.println("    AMQ_IOSTREAM_CATCH_CONVERT_ACTIVEMQ_EXCEPTION()" );
-out.println("    AMQ_IOSTREAM_CATCHALL_THROW()" );
+out.println("    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)" );
+out.println("    AMQ_CATCH_EXCEPTION_CONVERT(activemq::exceptions::ActiveMQException," );
+out.println("                                    activemq::exceptions::IOException)" );
+out.println("    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)" );
 out.println("}");
 out.println("");
 out.println("///////////////////////////////////////////////////////////////////////////////");
@@ -712,9 +715,10 @@ out.println("        info->afterMarshal(wireFormat);");
     }
 
 out.println("    }");
-out.println("    AMQ_IOSTREAM_CATCH_RETHROW()" );
-out.println("    AMQ_IOSTREAM_CATCH_CONVERT_ACTIVEMQ_EXCEPTION()" );
-out.println("    AMQ_IOSTREAM_CATCHALL_THROW()" );
+out.println("    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)" );
+out.println("    AMQ_CATCH_EXCEPTION_CONVERT(activemq::exceptions::ActiveMQException," );
+out.println("                                    activemq::exceptions::IOException)" );
+out.println("    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)" );
 out.println("}");
 out.println("");
 out.println("///////////////////////////////////////////////////////////////////////////////");
@@ -747,9 +751,10 @@ out.println("        info->afterUnmarshal(wireFormat);");
     }
 
 out.println("    }");
-out.println("    AMQ_IOSTREAM_CATCH_RETHROW()" );
-out.println("    AMQ_IOSTREAM_CATCH_CONVERT_ACTIVEMQ_EXCEPTION()" );
-out.println("    AMQ_IOSTREAM_CATCHALL_THROW()" );
+out.println("    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)" );
+out.println("    AMQ_CATCH_EXCEPTION_CONVERT(activemq::exceptions::ActiveMQException," );
+out.println("                                    activemq::exceptions::IOException)" );
+out.println("    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)" );
 out.println("}");
 out.println("");
 out.println("///////////////////////////////////////////////////////////////////////////////");
@@ -783,9 +788,10 @@ out.println("        info->afterMarshal(wireFormat);");
     }
 
 out.println("    }");
-out.println("    AMQ_IOSTREAM_CATCH_RETHROW()" );
-out.println("    AMQ_IOSTREAM_CATCH_CONVERT_ACTIVEMQ_EXCEPTION()" );
-out.println("    AMQ_IOSTREAM_CATCHALL_THROW()" );
+out.println("    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)" );
+out.println("    AMQ_CATCH_EXCEPTION_CONVERT(activemq::exceptions::ActiveMQException," );
+out.println("                                    activemq::exceptions::IOException)" );
+out.println("    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)" );
 out.println("}");
 out.println("");
 }

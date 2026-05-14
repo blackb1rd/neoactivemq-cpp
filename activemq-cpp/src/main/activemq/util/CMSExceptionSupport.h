@@ -431,6 +431,12 @@ namespace util
         ex.setMark(__FILE__, __LINE__);                                        \
         throw ex.convertToCMSException();                                      \
     }                                                                          \
+    catch (decaf::lang::Exception & ex)                                        \
+    {                                                                          \
+        ex.setMark(__FILE__, __LINE__);                                        \
+        activemq::exceptions::ActiveMQException amqEx(ex);                     \
+        throw amqEx.convertToCMSException();                                   \
+    }                                                                          \
     catch (std::exception & ex)                                                \
     {                                                                          \
         decaf::lang::Exception cause(__FILE__, __LINE__, "%s", ex.what());     \

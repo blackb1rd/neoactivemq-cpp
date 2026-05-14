@@ -18,6 +18,14 @@
 #ifndef _ACTIVEMQ_EXCEPTIONS_IOCATCHMACROS_H_
 #define _ACTIVEMQ_EXCEPTIONS_IOCATCHMACROS_H_
 
+/*
+ * Implementation helpers AMQ_IOSTREAM_* (Decaf + AMQ stream exception ladder).
+ * OpenWire / DataStream marshalling uses the historical three-macro call shape
+ * via activemq/wireformat/openwire/marshal/OpenWireMarshalCatchMacros.h
+ * (AMQ_CATCH_RETHROW / AMQ_CATCH_EXCEPTION_CONVERT / AMQ_CATCHALL_THROW with
+ * explicit activemq::exceptions::IOException parameters for review).
+ */
+
 #include <activemq/exceptions/ActiveMQException.h>
 #include <activemq/exceptions/IoExceptions.h>
 #include <activemq/exceptions/StdExceptionCatchMacros.h>

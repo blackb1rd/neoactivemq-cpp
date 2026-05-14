@@ -21,9 +21,9 @@
 #include <activemq/commands/MessageId.h>
 #include <activemq/commands/ProducerId.h>
 #include <activemq/commands/TransactionId.h>
-#include <activemq/exceptions/IoCatchMacros.h>
 #include <activemq/util/Config.h>
 #include <activemq/wireformat/openwire/marshal/DataStreamMarshaller.h>
+#include <activemq/exceptions/IoCatchMacros.h>
 #include <activemq/wireformat/openwire/utils/HexTable.h>
 
 namespace activemq

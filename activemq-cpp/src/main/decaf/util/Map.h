@@ -18,13 +18,12 @@
 #ifndef _DECAF_UTIL_MAP_H_
 #define _DECAF_UTIL_MAP_H_
 
-#include <decaf/lang/exceptions/UnsupportedOperationException.h>
 #include <decaf/util/Collection.h>
 #include <decaf/util/MapEntry.h>
-#include <decaf/util/NoSuchElementException.h>
 #include <decaf/util/Set.h>
 #include <decaf/util/concurrent/Synchronizable.h>
 #include <functional>
+#include <stdexcept>
 #include <vector>
 
 namespace decaf
@@ -60,9 +59,9 @@ namespace util
      *
      * The "destructive" methods contained in this interface, that is, the
      * methods that modify the map on which they operate, are specified to throw
-     * UnsupportedOperationException if this map does not support the operation.
+     * std::logic_error if this map does not support the operation.
      * If this is the case, these methods may, but are not required to, throw an
-     * UnsupportedOperationException if the invocation would have no effect on
+     * std::logic_error if the invocation would have no effect on
      * the map. For example, invoking the putAll(Map) method on an unmodifiable
      * map may, but is not required to, throw the exception if the map whose
      * mappings are to be "superimposed" is empty.
@@ -71,7 +70,7 @@ namespace util
      * may contain. For example, some implementations prohibit NULL keys and
      * values, and some have restrictions on the types of their keys. Attempting
      * to insert an ineligible key or value throws an exception, typically
-     * NullPointerException or ClassCastException. Attempting to query the
+     * std::logic_error or std::bad_cast. Attempting to query the
      * presence of an ineligible key or value may throw an exception, or it may
      * simply return false; some implementations will exhibit the former
      * behavior and some will exhibit the latter. More generally, attempting an
@@ -144,7 +143,7 @@ namespace util
          * Removes all of the mappings from this map (optional operation). The
          * map will be empty after this call returns.
          *
-         * @throw UnsupportedOperationException if the clear operation is not
+         * @throws std::logic_error if the clear operation is not
          * supported by this map.
          */
         virtual void clear() = 0;
@@ -190,7 +189,7 @@ namespace util
         /**
          * Gets the value mapped to the specified key in the Map.  If there is
          * no element in the map whose key is equivalent to the key provided
-         * then a NoSuchElementException is thrown.
+         * then a std::runtime_error is thrown.
          *
          * @param key
          *      The search key whose value should be returned if present.
@@ -198,7 +197,7 @@ namespace util
          * @return A reference to the value for the given key if present in the
          * Map.
          *
-         * @throws NoSuchElementException if the key requests doesn't exist in
+         * @throws std::runtime_error if the key requests doesn't exist in
          * the Map.
          */
         virtual V& get(const K& key) = 0;
@@ -206,7 +205,7 @@ namespace util
         /**
          * Gets the value mapped to the specified key in the Map.  If there is
          * no element in the map whose key is equivalent to the key provided
-         * then a NoSuchElementException is thrown.
+         * then a std::runtime_error is thrown.
          *
          * @param key
          *      The search key whose value should be returned if present.
@@ -214,7 +213,7 @@ namespace util
          * @return A const reference to the value for the given key if present
          * in the Map.
          *
-         * @throws NoSuchElementException if the key requests doesn't exist in
+         * @throws std::runtime_error if the key requests doesn't exist in
          * the Map.
          */
         virtual const V& get(const K& key) const = 0;
@@ -235,8 +234,8 @@ namespace util
          * associated with an existing mapping to the given key or false
          * otherwise.
          *
-         * @throws UnsupportedOperationException if this map is unmodifiable.
-         * @throws IllegalArgumentException if some property of the specified
+         * @throws std::logic_error if this map is unmodifiable.
+         * @throws std::invalid_argument if some property of the specified
          * key or value prevents it from being stored in this map
          */
         virtual bool put(const K& key, const V& value) = 0;
@@ -264,8 +263,8 @@ namespace util
          * associated with an existing mapping to the given key or false
          * otherwise.
          *
-         * @throws UnsupportedOperationException if this map is unmodifiable.
-         * @throws IllegalArgumentException if some property of the specified
+         * @throws std::logic_error if this map is unmodifiable.
+         * @throws std::invalid_argument if some property of the specified
          * key or value prevents it from being stored in this map
          */
         virtual bool put(const K& key, const V& value, V& oldValue) = 0;
@@ -282,7 +281,7 @@ namespace util
          *      A Map instance whose elements are to all be inserted in this
          * Map.
          *
-         * @throws UnsupportedOperationException
+         * @throws std::logic_error
          *      If the implementing class does not support the putAll operation.
          */
         virtual void putAll(const Map<K, V>& other) = 0;
@@ -299,8 +298,8 @@ namespace util
          * @return a copy of the element that was previously mapped to the given
          * key.
          *
-         * @throw NoSuchElementException if this key is not in the Map.
-         * @throw UnsupportedOperationException if this map is unmodifiable.
+         * @throw std::runtime_error if this key is not in the Map.
+         * @throws std::logic_error if this map is unmodifiable.
          */
         virtual V remove(const K& key) = 0;
 

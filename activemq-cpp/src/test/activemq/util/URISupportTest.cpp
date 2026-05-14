@@ -19,8 +19,8 @@
 
 #include <activemq/util/URISupport.h>
 #include <decaf/lang/System.h>
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
 #include <decaf/util/Properties.h>
+#include <stdexcept>
 
 using namespace std;
 using namespace decaf;
@@ -137,28 +137,23 @@ TEST_F(URISupportTest, testURIParseEnv)
     ASSERT_TRUE(map.getProperty("option2", "") == "test2");
 
     test = "tcp://localhost:61616?option1=test1&option2=${TEST_CPP_AMQ_XXX}";
-    ASSERT_THROW(URISupport::parseURL(test, map),
-                 decaf::lang::exceptions::IllegalArgumentException)
+    ASSERT_THROW(URISupport::parseURL(test, map), std::invalid_argument)
         << ("Should Throw an IllegalArgumentException");
 
     test = "tcp://localhost:61616?option1=test1&option2=${}";
-    ASSERT_THROW(URISupport::parseURL(test, map),
-                 decaf::lang::exceptions::IllegalArgumentException)
+    ASSERT_THROW(URISupport::parseURL(test, map), std::invalid_argument)
         << ("Should Throw an IllegalArgumentException");
 
     test = "tcp://localhost:61616?option1=test1&option2=$X}";
-    ASSERT_THROW(URISupport::parseURL(test, map),
-                 decaf::lang::exceptions::IllegalArgumentException)
+    ASSERT_THROW(URISupport::parseURL(test, map), std::invalid_argument)
         << ("Should Throw an IllegalArgumentException");
 
     test = "tcp://localhost:61616?option1=test1&option2=${X";
-    ASSERT_THROW(URISupport::parseURL(test, map),
-                 decaf::lang::exceptions::IllegalArgumentException)
+    ASSERT_THROW(URISupport::parseURL(test, map), std::invalid_argument)
         << ("Should Throw an IllegalArgumentException");
 
     test = "tcp://localhost:61616?option1=test1&option2=$X";
-    ASSERT_THROW(URISupport::parseURL(test, map),
-                 decaf::lang::exceptions::IllegalArgumentException)
+    ASSERT_THROW(URISupport::parseURL(test, map), std::invalid_argument)
         << ("Should Throw an IllegalArgumentException");
 }
 

@@ -18,16 +18,15 @@
 #include <activemq/exceptions/ActiveMQException.h>
 #include <activemq/exceptions/ExceptionDefines.h>
 #include <cms/MessageNotReadableException.h>
-#include <decaf/lang/Exception.h>
-#include <decaf/lang/exceptions/UnsupportedOperationException.h>
+#include <decaf/io/IOException.h>
 #include <gtest/gtest.h>
 #include <string.h>
+#include <string>
 
 using namespace activemq;
 using namespace activemq::exceptions;
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 class ActiveMQExceptionTest : public ::testing::Test
 {
@@ -54,9 +53,7 @@ TEST_F(ActiveMQExceptionTest, testMacros)
         {
             try
             {
-                throw UnsupportedOperationException(__FILE__,
-                                                    __LINE__,
-                                                    "EXCEPTION");
+                throw decaf::io::IOException(__FILE__, __LINE__, "EXCEPTION");
                 FAIL() << ("Should not get this far.");
             }
             AMQ_CATCH_EXCEPTION_CONVERT(Exception, ActiveMQException)
@@ -67,8 +64,8 @@ TEST_F(ActiveMQExceptionTest, testMacros)
     {
         ASSERT_TRUE(ex.getCause() != NULL);
 
-        const UnsupportedOperationException* cause =
-            dynamic_cast<const UnsupportedOperationException*>(ex.getCause());
+        const decaf::io::IOException* cause =
+            dynamic_cast<const decaf::io::IOException*>(ex.getCause());
 
         ASSERT_TRUE(cause != NULL);
     }
@@ -90,9 +87,7 @@ TEST_F(ActiveMQExceptionTest, testMacros)
         {
             try
             {
-                throw UnsupportedOperationException(__FILE__,
-                                                    __LINE__,
-                                                    "EXCEPTION");
+                throw decaf::io::IOException(__FILE__, __LINE__, "EXCEPTION");
                 FAIL() << ("Should not get this far.");
             }
             AMQ_CATCH_EXCEPTION_CONVERT(Exception, ActiveMQException)
@@ -106,9 +101,8 @@ TEST_F(ActiveMQExceptionTest, testMacros)
         ASSERT_TRUE(converted != NULL);
         ASSERT_TRUE(converted->getCause() != NULL);
 
-        const UnsupportedOperationException* cause =
-            dynamic_cast<const UnsupportedOperationException*>(
-                converted->getCause());
+        const decaf::io::IOException* cause =
+            dynamic_cast<const decaf::io::IOException*>(converted->getCause());
 
         ASSERT_TRUE(cause != NULL);
     }

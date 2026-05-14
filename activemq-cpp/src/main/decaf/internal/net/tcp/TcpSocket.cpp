@@ -24,7 +24,6 @@
 #include <decaf/internal/net/tcp/TcpSocketOutputStream.h>
 
 #include <decaf/lang/Character.h>
-#include <decaf/lang/exceptions/UnsupportedOperationException.h>
 #include <decaf/net/SocketError.h>
 #include <decaf/net/SocketOptions.h>
 #include <decaf/net/SocketTimeoutException.h>
@@ -32,11 +31,13 @@
 
 #include <asio.hpp>
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <chrono>
 #include <iostream>
 #include <memory>
+#include <stdexcept>
 #include <string>
 
 using namespace decaf;
@@ -46,7 +47,6 @@ using namespace decaf::internal::net::tcp;
 using namespace decaf::net;
 using namespace decaf::io;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util::concurrent::atomic;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -503,10 +503,9 @@ void TcpSocket::connect(const std::string& hostname, int port, int timeout)
 
         if (port < 0 || port > 65535)
         {
-            throw IllegalArgumentException(__FILE__,
-                                           __LINE__,
-                                           "Given port is out of range: %d",
-                                           port);
+            throw activemq::exceptions::InvalidArgumentException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+                "Given port is out of range: " + std::to_string(port));
         }
 
         if (this->impl->socket == nullptr)
@@ -749,12 +748,9 @@ void TcpSocket::connect(const std::string& hostname, int port, int timeout)
         }
         throw;
     }
-    catch (IllegalArgumentException& ex)
+    catch (std::invalid_argument& ex)
     {
-        AMQ_LOG_ERROR(
-            "TcpSocket",
-            "connect() IllegalArgumentException: " << ex.getMessage());
-        ex.setMark(__FILE__, __LINE__);
+        AMQ_LOG_ERROR("TcpSocket", "connect() invalid_argument: " << ex.what());
         try
         {
             close();
@@ -1349,35 +1345,33 @@ int TcpSocket::read(unsigned char* buffer, int size, int offset, int length)
 
         if (buffer == nullptr)
         {
-            throw NullPointerException(__FILE__,
-                                       __LINE__,
-                                       "Buffer passed is Null");
+            throw activemq::exceptions::NullPointerException(
+                __FILE__,
+                __LINE__,
+                "Buffer passed is Null");
         }
 
         if (size < 0)
         {
-            throw IndexOutOfBoundsException(__FILE__,
-                                            __LINE__,
-                                            "size parameter out of Bounds: %d.",
-                                            size);
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+                "size parameter out of Bounds: " + std::to_string(size) + ".");
         }
 
         if (offset > size || offset < 0)
         {
-            throw IndexOutOfBoundsException(
-                __FILE__,
-                __LINE__,
-                "offset parameter out of Bounds: %d.",
-                offset);
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+                "offset parameter out of Bounds: " + std::to_string(offset) +
+                ".");
         }
 
         if (length < 0 || length > size - offset)
         {
-            throw IndexOutOfBoundsException(
-                __FILE__,
-                __LINE__,
-                "length parameter out of Bounds: %d.",
-                length);
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+                "length parameter out of Bounds: " + std::to_string(length) +
+                ".");
         }
 
         asio::error_code ec;
@@ -1543,8 +1537,6 @@ int TcpSocket::read(unsigned char* buffer, int size, int offset, int length)
         return static_cast<int>(bytesRead);
     }
     DECAF_CATCH_RETHROW(IOException)
-    DECAF_CATCH_RETHROW(NullPointerException)
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
     DECAF_CATCHALL_THROW(IOException)
 }
 
@@ -1563,7 +1555,7 @@ void TcpSocket::write(const unsigned char* buffer,
 
         if (buffer == nullptr)
         {
-            throw NullPointerException(
+            throw activemq::exceptions::NullPointerException(
                 __FILE__,
                 __LINE__,
                 "TcpSocket::write - passed buffer is null");
@@ -1579,28 +1571,25 @@ void TcpSocket::write(const unsigned char* buffer,
 
         if (size < 0)
         {
-            throw IndexOutOfBoundsException(__FILE__,
-                                            __LINE__,
-                                            "size parameter out of Bounds: %d.",
-                                            size);
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+                "size parameter out of Bounds: " + std::to_string(size) + ".");
         }
 
         if (offset > size || offset < 0)
         {
-            throw IndexOutOfBoundsException(
-                __FILE__,
-                __LINE__,
-                "offset parameter out of Bounds: %d.",
-                offset);
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+                "offset parameter out of Bounds: " + std::to_string(offset) +
+                ".");
         }
 
         if (length < 0 || length > size - offset)
         {
-            throw IndexOutOfBoundsException(
-                __FILE__,
-                __LINE__,
-                "length parameter out of Bounds: %d.",
-                length);
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+                "length parameter out of Bounds: " + std::to_string(length) +
+                ".");
         }
 
         asio::error_code ec;
@@ -1658,8 +1647,6 @@ void TcpSocket::write(const unsigned char* buffer,
         }
     }
     DECAF_CATCH_RETHROW(IOException)
-    DECAF_CATCH_RETHROW(NullPointerException)
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
     DECAF_CATCHALL_THROW(IOException)
 }
 

@@ -21,8 +21,10 @@
 #include <memory>
 
 #include <activemq/commands/Response.h>
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <activemq/state/Tracked.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
+#include <stdexcept>
+#include <string>
 
 using namespace activemq;
 using namespace activemq::exceptions;
@@ -31,7 +33,6 @@ using namespace activemq::transport;
 using namespace activemq::transport::failover;
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 FailoverTransportListener::FailoverTransportListener(FailoverTransport* parent)
@@ -39,9 +40,10 @@ FailoverTransportListener::FailoverTransportListener(FailoverTransport* parent)
 {
     if (this->parent == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "Pointer to Parent Transport was NULL");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "Pointer to Parent Transport was NULL");
     }
 }
 

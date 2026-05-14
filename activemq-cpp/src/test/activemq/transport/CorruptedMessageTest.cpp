@@ -18,6 +18,8 @@
 #include <activemq/util/Config.h>
 #include <gtest/gtest.h>
 
+#include <exception>
+
 #include <activemq/commands/ActiveMQTextMessage.h>
 #include <activemq/commands/ActiveMQTopic.h>
 #include <activemq/commands/ConsumerId.h>
@@ -558,12 +560,16 @@ TEST_F(CorruptedMessageTest, testCorruptedFirstMessage)
         std::shared_ptr<Command> cmd =
             wireFormat->unmarshal(nullptr, dis.get());
     }
-    catch (IOException& e)
+    catch (activemq::exceptions::IOException& e)
     {
         caughtException = true;
         // This is expected - corrupted data should throw
     }
     catch (Exception& e)
+    {
+        caughtException = true;
+    }
+    catch (std::exception&)
     {
         caughtException = true;
     }
@@ -645,6 +651,10 @@ TEST_F(CorruptedMessageTest, testCorruptedMessageBetweenValidMessages)
     {
         FAIL() << ("First message should unmarshal successfully");
     }
+    catch (std::exception&)
+    {
+        FAIL() << ("First message should unmarshal successfully");
+    }
 
     // Message 2 - should throw (corrupted)
     try
@@ -653,12 +663,17 @@ TEST_F(CorruptedMessageTest, testCorruptedMessageBetweenValidMessages)
             wireFormat->unmarshal(nullptr, dis.get());
         FAIL() << ("Corrupted message should throw exception");
     }
-    catch (IOException& e)
+    catch (activemq::exceptions::IOException& e)
     {
         corruptedCount++;
         // Expected - corrupted message
     }
     catch (Exception& e)
+    {
+        corruptedCount++;
+        // Also acceptable
+    }
+    catch (std::exception&)
     {
         corruptedCount++;
         // Also acceptable
@@ -715,6 +730,10 @@ TEST_F(CorruptedMessageTest, testContinueAfterCorruptedMessage)
             wireFormat->unmarshal(nullptr, dis.get());
     }
     catch (Exception& e)
+    {
+        caughtException = true;
+    }
+    catch (std::exception&)
     {
         caughtException = true;
     }
@@ -776,6 +795,10 @@ TEST_F(CorruptedMessageTest, testMultipleCorruptedMessages)
         {
             corruptedCount++;
         }
+        catch (std::exception&)
+        {
+            corruptedCount++;
+        }
     }
 
     ASSERT_EQ(5, corruptedCount) << ("Should have caught 5 corrupted messages");
@@ -816,6 +839,10 @@ TEST_F(CorruptedMessageTest, testCorruptedMessageWithoutMessageId)
             wireFormat->unmarshal(nullptr, dis.get());
     }
     catch (Exception& e)
+    {
+        caughtException = true;
+    }
+    catch (std::exception&)
     {
         caughtException = true;
     }
@@ -873,6 +900,10 @@ TEST_F(CorruptedMessageTest, testMaxConsecutiveErrors)
             FAIL() << ("Corrupted message should throw exception");
         }
         catch (Exception& e)
+        {
+            corruptedCount++;
+        }
+        catch (std::exception&)
         {
             corruptedCount++;
         }
@@ -951,6 +982,11 @@ TEST_F(CorruptedMessageTest, testPoisonAckSent)
         FAIL() << (std::string("POISON_ACK marshal should succeed: ") +
                    e.getMessage());
     }
+    catch (std::exception& e)
+    {
+        FAIL() << (std::string("POISON_ACK marshal should succeed: ") +
+                   e.what());
+    }
 
     // Verify we wrote some bytes
     std::pair<unsigned char*, int> ackData = baos->toByteArray();
@@ -1004,6 +1040,10 @@ TEST_F(CorruptedMessageTest, testStreamResyncAfterSingleCorruption)
         ASSERT_TRUE(cmd != nullptr);
     }
     catch (Exception& e)
+    {
+        FAIL() << ("Valid message should unmarshal successfully");
+    }
+    catch (std::exception&)
     {
         FAIL() << ("Valid message should unmarshal successfully");
     }
@@ -1075,6 +1115,10 @@ TEST_F(CorruptedMessageTest, testCorruptedMessageDuringFailover)
         {
             errorCount++;
         }
+        catch (std::exception&)
+        {
+            errorCount++;
+        }
     }
 
     ASSERT_EQ(10, errorCount);
@@ -1123,6 +1167,10 @@ TEST_F(CorruptedMessageTest, testCorruptionInDifferentMessageParts)
         {
             caught = true;
         }
+        catch (std::exception&)
+        {
+            caught = true;
+        }
         ASSERT_TRUE(caught) << ("Early corruption should throw");
     }
 
@@ -1142,6 +1190,10 @@ TEST_F(CorruptedMessageTest, testCorruptionInDifferentMessageParts)
             wireFormat->unmarshal(nullptr, dis.get());
         }
         catch (Exception& e)
+        {
+            caught = true;
+        }
+        catch (std::exception&)
         {
             caught = true;
         }
@@ -1165,6 +1217,10 @@ TEST_F(CorruptedMessageTest, testCorruptionInDifferentMessageParts)
             wireFormat->unmarshal(nullptr, dis.get());
         }
         catch (Exception& e)
+        {
+            caught = true;
+        }
+        catch (std::exception&)
         {
             caught = true;
         }
@@ -1229,6 +1285,10 @@ TEST_F(CorruptedMessageTest, testCorruptedMessageNonDurableConsumer)
     {
         caughtException = true;
     }
+    catch (std::exception&)
+    {
+        caughtException = true;
+    }
 
     ASSERT_TRUE(caughtException)
         << ("Non-durable consumer corrupted message should throw exception");
@@ -1290,6 +1350,10 @@ TEST_F(CorruptedMessageTest, testCorruptedMessageDurableTopicSubscriber)
             wireFormat->unmarshal(nullptr, dis.get());
     }
     catch (Exception& e)
+    {
+        caughtException = true;
+    }
+    catch (std::exception&)
     {
         caughtException = true;
     }
@@ -1376,6 +1440,12 @@ TEST_F(CorruptedMessageTest, testPoisonAckForDurableSubscriber)
                                "should succeed: ") +
                    e.getMessage());
     }
+    catch (std::exception& e)
+    {
+        FAIL() << (std::string("POISON_ACK marshal for durable subscriber "
+                               "should succeed: ") +
+                   e.what());
+    }
 
     std::pair<unsigned char*, int> ackData = baos->toByteArray();
     std::vector<unsigned char>     ackBytes(ackData.first,
@@ -1443,7 +1513,7 @@ TEST_F(CorruptedMessageTest, testEOFDuringMessageIdRead)
         caughtException = true;
         exceptionType   = "EOFException";
     }
-    catch (IOException& e)
+    catch (activemq::exceptions::IOException& e)
     {
         caughtException = true;
         exceptionType   = "IOException";
@@ -1452,6 +1522,11 @@ TEST_F(CorruptedMessageTest, testEOFDuringMessageIdRead)
     {
         caughtException = true;
         exceptionType   = "Exception";
+    }
+    catch (std::exception&)
+    {
+        caughtException = true;
+        exceptionType   = "std::exception";
     }
 
     ASSERT_TRUE(caughtException)
@@ -1517,11 +1592,15 @@ TEST_F(CorruptedMessageTest, testEOFDuringPropertiesRead)
     {
         caughtException = true;
     }
-    catch (IOException& e)
+    catch (activemq::exceptions::IOException& e)
     {
         caughtException = true;
     }
     catch (Exception& e)
+    {
+        caughtException = true;
+    }
+    catch (std::exception&)
     {
         caughtException = true;
     }
@@ -1594,11 +1673,15 @@ TEST_F(CorruptedMessageTest, testEOFDuringBodyRead)
     {
         caughtException = true;
     }
-    catch (IOException& e)
+    catch (activemq::exceptions::IOException& e)
     {
         caughtException = true;
     }
     catch (Exception& e)
+    {
+        caughtException = true;
+    }
+    catch (std::exception&)
     {
         caughtException = true;
     }

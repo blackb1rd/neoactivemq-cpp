@@ -21,7 +21,6 @@
 #include <decaf/lang/Comparable.h>
 #include <decaf/lang/Number.h>
 #include <decaf/lang/String.h>
-#include <decaf/lang/exceptions/NumberFormatException.h>
 #include <decaf/util/Config.h>
 #include <string>
 
@@ -69,13 +68,13 @@ namespace lang
         /**
          * Constructs a new Double and attempts to convert the given string to a
          * double value, assigning it to the new object is successful or
-         * throwing a NumberFormatException if the string is not a properly
+         * throwing a std::invalid_argument if the string is not a properly
          * formatted double.
          *
          * @param value
          *      The string to convert to a primitive type to wrap.
          *
-         * @throws NumberFormatException if the string is not a a valid double.
+         * @throws std::invalid_argument if the string is not a a valid double.
          */
         Double(const String& value);
 
@@ -338,7 +337,7 @@ namespace lang
          *
          * @return a double parsed from the passed string
          *
-         * @throws NumberFormatException
+         * @throws std::invalid_argument
          */
         static double parseDouble(const String& value);
 
@@ -430,7 +429,7 @@ namespace lang
          *
          * @return a new Double instance wrapping the double parsed from value
          *
-         * @throws NumberFormatException on error.
+         * @throws std::invalid_argument on error.
          */
         static Double valueOf(const String& value);
 

@@ -22,11 +22,14 @@
 
 #include <zlib.h>
 
-#include <decaf/lang/exceptions/RuntimeException.h>
+#include <decaf/lang/Exception.h>
+
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <stdexcept>
+#include <string>
 
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::zip;
 
@@ -68,9 +71,7 @@ namespace util
             {
                 if (handle == NULL)
                 {
-                    throw NullPointerException(
-                        __FILE__,
-                        __LINE__,
+                    throw activemq::exceptions::NullPointerException(
                         "Error While initializing the Decompression Library.");
                 }
 
@@ -100,7 +101,7 @@ namespace util
 
                 if (result != Z_OK)
                 {
-                    throw RuntimeException(
+                    throw activemq::exceptions::NullPointerException(
                         __FILE__,
                         __LINE__,
                         "Error While initializing the Decompression Library.");
@@ -111,9 +112,7 @@ namespace util
             {
                 if (handle == NULL)
                 {
-                    throw NullPointerException(
-                        __FILE__,
-                        __LINE__,
+                    throw activemq::exceptions::NullPointerException(
                         "Error While initializing the Decompression Library.");
                 }
 
@@ -130,9 +129,7 @@ namespace util
             {
                 if (handle == NULL)
                 {
-                    throw NullPointerException(
-                        __FILE__,
-                        __LINE__,
+                    throw activemq::exceptions::NullPointerException(
                         "Error While initializing the Decompression Library.");
                 }
 
@@ -193,24 +190,25 @@ void Inflater::setInput(const unsigned char* buffer,
     {
         if (buffer == NULL)
         {
-            throw NullPointerException(__FILE__,
-                                       __LINE__,
-                                       "Passed Buffer was NULL.");
+            throw activemq::exceptions::NullPointerException(
+                __FILE__,
+                __LINE__,
+                "Passed Buffer was NULL.");
         }
 
         if (this->data->stream == NULL)
         {
-            throw IllegalStateException(
+            throw activemq::exceptions::IllegalStateException(
                 __FILE__,
                 __LINE__,
-                "The Inflater end method has already been called.");
+                "The Inflater end method has already been "
+                "called.");
         }
 
         if (offset + length > size)
         {
-            throw IndexOutOfBoundsException(
-                __FILE__,
-                __LINE__,
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
                 "The offset + length given is greater than the specified "
                 "buffer size.");
         }
@@ -218,10 +216,28 @@ void Inflater::setInput(const unsigned char* buffer,
         this->data->stream->avail_in = (uInt)length;
         this->data->stream->next_in  = (Bytef*)(buffer + offset);
     }
-    DECAF_CATCH_RETHROW(NullPointerException)
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCH_RETHROW(IllegalStateException)
-    DECAF_CATCHALL_THROW(IllegalStateException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (std::invalid_argument&)
+    {
+        throw;
+    }
+    catch (activemq::exceptions::NullPointerException&)
+    {
+        throw;
+    }
+    catch (activemq::exceptions::IllegalStateException&)
+    {
+        throw;
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::IllegalStateException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -269,24 +285,25 @@ void Inflater::setDictionary(const unsigned char* buffer,
     {
         if (buffer == NULL)
         {
-            throw NullPointerException(__FILE__,
-                                       __LINE__,
-                                       "Passed Buffer was NULL.");
+            throw activemq::exceptions::NullPointerException(
+                __FILE__,
+                __LINE__,
+                "Passed Buffer was NULL.");
         }
 
         if (this->data->stream == NULL)
         {
-            throw IllegalStateException(
+            throw activemq::exceptions::IllegalStateException(
                 __FILE__,
                 __LINE__,
-                "The Inflater end method has already been called.");
+                "The Inflater end method has already been "
+                "called.");
         }
 
         if (offset + length > size)
         {
-            throw IndexOutOfBoundsException(
-                __FILE__,
-                __LINE__,
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
                 "The offset + length given is greater than the specified "
                 "buffer size.");
         }
@@ -303,17 +320,33 @@ void Inflater::setDictionary(const unsigned char* buffer,
                                           (uInt)length);
         if (result != Z_OK)
         {
-            throw IllegalArgumentException(
-                __FILE__,
-                __LINE__,
+            throw activemq::exceptions::InvalidArgumentException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
                 "Dictionary given does not match required checksum value.");
         }
     }
-    DECAF_CATCH_RETHROW(NullPointerException)
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCH_RETHROW(IllegalStateException)
-    DECAF_CATCH_RETHROW(IllegalArgumentException)
-    DECAF_CATCHALL_THROW(IllegalStateException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (std::invalid_argument&)
+    {
+        throw;
+    }
+    catch (activemq::exceptions::NullPointerException&)
+    {
+        throw;
+    }
+    catch (activemq::exceptions::IllegalStateException&)
+    {
+        throw;
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::IllegalStateException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -376,43 +409,42 @@ int Inflater::inflate(unsigned char* buffer, int size, int offset, int length)
     {
         if (buffer == NULL)
         {
-            throw NullPointerException(__FILE__,
-                                       __LINE__,
-                                       "Passed Buffer was NULL.");
+            throw activemq::exceptions::NullPointerException(
+                __FILE__,
+                __LINE__,
+                "Passed Buffer was NULL.");
         }
 
         if (this->data->stream == NULL)
         {
-            throw IllegalStateException(
+            throw activemq::exceptions::IllegalStateException(
                 __FILE__,
                 __LINE__,
-                "The Inflater end method has already been called.");
+                "The Inflater end method has already been "
+                "called.");
         }
 
         if (size < 0)
         {
-            throw IndexOutOfBoundsException(__FILE__,
-                                            __LINE__,
-                                            "size parameter out of Bounds: %d.",
-                                            size);
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+                "size parameter out of Bounds: " + std::to_string(size) + ".");
         }
 
         if (offset > size || offset < 0)
         {
-            throw IndexOutOfBoundsException(
-                __FILE__,
-                __LINE__,
-                "offset parameter out of Bounds: %d.",
-                offset);
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+                "offset parameter out of Bounds: " + std::to_string(offset) +
+                ".");
         }
 
         if (length < 0 || length > size - offset)
         {
-            throw IndexOutOfBoundsException(
-                __FILE__,
-                __LINE__,
-                "length parameter out of Bounds: %d.",
-                length);
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+                "length parameter out of Bounds: " + std::to_string(length) +
+                ".");
         }
 
         unsigned long outStart = this->data->stream->total_out;
@@ -450,11 +482,29 @@ int Inflater::inflate(unsigned char* buffer, int size, int offset, int length)
 
         return (int)(this->data->stream->total_out - outStart);
     }
-    DECAF_CATCH_RETHROW(NullPointerException)
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (std::invalid_argument&)
+    {
+        throw;
+    }
+    catch (activemq::exceptions::NullPointerException&)
+    {
+        throw;
+    }
+    catch (activemq::exceptions::IllegalStateException&)
+    {
+        throw;
+    }
     DECAF_CATCH_RETHROW(DataFormatException)
-    DECAF_CATCH_RETHROW(IllegalStateException)
-    DECAF_CATCHALL_THROW(IllegalStateException)
+    catch (...)
+    {
+        throw activemq::exceptions::IllegalStateException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -486,9 +536,10 @@ long long Inflater::getAdler() const
 {
     if (this->data->stream == NULL)
     {
-        throw IllegalStateException(__FILE__,
-                                    __LINE__,
-                                    "The Inflater has already been ended.");
+        throw activemq::exceptions::IllegalStateException(
+            __FILE__,
+            __LINE__,
+            "The Inflater has already been ended.");
     }
 
     return this->data->stream->adler;
@@ -499,9 +550,10 @@ long long Inflater::getBytesRead() const
 {
     if (this->data->stream == NULL)
     {
-        throw IllegalStateException(__FILE__,
-                                    __LINE__,
-                                    "The Inflater has already been ended.");
+        throw activemq::exceptions::IllegalStateException(
+            __FILE__,
+            __LINE__,
+            "The Inflater has already been ended.");
     }
 
     return this->data->stream->total_in;
@@ -512,9 +564,10 @@ long long Inflater::getBytesWritten() const
 {
     if (this->data->stream == NULL)
     {
-        throw IllegalStateException(__FILE__,
-                                    __LINE__,
-                                    "The Inflater has already been ended.");
+        throw activemq::exceptions::IllegalStateException(
+            __FILE__,
+            __LINE__,
+            "The Inflater has already been ended.");
     }
 
     return this->data->stream->total_out;
@@ -525,9 +578,10 @@ void Inflater::reset()
 {
     if (this->data->stream == NULL)
     {
-        throw IllegalStateException(__FILE__,
-                                    __LINE__,
-                                    "The Inflater has already been ended.");
+        throw activemq::exceptions::IllegalStateException(
+            __FILE__,
+            __LINE__,
+            "The Inflater has already been ended.");
     }
 
     InflaterData::resetZlibStream(this->data);

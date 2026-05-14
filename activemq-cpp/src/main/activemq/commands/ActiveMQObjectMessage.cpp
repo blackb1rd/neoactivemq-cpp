@@ -34,7 +34,6 @@ using namespace activemq::commands;
 using namespace activemq::exceptions;
 using namespace decaf::io;
 
-using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::zip;
 
@@ -148,7 +147,7 @@ std::vector<unsigned char> ActiveMQObjectMessage::getObjectBytes() const
 
                 uncompressed.resize((std::size_t)length);
             }
-            catch (IOException& ex)
+            catch (activemq::exceptions::IOException& ex)
             {
                 throw CMSExceptionSupport::create(ex);
             }

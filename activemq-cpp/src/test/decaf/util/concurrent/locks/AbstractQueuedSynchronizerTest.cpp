@@ -17,6 +17,9 @@
 
 #include <gtest/gtest.h>
 
+#include <stdexcept>
+
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/lang/Runnable.h>
 #include <decaf/lang/System.h>
 #include <decaf/lang/Thread.h>
@@ -25,11 +28,11 @@
 #include <decaf/util/concurrent/TimeUnit.h>
 #include <decaf/util/concurrent/locks/AbstractQueuedSynchronizer.h>
 #include <decaf/util/concurrent/locks/LockSupport.h>
+#include <string>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 using namespace decaf::util::concurrent::locks;
@@ -71,7 +74,10 @@ public:
     {
         if (getState() == 0)
         {
-            throw IllegalMonitorStateException();
+            throw activemq::exceptions::IllegalStateException(
+                __FILE__,
+                __LINE__,
+                "Illegal monitor state");
         }
         setState(0);
         return true;
@@ -143,7 +149,7 @@ public:
         {
             mutex->acquireInterruptibly(1);
         }
-        catch (InterruptedException& success)
+        catch (activemq::exceptions::InterruptedException& success)
         {
         }
         catch (Exception& ex)
@@ -187,7 +193,7 @@ public:
             mutex->acquireInterruptibly(1);
             parent->threadFail("Should have been interrupted.");
         }
-        catch (InterruptedException& success)
+        catch (activemq::exceptions::InterruptedException& success)
         {
         }
         catch (Exception& ex)
@@ -284,7 +290,7 @@ TEST_F(AbstractQueuedSynchronizerTest, testIsQueuedNPE)
         mutex.isQueued(NULL);
         shouldThrow();
     }
-    catch (NullPointerException& success)
+    catch (activemq::exceptions::NullPointerException& success)
     {
     }
 }
@@ -573,27 +579,26 @@ TEST_F(AbstractQueuedSynchronizerTest, testGetSharedQueuedThreads)
 namespace
 {
 
-class TestInterruptedException2Runnable : public Runnable
+class TestRuntimeError2Runnable : public Runnable
 {
 private:
     TestMutex*                      mutex;
     AbstractQueuedSynchronizerTest* parent;
 
 private:
-    TestInterruptedException2Runnable(const TestInterruptedException2Runnable&);
-    TestInterruptedException2Runnable operator=(
-        const TestInterruptedException2Runnable&);
+    TestRuntimeError2Runnable(const TestRuntimeError2Runnable&);
+    TestRuntimeError2Runnable operator=(const TestRuntimeError2Runnable&);
 
 public:
-    TestInterruptedException2Runnable(AbstractQueuedSynchronizerTest* parent,
-                                      TestMutex*                      mutex)
+    TestRuntimeError2Runnable(AbstractQueuedSynchronizerTest* parent,
+                              TestMutex*                      mutex)
         : Runnable(),
           mutex(mutex),
           parent(parent)
     {
     }
 
-    virtual ~TestInterruptedException2Runnable()
+    virtual ~TestRuntimeError2Runnable()
     {
     }
 
@@ -606,7 +611,7 @@ public:
                 AbstractQueuedSynchronizerTest::MEDIUM_DELAY_MS * 1000 * 1000);
             parent->threadShouldThrow();
         }
-        catch (InterruptedException& success)
+        catch (activemq::exceptions::InterruptedException& success)
         {
         }
     }
@@ -615,12 +620,12 @@ public:
 }  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(AbstractQueuedSynchronizerTest, testInterruptedException2)
+TEST_F(AbstractQueuedSynchronizerTest, testRuntimeError2)
 {
     TestMutex mutex;
     mutex.acquire(1);
-    TestInterruptedException2Runnable run(this, &mutex);
-    Thread                            t(&run);
+    TestRuntimeError2Runnable run(this, &mutex);
+    Thread                    t(&run);
 
     try
     {
@@ -891,7 +896,7 @@ TEST_F(AbstractQueuedSynchronizerTest, testAwaitIllegalMonitor)
         c->await();
         shouldThrow();
     }
-    catch (IllegalMonitorStateException& success)
+    catch (std::logic_error& success)
     {
     }
     catch (Exception& ex)
@@ -911,7 +916,7 @@ TEST_F(AbstractQueuedSynchronizerTest, testSignalIllegalMonitor)
         c->signal();
         shouldThrow();
     }
-    catch (IllegalMonitorStateException& success)
+    catch (std::logic_error& success)
     {
     }
     catch (Exception& ex)
@@ -1015,7 +1020,7 @@ public:
             cond->await();
             mutex->release(1);
         }
-        catch (InterruptedException& e)
+        catch (activemq::exceptions::InterruptedException& e)
         {
             parent->threadUnexpectedException();
         }
@@ -1057,7 +1062,7 @@ TEST_F(AbstractQueuedSynchronizerTest, testHasWaitersNPE)
         mutex.hasWaiters(NULL);
         shouldThrow();
     }
-    catch (NullPointerException& success)
+    catch (activemq::exceptions::NullPointerException& success)
     {
     }
     catch (Exception& ex)
@@ -1075,7 +1080,7 @@ TEST_F(AbstractQueuedSynchronizerTest, testGetWaitQueueLengthNPE)
         mutex.getWaitQueueLength(NULL);
         shouldThrow();
     }
-    catch (NullPointerException& success)
+    catch (activemq::exceptions::NullPointerException& success)
     {
     }
     catch (Exception& ex)
@@ -1093,7 +1098,7 @@ TEST_F(AbstractQueuedSynchronizerTest, testGetWaitingThreadsNPE)
         mutex.getWaitingThreads(NULL);
         shouldThrow();
     }
-    catch (NullPointerException& success)
+    catch (activemq::exceptions::NullPointerException& success)
     {
     }
     catch (Exception& ex)
@@ -1113,7 +1118,7 @@ TEST_F(AbstractQueuedSynchronizerTest, testHasWaitersIAE)
         mutex2.hasWaiters(c);
         shouldThrow();
     }
-    catch (IllegalArgumentException& success)
+    catch (std::invalid_argument& success)
     {
     }
     catch (Exception& ex)
@@ -1133,7 +1138,7 @@ TEST_F(AbstractQueuedSynchronizerTest, testHasWaitersIMSE)
         mutex.hasWaiters(c);
         shouldThrow();
     }
-    catch (IllegalMonitorStateException& success)
+    catch (activemq::exceptions::IllegalMonitorStateException& success)
     {
     }
     catch (Exception& ex)
@@ -1154,7 +1159,7 @@ TEST_F(AbstractQueuedSynchronizerTest, testGetWaitQueueLengthIAE)
         mutex2.getWaitQueueLength(c);
         shouldThrow();
     }
-    catch (IllegalArgumentException& success)
+    catch (std::invalid_argument& success)
     {
     }
     catch (Exception& ex)
@@ -1174,7 +1179,7 @@ TEST_F(AbstractQueuedSynchronizerTest, testGetWaitQueueLengthIMSE)
         mutex.getWaitQueueLength(c);
         shouldThrow();
     }
-    catch (IllegalMonitorStateException& success)
+    catch (activemq::exceptions::IllegalMonitorStateException& success)
     {
     }
     catch (Exception& ex)
@@ -1195,7 +1200,7 @@ TEST_F(AbstractQueuedSynchronizerTest, testGetWaitingThreadsIAE)
         mutex2.getWaitingThreads(c);
         shouldThrow();
     }
-    catch (IllegalArgumentException& success)
+    catch (std::invalid_argument& success)
     {
     }
     catch (Exception& ex)
@@ -1215,7 +1220,7 @@ TEST_F(AbstractQueuedSynchronizerTest, testGetWaitingThreadsIMSE)
         mutex.getWaitingThreads(c);
         shouldThrow();
     }
-    catch (IllegalMonitorStateException& success)
+    catch (activemq::exceptions::IllegalMonitorStateException& success)
     {
     }
     catch (Exception& ex)
@@ -1265,7 +1270,7 @@ public:
             cond->await();
             mutex->release(1);
         }
-        catch (InterruptedException& e)
+        catch (activemq::exceptions::InterruptedException& e)
         {
             parent->threadUnexpectedException();
         }
@@ -1347,7 +1352,7 @@ public:
             cond->await();
             mutex->release(1);
         }
-        catch (InterruptedException& e)
+        catch (activemq::exceptions::InterruptedException& e)
         {
             parent->threadUnexpectedException();
         }
@@ -1392,7 +1397,7 @@ public:
             cond->await();
             mutex->release(1);
         }
-        catch (InterruptedException& e)
+        catch (activemq::exceptions::InterruptedException& e)
         {
             parent->threadUnexpectedException();
         }
@@ -1481,7 +1486,7 @@ public:
             cond->await();
             mutex->release(1);
         }
-        catch (InterruptedException& e)
+        catch (activemq::exceptions::InterruptedException& e)
         {
             parent->threadUnexpectedException();
         }
@@ -1527,7 +1532,7 @@ public:
             cond->await();
             mutex->release(1);
         }
-        catch (InterruptedException& e)
+        catch (activemq::exceptions::InterruptedException& e)
         {
             parent->threadUnexpectedException();
         }
@@ -1704,7 +1709,7 @@ public:
             mutex->release(1);
             parent->threadShouldThrow();
         }
-        catch (InterruptedException& success)
+        catch (activemq::exceptions::InterruptedException& success)
         {
         }
     }
@@ -1775,7 +1780,7 @@ public:
             mutex->release(1);
             parent->threadShouldThrow();
         }
-        catch (InterruptedException& success)
+        catch (activemq::exceptions::InterruptedException& success)
         {
         }
     }
@@ -1847,7 +1852,7 @@ public:
             mutex->release(1);
             parent->threadShouldThrow();
         }
-        catch (InterruptedException& success)
+        catch (activemq::exceptions::InterruptedException& success)
         {
         }
     }
@@ -1915,7 +1920,7 @@ public:
             cond->await();
             mutex->release(1);
         }
-        catch (InterruptedException& e)
+        catch (activemq::exceptions::InterruptedException& e)
         {
             parent->threadUnexpectedException();
         }
@@ -2022,7 +2027,7 @@ public:
             latch->acquireSharedInterruptibly(0);
             parent->threadAssertTrue(latch->isSignalled());
         }
-        catch (InterruptedException& e)
+        catch (activemq::exceptions::InterruptedException& e)
         {
             parent->threadUnexpectedException();
         }
@@ -2046,7 +2051,7 @@ TEST_F(AbstractQueuedSynchronizerTest, testAcquireSharedInterruptibly)
         ASSERT_TRUE(l.isSignalled());
         t.join();
     }
-    catch (InterruptedException& e)
+    catch (activemq::exceptions::InterruptedException& e)
     {
         unexpectedException();
     }
@@ -2090,7 +2095,7 @@ public:
                 AbstractQueuedSynchronizerTest::MEDIUM_DELAY_MS * 1000 * 1000));
             parent->threadAssertTrue(latch->isSignalled());
         }
-        catch (InterruptedException& e)
+        catch (activemq::exceptions::InterruptedException& e)
         {
             parent->threadUnexpectedException();
         }
@@ -2114,7 +2119,7 @@ TEST_F(AbstractQueuedSynchronizerTest, testAsquireSharedTimed)
         ASSERT_TRUE(l.isSignalled());
         t.join();
     }
-    catch (InterruptedException& e)
+    catch (activemq::exceptions::InterruptedException& e)
     {
         unexpectedException();
     }
@@ -2124,21 +2129,20 @@ TEST_F(AbstractQueuedSynchronizerTest, testAsquireSharedTimed)
 namespace
 {
 
-class TestAcquireSharedInterruptiblyInterruptedExceptionRunnable
-    : public Runnable
+class TestAcquireSharedInterruptiblyRuntimeErrorRunnable : public Runnable
 {
 private:
     BooleanLatch*                   latch;
     AbstractQueuedSynchronizerTest* parent;
 
 private:
-    TestAcquireSharedInterruptiblyInterruptedExceptionRunnable(
-        const TestAcquireSharedInterruptiblyInterruptedExceptionRunnable&);
-    TestAcquireSharedInterruptiblyInterruptedExceptionRunnable operator=(
-        const TestAcquireSharedInterruptiblyInterruptedExceptionRunnable&);
+    TestAcquireSharedInterruptiblyRuntimeErrorRunnable(
+        const TestAcquireSharedInterruptiblyRuntimeErrorRunnable&);
+    TestAcquireSharedInterruptiblyRuntimeErrorRunnable operator=(
+        const TestAcquireSharedInterruptiblyRuntimeErrorRunnable&);
 
 public:
-    TestAcquireSharedInterruptiblyInterruptedExceptionRunnable(
+    TestAcquireSharedInterruptiblyRuntimeErrorRunnable(
         AbstractQueuedSynchronizerTest* parent,
         BooleanLatch*                   latch)
         : Runnable(),
@@ -2147,7 +2151,7 @@ public:
     {
     }
 
-    virtual ~TestAcquireSharedInterruptiblyInterruptedExceptionRunnable()
+    virtual ~TestAcquireSharedInterruptiblyRuntimeErrorRunnable()
     {
     }
 
@@ -2159,7 +2163,7 @@ public:
             latch->acquireSharedInterruptibly(0);
             parent->threadShouldThrow();
         }
-        catch (InterruptedException& e)
+        catch (activemq::exceptions::InterruptedException& e)
         {
         }
     }
@@ -2168,11 +2172,11 @@ public:
 
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(AbstractQueuedSynchronizerTest,
-       testAcquireSharedInterruptiblyInterruptedException)
+       testAcquireSharedInterruptiblyRuntimeError)
 {
-    BooleanLatch                                               l;
-    TestAcquireSharedInterruptiblyInterruptedExceptionRunnable run(this, &l);
-    Thread                                                     t(&run);
+    BooleanLatch                                       l;
+    TestAcquireSharedInterruptiblyRuntimeErrorRunnable run(this, &l);
+    Thread                                             t(&run);
 
     t.start();
     try
@@ -2181,7 +2185,7 @@ TEST_F(AbstractQueuedSynchronizerTest,
         t.interrupt();
         t.join();
     }
-    catch (InterruptedException& e)
+    catch (activemq::exceptions::InterruptedException& e)
     {
         unexpectedException();
     }
@@ -2191,20 +2195,20 @@ TEST_F(AbstractQueuedSynchronizerTest,
 namespace
 {
 
-class TestAcquireSharedNanosInterruptedExceptionRunnable : public Runnable
+class TestAcquireSharedNanosRuntimeErrorRunnable : public Runnable
 {
 private:
     BooleanLatch*                   latch;
     AbstractQueuedSynchronizerTest* parent;
 
 private:
-    TestAcquireSharedNanosInterruptedExceptionRunnable(
-        const TestAcquireSharedNanosInterruptedExceptionRunnable&);
-    TestAcquireSharedNanosInterruptedExceptionRunnable operator=(
-        const TestAcquireSharedNanosInterruptedExceptionRunnable&);
+    TestAcquireSharedNanosRuntimeErrorRunnable(
+        const TestAcquireSharedNanosRuntimeErrorRunnable&);
+    TestAcquireSharedNanosRuntimeErrorRunnable operator=(
+        const TestAcquireSharedNanosRuntimeErrorRunnable&);
 
 public:
-    TestAcquireSharedNanosInterruptedExceptionRunnable(
+    TestAcquireSharedNanosRuntimeErrorRunnable(
         AbstractQueuedSynchronizerTest* parent,
         BooleanLatch*                   latch)
         : Runnable(),
@@ -2213,7 +2217,7 @@ public:
     {
     }
 
-    virtual ~TestAcquireSharedNanosInterruptedExceptionRunnable()
+    virtual ~TestAcquireSharedNanosRuntimeErrorRunnable()
     {
     }
 
@@ -2227,7 +2231,7 @@ public:
                 AbstractQueuedSynchronizerTest::SMALL_DELAY_MS * 1000 * 1000);
             parent->threadShouldThrow();
         }
-        catch (InterruptedException& e)
+        catch (activemq::exceptions::InterruptedException& e)
         {
         }
     }
@@ -2235,12 +2239,11 @@ public:
 }  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(AbstractQueuedSynchronizerTest,
-       testAcquireSharedNanosInterruptedException)
+TEST_F(AbstractQueuedSynchronizerTest, testAcquireSharedNanosRuntimeError)
 {
-    BooleanLatch                                       l;
-    TestAcquireSharedNanosInterruptedExceptionRunnable run(this, &l);
-    Thread                                             t(&run);
+    BooleanLatch                               l;
+    TestAcquireSharedNanosRuntimeErrorRunnable run(this, &l);
+    Thread                                     t(&run);
 
     t.start();
     try
@@ -2250,7 +2253,7 @@ TEST_F(AbstractQueuedSynchronizerTest,
         t.interrupt();
         t.join();
     }
-    catch (InterruptedException& e)
+    catch (activemq::exceptions::InterruptedException& e)
     {
         unexpectedException();
     }
@@ -2294,7 +2297,7 @@ public:
                 0,
                 AbstractQueuedSynchronizerTest::SMALL_DELAY_MS * 1000 * 1000));
         }
-        catch (InterruptedException& e)
+        catch (activemq::exceptions::InterruptedException& e)
         {
             parent->threadUnexpectedException();
         }
@@ -2316,7 +2319,7 @@ TEST_F(AbstractQueuedSynchronizerTest, testAcquireSharedNanosTimeout)
         ASSERT_TRUE(!l.isSignalled());
         t.join();
     }
-    catch (InterruptedException& e)
+    catch (activemq::exceptions::InterruptedException& e)
     {
         unexpectedException();
     }

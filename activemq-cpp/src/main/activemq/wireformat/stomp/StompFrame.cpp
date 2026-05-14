@@ -19,10 +19,14 @@
 
 #include <string>
 
+#include <stdexcept>
+
 #include <decaf/lang/Character.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
 
 #include <activemq/exceptions/ActiveMQException.h>
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <activemq/exceptions/IoExceptions.h>
+#include <activemq/wireformat/openwire/marshal/OpenWireMarshalCatchMacros.h>
 #include <activemq/wireformat/stomp/StompCommandConstants.h>
 
 using namespace std;
@@ -31,9 +35,7 @@ using namespace activemq::exceptions;
 using namespace activemq::wireformat;
 using namespace activemq::wireformat::stomp;
 using namespace decaf;
-using namespace decaf::io;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 StompFrame::StompFrame()
@@ -80,7 +82,10 @@ void StompFrame::toStream(decaf::io::DataOutputStream* stream) const
 {
     if (stream == NULL)
     {
-        throw NullPointerException(__FILE__, __LINE__, "Stream Passed is Null");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "Stream Passed is Null");
     }
 
     // Write the command.
@@ -137,9 +142,10 @@ void StompFrame::fromStream(decaf::io::DataInputStream* in)
 {
     if (in == NULL)
     {
-        throw decaf::io::IOException(__FILE__,
-                                     __LINE__,
-                                     "DataInputStream passed is NULL");
+        throw activemq::exceptions::IOException(
+            __FILE__,
+            __LINE__,
+            "DataInputStream passed is NULL");
     }
 
     try
@@ -153,9 +159,10 @@ void StompFrame::fromStream(decaf::io::DataInputStream* in)
         // Read the body.
         readBody(in);
     }
-    AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(decaf::lang::Exception, decaf::io::IOException)
-    AMQ_CATCHALL_THROW(decaf::io::IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(decaf::lang::Exception,
+                                activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -191,9 +198,10 @@ void StompFrame::readCommandHeader(decaf::io::DataInputStream* in)
             }
         }
     }
-    AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(decaf::lang::Exception, decaf::io::IOException)
-    AMQ_CATCHALL_THROW(decaf::io::IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(decaf::lang::Exception,
+                                activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -213,7 +221,7 @@ void StompFrame::readHeaders(decaf::io::DataInputStream* in)
             if (numChars == 0)
             {
                 // should never get here
-                throw decaf::io::IOException(
+                throw activemq::exceptions::IOException(
                     __FILE__,
                     __LINE__,
                     "StompWireFormat::readStompHeaders: no characters read");
@@ -253,9 +261,10 @@ void StompFrame::readHeaders(decaf::io::DataInputStream* in)
             }
         }
     }
-    AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(decaf::lang::Exception, decaf::io::IOException)
-    AMQ_CATCHALL_THROW(decaf::io::IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(decaf::lang::Exception,
+                                activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -288,14 +297,16 @@ std::size_t StompFrame::readHeaderLine(std::vector<unsigned char>& buffer,
         }
 
         // If we get here something bad must have happened.
-        throw decaf::io::IOException(__FILE__,
-                                     __LINE__,
-                                     "StompWireFormat::readStompHeaderLine: "
-                                     "Unrecoverable, error condition");
+        throw activemq::exceptions::IOException(
+            __FILE__,
+            __LINE__,
+            "StompWireFormat::readStompHeaderLine: "
+            "Unrecoverable, error condition");
     }
-    AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(decaf::lang::Exception, decaf::io::IOException)
-    AMQ_CATCHALL_THROW(decaf::io::IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(decaf::lang::Exception,
+                                activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -339,7 +350,7 @@ void StompFrame::readBody(decaf::io::DataInputStream* in)
             // Content Length read, now pop the end terminator off (\0\n).
             if (in->readByte() != '\0')
             {
-                throw decaf::io::IOException(
+                throw activemq::exceptions::IOException(
                     __FILE__,
                     __LINE__,
                     "StompWireFormat::readStompBody: "
@@ -364,7 +375,8 @@ void StompFrame::readBody(decaf::io::DataInputStream* in)
             }
         }
     }
-    AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(decaf::lang::Exception, decaf::io::IOException)
-    AMQ_CATCHALL_THROW(decaf::io::IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(decaf::lang::Exception,
+                                activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }

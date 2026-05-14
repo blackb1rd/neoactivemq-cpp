@@ -24,6 +24,7 @@
 #include <decaf/io/OutputStream.h>
 #include <decaf/net/URL.h>
 #include <decaf/net/UnknownServiceException.h>
+#include <stdexcept>
 
 namespace decaf
 {
@@ -125,7 +126,7 @@ namespace net
          *
          * @param newValue
          *      the value of the flag to be set.
-         * @throws IllegalStateException
+         * @throws std::logic_error
          *      if this method attempts to change the flag after the connection
          * has been established.
          */
@@ -281,7 +282,7 @@ namespace net
          *
          * @param newValue
          *      the value of the flag to be set.
-         * @throws IllegalStateException
+         * @throws std::logic_error
          *      if this method attempts to change the flag after the connection
          * has been established.
          */
@@ -303,7 +304,7 @@ namespace net
          *
          * @param timeout
          *      the connecting timeout in milliseconds.
-         * @throws IllegalArgumentException
+         * @throws std::invalid_argument
          *      if the parameter timeout is less than zero.
          */
         void setConnectTimeout(int timeout);
@@ -325,7 +326,7 @@ namespace net
          *
          * @param timeout
          *      the reading timeout in milliseconds.
-         * @throws IllegalArgumentException
+         * @throws std::invalid_argument
          *      if the parameter timeout is less than zero.
          */
         void setReadTimeout(int timeout);
@@ -464,7 +465,7 @@ namespace net
          *
          * @param newValue
          *      the time in milliseconds since January 1, 1970 GMT.
-         * @throws IllegalStateException
+         * @throws std::logic_error
          *      if this URLConnection has already been connected.
          */
         void setIfModifiedSince(long long newValue);

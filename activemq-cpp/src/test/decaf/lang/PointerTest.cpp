@@ -20,17 +20,17 @@
 #include <decaf/lang/Pointer.h>
 #include <decaf/lang/Runnable.h>
 #include <decaf/lang/Thread.h>
-#include <decaf/lang/exceptions/ClassCastException.h>
 #include <decaf/util/concurrent/CountDownLatch.h>
 
 #include <map>
+#include <stdexcept>
 #include <string>
+#include <typeinfo>
 #include <vector>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util::concurrent;
 
 class PointerTest : public ::testing::Test
@@ -353,21 +353,17 @@ TEST_F(PointerTest, testOperators)
     ASSERT_TRUE((*pointer1).returnHello() == "Hello");
     ASSERT_TRUE((*pointer2).returnHello() == "GoodBye");
 
-    ASSERT_THROW((*pointer3).returnHello(),
-                 decaf::lang::exceptions::NullPointerException)
-        << ("operator* on a NULL Should Throw a NullPointerException");
-    ASSERT_THROW(pointer3->returnHello(),
-                 decaf::lang::exceptions::NullPointerException)
-        << ("operator-> on a NULL Should Throw a NullPointerException");
+    ASSERT_THROW((*pointer3).returnHello(), std::logic_error)
+        << ("operator* on a NULL Should Throw a std::logic_error");
+    ASSERT_THROW(pointer3->returnHello(), std::logic_error)
+        << ("operator-> on a NULL Should Throw a std::logic_error");
 
     pointer2.reset(NULL);
 
-    ASSERT_THROW((*pointer2).returnHello(),
-                 decaf::lang::exceptions::NullPointerException)
-        << ("operator* on a NULL Should Throw a NullPointerException");
-    ASSERT_THROW(pointer2->returnHello(),
-                 decaf::lang::exceptions::NullPointerException)
-        << ("operator-> on a NULL Should Throw a NullPointerException");
+    ASSERT_THROW((*pointer2).returnHello(), std::logic_error)
+        << ("operator* on a NULL Should Throw a std::logic_error");
+    ASSERT_THROW(pointer2->returnHello(), std::logic_error)
+        << ("operator-> on a NULL Should Throw a std::logic_error");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -452,13 +448,13 @@ TEST_F(PointerTest, testDynamicCast)
 
     Pointer<TestClassA> ptrTestClassA2;
     ASSERT_THROW(ptrTestClassA2 = pointer2.dynamicCast<TestClassA>(),
-                 ClassCastException)
-        << ("Should Throw a ClassCastException");
+                 std::bad_cast)
+        << ("Should throw std::bad_cast");
 
     Pointer<TestClassBase> nullPointer;
     ASSERT_THROW(ptrTestClassA2 = nullPointer.dynamicCast<TestClassA>(),
-                 ClassCastException)
-        << ("Should Throw a ClassCastException");
+                 std::bad_cast)
+        << ("Should throw std::bad_cast");
 
     Pointer<TestClassBase> basePointer =
         ptrTestClassA.dynamicCast<TestClassBase>();

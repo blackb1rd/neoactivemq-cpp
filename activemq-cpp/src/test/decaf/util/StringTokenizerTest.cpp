@@ -57,7 +57,7 @@ TEST_F(StringTokenizerTest, test)
         tokenizer3.nextToken();
         ASSERT_TRUE(false);
     }
-    catch (decaf::util::NoSuchElementException ex)
+    catch (std::runtime_error ex)
     {
         ASSERT_TRUE(true);
     }

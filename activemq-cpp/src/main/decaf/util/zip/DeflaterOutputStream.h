@@ -24,6 +24,7 @@
 #include <decaf/io/IOException.h>
 #include <decaf/util/zip/Deflater.h>
 
+#include <stdexcept>
 #include <vector>
 
 namespace decaf
@@ -95,7 +96,8 @@ namespace util
              *      Should the filter take ownership of the passed Deflater
              * object (default is false).
              *
-             * @throws NullPointerException if the Deflater given is NULL.
+             * @throws activemq::exceptions::IllegalStateException if
+             * the Deflater given is NULL.
              */
             DeflaterOutputStream(decaf::io::OutputStream* outputStream,
                                  Deflater*                deflater,
@@ -123,8 +125,9 @@ namespace util
              *      Should the filter take ownership of the passed Deflater
              * object (default is false).
              *
-             * @throws NullPointerException if the Deflater given is NULL.
-             * @throws IllegalArgumentException if bufferSize is 0.
+             * @throws activemq::exceptions::IllegalStateException if
+             * the Deflater given is NULL.
+             * @throws std::invalid_argument if bufferSize is 0.
              */
             DeflaterOutputStream(decaf::io::OutputStream* outputStream,
                                  Deflater*                deflater,

@@ -16,8 +16,11 @@
  */
 
 #include "Long.h"
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/lang/Character.h>
 #include <sstream>
+#include <stdexcept>
+#include <string>
 
 using namespace decaf;
 using namespace decaf::lang;
@@ -85,9 +88,8 @@ Long Long::decode(const String& value)
     int length = (int)value.length(), i = 0;
     if (length == 0)
     {
-        throw exceptions::NumberFormatException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
             "Long::decode - Zero length string given.");
     }
 
@@ -97,10 +99,8 @@ Long Long::decode(const String& value)
     {
         if (length == 1)
         {
-            throw exceptions::NumberFormatException(
-                __FILE__,
-                __LINE__,
-                "Long::decode - Invalid length string given.",
+            throw activemq::exceptions::NumberFormatException(
+                std::string("Long::decode - Invalid length string given.") +
                 value.c_str());
         }
         firstDigit = value.charAt(++i);
@@ -117,10 +117,8 @@ Long Long::decode(const String& value)
         {
             if (i == length)
             {
-                throw exceptions::NumberFormatException(
-                    __FILE__,
-                    __LINE__,
-                    "Long::decode - Invalid length string given.",
+                throw activemq::exceptions::NumberFormatException(
+                    std::string("Long::decode - Invalid length string given.") +
                     value.c_str());
             }
             i++;
@@ -135,10 +133,8 @@ Long Long::decode(const String& value)
     {
         if (i == length)
         {
-            throw exceptions::NumberFormatException(
-                __FILE__,
-                __LINE__,
-                "Long::decode - Invalid length string given.",
+            throw activemq::exceptions::NumberFormatException(
+                std::string("Long::decode - Invalid length string given.") +
                 value.c_str());
         }
         i++;
@@ -222,9 +218,7 @@ long long Long::parseLong(const String& value, int radix)
 {
     if (radix < Character::MIN_RADIX || radix > Character::MAX_RADIX)
     {
-        throw exceptions::NumberFormatException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::NumberFormatException(
             "Long::parseLong - Given Radix is out of range.");
     }
 
@@ -233,18 +227,14 @@ long long Long::parseLong(const String& value, int radix)
 
     if (length == 0)
     {
-        throw exceptions::NumberFormatException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::NumberFormatException(
             "Long::parseLong - Zero length string is illegal.");
     }
 
     bool negative = value.charAt(i) == '-';
     if (negative && ++i == length)
     {
-        throw exceptions::NumberFormatException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::NumberFormatException(
             "Long::parseLong - Only a minus given, string is invalid.");
     }
 
@@ -264,17 +254,13 @@ long long Long::parse(const String& value, int offset, int radix, bool negative)
 
         if (digit == -1)
         {
-            throw exceptions::NumberFormatException(
-                __FILE__,
-                __LINE__,
+            throw activemq::exceptions::NumberFormatException(
                 "Long::parseLong - String contains no digit characters.");
         }
 
         if (max > result)
         {
-            throw exceptions::NumberFormatException(
-                __FILE__,
-                __LINE__,
+            throw activemq::exceptions::NumberFormatException(
                 "Long::parseLong - Parsed value greater than max for radix.");
         }
 
@@ -282,9 +268,7 @@ long long Long::parse(const String& value, int offset, int radix, bool negative)
 
         if (next > result)
         {
-            throw exceptions::NumberFormatException(
-                __FILE__,
-                __LINE__,
+            throw activemq::exceptions::NumberFormatException(
                 "Long::parseLong - Only a minus given, string is invalid.");
         }
 
@@ -295,9 +279,7 @@ long long Long::parse(const String& value, int offset, int radix, bool negative)
     {
         if (result == Long::MIN_VALUE)
         {
-            throw exceptions::NumberFormatException(
-                __FILE__,
-                __LINE__,
+            throw activemq::exceptions::NumberFormatException(
                 "Long::parseLong - Value less than zero, but no minus sign.");
         }
         result = -result;

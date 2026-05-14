@@ -24,8 +24,9 @@
 #include <activemq/util/IntegrationCommon.h>
 
 #include <decaf/lang/Thread.h>
-#include <decaf/lang/exceptions/IllegalStateException.h>
 #include <decaf/util/UUID.h>
+#include <stdexcept>
+#include <string>
 
 using namespace std;
 using namespace cms;
@@ -35,7 +36,6 @@ using namespace activemq::core;
 using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 CMSProvider::CMSProvider(const std::string&            brokerURL,
@@ -255,9 +255,8 @@ void CMSProvider::reconnectSession()
     {
         if (this->connection.get() == NULL)
         {
-            throw decaf::lang::exceptions::IllegalStateException(
-                __FILE__,
-                __LINE__,
+            throw std::logic_error(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
                 "CMSProvider has not been Initialized or is closed.");
         }
 
@@ -296,9 +295,8 @@ void CMSProvider::unsubscribe()
     {
         if (this->connection.get() == NULL)
         {
-            throw decaf::lang::exceptions::IllegalStateException(
-                __FILE__,
-                __LINE__,
+            throw std::logic_error(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
                 "CMSProvider has not been Initialized or is closed.");
         }
 
@@ -323,9 +321,8 @@ cms::ConnectionFactory* CMSProvider::getConnectionFactory()
     {
         if (this->connectionFactory.get() == NULL)
         {
-            throw decaf::lang::exceptions::IllegalStateException(
-                __FILE__,
-                __LINE__,
+            throw std::logic_error(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
                 "CMSProvider has not been Initialized or is closed.");
         }
 
@@ -342,9 +339,8 @@ cms::Connection* CMSProvider::getConnection()
     {
         if (this->connection.get() == NULL)
         {
-            throw decaf::lang::exceptions::IllegalStateException(
-                __FILE__,
-                __LINE__,
+            throw std::logic_error(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
                 "CMSProvider has not been Initialized or is closed.");
         }
 
@@ -361,9 +357,8 @@ cms::Session* CMSProvider::getSession()
     {
         if (this->connection.get() == NULL)
         {
-            throw decaf::lang::exceptions::IllegalStateException(
-                __FILE__,
-                __LINE__,
+            throw std::logic_error(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
                 "CMSProvider has not been Initialized or is closed.");
         }
 
@@ -380,9 +375,8 @@ cms::MessageProducer* CMSProvider::getProducer()
     {
         if (this->connection.get() == NULL)
         {
-            throw decaf::lang::exceptions::IllegalStateException(
-                __FILE__,
-                __LINE__,
+            throw std::logic_error(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
                 "CMSProvider has not been Initialized or is closed.");
         }
 
@@ -405,9 +399,8 @@ cms::MessageProducer* CMSProvider::getNoDestProducer()
     {
         if (this->connection.get() == NULL)
         {
-            throw decaf::lang::exceptions::IllegalStateException(
-                __FILE__,
-                __LINE__,
+            throw std::logic_error(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
                 "CMSProvider has not been Initialized or is closed.");
         }
 
@@ -430,9 +423,8 @@ cms::MessageConsumer* CMSProvider::getConsumer()
     {
         if (this->connection.get() == NULL)
         {
-            throw decaf::lang::exceptions::IllegalStateException(
-                __FILE__,
-                __LINE__,
+            throw std::logic_error(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
                 "CMSProvider has not been Initialized or is closed.");
         }
 
@@ -465,9 +457,8 @@ cms::Destination* CMSProvider::getDestination()
     {
         if (this->connection.get() == NULL)
         {
-            throw decaf::lang::exceptions::IllegalStateException(
-                __FILE__,
-                __LINE__,
+            throw std::logic_error(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
                 "CMSProvider has not been Initialized or is closed.");
         }
 
@@ -498,9 +489,8 @@ cms::Destination* CMSProvider::getTempDestination()
     {
         if (this->connection.get() == NULL)
         {
-            throw decaf::lang::exceptions::IllegalStateException(
-                __FILE__,
-                __LINE__,
+            throw std::logic_error(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
                 "CMSProvider has not been Initialized or is closed.");
         }
 
@@ -531,9 +521,8 @@ void CMSProvider::destroyDestination(const cms::Destination* destination)
     {
         if (this->connection.get() == NULL)
         {
-            throw decaf::lang::exceptions::IllegalStateException(
-                __FILE__,
-                __LINE__,
+            throw std::logic_error(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
                 "CMSProvider has not been Initialized or is closed.");
         }
 

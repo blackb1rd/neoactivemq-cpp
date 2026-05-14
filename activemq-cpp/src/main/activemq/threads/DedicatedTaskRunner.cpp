@@ -18,14 +18,15 @@
 #include "DedicatedTaskRunner.h"
 
 #include <activemq/exceptions/ActiveMQException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <stdexcept>
+#include <string>
 
 using namespace activemq;
 using namespace activemq::threads;
 using namespace activemq::exceptions;
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 DedicatedTaskRunner::DedicatedTaskRunner(Task* task)
@@ -37,7 +38,10 @@ DedicatedTaskRunner::DedicatedTaskRunner(Task* task)
 {
     if (this->task == NULL)
     {
-        throw NullPointerException(__FILE__, __LINE__, "Task passed was null");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "Task passed was null");
     }
 
     this->thread.reset(new Thread(this, "ActiveMQ Dedicated Task Runner"));

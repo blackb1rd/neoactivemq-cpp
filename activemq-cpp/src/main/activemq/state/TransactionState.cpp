@@ -19,7 +19,9 @@
 
 #include <activemq/state/ProducerState.h>
 
-#include <decaf/lang/exceptions/IllegalStateException.h>
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <stdexcept>
+#include <string>
 
 using namespace activemq;
 using namespace activemq::commands;
@@ -85,7 +87,7 @@ void TransactionState::checkShutdown() const
 {
     if (this->disposed.load())
     {
-        throw decaf::lang::exceptions::IllegalStateException(
+        throw activemq::exceptions::IllegalStateException(
             __FILE__,
             __LINE__,
             "Transaction already Disposed");

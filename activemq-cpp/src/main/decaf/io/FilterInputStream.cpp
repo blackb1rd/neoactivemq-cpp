@@ -17,13 +17,12 @@
 
 #include "FilterInputStream.h"
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/io/InputStream.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
 
 using namespace decaf;
 using namespace decaf::io;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 FilterInputStream::FilterInputStream(InputStream* inputStream, bool own)
@@ -147,7 +146,6 @@ long long FilterInputStream::skip(long long num)
 
         return inputStream->skip(num);
     }
-    DECAF_CATCH_RETHROW(UnsupportedOperationException)
     DECAF_CATCH_RETHROW(IOException)
     DECAF_CATCHALL_THROW(IOException)
 }
@@ -187,7 +185,6 @@ int FilterInputStream::doReadArray(unsigned char* buffer, int size)
         return doReadArrayBounded(buffer, size, 0, size);
     }
     DECAF_CATCH_RETHROW(IOException)
-    DECAF_CATCH_RETHROW(NullPointerException)
     DECAF_CATCHALL_THROW(IOException)
 }
 
@@ -210,8 +207,6 @@ int FilterInputStream::doReadArrayBounded(unsigned char* buffer,
         return inputStream->read(buffer, size, offset, length);
     }
     DECAF_CATCH_RETHROW(IOException)
-    DECAF_CATCH_RETHROW(NullPointerException)
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
     DECAF_CATCHALL_THROW(IOException)
 }
 

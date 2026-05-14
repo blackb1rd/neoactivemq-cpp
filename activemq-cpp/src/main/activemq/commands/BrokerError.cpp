@@ -16,10 +16,11 @@
  */
 #include <activemq/commands/BrokerError.h>
 #include <activemq/exceptions/ActiveMQException.h>
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <activemq/state/CommandVisitor.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/util/StringTokenizer.h>
 #include <memory>
+#include <stdexcept>
 #include <string>
 #include <utility>
 
@@ -43,7 +44,6 @@ using namespace activemq;
 using namespace activemq::exceptions;
 using namespace activemq::commands;
 using namespace decaf::util;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 BrokerError::BrokerError()
@@ -80,9 +80,7 @@ void BrokerError::copyDataStructure(const DataStructure* src)
 
     if (srcErr == NULL || src == NULL)
     {
-        throw NullPointerException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::NullPointerException(
             "BrokerError::copyCommand - src is NULL or invalid");
     }
 

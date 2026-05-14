@@ -52,7 +52,7 @@ namespace internal
              * @return the length of the string if the size is <
              * Integer::MAX_VALUE.
              *
-             * @throws RuntimeException if the length becomes larger than
+             * @throws Exception if the length becomes larger than
              *         the max value of an int.
              */
             static int stringLength(const char* string);

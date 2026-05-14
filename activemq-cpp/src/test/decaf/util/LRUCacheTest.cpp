@@ -20,13 +20,13 @@
 #include <decaf/lang/System.h>
 #include <decaf/util/LRUCache.h>
 
+#include <stdexcept>
 #include <string>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 class LRUCacheTest : public ::testing::Test
 {
@@ -68,13 +68,13 @@ TEST_F(LRUCacheTest, testExceptions)
         LRUCache<int, int> underTest(-1);
         FAIL() << ("Should have thrown an IllegalArgumentException");
     }
-    catch (IllegalArgumentException& ex)
+    catch (std::invalid_argument& ex)
     {
     }
 
     LRUCache<int, int> underTest(1000);
 
-    ASSERT_THROW(underTest.setMaxCacheSize(-1), IllegalArgumentException)
+    ASSERT_THROW(underTest.setMaxCacheSize(-1), std::invalid_argument)
         << ("Should throw an IllegalArgumentException");
 }
 

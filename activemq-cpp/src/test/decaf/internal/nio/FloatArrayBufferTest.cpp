@@ -20,6 +20,7 @@
 #include <decaf/lang/Integer.h>
 #include <decaf/nio/FloatBuffer.h>
 #include <gtest/gtest.h>
+#include <stdexcept>
 
 namespace decaf
 {
@@ -36,7 +37,7 @@ using namespace decaf;
 using namespace decaf::nio;
 using namespace decaf::internal::nio;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
+using activemq::exceptions::BufferUnderflowException;
 
 class FloatArrayBufferTest : public ::testing::Test
 {
@@ -245,10 +246,10 @@ TEST_F(FloatArrayBufferTest, testReadOnlyArray)
     ASSERT_TRUE(readOnly != NULL);
     ASSERT_TRUE(readOnly->isReadOnly() == true);
 
-    ASSERT_THROW(readOnly->array(), UnsupportedOperationException)
+    ASSERT_THROW(readOnly->array(), std::logic_error)
         << ("Should throw UnsupportedOperationException");
 
-    ASSERT_THROW(readOnly->arrayOffset(), UnsupportedOperationException)
+    ASSERT_THROW(readOnly->arrayOffset(), std::logic_error)
         << ("Should throw UnsupportedOperationException");
 
     delete readOnly;
@@ -481,41 +482,41 @@ TEST_F(FloatArrayBufferTest, testGetFloatArray2)
                                   testBuffer1->capacity(),
                                   -1,
                                   testBuffer1->capacity()),
-                 IndexOutOfBoundsException)
-        << ("Should throw IndexOutOfBoundsException");
+                 std::out_of_range)
+        << ("Should throw std::out_of_range");
 
     ASSERT_THROW(testBuffer1->get(array1,
                                   testBuffer1->capacity(),
                                   testBuffer1->capacity() + 1,
                                   1),
-                 IndexOutOfBoundsException)
-        << ("Should throw IndexOutOfBoundsException");
+                 std::out_of_range)
+        << ("Should throw std::out_of_range");
 
     ASSERT_THROW(testBuffer1->get(array1, testBuffer1->capacity(), 2, -1),
-                 IndexOutOfBoundsException)
-        << ("Should throw IndexOutOfBoundsException");
+                 std::out_of_range)
+        << ("Should throw std::out_of_range");
 
     ASSERT_THROW(testBuffer1->get(array1,
                                   testBuffer1->capacity(),
                                   2,
                                   testBuffer1->capacity()),
-                 IndexOutOfBoundsException)
-        << ("Should throw IndexOutOfBoundsException");
+                 std::out_of_range)
+        << ("Should throw std::out_of_range");
 
     ASSERT_THROW(
         testBuffer1->get(array1, testBuffer1->capacity(), 1, Integer::MAX_VALUE),
-        IndexOutOfBoundsException)
-        << ("Should throw IndexOutOfBoundsException");
+        std::out_of_range)
+        << ("Should throw std::out_of_range");
 
     ASSERT_THROW(
         testBuffer1->get(array1, testBuffer1->capacity(), Integer::MAX_VALUE, 1),
-        IndexOutOfBoundsException)
-        << ("Should throw IndexOutOfBoundsException");
+        std::out_of_range)
+        << ("Should throw std::out_of_range");
 
     ASSERT_THROW(
         testBuffer1->get(NULL, testBuffer1->capacity(), 1, Integer::MAX_VALUE),
-        NullPointerException)
-        << ("Should throw NullPointerException");
+        std::logic_error)
+        << ("Should throw std::logic_error");
 
     ASSERT_TRUE(testBuffer1->position() == 0);
 
@@ -542,12 +543,11 @@ TEST_F(FloatArrayBufferTest, testGet2)
         ASSERT_TRUE(testBuffer1->get() == testBuffer1->get(i));
     }
 
-    ASSERT_THROW(testBuffer1->get(-1), IndexOutOfBoundsException)
-        << ("Should throw IndexOutOfBoundsException");
+    ASSERT_THROW(testBuffer1->get(-1), std::out_of_range)
+        << ("Should throw std::out_of_range");
 
-    ASSERT_THROW(testBuffer1->get(testBuffer1->limit()),
-                 IndexOutOfBoundsException)
-        << ("Should throw IndexOutOfBoundsException");
+    ASSERT_THROW(testBuffer1->get(testBuffer1->limit()), std::out_of_range)
+        << ("Should throw std::out_of_range");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -620,41 +620,41 @@ TEST_F(FloatArrayBufferTest, testPutFloatArray2)
                                   testBuffer1->capacity(),
                                   -1,
                                   testBuffer1->capacity()),
-                 IndexOutOfBoundsException)
-        << ("Should throw IndexOutOfBoundsException");
+                 std::out_of_range)
+        << ("Should throw std::out_of_range");
 
     ASSERT_THROW(testBuffer1->put(array1,
                                   testBuffer1->capacity(),
                                   testBuffer1->capacity() + 1,
                                   1),
-                 IndexOutOfBoundsException)
-        << ("Should throw IndexOutOfBoundsException");
+                 std::out_of_range)
+        << ("Should throw std::out_of_range");
 
     ASSERT_THROW(testBuffer1->put(array1, testBuffer1->capacity(), 2, -1),
-                 IndexOutOfBoundsException)
-        << ("Should throw IndexOutOfBoundsException");
+                 std::out_of_range)
+        << ("Should throw std::out_of_range");
 
     ASSERT_THROW(testBuffer1->put(array1,
                                   testBuffer1->capacity(),
                                   2,
                                   testBuffer1->capacity()),
-                 IndexOutOfBoundsException)
-        << ("Should throw IndexOutOfBoundsException");
+                 std::out_of_range)
+        << ("Should throw std::out_of_range");
 
     ASSERT_THROW(
         testBuffer1->put(array1, testBuffer1->capacity(), 1, Integer::MAX_VALUE),
-        IndexOutOfBoundsException)
-        << ("Should throw IndexOutOfBoundsException");
+        std::out_of_range)
+        << ("Should throw std::out_of_range");
 
     ASSERT_THROW(
         testBuffer1->put(array1, testBuffer1->capacity(), Integer::MAX_VALUE, 1),
-        IndexOutOfBoundsException)
-        << ("Should throw IndexOutOfBoundsException");
+        std::out_of_range)
+        << ("Should throw std::out_of_range");
 
     ASSERT_THROW(
         testBuffer1->put(NULL, testBuffer1->capacity(), 1, Integer::MAX_VALUE),
-        NullPointerException)
-        << ("Should throw NullPointerException");
+        std::logic_error)
+        << ("Should throw std::logic_error");
 
     ASSERT_TRUE(testBuffer1->position() == 0);
 
@@ -677,7 +677,7 @@ TEST_F(FloatArrayBufferTest, testPutFloatBuffer)
     FloatBuffer* other  = FloatBuffer::allocate(testBuffer1->capacity());
     FloatBuffer* other1 = FloatBuffer::allocate(testBuffer1->capacity() + 1);
 
-    ASSERT_THROW(testBuffer1->put(*testBuffer1), IllegalArgumentException)
+    ASSERT_THROW(testBuffer1->put(*testBuffer1), std::invalid_argument)
         << ("Should throw IllegalArgumentException");
 
     ASSERT_THROW(testBuffer1->put(*other1), BufferOverflowException)
@@ -710,12 +710,11 @@ TEST_F(FloatArrayBufferTest, testGetWithIndex)
         ASSERT_TRUE(&ret == testBuffer1);
     }
 
-    ASSERT_THROW(testBuffer1->put(-1, 0), IndexOutOfBoundsException)
-        << ("Should throw IndexOutOfBoundsException");
+    ASSERT_THROW(testBuffer1->put(-1, 0), std::out_of_range)
+        << ("Should throw std::out_of_range");
 
-    ASSERT_THROW(testBuffer1->put(testBuffer1->limit(), 0),
-                 IndexOutOfBoundsException)
-        << ("Should throw IndexOutOfBoundsException");
+    ASSERT_THROW(testBuffer1->put(testBuffer1->limit(), 0), std::out_of_range)
+        << ("Should throw std::out_of_range");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -737,12 +736,11 @@ TEST_F(FloatArrayBufferTest, testPutIndexed)
         ASSERT_TRUE(&ret == testBuffer1);
     }
 
-    ASSERT_THROW(testBuffer1->put(-1, 0), IndexOutOfBoundsException)
-        << ("Should throw a IndexOutOfBoundsException");
+    ASSERT_THROW(testBuffer1->put(-1, 0), std::out_of_range)
+        << ("Should throw a std::out_of_range");
 
-    ASSERT_THROW(testBuffer1->put(testBuffer1->limit(), 0),
-                 IndexOutOfBoundsException)
-        << ("Should throw a IndexOutOfBoundsException");
+    ASSERT_THROW(testBuffer1->put(testBuffer1->limit(), 0), std::out_of_range)
+        << ("Should throw a std::out_of_range");
 }
 
 ////////////////////////////////////////////////////////////////////////////////

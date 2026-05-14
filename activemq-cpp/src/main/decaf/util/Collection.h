@@ -19,12 +19,10 @@
 #define _DECAF_UTIL_COLLECTION_H_
 
 #include <decaf/lang/Iterable.h>
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
-#include <decaf/lang/exceptions/UnsupportedOperationException.h>
 #include <decaf/util/Config.h>
 #include <decaf/util/Iterator.h>
 #include <decaf/util/concurrent/Synchronizable.h>
+#include <stdexcept>
 
 namespace decaf
 {
@@ -52,9 +50,9 @@ namespace util
      *
      * The "destructive" methods contained in this interface, that is, the
      * methods that modify the collection on which they operate, are specified
-     * to throw UnsupportedOperationException if this collection does not
+     * to throw std::logic_error if this collection does not
      * support the operation. If this is the case, these methods may, but are
-     * not required to, throw an UnsupportedOperationException if the invocation
+     * not required to, throw an std::logic_error if the invocation
      * would have no effect on the collection. For example, invoking the
      * addAll(Collection) method on an unmodifiable collection may, but is not
      * required to, throw the exception if the collection to be added is empty.
@@ -84,7 +82,7 @@ namespace util
          *
          * @throws UnsupportedOperationExceptio if this is an unmodifiable
          * collection.
-         * @throws IllegalStateException if the elements cannot be added at this
+         * @throws std::logic_error if the elements cannot be added at this
          * time due to insertion restrictions.
          */
         virtual void copy(const Collection<E>& collection) = 0;
@@ -119,11 +117,11 @@ namespace util
          *
          * @throws UnsupportedOperationExceptio if this is an unmodifiable
          * collection.
-         * @throws NullPointerException if the Collection is a container of
+         * @throws std::logic_error if the Collection is a container of
          * pointers and does not allow NULL values.
-         * @throws IllegalArgumentException if some property of the element
+         * @throws std::invalid_argument if some property of the element
          * prevents it from being added to this collection
-         * @throws IllegalStateException if the element cannot be added at this
+         * @throws std::logic_error if the element cannot be added at this
          * time due to insertion restrictions.
          */
         virtual bool add(const E& value) = 0;
@@ -143,11 +141,11 @@ namespace util
          *
          * @throws UnsupportedOperationExceptio if this is an unmodifiable
          * collection.
-         * @throws NullPointerException if the Collection is a container of
+         * @throws std::logic_error if the Collection is a container of
          * pointers and does not allow NULL values.
-         * @throws IllegalArgumentException if some property of an element
+         * @throws std::invalid_argument if some property of an element
          * prevents it from being added to this collection
-         * @throws IllegalStateException if an element cannot be added at this
+         * @throws std::logic_error if an element cannot be added at this
          * time due to insertion restrictions.
          */
         virtual bool addAll(const Collection<E>& collection) = 0;
@@ -174,7 +172,7 @@ namespace util
          * @return true if there is at least one of the elements in the
          * collection
          *
-         * @throws NullPointerException if the Collection contains pointers and
+         * @throws std::logic_error if the Collection contains pointers and
          * the Collection does not allow for NULL elements (optional check).
          */
         virtual bool contains(const E& value) const = 0;
@@ -186,7 +184,7 @@ namespace util
          * @param collection
          *      The Collection to compare to this one.
          *
-         * @throws NullPointerException if the Collection contains pointers and
+         * @throws std::logic_error if the Collection contains pointers and
          * the Collection does not allow for NULL elements (optional check).
          */
         virtual bool containsAll(const Collection<E>& collection) const = 0;
@@ -220,7 +218,7 @@ namespace util
          *
          * @throws UnsupportedOperationExceptio if this is an unmodifiable
          * collection.
-         * @throws NullPointerException if the Collection is a container of
+         * @throws std::logic_error if the Collection is a container of
          * pointers and does not allow NULL values.
          */
         virtual bool remove(const E& value) = 0;
@@ -238,7 +236,7 @@ namespace util
          *
          * @throws UnsupportedOperationExceptio if this is an unmodifiable
          * collection.
-         * @throws NullPointerException if the Collection is a container of
+         * @throws std::logic_error if the Collection is a container of
          * pointers and does not allow NULL values.
          */
         virtual bool removeAll(const Collection<E>& collection) = 0;
@@ -256,7 +254,7 @@ namespace util
          *
          * @throws UnsupportedOperationExceptio if this is an unmodifiable
          * collection.
-         * @throws NullPointerException if the Collection is a container of
+         * @throws std::logic_error if the Collection is a container of
          * pointers and does not allow NULL values.
          */
         virtual bool retainAll(const Collection<E>& collection) = 0;

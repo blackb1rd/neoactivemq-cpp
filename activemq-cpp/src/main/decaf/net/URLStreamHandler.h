@@ -23,6 +23,7 @@
 #include <decaf/lang/String.h>
 #include <decaf/net/InetAddress.h>
 #include <decaf/net/URL.h>
+#include <stdexcept>
 
 namespace decaf
 {
@@ -84,7 +85,7 @@ namespace net
          *
          * @throws IOException if an I/O error occurs during opening the
          * connection.
-         * @throws UnsupportedOperationException if the protocol in use doesn't
+         * @throws std::logic_error if the protocol in use doesn't
          * support this.
          */
         virtual URLConnection* openConnection(const URL&   url,
@@ -219,7 +220,7 @@ namespace net
          * @param ref
          *      the internal reference in the URL
          *
-         * @throws SecurityException if the protocol handler of the URL is not
+         * @throws std::logic_error if the protocol handler of the URL is not
          * this instance.
          */
         void setURL(URL&                       url,

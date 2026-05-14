@@ -15,17 +15,19 @@
  * limitations under the License.
  */
 
+#include <string>
+
 #include "Level.h"
 
 #include <decaf/lang/Integer.h>
-#include <decaf/lang/exceptions/NumberFormatException.h>
 #include <decaf/util/concurrent/Mutex.h>
 
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <stdexcept>
 #include <vector>
 
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 using namespace decaf::util::logging;
@@ -97,7 +99,7 @@ Level Level::parse(const std::string& name)
         nameAsInt   = Integer::parseInt(name);
         isNameAnInt = true;
     }
-    catch (NumberFormatException& e)
+    catch (std::invalid_argument&)
     {
         nameAsInt   = 0;
         isNameAnInt = false;
@@ -129,11 +131,9 @@ Level Level::parse(const std::string& name)
 
     if (!isNameAnInt)
     {
-        throw IllegalArgumentException(
-            __FILE__,
-            __LINE__,
-            "Could not find match for Level Name: %s",
-            name.c_str());
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": Could not find match for Level Name: " + name);
     }
 
     return Level(name, nameAsInt);

@@ -18,15 +18,18 @@
 #include "DoubleBuffer.h"
 
 #include "decaf/internal/nio/BufferFactory.h"
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/lang/Double.h>
 #include <decaf/lang/Math.h>
+#include <stdexcept>
+#include <string>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::nio;
 using namespace decaf::internal::nio;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
+using activemq::exceptions::BufferUnderflowException;
 
 ////////////////////////////////////////////////////////////////////////////////
 DoubleBuffer::DoubleBuffer(int capacity)
@@ -41,8 +44,16 @@ DoubleBuffer* DoubleBuffer::allocate(int capacity)
     {
         return BufferFactory::createDoubleBuffer(capacity);
     }
-    DECAF_CATCH_RETHROW(IllegalArgumentException)
-    DECAF_CATCHALL_THROW(IllegalArgumentException)
+    catch (std::invalid_argument&)
+    {
+        throw;
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -55,7 +66,7 @@ DoubleBuffer* DoubleBuffer::wrap(double* buffer,
     {
         if (buffer == NULL)
         {
-            throw NullPointerException(
+            throw activemq::exceptions::NullPointerException(
                 __FILE__,
                 __LINE__,
                 "DoubleBuffer::wrap - Passed Buffer is Null.");
@@ -63,10 +74,31 @@ DoubleBuffer* DoubleBuffer::wrap(double* buffer,
 
         return BufferFactory::createDoubleBuffer(buffer, size, offset, length);
     }
-    DECAF_CATCH_RETHROW(NullPointerException)
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception, NullPointerException)
-    DECAF_CATCHALL_THROW(NullPointerException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (std::invalid_argument&)
+    {
+        throw;
+    }
+    catch (activemq::exceptions::NullPointerException&)
+    {
+        throw;
+    }
+    catch (Exception& ex)
+    {
+        throw activemq::exceptions::NullPointerException(__FILE__,
+                                                         __LINE__,
+                                                         ex.what());
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -76,7 +108,7 @@ DoubleBuffer* DoubleBuffer::wrap(std::vector<double>& buffer)
     {
         if (buffer.empty())
         {
-            throw NullPointerException(
+            throw activemq::exceptions::NullPointerException(
                 __FILE__,
                 __LINE__,
                 "DoubleBuffer::wrap - Passed Buffer is Empty.");
@@ -87,9 +119,31 @@ DoubleBuffer* DoubleBuffer::wrap(std::vector<double>& buffer)
                                                  0,
                                                  (int)buffer.size());
     }
-    DECAF_CATCH_RETHROW(NullPointerException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception, NullPointerException)
-    DECAF_CATCHALL_THROW(NullPointerException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (std::invalid_argument&)
+    {
+        throw;
+    }
+    catch (activemq::exceptions::NullPointerException&)
+    {
+        throw;
+    }
+    catch (Exception& ex)
+    {
+        throw activemq::exceptions::NullPointerException(__FILE__,
+                                                         __LINE__,
+                                                         ex.what());
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -132,7 +186,7 @@ DoubleBuffer& DoubleBuffer::get(double* buffer, int size, int offset, int length
 
         if (buffer == NULL)
         {
-            throw NullPointerException(
+            throw activemq::exceptions::NullPointerException(
                 __FILE__,
                 __LINE__,
                 "DoubleBuffer::get - Passed Buffer is Null");
@@ -141,18 +195,20 @@ DoubleBuffer& DoubleBuffer::get(double* buffer, int size, int offset, int length
         if (size < 0 || offset < 0 || length < 0 ||
             (long long)offset + (long long)length > (long long)size)
         {
-            throw IndexOutOfBoundsException(__FILE__,
-                                            __LINE__,
-                                            "Arguments violate array bounds.");
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+                "Arguments violate array bounds.");
         }
 
         if (length > remaining())
         {
             throw BufferUnderflowException(
-                __FILE__,
-                __LINE__,
-                "DoubleBuffer::get - Not enough data to fill length = %d",
-                length);
+                activemq::exceptions::buildSourceMessage(
+                    __FILE__,
+                    __LINE__,
+                    std::string("DoubleBuffer::get - Not enough data to fill "
+                                "length = ") +
+                        std::to_string(length)));
         }
 
         for (int ix = 0; ix < length; ++ix)
@@ -163,8 +219,6 @@ DoubleBuffer& DoubleBuffer::get(double* buffer, int size, int offset, int length
         return *this;
     }
     DECAF_CATCH_RETHROW(BufferUnderflowException)
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCH_RETHROW(NullPointerException)
     DECAF_CATCH_EXCEPTION_CONVERT(Exception, BufferUnderflowException)
     DECAF_CATCHALL_THROW(BufferUnderflowException)
 }
@@ -176,9 +230,8 @@ DoubleBuffer& DoubleBuffer::put(DoubleBuffer& src)
     {
         if (this == &src)
         {
-            throw IllegalArgumentException(
-                __FILE__,
-                __LINE__,
+            throw activemq::exceptions::InvalidArgumentException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
                 "DoubleBuffer::put - Can't put Self");
         }
 
@@ -206,8 +259,10 @@ DoubleBuffer& DoubleBuffer::put(DoubleBuffer& src)
         return *this;
     }
     DECAF_CATCH_RETHROW(BufferOverflowException)
-    DECAF_CATCH_RETHROW(ReadOnlyBufferException)
-    DECAF_CATCH_RETHROW(IllegalArgumentException)
+    catch (ReadOnlyBufferException&)
+    {
+        throw;
+    }
     DECAF_CATCH_EXCEPTION_CONVERT(Exception, BufferOverflowException)
     DECAF_CATCHALL_THROW(BufferOverflowException)
 }
@@ -235,7 +290,7 @@ DoubleBuffer& DoubleBuffer::put(const double* buffer,
 
         if (buffer == NULL)
         {
-            throw NullPointerException(
+            throw activemq::exceptions::NullPointerException(
                 __FILE__,
                 __LINE__,
                 "DoubleBuffer::put - Passed Buffer is Null.");
@@ -244,9 +299,9 @@ DoubleBuffer& DoubleBuffer::put(const double* buffer,
         if (size < 0 || offset < 0 || length < 0 ||
             (long long)offset + (long long)length > (long long)size)
         {
-            throw IndexOutOfBoundsException(__FILE__,
-                                            __LINE__,
-                                            "Arguments violate array bounds.");
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+                "Arguments violate array bounds.");
         }
 
         if (length > this->remaining())
@@ -266,9 +321,10 @@ DoubleBuffer& DoubleBuffer::put(const double* buffer,
         return *this;
     }
     DECAF_CATCH_RETHROW(BufferOverflowException)
-    DECAF_CATCH_RETHROW(ReadOnlyBufferException)
-    DECAF_CATCH_RETHROW(NullPointerException)
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
+    catch (ReadOnlyBufferException&)
+    {
+        throw;
+    }
     DECAF_CATCH_EXCEPTION_CONVERT(Exception, BufferOverflowException)
     DECAF_CATCHALL_THROW(BufferOverflowException)
 }
@@ -286,7 +342,10 @@ DoubleBuffer& DoubleBuffer::put(std::vector<double>& buffer)
         return *this;
     }
     DECAF_CATCH_RETHROW(BufferOverflowException)
-    DECAF_CATCH_RETHROW(ReadOnlyBufferException)
+    catch (ReadOnlyBufferException&)
+    {
+        throw;
+    }
     DECAF_CATCH_EXCEPTION_CONVERT(Exception, BufferOverflowException)
     DECAF_CATCHALL_THROW(BufferOverflowException)
 }

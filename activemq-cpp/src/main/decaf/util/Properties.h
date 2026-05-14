@@ -22,10 +22,9 @@
 #include <decaf/io/InputStream.h>
 #include <decaf/io/OutputStream.h>
 #include <decaf/lang/Pointer.h>
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/util/Config.h>
 #include <decaf/util/StlMap.h>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -230,10 +229,6 @@ namespace util
          * @param stream
          *      The stream to read the properties data from.
          *
-         * @throw IOException if there is an error while reading from the
-         * stream.
-         * @throw IllegalArgumentException if malformed data is found while
-         * reading the properties.
          * @throw NullPointerException if the passed stream is Null.
          */
         void load(decaf::io::InputStream* stream);
@@ -336,10 +331,6 @@ namespace util
          * @param reader
          *      The Reader that provides an character stream as input.
          *
-         * @throw IOException if there is an error while reading from the
-         * stream.
-         * @throw IllegalArgumentException if malformed data is found while
-         * reading the properties.
          * @throw NullPointerException if the passed stream is Null.
          */
         void load(decaf::io::Reader* reader);
@@ -371,8 +362,6 @@ namespace util
          *      A description of these properties that is written to the output
          * stream.
          *
-         * @throw IOException if there is an error while writing from the
-         * stream.
          * @throw NullPointerException if the passed stream is Null.
          */
         void store(decaf::io::OutputStream* out, const std::string& comment);
@@ -411,8 +400,6 @@ namespace util
          *      A description of these properties that is written before writing
          * the properties.
          *
-         * @throw IOException if there is an error while writing from the
-         * stream.
          * @throw NullPointerException if the passed stream is Null.
          */
         void store(decaf::io::Writer* writer, const std::string& comments);

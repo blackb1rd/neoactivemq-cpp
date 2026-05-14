@@ -17,21 +17,21 @@
 
 #include <gtest/gtest.h>
 
+#include <stdexcept>
 #include <string>
 
 #include <decaf/lang/Integer.h>
 #include <decaf/lang/Long.h>
 #include <decaf/lang/System.h>
 #include <decaf/lang/Thread.h>
-#include <decaf/lang/exceptions/InterruptedException.h>
 #include <decaf/util/Timer.h>
 #include <decaf/util/TimerTask.h>
 #include <decaf/util/concurrent/Mutex.h>
 #include <decaf/util/concurrent/atomic/AtomicInteger.h>
+#include <stdexcept>
 
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 using namespace decaf::util::concurrent::atomic;
@@ -172,7 +172,7 @@ namespace util
                 {
                     Thread::sleep(200);
                 }
-                catch (InterruptedException& e)
+                catch (std::runtime_error& e)
                 {
                 }
             }
@@ -235,7 +235,7 @@ namespace util
                 {
                     Thread::sleep(200);
                 }
-                catch (InterruptedException& e)
+                catch (std::runtime_error& e)
                 {
                 }
             }
@@ -270,7 +270,7 @@ TEST_F(TimerTest, testConstructor)
         {
             this->gsync.wait(2000000);
         }
-        catch (InterruptedException& e)
+        catch (std::runtime_error& e)
         {
         }
     }
@@ -287,16 +287,16 @@ TEST_F(TimerTest, testCancel)
     std::unique_ptr<Timer> t;
     TimerTaskReport        report;
 
-    // Ensure a task throws an IllegalStateException after cancelled
+    // Ensure a task throws std::logic_error after cancelled
     t.reset(new Timer());
 
     TimerTestTask* testTask =
         new TimerTestTask(&report, &this->timerCounter, &this->gsync);
     t->cancel();
 
-    ASSERT_THROW(t->schedule(testTask, 100, 200), IllegalStateException)
+    ASSERT_THROW(t->schedule(testTask, 100, 200), std::logic_error)
         << ("Scheduling a task after Timer.cancel() should throw "
-            "IllegalStateException");
+            "std::logic_error");
 
     // unscheduled tasks must be deleted
     delete testTask;
@@ -311,7 +311,7 @@ TEST_F(TimerTest, testCancel)
         {
             this->gsync.wait(1000);
         }
-        catch (InterruptedException& e)
+        catch (std::runtime_error& e)
         {
         }
     }
@@ -326,7 +326,7 @@ TEST_F(TimerTest, testCancel)
         {
             this->gsync.wait(500);
         }
-        catch (InterruptedException& e)
+        catch (std::runtime_error& e)
         {
         }
     }
@@ -345,7 +345,7 @@ TEST_F(TimerTest, testCancel)
         {
             this->gsync.wait(500);
         }
-        catch (InterruptedException& e)
+        catch (std::runtime_error& e)
         {
         }
     }
@@ -363,7 +363,7 @@ TEST_F(TimerTest, testCancel)
         {
             this->gsync.wait(500);
         }
-        catch (InterruptedException& e)
+        catch (std::runtime_error& e)
         {
         }
     }
@@ -391,7 +391,7 @@ TEST_F(TimerTest, testCancel)
             this->gsync.wait(500);
             this->gsync.wait(500);
         }
-        catch (InterruptedException& e)
+        catch (std::runtime_error& e)
         {
         }
     }
@@ -406,7 +406,7 @@ TEST_F(TimerTest, testCancel)
     {
         Thread::sleep(200);
     }
-    catch (InterruptedException& e)
+    catch (std::runtime_error& e)
     {
     }
 }
@@ -449,7 +449,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Date)
     std::unique_ptr<Timer> t;
     TimerTaskReport        report;
 
-    // Ensure a Timer throws an IllegalStateException after cancelled
+    // Ensure a Timer throws std::logic_error after cancelled
     t.reset(new Timer());
     TimerTestTask* testTask =
         new TimerTestTask(&this->timerCounter, &this->gsync);
@@ -461,7 +461,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Date)
     {
         t->schedule(testTask, d);
     }
-    catch (IllegalStateException& e)
+    catch (std::logic_error& e)
     {
         exception = true;
         // unscheduled tasks must be deleted
@@ -471,7 +471,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Date)
     ASSERT_TRUE(exception == true)
         << ("Scheduling a task after Timer.cancel() should throw exception");
 
-    // Ensure a Timer throws an IllegalStateException if task already cancelled
+    // Ensure a Timer throws std::logic_error if task already cancelled
     t.reset(new Timer());
     testTask = new TimerTestTask(&this->timerCounter, &this->gsync);
     d.setTime(System::currentTimeMillis() + 100);
@@ -481,7 +481,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Date)
     {
         t->schedule(testTask, d);
     }
-    catch (IllegalStateException& e)
+    catch (std::logic_error& e)
     {
         exception = true;
         // unscheduled tasks must be deleted
@@ -492,7 +492,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Date)
         << ("Scheduling a task after cancelling it should throw exception");
     t->cancel();
 
-    // Ensure a Timer throws an IllegalArgumentException if delay is negative
+    // Ensure a Timer throws an std::invalid_argument if delay is negative
     t.reset(new Timer());
     testTask = new TimerTestTask(&this->timerCounter, &this->gsync);
     d.setTime(-100);
@@ -501,7 +501,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Date)
     {
         t->schedule(testTask, d);
     }
-    catch (IllegalArgumentException& e)
+    catch (std::invalid_argument& e)
     {
         exception = true;
         // unscheduled tasks must be deleted
@@ -511,7 +511,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Date)
                                        "should throw IllegalArgumentException");
     t->cancel();
 
-    // Ensure a Timer throws a NullPointerException if the task is null
+    // Ensure a Timer throws a std::logic_error if the task is null
     t.reset(new Timer());
     exception = false;
     d.setTime(System::currentTimeMillis() + 100);
@@ -519,12 +519,12 @@ TEST_F(TimerTest, testSchedule_TimerTask_Date)
     {
         t->schedule(NULL, d);
     }
-    catch (NullPointerException& e)
+    catch (std::logic_error& e)
     {
         exception = true;
     }
     ASSERT_TRUE(exception == true)
-        << ("Scheduling a null task should throw NullPointerException");
+        << ("Scheduling a null task should throw std::logic_error");
     t->cancel();
 
     // Ensure proper sequence of exceptions
@@ -535,12 +535,12 @@ TEST_F(TimerTest, testSchedule_TimerTask_Date)
     {
         t->schedule(NULL, d);
     }
-    catch (NullPointerException& e)
-    {
-    }
-    catch (IllegalArgumentException& e)
+    catch (std::invalid_argument& e)
     {
         exception = true;
+    }
+    catch (std::logic_error& e)
+    {
     }
     ASSERT_TRUE(exception == true)
         << ("Scheduling a null task with negative date should throw "
@@ -556,7 +556,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Date)
     {
         Thread::sleep(400);
     }
-    catch (InterruptedException& e)
+    catch (std::runtime_error& e)
     {
     }
 
@@ -586,7 +586,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Date)
     {
         Thread::sleep(400);
     }
-    catch (InterruptedException& e)
+    catch (std::runtime_error& e)
     {
     }
 
@@ -603,7 +603,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Date2)
     std::unique_ptr<Timer> t;
     TimerTaskReport        report;
 
-    // Ensure a Timer throws an IllegalStateException after cancelled
+    // Ensure a Timer throws std::logic_error after cancelled
     t.reset(new Timer());
     Pointer<TimerTestTask> testTask(
         new TimerTestTask(&this->timerCounter, &this->gsync));
@@ -615,7 +615,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Date2)
     {
         t->schedule(testTask, d);
     }
-    catch (IllegalStateException& e)
+    catch (std::logic_error& e)
     {
         exception = true;
     }
@@ -623,7 +623,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Date2)
     ASSERT_TRUE(exception == true)
         << ("Scheduling a task after Timer.cancel() should throw exception");
 
-    // Ensure a Timer throws an IllegalStateException if task already cancelled
+    // Ensure a Timer throws std::logic_error if task already cancelled
     t.reset(new Timer());
     testTask.reset(new TimerTestTask(&this->timerCounter, &this->gsync));
     d.setTime(System::currentTimeMillis() + 100);
@@ -633,7 +633,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Date2)
     {
         t->schedule(testTask, d);
     }
-    catch (IllegalStateException& e)
+    catch (std::logic_error& e)
     {
         exception = true;
     }
@@ -642,7 +642,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Date2)
         << ("Scheduling a task after cancelling it should throw exception");
     t->cancel();
 
-    // Ensure a Timer throws an IllegalArgumentException if delay is negative
+    // Ensure a Timer throws an std::invalid_argument if delay is negative
     t.reset(new Timer());
     testTask.reset(new TimerTestTask(&this->timerCounter, &this->gsync));
     d.setTime(-100);
@@ -651,7 +651,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Date2)
     {
         t->schedule(testTask, d);
     }
-    catch (IllegalArgumentException& e)
+    catch (std::invalid_argument& e)
     {
         exception = true;
     }
@@ -659,7 +659,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Date2)
                                        "should throw IllegalArgumentException");
     t->cancel();
 
-    // Ensure a Timer throws a NullPointerException if the task is null
+    // Ensure a Timer throws a std::logic_error if the task is null
     t.reset(new Timer());
     exception = false;
     d.setTime(System::currentTimeMillis() + 100);
@@ -667,12 +667,12 @@ TEST_F(TimerTest, testSchedule_TimerTask_Date2)
     {
         t->schedule(NULL, d);
     }
-    catch (NullPointerException& e)
+    catch (std::logic_error& e)
     {
         exception = true;
     }
     ASSERT_TRUE(exception == true)
-        << ("Scheduling a null task should throw NullPointerException");
+        << ("Scheduling a null task should throw std::logic_error");
     t->cancel();
 
     // Ensure proper sequence of exceptions
@@ -683,12 +683,12 @@ TEST_F(TimerTest, testSchedule_TimerTask_Date2)
     {
         t->schedule(NULL, d);
     }
-    catch (NullPointerException& e)
-    {
-    }
-    catch (IllegalArgumentException& e)
+    catch (std::invalid_argument& e)
     {
         exception = true;
+    }
+    catch (std::logic_error& e)
+    {
     }
     ASSERT_TRUE(exception == true)
         << ("Scheduling a null task with negative date should throw "
@@ -705,7 +705,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Date2)
     {
         Thread::sleep(500);
     }
-    catch (InterruptedException& e)
+    catch (std::runtime_error& e)
     {
     }
 
@@ -735,7 +735,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Date2)
     {
         Thread::sleep(400);
     }
-    catch (InterruptedException& e)
+    catch (std::runtime_error& e)
     {
     }
 
@@ -752,7 +752,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Long)
     std::unique_ptr<Timer> t;
     TimerTaskReport        report;
 
-    // Ensure a Timer throws an IllegalStateException after cancelled
+    // Ensure a Timer throws std::logic_error after cancelled
     t.reset(new Timer());
     TimerTestTask* testTask =
         new TimerTestTask(&this->timerCounter, &this->gsync);
@@ -762,7 +762,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Long)
     {
         t->schedule(testTask, 100);
     }
-    catch (IllegalStateException& e)
+    catch (std::logic_error& e)
     {
         exception = true;
         // unscheduled tasks must be deleted
@@ -771,7 +771,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Long)
     ASSERT_TRUE(exception == true)
         << ("Scheduling a task after Timer.cancel() should throw exception");
 
-    // Ensure a Timer throws an IllegalStateException if task already cancelled
+    // Ensure a Timer throws std::logic_error if task already cancelled
     t.reset(new Timer());
     testTask = new TimerTestTask(&this->timerCounter, &this->gsync);
     testTask->cancel();
@@ -780,7 +780,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Long)
     {
         t->schedule(testTask, 100);
     }
-    catch (IllegalStateException& e)
+    catch (std::logic_error& e)
     {
         exception = true;
         // unscheduled tasks must be deleted
@@ -790,7 +790,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Long)
         << ("Scheduling a task after cancelling it should throw exception");
     t->cancel();
 
-    // Ensure a Timer throws an IllegalArgumentException if delay is negative
+    // Ensure a Timer throws an std::invalid_argument if delay is negative
     t.reset(new Timer());
     testTask  = new TimerTestTask(&this->timerCounter, &this->gsync);
     exception = false;
@@ -798,7 +798,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Long)
     {
         t->schedule(testTask, -100);
     }
-    catch (IllegalArgumentException e)
+    catch (std::invalid_argument e)
     {
         exception = true;
         // unscheduled tasks must be deleted
@@ -808,19 +808,19 @@ TEST_F(TimerTest, testSchedule_TimerTask_Long)
                                        "should throw IllegalArgumentException");
     t->cancel();
 
-    // Ensure a Timer throws a NullPointerException if the task is null
+    // Ensure a Timer throws a std::logic_error if the task is null
     t.reset(new Timer());
     exception = false;
     try
     {
         t->schedule(NULL, 10);
     }
-    catch (NullPointerException e)
+    catch (std::logic_error e)
     {
         exception = true;
     }
     ASSERT_TRUE(exception == true)
-        << ("Scheduling a null task should throw NullPointerException");
+        << ("Scheduling a null task should throw std::logic_error");
     t->cancel();
 
     // Ensure proper sequence of exceptions
@@ -830,12 +830,12 @@ TEST_F(TimerTest, testSchedule_TimerTask_Long)
     {
         t->schedule(NULL, -10);
     }
-    catch (NullPointerException& e)
-    {
-    }
-    catch (IllegalArgumentException& e)
+    catch (std::invalid_argument& e)
     {
         exception = true;
+    }
+    catch (std::logic_error& e)
+    {
     }
     ASSERT_TRUE(exception == true)
         << ("Scheduling a null task with negative delays should throw "
@@ -850,7 +850,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Long)
     {
         Thread::sleep(400);
     }
-    catch (InterruptedException& e)
+    catch (std::runtime_error& e)
     {
     }
     ASSERT_TRUE(1 == report.wasRun.get())
@@ -875,7 +875,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Long)
     {
         Thread::sleep(400);
     }
-    catch (InterruptedException& e)
+    catch (std::runtime_error& e)
     {
     }
 
@@ -892,7 +892,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Long2)
     std::unique_ptr<Timer> t;
     TimerTaskReport        report;
 
-    // Ensure a Timer throws an IllegalStateException after cancelled
+    // Ensure a Timer throws std::logic_error after cancelled
     t.reset(new Timer());
     Pointer<TimerTestTask> testTask(
         new TimerTestTask(&this->timerCounter, &this->gsync));
@@ -902,14 +902,14 @@ TEST_F(TimerTest, testSchedule_TimerTask_Long2)
     {
         t->schedule(testTask, 100);
     }
-    catch (IllegalStateException& e)
+    catch (std::logic_error& e)
     {
         exception = true;
     }
     ASSERT_TRUE(exception == true)
         << ("Scheduling a task after Timer.cancel() should throw exception");
 
-    // Ensure a Timer throws an IllegalStateException if task already cancelled
+    // Ensure a Timer throws std::logic_error if task already cancelled
     t.reset(new Timer());
     testTask.reset(new TimerTestTask(&this->timerCounter, &this->gsync));
     testTask->cancel();
@@ -918,7 +918,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Long2)
     {
         t->schedule(testTask, 100);
     }
-    catch (IllegalStateException& e)
+    catch (std::logic_error& e)
     {
         exception = true;
     }
@@ -926,7 +926,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Long2)
         << ("Scheduling a task after cancelling it should throw exception");
     t->cancel();
 
-    // Ensure a Timer throws an IllegalArgumentException if delay is negative
+    // Ensure a Timer throws an std::invalid_argument if delay is negative
     t.reset(new Timer());
     testTask.reset(new TimerTestTask(&this->timerCounter, &this->gsync));
     exception = false;
@@ -934,7 +934,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Long2)
     {
         t->schedule(testTask, -100);
     }
-    catch (IllegalArgumentException e)
+    catch (std::invalid_argument e)
     {
         exception = true;
     }
@@ -942,19 +942,19 @@ TEST_F(TimerTest, testSchedule_TimerTask_Long2)
                                        "should throw IllegalArgumentException");
     t->cancel();
 
-    // Ensure a Timer throws a NullPointerException if the task is null
+    // Ensure a Timer throws a std::logic_error if the task is null
     t.reset(new Timer());
     exception = false;
     try
     {
         t->schedule(NULL, 10);
     }
-    catch (NullPointerException e)
+    catch (std::logic_error e)
     {
         exception = true;
     }
     ASSERT_TRUE(exception == true)
-        << ("Scheduling a null task should throw NullPointerException");
+        << ("Scheduling a null task should throw std::logic_error");
     t->cancel();
 
     // Ensure proper sequence of exceptions
@@ -964,12 +964,12 @@ TEST_F(TimerTest, testSchedule_TimerTask_Long2)
     {
         t->schedule(NULL, -10);
     }
-    catch (NullPointerException& e)
-    {
-    }
-    catch (IllegalArgumentException& e)
+    catch (std::invalid_argument& e)
     {
         exception = true;
+    }
+    catch (std::logic_error& e)
+    {
     }
     ASSERT_TRUE(exception == true)
         << ("Scheduling a null task with negative delays should throw "
@@ -985,7 +985,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Long2)
     {
         Thread::sleep(400);
     }
-    catch (InterruptedException& e)
+    catch (std::runtime_error& e)
     {
     }
     ASSERT_TRUE(1 == report.wasRun.get())
@@ -1010,7 +1010,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Long2)
     {
         Thread::sleep(400);
     }
-    catch (InterruptedException& e)
+    catch (std::runtime_error& e)
     {
     }
 
@@ -1027,7 +1027,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Long_Long)
     std::unique_ptr<Timer> t;
     TimerTaskReport        report;
 
-    // Ensure a Timer throws an IllegalStateException after cancelled
+    // Ensure a Timer throws std::logic_error after cancelled
     t.reset(new Timer());
     TimerTestTask* testTask =
         new TimerTestTask(&this->timerCounter, &this->gsync);
@@ -1037,7 +1037,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Long_Long)
     {
         t->schedule(testTask, 100, 100);
     }
-    catch (IllegalStateException& e)
+    catch (std::logic_error& e)
     {
         exception = true;
         // unscheduled tasks must be deleted
@@ -1046,7 +1046,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Long_Long)
     ASSERT_TRUE(exception) << ("Scheduling a task after Timer.cancel() should "
                                "throw exception");
 
-    // Ensure a Timer throws an IllegalStateException if task already cancelled
+    // Ensure a Timer throws std::logic_error if task already cancelled
     t.reset(new Timer());
     testTask = new TimerTestTask(&this->timerCounter, &this->gsync);
     testTask->cancel();
@@ -1055,7 +1055,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Long_Long)
     {
         t->schedule(testTask, 100, 100);
     }
-    catch (IllegalStateException& e)
+    catch (std::logic_error& e)
     {
         exception = true;
         // unscheduled tasks must be deleted
@@ -1065,7 +1065,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Long_Long)
                                "throw exception");
     t->cancel();
 
-    // Ensure a Timer throws an IllegalArgumentException if delay is
+    // Ensure a Timer throws an std::invalid_argument if delay is
     // negative
     t.reset(new Timer());
     testTask  = new TimerTestTask(&this->timerCounter, &this->gsync);
@@ -1074,7 +1074,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Long_Long)
     {
         t->schedule(testTask, -100, 100);
     }
-    catch (IllegalArgumentException& e)
+    catch (std::invalid_argument& e)
     {
         exception = true;
         // unscheduled tasks must be deleted
@@ -1084,7 +1084,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Long_Long)
                                "throw IllegalArgumentException");
     t->cancel();
 
-    // Ensure a Timer throws an IllegalArgumentException if period is negative
+    // Ensure a Timer throws an std::invalid_argument if period is negative
     t.reset(new Timer());
     testTask  = new TimerTestTask(&this->timerCounter, &this->gsync);
     exception = false;
@@ -1092,7 +1092,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Long_Long)
     {
         t->schedule(testTask, 100, -100);
     }
-    catch (IllegalArgumentException& e)
+    catch (std::invalid_argument& e)
     {
         exception = true;
         // unscheduled tasks must be deleted
@@ -1102,7 +1102,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Long_Long)
                                "throw IllegalArgumentException");
     t->cancel();
 
-    // Ensure a Timer throws an IllegalArgumentException if period is zero
+    // Ensure a Timer throws an std::invalid_argument if period is zero
     t.reset(new Timer());
     testTask  = new TimerTestTask(&this->timerCounter, &this->gsync);
     exception = false;
@@ -1110,7 +1110,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Long_Long)
     {
         t->schedule(testTask, 100, 0);
     }
-    catch (IllegalArgumentException& e)
+    catch (std::invalid_argument& e)
     {
         exception = true;
         // unscheduled tasks must be deleted
@@ -1120,19 +1120,19 @@ TEST_F(TimerTest, testSchedule_TimerTask_Long_Long)
                                "IllegalArgumentException");
     t->cancel();
 
-    // Ensure a Timer throws a NullPointerException if the task is null
+    // Ensure a Timer throws a std::logic_error if the task is null
     t.reset(new Timer());
     exception = false;
     try
     {
         t->schedule(NULL, 10, 10);
     }
-    catch (NullPointerException& e)
+    catch (std::logic_error& e)
     {
         exception = true;
     }
     ASSERT_TRUE(exception) << ("Scheduling a null task should throw "
-                               "NullPointerException");
+                               "std::logic_error");
     t->cancel();
 
     // Ensure proper sequence of exceptions
@@ -1142,12 +1142,12 @@ TEST_F(TimerTest, testSchedule_TimerTask_Long_Long)
     {
         t->schedule(NULL, -10, -10);
     }
-    catch (NullPointerException& e)
-    {
-    }
-    catch (IllegalArgumentException& e)
+    catch (std::invalid_argument& e)
     {
         exception = true;
+    }
+    catch (std::logic_error& e)
+    {
     }
     ASSERT_TRUE(exception) << ("Scheduling a null task with negative delays "
                                "should throw IllegalArgumentException first");
@@ -1161,7 +1161,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Long_Long)
     {
         Thread::sleep(1000);  // Increased for macOS CI scheduling latency
     }
-    catch (InterruptedException& e)
+    catch (std::runtime_error& e)
     {
     }
     ASSERT_TRUE(report.wasRun.get() >= 2)
@@ -1188,7 +1188,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Long_Long)
         Thread::sleep(2000);  // Allowed more room for error (increased for
                               // macOS CI scheduling latency)
     }
-    catch (InterruptedException& e)
+    catch (std::runtime_error& e)
     {
     }
     ASSERT_TRUE(timerCounter.get() >= 24)
@@ -1204,7 +1204,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Long_Long2)
     std::unique_ptr<Timer> t;
     TimerTaskReport        report;
 
-    // Ensure a Timer throws an IllegalStateException after cancelled
+    // Ensure a Timer throws std::logic_error after cancelled
     t.reset(new Timer());
     Pointer<TimerTestTask> testTask(
         new TimerTestTask(&this->timerCounter, &this->gsync));
@@ -1214,14 +1214,14 @@ TEST_F(TimerTest, testSchedule_TimerTask_Long_Long2)
     {
         t->schedule(testTask, 100, 100);
     }
-    catch (IllegalStateException& e)
+    catch (std::logic_error& e)
     {
         exception = true;
     }
     ASSERT_TRUE(exception) << ("Scheduling a task after Timer.cancel() should "
                                "throw exception");
 
-    // Ensure a Timer throws an IllegalStateException if task already cancelled
+    // Ensure a Timer throws std::logic_error if task already cancelled
     t.reset(new Timer());
     testTask.reset(new TimerTestTask(&this->timerCounter, &this->gsync));
     testTask->cancel();
@@ -1230,7 +1230,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Long_Long2)
     {
         t->schedule(testTask, 100, 100);
     }
-    catch (IllegalStateException& e)
+    catch (std::logic_error& e)
     {
         exception = true;
     }
@@ -1238,7 +1238,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Long_Long2)
                                "throw exception");
     t->cancel();
 
-    // Ensure a Timer throws an IllegalArgumentException if delay is
+    // Ensure a Timer throws an std::invalid_argument if delay is
     // negative
     t.reset(new Timer());
     testTask.reset(new TimerTestTask(&this->timerCounter, &this->gsync));
@@ -1247,7 +1247,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Long_Long2)
     {
         t->schedule(testTask, -100, 100);
     }
-    catch (IllegalArgumentException& e)
+    catch (std::invalid_argument& e)
     {
         exception = true;
     }
@@ -1255,7 +1255,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Long_Long2)
                                "throw IllegalArgumentException");
     t->cancel();
 
-    // Ensure a Timer throws an IllegalArgumentException if period is negative
+    // Ensure a Timer throws an std::invalid_argument if period is negative
     t.reset(new Timer());
     testTask.reset(new TimerTestTask(&this->timerCounter, &this->gsync));
     exception = false;
@@ -1263,7 +1263,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Long_Long2)
     {
         t->schedule(testTask, 100, -100);
     }
-    catch (IllegalArgumentException& e)
+    catch (std::invalid_argument& e)
     {
         exception = true;
     }
@@ -1271,7 +1271,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Long_Long2)
                                "throw IllegalArgumentException");
     t->cancel();
 
-    // Ensure a Timer throws an IllegalArgumentException if period is zero
+    // Ensure a Timer throws an std::invalid_argument if period is zero
     t.reset(new Timer());
     testTask.reset(new TimerTestTask(&this->timerCounter, &this->gsync));
     exception = false;
@@ -1279,7 +1279,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Long_Long2)
     {
         t->schedule(testTask, 100, 0);
     }
-    catch (IllegalArgumentException& e)
+    catch (std::invalid_argument& e)
     {
         exception = true;
     }
@@ -1287,19 +1287,19 @@ TEST_F(TimerTest, testSchedule_TimerTask_Long_Long2)
                                "IllegalArgumentException");
     t->cancel();
 
-    // Ensure a Timer throws a NullPointerException if the task is null
+    // Ensure a Timer throws a std::logic_error if the task is null
     t.reset(new Timer());
     exception = false;
     try
     {
         t->schedule(NULL, 10, 10);
     }
-    catch (NullPointerException& e)
+    catch (std::logic_error& e)
     {
         exception = true;
     }
     ASSERT_TRUE(exception) << ("Scheduling a null task should throw "
-                               "NullPointerException");
+                               "std::logic_error");
     t->cancel();
 
     // Ensure proper sequence of exceptions
@@ -1309,12 +1309,12 @@ TEST_F(TimerTest, testSchedule_TimerTask_Long_Long2)
     {
         t->schedule(NULL, -10, -10);
     }
-    catch (NullPointerException& e)
-    {
-    }
-    catch (IllegalArgumentException& e)
+    catch (std::invalid_argument& e)
     {
         exception = true;
+    }
+    catch (std::logic_error& e)
+    {
     }
     ASSERT_TRUE(exception) << ("Scheduling a null task with negative delays "
                                "should throw IllegalArgumentException first");
@@ -1329,7 +1329,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Long_Long2)
     {
         Thread::sleep(1000);  // Increased for macOS CI scheduling latency
     }
-    catch (InterruptedException& e)
+    catch (std::runtime_error& e)
     {
     }
     ASSERT_TRUE(report.wasRun.get() >= 2)
@@ -1356,7 +1356,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Long_Long2)
         Thread::sleep(2000);  // Allowed more room for error (increased for
                               // macOS CI scheduling latency)
     }
-    catch (InterruptedException& e)
+    catch (std::runtime_error& e)
     {
     }
     ASSERT_TRUE(timerCounter.get() >= 24)
@@ -1372,7 +1372,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Date_Long)
     std::unique_ptr<Timer> t;
     TimerTaskReport        report;
 
-    // Ensure a Timer throws an IllegalStateException after cancelled
+    // Ensure a Timer throws std::logic_error after cancelled
     t.reset(new Timer());
     TimerTestTask* testTask =
         new TimerTestTask(&this->timerCounter, &this->gsync);
@@ -1383,7 +1383,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Date_Long)
     {
         t->schedule(testTask, d, 100);
     }
-    catch (IllegalStateException& e)
+    catch (std::logic_error& e)
     {
         exception = true;
         // unscheduled tasks must be deleted
@@ -1392,7 +1392,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Date_Long)
     ASSERT_TRUE(exception) << ("Scheduling a task after Timer.cancel() should "
                                "throw exception");
 
-    // Ensure a Timer throws an IllegalStateException if task already cancelled
+    // Ensure a Timer throws std::logic_error if task already cancelled
     t.reset(new Timer());
     d.setTime(System::currentTimeMillis() + 100);
     testTask = new TimerTestTask(&this->timerCounter, &this->gsync);
@@ -1402,7 +1402,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Date_Long)
     {
         t->schedule(testTask, d, 100);
     }
-    catch (IllegalStateException& e)
+    catch (std::logic_error& e)
     {
         exception = true;
         // unscheduled tasks must be deleted
@@ -1412,7 +1412,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Date_Long)
                                "throw exception");
     t->cancel();
 
-    // Ensure a Timer throws an IllegalArgumentException if delay is
+    // Ensure a Timer throws an std::invalid_argument if delay is
     // negative
     t.reset(new Timer());
     d.setTime(-100);
@@ -1422,7 +1422,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Date_Long)
     {
         t->schedule(testTask, d, 100);
     }
-    catch (IllegalArgumentException& e)
+    catch (std::invalid_argument& e)
     {
         exception = true;
         // unscheduled tasks must be deleted
@@ -1432,7 +1432,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Date_Long)
                                "throw IllegalArgumentException");
     t->cancel();
 
-    // Ensure a Timer throws an IllegalArgumentException if period is
+    // Ensure a Timer throws an std::invalid_argument if period is
     // negative
     t.reset(new Timer());
     d.setTime(System::currentTimeMillis() + 100);
@@ -1442,7 +1442,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Date_Long)
     {
         t->schedule(testTask, d, -100);
     }
-    catch (IllegalArgumentException& e)
+    catch (std::invalid_argument& e)
     {
         exception = true;
         // unscheduled tasks must be deleted
@@ -1452,7 +1452,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Date_Long)
                                "throw IllegalArgumentException");
     t->cancel();
 
-    // Ensure a Timer throws a NullPointerException if the task is null
+    // Ensure a Timer throws a std::logic_error if the task is null
     t.reset(new Timer());
     d.setTime(System::currentTimeMillis() + 100);
     exception = false;
@@ -1460,12 +1460,12 @@ TEST_F(TimerTest, testSchedule_TimerTask_Date_Long)
     {
         t->schedule(NULL, d, 10);
     }
-    catch (NullPointerException& e)
+    catch (std::logic_error& e)
     {
         exception = true;
     }
     ASSERT_TRUE(exception) << ("Scheduling a null task should throw "
-                               "NullPointerException");
+                               "std::logic_error");
     t->cancel();
 
     // Ensure proper sequence of exceptions
@@ -1476,12 +1476,12 @@ TEST_F(TimerTest, testSchedule_TimerTask_Date_Long)
     {
         t->schedule(NULL, d, 10);
     }
-    catch (NullPointerException& e)
-    {
-    }
-    catch (IllegalArgumentException& e)
+    catch (std::invalid_argument& e)
     {
         exception = true;
+    }
+    catch (std::logic_error& e)
+    {
     }
     ASSERT_TRUE(exception) << ("Scheduling a null task with negative dates "
                                "should throw IllegalArgumentException first");
@@ -1496,7 +1496,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Date_Long)
     {
         Thread::sleep(800);
     }
-    catch (InterruptedException& e)
+    catch (std::runtime_error& e)
     {
     }
     ASSERT_TRUE(report.wasRun.get() >= 2)
@@ -1527,7 +1527,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Date_Long)
     {
         Thread::sleep(3000);
     }
-    catch (InterruptedException& e)
+    catch (std::runtime_error& e)
     {
     }
     ASSERT_TRUE(timerCounter.get() >= 24)
@@ -1543,7 +1543,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Date_Long2)
     std::unique_ptr<Timer> t;
     TimerTaskReport        report;
 
-    // Ensure a Timer throws an IllegalStateException after cancelled
+    // Ensure a Timer throws std::logic_error after cancelled
     t.reset(new Timer());
     Pointer<TimerTestTask> testTask(
         new TimerTestTask(&this->timerCounter, &this->gsync));
@@ -1554,14 +1554,14 @@ TEST_F(TimerTest, testSchedule_TimerTask_Date_Long2)
     {
         t->schedule(testTask, d, 100);
     }
-    catch (IllegalStateException& e)
+    catch (std::logic_error& e)
     {
         exception = true;
     }
     ASSERT_TRUE(exception) << ("Scheduling a task after Timer.cancel() should "
                                "throw exception");
 
-    // Ensure a Timer throws an IllegalStateException if task already cancelled
+    // Ensure a Timer throws std::logic_error if task already cancelled
     t.reset(new Timer());
     d.setTime(System::currentTimeMillis() + 100);
     testTask.reset(new TimerTestTask(&this->timerCounter, &this->gsync));
@@ -1571,7 +1571,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Date_Long2)
     {
         t->schedule(testTask, d, 100);
     }
-    catch (IllegalStateException& e)
+    catch (std::logic_error& e)
     {
         exception = true;
     }
@@ -1579,7 +1579,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Date_Long2)
                                "throw exception");
     t->cancel();
 
-    // Ensure a Timer throws an IllegalArgumentException if delay is
+    // Ensure a Timer throws an std::invalid_argument if delay is
     // negative
     t.reset(new Timer());
     d.setTime(-100);
@@ -1589,7 +1589,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Date_Long2)
     {
         t->schedule(testTask, d, 100);
     }
-    catch (IllegalArgumentException& e)
+    catch (std::invalid_argument& e)
     {
         exception = true;
     }
@@ -1597,7 +1597,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Date_Long2)
                                "throw IllegalArgumentException");
     t->cancel();
 
-    // Ensure a Timer throws an IllegalArgumentException if period is
+    // Ensure a Timer throws an std::invalid_argument if period is
     // negative
     t.reset(new Timer());
     d.setTime(System::currentTimeMillis() + 100);
@@ -1607,7 +1607,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Date_Long2)
     {
         t->schedule(testTask, d, -100);
     }
-    catch (IllegalArgumentException& e)
+    catch (std::invalid_argument& e)
     {
         exception = true;
     }
@@ -1615,7 +1615,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Date_Long2)
                                "throw IllegalArgumentException");
     t->cancel();
 
-    // Ensure a Timer throws a NullPointerException if the task is null
+    // Ensure a Timer throws a std::logic_error if the task is null
     t.reset(new Timer());
     d.setTime(System::currentTimeMillis() + 100);
     exception = false;
@@ -1623,12 +1623,12 @@ TEST_F(TimerTest, testSchedule_TimerTask_Date_Long2)
     {
         t->schedule(NULL, d, 10);
     }
-    catch (NullPointerException& e)
+    catch (std::logic_error& e)
     {
         exception = true;
     }
     ASSERT_TRUE(exception) << ("Scheduling a null task should throw "
-                               "NullPointerException");
+                               "std::logic_error");
     t->cancel();
 
     // Ensure proper sequence of exceptions
@@ -1639,12 +1639,12 @@ TEST_F(TimerTest, testSchedule_TimerTask_Date_Long2)
     {
         t->schedule(NULL, d, 10);
     }
-    catch (NullPointerException& e)
-    {
-    }
-    catch (IllegalArgumentException& e)
+    catch (std::invalid_argument& e)
     {
         exception = true;
+    }
+    catch (std::logic_error& e)
+    {
     }
     ASSERT_TRUE(exception) << ("Scheduling a null task with negative dates "
                                "should throw IllegalArgumentException first");
@@ -1660,7 +1660,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Date_Long2)
     {
         Thread::sleep(800);
     }
-    catch (InterruptedException& e)
+    catch (std::runtime_error& e)
     {
     }
     ASSERT_TRUE(report.wasRun.get() >= 2)
@@ -1691,7 +1691,7 @@ TEST_F(TimerTest, testSchedule_TimerTask_Date_Long2)
     {
         Thread::sleep(3000);
     }
-    catch (InterruptedException& e)
+    catch (std::runtime_error& e)
     {
     }
     ASSERT_TRUE(timerCounter.get() >= 24)
@@ -1707,7 +1707,7 @@ TEST_F(TimerTest, testScheduleAtFixedRate_TimerTask_Long_Long)
     std::unique_ptr<Timer> t;
     TimerTaskReport        report;
 
-    // Ensure a Timer throws an IllegalStateException after cancelled
+    // Ensure a Timer throws std::logic_error after cancelled
     t.reset(new Timer());
     TimerTestTask* testTask =
         new TimerTestTask(&this->timerCounter, &this->gsync);
@@ -1717,7 +1717,7 @@ TEST_F(TimerTest, testScheduleAtFixedRate_TimerTask_Long_Long)
     {
         t->scheduleAtFixedRate(testTask, 100, 100);
     }
-    catch (IllegalStateException& e)
+    catch (std::logic_error& e)
     {
         exception = true;
         // unscheduled tasks must be deleted
@@ -1726,7 +1726,7 @@ TEST_F(TimerTest, testScheduleAtFixedRate_TimerTask_Long_Long)
     ASSERT_TRUE(exception) << ("scheduleAtFixedRate after Timer.cancel() "
                                "should throw exception");
 
-    // Ensure a Timer throws an IllegalArgumentException if delay is negative
+    // Ensure a Timer throws an std::invalid_argument if delay is negative
     t.reset(new Timer());
     testTask  = new TimerTestTask(&this->timerCounter, &this->gsync);
     exception = false;
@@ -1734,7 +1734,7 @@ TEST_F(TimerTest, testScheduleAtFixedRate_TimerTask_Long_Long)
     {
         t->scheduleAtFixedRate(testTask, -100, 100);
     }
-    catch (IllegalArgumentException& e)
+    catch (std::invalid_argument& e)
     {
         exception = true;
         // unscheduled tasks must be deleted
@@ -1744,7 +1744,7 @@ TEST_F(TimerTest, testScheduleAtFixedRate_TimerTask_Long_Long)
                                "throw IllegalArgumentException");
     t->cancel();
 
-    // Ensure a Timer throws an IllegalArgumentException if period is negative
+    // Ensure a Timer throws an std::invalid_argument if period is negative
     t.reset(new Timer());
     testTask  = new TimerTestTask(&this->timerCounter, &this->gsync);
     exception = false;
@@ -1752,7 +1752,7 @@ TEST_F(TimerTest, testScheduleAtFixedRate_TimerTask_Long_Long)
     {
         t->scheduleAtFixedRate(testTask, 100, -100);
     }
-    catch (IllegalArgumentException& e)
+    catch (std::invalid_argument& e)
     {
         exception = true;
         // unscheduled tasks must be deleted
@@ -1770,7 +1770,7 @@ TEST_F(TimerTest, testScheduleAtFixedRate_TimerTask_Long_Long)
     {
         Thread::sleep(400);
     }
-    catch (InterruptedException& e)
+    catch (std::runtime_error& e)
     {
     }
     ASSERT_TRUE(report.wasRun.get() >= 2)
@@ -1790,7 +1790,7 @@ TEST_F(TimerTest, testScheduleAtFixedRate_TimerTask_Long_Long)
     {
         Thread::sleep(1000);
     }
-    catch (InterruptedException& e)
+    catch (std::runtime_error& e)
     {
     }
     long long lastDelta = report.lastDelta;
@@ -1806,7 +1806,7 @@ TEST_F(TimerTest, testScheduleAtFixedRate_TimerTask_Long_Long2)
     std::unique_ptr<Timer> t;
     TimerTaskReport        report;
 
-    // Ensure a Timer throws an IllegalStateException after cancelled
+    // Ensure a Timer throws std::logic_error after cancelled
     t.reset(new Timer());
     Pointer<TimerTestTask> testTask(
         new TimerTestTask(&this->timerCounter, &this->gsync));
@@ -1816,14 +1816,14 @@ TEST_F(TimerTest, testScheduleAtFixedRate_TimerTask_Long_Long2)
     {
         t->scheduleAtFixedRate(testTask, 100, 100);
     }
-    catch (IllegalStateException& e)
+    catch (std::logic_error& e)
     {
         exception = true;
     }
     ASSERT_TRUE(exception) << ("scheduleAtFixedRate after Timer.cancel() "
                                "should throw exception");
 
-    // Ensure a Timer throws an IllegalArgumentException if delay is negative
+    // Ensure a Timer throws an std::invalid_argument if delay is negative
     t.reset(new Timer());
     testTask.reset(new TimerTestTask(&this->timerCounter, &this->gsync));
     exception = false;
@@ -1831,7 +1831,7 @@ TEST_F(TimerTest, testScheduleAtFixedRate_TimerTask_Long_Long2)
     {
         t->scheduleAtFixedRate(testTask, -100, 100);
     }
-    catch (IllegalArgumentException& e)
+    catch (std::invalid_argument& e)
     {
         exception = true;
     }
@@ -1839,7 +1839,7 @@ TEST_F(TimerTest, testScheduleAtFixedRate_TimerTask_Long_Long2)
                                "throw IllegalArgumentException");
     t->cancel();
 
-    // Ensure a Timer throws an IllegalArgumentException if period is negative
+    // Ensure a Timer throws an std::invalid_argument if period is negative
     t.reset(new Timer());
     testTask.reset(new TimerTestTask(&this->timerCounter, &this->gsync));
     exception = false;
@@ -1847,7 +1847,7 @@ TEST_F(TimerTest, testScheduleAtFixedRate_TimerTask_Long_Long2)
     {
         t->scheduleAtFixedRate(testTask, 100, -100);
     }
-    catch (IllegalArgumentException& e)
+    catch (std::invalid_argument& e)
     {
         exception = true;
     }
@@ -1864,7 +1864,7 @@ TEST_F(TimerTest, testScheduleAtFixedRate_TimerTask_Long_Long2)
     {
         Thread::sleep(400);
     }
-    catch (InterruptedException& e)
+    catch (std::runtime_error& e)
     {
     }
     ASSERT_TRUE(report.wasRun.get() >= 2)
@@ -1884,7 +1884,7 @@ TEST_F(TimerTest, testScheduleAtFixedRate_TimerTask_Long_Long2)
     {
         Thread::sleep(1000);
     }
-    catch (InterruptedException& e)
+    catch (std::runtime_error& e)
     {
     }
     long long lastDelta = report.lastDelta;
@@ -1900,7 +1900,7 @@ TEST_F(TimerTest, testScheduleAtFixedRate_TimerTask_Date_Long)
     std::unique_ptr<Timer> t;
     TimerTaskReport        report;
 
-    // Ensure a Timer throws an IllegalStateException after cancelled
+    // Ensure a Timer throws std::logic_error after cancelled
     t.reset(new Timer());
     TimerTestTask* testTask =
         new TimerTestTask(&this->timerCounter, &this->gsync);
@@ -1911,7 +1911,7 @@ TEST_F(TimerTest, testScheduleAtFixedRate_TimerTask_Date_Long)
     {
         t->scheduleAtFixedRate(testTask, d, 100);
     }
-    catch (IllegalStateException& e)
+    catch (std::logic_error& e)
     {
         exception = true;
         // unscheduled tasks must be deleted
@@ -1920,7 +1920,7 @@ TEST_F(TimerTest, testScheduleAtFixedRate_TimerTask_Date_Long)
     ASSERT_TRUE(exception) << ("scheduleAtFixedRate after Timer.cancel() "
                                "should throw exception");
 
-    // Ensure a Timer throws an IllegalArgumentException if delay is negative
+    // Ensure a Timer throws an std::invalid_argument if delay is negative
     t.reset(new Timer());
     testTask  = new TimerTestTask(&this->timerCounter, &this->gsync);
     exception = false;
@@ -1929,7 +1929,7 @@ TEST_F(TimerTest, testScheduleAtFixedRate_TimerTask_Date_Long)
     {
         t->scheduleAtFixedRate(testTask, d, 100);
     }
-    catch (IllegalArgumentException& e)
+    catch (std::invalid_argument& e)
     {
         exception = true;
         // unscheduled tasks must be deleted
@@ -1939,7 +1939,7 @@ TEST_F(TimerTest, testScheduleAtFixedRate_TimerTask_Date_Long)
                                "throw IllegalArgumentException");
     t->cancel();
 
-    // Ensure a Timer throws an IllegalArgumentException if period is negative
+    // Ensure a Timer throws an std::invalid_argument if period is negative
     t.reset(new Timer());
     testTask  = new TimerTestTask(&this->timerCounter, &this->gsync);
     exception = false;
@@ -1947,7 +1947,7 @@ TEST_F(TimerTest, testScheduleAtFixedRate_TimerTask_Date_Long)
     {
         t->scheduleAtFixedRate(testTask, d, -100);
     }
-    catch (IllegalArgumentException& e)
+    catch (std::invalid_argument& e)
     {
         exception = true;
         // unscheduled tasks must be deleted
@@ -1965,12 +1965,12 @@ TEST_F(TimerTest, testScheduleAtFixedRate_TimerTask_Date_Long)
     {
         t->scheduleAtFixedRate(NULL, d, 10);
     }
-    catch (NullPointerException& e)
-    {
-    }
-    catch (IllegalArgumentException& e)
+    catch (std::invalid_argument& e)
     {
         exception = true;
+    }
+    catch (std::logic_error& e)
+    {
     }
     ASSERT_TRUE(exception) << ("Scheduling a null task with negative date "
                                "should throw IllegalArgumentException first");
@@ -1983,12 +1983,12 @@ TEST_F(TimerTest, testScheduleAtFixedRate_TimerTask_Date_Long)
     {
         t->scheduleAtFixedRate(NULL, d, -10);
     }
-    catch (NullPointerException& e)
-    {
-    }
-    catch (IllegalArgumentException& e)
+    catch (std::invalid_argument& e)
     {
         exception = true;
+    }
+    catch (std::logic_error& e)
+    {
     }
     ASSERT_TRUE(exception) << ("Scheduling a null task & negative period "
                                "should throw IllegalArgumentException first");
@@ -2003,7 +2003,7 @@ TEST_F(TimerTest, testScheduleAtFixedRate_TimerTask_Date_Long)
     {
         Thread::sleep(400);
     }
-    catch (InterruptedException& e)
+    catch (std::runtime_error& e)
     {
     }
     ASSERT_TRUE(report.wasRun.get() >= 2)
@@ -2024,7 +2024,7 @@ TEST_F(TimerTest, testScheduleAtFixedRate_TimerTask_Date_Long)
     {
         Thread::sleep(1000);
     }
-    catch (InterruptedException& e)
+    catch (std::runtime_error& e)
     {
     }
     long long lastDelta = report.lastDelta;
@@ -2040,7 +2040,7 @@ TEST_F(TimerTest, testScheduleAtFixedRate_TimerTask_Date_Long2)
     std::unique_ptr<Timer> t;
     TimerTaskReport        report;
 
-    // Ensure a Timer throws an IllegalStateException after cancelled
+    // Ensure a Timer throws std::logic_error after cancelled
     t.reset(new Timer());
     Pointer<TimerTestTask> testTask(
         new TimerTestTask(&this->timerCounter, &this->gsync));
@@ -2051,14 +2051,14 @@ TEST_F(TimerTest, testScheduleAtFixedRate_TimerTask_Date_Long2)
     {
         t->scheduleAtFixedRate(testTask, d, 100);
     }
-    catch (IllegalStateException& e)
+    catch (std::logic_error& e)
     {
         exception = true;
     }
     ASSERT_TRUE(exception) << ("scheduleAtFixedRate after Timer.cancel() "
                                "should throw exception");
 
-    // Ensure a Timer throws an IllegalArgumentException if delay is negative
+    // Ensure a Timer throws an std::invalid_argument if delay is negative
     t.reset(new Timer());
     testTask.reset(new TimerTestTask(&this->timerCounter, &this->gsync));
     exception = false;
@@ -2067,7 +2067,7 @@ TEST_F(TimerTest, testScheduleAtFixedRate_TimerTask_Date_Long2)
     {
         t->scheduleAtFixedRate(testTask, d, 100);
     }
-    catch (IllegalArgumentException& e)
+    catch (std::invalid_argument& e)
     {
         exception = true;
     }
@@ -2075,7 +2075,7 @@ TEST_F(TimerTest, testScheduleAtFixedRate_TimerTask_Date_Long2)
                                "throw IllegalArgumentException");
     t->cancel();
 
-    // Ensure a Timer throws an IllegalArgumentException if period is negative
+    // Ensure a Timer throws an std::invalid_argument if period is negative
     t.reset(new Timer());
     testTask.reset(new TimerTestTask(&this->timerCounter, &this->gsync));
     exception = false;
@@ -2083,7 +2083,7 @@ TEST_F(TimerTest, testScheduleAtFixedRate_TimerTask_Date_Long2)
     {
         t->scheduleAtFixedRate(testTask, d, -100);
     }
-    catch (IllegalArgumentException& e)
+    catch (std::invalid_argument& e)
     {
         exception = true;
     }
@@ -2099,12 +2099,12 @@ TEST_F(TimerTest, testScheduleAtFixedRate_TimerTask_Date_Long2)
     {
         t->scheduleAtFixedRate(NULL, d, 10);
     }
-    catch (NullPointerException& e)
-    {
-    }
-    catch (IllegalArgumentException& e)
+    catch (std::invalid_argument& e)
     {
         exception = true;
+    }
+    catch (std::logic_error& e)
+    {
     }
     ASSERT_TRUE(exception) << ("Scheduling a null task with negative date "
                                "should throw IllegalArgumentException first");
@@ -2117,12 +2117,12 @@ TEST_F(TimerTest, testScheduleAtFixedRate_TimerTask_Date_Long2)
     {
         t->scheduleAtFixedRate(NULL, d, -10);
     }
-    catch (NullPointerException& e)
-    {
-    }
-    catch (IllegalArgumentException& e)
+    catch (std::invalid_argument& e)
     {
         exception = true;
+    }
+    catch (std::logic_error& e)
+    {
     }
     ASSERT_TRUE(exception) << ("Scheduling a null task & negative period "
                                "should throw IllegalArgumentException first");
@@ -2138,7 +2138,7 @@ TEST_F(TimerTest, testScheduleAtFixedRate_TimerTask_Date_Long2)
     {
         Thread::sleep(400);
     }
-    catch (InterruptedException& e)
+    catch (std::runtime_error& e)
     {
     }
     ASSERT_TRUE(report.wasRun.get() >= 2)
@@ -2159,7 +2159,7 @@ TEST_F(TimerTest, testScheduleAtFixedRate_TimerTask_Date_Long2)
     {
         Thread::sleep(1000);
     }
-    catch (InterruptedException& e)
+    catch (std::runtime_error& e)
     {
     }
     long long lastDelta = report.lastDelta;

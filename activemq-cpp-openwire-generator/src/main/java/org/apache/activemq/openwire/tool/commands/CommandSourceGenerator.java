@@ -42,7 +42,6 @@ public class CommandSourceGenerator extends CommandCodeGenerator {
         out.println("using namespace activemq::exceptions;");
         out.println("using namespace activemq::commands;");
         out.println("using namespace decaf::lang;");
-        out.println("using namespace decaf::lang::exceptions;");
         if( isComparable() ) {
             out.println("using namespace decaf::internal::util;");
         }
@@ -95,7 +94,7 @@ public class CommandSourceGenerator extends CommandCodeGenerator {
         out.println("    const "+getClassName()+"* srcPtr = dynamic_cast<const "+getClassName()+"*>(src);");
         out.println("");
         out.println("    if (srcPtr == NULL || src == NULL) {");
-        out.println("        throw decaf::lang::exceptions::NullPointerException(");
+        out.println("        throw NullPointerException(");
         out.println("            __FILE__, __LINE__,");
         out.println("            \""+getClassName()+"::copyDataStructure - src is NULL or invalid\");");
         out.println("    }");
@@ -203,7 +202,7 @@ public class CommandSourceGenerator extends CommandCodeGenerator {
         includes.add("<activemq/commands/"+getClassName()+".h>");
         includes.add("<activemq/state/CommandVisitor.h>");
         includes.add("<activemq/exceptions/ActiveMQException.h>");
-        includes.add("<decaf/lang/exceptions/NullPointerException.h>");
+        includes.add("<activemq/exceptions/ExceptionTypes.h>");
         if( isHashable() ) {
             includes.add("<decaf/util/HashCode.h>");
         }

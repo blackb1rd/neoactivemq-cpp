@@ -17,18 +17,17 @@
 
 #include "SecureRandom.h"
 
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
-
+#include <activemq/exceptions/ExceptionTypes.h>
 #ifdef HAVE_PTHREAD_H
 #include <decaf/internal/security/unix/SecureRandomImpl.h>
+#include <string>
 #else
 #include <decaf/internal/security/windows/SecureRandomImpl.h>
+#include <stdexcept>
+#include <string>
 #endif
 
 using namespace decaf;
-using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::security;
 using namespace decaf::internal;
 using namespace decaf::internal::security;
@@ -55,16 +54,17 @@ SecureRandom::SecureRandom(const unsigned char* seed, int size)
 {
     if (seed == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "Seed buffer pointer passed was NULL");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "Seed buffer pointer passed was NULL");
     }
 
     if (size < 0)
     {
-        throw IllegalArgumentException(__FILE__,
-                                       __LINE__,
-                                       "Passed buffer size was negative.");
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Passed buffer size was negative.");
     }
 
     if (size > 0)
@@ -92,16 +92,17 @@ void SecureRandom::nextBytes(unsigned char* buf, int size)
 {
     if (buf == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "Buffer pointer passed was NULL");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "Buffer pointer passed was NULL");
     }
 
     if (size < 0)
     {
-        throw IllegalArgumentException(__FILE__,
-                                       __LINE__,
-                                       "Passed buffer size was negative.");
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Passed buffer size was negative.");
     }
 
     if (size > 0)
@@ -144,16 +145,17 @@ void SecureRandom::setSeed(const unsigned char* seed, int size)
 {
     if (seed == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "Buffer pointer passed was NULL");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "Buffer pointer passed was NULL");
     }
 
     if (size < 0)
     {
-        throw IllegalArgumentException(__FILE__,
-                                       __LINE__,
-                                       "Passed buffer size was negative.");
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Passed buffer size was negative.");
     }
 
     if (size > 0)

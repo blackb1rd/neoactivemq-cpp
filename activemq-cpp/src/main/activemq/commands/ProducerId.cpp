@@ -17,10 +17,9 @@
 
 #include <activemq/commands/ProducerId.h>
 #include <activemq/exceptions/ActiveMQException.h>
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <activemq/state/CommandVisitor.h>
 #include <decaf/internal/util/StringUtils.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
-#include <decaf/lang/exceptions/NumberFormatException.h>
 #include <decaf/util/HashCode.h>
 #include <sstream>
 #include <stdexcept>
@@ -30,7 +29,6 @@ using namespace std;
 using namespace activemq;
 using namespace activemq::exceptions;
 using namespace activemq::commands;
-using namespace decaf::lang::exceptions;
 using namespace decaf::internal::util;
 
 /*
@@ -90,22 +88,7 @@ ProducerId::ProducerId(std::string producerKey)
 
     if (p != std::string::npos)
     {
-        try
-        {
-            value = std::stoll(producerKey.substr(p + 1, std::string::npos));
-        }
-        catch (const std::invalid_argument& e)
-        {
-            throw decaf::lang::exceptions::NumberFormatException(__FILE__,
-                                                                 __LINE__,
-                                                                 e.what());
-        }
-        catch (const std::out_of_range& e)
-        {
-            throw decaf::lang::exceptions::NumberFormatException(__FILE__,
-                                                                 __LINE__,
-                                                                 e.what());
-        }
+        value       = std::stoll(producerKey.substr(p + 1, std::string::npos));
         producerKey = producerKey.substr(0, p);
     }
 
@@ -141,9 +124,7 @@ void ProducerId::copyDataStructure(const DataStructure* src)
 
     if (srcPtr == NULL || src == NULL)
     {
-        throw decaf::lang::exceptions::NullPointerException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::TypeMismatchException(
             "ProducerId::copyDataStructure - src is NULL or invalid");
     }
 
@@ -334,23 +315,8 @@ void ProducerId::setProducerSessionKey(std::string sessionKey)
 
     if (p != std::string::npos)
     {
-        try
-        {
-            this->sessionId =
-                std::stoll(sessionKey.substr(p + 1, std::string::npos));
-        }
-        catch (const std::invalid_argument& e)
-        {
-            throw decaf::lang::exceptions::NumberFormatException(__FILE__,
-                                                                 __LINE__,
-                                                                 e.what());
-        }
-        catch (const std::out_of_range& e)
-        {
-            throw decaf::lang::exceptions::NumberFormatException(__FILE__,
-                                                                 __LINE__,
-                                                                 e.what());
-        }
+        this->sessionId =
+            std::stoll(sessionKey.substr(p + 1, std::string::npos));
         sessionKey = sessionKey.substr(0, p);
     }
 

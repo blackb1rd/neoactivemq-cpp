@@ -18,6 +18,8 @@
 #ifndef _DECAF_IO_UNSUPPORTEDENCODINGEXCEPTION_H_
 #define _DECAF_IO_UNSUPPORTEDENCODINGEXCEPTION_H_
 
+#include <cstdarg>
+
 #include <decaf/io/IOException.h>
 
 namespace decaf
@@ -101,6 +103,66 @@ namespace io
 
         virtual ~UnsupportedEncodingException() throw();
     };
+
+    inline UnsupportedEncodingException::UnsupportedEncodingException()
+        : io::IOException()
+    {
+    }
+
+    inline UnsupportedEncodingException::~UnsupportedEncodingException() throw()
+    {
+    }
+
+    inline UnsupportedEncodingException::UnsupportedEncodingException(
+        const lang::Exception& ex)
+        : io::IOException()
+    {
+        *(lang::Exception*)this = ex;
+    }
+
+    inline UnsupportedEncodingException::UnsupportedEncodingException(
+        const UnsupportedEncodingException& ex)
+        : io::IOException()
+    {
+        *(lang::Exception*)this = ex;
+    }
+
+    inline UnsupportedEncodingException::UnsupportedEncodingException(
+        const char*           file,
+        const int             lineNumber,
+        const std::exception* cause,
+        const char*           msg,
+        ...)
+        : io::IOException(cause)
+    {
+        va_list vargs;
+        va_start(vargs, msg);
+        buildMessage(msg, vargs);
+        va_end(vargs);
+
+        setMark(file, lineNumber);
+    }
+
+    inline UnsupportedEncodingException::UnsupportedEncodingException(
+        const std::exception* cause)
+        : io::IOException(cause)
+    {
+    }
+
+    inline UnsupportedEncodingException::UnsupportedEncodingException(
+        const char* file,
+        const int   lineNumber,
+        const char* msg,
+        ...)
+        : io::IOException()
+    {
+        va_list vargs;
+        va_start(vargs, msg);
+        buildMessage(msg, vargs);
+        va_end(vargs);
+
+        setMark(file, lineNumber);
+    }
 
 }  // namespace io
 }  // namespace decaf

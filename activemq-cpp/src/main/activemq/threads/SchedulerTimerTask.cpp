@@ -18,14 +18,15 @@
 #include "SchedulerTimerTask.h"
 
 #include <activemq/exceptions/ActiveMQException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <stdexcept>
+#include <string>
 
 using namespace activemq;
 using namespace activemq::threads;
 using namespace activemq::exceptions;
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 SchedulerTimerTask::SchedulerTimerTask(Runnable* task, bool ownsTask)
@@ -34,9 +35,10 @@ SchedulerTimerTask::SchedulerTimerTask(Runnable* task, bool ownsTask)
 {
     if (task == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "Assigned Task cannot be NULL.");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "Assigned Task cannot be NULL.");
     }
 }
 

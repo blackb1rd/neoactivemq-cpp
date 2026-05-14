@@ -19,14 +19,16 @@
 #pragma warning(disable : 4146)
 #endif
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/lang/Character.h>
 #include <decaf/lang/Integer.h>
 #include <sstream>
+#include <stdexcept>
+#include <string>
 #include <vector>
 
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 DECAF_API const int Integer::SIZE      = 32;
@@ -287,26 +289,22 @@ int Integer::parseInt(const String& value, int radix)
 {
     if (radix < Character::MIN_RADIX || radix > Character::MAX_RADIX)
     {
-        throw NumberFormatException(__FILE__,
-                                    __LINE__,
-                                    "Integer:decode - Invalid radix");
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Integer:decode - Invalid radix");
     }
 
     int length = (int)value.length(), i = 0;
     if (length == 0)
     {
-        throw NumberFormatException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::NumberFormatException(
             "Integer:decode - Invalid: zero length string");
     }
 
     bool negative = value.charAt(i) == '-';
     if (negative && ++i == length)
     {
-        throw NumberFormatException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::NumberFormatException(
             "Integer:decode - Invalid only a minus sign given");
     }
 
@@ -331,9 +329,7 @@ Integer Integer::decode(const String& value)
     int length = (int)value.length(), i = 0;
     if (length == 0)
     {
-        throw NumberFormatException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::NumberFormatException(
             "Integer:decode - Invalid zero size string");
     }
 
@@ -343,9 +339,7 @@ Integer Integer::decode(const String& value)
     {
         if (length == 1)
         {
-            throw NumberFormatException(
-                __FILE__,
-                __LINE__,
+            throw activemq::exceptions::NumberFormatException(
                 "Integer:decode - Invalid zero string, minus only");
         }
 
@@ -364,9 +358,7 @@ Integer Integer::decode(const String& value)
         {
             if (i == length)
             {
-                throw NumberFormatException(
-                    __FILE__,
-                    __LINE__,
+                throw activemq::exceptions::NumberFormatException(
                     "Integer:decode - Invalid zero string, minus only");
             }
             i++;
@@ -381,9 +373,7 @@ Integer Integer::decode(const String& value)
     {
         if (i == length)
         {
-            throw NumberFormatException(
-                __FILE__,
-                __LINE__,
+            throw activemq::exceptions::NumberFormatException(
                 "Integer:decode - Invalid zero string, minus only");
         }
         i++;
@@ -405,27 +395,21 @@ int Integer::parse(const String& value, int offset, int radix, bool negative)
         int digit = Character::digit(value.charAt(offset++), radix);
         if (digit == -1)
         {
-            throw NumberFormatException(
-                __FILE__,
-                __LINE__,
-                "Integer::parse - number string is invalid: ",
+            throw activemq::exceptions::NumberFormatException(
+                std::string("Integer::parse - number string is invalid: ") +
                 value.c_str());
         }
         if (max > result)
         {
-            throw NumberFormatException(
-                __FILE__,
-                __LINE__,
-                "Integer::parse - number string is invalid: ",
+            throw activemq::exceptions::NumberFormatException(
+                std::string("Integer::parse - number string is invalid: ") +
                 value.c_str());
         }
         int next = result * radix - digit;
         if (next > result)
         {
-            throw NumberFormatException(
-                __FILE__,
-                __LINE__,
-                "Integer::parse - number string is invalid: ",
+            throw activemq::exceptions::NumberFormatException(
+                std::string("Integer::parse - number string is invalid: ") +
                 value.c_str());
         }
         result = next;
@@ -435,10 +419,8 @@ int Integer::parse(const String& value, int offset, int radix, bool negative)
         result = -result;
         if (result < 0)
         {
-            throw NumberFormatException(
-                __FILE__,
-                __LINE__,
-                "Integer::parse - number string is invalid: ",
+            throw activemq::exceptions::NumberFormatException(
+                std::string("Integer::parse - number string is invalid: ") +
                 value.c_str());
         }
     }

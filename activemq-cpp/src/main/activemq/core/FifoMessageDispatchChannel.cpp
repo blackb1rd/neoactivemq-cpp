@@ -98,7 +98,7 @@ std::shared_ptr<MessageDispatch> FifoMessageDispatchChannel::dequeue(
             return std::shared_ptr<MessageDispatch>();
         }
 
-        // Use pollFirst instead of pop to avoid NoSuchElementException
+        // Use pollFirst instead of pop to avoid std::runtime_error
         std::shared_ptr<MessageDispatch> result;
         if (channel.pollFirst(result))
         {
@@ -119,7 +119,7 @@ std::shared_ptr<MessageDispatch> FifoMessageDispatchChannel::dequeueNoWait()
             return std::shared_ptr<MessageDispatch>();
         }
 
-        // Use pollFirst instead of pop to avoid NoSuchElementException
+        // Use pollFirst instead of pop to avoid std::runtime_error
         std::shared_ptr<MessageDispatch> result;
         if (channel.pollFirst(result))
         {
@@ -140,7 +140,7 @@ std::shared_ptr<MessageDispatch> FifoMessageDispatchChannel::peek() const
             return std::shared_ptr<MessageDispatch>();
         }
 
-        // Use peekFirst instead of getFirst to avoid NoSuchElementException
+        // Use peekFirst instead of getFirst to avoid std::runtime_error
         std::shared_ptr<MessageDispatch> result;
         if (channel.peekFirst(result))
         {

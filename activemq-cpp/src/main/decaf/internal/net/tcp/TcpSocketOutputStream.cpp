@@ -21,7 +21,10 @@
 
 #include <decaf/net/SocketError.h>
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/internal/net/tcp/TcpSocket.h>
+#include <stdexcept>
+#include <string>
 
 using namespace decaf;
 using namespace decaf::net;
@@ -31,7 +34,6 @@ using namespace decaf::internal;
 using namespace decaf::internal::net;
 using namespace decaf::internal::net::tcp;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -42,9 +44,10 @@ TcpSocketOutputStream::TcpSocketOutputStream(TcpSocket* socket)
 {
     if (socket == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "TcpSocket instance passed was NULL.");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "TcpSocket instance passed was NULL.");
     }
 }
 
@@ -97,9 +100,7 @@ void TcpSocketOutputStream::doWriteArrayBounded(const unsigned char* buffer,
 
         if (buffer == NULL)
         {
-            throw NullPointerException(
-                __FILE__,
-                __LINE__,
+            throw activemq::exceptions::NullPointerException(
                 "TcpSocketOutputStream::write - passed buffer is null");
         }
 
@@ -114,7 +115,5 @@ void TcpSocketOutputStream::doWriteArrayBounded(const unsigned char* buffer,
         this->socket->write(buffer, size, offset, length);
     }
     DECAF_CATCH_RETHROW(IOException)
-    DECAF_CATCH_RETHROW(NullPointerException)
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
     DECAF_CATCHALL_THROW(IOException)
 }

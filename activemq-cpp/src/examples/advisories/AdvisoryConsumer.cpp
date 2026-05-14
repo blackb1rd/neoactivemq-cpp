@@ -20,20 +20,21 @@
 #include <cms/Message.h>
 #include <cms/TextMessage.h>
 #include <cms/Topic.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
+
+#include <stdexcept>
 
 #include <activemq/commands/ActiveMQMessage.h>
 #include <activemq/commands/ProducerInfo.h>
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <string>
 
 using namespace std;
 using namespace activemq;
 using namespace activemq::commands;
+using namespace activemq::exceptions;
 using namespace activemqcpp;
 using namespace activemqcpp::examples;
 using namespace activemqcpp::examples::advisories;
-using namespace decaf;
-using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 AdvisoryConsumer::AdvisoryConsumer(cms::Session* session)

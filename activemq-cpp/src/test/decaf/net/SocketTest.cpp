@@ -30,6 +30,7 @@
 #include <decaf/util/concurrent/Mutex.h>
 #include <string.h>
 #include <list>
+#include <stdexcept>
 
 using namespace std;
 using namespace decaf;
@@ -37,7 +38,6 @@ using namespace decaf::io;
 using namespace decaf::net;
 using namespace decaf::util;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 class SocketTest : public ::testing::Test
 {
@@ -60,10 +60,10 @@ TEST_F(SocketTest, testConnectPortOutOfRange)
 {
     Socket s;
 
-    ASSERT_THROW(s.connect("0.0.0.0", 70000), IllegalArgumentException)
+    ASSERT_THROW(s.connect("0.0.0.0", 70000), std::invalid_argument)
         << ("Should Throw an IllegalArguementException");
 
-    ASSERT_THROW(s.connect("0.0.0.0", 70000, 1000), IllegalArgumentException)
+    ASSERT_THROW(s.connect("0.0.0.0", 70000, 1000), std::invalid_argument)
         << ("Should Throw an IllegalArguementException");
 }
 
@@ -408,7 +408,7 @@ TEST_F(SocketTest, testGetOutputStream)
         {
             Thread::sleep(200);
         }
-        catch (InterruptedException& e)
+        catch (std::runtime_error& e)
         {
         }
 
@@ -434,7 +434,7 @@ TEST_F(SocketTest, testGetOutputStream)
         {
             Thread::sleep(200);
         }
-        catch (InterruptedException& e)
+        catch (std::runtime_error& e)
         {
         }
 

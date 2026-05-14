@@ -21,6 +21,7 @@
 #include <activemq/util/Config.h>
 
 #include <decaf/util/Properties.h>
+#include <stdexcept>
 
 namespace activemq
 {
@@ -147,9 +148,9 @@ namespace core
          * @param properties
          *      The Properties object used to configure this object.
          *
-         * @throws NumberFormatException if a property that is numeric cannot be
+         * @throws std::invalid_argument if a property that is numeric cannot be
          * converted
-         * @throws IllegalArgumentException if a property can't be converted to
+         * @throws std::invalid_argument if a property can't be converted to
          * the correct type.
          */
         virtual void configure(const decaf::util::Properties& properties);

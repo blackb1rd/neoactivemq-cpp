@@ -23,7 +23,7 @@
 #include <decaf/lang/Thread.h>
 #include <gtest/gtest.h>
 
-#include <decaf/lang/Throwable.h>
+#include <decaf/lang/Exception.h>
 #include <decaf/util/concurrent/Callable.h>
 #include <decaf/util/concurrent/ExecutorService.h>
 #include <decaf/util/concurrent/ThreadFactory.h>
@@ -63,13 +63,13 @@ namespace util
             void threadFail(const std::string& reason);
             void threadShouldThrow();
             void threadUnexpectedException();
-            void threadUnexpectedException(decaf::lang::Throwable& ex);
+            void threadUnexpectedException(decaf::lang::Exception& ex);
             void threadAssertFalse(bool value);
             void threadAssertTrue(bool value);
             void threadAssertEquals(long long x, long long y);
 
             void unexpectedException();
-            void unexpectedException(decaf::lang::Throwable& ex);
+            void unexpectedException(decaf::lang::Exception& ex);
             void shouldThrow();
 
             void joinPool(ExecutorService* exec);
@@ -279,7 +279,7 @@ namespace util
                     {
                         Thread::sleep(SMALL_DELAY_MS);
                     }
-                    catch (decaf::lang::exceptions::InterruptedException& e)
+                    catch (std::runtime_error& e)
                     {
                     }
                 }
@@ -381,7 +381,7 @@ namespace util
                     {
                         Thread::sleep(MEDIUM_DELAY_MS);
                     }
-                    catch (decaf::lang::exceptions::InterruptedException& e)
+                    catch (std::runtime_error& e)
                     {
                     }
                 }
@@ -482,7 +482,7 @@ namespace util
                     {
                         Thread::sleep(LONG_DELAY_MS);
                     }
-                    catch (decaf::lang::exceptions::InterruptedException& e)
+                    catch (std::runtime_error& e)
                     {
                     }
                 }

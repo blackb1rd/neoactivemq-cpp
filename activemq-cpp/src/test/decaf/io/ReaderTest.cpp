@@ -19,16 +19,15 @@
 
 #include <decaf/io/Reader.h>
 #include <decaf/lang/Math.h>
-#include <decaf/lang/exceptions/IndexOutOfBoundsException.h>
 #include <decaf/nio/CharBuffer.h>
 
+#include <stdexcept>
 #include <vector>
 
 using namespace decaf;
 using namespace decaf::io;
 using namespace decaf::nio;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 class ReaderTest : public ::testing::Test
 {
@@ -118,8 +117,8 @@ TEST_F(ReaderTest, testReaderCharBufferNull)
 
     CharBuffer* charBuffer = NULL;
 
-    ASSERT_THROW(mockReader.read(charBuffer), NullPointerException)
-        << ("Should throw an NullPointerException");
+    ASSERT_THROW(mockReader.read(charBuffer), std::logic_error)
+        << ("Should throw an std::logic_error");
 }
 
 ////////////////////////////////////////////////////////////////////////////////

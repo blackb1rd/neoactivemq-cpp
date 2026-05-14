@@ -17,6 +17,9 @@
 
 #include <gtest/gtest.h>
 
+#include <stdexcept>
+#include <typeinfo>
+
 #include <decaf/lang/Pointer.h>
 #include <decaf/util/concurrent/CountDownLatch.h>
 #include <decaf/util/concurrent/Executors.h>
@@ -26,7 +29,6 @@
 using namespace std;
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 
@@ -112,8 +114,8 @@ TEST_F(ExecutorsTest, testNewSingleThreadExecutor2)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(ExecutorsTest, testNewSingleThreadExecutor3)
 {
-    ASSERT_THROW(Executors::newSingleThreadExecutor(NULL), NullPointerException)
-        << ("Should throw a NullPointerException");
+    ASSERT_THROW(Executors::newSingleThreadExecutor(NULL), std::logic_error)
+        << ("Should throw std::logic_error");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -121,8 +123,8 @@ TEST_F(ExecutorsTest, testCastNewSingleThreadExecutor)
 {
     Pointer<ExecutorService> e(Executors::newSingleThreadExecutor());
 
-    ASSERT_THROW(e.dynamicCast<ThreadPoolExecutor>(), ClassCastException)
-        << ("Should throw a ClassCastException");
+    ASSERT_THROW(e.dynamicCast<ThreadPoolExecutor>(), std::bad_cast)
+        << ("Should throw std::bad_cast");
 
     joinPool(e.get());
 }
@@ -180,14 +182,14 @@ TEST_F(ExecutorsTest, testNewFixedThreadPool2)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(ExecutorsTest, testNewFixedThreadPool3)
 {
-    ASSERT_THROW(Executors::newFixedThreadPool(2, NULL), NullPointerException)
-        << ("Should throw a NullPointerException");
+    ASSERT_THROW(Executors::newFixedThreadPool(2, NULL), std::logic_error)
+        << ("Should throw std::logic_error");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(ExecutorsTest, testNewFixedThreadPool4)
 {
-    ASSERT_THROW(Executors::newFixedThreadPool(0), IllegalArgumentException)
+    ASSERT_THROW(Executors::newFixedThreadPool(0), std::invalid_argument)
         << ("Should throw a IllegalArgumentException");
 }
 
@@ -208,8 +210,8 @@ TEST_F(ExecutorsTest, testUnconfigurableExecutorService)
 TEST_F(ExecutorsTest, testUnconfigurableExecutorServiceNPE)
 {
     ASSERT_THROW(Executors::unconfigurableExecutorService(NULL),
-                 NullPointerException)
-        << ("Should throw a NullPointerException");
+                 std::logic_error)
+        << ("Should throw std::logic_error");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -229,13 +231,13 @@ TEST_F(ExecutorsTest, testCallable2)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(ExecutorsTest, testCallableNPE1)
 {
-    ASSERT_THROW(Executors::callable<int>(NULL), NullPointerException)
-        << ("Should throw a NullPointerException");
+    ASSERT_THROW(Executors::callable<int>(NULL), std::logic_error)
+        << ("Should throw std::logic_error");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(ExecutorsTest, testCallableNPE2)
 {
-    ASSERT_THROW(Executors::callable<int>(NULL, 42), NullPointerException)
-        << ("Should throw a NullPointerException");
+    ASSERT_THROW(Executors::callable<int>(NULL, 42), std::logic_error)
+        << ("Should throw std::logic_error");
 }

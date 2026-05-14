@@ -17,19 +17,18 @@
 
 #include <gtest/gtest.h>
 
+#include <decaf/lang/Exception.h>
 #include <decaf/lang/System.h>
-#include <decaf/lang/exceptions/InterruptedException.h>
-#include <decaf/lang/exceptions/RuntimeException.h>
 #include <decaf/util/ArrayList.h>
 #include <decaf/util/Random.h>
 #include <decaf/util/concurrent/Mutex.h>
+#include <stdexcept>
 
 #include <memory>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 
@@ -61,7 +60,7 @@ namespace lang
                     lock.wait(delay);
                 }
             }
-            catch (decaf::lang::exceptions::InterruptedException& e)
+            catch (std::runtime_error& e)
             {
                 return;
             }
@@ -118,7 +117,7 @@ namespace lang
                     {
                         lock.wait();
                     }
-                    catch (InterruptedException& e)
+                    catch (std::runtime_error& e)
                     {
                     }
                 }
@@ -303,7 +302,7 @@ namespace lang
         virtual void run()
         {
             Thread::sleep(100);
-            throw RuntimeException(__FILE__, __LINE__, "Planned");
+            throw Exception(__FILE__, __LINE__, "Planned");
         }
     };
 
@@ -329,7 +328,7 @@ namespace lang
             {
                 Thread::sleep(10000);
             }
-            catch (InterruptedException& ex)
+            catch (std::runtime_error& ex)
             {
                 interrupted = true;
             }
@@ -369,7 +368,7 @@ namespace lang
             {
                 parent->join(10000);
             }
-            catch (InterruptedException& ex)
+            catch (std::runtime_error& ex)
             {
                 interrupted = true;
             }
@@ -408,7 +407,7 @@ namespace lang
                 {
                     lock.wait();
                 }
-                catch (InterruptedException& e)
+                catch (std::runtime_error& e)
                 {
                     interrupted = true;
                 }
@@ -494,7 +493,7 @@ TEST_F(ThreadTest, testRun)
         ASSERT_TRUE(rt.didThreadRun) << ("Thread did not run");
         t.join();
     }
-    catch (InterruptedException& e)
+    catch (std::runtime_error& e)
     {
         FAIL() << ("Joined thread was interrupted");
     }
@@ -655,7 +654,7 @@ TEST_F(ThreadTest, testIsAlive)
         {
             runnable->lock.wait();
         }
-        catch (InterruptedException& e)
+        catch (std::runtime_error& e)
         {
         }
     }
@@ -666,7 +665,7 @@ TEST_F(ThreadTest, testIsAlive)
     {
         ct.join();
     }
-    catch (InterruptedException& e)
+    catch (std::runtime_error& e)
     {
         FAIL() << ("Thread did not die");
     }
@@ -693,7 +692,7 @@ TEST_F(ThreadTest, testSleep)
         Thread::sleep(1000);
         endTime = System::currentTimeMillis();
     }
-    catch (InterruptedException& e)
+    catch (std::runtime_error& e)
     {
         FAIL() << ("Unexpected interrupt received");
     }
@@ -701,7 +700,7 @@ TEST_F(ThreadTest, testSleep)
     ASSERT_TRUE((endTime - startTime) >= 800)
         << ("Failed to sleep long enough");
 
-    ASSERT_THROW(Thread::sleep(-1), IllegalArgumentException)
+    ASSERT_THROW(Thread::sleep(-1), std::invalid_argument)
         << ("Should throw an IllegalArgumentException");
 }
 
@@ -717,7 +716,7 @@ TEST_F(ThreadTest, testSleep2Arg)
         Thread::sleep(1000, 10);
         endTime = System::currentTimeMillis();
     }
-    catch (InterruptedException& e)
+    catch (std::runtime_error& e)
     {
         FAIL() << ("Unexpected interrupt received");
     }
@@ -725,10 +724,10 @@ TEST_F(ThreadTest, testSleep2Arg)
     ASSERT_TRUE((endTime - startTime) >= 800)
         << ("Failed to sleep long enough");
 
-    ASSERT_THROW(Thread::sleep(-1, 0), IllegalArgumentException)
+    ASSERT_THROW(Thread::sleep(-1, 0), std::invalid_argument)
         << ("Should throw an IllegalArgumentException");
 
-    ASSERT_THROW(Thread::sleep(1000, 10000000), IllegalArgumentException)
+    ASSERT_THROW(Thread::sleep(1000, 10000000), std::invalid_argument)
         << ("Should throw an IllegalArgumentException");
 }
 
@@ -747,7 +746,7 @@ TEST_F(ThreadTest, testGetState)
         {
             runnable->lock.wait();
         }
-        catch (InterruptedException& e)
+        catch (std::runtime_error& e)
         {
         }
     }
@@ -759,7 +758,7 @@ TEST_F(ThreadTest, testGetState)
     {
         ct.join();
     }
-    catch (InterruptedException& e)
+    catch (std::runtime_error& e)
     {
         FAIL() << ("Thread did not die");
     }
@@ -816,7 +815,7 @@ TEST_F(ThreadTest, testInterrupt)
             ct.lock.wait();
         }
     }
-    catch (InterruptedException& e)
+    catch (std::runtime_error& e)
     {
         interrupted = true;
     }
@@ -840,7 +839,7 @@ TEST_F(ThreadTest, testInterrupt)
         }
         Thread::sleep(20000);
     }
-    catch (InterruptedException& e)
+    catch (std::runtime_error& e)
     {
         interrupted = true;
     }

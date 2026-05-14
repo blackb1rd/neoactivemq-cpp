@@ -17,12 +17,15 @@
 
 #include "TimeUnit.h"
 
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <stdexcept>
+#include <string>
+
 #include <decaf/lang/Long.h>
 #include <decaf/lang/Thread.h>
 
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 
@@ -125,9 +128,10 @@ void TimeUnit::timedWait(Synchronizable* obj, long long timeout) const
 {
     if (obj == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "Synchronizable object pointer was null.");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "Synchronizable object pointer was null.");
     }
 
     if (timeout > 0)
@@ -143,9 +147,10 @@ void TimeUnit::timedJoin(Thread* thread, long long timeout)
 {
     if (thread == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "Thread object pointer was null.");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "Thread object pointer was null.");
     }
 
     if (timeout > 0)
@@ -214,9 +219,8 @@ const TimeUnit& TimeUnit::valueOf(const std::string& name)
         }
     }
 
-    throw IllegalArgumentException(
-        __FILE__,
-        __LINE__,
-        "Passed TimeUnit name; %s, Does not match any instances of TimeUnit",
-        name.c_str());
+    throw activemq::exceptions::InvalidArgumentException(
+        std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+        ": Passed TimeUnit name; " + name +
+        ", Does not match any instances of TimeUnit");
 }

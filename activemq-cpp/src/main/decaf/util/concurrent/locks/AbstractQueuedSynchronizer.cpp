@@ -17,11 +17,11 @@
 
 #include "AbstractQueuedSynchronizer.h"
 
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <activemq/exceptions/StdExceptionCatchMacros.h>
 #include <decaf/lang/Integer.h>
 #include <decaf/lang/System.h>
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
-#include <decaf/lang/exceptions/UnsupportedOperationException.h>
+#include <stdexcept>
 
 #include <decaf/internal/util/concurrent/Atomics.h>
 #include <decaf/internal/util/concurrent/PlatformThread.h>
@@ -30,10 +30,10 @@
 #include <decaf/util/concurrent/locks/LockSupport.h>
 
 #include <deque>
+#include <string>
 
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 using namespace decaf::util::concurrent::atomic;
@@ -254,7 +254,11 @@ public:
         Node* p = prev;
         if (p == NULL)
         {
-            throw NullPointerException();
+            throw activemq::exceptions::NullPointerException(__FILE__,
+                                                             __LINE__,
+                                                             "Predecessor "
+                                                             "link was "
+                                                             "NULL");
         }
         else
         {
@@ -874,17 +878,20 @@ namespace util
                             if (shouldParkAfterFailedAcquire(p, node) &&
                                 parkAndCheckInterrupt())
                             {
-                                throw InterruptedException(
+                                throw activemq::exceptions::InterruptedException(
                                     __FILE__,
                                     __LINE__,
                                     "Interrupted while waiting for lock.");
                             }
                         }
                     }
+                    AMQ_CANCEL_AND_RETHROW_RUNTIME_HIERARCHY(
+                        cancelAcquire(node))
                     catch (Exception& ex)
                     {
                         cancelAcquire(node);
-                        throw InterruptedException(ex);
+                        throw activemq::exceptions::InterruptedException(
+                            ex.what());
                     }
                 }
 
@@ -930,13 +937,15 @@ namespace util
 
                             if (Thread::interrupted())
                             {
-                                throw InterruptedException(
+                                throw activemq::exceptions::InterruptedException(
                                     __FILE__,
                                     __LINE__,
                                     "Interrupted while waiting for lock.");
                             }
                         }
                     }
+                    AMQ_CANCEL_AND_RETHROW_RUNTIME_HIERARCHY(
+                        cancelAcquire(node))
                     catch (Exception& ex)
                     {
                         cancelAcquire(node);
@@ -985,6 +994,8 @@ namespace util
                             }
                         }
                     }
+                    AMQ_CANCEL_AND_RETHROW_RUNTIME_HIERARCHY(
+                        cancelAcquire(node))
                     catch (Exception& ex)
                     {
                         cancelAcquire(node);
@@ -1022,13 +1033,15 @@ namespace util
                             if (shouldParkAfterFailedAcquire(p, node) &&
                                 parkAndCheckInterrupt())
                             {
-                                throw InterruptedException(
+                                throw activemq::exceptions::InterruptedException(
                                     __FILE__,
                                     __LINE__,
                                     "Interrupted while waiting for lock.");
                             }
                         }
                     }
+                    AMQ_CANCEL_AND_RETHROW_RUNTIME_HIERARCHY(
+                        cancelAcquire(node))
                     catch (Exception& ex)
                     {
                         cancelAcquire(node);
@@ -1084,7 +1097,7 @@ namespace util
 
                             if (Thread::interrupted())
                             {
-                                throw InterruptedException(
+                                throw activemq::exceptions::InterruptedException(
                                     __FILE__,
                                     __LINE__,
                                     "Interrupted while waiting for lock.");
@@ -1232,12 +1245,7 @@ namespace util
                  * already then its not added as the signal will have already
                  * done so, we must wait though until it appears on the sync
                  * queue otherwise the attempt to re-acquire the lock could
-                 * throw a NullPointerException.
-                 *
-                 * @param node
-                 *      The node that is to be transferred onto the sync queue.
-                 *
-                 * @return true if canceled before the node was signaled
+                 * throw NullPointerException.
                  */
                 bool transferAfterCancelledWait(Node* node)
                 {
@@ -1283,10 +1291,11 @@ namespace util
                         }
                         else
                         {
-                            throw IllegalMonitorStateException();
+                            throw activemq::exceptions::
+                                IllegalMonitorStateException();
                         }
                     }
-                    catch (IllegalMonitorStateException& ex)
+                    catch (activemq::exceptions::IllegalMonitorStateException&)
                     {
                         node->waitStatus = Node::CANCELLED;
                         throw;
@@ -1349,8 +1358,9 @@ namespace util
                 {
                     REINTERRUPT =
                         1,  // Re-interrupt thread on exit from a wait call.
-                    THROW_IE = -1  // Throw a new InterruptedException on wait
-                                   // call exit.
+                    THROW_IE = -1  // Throw a new
+                                   // activemq::exceptions::InterruptedException
+                                   // on wait call exit.
                 };
 
             private:
@@ -1379,9 +1389,10 @@ namespace util
                 {
                     if (Thread::interrupted())
                     {
-                        throw InterruptedException(__FILE__,
-                                                   __LINE__,
-                                                   "Thread was interrupted");
+                        throw activemq::exceptions::InterruptedException(
+                            __FILE__,
+                            __LINE__,
+                            "Thread was interrupted");
                     }
 
                     Node* node = addConditionWaiter();
@@ -1439,9 +1450,10 @@ namespace util
                 {
                     if (Thread::interrupted())
                     {
-                        throw InterruptedException(__FILE__,
-                                                   __LINE__,
-                                                   "Thread was interrupted");
+                        throw activemq::exceptions::InterruptedException(
+                            __FILE__,
+                            __LINE__,
+                            "Thread was interrupted");
                     }
                     Node*     node          = addConditionWaiter();
                     int       savedState    = impl->fullyRelease(node);
@@ -1489,9 +1501,10 @@ namespace util
                     long long nanosTimeout = unit.toNanos(time);
                     if (Thread::interrupted())
                     {
-                        throw InterruptedException(__FILE__,
-                                                   __LINE__,
-                                                   "Thread was interrupted");
+                        throw activemq::exceptions::InterruptedException(
+                            __FILE__,
+                            __LINE__,
+                            "Thread was interrupted");
                     }
                     Node*     node          = addConditionWaiter();
                     int       savedState    = impl->fullyRelease(node);
@@ -1542,9 +1555,10 @@ namespace util
                     long long abstime = deadline.getTime();
                     if (Thread::interrupted())
                     {
-                        throw InterruptedException(__FILE__,
-                                                   __LINE__,
-                                                   "Thread was interrupted");
+                        throw activemq::exceptions::InterruptedException(
+                            __FILE__,
+                            __LINE__,
+                            "Thread was interrupted");
                     }
                     Node* node          = addConditionWaiter();
                     int   savedState    = impl->fullyRelease(node);
@@ -1591,7 +1605,8 @@ namespace util
                 {
                     if (!impl->isHeldExclusively())
                     {
-                        throw IllegalMonitorStateException();
+                        throw activemq::exceptions::
+                            IllegalMonitorStateException();
                     }
                     Node* first = head;
                     if (first != NULL)
@@ -1604,7 +1619,8 @@ namespace util
                 {
                     if (!impl->isHeldExclusively())
                     {
-                        throw IllegalMonitorStateException();
+                        throw activemq::exceptions::
+                            IllegalMonitorStateException();
                     }
                     Node* first = head;
                     if (first != NULL)
@@ -1623,7 +1639,8 @@ namespace util
                 {
                     if (!impl->isHeldExclusively())
                     {
-                        throw IllegalMonitorStateException();
+                        throw activemq::exceptions::
+                            IllegalMonitorStateException();
                     }
 
                     for (Node* w = head; w != NULL; w = w->nextWaiter)
@@ -1641,7 +1658,8 @@ namespace util
                 {
                     if (!impl->isHeldExclusively())
                     {
-                        throw IllegalMonitorStateException();
+                        throw activemq::exceptions::
+                            IllegalMonitorStateException();
                     }
                     int n = 0;
 
@@ -1661,7 +1679,8 @@ namespace util
                 {
                     if (!impl->isHeldExclusively())
                     {
-                        throw IllegalMonitorStateException();
+                        throw activemq::exceptions::
+                            IllegalMonitorStateException();
                     }
                     ArrayList<Thread*>* list = new ArrayList<Thread*>();
 
@@ -1832,10 +1851,10 @@ namespace util
                 }
 
                 /**
-                 * Throws InterruptedException, re-interrupts current thread, or
-                 * does nothing, depending on mode passed, abstract the logic
-                 * needed for all the interruptible wait methods out into a
-                 * single place.
+                 * Throws activemq::exceptions::InterruptedException,
+                 * re-interrupts current thread, or does nothing, depending on
+                 * mode passed, abstract the logic needed for all the
+                 * interruptible wait methods out into a single place.
                  *
                  * @param interruptMode
                  *      indicates what action is needed for interruption
@@ -1845,9 +1864,10 @@ namespace util
                 {
                     if (interruptMode == THROW_IE)
                     {
-                        throw InterruptedException(__FILE__,
-                                                   __LINE__,
-                                                   "Thread was Interrupted");
+                        throw activemq::exceptions::InterruptedException(
+                            __FILE__,
+                            __LINE__,
+                            "Thread was Interrupted");
                     }
                     else if (interruptMode == REINTERRUPT)
                     {
@@ -1900,31 +1920,41 @@ bool AbstractQueuedSynchronizer::compareAndSetState(int expect, int update)
 ////////////////////////////////////////////////////////////////////////////////
 bool AbstractQueuedSynchronizer::tryAcquire(int arg DECAF_UNUSED)
 {
-    throw UnsupportedOperationException();
+    throw activemq::exceptions::UnsupportedOperationException(__FILE__,
+                                                              __LINE__,
+                                                              "");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 bool AbstractQueuedSynchronizer::tryRelease(int arg DECAF_UNUSED)
 {
-    throw UnsupportedOperationException();
+    throw activemq::exceptions::UnsupportedOperationException(__FILE__,
+                                                              __LINE__,
+                                                              "");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 int AbstractQueuedSynchronizer::tryAcquireShared(int arg DECAF_UNUSED)
 {
-    throw UnsupportedOperationException();
+    throw activemq::exceptions::UnsupportedOperationException(__FILE__,
+                                                              __LINE__,
+                                                              "");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 bool AbstractQueuedSynchronizer::tryReleaseShared(int arg DECAF_UNUSED)
 {
-    throw UnsupportedOperationException();
+    throw activemq::exceptions::UnsupportedOperationException(__FILE__,
+                                                              __LINE__,
+                                                              "");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 bool AbstractQueuedSynchronizer::isHeldExclusively() const
 {
-    throw UnsupportedOperationException();
+    throw activemq::exceptions::UnsupportedOperationException(__FILE__,
+                                                              __LINE__,
+                                                              "");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1952,9 +1982,10 @@ void AbstractQueuedSynchronizer::acquireInterruptibly(int arg)
 {
     if (Thread::interrupted())
     {
-        throw InterruptedException(__FILE__,
-                                   __LINE__,
-                                   "Thread interrupted before acquisition");
+        throw activemq::exceptions::InterruptedException(
+            __FILE__,
+            __LINE__,
+            "Thread interrupted before acquisition");
     }
 
     if (!tryAcquire(arg))
@@ -1969,9 +2000,10 @@ bool AbstractQueuedSynchronizer::tryAcquireNanos(int       arg,
 {
     if (Thread::interrupted())
     {
-        throw InterruptedException(__FILE__,
-                                   __LINE__,
-                                   "Thread interrupted before acquisition");
+        throw activemq::exceptions::InterruptedException(
+            __FILE__,
+            __LINE__,
+            "Thread interrupted before acquisition");
     }
 
     return tryAcquire(arg) || this->impl->doAcquireNanos(arg, nanosTimeout);
@@ -2008,9 +2040,10 @@ void AbstractQueuedSynchronizer::acquireSharedInterruptibly(int arg)
 {
     if (Thread::interrupted())
     {
-        throw InterruptedException(__FILE__,
-                                   __LINE__,
-                                   "Thread interrupted before acquisition");
+        throw activemq::exceptions::InterruptedException(
+            __FILE__,
+            __LINE__,
+            "Thread interrupted before acquisition");
     }
 
     if (tryAcquireShared(arg) < 0)
@@ -2025,9 +2058,10 @@ bool AbstractQueuedSynchronizer::tryAcquireSharedNanos(int       arg,
 {
     if (Thread::interrupted())
     {
-        throw InterruptedException(__FILE__,
-                                   __LINE__,
-                                   "Thread interrupted before acquisition");
+        throw activemq::exceptions::InterruptedException(
+            __FILE__,
+            __LINE__,
+            "Thread interrupted before acquisition");
     }
 
     return tryAcquireShared(arg) >= 0 ||
@@ -2072,9 +2106,10 @@ bool AbstractQueuedSynchronizer::isQueued(Thread* thread) const
 {
     if (thread == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "Passed in thread was NULL");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "Passed in thread was NULL");
     }
 
     for (Node* p = this->impl->tail.get(); p != NULL; p = p->prev)
@@ -2167,9 +2202,10 @@ bool AbstractQueuedSynchronizer::owns(const ConditionObject* condition) const
 {
     if (condition == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "Condition Pointer arg was NULL");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "Condition Pointer arg was NULL");
     }
     return condition->isOwnedBy(this);
 }
@@ -2180,7 +2216,9 @@ bool AbstractQueuedSynchronizer::hasWaiters(
 {
     if (!owns(condition))
     {
-        throw IllegalArgumentException(__FILE__, __LINE__, "Not owner");
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Not owner");
     }
     return condition->hasWaiters();
 }
@@ -2191,7 +2229,9 @@ int AbstractQueuedSynchronizer::getWaitQueueLength(
 {
     if (!owns(condition))
     {
-        throw IllegalArgumentException(__FILE__, __LINE__, "Not owner");
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Not owner");
     }
     return condition->getWaitQueueLength();
 }
@@ -2202,7 +2242,9 @@ Collection<Thread*>* AbstractQueuedSynchronizer::getWaitingThreads(
 {
     if (!owns(condition))
     {
-        throw IllegalArgumentException(__FILE__, __LINE__, "Not owner");
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Not owner");
     }
     return condition->getWaitingThreads();
 }

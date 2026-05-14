@@ -25,7 +25,6 @@
 #include <decaf/lang/Pointer.h>
 #include <decaf/lang/Runnable.h>
 #include <decaf/lang/Thread.h>
-#include <decaf/lang/exceptions/ClassCastException.h>
 #include <decaf/util/UUID.h>
 #include <decaf/util/concurrent/TimeUnit.h>
 
@@ -68,7 +67,6 @@ using namespace cms;
 using namespace std;
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 using namespace activemq;

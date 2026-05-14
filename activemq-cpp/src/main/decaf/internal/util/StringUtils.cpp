@@ -20,12 +20,14 @@
 #include <decaf/lang/Character.h>
 #include <decaf/lang/Integer.h>
 
-#include <decaf/lang/exceptions/NullPointerException.h>
-#include <decaf/lang/exceptions/RuntimeException.h>
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <decaf/lang/Exception.h>
+
+#include <stdexcept>
+#include <string>
 
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::internal;
 using namespace decaf::internal::util;
 
@@ -188,9 +190,10 @@ int StringUtils::stringLength(const char* string)
 {
     if (string == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "Cannot check length of NULL string.");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "Cannot check length of NULL string.");
     }
 
     int length = 0;
@@ -200,7 +203,7 @@ int StringUtils::stringLength(const char* string)
 
         if (length == Integer::MAX_VALUE)
         {
-            throw RuntimeException(
+            throw activemq::exceptions::RuntimeException(
                 __FILE__,
                 __LINE__,
                 "String length is longer than Integer::MAX_VALUE");

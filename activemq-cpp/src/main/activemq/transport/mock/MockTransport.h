@@ -19,6 +19,7 @@
 #define _ACTIVEMQ_TANSPORT_MOCK_MOCKTRANSPORT_H_
 
 #include <activemq/exceptions/ActiveMQException.h>
+#include <activemq/exceptions/IoExceptions.h>
 #include <activemq/transport/DefaultTransportListener.h>
 #include <activemq/transport/Transport.h>
 #include <activemq/transport/TransportListener.h>
@@ -385,7 +386,10 @@ namespace transport
                 bool rebalance                                 AMQCPP_UNUSED,
                 const decaf::util::List<decaf::net::URI>& uris AMQCPP_UNUSED)
             {
-                throw decaf::io::IOException();
+                throw activemq::exceptions::IOException(
+                    __FILE__,
+                    __LINE__,
+                    "updateURIs not supported");
             }
         };
 

@@ -18,11 +18,12 @@
 #include "Short.h"
 #include "Integer.h"
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <sstream>
+#include <stdexcept>
 
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 DECAF_API const int   Short::SIZE      = 16;
@@ -78,9 +79,7 @@ short Short::parseShort(const String& s, int radix)
     short result   = (short)intValue;
     if (result != intValue)
     {
-        throw NumberFormatException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::NumberFormatException(
             "Short::parseShort - Not a valid short encoded string.");
     }
 
@@ -100,9 +99,7 @@ Short Short::decode(const String& value)
     short result   = (short)intValue;
     if (result != intValue)
     {
-        throw NumberFormatException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::NumberFormatException(
             "Short::decode - Not a valid short encoded string.");
     }
 

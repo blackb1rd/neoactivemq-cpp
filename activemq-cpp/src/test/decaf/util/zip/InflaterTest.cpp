@@ -21,13 +21,13 @@
 #include <decaf/util/zip/CRC32.h>
 #include <decaf/util/zip/Deflater.h>
 #include <decaf/util/zip/Inflater.h>
+#include <stdexcept>
 
 #include <vector>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::zip;
 
@@ -77,7 +77,7 @@ TEST_F(InflaterTest, testEnd)
         inflate.reset();
         inflate.setInput(byteArray, 5, 0, 5);
     }
-    catch (IllegalStateException& e)
+    catch (std::logic_error& e)
     {
         r = 1;
     }
@@ -485,7 +485,7 @@ TEST_F(InflaterTest, testInflateBII)
     {
         FAIL() << ("Invalid input to be decompressed");
     }
-    catch (IndexOutOfBoundsException& e)
+    catch (std::out_of_range& e)
     {
         r = 1;
     }
@@ -854,7 +854,7 @@ TEST_F(InflaterTest, testSetInputBIII)
     {
         inflate.setInput(byteArray, SIZE, 100, 100);
     }
-    catch (IndexOutOfBoundsException& e)
+    catch (std::out_of_range& e)
     {
         r = 1;
     }
@@ -1073,7 +1073,7 @@ TEST_F(InflaterTest, testSetDictionaryB)
         Inflater infl1;
         inflNo.setInput(outputNo, 0, dataLenNo);
 
-        ASSERT_THROW(infl1.setDictionary(dictionary1), IllegalArgumentException)
+        ASSERT_THROW(infl1.setDictionary(dictionary1), std::invalid_argument)
             << ("IllegalArgumentException expected.");
 
         inflNo.end();
@@ -1083,7 +1083,7 @@ TEST_F(InflaterTest, testSetDictionaryB)
 
         ASSERT_TRUE(infl1.needsDictionary());
 
-        ASSERT_THROW(infl1.setDictionary(dictionary2), IllegalArgumentException)
+        ASSERT_THROW(infl1.setDictionary(dictionary2), std::invalid_argument)
             << ("IllegalArgumentException expected.");
 
         infl1.end();
@@ -1184,7 +1184,7 @@ TEST_F(InflaterTest, testSetDictionaryBIII)
     decLen = infl2.inflate(result);
 
     ASSERT_TRUE(infl2.needsDictionary());
-    ASSERT_THROW(infl2.setDictionary(dictionary1), IllegalArgumentException)
+    ASSERT_THROW(infl2.setDictionary(dictionary1), std::invalid_argument)
         << ("IllegalArgumentException expected.");
 
     infl2.end();

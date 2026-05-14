@@ -17,6 +17,7 @@
 
 #include "PrimitiveValueConverter.h"
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/lang/Boolean.h>
 #include <decaf/lang/Byte.h>
 #include <decaf/lang/Character.h>
@@ -25,6 +26,9 @@
 #include <decaf/lang/Integer.h>
 #include <decaf/lang/Long.h>
 #include <decaf/lang/Short.h>
+#include <exception>
+#include <stdexcept>
+#include <string>
 
 using namespace activemq;
 using namespace activemq::util;
@@ -45,12 +49,12 @@ bool PrimitiveValueConverter::convert<bool>(
             {
                 return decaf::lang::Boolean::parseBoolean(value.getString());
             }
-            catch (decaf::lang::Exception& ex)
+            catch (std::exception& ex)
             {
             }
         }
         default:
-            throw decaf::lang::exceptions::UnsupportedOperationException(
+            throw activemq::exceptions::UnsupportedOperationException(
                 __FILE__,
                 __LINE__,
                 "Unsupported Type Conversion");
@@ -73,12 +77,12 @@ unsigned char PrimitiveValueConverter::convert<unsigned char>(
             {
                 return decaf::lang::Byte::parseByte(value.getString());
             }
-            catch (decaf::lang::Exception& ex)
+            catch (std::exception& ex)
             {
             }
         }
         default:
-            throw decaf::lang::exceptions::UnsupportedOperationException(
+            throw activemq::exceptions::UnsupportedOperationException(
                 __FILE__,
                 __LINE__,
                 "Unsupported Type Conversion");
@@ -101,12 +105,12 @@ char PrimitiveValueConverter::convert<char>(
             {
                 return (char)decaf::lang::Byte::parseByte(value.getString());
             }
-            catch (decaf::lang::Exception& ex)
+            catch (std::exception& ex)
             {
             }
         }
         default:
-            throw decaf::lang::exceptions::UnsupportedOperationException(
+            throw activemq::exceptions::UnsupportedOperationException(
                 __FILE__,
                 __LINE__,
                 "Unsupported Type Conversion");
@@ -131,12 +135,12 @@ short PrimitiveValueConverter::convert<short>(
             {
                 return decaf::lang::Short::parseShort(value.getString());
             }
-            catch (decaf::lang::Exception& ex)
+            catch (std::exception& ex)
             {
             }
         }
         default:
-            throw decaf::lang::exceptions::UnsupportedOperationException(
+            throw activemq::exceptions::UnsupportedOperationException(
                 __FILE__,
                 __LINE__,
                 "Unsupported Type Conversion");
@@ -162,12 +166,12 @@ int PrimitiveValueConverter::convert<int>(const PrimitiveValueNode& value) const
             {
                 return decaf::lang::Integer::parseInt(value.getString());
             }
-            catch (decaf::lang::Exception& ex)
+            catch (std::exception& ex)
             {
             }
         }
         default:
-            throw decaf::lang::exceptions::UnsupportedOperationException(
+            throw activemq::exceptions::UnsupportedOperationException(
                 __FILE__,
                 __LINE__,
                 "Unsupported Type Conversion");
@@ -196,12 +200,12 @@ long long PrimitiveValueConverter::convert<long long>(
             {
                 return decaf::lang::Long::parseLong(value.getString());
             }
-            catch (decaf::lang::Exception& ex)
+            catch (std::exception& ex)
             {
             }
         }
         default:
-            throw decaf::lang::exceptions::UnsupportedOperationException(
+            throw activemq::exceptions::UnsupportedOperationException(
                 __FILE__,
                 __LINE__,
                 "Unsupported Type Conversion");
@@ -224,12 +228,12 @@ float PrimitiveValueConverter::convert<float>(
             {
                 return decaf::lang::Float::parseFloat(value.getString());
             }
-            catch (decaf::lang::Exception& ex)
+            catch (std::exception& ex)
             {
             }
         }
         default:
-            throw decaf::lang::exceptions::UnsupportedOperationException(
+            throw activemq::exceptions::UnsupportedOperationException(
                 __FILE__,
                 __LINE__,
                 "Unsupported Type Conversion");
@@ -254,12 +258,12 @@ double PrimitiveValueConverter::convert<double>(
             {
                 return decaf::lang::Double::parseDouble(value.getString());
             }
-            catch (decaf::lang::Exception& ex)
+            catch (std::exception& ex)
             {
             }
         }
         default:
-            throw decaf::lang::exceptions::UnsupportedOperationException(
+            throw activemq::exceptions::UnsupportedOperationException(
                 __FILE__,
                 __LINE__,
                 "Unsupported Type Conversion");
@@ -295,7 +299,7 @@ std::string PrimitiveValueConverter::convert<std::string>(
         case PrimitiveValueNode::BIG_STRING_TYPE:
             return value.getString();
         default:
-            throw decaf::lang::exceptions::UnsupportedOperationException(
+            throw activemq::exceptions::UnsupportedOperationException(
                 __FILE__,
                 __LINE__,
                 "Unsupported Type Conversion");
@@ -313,7 +317,7 @@ PrimitiveValueConverter::convert<std::vector<unsigned char>>(
         case PrimitiveValueNode::BYTE_ARRAY_TYPE:
             return value.getByteArray();
         default:
-            throw decaf::lang::exceptions::UnsupportedOperationException(
+            throw activemq::exceptions::UnsupportedOperationException(
                 __FILE__,
                 __LINE__,
                 "Unsupported Type Conversion");

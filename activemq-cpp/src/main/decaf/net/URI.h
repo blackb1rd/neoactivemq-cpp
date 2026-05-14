@@ -20,10 +20,10 @@
 
 #include <decaf/internal/net/URIType.h>
 #include <decaf/lang/Comparable.h>
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
 #include <decaf/net/MalformedURLException.h>
 #include <decaf/net/URISyntaxException.h>
 #include <decaf/util/Config.h>
+#include <stdexcept>
 #include <string>
 
 namespace decaf
@@ -387,7 +387,7 @@ namespace net
          *
          * @return The resulting URI
          *
-         * @throws IllegalArgumentException - If the given string violates RFC
+         * @throws std::invalid_argument - If the given string violates RFC
          * 2396
          */
         URI resolve(const std::string& str) const;
@@ -458,7 +458,7 @@ namespace net
          *
          * @return A URL constructed from this URI
          *
-         * @throws IllegalArgumentException - If this URL is not absolute
+         * @throws std::invalid_argument - If this URL is not absolute
          * @throws MalformedURLException - If a protocol handler for the URL
          * could not be found, or if some other error occurred while
          * constructing the URL
@@ -470,12 +470,12 @@ namespace net
          * Creates a URI by parsing the given string.
          * This convenience factory method works as if by invoking the
          * URI(string) constructor; any URISyntaxException thrown by the
-         * constructor is caught and wrapped in a new IllegalArgumentException
+         * constructor is caught and wrapped in a new std::invalid_argument
          * object, which is then thrown.
          *
          * @param uri - URI string to parse
          *
-         * @throws IllegalArgumentException
+         * @throws std::invalid_argument
          */
         static URI create(const std::string uri);
 

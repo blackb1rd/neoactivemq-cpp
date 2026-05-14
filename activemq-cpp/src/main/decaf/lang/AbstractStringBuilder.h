@@ -22,6 +22,7 @@
 #include <decaf/util/Config.h>
 
 #include <decaf/internal/util/concurrent/SynchronizableImpl.h>
+#include <stdexcept>
 
 namespace decaf
 {
@@ -80,7 +81,7 @@ namespace lang
          *      The index in this buffer where the character to return is
          * located.
          *
-         * @throws IndexOutOfBoundsException if index < 0 or index >= length().
+         * @throws std::out_of_range if index < 0 or index >= length().
          */
         virtual char charAt(int index) const;
 
@@ -114,8 +115,8 @@ namespace lang
          * @param destStart
          *      The index in the destination array to start the copy at.
          *
-         * @throws NullPointerException if the dst pointer is NULL
-         * @throws IndexOutOfBoundsException if:
+         * @throws std::logic_error if the dst pointer is NULL
+         * @throws std::out_of_range if:
          *      start or end is negative
          *      dstSize or dstStart is negative
          *      start is greater than end
@@ -200,7 +201,7 @@ namespace lang
          * @param length
          *      The new length to give this character buffer
          *
-         * @throws IndexOutOfBoundsException if length is less than zero.
+         * @throws std::out_of_range if length is less than zero.
          */
         virtual void setLength(int length);
 
@@ -213,7 +214,7 @@ namespace lang
          * @param value
          *      The new char value to assign at the given index.
          *
-         * @throws IndexOutOfBoundsException if index is negative or greater
+         * @throws std::out_of_range if index is negative or greater
          * than length().
          */
         virtual void setCharAt(int index, char value);
@@ -228,7 +229,7 @@ namespace lang
          *
          * @return a new String that is a subset of this character buffer.
          *
-         * @throws StringIndexOutOfBoundsException
+         * @throws std::out_of_range
          *      if start is less than zero, or greater than the length of this
          * buffer.
          */
@@ -246,7 +247,7 @@ namespace lang
          *
          * @return a new String that is a subset of this character buffer.
          *
-         * @throws StringIndexOutOfBoundsException
+         * @throws std::out_of_range
          *      if start or end is less than zero, or end is greater than the
          * length of this buffer or start is greater than end.
          */
@@ -267,7 +268,7 @@ namespace lang
          * @return a new CharSequence pointer that is a subset of this character
          * buffer.
          *
-         * @throws StringIndexOutOfBoundsException
+         * @throws std::out_of_range
          *      if start or end is less than zero, or end is greater than the
          * length of this buffer or start is greater than end.
          */
@@ -309,7 +310,7 @@ namespace lang
          * @param value
          *      The C string value to be appended into this buffer.
          *
-         * @throws NullPointerException if the pointer is NULL.
+         * @throws std::logic_error if the pointer is NULL.
          */
         void doAppend(const char* value);
 
@@ -325,8 +326,8 @@ namespace lang
          * @param length
          *      The number of characters to copy from the given array.
          *
-         * @throws NullPointerException if the pointer is NULL.
-         * @throws IndexOutOfBoundsException if offset or length is negative or
+         * @throws std::logic_error if the pointer is NULL.
+         * @throws std::out_of_range if offset or length is negative or
          * the value of offset + length is greater than the strings length.
          */
         void doAppend(const char* value, int offset, int length);
@@ -337,7 +338,7 @@ namespace lang
          * @param value
          *      The CharSequence value to be appended into this buffer.
          *
-         * @throws NullPointerException if the pointer is NULL.
+         * @throws std::logic_error if the pointer is NULL.
          */
         void doAppend(const CharSequence* value);
 
@@ -353,8 +354,8 @@ namespace lang
          * @param length
          *      The number of characters to copy from the given CharSequence.
          *
-         * @throws NullPointerException if the pointer is NULL.
-         * @throws IndexOutOfBoundsException if offset or length is negative or
+         * @throws std::logic_error if the pointer is NULL.
+         * @throws std::out_of_range if offset or length is negative or
          * the value of offset + length is greater than the strings length.
          */
         void doAppend(const CharSequence* value, int offset, int length);
@@ -455,8 +456,8 @@ namespace lang
          * @param length
          *      The number of characters to copy from the given array.
          *
-         * @throws NullPointerException if the pointer is NULL.
-         * @throws IndexOutOfBoundsException if index, offset or length is
+         * @throws std::logic_error if the pointer is NULL.
+         * @throws std::out_of_range if index, offset or length is
          * negative or the value of offset + length is greater than the strings
          * length.
          */
@@ -470,8 +471,8 @@ namespace lang
          * @param value
          *      The CharSequence value to be appended into this buffer.
          *
-         * @throws NullPointerException if the pointer is NULL.
-         * @throws IndexOutOfBoundsException if index is negative or greater
+         * @throws std::logic_error if the pointer is NULL.
+         * @throws std::out_of_range if index is negative or greater
          * than length().
          */
         void doInsert(int index, const CharSequence* value);
@@ -492,7 +493,7 @@ namespace lang
          *      The end index in the CharSequence to be inserted into this
          * Buffer.
          *
-         * @throws IndexOutOfBoundsException if index, start or end is negative
+         * @throws std::out_of_range if index, start or end is negative
          * or the value of start < end or the end index is greater than the
          * sequence length.
          */
@@ -513,7 +514,7 @@ namespace lang
          * @param value
          *      The new string value to replace the older value.
          *
-         * @throws IndexOutOfBoundsException if start is negative, greater than
+         * @throws std::out_of_range if start is negative, greater than
          * end or greater than length().
          */
         void doReplace(int start, int end, const String& value);

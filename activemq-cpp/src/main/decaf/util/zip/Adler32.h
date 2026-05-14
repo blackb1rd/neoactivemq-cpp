@@ -73,7 +73,7 @@ namespace util
              * @param length
              *      The amount of data to read from the byte buffer.
              *
-             * @throw IndexOutOfBoundsException if offset + length > size of the
+             * @throw std::out_of_range if offset + length > size of the
              * buffer.
              */
             virtual void update(const std::vector<unsigned char>& buffer,

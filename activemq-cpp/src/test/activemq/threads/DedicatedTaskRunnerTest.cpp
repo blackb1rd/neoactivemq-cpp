@@ -23,12 +23,11 @@
 #include <activemq/threads/Task.h>
 
 #include <decaf/lang/Thread.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
+#include <stdexcept>
 
 using namespace activemq;
 using namespace activemq::threads;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 class DedicatedTaskRunnerTest : public ::testing::Test
 {
@@ -97,8 +96,8 @@ public:
 TEST_F(DedicatedTaskRunnerTest, testSimple)
 {
     ASSERT_THROW(std::unique_ptr<TaskRunner>(new DedicatedTaskRunner(NULL)),
-                 NullPointerException)
-        << ("Should throw a NullPointerException");
+                 std::logic_error)
+        << ("Should throw std::logic_error");
 
     SimpleCountingTask simpleTask;
     ASSERT_TRUE(simpleTask.getCount() == 0);

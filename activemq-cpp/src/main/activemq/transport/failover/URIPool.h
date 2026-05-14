@@ -22,7 +22,7 @@
 
 #include <decaf/net/URI.h>
 #include <decaf/util/LinkedList.h>
-#include <decaf/util/NoSuchElementException.h>
+#include <stdexcept>
 
 namespace activemq
 {
@@ -110,13 +110,13 @@ namespace transport
             /**
              * Fetches the next available URI from the pool, if there are no
              * more URIs free when this method is called it throws a
-             * NoSuchElementException. Receiving the exception is not an
+             * std::runtime_error. Receiving the exception is not an
              * indication that a URI won't be available in the future, the
              * caller should react accordingly.
              *
              * @return the next free URI in the Pool.
              *
-             * @throw NoSuchElementException if there are none free currently.
+             * @throw std::runtime_error if there are none free currently.
              */
             decaf::net::URI getURI();
 

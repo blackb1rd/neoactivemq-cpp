@@ -24,6 +24,7 @@
 #include <decaf/util/Random.h>
 
 #include <memory>
+#include <stdexcept>
 
 namespace decaf
 {
@@ -76,8 +77,8 @@ namespace security
          * @param size
          *      The number of bytes in the seed buffer.
          *
-         * @throw NullPointerException if the seed buffer is NULL.
-         * @throw IllegalArgumentException if the size value is negative.
+         * @throw std::logic_error if the seed buffer is NULL.
+         * @throws std::invalid_argument if the size value is negative.
          */
         SecureRandom(const unsigned char* seed, int size);
 
@@ -109,8 +110,8 @@ namespace security
          * @param size
          *      The number of bytes in the seed buffer.
          *
-         * @throw NullPointerException if the seed buffer is NULL.
-         * @throw IllegalArgumentException if the size value is negative.
+         * @throw std::logic_error if the seed buffer is NULL.
+         * @throws std::invalid_argument if the size value is negative.
          */
         virtual void setSeed(const unsigned char* seed, int size);
 

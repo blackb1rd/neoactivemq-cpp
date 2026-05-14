@@ -18,7 +18,6 @@
 
 #include <activemq/util/CMSExceptionSupport.h>
 #include <cms/Message.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
 
 using namespace std;
 using namespace activemq;
@@ -27,7 +26,6 @@ using namespace activemq::core;
 using namespace activemq::core::kernels;
 using namespace activemq::exceptions;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 ActiveMQProducer::ActiveMQProducer(

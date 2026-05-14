@@ -17,6 +17,7 @@
 
 #include <gtest/gtest.h>
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <activemq/transport/discovery/AbstractDiscoveryAgent.h>
 #include <activemq/transport/discovery/AbstractDiscoveryAgentFactory.h>
 #include <activemq/transport/discovery/DiscoveryAgentRegistry.h>
@@ -24,13 +25,13 @@
 #include <decaf/net/URI.h>
 
 using namespace activemq;
+using namespace activemq::exceptions;
 using namespace activemq::transport;
 using namespace activemq::transport::discovery;
 using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::net;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 class AbstractDiscoveryAgentFactoryTest : public ::testing::Test
 {
@@ -89,7 +90,7 @@ protected:
                 Thread::sleep(500);
             }
         }
-        catch (InterruptedException& ex)
+        catch (InterruptedException&)
         {
         }
     }

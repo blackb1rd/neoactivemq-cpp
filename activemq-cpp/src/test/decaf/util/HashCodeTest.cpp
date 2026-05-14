@@ -22,7 +22,6 @@
 
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 
 class HashCodeTest : public ::testing::Test

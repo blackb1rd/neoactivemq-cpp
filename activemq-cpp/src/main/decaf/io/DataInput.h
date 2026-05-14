@@ -26,8 +26,6 @@
 #include <decaf/io/EOFException.h>
 #include <decaf/io/IOException.h>
 #include <decaf/io/UTFDataFormatException.h>
-#include <decaf/lang/exceptions/IndexOutOfBoundsException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
 
 namespace decaf
 {
@@ -275,7 +273,7 @@ namespace io
          *
          * @throws IOException if an I/O Error occurs.
          * @throws EOFException if the end of input is reached.
-         * @throws IndexOutOfBoundsException if the size value is negative.
+         * @throws std::out_of_range if the size value is negative.
          */
         virtual void readFully(unsigned char* buffer, int size) = 0;
 
@@ -290,9 +288,9 @@ namespace io
          *    * An I/O error occurs, in which case an IOException other
          *      than EOFException is thrown.
          *
-         * If buffer is NULL, a NullPointerException is thrown. If offset+length
+         * If buffer is NULL, a std::logic_error is thrown. If offset+length
          * is greater than the length of the array buffer, then an
-         * IndexOutOfBoundsException is thrown. If length is zero, then no bytes
+         * std::out_of_range is thrown. If length is zero, then no bytes
          * are read. Otherwise, the first byte read is stored into element
          * buffer[off], the next one into buffer[offset+1], and so on. The
          * number of bytes read is, at most, equal to length.
@@ -308,8 +306,8 @@ namespace io
          *
          * @throws IOException if an I/O Error occurs.
          * @throws EOFException if the end of input is reached.
-         * @throws NullPointerException if the buffer is NULL.
-         * @throws IndexOutOfBoundsException if the offset + length > size, or
+         * @throws std::logic_error if the buffer is NULL.
+         * @throws std::out_of_range if the offset + length > size, or
          * an int param is negative.
          */
         virtual void readFully(unsigned char* buffer,

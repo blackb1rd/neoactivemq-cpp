@@ -17,6 +17,7 @@
 #ifndef _ACTIVEMQ_CORE_ACTIVEMQTRANSACTIONCONTEXT_H_
 #define _ACTIVEMQ_CORE_ACTIVEMQTRANSACTIONCONTEXT_H_
 
+#include <exception>
 #include <memory>
 
 #include <cms/CMSException.h>
@@ -30,7 +31,6 @@
 #include <activemq/util/Config.h>
 #include <activemq/util/LongSequenceGenerator.h>
 
-#include <decaf/lang/exceptions/InvalidStateException.h>
 #include <decaf/util/Properties.h>
 #include <decaf/util/StlSet.h>
 #include <decaf/util/concurrent/Mutex.h>
@@ -127,7 +127,7 @@ namespace core
          * Get the Transaction Id object for the current
          * Transaction, returns NULL if no transaction is running
          * @return TransactionInfo
-         * @throw InvalidStateException if a Transaction is not in progress.
+         * @throw std::logic_error if a Transaction is not in progress.
          */
         virtual const std::shared_ptr<commands::TransactionId>&
         getTransactionId() const;
@@ -182,7 +182,7 @@ namespace core
         void             setXid(const cms::Xid* xid);
         bool             equals(const cms::Xid* local, const cms::Xid* remote);
         cms::XAException toXAException(cms::CMSException& ex);
-        cms::XAException toXAException(decaf::lang::Exception& ex);
+        cms::XAException toXAException(std::exception& ex);
 
         void beforeEnd();
         void afterCommit();

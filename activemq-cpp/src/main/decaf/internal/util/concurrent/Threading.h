@@ -21,6 +21,7 @@
 #include <decaf/util/Config.h>
 
 #include <decaf/lang/Thread.h>
+#include <stdexcept>
 #include <thread>
 
 namespace decaf
@@ -95,7 +96,7 @@ namespace internal
                  * @param monitor
                  *      The handle of the Monitor to return to the Monitor pool.
                  *
-                 * @throws IllegalMonitorStateException if the monitor is in use
+                 * @throws std::logic_error if the monitor is in use
                  * when returned.
                  */
                 static void returnMonitor(MonitorHandle* monitor,
@@ -139,7 +140,7 @@ namespace internal
                  * @param monitor
                  *      Handle to the monitor instance that is to be excited.
                  *
-                 * @throws IllegalMonitorStateException if the caller is not the
+                 * @throws std::logic_error if the caller is not the
                  * owner of the monitor.
                  */
                 static void exitMonitor(MonitorHandle* monitor);
@@ -151,7 +152,7 @@ namespace internal
                  * caller specifies a timeout and that timeout expires before
                  * the monitor is signaled this method returns true.  The
                  * calling thread must own the monitor in order to call this
-                 * method, otherwise an IllegalMonitorStateException is thrown.
+                 * method, otherwise an std::logic_error is thrown.
                  *
                  * @param monitor
                  *      Handle to the monitor that the calling thread is to wait
@@ -166,7 +167,7 @@ namespace internal
                  * @return true if the timeout given expires before the caller
                  * was signaled.
                  *
-                 * @throws IllegalMonitorStateException if the caller does not
+                 * @throws std::logic_error if the caller does not
                  * own the monitor.
                  */
                 static bool waitOnMonitor(MonitorHandle* monitor,
@@ -177,14 +178,14 @@ namespace internal
                  * Notify a single waiter on the given Monitor instance, if
                  * there is no thread currently waiting on the specified monitor
                  * then no action is taken.  The calling thread must own the
-                 * given monitor otherwise an IllegalMonitorStateException is
+                 * given monitor otherwise an std::logic_error is
                  * thrown.
                  *
                  * @param monitor
                  *      The monitor handle that is to have a single waiting
                  * thread signaled.
                  *
-                 * @throws IllegalMonitorStateException if the caller does not
+                 * @throws std::logic_error if the caller does not
                  * own the monitor.
                  */
                 static void notifyWaiter(MonitorHandle* monitor);
@@ -194,13 +195,13 @@ namespace internal
                  * are no threads currently waiting on the given monitor
                  * instance then no action is taken.  The calling thread must
                  * own the given monitor otherwise an
-                 * IllegalMonitorStateException is thrown.
+                 * std::logic_error is thrown.
                  *
                  * @param monitor
                  *      The monitor handle that is to have all of its waiting
                  * thread signaled.
                  *
-                 * @throws IllegalMonitorStateException if the caller does not
+                 * @throws std::logic_error if the caller does not
                  * own the monitor.
                  */
                 static void notifyAllWaiters(MonitorHandle* monitor);
@@ -270,8 +271,8 @@ namespace internal
                  *
                  * @return true if the timeout period expired, false otherwise.
                  *
-                 * @throws InterruptedException if the Join was interrupted.
-                 * @throws IllegalArgumentException if the value of mills or
+                 * @throws std::runtime_error if the Join was interrupted.
+                 * @throws std::invalid_argument if the value of mills or
                  * nanos is invalid.
                  */
                 static bool join(ThreadHandle* thread,

@@ -17,16 +17,17 @@
 
 #include <decaf/util/concurrent/locks/ReentrantLock.h>
 
+#include <decaf/lang/Exception.h>
 #include <decaf/lang/Thread.h>
-#include <decaf/lang/exceptions/IllegalMonitorStateException.h>
-#include <decaf/lang/exceptions/RuntimeException.h>
 #include <decaf/util/concurrent/locks/AbstractQueuedSynchronizer.h>
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <sstream>
+#include <stdexcept>
+#include <string>
 
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 using namespace decaf::util::concurrent::locks;
@@ -90,7 +91,7 @@ namespace util
                         // Check for overflow of the state counter.
                         if (nextc < 0)
                         {
-                            throw new RuntimeException(
+                            throw activemq::exceptions::RuntimeException(
                                 __FILE__,
                                 __LINE__,
                                 "Maximum lock count exceeded");
@@ -136,7 +137,8 @@ namespace util
 
                     if (Thread::currentThread() != getExclusiveOwnerThread())
                     {
-                        throw IllegalMonitorStateException();
+                        throw activemq::exceptions::
+                            IllegalMonitorStateException();
                     }
 
                     bool free = false;
@@ -241,7 +243,7 @@ namespace util
                         // Check for overflow of the lock sstate variable.
                         if (nextc < 0)
                         {
-                            throw new RuntimeException(
+                            throw activemq::exceptions::RuntimeException(
                                 __FILE__,
                                 __LINE__,
                                 "Maximum lock count exceeded");
@@ -395,9 +397,10 @@ bool ReentrantLock::hasQueuedThread(decaf::lang::Thread* thread) const
 {
     if (thread == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "The thread to check was NULL");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "The thread to check was NULL");
     }
 
     return this->sync->isQueued(thread);
@@ -408,9 +411,10 @@ int ReentrantLock::getWaitQueueLength(Condition* condition) const
 {
     if (condition == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "The Condition to check was NULL");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "The Condition to check was NULL");
     }
 
     const AbstractQueuedSynchronizer::ConditionObject* cond =
@@ -419,9 +423,8 @@ int ReentrantLock::getWaitQueueLength(Condition* condition) const
 
     if (cond == NULL)
     {
-        throw IllegalArgumentException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
             "Condition is not associated with this Lock");
     }
 
@@ -433,9 +436,10 @@ bool ReentrantLock::hasWaiters(Condition* condition) const
 {
     if (condition == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "The Condition to check was NULL");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "The Condition to check was NULL");
     }
 
     const AbstractQueuedSynchronizer::ConditionObject* cond =
@@ -444,9 +448,8 @@ bool ReentrantLock::hasWaiters(Condition* condition) const
 
     if (cond == NULL)
     {
-        throw IllegalArgumentException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
             "Condition is not associated with this Lock");
     }
 
@@ -459,9 +462,10 @@ Collection<decaf::lang::Thread*>* ReentrantLock::getWaitingThreads(
 {
     if (condition == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "The Condition to check was NULL");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "The Condition to check was NULL");
     }
 
     const AbstractQueuedSynchronizer::ConditionObject* cond =
@@ -470,9 +474,8 @@ Collection<decaf::lang::Thread*>* ReentrantLock::getWaitingThreads(
 
     if (cond == NULL)
     {
-        throw IllegalArgumentException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
             "Condition is not associated with this Lock");
     }
 

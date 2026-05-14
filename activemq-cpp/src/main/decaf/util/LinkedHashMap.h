@@ -15,12 +15,15 @@
  * limitations under the License.
  */
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #ifndef _DECAF_UTIL_LINKEDHASHMAP_H_
 #define _DECAF_UTIL_LINKEDHASHMAP_H_
 
 #include <decaf/util/Config.h>
 
 #include <decaf/util/HashMap.h>
+#include <stdexcept>
+#include <string>
 
 namespace decaf
 {
@@ -110,18 +113,18 @@ namespace util
      * by all of this class's collection view methods are fail-fast: if the map
      * is structurally modified at any time after the iterator is created, in
      * any way except through the iterator's own remove method, the iterator
-     * will throw a ConcurrentModificationException. Thus, in the face of
-     * concurrent modification, the iterator fails quickly and cleanly, rather
-     * than risking arbitrary, non-deterministic behavior at an undetermined
-     * time in the future.
+     * will throw a activemq::exceptions::InterruptedException. Thus, in
+     * the face of concurrent modification, the iterator fails quickly and
+     * cleanly, rather than risking arbitrary, non-deterministic behavior at an
+     * undetermined time in the future.
      *
      * Note that the fail-fast behavior of an iterator cannot be guaranteed as
      * it is, generally speaking, impossible to make any hard guarantees in the
      * presence of unsynchronized concurrent modification. Fail-fast iterators
-     * throw ConcurrentModificationException on a best-effort basis. Therefore,
-     * it would be wrong to write a program that depended on this exception for
-     * its correctness: the fail-fast behavior of iterators should be used only
-     * to detect bugs.
+     * throw activemq::exceptions::InterruptedException on a best-effort
+     * basis. Therefore, it would be wrong to write a program that depended on
+     * this exception for its correctness: the fail-fast behavior of iterators
+     * should be used only to detect bugs.
      *
      * @since 1.0
      */
@@ -190,7 +193,7 @@ namespace util
             {
                 if (expectedModCount != associatedMap->modCount)
                 {
-                    throw ConcurrentModificationException(
+                    throw activemq::exceptions::ConcurrentModificationException(
                         __FILE__,
                         __LINE__,
                         "LinkedHashMap modified outside this iterator");
@@ -207,7 +210,7 @@ namespace util
                 checkConcurrentMod();
                 if (!checkHasNext())
                 {
-                    throw decaf::util::NoSuchElementException(
+                    throw activemq::exceptions::NoSuchElementException(
                         __FILE__,
                         __LINE__,
                         "No next element");
@@ -221,10 +224,11 @@ namespace util
                 checkConcurrentMod();
                 if (currentEntry == NULL)
                 {
-                    throw decaf::lang::exceptions::IllegalStateException(
+                    throw activemq::exceptions::IllegalStateException(
                         __FILE__,
                         __LINE__,
-                        "Remove called before call to next()");
+                        "Remove called before call to "
+                        "next()");
                 }
 
                 LinkedHashMapEntry* entry = currentEntry;
@@ -399,7 +403,7 @@ namespace util
             {
                 if (expectedModCount != associatedMap->modCount)
                 {
-                    throw ConcurrentModificationException(
+                    throw activemq::exceptions::ConcurrentModificationException(
                         __FILE__,
                         __LINE__,
                         "LinkedHashMap modified outside this iterator");
@@ -411,7 +415,7 @@ namespace util
                 checkConcurrentMod();
                 if (!checkHasNext())
                 {
-                    throw decaf::util::NoSuchElementException(
+                    throw activemq::exceptions::NoSuchElementException(
                         __FILE__,
                         __LINE__,
                         "No next element");
@@ -451,7 +455,7 @@ namespace util
 
             virtual void remove()
             {
-                throw lang::exceptions::UnsupportedOperationException(
+                throw activemq::exceptions::UnsupportedOperationException(
                     __FILE__,
                     __LINE__,
                     "Cannot write to a const Iterator.");
@@ -488,7 +492,7 @@ namespace util
 
             virtual void remove()
             {
-                throw lang::exceptions::UnsupportedOperationException(
+                throw activemq::exceptions::UnsupportedOperationException(
                     __FILE__,
                     __LINE__,
                     "Cannot write to a const Iterator.");
@@ -525,7 +529,7 @@ namespace util
 
             virtual void remove()
             {
-                throw lang::exceptions::UnsupportedOperationException(
+                throw activemq::exceptions::UnsupportedOperationException(
                     __FILE__,
                     __LINE__,
                     "Cannot write to a const Iterator.");
@@ -591,7 +595,7 @@ namespace util
 
             virtual Iterator<MapEntry<K, V>>* iterator()
             {
-                throw decaf::lang::exceptions::UnsupportedOperationException(
+                throw activemq::exceptions::UnsupportedOperationException(
                     __FILE__,
                     __LINE__,
                     "Can't return a non-const iterator for a const collection");
@@ -749,7 +753,7 @@ namespace util
          * @param capacity
          *      The initial capacity of this map.
          *
-         * @throws IllegalArgumentException if the capacity is less than zero.
+         * @throws std::invalid_argument if the capacity is less than zero.
          */
         LinkedHashMap(int capacity)
             : HashMap<K, V, HASHCODE>(capacity),
@@ -768,7 +772,7 @@ namespace util
          * @param load
          *      The initial load factor for this map.
          *
-         * @throws IllegalArgumentException
+         * @throws std::invalid_argument
          *     If the capacity is less than zero or the load factor is less or
          * equal to zero.
          */
@@ -794,7 +798,7 @@ namespace util
          * if the ordering should be the order in which the entries were
          * inserted.
          *
-         * @throws IllegalArgumentException
+         * @throws std::invalid_argument
          *     If the capacity is less than zero or the load factor is less or
          * equal to zero.
          */
@@ -934,7 +938,7 @@ namespace util
                 return oldValue;
             }
 
-            throw NoSuchElementException(
+            throw activemq::exceptions::NoSuchElementException(
                 __FILE__,
                 __LINE__,
                 "Specified key not present in the Map.");

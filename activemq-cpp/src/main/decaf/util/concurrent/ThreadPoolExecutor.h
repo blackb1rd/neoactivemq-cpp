@@ -17,8 +17,8 @@
 #ifndef _DECAF_UTIL_CONCURRENT_THREADPOOLEXECUTOR_H_
 #define _DECAF_UTIL_CONCURRENT_THREADPOOLEXECUTOR_H_
 
+#include <decaf/lang/Exception.h>
 #include <decaf/lang/Runnable.h>
-#include <decaf/lang/Throwable.h>
 #include <decaf/util/ArrayList.h>
 #include <decaf/util/Config.h>
 #include <decaf/util/LinkedList.h>
@@ -29,6 +29,7 @@
 #include <decaf/util/concurrent/ThreadFactory.h>
 #include <decaf/util/concurrent/TimeUnit.h>
 
+#include <stdexcept>
 #include <vector>
 
 namespace decaf
@@ -97,7 +98,7 @@ namespace util
              * keepAliveTime are negative or the or if maximumPoolSize is less
              * than or equal to zero, or if corePoolSize is greater than
              * maximumPoolSize.
-             * @throws NullPointerException if the workQueue pointer is NULL.
+             * @throws std::logic_error if the workQueue pointer is NULL.
              */
             ThreadPoolExecutor(int             corePoolSize,
                                int             maxPoolSize,
@@ -139,7 +140,7 @@ namespace util
              * keepAliveTime are negative or the or if maximumPoolSize is less
              * than or equal to zero, or if corePoolSize is greater than
              * maximumPoolSize.
-             * @throws NullPointerException if the workQueue pointer is NULL.
+             * @throws std::logic_error if the workQueue pointer is NULL.
              */
             ThreadPoolExecutor(int             corePoolSize,
                                int             maxPoolSize,
@@ -181,7 +182,7 @@ namespace util
              * keepAliveTime are negative or the or if maximumPoolSize is less
              * than or equal to zero, or if corePoolSize is greater than
              * maximumPoolSize.
-             * @throws NullPointerException if the workQueue pointer is NULL.
+             * @throws std::logic_error if the workQueue pointer is NULL.
              */
             ThreadPoolExecutor(int             corePoolSize,
                                int             maxPoolSize,
@@ -228,7 +229,7 @@ namespace util
              * keepAliveTime are negative or the or if maximumPoolSize is less
              * than or equal to zero, or if corePoolSize is greater than
              * maximumPoolSize.
-             * @throws NullPointerException if the workQueue pointer is NULL.
+             * @throws std::logic_error if the workQueue pointer is NULL.
              */
             ThreadPoolExecutor(int             corePoolSize,
                                int             maxPoolSize,
@@ -284,7 +285,7 @@ namespace util
              * @param poolSize
              *      The new core pool size for this executor.
              *
-             * @throws IllegalArgumentException if the pool size value is less
+             * @throws std::invalid_argument if the pool size value is less
              * than zero.
              */
             virtual void setCorePoolSize(int poolSize);
@@ -307,7 +308,7 @@ namespace util
              * @param maxSize
              *      The new maximum allowed worker pool size.
              *
-             * @throws IllegalArgumentException if maxSize is negative or less
+             * @throws std::invalid_argument if maxSize is negative or less
              * than core pool size.
              */
             virtual void setMaximumPoolSize(int maxSize);
@@ -384,7 +385,7 @@ namespace util
              *      Boolean value indicating if core threads are allowed to time
              * out when idle.
              *
-             * @throws IllegalArgumentException if the keep alive time is set to
+             * @throws std::invalid_argument if the keep alive time is set to
              * zero.
              */
             virtual void allowCoreThreadTimeout(bool value);
@@ -425,7 +426,7 @@ namespace util
              * @param unit
              *      The units that the timeout is given in.
              *
-             * @throws IllegalArgumentException if allowCoreThreadsTimeout is
+             * @throws std::invalid_argument if allowCoreThreadsTimeout is
              * enabled and the the timeout value given is zero, or the timeout
              * given is negative.
              */
@@ -444,7 +445,7 @@ namespace util
              *      A ThreadFactory instance used by this Executor to create new
              * Threads.
              *
-             * @throws NullPointerException if the given factory pointer is
+             * @throws std::logic_error if the given factory pointer is
              * NULL.
              */
             virtual void setThreadFactory(ThreadFactory* factory);
@@ -476,7 +477,7 @@ namespace util
              * @param handler
              *      The new RejectedExecutionHandler instance to use.
              *
-             * @throws NullPointerException if the handler is NULL.
+             * @throws std::logic_error if the handler is NULL.
              */
             virtual void setRejectedExecutionHandler(
                 RejectedExecutionHandler* handler);
@@ -546,7 +547,7 @@ namespace util
             /**
              * Called upon completion of execution of a given task.  This method
              * is called from the Thread that executed the given Runnable.  If
-             * the Throwable pointer is not NULL then its value is the Exception
+             * error is not NULL then it points to the decaf::lang::Exception
              * that caused the task to terminate.
              *
              * The base class implementation does nothing, a derived class
@@ -560,7 +561,7 @@ namespace util
              *      The exception that was thrown from the given Runnable.
              */
             virtual void afterExecute(decaf::lang::Runnable*  task,
-                                      decaf::lang::Throwable* error);
+                                      decaf::lang::Exception* error);
 
             /**
              * Method invoked when the Executor has terminated, by default this
@@ -649,6 +650,11 @@ namespace util
                         delete task;
                         throw ex;
                     }
+                    catch (std::exception&)
+                    {
+                        delete task;
+                        throw;
+                    }
                 }
             };
 
@@ -720,6 +726,11 @@ namespace util
                     {
                         delete task;
                         throw ex;
+                    }
+                    catch (std::exception&)
+                    {
+                        delete task;
+                        throw;
                     }
                 }
             };

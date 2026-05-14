@@ -27,7 +27,7 @@
 
 #include <memory>
 
-#include <decaf/io/IOException.h>
+#include <activemq/exceptions/IoExceptions.h>
 #include <decaf/util/LinkedList.h>
 
 namespace activemq

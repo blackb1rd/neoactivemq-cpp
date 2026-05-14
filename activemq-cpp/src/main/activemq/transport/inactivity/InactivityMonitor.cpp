@@ -28,11 +28,17 @@
 
 #include <atomic>
 
+#include <activemq/exceptions/ActiveMQException.h>
+#include <activemq/exceptions/IoExceptions.h>
+#include <activemq/exceptions/StdExceptionCatchMacros.h>
+#include <decaf/io/IOException.h>
 #include <decaf/lang/Boolean.h>
+#include <decaf/lang/Exception.h>
 #include <decaf/lang/Math.h>
 #include <decaf/lang/Runnable.h>
 #include <decaf/lang/Thread.h>
 #include <decaf/util/Timer.h>
+#include <stdexcept>
 
 using namespace std;
 using namespace activemq;
@@ -43,11 +49,9 @@ using namespace activemq::transport::inactivity;
 using namespace activemq::exceptions;
 using namespace activemq::wireformat;
 using namespace decaf;
-using namespace decaf::io;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace activemq
@@ -165,7 +169,7 @@ namespace transport
                 bool _e_failed = true;
                 if (this->failed.compare_exchange_strong(_e_failed, false))
                 {
-                    IOException ex(
+                    ActiveMQException ex(
                         __FILE__,
                         __LINE__,
                         (std::string("Channel was inactive for too long: ") +
@@ -225,9 +229,21 @@ namespace transport
                             this->parent->members->keepAliveResponseRequired);
                         this->parent->oneway(info);
                     }
-                    catch (IOException& e)
+                    catch (activemq::exceptions::IOException& e)
                     {
-                        this->parent->onException(e);
+                        ActiveMQException wrapped(e);
+                        wrapped.setMark(__FILE__, __LINE__);
+                        this->parent->onException(wrapped);
+                        // onException() may destroy 'this' via the transport
+                        // teardown chain. compareAndSet already cleared 'write'
+                        // to false, so return false directly.
+                        return false;
+                    }
+                    catch (decaf::io::IOException& e)
+                    {
+                        ActiveMQException wrapped(e);
+                        wrapped.setMark(__FILE__, __LINE__);
+                        this->parent->onException(wrapped);
                         // onException() may destroy 'this' via the transport
                         // teardown chain. compareAndSet already cleared 'write'
                         // to false, so return false directly.
@@ -346,9 +362,9 @@ void InactivityMonitor::afterNextIsStarted()
     {
         startMonitorThreads();
     }
-    AMQ_CATCH_RETHROW(IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, IOException)
-    AMQ_CATCHALL_THROW(IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(Exception, activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -358,9 +374,9 @@ void InactivityMonitor::beforeNextIsStopped()
     {
         stopMonitorThreads();
     }
-    AMQ_CATCH_RETHROW(IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, IOException)
-    AMQ_CATCHALL_THROW(IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(Exception, activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -370,9 +386,9 @@ void InactivityMonitor::doClose()
     {
         stopMonitorThreads();
     }
-    AMQ_CATCH_RETHROW(IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, IOException)
-    AMQ_CATCHALL_THROW(IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(Exception, activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -404,9 +420,17 @@ void InactivityMonitor::onCommand(const std::shared_ptr<Command> command)
                 {
                     startMonitorThreads();
                 }
-                catch (IOException& e)
+                catch (activemq::exceptions::IOException& e)
                 {
-                    onException(e);
+                    ActiveMQException wrapped(e);
+                    wrapped.setMark(__FILE__, __LINE__);
+                    onException(wrapped);
+                }
+                catch (decaf::io::IOException& e)
+                {
+                    ActiveMQException wrapped(e);
+                    wrapped.setMark(__FILE__, __LINE__);
+                    onException(wrapped);
                 }
             }
         }
@@ -415,10 +439,27 @@ void InactivityMonitor::onCommand(const std::shared_ptr<Command> command)
 
         this->members->inRead.store(false);
     }
-    catch (Exception& ex)
+    catch (activemq::exceptions::IOException& ex)
     {
         this->members->inRead.store(false);
         ex.setMark(__FILE__, __LINE__);
+        throw;
+    }
+    catch (activemq::exceptions::ActiveMQException& ex)
+    {
+        this->members->inRead.store(false);
+        ex.setMark(__FILE__, __LINE__);
+        throw;
+    }
+    catch (std::exception& ex)
+    {
+        this->members->inRead.store(false);
+        decaf::lang::Exception* dex =
+            dynamic_cast<decaf::lang::Exception*>(&ex);
+        if (dex != nullptr)
+        {
+            dex->setMark(__FILE__, __LINE__);
+        }
         throw;
     }
 }
@@ -461,19 +502,38 @@ void InactivityMonitor::oneway(const std::shared_ptr<Command> command)
                 this->members->commandSent.store(true);
                 this->members->inWrite.store(false);
             }
-            catch (Exception& ex)
+            catch (activemq::exceptions::IOException& ex)
             {
                 this->members->commandSent.store(true);
                 this->members->inWrite.store(false);
                 ex.setMark(__FILE__, __LINE__);
                 throw;
             }
+            catch (activemq::exceptions::ActiveMQException& ex)
+            {
+                this->members->commandSent.store(true);
+                this->members->inWrite.store(false);
+                ex.setMark(__FILE__, __LINE__);
+                throw;
+            }
+            catch (std::exception& ex)
+            {
+                this->members->commandSent.store(true);
+                this->members->inWrite.store(false);
+                decaf::lang::Exception* dex =
+                    dynamic_cast<decaf::lang::Exception*>(&ex);
+                if (dex != nullptr)
+                {
+                    dex->setMark(__FILE__, __LINE__);
+                }
+                throw;
+            }
         }
     }
-    AMQ_CATCH_RETHROW(IOException)
-    AMQ_CATCH_RETHROW(UnsupportedOperationException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, IOException)
-    AMQ_CATCHALL_THROW(IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCHALL_RETHROW_STL_BACKED_EXCEPTIONS()
+    AMQ_CATCH_EXCEPTION_CONVERT(Exception, activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////

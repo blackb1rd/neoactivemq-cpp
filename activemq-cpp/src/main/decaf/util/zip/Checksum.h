@@ -20,9 +20,6 @@
 
 #include <decaf/util/Config.h>
 
-#include <decaf/lang/exceptions/IndexOutOfBoundsException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
-
 #include <vector>
 
 namespace decaf
@@ -70,7 +67,7 @@ namespace util
              * @param length
              *      The amount of data to read from the byte buffer.
              *
-             * @throw IndexOutOfBoundsException if offset + length > size of the
+             * @throw std::out_of_range if offset + length > size of the
              * buffer.
              */
             virtual void update(const std::vector<unsigned char>& buffer,
@@ -89,8 +86,7 @@ namespace util
              * @param length
              *      The amount of data to read from the byte buffer.
              *
-             * @throw NullPointerException if the passed buffer is NULL.
-             * @throw IndexOutOfBoundsException if offset + length > size of the
+             * @throw std::out_of_range if offset + length > size of the
              * buffer.
              */
             virtual void update(const unsigned char* buffer,

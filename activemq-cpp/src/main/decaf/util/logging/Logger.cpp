@@ -16,14 +16,16 @@
  */
 #include "Logger.h"
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/util/Config.h>
 #include <decaf/util/logging/Handler.h>
 #include <algorithm>
+#include <stdexcept>
+#include <string>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::logging;
 
@@ -53,9 +55,10 @@ void Logger::addHandler(Handler* handler)
 {
     if (handler == NULL)
     {
-        NullPointerException(__FILE__,
-                             __LINE__,
-                             "Logger::addHandler - Handler cannot be null");
+        throw activemq::exceptions::IllegalStateException(
+            __FILE__,
+            __LINE__,
+            "Logger::addHandler - Handler cannot be null");
     }
 
     if (find(handlers.begin(), handlers.end(), handler) != handlers.end())

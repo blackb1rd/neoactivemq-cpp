@@ -24,8 +24,9 @@
 #include <activemq/transport/TransportRegistry.h>
 #include <activemq/transport/failover/FailoverTransport.h>
 
-#include <decaf/lang/exceptions/IllegalStateException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <stdexcept>
+#include <string>
 
 using namespace activemq;
 using namespace activemq::threads;
@@ -33,9 +34,7 @@ using namespace activemq::exceptions;
 using namespace activemq::transport;
 using namespace activemq::transport::failover;
 using namespace decaf;
-using namespace decaf::io;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::net;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
@@ -124,37 +123,42 @@ BackupTransportPool::BackupTransportPool(
 {
     if (parent == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "Parent transport passed is NULL");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "Parent transport passed is NULL");
     }
 
     if (!taskRunner)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "TaskRunner passed is NULL");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "TaskRunner passed is NULL");
     }
 
     if (!uriPool)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "URIPool passed is NULL");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "URIPool passed is NULL");
     }
 
     if (!priorityUriPool)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "Piroirty URIPool passed is NULL");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "Piroirty URIPool passed is NULL");
     }
 
     if (!closeTask)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "Close Transport Task passed is NULL");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "Close Transport Task passed is NULL");
     }
 
     this->impl = new BackupTransportPoolImpl(this, parent);
@@ -185,37 +189,42 @@ BackupTransportPool::BackupTransportPool(
 {
     if (parent == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "Parent transport passed is NULL");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "Parent transport passed is NULL");
     }
 
     if (!taskRunner)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "TaskRunner passed is NULL");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "TaskRunner passed is NULL");
     }
 
     if (!uriPool)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "URIPool passed is NULL");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "URIPool passed is NULL");
     }
 
     if (!priorityUriPool)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "Piroirty URIPool passed is NULL");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "Piroirty URIPool passed is NULL");
     }
 
     if (!closeTask)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "Close Transport Task passed is NULL");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "Close Transport Task passed is NULL");
     }
 
     this->impl = new BackupTransportPoolImpl(this, parent);
@@ -306,9 +315,10 @@ std::shared_ptr<BackupTransport> BackupTransportPool::getBackup()
 {
     if (!isEnabled())
     {
-        throw IllegalStateException(__FILE__,
-                                    __LINE__,
-                                    "The Backup Pool is not enabled.");
+        throw activemq::exceptions::IllegalStateException(
+            __FILE__,
+            __LINE__,
+            "The Backup Pool is not enabled.");
     }
 
     std::shared_ptr<BackupTransport> result;
@@ -584,7 +594,7 @@ std::shared_ptr<Transport> BackupTransportPool::createTransport(
 
         if (factory == NULL)
         {
-            throw new IOException(
+            throw activemq::exceptions::IOException(
                 __FILE__,
                 __LINE__,
                 "Invalid URI specified, no valid Factory Found.");
@@ -595,7 +605,7 @@ std::shared_ptr<Transport> BackupTransportPool::createTransport(
 
         return transport;
     }
-    AMQ_CATCH_RETHROW(IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, IOException)
-    AMQ_CATCHALL_THROW(IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(Exception, activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }

@@ -17,15 +17,17 @@
 
 #include <gtest/gtest.h>
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <activemq/transport/TransportRegistry.h>
 #include <activemq/transport/mock/MockTransportFactory.h>
+#include <stdexcept>
 
 using namespace activemq;
+using namespace activemq::exceptions;
 using namespace activemq::transport;
 using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 class TransportRegistryTest : public ::testing::Test
 {
@@ -43,12 +45,11 @@ TEST_F(TransportRegistryTest, test)
     ASSERT_NO_THROW(registry.findFactory("mock"));
 
     ASSERT_THROW(registry.findFactory(""), NoSuchElementException)
-        << ("Should have thrown an NoSuchElementException");
+        << ("Should have thrown NoSuchElementException");
 
-    ASSERT_THROW(registry.registerFactory("test", NULL), NullPointerException)
-        << ("Should have thrown an NullPointerException");
+    ASSERT_THROW(registry.registerFactory("test", NULL), std::logic_error)
+        << ("Should have thrown std::logic_error");
 
-    ASSERT_THROW(registry.registerFactory("", &factory),
-                 IllegalArgumentException)
+    ASSERT_THROW(registry.registerFactory("", &factory), std::invalid_argument)
         << ("Should have thrown an IllegalArgumentException");
 }

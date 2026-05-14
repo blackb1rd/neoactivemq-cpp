@@ -26,8 +26,6 @@
 #include <decaf/nio/LongBuffer.h>
 #include <decaf/nio/ShortBuffer.h>
 
-#include <decaf/lang/exceptions/IndexOutOfBoundsException.h>
-
 namespace decaf
 {
 namespace internal
@@ -57,7 +55,7 @@ namespace internal
              *
              * @return a newly allocated ByteBuffer which the caller owns.
              *
-             * @throws IndexOutOfBoundsException if the capacity specified is
+             * @throws std::out_of_range if the capacity specified is
              * negative.
              */
             static decaf::nio::ByteBuffer* createByteBuffer(int capacity);
@@ -84,8 +82,8 @@ namespace internal
              * @return a new ByteBuffer that is backed by buffer, caller owns
              * the returned pointer.
              *
-             * @throws NullPointerException if the buffer given in Null.
-             * @throws IndexOutOfBoundsException if the capacity specified is
+             * @throws std::logic_error if the buffer given in Null.
+             * @throws std::out_of_range if the capacity specified is
              * negative.
              */
             static decaf::nio::ByteBuffer* createByteBuffer(
@@ -123,7 +121,7 @@ namespace internal
              *
              * @return a newly allocated CharBuffer which the caller owns.
              *
-             * @throws IndexOutOfBoundsException if the capacity specified is
+             * @throws std::out_of_range if the capacity specified is
              * negative.
              */
             static decaf::nio::CharBuffer* createCharBuffer(int capacity);
@@ -150,8 +148,8 @@ namespace internal
              * @return a new CharBuffer that is backed by buffer, caller owns
              * the returned pointer.
              *
-             * @throws NullPointerException if the buffer given in Null.
-             * @throws IndexOutOfBoundsException if the capacity specified is
+             * @throws std::logic_error if the buffer given in Null.
+             * @throws std::out_of_range if the capacity specified is
              * negative.
              */
             static decaf::nio::CharBuffer* createCharBuffer(char* buffer,
@@ -188,7 +186,7 @@ namespace internal
              *
              * @return a newly allocated DoubleBuffer which the caller owns.
              *
-             * @throws IndexOutOfBoundsException if the capacity specified is
+             * @throws std::out_of_range if the capacity specified is
              * negative.
              */
             static decaf::nio::DoubleBuffer* createDoubleBuffer(int capacity);
@@ -215,8 +213,8 @@ namespace internal
              * @return a new DoubleBuffer that is backed by buffer, caller owns
              * the returned pointer.
              *
-             * @throws NullPointerException if the buffer given in Null.
-             * @throws IndexOutOfBoundsException if the capacity specified is
+             * @throws std::logic_error if the buffer given in Null.
+             * @throws std::out_of_range if the capacity specified is
              * negative.
              */
             static decaf::nio::DoubleBuffer* createDoubleBuffer(double* buffer,
@@ -253,7 +251,7 @@ namespace internal
              *
              * @return a newly allocated FloatBuffer which the caller owns.
              *
-             * @throws IndexOutOfBoundsException if the capacity specified is
+             * @throws std::out_of_range if the capacity specified is
              * negative.
              */
             static decaf::nio::FloatBuffer* createFloatBuffer(int capacity);
@@ -280,8 +278,8 @@ namespace internal
              * @return a new FloatBuffer that is backed by buffer, caller owns
              * the returned pointer.
              *
-             * @throws NullPointerException if the buffer given in Null.
-             * @throws IndexOutOfBoundsException if the capacity specified is
+             * @throws std::logic_error if the buffer given in Null.
+             * @throws std::out_of_range if the capacity specified is
              * negative.
              */
             static decaf::nio::FloatBuffer* createFloatBuffer(float* buffer,
@@ -315,7 +313,7 @@ namespace internal
              * @param capacity - the internal buffer's capacity.
              * @return a newly allocated DoubleBuffer which the caller owns.
              *
-             * @throws IndexOutOfBoundsException if the capacity specified is
+             * @throws std::out_of_range if the capacity specified is
              * negative.
              */
             static decaf::nio::LongBuffer* createLongBuffer(int capacity);
@@ -342,8 +340,8 @@ namespace internal
              * @return a new LongBuffer that is backed by buffer, caller owns
              * the returned pointer.
              *
-             * @throws NullPointerException if the buffer given in Null.
-             * @throws IndexOutOfBoundsException if the capacity specified is
+             * @throws std::logic_error if the buffer given in Null.
+             * @throws std::out_of_range if the capacity specified is
              * negative.
              */
             static decaf::nio::LongBuffer* createLongBuffer(long long* buffer,
@@ -380,7 +378,7 @@ namespace internal
              *
              * @return a newly allocated IntBuffer which the caller owns.
              *
-             * @throws IndexOutOfBoundsException if the capacity specified is
+             * @throws std::out_of_range if the capacity specified is
              * negative.
              */
             static decaf::nio::IntBuffer* createIntBuffer(int capacity);
@@ -407,8 +405,8 @@ namespace internal
              * @return a new IntBuffer that is backed by buffer, caller owns the
              * returned pointer.
              *
-             * @throws NullPointerException if the buffer given in Null.
-             * @throws IndexOutOfBoundsException if the capacity specified is
+             * @throws std::logic_error if the buffer given in Null.
+             * @throws std::out_of_range if the capacity specified is
              * negative.
              */
             static decaf::nio::IntBuffer* createIntBuffer(int* buffer,
@@ -445,7 +443,7 @@ namespace internal
              *
              * @return a newly allocated ShortBuffer which the caller owns.
              *
-             * @throws IndexOutOfBoundsException if the capacity specified is
+             * @throws std::out_of_range if the capacity specified is
              * negative.
              */
             static decaf::nio::ShortBuffer* createShortBuffer(int capacity);
@@ -472,8 +470,8 @@ namespace internal
              * @return a new ShortBuffer that is backed by buffer, caller owns
              * the returned pointer.
              *
-             * @throws NullPointerException if the buffer given in Null.
-             * @throws IndexOutOfBoundsException if the capacity specified is
+             * @throws std::logic_error if the buffer given in Null.
+             * @throws std::out_of_range if the capacity specified is
              * negative.
              */
             static decaf::nio::ShortBuffer* createShortBuffer(short* buffer,

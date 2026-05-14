@@ -24,6 +24,7 @@
 #include <decaf/io/IOException.h>
 #include <decaf/util/zip/Inflater.h>
 
+#include <stdexcept>
 #include <vector>
 
 namespace decaf
@@ -101,7 +102,8 @@ namespace util
              *      Should the filter take ownership of the passed Inflater
              * object (default is false).
              *
-             * @throws NullPointerException if the Inflater given is NULL.
+             * @throws activemq::exceptions::IllegalStateException if
+             * the Inflater given is NULL.
              */
             InflaterInputStream(decaf::io::InputStream* inputStream,
                                 Inflater*               inflater,
@@ -129,8 +131,9 @@ namespace util
              *      Should the filter take ownership of the passed Inflater
              * object (default is false).
              *
-             * @throws NullPointerException if the Inflater given is NULL.
-             * @throws IllegalArgumentException if the bufferSize value is zero.
+             * @throws activemq::exceptions::IllegalStateException if
+             * the Inflater given is NULL.
+             * @throws std::invalid_argument if the bufferSize value is zero.
              */
             InflaterInputStream(decaf::io::InputStream* inputStream,
                                 Inflater*               inflater,

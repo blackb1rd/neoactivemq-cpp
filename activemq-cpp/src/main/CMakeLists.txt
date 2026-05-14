@@ -128,6 +128,8 @@ set(ACTIVEMQ_CPP_SOURCES
     activemq/exceptions/ActiveMQException.cpp
     activemq/exceptions/BrokerException.cpp
     activemq/exceptions/ConnectionFailedException.cpp
+    activemq/exceptions/BufferUnderflowException.cpp
+    activemq/exceptions/IoExceptions.cpp
     activemq/io/LoggingInputStream.cpp
     activemq/io/LoggingOutputStream.cpp
     activemq/library/ActiveMQCPP.cpp
@@ -402,21 +404,16 @@ set(ACTIVEMQ_CPP_SOURCES
     decaf/io/DataInputStream.cpp
     decaf/io/DataOutput.cpp
     decaf/io/DataOutputStream.cpp
-    decaf/io/EOFException.cpp
     decaf/io/FileDescriptor.cpp
     decaf/io/FilterInputStream.cpp
     decaf/io/FilterOutputStream.cpp
     decaf/io/Flushable.cpp
-    decaf/io/IOException.cpp
     decaf/io/InputStream.cpp
     decaf/io/InputStreamReader.cpp
-    decaf/io/InterruptedIOException.cpp
     decaf/io/OutputStream.cpp
     decaf/io/OutputStreamWriter.cpp
     decaf/io/PushbackInputStream.cpp
     decaf/io/Reader.cpp
-    decaf/io/UTFDataFormatException.cpp
-    decaf/io/UnsupportedEncodingException.cpp
     decaf/io/Writer.cpp
     decaf/lang/AbstractStringBuilder.cpp
     decaf/lang/Appendable.cpp
@@ -444,26 +441,7 @@ set(ACTIVEMQ_CPP_SOURCES
     decaf/lang/Thread.cpp
     decaf/lang/ThreadGroup.cpp
     decaf/lang/ThreadLocal.cpp
-    decaf/lang/Throwable.cpp
     decaf/lang/Types.cpp
-    decaf/lang/exceptions/ArrayIndexOutOfBoundsException.cpp
-    decaf/lang/exceptions/ClassCastException.cpp
-    decaf/lang/exceptions/CloneNotSupportedException.cpp
-    decaf/lang/exceptions/IllegalArgumentException.cpp
-    decaf/lang/exceptions/IllegalMonitorStateException.cpp
-    decaf/lang/exceptions/IllegalStateException.cpp
-    decaf/lang/exceptions/IllegalThreadStateException.cpp
-    decaf/lang/exceptions/IndexOutOfBoundsException.cpp
-    decaf/lang/exceptions/InterruptedException.cpp
-    decaf/lang/exceptions/InvalidStateException.cpp
-    decaf/lang/exceptions/NegativeArraySizeException.cpp
-    decaf/lang/exceptions/NullPointerException.cpp
-    decaf/lang/exceptions/NumberFormatException.cpp
-    decaf/lang/exceptions/OutOfMemoryError.cpp
-    decaf/lang/exceptions/RuntimeException.cpp
-    decaf/lang/exceptions/SecurityException.cpp
-    decaf/lang/exceptions/StringIndexOutOfBoundsException.cpp
-    decaf/lang/exceptions/UnsupportedOperationException.cpp
     decaf/net/BindException.cpp
     decaf/net/ConnectException.cpp
     decaf/net/ContentHandlerFactory.cpp
@@ -503,7 +481,6 @@ set(ACTIVEMQ_CPP_SOURCES
     decaf/net/UnknownServiceException.cpp
     decaf/nio/Buffer.cpp
     decaf/nio/BufferOverflowException.cpp
-    decaf/nio/BufferUnderflowException.cpp
     decaf/nio/ByteBuffer.cpp
     decaf/nio/CharBuffer.cpp
     decaf/nio/DoubleBuffer.cpp
@@ -525,7 +502,6 @@ set(ACTIVEMQ_CPP_SOURCES
     decaf/security/NoSuchProviderException.cpp
     decaf/security/Principal.cpp
     decaf/security/Provider.cpp
-    decaf/security/ProviderException.cpp
     decaf/security/ProviderService.cpp
     decaf/security/PublicKey.cpp
     decaf/security/SecureRandom.cpp
@@ -553,7 +529,6 @@ set(ACTIVEMQ_CPP_SOURCES
     decaf/util/Collection.cpp
     decaf/util/Collections.cpp
     decaf/util/Comparator.cpp
-    decaf/util/ConcurrentModificationException.cpp
     decaf/util/Date.cpp
     decaf/util/Deque.cpp
     decaf/util/HashCode.cpp
@@ -568,7 +543,6 @@ set(ACTIVEMQ_CPP_SOURCES
     decaf/util/ListIterator.cpp
     decaf/util/Map.cpp
     decaf/util/MapEntry.cpp
-    decaf/util/NoSuchElementException.cpp
     decaf/util/PriorityQueue.cpp
     decaf/util/Properties.cpp
     decaf/util/Queue.cpp

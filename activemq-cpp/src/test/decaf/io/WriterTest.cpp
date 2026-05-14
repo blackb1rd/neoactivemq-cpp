@@ -18,14 +18,13 @@
 #include <gtest/gtest.h>
 
 #include <decaf/io/Writer.h>
-#include <decaf/lang/exceptions/IndexOutOfBoundsException.h>
 #include <decaf/nio/CharBuffer.h>
+#include <stdexcept>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::io;
 using namespace decaf::nio;
-using namespace decaf::lang::exceptions;
 
 class WriterTest : public ::testing::Test
 {
@@ -86,10 +85,9 @@ public:
 
         if (offset + length > size)
         {
-            throw IndexOutOfBoundsException(
-                __FILE__,
-                __LINE__,
-                "offset + length must be less than size.");
+            throw std::out_of_range(std::string(__FILE__) + ":" +
+                                    std::to_string(__LINE__) + ": " +
+                                    "offset + length must be less than size.");
         }
 
         for (int i = 0; i < length; i++)

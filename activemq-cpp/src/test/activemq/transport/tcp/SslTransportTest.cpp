@@ -19,6 +19,7 @@
 
 #include <activemq/core/ActiveMQConnectionFactory.h>
 #include <activemq/exceptions/ActiveMQException.h>
+#include <activemq/exceptions/IoExceptions.h>
 #include <activemq/transport/IOTransport.h>
 #include <activemq/transport/tcp/SslTransport.h>
 #include <activemq/wireformat/openwire/OpenWireFormat.h>
@@ -310,7 +311,15 @@ TEST_F(SslTransportTest, testSslConnectionFailureHandling)
         {
             sslTransport->start();
         }
-        catch (decaf::io::IOException& ex)
+        catch (activemq::exceptions::IOException&)
+        {
+            exceptionCaught = true;
+        }
+        catch (activemq::exceptions::ActiveMQException&)
+        {
+            exceptionCaught = true;
+        }
+        catch (decaf::io::IOException&)
         {
             exceptionCaught = true;
         }

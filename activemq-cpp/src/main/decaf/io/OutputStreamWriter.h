@@ -61,7 +61,7 @@ namespace io
          *      Indicates whether this instance own the given OutputStream.
          *      If true then the OutputStream is destroyed when this class is.
          *
-         * @throws NullPointerException if the stream is NULL.
+         * @throws std::logic_error if the stream is NULL.
          */
         OutputStreamWriter(OutputStream* stream, bool own = false);
 

@@ -232,7 +232,7 @@ public:
      * be read from the stream. The next read of the stream returns -1.
      *
      * If length is negative, or length is greater than the length of the
-     * array value, then an IndexOutOfBoundsException is thrown. No bytes
+     * array value, then std::out_of_range is thrown. No bytes
      * will be read from the stream for this exception case.
      *
      * @param buffer

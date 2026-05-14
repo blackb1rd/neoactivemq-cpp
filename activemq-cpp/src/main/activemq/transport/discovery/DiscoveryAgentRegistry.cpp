@@ -17,10 +17,13 @@
 
 #include "DiscoveryAgentRegistry.h"
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <memory>
+#include <stdexcept>
 
 #include <activemq/exceptions/ActiveMQException.h>
 #include <activemq/transport/discovery/DiscoveryAgentFactory.h>
+#include <string>
 
 using namespace std;
 using namespace activemq;
@@ -30,7 +33,6 @@ using namespace activemq::transport::discovery;
 using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace
@@ -60,11 +62,11 @@ DiscoveryAgentFactory* DiscoveryAgentRegistry::findFactory(
 {
     if (!this->registry.containsKey(name))
     {
-        throw NoSuchElementException(
+        throw activemq::exceptions::NoSuchElementException(
             __FILE__,
             __LINE__,
-            "No Matching Factory Registered for format := %s",
-            name.c_str());
+            std::string("No Matching Factory Registered for format := ") +
+                name);
     }
 
     return this->registry.get(name);
@@ -76,17 +78,14 @@ void DiscoveryAgentRegistry::registerFactory(const std::string&     name,
 {
     if (name == "")
     {
-        throw IllegalArgumentException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
             "DiscoveryAgentFactory name cannot be the empty string");
     }
 
     if (factory == NULL)
     {
-        throw NullPointerException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::NullPointerException(
             "Supplied DiscoveryAgentFactory pointer was NULL");
     }
 

@@ -18,12 +18,9 @@
 #ifndef _DECAF_UTIL_DEQUE_H_
 #define _DECAF_UTIL_DEQUE_H_
 
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
-#include <decaf/lang/exceptions/IllegalStateException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/util/Config.h>
-#include <decaf/util/NoSuchElementException.h>
 #include <decaf/util/Queue.h>
+#include <stdexcept>
 
 namespace decaf
 {
@@ -56,12 +53,12 @@ namespace util
          * @param element
          *      The element to be placed at the front of the Deque.
          *
-         * @throws IllegalStateException if the element cannot be added at this
+         * @throws std::logic_error if the element cannot be added at this
          * time due to capacity restrictions
-         * @throws NullPointerException if the specified element is NULL and
+         * @throws std::logic_error if the specified element is NULL and
          * this deque is a Collection of pointers and does not permit null
          * elements.
-         * @throws IllegalArgumentException if some property of the specified
+         * @throws std::invalid_argument if some property of the specified
          * element prevents it from being added to this deque.
          */
         virtual void addFirst(const E& element) = 0;
@@ -74,12 +71,12 @@ namespace util
          * @param element
          *      The element to be placed at the end of the Deque.
          *
-         * @throws IllegalStateException if the element cannot be added at this
+         * @throws std::logic_error if the element cannot be added at this
          * time due to capacity restrictions
-         * @throws NullPointerException if the specified element is NULL and
+         * @throws std::logic_error if the specified element is NULL and
          * this deque is a Collection of pointers and does not permit null
          * elements.
-         * @throws IllegalArgumentException if some property of the specified
+         * @throws std::invalid_argument if some property of the specified
          * element prevents it from being added to this deque.
          */
         virtual void addLast(const E& element) = 0;
@@ -95,10 +92,10 @@ namespace util
          *
          * @return true if the element was added, false otherwise.
          *
-         * @throws NullPointerException if the specified element is NULL and
+         * @throws std::logic_error if the specified element is NULL and
          * this deque is a Collection of pointers and does not permit null
          * elements.
-         * @throws IllegalArgumentException if some property of the specified
+         * @throws std::invalid_argument if some property of the specified
          * element prevents it from being added to this deque.
          */
         virtual bool offerFirst(const E& element) = 0;
@@ -114,10 +111,10 @@ namespace util
          *
          * @return true if the element was added, false otherwise.
          *
-         * @throws NullPointerException if the specified element is NULL and
+         * @throws std::logic_error if the specified element is NULL and
          * this deque is a Collection of pointers and does not permit null
          * elements.
-         * @throws IllegalArgumentException if some property of the specified
+         * @throws std::invalid_argument if some property of the specified
          * element prevents it from being added to this deque.
          */
         virtual bool offerLast(const E& element) = 0;
@@ -129,7 +126,7 @@ namespace util
          *
          * @return the element at the Head of the Deque.
          *
-         * @throws NoSuchElementException if the Deque is empty.
+         * @throws std::runtime_error if the Deque is empty.
          */
         virtual E removeFirst() = 0;
 
@@ -140,7 +137,7 @@ namespace util
          *
          * @return the element at the Tail of the Deque.
          *
-         * @throws NoSuchElementException if the Deque is empty.
+         * @throws std::runtime_error if the Deque is empty.
          */
         virtual E removeLast() = 0;
 
@@ -175,7 +172,7 @@ namespace util
          *
          * @return reference to the first element in the Deque.
          *
-         * @throws NoSuchElementException if the Deque is empty.
+         * @throws std::runtime_error if the Deque is empty.
          */
         virtual E&       getFirst()       = 0;
         virtual const E& getFirst() const = 0;
@@ -187,7 +184,7 @@ namespace util
          *
          * @return reference to the last element in the Deque.
          *
-         * @throws NoSuchElementException if the Deque is empty.
+         * @throws std::runtime_error if the Deque is empty.
          */
         virtual E&       getLast()       = 0;
         virtual const E& getLast() const = 0;
@@ -226,7 +223,7 @@ namespace util
          *
          * @return true if the Deque was modified as a result of this operation.
          *
-         * @throws NullPointerException if the specified element is NULL and
+         * @throws std::logic_error if the specified element is NULL and
          * this deque is a Collection of pointers and does not permit null
          * elements.
          */
@@ -241,7 +238,7 @@ namespace util
          *
          * @return true if the Deque was modified as a result of this operation.
          *
-         * @throws NullPointerException if the specified element is NULL and
+         * @throws std::logic_error if the specified element is NULL and
          * this deque is a Collection of pointers and does not permit null
          * elements.
          */
@@ -251,19 +248,19 @@ namespace util
          * Pushes an element onto the stack represented by this deque (in other
          * words, at the head of this deque) if it is possible to do so
          * immediately without violating capacity restrictions, otherwise it
-         * throwing an IllegalStateException if no space is currently available.
+         * throwing std::logic_error if no space is currently available.
          *
          * This method performs the same basic operation as the addFirst method.
          *
          * @param element
          *      The element to be pushed onto the Deque.
          *
-         * @throws IllegalStateException if the element cannot be added at this
+         * @throws std::logic_error if the element cannot be added at this
          * time due to capacity restrictions
-         * @throws NullPointerException if the specified element is NULL and
+         * @throws std::logic_error if the specified element is NULL and
          * this deque is a Collection of pointers and does not permit null
          * elements.
-         * @throws IllegalArgumentException if some property of the specified
+         * @throws std::invalid_argument if some property of the specified
          * element prevents it from being added to this deque.
          */
         virtual void push(const E& element) = 0;
@@ -280,7 +277,7 @@ namespace util
          * @return the element at the front of this deque which would be the top
          * of a stack.
          *
-         * @throws NoSuchElementException if there is nothing on the top of the
+         * @throws std::runtime_error if there is nothing on the top of the
          * stack.
          */
         virtual E pop() = 0;

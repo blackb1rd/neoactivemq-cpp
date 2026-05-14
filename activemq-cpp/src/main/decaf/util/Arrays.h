@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #ifndef _DECAF_UTIL_ARRAYS_H_
 #define _DECAF_UTIL_ARRAYS_H_
 
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
-#include <decaf/lang/exceptions/IndexOutOfBoundsException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
+#include <stdexcept>
+#include <string>
 
 namespace decaf
 {
@@ -49,8 +49,9 @@ namespace util
          * @param value
          *      The value to fill the array with.
          *
-         * @throws NullPointerException if array is Null.
-         * @throws IllegalArgumentException if the size parameter is negative,
+         * @throws activemq::exceptions::IllegalStateException if array
+         * is Null.
+         * @throws std::invalid_argument if the size parameter is negative,
          * or the start index is greater than the end index.
          */
         template <typename E>
@@ -58,7 +59,7 @@ namespace util
         {
             if (array == NULL)
             {
-                throw decaf::lang::exceptions::NullPointerException(
+                throw activemq::exceptions::NullPointerException(
                     __FILE__,
                     __LINE__,
                     "Array pointer given was NULL.");
@@ -66,10 +67,9 @@ namespace util
 
             if (size < 0)
             {
-                throw decaf::lang::exceptions::IllegalArgumentException(
-                    __FILE__,
-                    __LINE__,
-                    "Array size value given was negative.");
+                throw activemq::exceptions::InvalidArgumentException(
+                    std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+                    ": " + "Array size value given was negative.");
             }
 
             for (int i = 0; i < size; ++i)
@@ -92,10 +92,11 @@ namespace util
          * @param value
          *      The value to fill the array with.
          *
-         * @throws NullPointerException if array is Null.
-         * @throws IllegalArgumentException if the size parameter is negative,
+         * @throws activemq::exceptions::IllegalStateException if array
+         * is Null.
+         * @throws std::invalid_argument if the size parameter is negative,
          * or the start index is greater than the end index.
-         * @throws IndexOutOfBoundsException if the start index is negative or
+         * @throws std::out_of_range if the start index is negative or
          * the end index is greater than the size parameter.
          */
         template <typename E>
@@ -103,7 +104,7 @@ namespace util
         {
             if (array == NULL)
             {
-                throw decaf::lang::exceptions::NullPointerException(
+                throw activemq::exceptions::NullPointerException(
                     __FILE__,
                     __LINE__,
                     "Array pointer given was NULL.");
@@ -111,28 +112,25 @@ namespace util
 
             if (size < 0)
             {
-                throw decaf::lang::exceptions::IllegalArgumentException(
-                    __FILE__,
-                    __LINE__,
-                    "Array size value given was negative.");
+                throw activemq::exceptions::InvalidArgumentException(
+                    std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+                    ": " + "Array size value given was negative.");
             }
 
             if (start > end)
             {
-                throw decaf::lang::exceptions::IllegalArgumentException(
-                    __FILE__,
-                    __LINE__,
-                    "The start index was greater than the end index.");
+                throw activemq::exceptions::InvalidArgumentException(
+                    std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+                    ": " + "The start index was greater than the end index.");
             }
 
             if (start < 0 || end > size)
             {
-                throw decaf::lang::exceptions::IndexOutOfBoundsException(
-                    __FILE__,
-                    __LINE__,
-                    "The start index {%d} end index {%d} range is invalid.",
-                    start,
-                    end);
+                throw activemq::exceptions::OutOfRangeException(
+                    std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+                    ": " + "The start index {" + std::to_string(start) +
+                    "} end index {" + std::to_string(end) +
+                    "} range is invalid.");
             }
 
             for (int i = start; i < end; ++i)

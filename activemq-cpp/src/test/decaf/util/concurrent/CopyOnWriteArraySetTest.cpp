@@ -19,12 +19,12 @@
 
 #include <decaf/util/StlList.h>
 #include <decaf/util/concurrent/CopyOnWriteArraySet.h>
+#include <stdexcept>
 
 using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 class CopyOnWriteArraySetTest : public ::testing::Test
 {
@@ -262,7 +262,7 @@ TEST_F(CopyOnWriteArraySetTest, testIteratorRemove)
     std::unique_ptr<Iterator<int>> iter(full.iterator());
     iter->next();
 
-    ASSERT_THROW(iter->remove(), UnsupportedOperationException)
+    ASSERT_THROW(iter->remove(), std::logic_error)
         << ("Should throw a UnsupportedOperationException");
 }
 

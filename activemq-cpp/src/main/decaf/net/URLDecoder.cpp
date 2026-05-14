@@ -17,12 +17,14 @@
 
 #include "URLDecoder.h"
 #include <decaf/lang/Character.h>
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
+
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <stdexcept>
+#include <string>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::net;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -49,11 +51,10 @@ std::string URLDecoder::decode(const std::string& src)
             {
                 if (i + 2 >= src.length())
                 {
-                    throw IllegalArgumentException(
-                        __FILE__,
-                        __LINE__,
-                        "Incomplete % sequence at: %d.",
-                        i);
+                    throw activemq::exceptions::InvalidArgumentException(
+                        std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+                        ": Incomplete % sequence at: " + std::to_string(i) +
+                        ".");
                 }
 
                 int d1 = Character::digit(src.at(i + 1), 16);
@@ -61,12 +62,10 @@ std::string URLDecoder::decode(const std::string& src)
 
                 if (d1 == -1 || d2 == -1)
                 {
-                    throw IllegalArgumentException(
-                        __FILE__,
-                        __LINE__,
-                        "Invalid % sequence (%s) at: %d.",
-                        src.substr(i, 3).c_str(),
-                        i);
+                    throw activemq::exceptions::InvalidArgumentException(
+                        std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+                        ": Invalid % sequence (" + src.substr(i, 3) +
+                        ") at: " + std::to_string(i) + ".");
                 }
 
                 decoded += (char)((d1 << 4) + d2);

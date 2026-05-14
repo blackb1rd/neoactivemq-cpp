@@ -24,9 +24,6 @@
 #include <decaf/util/logging/LogRecord.h>
 #include <decaf/util/logging/LoggerCommon.h>
 
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
-
 #include <stdarg.h>
 #include <list>
 #include <string>
@@ -187,7 +184,7 @@ namespace util
              *
              * @param handler A Logging Handler
              *
-             * @throws NullPointerException if the Handler given is NULL.
+             * @throws std::logic_error if the Handler given is NULL.
              */
             void addHandler(Handler* handler);
 

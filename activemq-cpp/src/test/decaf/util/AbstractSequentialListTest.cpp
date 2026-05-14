@@ -17,15 +17,16 @@
 
 #include <gtest/gtest.h>
 
-#include <decaf/lang/exceptions/UnsupportedOperationException.h>
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/util/AbstractSequentialList.h>
 #include <decaf/util/LinkedList.h>
+#include <stdexcept>
+#include <string>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 class AbstractSequentialListTest : public ::testing::Test
 {
@@ -84,47 +85,74 @@ public:
 
     virtual E next()
     {
-        throw UnsupportedOperationException();
+        throw activemq::exceptions::IllegalStateException(
+            __FILE__,
+            __LINE__,
+            "UnsupportedOperationException");
     }
 
     virtual bool hasNext() const
     {
-        throw UnsupportedOperationException();
+        throw activemq::exceptions::IllegalStateException(
+            __FILE__,
+            __LINE__,
+            "UnsupportedOperationException");
     }
 
     virtual void remove()
     {
-        throw UnsupportedOperationException();
+        throw activemq::exceptions::IllegalStateException(
+            __FILE__,
+            __LINE__,
+            "UnsupportedOperationException");
     }
 
     virtual void add(const E& e)
     {
-        throw UnsupportedOperationException();
+        throw activemq::exceptions::IllegalStateException(
+            __FILE__,
+            __LINE__,
+            "UnsupportedOperationException");
     }
 
     virtual void set(const E& e)
     {
-        throw UnsupportedOperationException();
+        throw activemq::exceptions::IllegalStateException(
+            __FILE__,
+            __LINE__,
+            "UnsupportedOperationException");
     }
 
     virtual bool hasPrevious() const
     {
-        throw UnsupportedOperationException();
+        throw activemq::exceptions::IllegalStateException(
+            __FILE__,
+            __LINE__,
+            "UnsupportedOperationException");
     }
 
     virtual E previous()
     {
-        throw UnsupportedOperationException();
+        throw activemq::exceptions::IllegalStateException(
+            __FILE__,
+            __LINE__,
+            "UnsupportedOperationException");
     }
 
     virtual int nextIndex() const
     {
-        throw UnsupportedOperationException();
+        throw activemq::exceptions::IllegalStateException(
+            __FILE__,
+            __LINE__,
+            "UnsupportedOperationException");
     }
 
     virtual int previousIndex() const
     {
-        throw UnsupportedOperationException();
+        throw activemq::exceptions::IllegalStateException(
+            __FILE__,
+            __LINE__,
+            "UnsupportedOperationException");
     }
 };
 
@@ -194,9 +222,9 @@ TEST_F(AbstractSequentialListTest, testGet)
     try
     {
         list.get(list.size());
-        FAIL() << ("Should throw IndexOutOfBoundsException.");
+        FAIL() << ("Should throw std::out_of_range.");
     }
-    catch (IndexOutOfBoundsException& e)
+    catch (std::out_of_range& e)
     {
         // expected
     }
@@ -204,9 +232,9 @@ TEST_F(AbstractSequentialListTest, testGet)
     try
     {
         list.get(-1);
-        FAIL() << ("Should throw IndexOutOfBoundsException.");
+        FAIL() << ("Should throw std::out_of_range.");
     }
-    catch (IndexOutOfBoundsException& e)
+    catch (std::out_of_range& e)
     {
         // expected
     }
@@ -227,18 +255,18 @@ TEST_F(AbstractSequentialListTest, testRemove)
     try
     {
         list.removeAt(list.size());
-        FAIL() << ("Should throw IndexOutOfBoundsException.");
+        FAIL() << ("Should throw std::out_of_range.");
     }
-    catch (IndexOutOfBoundsException& e)
+    catch (std::out_of_range& e)
     {
         // expected
     }
     try
     {
         list.removeAt(-1);
-        FAIL() << ("Should throw IndexOutOfBoundsException.");
+        FAIL() << ("Should throw std::out_of_range.");
     }
-    catch (IndexOutOfBoundsException& e)
+    catch (std::out_of_range& e)
     {
         // expected
     }
@@ -250,7 +278,7 @@ TEST_F(AbstractSequentialListTest, testRemove)
         mylist.removeAt(0);
         FAIL() << ("Should throw UnsupportedOperationException.");
     }
-    catch (UnsupportedOperationException& e)
+    catch (activemq::exceptions::IllegalStateException& e)
     {
         // expected
     }
@@ -264,9 +292,9 @@ TEST_F(AbstractSequentialListTest, testSet)
     try
     {
         list.set(0, 12);
-        FAIL() << ("should throw IndexOutOfBoundsException");
+        FAIL() << ("should throw std::out_of_range");
     }
-    catch (IndexOutOfBoundsException& e)
+    catch (std::out_of_range& e)
     {
         // expected
     }

@@ -21,8 +21,9 @@
 #include <decaf/util/HashCode.h>
 #include <decaf/util/LinkedHashMap.h>
 #include <decaf/util/MapEntry.h>
-#include <decaf/util/NoSuchElementException.h>
 #include <decaf/util/concurrent/ConcurrentStlMap.h>
+#include <exception>
+#include <stdexcept>
 
 #include <activemq/commands/ConsumerControl.h>
 #include <activemq/commands/ExceptionResponse.h>
@@ -40,7 +41,6 @@ using namespace decaf;
 using namespace decaf::lang;
 using namespace decaf::util;
 using namespace decaf::io;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace activemq
@@ -237,9 +237,9 @@ std::shared_ptr<Tracked> ConnectionStateTracker::track(
             return std::dynamic_pointer_cast<Tracked>(result);
         }
     }
-    AMQ_CATCH_RETHROW(IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, IOException)
-    AMQ_CATCHALL_THROW(IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(Exception, activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -311,9 +311,9 @@ void ConnectionStateTracker::restore(
             transport->oneway(messagePullIter->next());
         }
     }
-    AMQ_CATCH_RETHROW(IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, IOException)
-    AMQ_CATCHALL_THROW(IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(Exception, activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -391,9 +391,9 @@ void ConnectionStateTracker::doRestoreTransactions(
             transport->getTransportListener()->onCommand(response);
         }
     }
-    AMQ_CATCH_RETHROW(IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, IOException)
-    AMQ_CATCHALL_THROW(IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(Exception, activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -421,9 +421,9 @@ void ConnectionStateTracker::doRestoreSessions(
             }
         }
     }
-    AMQ_CATCH_RETHROW(IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, IOException)
-    AMQ_CATCHALL_THROW(IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(Exception, activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -464,9 +464,9 @@ void ConnectionStateTracker::doRestoreConsumers(
             transport->oneway(infoToSend);
         }
     }
-    AMQ_CATCH_RETHROW(IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, IOException)
-    AMQ_CATCHALL_THROW(IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(Exception, activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -485,9 +485,9 @@ void ConnectionStateTracker::doRestoreProducers(
             transport->oneway(state->getInfo());
         }
     }
-    AMQ_CATCH_RETHROW(IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, IOException)
-    AMQ_CATCHALL_THROW(IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(Exception, activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -505,9 +505,9 @@ void ConnectionStateTracker::doRestoreTempDestinations(
             transport->oneway(iter->next());
         }
     }
-    AMQ_CATCH_RETHROW(IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, IOException)
-    AMQ_CATCHALL_THROW(IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(Exception, activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -700,7 +700,7 @@ std::shared_ptr<Command> ConnectionStateTracker::processRemoveConsumer(
                     {
                         cs->getRecoveringPullConsumers().remove(consumerId);
                     }
-                    catch (NoSuchElementException e)
+                    catch (NoSuchElementException&)
                     {
                     }
                 }
@@ -1147,7 +1147,7 @@ void ConnectionStateTracker::connectionInterruptProcessingComplete(
             {
                 transport->oneway(control);
             }
-            catch (Exception& ex)
+            catch (const std::exception&)
             {
             }
         }

@@ -27,10 +27,11 @@
 
 #include <time.h>
 
+#include <stdexcept>
+
 using namespace std;
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 using namespace decaf::internal::util::concurrent;
@@ -233,13 +234,13 @@ TEST_F(MutexTest, testTimedWait)
             Mutex test;
             test.lock();
 
-            ASSERT_THROW(test.wait(-1, -1), IllegalArgumentException)
+            ASSERT_THROW(test.wait(-1, -1), std::invalid_argument)
                 << ("Should Throw an IllegalArgumentException");
 
-            ASSERT_THROW(test.wait(1, 9999999), IllegalArgumentException)
+            ASSERT_THROW(test.wait(1, 9999999), std::invalid_argument)
                 << ("Should Throw an IllegalArgumentException");
 
-            ASSERT_THROW(test.wait(0, -1), IllegalArgumentException)
+            ASSERT_THROW(test.wait(0, -1), std::invalid_argument)
                 << ("Should Throw an IllegalArgumentException");
         }
     }

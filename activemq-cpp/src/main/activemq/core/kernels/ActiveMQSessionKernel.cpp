@@ -49,17 +49,19 @@
 #include <activemq/commands/RemoveInfo.h>
 #include <activemq/commands/RemoveSubscriptionInfo.h>
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/lang/Boolean.h>
 #include <decaf/lang/Math.h>
 #include <decaf/lang/Runnable.h>
-#include <decaf/lang/exceptions/InvalidStateException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/util/LinkedList.h>
 #include <decaf/util/Queue.h>
 #include <decaf/util/concurrent/Mutex.h>
 #include <decaf/util/concurrent/locks/ReentrantReadWriteLock.h>
 #include <atomic>
 #include <chrono>
+#include <exception>
+#include <stdexcept>
+#include <string>
 
 using namespace std;
 using namespace activemq;
@@ -72,7 +74,6 @@ using namespace activemq::threads;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace activemq
@@ -146,9 +147,7 @@ namespace core
             {
                 if (consumer == nullptr)
                 {
-                    throw NullPointerException(
-                        __FILE__,
-                        __LINE__,
+                    throw activemq::exceptions::NullPointerException(
                         "Synchronization Created with NULL Consumer.");
                 }
             }
@@ -188,9 +187,7 @@ namespace core
             {
                 if (session == nullptr || config == nullptr)
                 {
-                    throw NullPointerException(
-                        __FILE__,
-                        __LINE__,
+                    throw activemq::exceptions::NullPointerException(
                         "Synchronization Created with NULL Session.");
                 }
             }
@@ -467,7 +464,7 @@ void ActiveMQSessionKernel::dispose()
             this->config->consumers.clear();
             this->config->consumerLock.writeLock().unlock();
         }
-        catch (Exception& ex)
+        catch (const std::exception&)
         {
             this->config->consumerLock.writeLock().unlock();
             throw;
@@ -499,7 +496,7 @@ void ActiveMQSessionKernel::dispose()
             this->config->producers.clear();
             this->config->producerLock.writeLock().unlock();
         }
-        catch (Exception& ex)
+        catch (const std::exception&)
         {
             this->config->producerLock.writeLock().unlock();
             throw;
@@ -584,7 +581,8 @@ void ActiveMQSessionKernel::recover()
 
         if (isTransacted())
         {
-            throw cms::IllegalStateException("This session is transacted");
+            throw activemq::exceptions::IllegalStateException(
+                "This session is transacted");
         }
 
         AMQ_LOG_INFO("SessionKernel",
@@ -603,7 +601,7 @@ void ActiveMQSessionKernel::recover()
             }
             this->config->consumerLock.readLock().unlock();
         }
-        catch (Exception& ex)
+        catch (const std::exception&)
         {
             this->config->consumerLock.readLock().unlock();
             throw;
@@ -637,7 +635,7 @@ void ActiveMQSessionKernel::clearMessagesInProgress(
         }
         this->config->consumerLock.readLock().unlock();
     }
-    catch (Exception& ex)
+    catch (const std::exception&)
     {
         this->config->consumerLock.readLock().unlock();
         throw;
@@ -659,7 +657,7 @@ void ActiveMQSessionKernel::acknowledge()
         }
         this->config->consumerLock.readLock().unlock();
     }
-    catch (Exception& ex)
+    catch (const std::exception&)
     {
         this->config->consumerLock.readLock().unlock();
         throw;
@@ -681,7 +679,7 @@ void ActiveMQSessionKernel::deliverAcks()
         }
         this->config->consumerLock.readLock().unlock();
     }
-    catch (Exception& ex)
+    catch (const std::exception&)
     {
         this->config->consumerLock.readLock().unlock();
         throw;
@@ -778,7 +776,7 @@ cms::MessageConsumer* ActiveMQSessionKernel::createConsumer(
                 "SessionKernel",
                 "createConsumer() syncRequest completed successfully");
         }
-        catch (Exception& ex)
+        catch (const std::exception&)
         {
             this->removeConsumer(consumer);
             throw;
@@ -851,7 +849,7 @@ cms::MessageConsumer* ActiveMQSessionKernel::createDurableConsumer(
                 "SessionKernel",
                 "createDurableConsumer() syncRequest completed successfully");
         }
-        catch (Exception& ex)
+        catch (const std::exception&)
         {
             this->removeConsumer(consumer);
             throw;
@@ -919,7 +917,7 @@ cms::MessageProducer* ActiveMQSessionKernel::createProducer(
                 "SessionKernel",
                 "createProducer() syncRequest completed successfully");
         }
-        catch (Exception& ex)
+        catch (const std::exception&)
         {
             this->removeProducer(producer);
             throw;
@@ -989,9 +987,8 @@ cms::Queue* ActiveMQSessionKernel::createQueue(const std::string& queueName)
 
         if (queueName == "")
         {
-            throw IllegalArgumentException(
-                __FILE__,
-                __LINE__,
+            throw activemq::exceptions::InvalidArgumentException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
                 "Destination Name cannot be the Empty String.");
         }
 
@@ -1016,9 +1013,8 @@ cms::Topic* ActiveMQSessionKernel::createTopic(const std::string& topicName)
 
         if (topicName == "")
         {
-            throw IllegalArgumentException(
-                __FILE__,
-                __LINE__,
+            throw activemq::exceptions::InvalidArgumentException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
                 "Destination Name cannot be the Empty String.");
         }
 
@@ -1435,7 +1431,7 @@ void ActiveMQSessionKernel::start()
         }
         this->config->consumerLock.readLock().unlock();
     }
-    catch (Exception& ex)
+    catch (const std::exception&)
     {
         this->config->consumerLock.readLock().unlock();
         throw;
@@ -1463,7 +1459,7 @@ void ActiveMQSessionKernel::stop()
         }
         this->config->consumerLock.readLock().unlock();
     }
-    catch (Exception& ex)
+    catch (const std::exception&)
     {
         this->config->consumerLock.readLock().unlock();
         throw;
@@ -1534,7 +1530,7 @@ bool ActiveMQSessionKernel::isInUse(
         }
         this->config->consumerLock.readLock().unlock();
     }
-    catch (Exception& ex)
+    catch (const std::exception&)
     {
         this->config->consumerLock.readLock().unlock();
         throw;
@@ -1632,7 +1628,7 @@ void ActiveMQSessionKernel::addConsumer(
             this->config->consumers.add(consumer);
             this->config->consumerLock.writeLock().unlock();
         }
-        catch (Exception& ex)
+        catch (const std::exception&)
         {
             this->config->consumerLock.writeLock().unlock();
             throw;
@@ -1674,7 +1670,7 @@ void ActiveMQSessionKernel::removeConsumer(
             }
             this->config->consumerLock.writeLock().unlock();
         }
-        catch (Exception& ex)
+        catch (const std::exception&)
         {
             this->config->consumerLock.writeLock().unlock();
             throw;
@@ -1699,7 +1695,7 @@ void ActiveMQSessionKernel::addProducer(
             this->config->producers.add(producer);
             this->config->producerLock.writeLock().unlock();
         }
-        catch (Exception& ex)
+        catch (const std::exception&)
         {
             this->config->producerLock.writeLock().unlock();
             throw;
@@ -1725,7 +1721,7 @@ void ActiveMQSessionKernel::removeProducer(
             this->config->producers.remove(producer);
             this->config->producerLock.writeLock().unlock();
         }
-        catch (Exception& ex)
+        catch (const std::exception&)
         {
             this->config->producerLock.writeLock().unlock();
             throw;
@@ -1759,7 +1755,7 @@ ActiveMQSessionKernel::lookupProducerKernel(std::shared_ptr<ProducerId> id)
 
         this->config->producerLock.readLock().unlock();
     }
-    catch (Exception& ex)
+    catch (const std::exception&)
     {
         this->config->producerLock.readLock().unlock();
         throw;
@@ -1789,7 +1785,7 @@ ActiveMQSessionKernel::lookupConsumerKernel(std::shared_ptr<ConsumerId> id)
         }
         this->config->consumerLock.readLock().unlock();
     }
-    catch (Exception& ex)
+    catch (const std::exception&)
     {
         this->config->consumerLock.readLock().unlock();
         throw;
@@ -1823,7 +1819,7 @@ bool ActiveMQSessionKernel::iterateConsumers()
         }
         this->config->consumerLock.readLock().unlock();
     }
-    catch (Exception& ex)
+    catch (const std::exception&)
     {
         this->config->consumerLock.readLock().unlock();
         throw;
@@ -1852,7 +1848,7 @@ void ActiveMQSessionKernel::setPrefetchSize(std::shared_ptr<ConsumerId> id,
         }
         this->config->consumerLock.readLock().unlock();
     }
-    catch (Exception& ex)
+    catch (const std::exception&)
     {
         this->config->consumerLock.readLock().unlock();
         throw;
@@ -1884,7 +1880,7 @@ void ActiveMQSessionKernel::close(std::shared_ptr<ConsumerId> id)
         }
         this->config->consumerLock.readLock().unlock();
     }
-    catch (Exception& ex)
+    catch (const std::exception&)
     {
         this->config->consumerLock.readLock().unlock();
         throw;
@@ -1952,14 +1948,14 @@ void ActiveMQSessionKernel::checkMessageListener() const
             std::shared_ptr<ActiveMQConsumerKernel> consumer = iter->next();
             if (consumer->getMessageListener() != nullptr)
             {
-                throw cms::IllegalStateException(
+                throw activemq::exceptions::IllegalStateException(
                     "Cannot synchronously receive a message when a "
                     "MessageListener is set");
             }
         }
         this->config->consumerLock.readLock().unlock();
     }
-    catch (Exception& ex)
+    catch (const std::exception&)
     {
         this->config->consumerLock.readLock().unlock();
         throw;
@@ -2002,7 +1998,7 @@ ActiveMQSessionKernel::getConsumers() const
         result.addAll(this->config->consumers);
         this->config->consumerLock.readLock().unlock();
     }
-    catch (Exception& ex)
+    catch (const std::exception&)
     {
         this->config->consumerLock.readLock().unlock();
         throw;

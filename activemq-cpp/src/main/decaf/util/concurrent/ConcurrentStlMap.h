@@ -15,20 +15,21 @@
  * limitations under the License.
  */
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #ifndef _DECAF_UTIL_CONCURRENTSTLMAP_H_
 #define _DECAF_UTIL_CONCURRENTSTLMAP_H_
 
 #include <decaf/lang/Pointer.h>
 #include <decaf/util/AbstractCollection.h>
 #include <decaf/util/AbstractSet.h>
-#include <decaf/util/ConcurrentModificationException.h>
 #include <decaf/util/Iterator.h>
 #include <decaf/util/Map.h>
-#include <decaf/util/NoSuchElementException.h>
 #include <decaf/util/concurrent/ConcurrentMap.h>
 #include <decaf/util/concurrent/Mutex.h>
 #include <decaf/util/concurrent/Synchronizable.h>
 #include <map>
+#include <stdexcept>
+#include <string>
 #include <vector>
 
 namespace decaf
@@ -104,10 +105,11 @@ namespace util
                 {
                     if (expectedModCount != this->associatedMap->modCount)
                     {
-                        throw ConcurrentModificationException(
-                            __FILE__,
-                            __LINE__,
-                            "StlMap modified outside this iterator");
+                        throw activemq::exceptions::
+                            ConcurrentModificationException(
+                                __FILE__,
+                                __LINE__,
+                                "StlMap modified outside this iterator");
                     }
                 }
 
@@ -119,9 +121,10 @@ namespace util
 
                         if (!checkHasNext())
                         {
-                            throw NoSuchElementException(__FILE__,
-                                                         __LINE__,
-                                                         "No next element");
+                            throw activemq::exceptions::NoSuchElementException(
+                                __FILE__,
+                                __LINE__,
+                                "No next element");
                         }
 
                         currentEntry = futureEntry;
@@ -137,10 +140,11 @@ namespace util
 
                         if (currentEntry == this->associatedMap->valueMap.end())
                         {
-                            throw decaf::lang::exceptions::IllegalStateException(
+                            throw activemq::exceptions::IllegalStateException(
                                 __FILE__,
                                 __LINE__,
-                                "Remove called before call to next()");
+                                "Remove called before call "
+                                "to next()");
                         }
 
                         this->associatedMap->valueMap.erase(currentEntry);
@@ -316,10 +320,11 @@ namespace util
                     {
                         if (expectedModCount != this->associatedMap->modCount)
                         {
-                            throw ConcurrentModificationException(
-                                __FILE__,
-                                __LINE__,
-                                "StlMap modified outside this iterator");
+                            throw activemq::exceptions::
+                                ConcurrentModificationException(
+                                    __FILE__,
+                                    __LINE__,
+                                    "StlMap modified outside this iterator");
                         }
                     }
                 }
@@ -332,9 +337,10 @@ namespace util
 
                         if (!checkHasNext())
                         {
-                            throw NoSuchElementException(__FILE__,
-                                                         __LINE__,
-                                                         "No next element");
+                            throw activemq::exceptions::NoSuchElementException(
+                                __FILE__,
+                                __LINE__,
+                                "No next element");
                         }
 
                         currentEntry = futureEntry;
@@ -379,7 +385,7 @@ namespace util
 
                 virtual void remove()
                 {
-                    throw lang::exceptions::UnsupportedOperationException(
+                    throw activemq::exceptions::UnsupportedOperationException(
                         __FILE__,
                         __LINE__,
                         "Cannot write to a const Iterator.");
@@ -421,7 +427,7 @@ namespace util
 
                 virtual void remove()
                 {
-                    throw lang::exceptions::UnsupportedOperationException(
+                    throw activemq::exceptions::UnsupportedOperationException(
                         __FILE__,
                         __LINE__,
                         "Cannot write to a const Iterator.");
@@ -463,7 +469,7 @@ namespace util
 
                 virtual void remove()
                 {
-                    throw lang::exceptions::UnsupportedOperationException(
+                    throw activemq::exceptions::UnsupportedOperationException(
                         __FILE__,
                         __LINE__,
                         "Cannot write to a const Iterator.");
@@ -571,7 +577,7 @@ namespace util
 
                 virtual void clear()
                 {
-                    throw decaf::lang::exceptions::UnsupportedOperationException(
+                    throw activemq::exceptions::UnsupportedOperationException(
                         __FILE__,
                         __LINE__,
                         "Can't clear a const collection");
@@ -579,7 +585,7 @@ namespace util
 
                 virtual bool remove(const MapEntry<K, V>& entry DECAF_UNUSED)
                 {
-                    throw decaf::lang::exceptions::UnsupportedOperationException(
+                    throw activemq::exceptions::UnsupportedOperationException(
                         __FILE__,
                         __LINE__,
                         "Can't remove from const collection");
@@ -601,7 +607,7 @@ namespace util
 
                 virtual Iterator<MapEntry<K, V>>* iterator()
                 {
-                    throw decaf::lang::exceptions::UnsupportedOperationException(
+                    throw activemq::exceptions::UnsupportedOperationException(
                         __FILE__,
                         __LINE__,
                         "Can't return a non-const iterator for a const "
@@ -706,7 +712,7 @@ namespace util
 
                 virtual void clear()
                 {
-                    throw decaf::lang::exceptions::UnsupportedOperationException(
+                    throw activemq::exceptions::UnsupportedOperationException(
                         __FILE__,
                         __LINE__,
                         "Can't modify a const collection");
@@ -714,7 +720,7 @@ namespace util
 
                 virtual bool remove(const K& key DECAF_UNUSED)
                 {
-                    throw decaf::lang::exceptions::UnsupportedOperationException(
+                    throw activemq::exceptions::UnsupportedOperationException(
                         __FILE__,
                         __LINE__,
                         "Can't modify a const collection");
@@ -722,7 +728,7 @@ namespace util
 
                 virtual Iterator<K>* iterator()
                 {
-                    throw decaf::lang::exceptions::UnsupportedOperationException(
+                    throw activemq::exceptions::UnsupportedOperationException(
                         __FILE__,
                         __LINE__,
                         "Can't return a non-const iterator for a const "
@@ -815,7 +821,7 @@ namespace util
 
                 virtual void clear()
                 {
-                    throw decaf::lang::exceptions::UnsupportedOperationException(
+                    throw activemq::exceptions::UnsupportedOperationException(
                         __FILE__,
                         __LINE__,
                         "Can't modify a const collection");
@@ -823,7 +829,7 @@ namespace util
 
                 virtual Iterator<V>* iterator()
                 {
-                    throw decaf::lang::exceptions::UnsupportedOperationException(
+                    throw activemq::exceptions::UnsupportedOperationException(
                         __FILE__,
                         __LINE__,
                         "Can't return a non-const iterator for a const "
@@ -1072,9 +1078,10 @@ namespace util
                     }
                 }
 
-                throw NoSuchElementException(__FILE__,
-                                             __LINE__,
-                                             "Key does not exist in map");
+                throw activemq::exceptions::NoSuchElementException(
+                    __FILE__,
+                    __LINE__,
+                    "Key does not exist in map");
             }
 
             /**
@@ -1095,9 +1102,10 @@ namespace util
                     }
                 }
 
-                throw NoSuchElementException(__FILE__,
-                                             __LINE__,
-                                             "Key does not exist in map");
+                throw activemq::exceptions::NoSuchElementException(
+                    __FILE__,
+                    __LINE__,
+                    "Key does not exist in map");
             }
 
             /**
@@ -1210,7 +1218,7 @@ namespace util
              * @return true if the put operation was performed otherwise return
              * false which indicates there was a value previously mapped to the
              * key.
-             * @throw UnsupportedOperationException
+             * @throws activemq::exceptions::IllegalStateException
              *        if the put operation is not supported by this map
              */
             bool putIfAbsent(const K& key, const V& value)
@@ -1300,7 +1308,8 @@ namespace util
              * if( map.containsKey( key ) ) {
              *     return map.put( key, value );
              * } else {
-             *     throw NoSuchElementException(...);
+             *     throw
+             * activemq::exceptions::InterruptedException(...);
              * };
              * </pre>
              * except that the action is performed atomically.
@@ -1309,10 +1318,11 @@ namespace util
              * @param value value to be associated with the specified key.
              *
              * @return copy of the previous value associated with specified key,
-             * or throws an NoSuchElementException if there was no mapping for
-             * key.
+             * or throws an activemq::exceptions::InterruptedException
+             * if there was no mapping for key.
              *
-             * @throws NoSuchElementException if there was no previous mapping.
+             * @throws activemq::exceptions::InterruptedException if
+             * there was no previous mapping.
              */
             V replace(const K& key, const V& value)
             {
@@ -1326,7 +1336,7 @@ namespace util
                     }
                 }
 
-                throw NoSuchElementException(
+                throw activemq::exceptions::NoSuchElementException(
                     __FILE__,
                     __LINE__,
                     "Value to Replace was not in the Map.");

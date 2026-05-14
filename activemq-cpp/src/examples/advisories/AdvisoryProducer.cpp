@@ -21,15 +21,18 @@
 #include <cms/TextMessage.h>
 #include <cms/Topic.h>
 #include <decaf/lang/Integer.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
+
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <stdexcept>
+#include <string>
 
 using namespace std;
+using namespace activemq::exceptions;
 using namespace activemqcpp;
 using namespace activemqcpp::examples;
 using namespace activemqcpp::examples::advisories;
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 AdvisoryProducer::AdvisoryProducer(cms::Session* session)

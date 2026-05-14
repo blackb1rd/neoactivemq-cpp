@@ -18,11 +18,9 @@
 #ifndef _DECAF_UTIL_CONCURRENT_SYNCHRONIZABLE_H_
 #define _DECAF_UTIL_CONCURRENT_SYNCHRONIZABLE_H_
 
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
-#include <decaf/lang/exceptions/IllegalMonitorStateException.h>
-#include <decaf/lang/exceptions/InterruptedException.h>
-#include <decaf/lang/exceptions/RuntimeException.h>
+#include <decaf/lang/Exception.h>
 #include <decaf/util/Config.h>
+#include <stdexcept>
 
 namespace decaf
 {
@@ -45,7 +43,7 @@ namespace util
             /**
              * Locks the object.
              *
-             * @throws RuntimeException if an error occurs while locking the
+             * @throws Exception if an error occurs while locking the
              * object.
              */
             virtual void lock() = 0;
@@ -57,7 +55,7 @@ namespace util
              * @return true if the lock was acquired, false if it is already
              * held by another thread.
              *
-             * @throws RuntimeException if an error occurs while locking the
+             * @throws Exception if an error occurs while locking the
              * object.
              */
             virtual bool tryLock() = 0;
@@ -65,7 +63,7 @@ namespace util
             /**
              * Unlocks the object.
              *
-             * @throws RuntimeException if an error occurs while unlocking the
+             * @throws Exception if an error occurs while unlocking the
              * object.
              */
             virtual void unlock() = 0;
@@ -75,11 +73,11 @@ namespace util
              * by a call to Notify.  Must have this object locked before
              * calling.
              *
-             * @throws RuntimeException if an error occurs while waiting on the
+             * @throws Exception if an error occurs while waiting on the
              * object.
-             * @throws InterruptedException if the wait is interrupted before it
+             * @throws std::runtime_error if the wait is interrupted before it
              * completes.
-             * @throws IllegalMonitorStateException - if the current thread is
+             * @throws std::logic_error - if the current thread is
              * not the owner of the the Synchronizable Object.
              */
             virtual void wait() = 0;
@@ -93,11 +91,11 @@ namespace util
              * @param millisecs
              *      the time in milliseconds to wait, or WAIT_INIFINITE
              *
-             * @throws RuntimeException if an error occurs while waiting on the
+             * @throws Exception if an error occurs while waiting on the
              * object.
-             * @throws InterruptedException if the wait is interrupted before it
+             * @throws std::runtime_error if the wait is interrupted before it
              * completes.
-             * @throws IllegalMonitorStateException - if the current thread is
+             * @throws std::logic_error - if the current thread is
              * not the owner of the the Synchronizable Object.
              */
             virtual void wait(long long millisecs) = 0;
@@ -120,13 +118,13 @@ namespace util
              * @param nanos
              *      additional time in nanoseconds with a range of 0-999999
              *
-             * @throws IllegalArgumentException if an error occurs or the nanos
+             * @throws std::invalid_argument if an error occurs or the nanos
              * argument is not in the range of [0-999999]
-             * @throws RuntimeException if an error occurs while waiting on the
+             * @throws Exception if an error occurs while waiting on the
              * object.
-             * @throws InterruptedException if the wait is interrupted before it
+             * @throws std::runtime_error if the wait is interrupted before it
              * completes.
-             * @throws IllegalMonitorStateException - if the current thread is
+             * @throws std::logic_error - if the current thread is
              * not the owner of the the Synchronizable Object.
              */
             virtual void wait(long long millisecs, int nanos) = 0;
@@ -136,9 +134,9 @@ namespace util
              * up and continue.  Must have this object locked before
              * calling.
              *
-             * @throws IllegalMonitorStateException - if the current thread is
+             * @throws std::logic_error - if the current thread is
              * not the owner of the the Synchronizable Object.
-             * @throws RuntimeException if an error occurs while notifying one
+             * @throws Exception if an error occurs while notifying one
              * of the waiting threads.
              */
             virtual void notify() = 0;
@@ -148,9 +146,9 @@ namespace util
              * up and continue.  Must have this object locked before
              * calling.
              *
-             * @throws IllegalMonitorStateException - if the current thread is
+             * @throws std::logic_error - if the current thread is
              * not the owner of the the Synchronizable Object.
-             * @throws RuntimeException if an error occurs while notifying the
+             * @throws Exception if an error occurs while notifying the
              * waiting threads.
              */
             virtual void notifyAll() = 0;

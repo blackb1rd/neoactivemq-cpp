@@ -20,8 +20,12 @@
 
 #include <activemq/core/ActiveMQConnectionMetaData.h>
 
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <activemq/exceptions/StdExceptionCatchMacros.h>
 #include <decaf/lang/Boolean.h>
 #include <memory>
+#include <stdexcept>
+#include <string>
 
 using namespace std;
 using namespace activemq;
@@ -33,7 +37,6 @@ using namespace activemq::exceptions;
 using namespace activemq::wireformat;
 using namespace activemq::wireformat::openwire;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 std::shared_ptr<WireFormat> OpenWireFormatFactory::createWireFormat(
@@ -85,6 +88,11 @@ std::shared_ptr<WireFormat> OpenWireFormatFactory::createWireFormat(
 
         return wireFormat;
     }
-    AMQ_CATCH_RETHROW(IllegalStateException)
-    AMQ_CATCHALL_THROW(IllegalStateException)
+    AMQ_CATCHALL_RETHROW_STL_BACKED_EXCEPTIONS()
+    catch (...)
+    {
+        throw activemq::exceptions::TypeMismatchException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }

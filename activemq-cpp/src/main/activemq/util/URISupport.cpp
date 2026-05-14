@@ -19,12 +19,16 @@
 
 #include <activemq/exceptions/ExceptionDefines.h>
 
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <decaf/lang/Exception.h>
 #include <decaf/lang/System.h>
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
 #include <decaf/net/URISyntaxException.h>
 #include <decaf/net/URLEncoder.h>
 #include <decaf/util/StringTokenizer.h>
+#include <exception>
 #include <sstream>
+#include <stdexcept>
+#include <string>
 
 using namespace std;
 using namespace activemq;
@@ -32,7 +36,6 @@ using namespace activemq::util;
 using namespace decaf::util;
 using namespace decaf::net;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 bool URISupport::isCompositeURI(const URI& uri)
@@ -60,13 +63,11 @@ void URISupport::parseURL(const std::string&       URI,
         // transport, url, port.
         if (tokenizer.countTokens() < 3)
         {
-            throw decaf::lang::exceptions::IllegalArgumentException(
-                __FILE__,
-                __LINE__,
-                (string("URISupport::parseURL - "
-                        "Marlformed URI: ") +
-                 URI)
-                    .c_str());
+            throw activemq::exceptions::InvalidArgumentException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+                string("URISupport::parseURL - "
+                       "Marlformed URI: ") +
+                URI);
         }
 
         // First element should be the Transport Type, following that is the
@@ -88,13 +89,12 @@ void URISupport::parseURL(const std::string&       URI,
 
             if (tokenizer.countTokens() != 2)
             {
-                throw decaf::lang::exceptions::IllegalArgumentException(
-                    __FILE__,
-                    __LINE__,
-                    (string("URISupport::parseURL - "
-                            "Marlformed Parameter = ") +
-                     tokens[i])
-                        .c_str());
+                throw activemq::exceptions::InvalidArgumentException(
+                    std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+                    ": " +
+                    string("URISupport::parseURL - "
+                           "Marlformed Parameter = ") +
+                    tokens[i]);
             }
 
             // Get them in order, passing both as nextToken calls in the
@@ -106,9 +106,28 @@ void URISupport::parseURL(const std::string&       URI,
             properties.setProperty(key, value);
         }
     }
-    AMQ_CATCH_RETHROW(IllegalArgumentException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, IllegalArgumentException)
-    AMQ_CATCHALL_THROW(IllegalArgumentException)
+    catch (std::invalid_argument&)
+    {
+        throw;
+    }
+    catch (const std::exception& ex)
+    {
+        const decaf::lang::Exception* dex =
+            dynamic_cast<const decaf::lang::Exception*>(&ex);
+        if (dex != nullptr)
+        {
+            throw activemq::exceptions::InvalidArgumentException(
+                dex->getMessage());
+        }
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(ex.what()));
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -120,9 +139,28 @@ Properties URISupport::parseQuery(std::string query)
         URISupport::parseQuery(query, &options);
         return options;
     }
-    AMQ_CATCH_RETHROW(IllegalArgumentException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, IllegalArgumentException)
-    AMQ_CATCHALL_THROW(IllegalArgumentException)
+    catch (std::invalid_argument&)
+    {
+        throw;
+    }
+    catch (const std::exception& ex)
+    {
+        const decaf::lang::Exception* dex =
+            dynamic_cast<const decaf::lang::Exception*>(&ex);
+        if (dex != nullptr)
+        {
+            throw activemq::exceptions::InvalidArgumentException(
+                dex->getMessage());
+        }
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(ex.what()));
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -132,10 +170,10 @@ void URISupport::parseQuery(std::string query, Properties* properties)
     {
         if (properties == NULL)
         {
-            throw IllegalArgumentException(__FILE__,
-                                           __LINE__,
-                                           "URISupport::parseQuery - Can't "
-                                           "pass in a null properties object");
+            throw activemq::exceptions::InvalidArgumentException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+                "URISupport::parseQuery - Can't "
+                "pass in a null properties object");
         }
 
         // strip the initial "?"
@@ -161,10 +199,9 @@ void URISupport::parseQuery(std::string query, Properties* properties)
 
             if (tokenizer.countTokens() != 2)
             {
-                throw IllegalArgumentException(
-                    __FILE__,
-                    __LINE__,
-                    "URISupport::parseQuery - Invalid URI Option.");
+                throw activemq::exceptions::InvalidArgumentException(
+                    std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+                    ": " + "URISupport::parseQuery - Invalid URI Option.");
             }
 
             // Get the Key
@@ -183,9 +220,28 @@ void URISupport::parseQuery(std::string query, Properties* properties)
             properties->setProperty(key, value);
         }
     }
-    AMQ_CATCH_RETHROW(IllegalArgumentException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, IllegalArgumentException)
-    AMQ_CATCHALL_THROW(IllegalArgumentException)
+    catch (std::invalid_argument&)
+    {
+        throw;
+    }
+    catch (const std::exception& ex)
+    {
+        const decaf::lang::Exception* dex =
+            dynamic_cast<const decaf::lang::Exception*>(&ex);
+        if (dex != nullptr)
+        {
+            throw activemq::exceptions::InvalidArgumentException(
+                dex->getMessage());
+        }
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(ex.what()));
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -201,11 +257,11 @@ std::string URISupport::replaceEnvValues(const std::string& value)
             if (value.size() > 3 && value.at(1) != '{' &&
                 value.at(value.size() - 1) != '}')
             {
-                throw new decaf::lang::exceptions::IllegalArgumentException(
-                    __FILE__,
-                    __LINE__,
-                    "URISupport::replaceEnvValues - Invalid Env Var Syntax: %s",
-                    value.c_str());
+                throw activemq::exceptions::InvalidArgumentException(
+                    std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+                    ": " +
+                    "URISupport::replaceEnvValues - Invalid Env Var Syntax: " +
+                    value);
             }
 
             string var = value.substr(2, value.size() - 3);
@@ -213,11 +269,10 @@ std::string URISupport::replaceEnvValues(const std::string& value)
 
             if (var == "")
             {
-                throw new decaf::lang::exceptions::IllegalArgumentException(
-                    __FILE__,
-                    __LINE__,
-                    "URISupport::replaceEnvValues - Env Var not set: %s",
-                    value.c_str());
+                throw activemq::exceptions::InvalidArgumentException(
+                    std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+                    ": " +
+                    "URISupport::replaceEnvValues - Env Var not set: " + value);
             }
 
             return var;
@@ -225,9 +280,28 @@ std::string URISupport::replaceEnvValues(const std::string& value)
 
         return value;
     }
-    AMQ_CATCH_RETHROW(IllegalArgumentException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, IllegalArgumentException)
-    AMQ_CATCHALL_THROW(IllegalArgumentException)
+    catch (std::invalid_argument&)
+    {
+        throw;
+    }
+    catch (const std::exception& ex)
+    {
+        const decaf::lang::Exception* dex =
+            dynamic_cast<const decaf::lang::Exception*>(&ex);
+        if (dex != nullptr)
+        {
+            throw activemq::exceptions::InvalidArgumentException(
+                dex->getMessage());
+        }
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(ex.what()));
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

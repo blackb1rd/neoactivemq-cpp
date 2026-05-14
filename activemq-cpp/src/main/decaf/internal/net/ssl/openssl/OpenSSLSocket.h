@@ -24,6 +24,7 @@
 
 #include <decaf/io/InputStream.h>
 #include <decaf/io/OutputStream.h>
+#include <stdexcept>
 
 namespace decaf
 {
@@ -237,8 +238,8 @@ namespace internal
                      *
                      * @throw IOException if an I/O error occurs during the
                      * read.
-                     * @throw NullPointerException if buffer is Null.
-                     * @throw IndexOutOfBoundsException if offset + length is
+                     * @throw std::logic_error if buffer is Null.
+                     * @throw std::out_of_range if offset + length is
                      * greater than buffer size.
                      */
                     int read(unsigned char* buffer,
@@ -262,8 +263,8 @@ namespace internal
                      *
                      * @throw IOException if an I/O error occurs during the
                      * write.
-                     * @throw NullPointerException if buffer is Null.
-                     * @throw IndexOutOfBoundsException if offset + length is
+                     * @throw std::logic_error if buffer is Null.
+                     * @throw std::out_of_range if offset + length is
                      * greater than buffer size.
                      */
                     void write(const unsigned char* buffer,

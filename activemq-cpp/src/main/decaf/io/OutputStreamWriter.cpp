@@ -17,13 +17,14 @@
 
 #include "OutputStreamWriter.h"
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/io/OutputStream.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
+#include <stdexcept>
+#include <string>
 
 using namespace decaf;
 using namespace decaf::io;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 OutputStreamWriter::OutputStreamWriter(OutputStream* stream, bool own)
@@ -33,9 +34,10 @@ OutputStreamWriter::OutputStreamWriter(OutputStream* stream, bool own)
 {
     if (stream == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "OutputStream pointer cannot be NULL");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "OutputStream pointer cannot be NULL");
     }
 }
 
@@ -99,15 +101,15 @@ void OutputStreamWriter::doWriteArrayBounded(const char* buffer,
 
         if (buffer == NULL)
         {
-            throw NullPointerException(__FILE__,
-                                       __LINE__,
-                                       "Given buffer was NULL.");
+            throw activemq::exceptions::NullPointerException(
+                __FILE__,
+                __LINE__,
+                "Given buffer was NULL.");
         }
 
         this->stream->write((const unsigned char*)buffer, size, offset, length);
     }
     DECAF_CATCH_RETHROW(IOException)
-    DECAF_CATCH_RETHROW(NullPointerException)
     DECAF_CATCHALL_THROW(IOException)
 }
 

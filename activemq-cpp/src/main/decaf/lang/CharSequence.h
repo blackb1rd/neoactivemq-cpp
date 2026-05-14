@@ -18,8 +18,8 @@
 #ifndef _DECAF_LANG_CHARSEQUENCE_H_
 #define _DECAF_LANG_CHARSEQUENCE_H_
 
-#include <decaf/lang/exceptions/IndexOutOfBoundsException.h>
 #include <decaf/util/Config.h>
+#include <string>
 
 namespace decaf
 {
@@ -55,7 +55,7 @@ namespace lang
          *
          * @return the char at the given position.
          *
-         * @throws IndexOutOfBoundsException if index is > than length() or
+         * @throws std::out_of_range if index is > than length() or
          * negative
          */
         virtual char charAt(int index) const = 0;
@@ -74,7 +74,7 @@ namespace lang
          *
          * @return a new CharSequence
          *
-         * @throws IndexOutOfBoundsException if start or end > length() or start
+         * @throws std::out_of_range if start or end > length() or start
          * or end are negative.
          */
         virtual CharSequence* subSequence(int start, int end) const = 0;

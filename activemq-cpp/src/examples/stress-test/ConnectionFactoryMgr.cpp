@@ -17,9 +17,10 @@
 
 #include "ConnectionFactoryMgr.h"
 #include <activemq/core/ActiveMQConnectionFactory.h>
+#include <activemq/exceptions/ExceptionTypes.h>
 
-using namespace decaf::lang::exceptions;
 using namespace activemq::core;
+using namespace activemq::exceptions;
 using namespace decaf::lang;
 using namespace cms;
 using namespace cms::stress;
@@ -82,7 +83,7 @@ ConnectionFactory* ConnectionFactoryMgr::getConnectionFactory(
             connectionFactory = connectionFactories->get(url);
         }
     }
-    catch (NoSuchElementException& ex)
+    catch (NoSuchElementException&)
     {
     }
 

@@ -20,11 +20,7 @@
 
 #include <decaf/util/Config.h>
 
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
-#include <decaf/lang/exceptions/IllegalStateException.h>
-#include <decaf/lang/exceptions/IndexOutOfBoundsException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
-
+#include <stdexcept>
 #include <vector>
 
 namespace decaf
@@ -143,10 +139,12 @@ namespace util
              * @param length
              *      The number of bytes to read from the input buffer.
              *
-             * @throws NullPointerException if buffer is NULL.
-             * @throws IndexOutOfBoundsException if the offset + length > size
+             * @throws activemq::exceptions::IllegalStateException if
+             * buffer is NULL.
+             * @throws std::out_of_range if the offset + length > size
              * of the buffer.
-             * @throws IllegalStateException if in the end state.
+             * @throws activemq::exceptions::IllegalStateException if in
+             * the end state.
              */
             void setInput(const unsigned char* buffer,
                           int                  size,
@@ -165,9 +163,10 @@ namespace util
              * @param length
              *      The number of bytes to read from the input buffer.
              *
-             * @throws IndexOutOfBoundsException if the offset + length > size
+             * @throws std::out_of_range if the offset + length > size
              * of the buffer.
-             * @throws IllegalStateException if in the end state.
+             * @throws activemq::exceptions::IllegalStateException if in
+             * the end state.
              */
             void setInput(const std::vector<unsigned char>& buffer,
                           int                               offset,
@@ -181,7 +180,8 @@ namespace util
              * @param buffer
              *      The Buffer to read in for compression.
              *
-             * @throws IllegalStateException if in the end state.
+             * @throws activemq::exceptions::IllegalStateException if in
+             * the end state.
              */
             void setInput(const std::vector<unsigned char>& buffer);
 
@@ -201,10 +201,12 @@ namespace util
              * @param length
              *      The number of bytes to read from the input buffer.
              *
-             * @throws NullPointerException if buffer is NULL.
-             * @throws IndexOutOfBoundsException if the offset + length > size
+             * @throws activemq::exceptions::IllegalStateException if
+             * buffer is NULL.
+             * @throws std::out_of_range if the offset + length > size
              * of the buffer.
-             * @throws IllegalStateException if in the end state.
+             * @throws activemq::exceptions::IllegalStateException if in
+             * the end state.
              */
             void setDictionary(const unsigned char* buffer,
                                int                  size,
@@ -225,9 +227,10 @@ namespace util
              * @param length
              *      The number of bytes to read from the input buffer.
              *
-             * @throws IndexOutOfBoundsException if the offset + length > size
+             * @throws std::out_of_range if the offset + length > size
              * of the buffer.
-             * @throws IllegalStateException if in the end state.
+             * @throws activemq::exceptions::IllegalStateException if in
+             * the end state.
              */
             void setDictionary(const std::vector<unsigned char>& buffer,
                                int                               offset,
@@ -243,7 +246,8 @@ namespace util
              * @param buffer
              *      The buffer containing the preset dictionary.
              *
-             * @throws IllegalStateException if in the end state.
+             * @throws activemq::exceptions::IllegalStateException if in
+             * the end state.
              */
             void setDictionary(const std::vector<unsigned char>& buffer);
 
@@ -253,9 +257,10 @@ namespace util
              * @param strategy
              *      The new Compression strategy to use.
              *
-             * @throws IllegalArgumentException if the strategy value is
+             * @throws std::invalid_argument if the strategy value is
              * invalid.
-             * @throws IllegalStateException if in the end state.
+             * @throws activemq::exceptions::IllegalStateException if in
+             * the end state.
              */
             void setStrategy(int strategy);
 
@@ -265,8 +270,9 @@ namespace util
              * @param level
              *      The new Compression level to use.
              *
-             * @throws IllegalArgumentException if the level value is invalid.
-             * @throws IllegalStateException if in the end state.
+             * @throws std::invalid_argument if the level value is invalid.
+             * @throws activemq::exceptions::IllegalStateException if in
+             * the end state.
              */
             void setLevel(int level);
 
@@ -305,10 +311,12 @@ namespace util
              *
              * @return the actual number of bytes of compressed data.
              *
-             * @throws NullPointerException if buffer is NULL.
-             * @throws IndexOutOfBoundsException if the offset + length > size
+             * @throws activemq::exceptions::IllegalStateException if
+             * buffer is NULL.
+             * @throws std::out_of_range if the offset + length > size
              * of the buffer.
-             * @throws IllegalStateException if in the end state.
+             * @throws activemq::exceptions::IllegalStateException if in
+             * the end state.
              */
             int deflate(unsigned char* buffer, int size, int offset, int length);
 
@@ -327,9 +335,10 @@ namespace util
              *
              * @return the actual number of bytes of compressed data.
              *
-             * @throws IndexOutOfBoundsException if the offset + length > size
+             * @throws std::out_of_range if the offset + length > size
              * of the buffer.
-             * @throws IllegalStateException if in the end state.
+             * @throws activemq::exceptions::IllegalStateException if in
+             * the end state.
              */
             int deflate(std::vector<unsigned char>& buffer,
                         int                         offset,
@@ -346,28 +355,32 @@ namespace util
              *
              * @return the actual number of bytes of compressed data.
              *
-             * @throws IllegalStateException if in the end state.
+             * @throws activemq::exceptions::IllegalStateException if in
+             * the end state.
              */
             int deflate(std::vector<unsigned char>& buffer);
 
             /**
              * @return the ADLER-32 value of the uncompressed data.
              *
-             * @throws IllegalStateException if in the end state.
+             * @throws activemq::exceptions::IllegalStateException if in
+             * the end state.
              */
             long long getAdler() const;
 
             /**
              * @return the total number of uncompressed bytes input so far.
              *
-             * @throws IllegalStateException if in the end state.
+             * @throws activemq::exceptions::IllegalStateException if in
+             * the end state.
              */
             long long getBytesRead() const;
 
             /**
              * @return the total number of compressed bytes output so far.
              *
-             * @throws IllegalStateException if in the end state.
+             * @throws activemq::exceptions::IllegalStateException if in
+             * the end state.
              */
             long long getBytesWritten() const;
 
@@ -375,7 +388,8 @@ namespace util
              * Resets deflater so that a new set of input data can be processed.
              * Keeps current compression level and strategy settings.
              *
-             * @throws IllegalStateException if in the end state.
+             * @throws activemq::exceptions::IllegalStateException if in
+             * the end state.
              */
             void reset();
 

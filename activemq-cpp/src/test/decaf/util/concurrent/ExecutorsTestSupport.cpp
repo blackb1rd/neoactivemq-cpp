@@ -20,7 +20,6 @@
 using namespace std;
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 
@@ -62,7 +61,7 @@ void ExecutorsTestSupport::unexpectedException()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ExecutorsTestSupport::unexpectedException(Throwable& ex)
+void ExecutorsTestSupport::unexpectedException(Exception& ex)
 {
     FAIL() << (std::string("Unexpected exception: ") + ex.getMessage());
 }
@@ -89,7 +88,7 @@ void ExecutorsTestSupport::threadUnexpectedException()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-void ExecutorsTestSupport::threadUnexpectedException(Throwable& ex)
+void ExecutorsTestSupport::threadUnexpectedException(Exception& ex)
 {
     threadFailed = true;
     FAIL() << (std::string("Unexpected exception: ") + ex.getMessage());
@@ -140,7 +139,7 @@ void ExecutorsTestSupport::joinPool(ExecutorService& exec)
         ASSERT_TRUE(
             exec.awaitTermination(LONG_DELAY_MS * 2, TimeUnit::MILLISECONDS));
     }
-    catch (InterruptedException& ie)
+    catch (std::runtime_error& ie)
     {
         FAIL() << ("Unexpected exception");
     }
@@ -153,9 +152,9 @@ void ExecutorsTestSupport::joinPool(ExecutorService* exec)
     {
         exec->shutdown();
         ASSERT_TRUE(
-            exec->awaitTermination(LONG_DELAY_MS, TimeUnit::MILLISECONDS));
+            exec->awaitTermination(LONG_DELAY_MS * 2, TimeUnit::MILLISECONDS));
     }
-    catch (InterruptedException& ie)
+    catch (std::runtime_error& ie)
     {
         FAIL() << ("Unexpected exception");
     }

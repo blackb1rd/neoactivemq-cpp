@@ -26,17 +26,13 @@
 #include <decaf/lang/String.h>
 #include <decaf/lang/StringBuffer.h>
 #include <decaf/lang/StringBuilder.h>
-#include <decaf/lang/exceptions/IndexOutOfBoundsException.h>
-#include <decaf/lang/exceptions/NegativeArraySizeException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
-#include <decaf/lang/exceptions/StringIndexOutOfBoundsException.h>
 #include <decaf/util/Arrays.h>
+#include <stdexcept>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 class StringBufferTest : public ::testing::Test
 {
@@ -68,8 +64,8 @@ TEST_F(StringBufferTest, testConstructorInt)
     StringBuffer sb(24);
     ASSERT_EQ(24, sb.capacity());
 
-    ASSERT_THROW(StringBuffer(-1), NegativeArraySizeException)
-        << ("Should have thrown a NegativeArraySizeException");
+    ASSERT_THROW(StringBuffer(-1), std::invalid_argument)
+        << ("Should have thrown a std::invalid_argument");
 
     ASSERT_NO_THROW(StringBuffer(0));
 }
@@ -114,8 +110,8 @@ TEST_F(StringBufferTest, testAppendCharArray)
     sb.append("cd");
     ASSERT_EQ(String("cd"), sb.toString());
 
-    ASSERT_THROW(sb.append((const char*)NULL), NullPointerException)
-        << ("Should have thrown a NullPointerException");
+    ASSERT_THROW(sb.append((const char*)NULL), std::logic_error)
+        << ("Should have thrown a std::logic_error");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -140,17 +136,17 @@ TEST_F(StringBufferTest, testAppendCharArrayIntInt)
     sb.append("abcd", 2, 0);
     ASSERT_EQ(String(""), sb.toString());
 
-    ASSERT_THROW(sb.append((const char*)NULL, 0, 2), NullPointerException)
-        << ("Should have thrown a NullPointerException");
+    ASSERT_THROW(sb.append((const char*)NULL, 0, 2), std::logic_error)
+        << ("Should have thrown a std::logic_error");
 
-    ASSERT_THROW(sb.append("abcd", -1, 2), IndexOutOfBoundsException)
-        << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.append("abcd", -1, 2), std::out_of_range)
+        << ("Should have thrown a std::out_of_range");
 
-    ASSERT_THROW(sb.append("abcd", 0, -1), IndexOutOfBoundsException)
-        << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.append("abcd", 0, -1), std::out_of_range)
+        << ("Should have thrown a std::out_of_range");
 
-    ASSERT_THROW(sb.append("abcd", 2, 3), IndexOutOfBoundsException)
-        << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.append("abcd", 2, 3), std::out_of_range)
+        << ("Should have thrown a std::out_of_range");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -395,14 +391,14 @@ TEST_F(StringBufferTest, testCharAt)
         ASSERT_EQ((char)('0' + i), sb.charAt(i));
     }
 
-    ASSERT_THROW(sb.charAt(-1), IndexOutOfBoundsException)
-        << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.charAt(-1), std::out_of_range)
+        << ("Should have thrown a std::out_of_range");
 
-    ASSERT_THROW(sb.charAt(fixture.length()), IndexOutOfBoundsException)
-        << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.charAt(fixture.length()), std::out_of_range)
+        << ("Should have thrown a std::out_of_range");
 
-    ASSERT_THROW(sb.charAt(fixture.length() + 1), IndexOutOfBoundsException)
-        << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.charAt(fixture.length() + 1), std::out_of_range)
+        << ("Should have thrown a std::out_of_range");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -429,17 +425,14 @@ TEST_F(StringBufferTest, testDeleteRange)
         ASSERT_EQ(0, sb.length());
     }
 
-    ASSERT_THROW(StringBuffer(fixture).deleteRange(-1, 2),
-                 StringIndexOutOfBoundsException)
-        << ("Should have thrown a StringIndexOutOfBoundsException");
+    ASSERT_THROW(StringBuffer(fixture).deleteRange(-1, 2), std::out_of_range)
+        << ("Should have thrown std::out_of_range");
 
-    ASSERT_THROW(StringBuffer(fixture).deleteRange(13, 12),
-                 StringIndexOutOfBoundsException)
-        << ("Should have thrown a StringIndexOutOfBoundsException");
+    ASSERT_THROW(StringBuffer(fixture).deleteRange(13, 12), std::out_of_range)
+        << ("Should have thrown std::out_of_range");
 
-    ASSERT_THROW(StringBuffer(fixture).deleteRange(11, 12),
-                 StringIndexOutOfBoundsException)
-        << ("Should have thrown a StringIndexOutOfBoundsException");
+    ASSERT_THROW(StringBuffer(fixture).deleteRange(11, 12), std::out_of_range)
+        << ("Should have thrown std::out_of_range");
 
     {
         StringBuffer sb;
@@ -474,17 +467,16 @@ TEST_F(StringBufferTest, testDeleteCharAt)
         ASSERT_EQ(9, sb.length());
     }
 
-    ASSERT_THROW(StringBuffer(fixture).deleteCharAt(-1),
-                 StringIndexOutOfBoundsException)
-        << ("Should have thrown a StringIndexOutOfBoundsException");
+    ASSERT_THROW(StringBuffer(fixture).deleteCharAt(-1), std::out_of_range)
+        << ("Should have thrown std::out_of_range");
 
     ASSERT_THROW(StringBuffer(fixture).deleteCharAt(fixture.length()),
-                 StringIndexOutOfBoundsException)
-        << ("Should have thrown a StringIndexOutOfBoundsException");
+                 std::out_of_range)
+        << ("Should have thrown std::out_of_range");
 
     ASSERT_THROW(StringBuffer(fixture).deleteCharAt(fixture.length() + 1),
-                 StringIndexOutOfBoundsException)
-        << ("Should have thrown a StringIndexOutOfBoundsException");
+                 std::out_of_range)
+        << ("Should have thrown std::out_of_range");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -538,28 +530,26 @@ TEST_F(StringBufferTest, testGetChars)
         ASSERT_EQ(dst[i], fixtureChars[i]);
     }
 
-    ASSERT_THROW(sb.getChars(0, 10, dst, -1, 0), StringIndexOutOfBoundsException)
-        << ("Should have thrown a StringIndexOutOfBoundsException");
+    ASSERT_THROW(sb.getChars(0, 10, dst, -1, 0), std::out_of_range)
+        << ("Should have thrown std::out_of_range");
 
-    ASSERT_THROW(sb.getChars(0, 10, (char*)NULL, 10, 0), NullPointerException)
-        << ("Should have thrown a NullPointerException");
+    ASSERT_THROW(sb.getChars(0, 10, (char*)NULL, 10, 0), std::logic_error)
+        << ("Should have thrown a std::logic_error");
 
-    ASSERT_THROW(sb.getChars(-1, 10, dst, 10, 0),
-                 StringIndexOutOfBoundsException)
-        << ("Should have thrown a StringIndexOutOfBoundsException");
+    ASSERT_THROW(sb.getChars(-1, 10, dst, 10, 0), std::out_of_range)
+        << ("Should have thrown std::out_of_range");
 
-    ASSERT_THROW(sb.getChars(0, 10, dst, 10, -1),
-                 StringIndexOutOfBoundsException)
-        << ("Should have thrown a StringIndexOutOfBoundsException");
+    ASSERT_THROW(sb.getChars(0, 10, dst, 10, -1), std::out_of_range)
+        << ("Should have thrown std::out_of_range");
 
-    ASSERT_THROW(sb.getChars(5, 4, dst, 10, 0), StringIndexOutOfBoundsException)
-        << ("Should have thrown a StringIndexOutOfBoundsException");
+    ASSERT_THROW(sb.getChars(5, 4, dst, 10, 0), std::out_of_range)
+        << ("Should have thrown std::out_of_range");
 
-    ASSERT_THROW(sb.getChars(0, 11, dst, 10, 0), StringIndexOutOfBoundsException)
-        << ("Should have thrown a StringIndexOutOfBoundsException");
+    ASSERT_THROW(sb.getChars(0, 11, dst, 10, 0), std::out_of_range)
+        << ("Should have thrown std::out_of_range");
 
-    ASSERT_THROW(sb.getChars(0, 10, dst, 10, 5), StringIndexOutOfBoundsException)
-        << ("Should have thrown a StringIndexOutOfBoundsException");
+    ASSERT_THROW(sb.getChars(0, 10, dst, 10, 5), std::out_of_range)
+        << ("Should have thrown std::out_of_range");
 
     delete[] dst;
     delete[] fixtureChars;
@@ -707,18 +697,17 @@ TEST_F(StringBufferTest, testSubSequence)
     ss.reset(sb.subSequence(0, 0));
     ASSERT_EQ(std::string(""), ss->toString());
 
-    ASSERT_THROW(sb.subSequence(-1, 1), StringIndexOutOfBoundsException)
-        << ("Should have thrown a StringIndexOutOfBoundsException");
+    ASSERT_THROW(sb.subSequence(-1, 1), std::out_of_range)
+        << ("Should have thrown std::out_of_range");
 
-    ASSERT_THROW(sb.subSequence(0, fixture.length() + 1),
-                 StringIndexOutOfBoundsException)
-        << ("Should have thrown a StringIndexOutOfBoundsException");
+    ASSERT_THROW(sb.subSequence(0, fixture.length() + 1), std::out_of_range)
+        << ("Should have thrown std::out_of_range");
 
-    ASSERT_THROW(sb.subSequence(0, -1), StringIndexOutOfBoundsException)
-        << ("Should have thrown a StringIndexOutOfBoundsException");
+    ASSERT_THROW(sb.subSequence(0, -1), std::out_of_range)
+        << ("Should have thrown std::out_of_range");
 
-    ASSERT_THROW(sb.subSequence(3, 2), StringIndexOutOfBoundsException)
-        << ("Should have thrown a StringIndexOutOfBoundsException");
+    ASSERT_THROW(sb.subSequence(3, 2), std::out_of_range)
+        << ("Should have thrown std::out_of_range");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -732,15 +721,14 @@ TEST_F(StringBufferTest, testSubstringInt)
     ss = sb.substring(10);
     ASSERT_EQ(String(""), ss);
 
-    ASSERT_THROW(sb.substring(-1), StringIndexOutOfBoundsException)
-        << ("Should have thrown a StringIndexOutOfBoundsException");
+    ASSERT_THROW(sb.substring(-1), std::out_of_range)
+        << ("Should have thrown std::out_of_range");
 
-    ASSERT_THROW(sb.substring(fixture.length() + 1),
-                 StringIndexOutOfBoundsException)
-        << ("Should have thrown a StringIndexOutOfBoundsException");
+    ASSERT_THROW(sb.substring(fixture.length() + 1), std::out_of_range)
+        << ("Should have thrown std::out_of_range");
 
-    ASSERT_THROW(sb.substring(0, -1), StringIndexOutOfBoundsException)
-        << ("Should have thrown a StringIndexOutOfBoundsException");
+    ASSERT_THROW(sb.substring(0, -1), std::out_of_range)
+        << ("Should have thrown std::out_of_range");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -754,18 +742,17 @@ TEST_F(StringBufferTest, testSubstringIntInt)
     ss = sb.substring(0, 0);
     ASSERT_EQ(String(), ss);
 
-    ASSERT_THROW(sb.substring(-1, 1), StringIndexOutOfBoundsException)
-        << ("Should have thrown a StringIndexOutOfBoundsException");
+    ASSERT_THROW(sb.substring(-1, 1), std::out_of_range)
+        << ("Should have thrown std::out_of_range");
 
-    ASSERT_THROW(sb.substring(0, fixture.length() + 1),
-                 StringIndexOutOfBoundsException)
-        << ("Should have thrown a StringIndexOutOfBoundsException");
+    ASSERT_THROW(sb.substring(0, fixture.length() + 1), std::out_of_range)
+        << ("Should have thrown std::out_of_range");
 
-    ASSERT_THROW(sb.substring(0, -1), StringIndexOutOfBoundsException)
-        << ("Should have thrown a StringIndexOutOfBoundsException");
+    ASSERT_THROW(sb.substring(0, -1), std::out_of_range)
+        << ("Should have thrown std::out_of_range");
 
-    ASSERT_THROW(sb.substring(3, 2), StringIndexOutOfBoundsException)
-        << ("Should have thrown a StringIndexOutOfBoundsException");
+    ASSERT_THROW(sb.substring(3, 2), std::out_of_range)
+        << ("Should have thrown std::out_of_range");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -794,11 +781,11 @@ TEST_F(StringBufferTest, testInsertChar)
     sb.setLength(0);
     sb.append(fixture);
 
-    ASSERT_THROW(sb.insert(-1, 'a'), IndexOutOfBoundsException)
-        << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(-1, 'a'), std::out_of_range)
+        << ("Should have thrown a std::out_of_range");
 
-    ASSERT_THROW(sb.insert(5, 'a'), IndexOutOfBoundsException)
-        << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(5, 'a'), std::out_of_range)
+        << ("Should have thrown a std::out_of_range");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -827,11 +814,11 @@ TEST_F(StringBufferTest, testInsertBoolean)
     sb.setLength(0);
     sb.append(fixture);
 
-    ASSERT_THROW(sb.insert(-1, false), IndexOutOfBoundsException)
-        << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(-1, false), std::out_of_range)
+        << ("Should have thrown a std::out_of_range");
 
-    ASSERT_THROW(sb.insert(5, false), IndexOutOfBoundsException)
-        << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(5, false), std::out_of_range)
+        << ("Should have thrown a std::out_of_range");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -855,14 +842,14 @@ TEST_F(StringBufferTest, testInsertCharArray)
     sb.setLength(0);
     sb.append(fixture);
 
-    ASSERT_THROW(sb.insert(0, (const char*)NULL), NullPointerException)
-        << ("Should have thrown a NullPointerException");
+    ASSERT_THROW(sb.insert(0, (const char*)NULL), std::logic_error)
+        << ("Should have thrown a std::logic_error");
 
-    ASSERT_THROW(sb.insert(-1, "Test"), IndexOutOfBoundsException)
-        << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(-1, "Test"), std::out_of_range)
+        << ("Should have thrown a std::out_of_range");
 
-    ASSERT_THROW(sb.insert(5, "Test"), IndexOutOfBoundsException)
-        << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(5, "Test"), std::out_of_range)
+        << ("Should have thrown a std::out_of_range");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -901,23 +888,23 @@ TEST_F(StringBufferTest, testInsertCharArrayWithOffset)
     sb.setLength(0);
     sb.append(fixture);
 
-    ASSERT_THROW(sb.insert(0, (const char*)NULL, 0, 2), NullPointerException)
-        << ("Should have thrown a NullPointerException");
+    ASSERT_THROW(sb.insert(0, (const char*)NULL, 0, 2), std::logic_error)
+        << ("Should have thrown a std::logic_error");
 
-    ASSERT_THROW(sb.insert(-1, "ab", 0, 2), IndexOutOfBoundsException)
-        << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(-1, "ab", 0, 2), std::out_of_range)
+        << ("Should have thrown a std::out_of_range");
 
-    ASSERT_THROW(sb.insert(5, "ab", 0, 2), IndexOutOfBoundsException)
-        << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(5, "ab", 0, 2), std::out_of_range)
+        << ("Should have thrown a std::out_of_range");
 
-    ASSERT_THROW(sb.insert(4, "ab", 0, -1), IndexOutOfBoundsException)
-        << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(4, "ab", 0, -1), std::out_of_range)
+        << ("Should have thrown a std::out_of_range");
 
-    ASSERT_THROW(sb.insert(4, "ab", -1, 2), IndexOutOfBoundsException)
-        << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(4, "ab", -1, 2), std::out_of_range)
+        << ("Should have thrown a std::out_of_range");
 
-    ASSERT_THROW(sb.insert(4, "ab", 0, 3), IndexOutOfBoundsException)
-        << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(4, "ab", 0, 3), std::out_of_range)
+        << ("Should have thrown a std::out_of_range");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -941,11 +928,11 @@ TEST_F(StringBufferTest, testInsertString)
     sb.setLength(0);
     sb.append(fixture);
 
-    ASSERT_THROW(sb.insert(-1, String("fixture")), IndexOutOfBoundsException)
-        << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(-1, String("fixture")), std::out_of_range)
+        << ("Should have thrown a std::out_of_range");
 
-    ASSERT_THROW(sb.insert(5, String("fixture")), IndexOutOfBoundsException)
-        << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(5, String("fixture")), std::out_of_range)
+        << ("Should have thrown a std::out_of_range");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -969,12 +956,11 @@ TEST_F(StringBufferTest, testInsertStdString)
     sb.setLength(0);
     sb.append(fixture);
 
-    ASSERT_THROW(sb.insert(-1, std::string("fixture")),
-                 IndexOutOfBoundsException)
-        << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(-1, std::string("fixture")), std::out_of_range)
+        << ("Should have thrown a std::out_of_range");
 
-    ASSERT_THROW(sb.insert(5, std::string("fixture")), IndexOutOfBoundsException)
-        << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(5, std::string("fixture")), std::out_of_range)
+        << ("Should have thrown a std::out_of_range");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1004,11 +990,11 @@ TEST_F(StringBufferTest, testInsertCharSequence)
     sb.setLength(0);
     sb.append(fixture);
 
-    ASSERT_THROW(sb.insert(-1, &ab), IndexOutOfBoundsException)
-        << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(-1, &ab), std::out_of_range)
+        << ("Should have thrown a std::out_of_range");
 
-    ASSERT_THROW(sb.insert(5, &ab), IndexOutOfBoundsException)
-        << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(5, &ab), std::out_of_range)
+        << ("Should have thrown a std::out_of_range");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1053,20 +1039,20 @@ TEST_F(StringBufferTest, testInsertCharSequenceIntInt)
     sb.setLength(0);
     sb.append(fixture);
 
-    ASSERT_THROW(sb.insert(-1, &ab, 0, 2), IndexOutOfBoundsException)
-        << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(-1, &ab, 0, 2), std::out_of_range)
+        << ("Should have thrown a std::out_of_range");
 
-    ASSERT_THROW(sb.insert(5, &ab, 0, 2), IndexOutOfBoundsException)
-        << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(5, &ab, 0, 2), std::out_of_range)
+        << ("Should have thrown a std::out_of_range");
 
-    ASSERT_THROW(sb.insert(5, &ab, -1, 2), IndexOutOfBoundsException)
-        << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(5, &ab, -1, 2), std::out_of_range)
+        << ("Should have thrown a std::out_of_range");
 
-    ASSERT_THROW(sb.insert(5, &ab, 0, -1), IndexOutOfBoundsException)
-        << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(5, &ab, 0, -1), std::out_of_range)
+        << ("Should have thrown a std::out_of_range");
 
-    ASSERT_THROW(sb.insert(5, &ab, 0, 3), IndexOutOfBoundsException)
-        << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(5, &ab, 0, 3), std::out_of_range)
+        << ("Should have thrown a std::out_of_range");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1095,11 +1081,11 @@ TEST_F(StringBufferTest, testInsertDouble)
     sb.setLength(0);
     sb.append(fixture);
 
-    ASSERT_THROW(sb.insert(-1, 1.0), IndexOutOfBoundsException)
-        << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(-1, 1.0), std::out_of_range)
+        << ("Should have thrown a std::out_of_range");
 
-    ASSERT_THROW(sb.insert(5, 1.0), IndexOutOfBoundsException)
-        << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(5, 1.0), std::out_of_range)
+        << ("Should have thrown a std::out_of_range");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1128,11 +1114,11 @@ TEST_F(StringBufferTest, testInsertFloat)
     sb.setLength(0);
     sb.append(fixture);
 
-    ASSERT_THROW(sb.insert(-1, 1.0f), IndexOutOfBoundsException)
-        << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(-1, 1.0f), std::out_of_range)
+        << ("Should have thrown a std::out_of_range");
 
-    ASSERT_THROW(sb.insert(5, 1.0f), IndexOutOfBoundsException)
-        << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(5, 1.0f), std::out_of_range)
+        << ("Should have thrown a std::out_of_range");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1161,11 +1147,11 @@ TEST_F(StringBufferTest, testInsertShort)
     sb.setLength(0);
     sb.append(fixture);
 
-    ASSERT_THROW(sb.insert(-1, (short)1), IndexOutOfBoundsException)
-        << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(-1, (short)1), std::out_of_range)
+        << ("Should have thrown a std::out_of_range");
 
-    ASSERT_THROW(sb.insert(5, (short)1), IndexOutOfBoundsException)
-        << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(5, (short)1), std::out_of_range)
+        << ("Should have thrown a std::out_of_range");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1194,11 +1180,11 @@ TEST_F(StringBufferTest, testInsertInt)
     sb.setLength(0);
     sb.append(fixture);
 
-    ASSERT_THROW(sb.insert(-1, 1), IndexOutOfBoundsException)
-        << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(-1, 1), std::out_of_range)
+        << ("Should have thrown a std::out_of_range");
 
-    ASSERT_THROW(sb.insert(5, 1), IndexOutOfBoundsException)
-        << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(5, 1), std::out_of_range)
+        << ("Should have thrown a std::out_of_range");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1227,11 +1213,11 @@ TEST_F(StringBufferTest, testInsertLong)
     sb.setLength(0);
     sb.append(fixture);
 
-    ASSERT_THROW(sb.insert(-1, 1LL), IndexOutOfBoundsException)
-        << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(-1, 1LL), std::out_of_range)
+        << ("Should have thrown a std::out_of_range");
 
-    ASSERT_THROW(sb.insert(5, 1LL), IndexOutOfBoundsException)
-        << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(5, 1LL), std::out_of_range)
+        << ("Should have thrown a std::out_of_range");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1245,11 +1231,11 @@ TEST_F(StringBufferTest, testInsertRawPointer)
     sb.setLength(0);
     sb.append(fixture);
 
-    ASSERT_THROW(sb.insert(-1, 1LL), IndexOutOfBoundsException)
-        << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(-1, 1LL), std::out_of_range)
+        << ("Should have thrown a std::out_of_range");
 
-    ASSERT_THROW(sb.insert(5, 1LL), IndexOutOfBoundsException)
-        << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(5, 1LL), std::out_of_range)
+        << ("Should have thrown a std::out_of_range");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1263,11 +1249,11 @@ TEST_F(StringBufferTest, testInsertPointer)
     sb.setLength(0);
     sb.append(fixture);
 
-    ASSERT_THROW(sb.insert(-1, obj), IndexOutOfBoundsException)
-        << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(-1, obj), std::out_of_range)
+        << ("Should have thrown a std::out_of_range");
 
-    ASSERT_THROW(sb.insert(5, obj), IndexOutOfBoundsException)
-        << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.insert(5, obj), std::out_of_range)
+        << ("Should have thrown a std::out_of_range");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1296,17 +1282,17 @@ TEST_F(StringBufferTest, testReplace)
     sb.setLength(0);
     sb.append(fixture);
 
-    ASSERT_THROW(sb.replace(1, 2, (const char*)NULL), NullPointerException)
-        << ("Should have thrown a NullPointerException");
+    ASSERT_THROW(sb.replace(1, 2, (const char*)NULL), std::logic_error)
+        << ("Should have thrown a std::logic_error");
 
-    ASSERT_THROW(sb.replace(-1, 2, "11"), IndexOutOfBoundsException)
-        << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.replace(-1, 2, "11"), std::out_of_range)
+        << ("Should have thrown a std::out_of_range");
 
-    ASSERT_THROW(sb.replace(5, 2, "11"), IndexOutOfBoundsException)
-        << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.replace(5, 2, "11"), std::out_of_range)
+        << ("Should have thrown a std::out_of_range");
 
-    ASSERT_THROW(sb.replace(3, 2, "11"), IndexOutOfBoundsException)
-        << ("Should have thrown a IndexOutOfBoundsException");
+    ASSERT_THROW(sb.replace(3, 2, "11"), std::out_of_range)
+        << ("Should have thrown a std::out_of_range");
 
     StringBuffer buffer("1234567");
     buffer.replace(2, 6, "XXX");

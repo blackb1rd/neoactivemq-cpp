@@ -22,7 +22,6 @@
 #include <decaf/lang/Integer.h>
 #include <decaf/lang/Pointer.h>
 #include <decaf/lang/String.h>
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
 #include <decaf/net/MalformedURLException.h>
 #include <decaf/net/URI.h>
 #include <decaf/net/URLConnection.h>
@@ -33,6 +32,10 @@
 
 #include <decaf/internal/net/URLStreamHandlerManager.h>
 
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <stdexcept>
+#include <string>
+
 using namespace std;
 using namespace decaf;
 using namespace decaf::io;
@@ -42,7 +45,6 @@ using namespace decaf::internal::net;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::internal;
 using namespace decaf::internal::net;
 
@@ -260,6 +262,10 @@ void URL::initialize(const URL*        context,
     {
         throw MalformedURLException(__FILE__, __LINE__, e.getMessage().c_str());
     }
+    catch (std::exception& e)
+    {
+        throw MalformedURLException(__FILE__, __LINE__, e.what());
+    }
 
     if (impl->url.getPort() < -1)
     {
@@ -293,10 +299,10 @@ void URL::initialize(const String&     protocol,
 
     if (protocol.isEmpty())
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "Unknown protocol: %s",
-                                   "NULL");
+        throw activemq::exceptions::NullPointerException(__FILE__,
+                                                         __LINE__,
+                                                         "Unknown protocol: "
+                                                         "NULL");
     }
 
     String theHost;
@@ -453,9 +459,9 @@ URLConnection* URL::openConnection(const Proxy* proxy)
 {
     if (proxy == NULL)
     {
-        throw IllegalArgumentException(__FILE__,
-                                       __LINE__,
-                                       "proxy should not be NULL");
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "proxy should not be NULL");
     }
 
     return impl->streamHandler->openConnection(*this, proxy);

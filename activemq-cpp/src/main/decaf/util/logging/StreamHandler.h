@@ -17,8 +17,6 @@
 #ifndef _DECAF_UTIL_LOGGING_STREAMHANDLER_H_
 #define _DECAF_UTIL_LOGGING_STREAMHANDLER_H_
 
-#include <decaf/lang/exceptions/InvalidStateException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/util/Config.h>
 #include <decaf/util/concurrent/Concurrent.h>
 #include <decaf/util/logging/Handler.h>
@@ -137,7 +135,7 @@ namespace util
              * @param stream
              *      The new output stream. May not be NULL.
              *
-             * @throws NullPointerException if the passed stream is NULL.
+             * @throws std::logic_error if the passed stream is NULL.
              */
             virtual void setOuputStream(decaf::io::OutputStream* stream);
 

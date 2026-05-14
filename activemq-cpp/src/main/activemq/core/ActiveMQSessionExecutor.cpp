@@ -24,6 +24,8 @@
 #include <activemq/core/SimplePriorityMessageDispatchChannel.h>
 #include <activemq/core/kernels/ActiveMQConsumerKernel.h>
 #include <activemq/core/kernels/ActiveMQSessionKernel.h>
+#include <activemq/exceptions/ActiveMQException.h>
+#include <activemq/exceptions/IoExceptions.h>
 #include <activemq/threads/DedicatedTaskRunner.h>
 
 using namespace std;
@@ -32,7 +34,6 @@ using namespace activemq::core;
 using namespace activemq::core::kernels;
 using namespace activemq::threads;
 using namespace activemq::exceptions;
-using namespace decaf::lang;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 
@@ -193,7 +194,11 @@ void ActiveMQSessionExecutor::dispatch(
             consumer->dispatch(dispatch);
         }
     }
-    catch (decaf::lang::Exception& ex)
+    catch (activemq::exceptions::IOException& ex)
+    {
+        ex.setMark(__FILE__, __LINE__);
+    }
+    catch (activemq::exceptions::ActiveMQException& ex)
     {
         ex.setMark(__FILE__, __LINE__);
     }
@@ -229,7 +234,14 @@ bool ActiveMQSessionExecutor::iterate()
 
         return false;
     }
-    catch (decaf::lang::Exception& ex)
+    catch (activemq::exceptions::IOException& ex)
+    {
+        ex.setMark(__FILE__, __LINE__);
+        ActiveMQException amq(ex);
+        session->fire(amq);
+        return true;
+    }
+    catch (activemq::exceptions::ActiveMQException& ex)
     {
         ex.setMark(__FILE__, __LINE__);
         session->fire(ex);

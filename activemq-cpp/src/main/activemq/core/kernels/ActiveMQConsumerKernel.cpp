@@ -2788,7 +2788,8 @@ void ActiveMQConsumerKernel::clearMessagesInProgress()
                 }
 
                 // allow dispatch on this connection to resume
-                int count = this->internal->inProgressClearRequiredFlag.exchange(0);
+                int count =
+                    this->internal->inProgressClearRequiredFlag.exchange(0);
                 for (int i = 0; i < count; ++i)
                 {
                     this->session->getConnection()

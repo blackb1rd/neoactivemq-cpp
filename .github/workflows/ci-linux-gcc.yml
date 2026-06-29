@@ -58,7 +58,7 @@ jobs:
         mkdir -p "${{ github.workspace }}/.cache/vcpkg/downloads"
 
     - name: Cache vcpkg binary packages
-      uses: actions/cache@v5
+      uses: actions/cache@v6
       with:
         path: |
           ${{ github.workspace }}/.cache/vcpkg/archives
@@ -124,7 +124,7 @@ jobs:
         mkdir -p "${{ github.workspace }}/.cache/vcpkg/downloads"
 
     - name: Cache vcpkg binary packages
-      uses: actions/cache@v5
+      uses: actions/cache@v6
       with:
         path: |
           ${{ github.workspace }}/.cache/vcpkg/archives
@@ -190,7 +190,7 @@ jobs:
         mkdir -p "${{ github.workspace }}/.cache/vcpkg/downloads"
 
     - name: Cache vcpkg binary packages
-      uses: actions/cache@v5
+      uses: actions/cache@v6
       with:
         path: |
           ${{ github.workspace }}/.cache/vcpkg/archives
@@ -257,7 +257,7 @@ jobs:
         mkdir -p "${{ github.workspace }}/.cache/vcpkg/downloads"
 
     - name: Cache vcpkg binary packages
-      uses: actions/cache@v5
+      uses: actions/cache@v6
       with:
         path: |
           ${{ github.workspace }}/.cache/vcpkg/archives
@@ -368,7 +368,7 @@ jobs:
         mkdir -p "${{ github.workspace }}/.cache/vcpkg/downloads"
 
     - name: Cache vcpkg binary packages
-      uses: actions/cache@v5
+      uses: actions/cache@v6
       with:
         path: |
           ${{ github.workspace }}/.cache/vcpkg/archives
@@ -501,7 +501,7 @@ jobs:
         mkdir -p "${{ github.workspace }}/.cache/vcpkg/downloads"
 
     - name: Cache vcpkg binary packages
-      uses: actions/cache@v5
+      uses: actions/cache@v6
       with:
         path: |
           ${{ github.workspace }}/.cache/vcpkg/archives
@@ -611,7 +611,7 @@ jobs:
         mkdir -p "${{ github.workspace }}/.cache/vcpkg/downloads"
 
     - name: Cache vcpkg binary packages
-      uses: actions/cache@v5
+      uses: actions/cache@v6
       with:
         path: |
           ${{ github.workspace }}/.cache/vcpkg/archives
@@ -714,7 +714,7 @@ jobs:
         mkdir -p "${{ github.workspace }}/.cache/vcpkg/downloads"
 
     - name: Cache vcpkg binary packages
-      uses: actions/cache@v5
+      uses: actions/cache@v6
       with:
         path: |
           ${{ github.workspace }}/.cache/vcpkg/archives

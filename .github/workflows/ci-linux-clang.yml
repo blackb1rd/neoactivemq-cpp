@@ -52,7 +52,7 @@ jobs:
       run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
 
     - name: Setup sccache
-      uses: mozilla-actions/sccache-action@v0.0.10
+      uses: mozilla-actions/sccache-action@v0.0.11
       with:
         sccache_version: "v0.15.0"
 
@@ -62,7 +62,7 @@ jobs:
         mkdir -p "${{ github.workspace }}/.cache/vcpkg/downloads"
 
     - name: Cache vcpkg binary packages
-      uses: actions/cache@v5
+      uses: actions/cache@v6
       with:
         path: |
           ${{ github.workspace }}/.cache/vcpkg/archives
@@ -132,7 +132,7 @@ jobs:
         mkdir -p "${{ github.workspace }}/.cache/vcpkg/downloads"
 
     - name: Cache vcpkg binary packages
-      uses: actions/cache@v5
+      uses: actions/cache@v6
       with:
         path: |
           ${{ github.workspace }}/.cache/vcpkg/archives
@@ -202,7 +202,7 @@ jobs:
         mkdir -p "${{ github.workspace }}/.cache/vcpkg/downloads"
 
     - name: Cache vcpkg binary packages
-      uses: actions/cache@v5
+      uses: actions/cache@v6
       with:
         path: |
           ${{ github.workspace }}/.cache/vcpkg/archives
@@ -275,7 +275,7 @@ jobs:
         mkdir -p "${{ github.workspace }}/.cache/vcpkg/downloads"
 
     - name: Cache vcpkg binary packages
-      uses: actions/cache@v5
+      uses: actions/cache@v6
       with:
         path: |
           ${{ github.workspace }}/.cache/vcpkg/archives
@@ -390,7 +390,7 @@ jobs:
         mkdir -p "${{ github.workspace }}/.cache/vcpkg/downloads"
 
     - name: Cache vcpkg binary packages
-      uses: actions/cache@v5
+      uses: actions/cache@v6
       with:
         path: |
           ${{ github.workspace }}/.cache/vcpkg/archives
@@ -527,7 +527,7 @@ jobs:
         mkdir -p "${{ github.workspace }}/.cache/vcpkg/downloads"
 
     - name: Cache vcpkg binary packages
-      uses: actions/cache@v5
+      uses: actions/cache@v6
       with:
         path: |
           ${{ github.workspace }}/.cache/vcpkg/archives
@@ -642,7 +642,7 @@ jobs:
         mkdir -p "${{ github.workspace }}/.cache/vcpkg/downloads"
 
     - name: Cache vcpkg binary packages
-      uses: actions/cache@v5
+      uses: actions/cache@v6
       with:
         path: |
           ${{ github.workspace }}/.cache/vcpkg/archives
@@ -752,7 +752,7 @@ jobs:
         mkdir -p "${{ github.workspace }}/.cache/vcpkg/downloads"
 
     - name: Cache vcpkg binary packages
-      uses: actions/cache@v5
+      uses: actions/cache@v6
       with:
         path: |
           ${{ github.workspace }}/.cache/vcpkg/archives
@@ -840,7 +840,7 @@ jobs:
       run: echo "VCPKG_ROOT=$VCPKG_INSTALLATION_ROOT" >> $GITHUB_ENV
 
     - name: Setup sccache
-      uses: mozilla-actions/sccache-action@v0.0.10
+      uses: mozilla-actions/sccache-action@v0.0.11
       with:
         sccache_version: "v0.15.0"
 
@@ -850,7 +850,7 @@ jobs:
         mkdir -p "${{ github.workspace }}/.cache/vcpkg/downloads"
 
     - name: Cache vcpkg binary packages
-      uses: actions/cache@v5
+      uses: actions/cache@v6
       with:
         path: |
           ${{ github.workspace }}/.cache/vcpkg/archives

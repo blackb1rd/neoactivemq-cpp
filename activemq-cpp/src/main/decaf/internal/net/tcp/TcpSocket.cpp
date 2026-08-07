@@ -35,8 +35,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <chrono>
+#include <condition_variable>
 #include <iostream>
 #include <memory>
+#include <mutex>
 #include <string>
 
 using namespace decaf;
@@ -48,6 +50,57 @@ using namespace decaf::io;
 using namespace decaf::lang;
 using namespace decaf::lang::exceptions;
 using namespace decaf::util::concurrent::atomic;
+
+namespace
+{
+// How long an aborted connect waits for the pending asio operation to
+// report completion before giving up on it.  The socket has already been
+// closed at that point, so the handler normally runs almost immediately;
+// this bound only exists so a wedged io_context worker cannot stall the
+// reconnect path.
+const int kConnectAbortDrainMillis = 250;
+
+// Shared state between TcpSocket::connect() and its asio completion
+// handler.  Held by shared_ptr so the handler remains valid even when the
+// waiting thread has already given up on the operation.
+struct ConnectState
+{
+    std::mutex              mutex;
+    std::condition_variable cv;
+    bool                    complete;
+    asio::error_code        error;
+
+    ConnectState()
+        : complete(false)
+    {
+    }
+};
+
+// Abort a still-pending async_connect and wait for it to report back.
+//
+// cancel() is not sufficient here.  asio's range_connect_op treats a
+// cancelled attempt as "this endpoint failed" and walks on to the next
+// endpoint in the resolved range (asio/impl/connect.hpp), so cancel()
+// leaves the operation live and it will re-close and re-open the socket
+// on an io_context worker.  Only the cancellation slot or a closed socket
+// ends the composed operation, so close() the socket and then wait for
+// the handler, which guarantees nothing is still in flight against this
+// socket by the time the caller unwinds.
+void abortPendingConnect(const std::shared_ptr<asio::ip::tcp::socket>& socket,
+                         const std::shared_ptr<ConnectState>&          state,
+                         std::unique_lock<std::mutex>&                 lock)
+{
+    asio::error_code ec;
+    socket->close(ec);
+
+    state->cv.wait_for(lock,
+                       std::chrono::milliseconds(kConnectAbortDrainMillis),
+                       [&state]
+                       {
+                           return state->complete;
+                       });
+}
+}  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace decaf
@@ -65,8 +118,16 @@ namespace internal
                 // Reference to shared I/O context from IoContextManager
                 asio::io_context& ioContext;
 
-                // The actual TCP socket
-                std::unique_ptr<asio::ip::tcp::socket> socket;
+                // The actual TCP socket.
+                //
+                // Shared rather than unique because asio's composed
+                // operations (async_connect in particular) hold only a
+                // reference to the socket object.  Handlers capture a copy of
+                // this shared_ptr so a pending operation keeps the socket
+                // alive even if this TcpSocket is destroyed first, which is
+                // exactly what happens when connect() times out and the
+                // failover transport immediately builds a replacement socket.
+                std::shared_ptr<asio::ip::tcp::socket> socket;
 
                 // Acceptor for server sockets
                 std::unique_ptr<asio::ip::tcp::acceptor> acceptor;
@@ -192,7 +253,7 @@ void TcpSocket::create()
         // Create the Asio TCP socket
         AMQ_LOG_DEBUG("TcpSocket", "create() creating ASIO socket");
         this->impl->socket =
-            std::make_unique<asio::ip::tcp::socket>(this->impl->ioContext);
+            std::make_shared<asio::ip::tcp::socket>(this->impl->ioContext);
 
         // Open the socket so that socket options can be set before connect/bind
         AMQ_LOG_DEBUG("TcpSocket", "create() opening socket for IPv4");
@@ -255,7 +316,7 @@ void TcpSocket::accept(SocketImpl* socket)
 
         // Create a new socket for the accepted connection
         tcpSocket->impl->socket =
-            std::make_unique<asio::ip::tcp::socket>(tcpSocket->impl->ioContext);
+            std::make_shared<asio::ip::tcp::socket>(tcpSocket->impl->ioContext);
 
         asio::error_code ec;
 
@@ -560,27 +621,22 @@ void TcpSocket::connect(const std::string& hostname, int port, int timeout)
 
             // Async connect with timeout
             // Use shared_ptr for state to prevent use-after-free
-            struct ConnectState
-            {
-                std::mutex              mutex;
-                std::condition_variable cv;
-                bool                    complete;
-                asio::error_code        error;
+            std::shared_ptr<ConnectState> state =
+                std::make_shared<ConnectState>();
 
-                ConnectState()
-                    : complete(false)
-                {
-                }
-            };
-
-            auto state = std::make_shared<ConnectState>();
+            // asio's range_connect_op keeps only a reference to the socket, so
+            // the handler has to own a reference of its own.  Without it, an
+            // operation still pending when this method throws below outlives
+            // the socket and resumes on freed memory.
+            std::shared_ptr<asio::ip::tcp::socket> socketRef =
+                this->impl->socket;
 
             AMQ_LOG_DEBUG("TcpSocket", "connect() calling async_connect...");
             asio::async_connect(
-                *this->impl->socket,
+                *socketRef,
                 endpoints,
-                [state](const asio::error_code&        error,
-                        const asio::ip::tcp::endpoint& ep)
+                [state, socketRef](const asio::error_code&        error,
+                                   const asio::ip::tcp::endpoint& ep)
                 {
                     AMQ_LOG_DEBUG("TcpSocket",
                                   "async_connect callback: error="
@@ -617,7 +673,7 @@ void TcpSocket::connect(const std::string& hostname, int port, int timeout)
 
                 if (this->impl->closed.get())
                 {
-                    this->impl->socket->cancel();
+                    abortPendingConnect(socketRef, state, lock);
                     throw SocketException(
                         __FILE__,
                         __LINE__,
@@ -626,7 +682,10 @@ void TcpSocket::connect(const std::string& hostname, int port, int timeout)
 
                 if (std::chrono::steady_clock::now() >= deadline)
                 {
-                    this->impl->socket->cancel();
+                    AMQ_LOG_DEBUG("TcpSocket",
+                                  "connect() TIMEOUT after " << timeout
+                                                             << "ms, aborting");
+                    abortPendingConnect(socketRef, state, lock);
                     throw SocketException(__FILE__,
                                           __LINE__,
                                           "TcpSocket::connect() timed out");
@@ -655,26 +714,19 @@ void TcpSocket::connect(const std::string& hostname, int port, int timeout)
 
             // Blocking connect (but still check for close() periodically)
             // Use shared_ptr for state to prevent use-after-free
-            struct ConnectState
-            {
-                std::mutex              mutex;
-                std::condition_variable cv;
-                bool                    complete;
-                asio::error_code        error;
+            std::shared_ptr<ConnectState> state =
+                std::make_shared<ConnectState>();
 
-                ConnectState()
-                    : complete(false)
-                {
-                }
-            };
-
-            auto state = std::make_shared<ConnectState>();
+            // See the timeout branch above: the handler must own a reference
+            // to the socket so a still-pending operation cannot outlive it.
+            std::shared_ptr<asio::ip::tcp::socket> socketRef =
+                this->impl->socket;
 
             asio::async_connect(
-                *this->impl->socket,
+                *socketRef,
                 endpoints,
-                [state](const asio::error_code& error,
-                        const asio::ip::tcp::endpoint&)
+                [state, socketRef](const asio::error_code& error,
+                                   const asio::ip::tcp::endpoint&)
                 {
                     {
                         std::lock_guard<std::mutex> lock(state->mutex);
@@ -701,7 +753,7 @@ void TcpSocket::connect(const std::string& hostname, int port, int timeout)
 
                 if (this->impl->closed.get())
                 {
-                    this->impl->socket->cancel();
+                    abortPendingConnect(socketRef, state, lock);
                     throw SocketException(
                         __FILE__,
                         __LINE__,
@@ -1401,11 +1453,16 @@ int TcpSocket::read(unsigned char* buffer, int size, int offset, int length)
             }
         };
 
-        auto state = std::make_shared<ReadState>();
+        std::shared_ptr<ReadState> state = std::make_shared<ReadState>();
 
-        this->impl->socket->async_read_some(
+        // As in connect(): the read paths below can throw while this
+        // operation is still pending, after which the transport may drop the
+        // socket.  The handler owns a reference so the socket outlives it.
+        std::shared_ptr<asio::ip::tcp::socket> socketRef = this->impl->socket;
+
+        socketRef->async_read_some(
             asio::buffer(buffer + offset, length),
-            [state](const asio::error_code& error, std::size_t bytes)
+            [state, socketRef](const asio::error_code& error, std::size_t bytes)
             {
                 AMQ_LOG_DEBUG("TcpSocket",
                               "async_read_some callback: error="
@@ -1438,9 +1495,9 @@ int TcpSocket::read(unsigned char* buffer, int size, int offset, int length)
                               "read() TIMEOUT after " << this->impl->soTimeout
                                                       << "ms, cancelling");
                 // Timeout - cancel operation but don't wait for completion.
-                // The lambda will still execute but state will be kept alive by
-                // shared_ptr.
-                this->impl->socket->cancel();
+                // The lambda will still execute; both the state and the socket
+                // it runs against are kept alive by its shared_ptr captures.
+                socketRef->cancel();
                 throw SocketTimeoutException(__FILE__,
                                              __LINE__,
                                              "Read timed out");

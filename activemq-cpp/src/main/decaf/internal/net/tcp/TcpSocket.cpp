@@ -53,54 +53,53 @@ using namespace decaf::util::concurrent::atomic;
 
 namespace
 {
-    // How long an aborted connect waits for the pending asio operation to
-    // report completion before giving up on it.  The socket has already been
-    // closed at that point, so the handler normally runs almost immediately;
-    // this bound only exists so a wedged io_context worker cannot stall the
-    // reconnect path.
-    const int kConnectAbortDrainMillis = 250;
+// How long an aborted connect waits for the pending asio operation to
+// report completion before giving up on it.  The socket has already been
+// closed at that point, so the handler normally runs almost immediately;
+// this bound only exists so a wedged io_context worker cannot stall the
+// reconnect path.
+const int kConnectAbortDrainMillis = 250;
 
-    // Shared state between TcpSocket::connect() and its asio completion
-    // handler.  Held by shared_ptr so the handler remains valid even when the
-    // waiting thread has already given up on the operation.
-    struct ConnectState
+// Shared state between TcpSocket::connect() and its asio completion
+// handler.  Held by shared_ptr so the handler remains valid even when the
+// waiting thread has already given up on the operation.
+struct ConnectState
+{
+    std::mutex              mutex;
+    std::condition_variable cv;
+    bool                    complete;
+    asio::error_code        error;
+
+    ConnectState()
+        : complete(false)
     {
-        std::mutex              mutex;
-        std::condition_variable cv;
-        bool                    complete;
-        asio::error_code        error;
-
-        ConnectState()
-            : complete(false)
-        {
-        }
-    };
-
-    // Abort a still-pending async_connect and wait for it to report back.
-    //
-    // cancel() is not sufficient here.  asio's range_connect_op treats a
-    // cancelled attempt as "this endpoint failed" and walks on to the next
-    // endpoint in the resolved range (asio/impl/connect.hpp), so cancel()
-    // leaves the operation live and it will re-close and re-open the socket
-    // on an io_context worker.  Only the cancellation slot or a closed socket
-    // ends the composed operation, so close() the socket and then wait for
-    // the handler, which guarantees nothing is still in flight against this
-    // socket by the time the caller unwinds.
-    void abortPendingConnect(
-        const std::shared_ptr<asio::ip::tcp::socket>& socket,
-        const std::shared_ptr<ConnectState>&          state,
-        std::unique_lock<std::mutex>&                 lock)
-    {
-        asio::error_code ec;
-        socket->close(ec);
-
-        state->cv.wait_for(lock,
-                           std::chrono::milliseconds(kConnectAbortDrainMillis),
-                           [&state]
-                           {
-                               return state->complete;
-                           });
     }
+};
+
+// Abort a still-pending async_connect and wait for it to report back.
+//
+// cancel() is not sufficient here.  asio's range_connect_op treats a
+// cancelled attempt as "this endpoint failed" and walks on to the next
+// endpoint in the resolved range (asio/impl/connect.hpp), so cancel()
+// leaves the operation live and it will re-close and re-open the socket
+// on an io_context worker.  Only the cancellation slot or a closed socket
+// ends the composed operation, so close() the socket and then wait for
+// the handler, which guarantees nothing is still in flight against this
+// socket by the time the caller unwinds.
+void abortPendingConnect(const std::shared_ptr<asio::ip::tcp::socket>& socket,
+                         const std::shared_ptr<ConnectState>&          state,
+                         std::unique_lock<std::mutex>&                 lock)
+{
+    asio::error_code ec;
+    socket->close(ec);
+
+    state->cv.wait_for(lock,
+                       std::chrono::milliseconds(kConnectAbortDrainMillis),
+                       [&state]
+                       {
+                           return state->complete;
+                       });
+}
 }  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////

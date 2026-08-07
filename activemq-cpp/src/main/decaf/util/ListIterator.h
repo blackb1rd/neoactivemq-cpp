@@ -18,9 +18,9 @@
 #ifndef _DECAF_UTIL_LISTITERATOR_H_
 #define _DECAF_UTIL_LISTITERATOR_H_
 
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
 #include <decaf/util/Config.h>
 #include <decaf/util/Iterator.h>
+#include <stdexcept>
 
 namespace decaf
 {
@@ -58,9 +58,9 @@ namespace util
          * @param e
          *      The element to insert into the List.
          *
-         * @throw UnsupportedOperationException if the add method is not
+         * @throws std::logic_error if the add method is not
          *        supported by this list iterator.
-         * @throw IllegalArgumentException if some aspect of this element
+         * @throws std::invalid_argument if some aspect of this element
          *        prevents it from being added to this list.
          */
         virtual void add(const E& e) = 0;
@@ -75,11 +75,11 @@ namespace util
          *      The element with which to replace the last element returned
          *      by next or previous.
          *
-         * @throw UnsupportedOperationException if the add method is not
+         * @throws std::logic_error if the add method is not
          *        supported by this list iterator.
-         * @throw IllegalArgumentException if some aspect of this element
+         * @throws std::invalid_argument if some aspect of this element
          *        prevents it from being added to this list.
-         * @throw IllegalStateException if neither next nor previous have been
+         * @throw std::logic_error if neither next nor previous have been
          *        called, or remove or add have been called after the last call
          * to next or previous.
          */
@@ -103,7 +103,7 @@ namespace util
          *
          * @return the previous element in the list.
          *
-         * @throw NoSuchElementException if the iteration has no previous
+         * @throw std::runtime_error if the iteration has no previous
          * element.
          */
         virtual E previous() = 0;

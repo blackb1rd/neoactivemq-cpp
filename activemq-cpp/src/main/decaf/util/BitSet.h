@@ -84,7 +84,7 @@ namespace util
          * @param bitCount
          *      The number of bits this BitSet should hold.
          *
-         * @throws NegativeArraySizeException if bitCount is negative.
+         * @throws std::runtime_error if bitCount is negative.
          */
         BitSet(int bitCount);
 
@@ -172,7 +172,7 @@ namespace util
          * @param index
          *      The index of the bit whose value is to be set to false
          *
-         * @throws IndexOutOfBoundsException if the index value is negative.
+         * @throws std::out_of_range if the index value is negative.
          */
         void clear(int index);
 
@@ -185,7 +185,7 @@ namespace util
          * @param toIndex
          *      The index (exclusive) to stop setting bits to false.
          *
-         * @throws IndexOutOfBoundsException if fromIndex is negative, or
+         * @throws std::out_of_range if fromIndex is negative, or
          * toIndex is negative, or fromIndex is larger than toIndex.
          */
         void clear(int fromIndex, int toIndex);
@@ -211,7 +211,7 @@ namespace util
          * @param index
          *      The index of the bit whose value is to be set to its compliment.
          *
-         * @throws IndexOutOfBoundsException if the index value is negative.
+         * @throws std::out_of_range if the index value is negative.
          */
         void flip(int index);
 
@@ -224,7 +224,7 @@ namespace util
          * @param toIndex
          *      The index (exclusive) to stop setting bits to its compliment.
          *
-         * @throws IndexOutOfBoundsException if fromIndex is negative, or
+         * @throws std::out_of_range if fromIndex is negative, or
          * toIndex is negative, or fromIndex is larger than toIndex.
          */
         void flip(int fromIndex, int toIndex);
@@ -239,7 +239,7 @@ namespace util
          *
          * @return the value of the bit with the specified index.
          *
-         * @throws IndexOutOfBoundsException if the index value is negative.
+         * @throws std::out_of_range if the index value is negative.
          */
         bool get(int index) const;
 
@@ -254,7 +254,7 @@ namespace util
          *
          * @return a new BitSet containing the specified values.
          *
-         * @throws IndexOutOfBoundsException if fromIndex is negative, or
+         * @throws std::out_of_range if fromIndex is negative, or
          * toIndex is negative, or fromIndex is larger than toIndex.
          */
         BitSet get(int fromIndex, int toIndex) const;
@@ -296,7 +296,7 @@ namespace util
          *
          * @return the index of the next clear bit.
          *
-         * @throws IndexOutOfBoundsException if the index value is negative.
+         * @throws std::out_of_range if the index value is negative.
          */
         int nextClearBit(int index) const;
 
@@ -309,7 +309,7 @@ namespace util
          *
          * @return the index of the next set bit.
          *
-         * @throws IndexOutOfBoundsException if the index value is negative.
+         * @throws std::out_of_range if the index value is negative.
          */
         int nextSetBit(int index) const;
 
@@ -319,7 +319,7 @@ namespace util
          * @param index
          *      The index to set to true.
          *
-         * @throws IndexOutOfBoundsException if the index value is negative.
+         * @throws std::out_of_range if the index value is negative.
          */
         void set(int index);
 
@@ -331,7 +331,7 @@ namespace util
          * @param value
          *      The value to assign to the given bit.
          *
-         * @throws IndexOutOfBoundsException if the index value is negative.
+         * @throws std::out_of_range if the index value is negative.
          */
         void set(int index, bool value);
 
@@ -344,7 +344,7 @@ namespace util
          * @param toIndex
          *      The index (exclusive) to stop at.
          *
-         * @throws IndexOutOfBoundsException if fromIndex is negative, or
+         * @throws std::out_of_range if fromIndex is negative, or
          * toIndex is negative, or fromIndex is larger than toIndex.
          */
         void set(int fromIndex, int toIndex);
@@ -360,7 +360,7 @@ namespace util
          * @param value
          *      The boolean value to assign to the target bits.
          *
-         * @throws IndexOutOfBoundsException if fromIndex is negative, or
+         * @throws std::out_of_range if fromIndex is negative, or
          * toIndex is negative, or fromIndex is larger than toIndex.
          */
         void set(int fromIndex, int toIndex, bool value);

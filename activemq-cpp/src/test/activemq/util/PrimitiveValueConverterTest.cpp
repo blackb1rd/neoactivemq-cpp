@@ -18,11 +18,10 @@
 #include <gtest/gtest.h>
 
 #include <activemq/util/PrimitiveValueConverter.h>
-#include <decaf/lang/exceptions/UnsupportedOperationException.h>
+#include <stdexcept>
 
 using namespace activemq;
 using namespace activemq::util;
-using namespace decaf::lang::exceptions;
 
 class PrimitiveValueConverterTest : public ::testing::Test
 {
@@ -48,7 +47,7 @@ TEST_F(PrimitiveValueConverterTest, testConvertToBoolean)
     ASSERT_TRUE(result3 == true);
     ASSERT_TRUE(result4 == false);
 
-    ASSERT_THROW(converter.convert<bool>(input5), UnsupportedOperationException)
+    ASSERT_THROW(converter.convert<bool>(input5), std::logic_error)
         << ("Should throw an UnsupportedOperationException");
 }
 
@@ -70,9 +69,9 @@ TEST_F(PrimitiveValueConverterTest, testConvertToChar)
     ASSERT_TRUE(result2 == (char)255);
     ASSERT_TRUE(result3 == 'a');
 
-    ASSERT_THROW(converter.convert<char>(input4), UnsupportedOperationException)
+    ASSERT_THROW(converter.convert<char>(input4), std::logic_error)
         << ("Should throw an UnsupportedOperationException");
-    ASSERT_THROW(converter.convert<char>(input5), UnsupportedOperationException)
+    ASSERT_THROW(converter.convert<char>(input5), std::logic_error)
         << ("Should throw an UnsupportedOperationException");
 }
 
@@ -94,11 +93,9 @@ TEST_F(PrimitiveValueConverterTest, testConvertToByte)
     ASSERT_TRUE(result2 == (unsigned char)255);
     ASSERT_TRUE(result3 == (unsigned char)4);
 
-    ASSERT_THROW(converter.convert<unsigned char>(input4),
-                 UnsupportedOperationException)
+    ASSERT_THROW(converter.convert<unsigned char>(input4), std::logic_error)
         << ("Should throw an UnsupportedOperationException");
-    ASSERT_THROW(converter.convert<unsigned char>(input5),
-                 UnsupportedOperationException)
+    ASSERT_THROW(converter.convert<unsigned char>(input5), std::logic_error)
         << ("Should throw an UnsupportedOperationException");
 }
 
@@ -120,9 +117,9 @@ TEST_F(PrimitiveValueConverterTest, testConvertToShort)
     ASSERT_TRUE(result2 == (short)65535);
     ASSERT_TRUE(result3 == 4);
 
-    ASSERT_THROW(converter.convert<short>(input4), UnsupportedOperationException)
+    ASSERT_THROW(converter.convert<short>(input4), std::logic_error)
         << ("Should throw an UnsupportedOperationException");
-    ASSERT_THROW(converter.convert<short>(input5), UnsupportedOperationException)
+    ASSERT_THROW(converter.convert<short>(input5), std::logic_error)
         << ("Should throw an UnsupportedOperationException");
 }
 
@@ -147,9 +144,9 @@ TEST_F(PrimitiveValueConverterTest, testConvertToInt)
     ASSERT_TRUE(result3 == -1);
     ASSERT_TRUE(result4 == 4);
 
-    ASSERT_THROW(converter.convert<int>(input5), UnsupportedOperationException)
+    ASSERT_THROW(converter.convert<int>(input5), std::logic_error)
         << ("Should throw an UnsupportedOperationException");
-    ASSERT_THROW(converter.convert<int>(input6), UnsupportedOperationException)
+    ASSERT_THROW(converter.convert<int>(input6), std::logic_error)
         << ("Should throw an UnsupportedOperationException");
 }
 
@@ -177,11 +174,9 @@ TEST_F(PrimitiveValueConverterTest, testConvertToLong)
     ASSERT_TRUE(result4 == 4);
     ASSERT_TRUE(result5 == 45LL);
 
-    ASSERT_THROW(converter.convert<long long>(input6),
-                 UnsupportedOperationException)
+    ASSERT_THROW(converter.convert<long long>(input6), std::logic_error)
         << ("Should throw an UnsupportedOperationException");
-    ASSERT_THROW(converter.convert<long long>(input7),
-                 UnsupportedOperationException)
+    ASSERT_THROW(converter.convert<long long>(input7), std::logic_error)
         << ("Should throw an UnsupportedOperationException");
 }
 
@@ -203,9 +198,9 @@ TEST_F(PrimitiveValueConverterTest, testConvertToFloat)
     ASSERT_TRUE(result2 == 135.0f);
     ASSERT_TRUE(result3 == 4.0);
 
-    ASSERT_THROW(converter.convert<float>(input4), UnsupportedOperationException)
+    ASSERT_THROW(converter.convert<float>(input4), std::logic_error)
         << ("Should throw an UnsupportedOperationException");
-    ASSERT_THROW(converter.convert<float>(input5), UnsupportedOperationException)
+    ASSERT_THROW(converter.convert<float>(input5), std::logic_error)
         << ("Should throw an UnsupportedOperationException");
 }
 
@@ -227,11 +222,9 @@ TEST_F(PrimitiveValueConverterTest, testConvertToDouble)
     ASSERT_TRUE(result2 == (double)135.0);
     ASSERT_TRUE(result3 == (double)4);
 
-    ASSERT_THROW(converter.convert<double>(input4),
-                 UnsupportedOperationException)
+    ASSERT_THROW(converter.convert<double>(input4), std::logic_error)
         << ("Should throw an UnsupportedOperationException");
-    ASSERT_THROW(converter.convert<double>(input5),
-                 UnsupportedOperationException)
+    ASSERT_THROW(converter.convert<double>(input5), std::logic_error)
         << ("Should throw an UnsupportedOperationException");
 }
 
@@ -263,7 +256,6 @@ TEST_F(PrimitiveValueConverterTest, testConvertToString)
     ASSERT_TRUE(result6 == "4asd");
     ASSERT_TRUE(result7 == "65539");
 
-    ASSERT_THROW(converter.convert<unsigned int>(24567),
-                 UnsupportedOperationException)
+    ASSERT_THROW(converter.convert<unsigned int>(24567), std::logic_error)
         << ("Should throw an UnsupportedOperationException");
 }

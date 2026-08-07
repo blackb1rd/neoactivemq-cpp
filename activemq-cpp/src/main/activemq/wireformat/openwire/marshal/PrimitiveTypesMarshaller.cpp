@@ -18,6 +18,7 @@
 #include "PrimitiveTypesMarshaller.h"
 
 #include <activemq/exceptions/ActiveMQException.h>
+#include <activemq/exceptions/IoCatchMacros.h>
 #include <decaf/io/ByteArrayInputStream.h>
 #include <decaf/io/ByteArrayOutputStream.h>
 #include <decaf/io/DataInputStream.h>
@@ -228,9 +229,9 @@ void PrimitiveTypesMarshaller::marshalPrimitiveMap(
             marshalPrimitive(dataOut, value);
         }
     }
-    AMQ_CATCH_RETHROW(io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, io::IOException)
-    AMQ_CATCHALL_THROW(io::IOException)
+    AMQ_IOSTREAM_CATCH_RETHROW()
+    AMQ_IOSTREAM_CATCH_CONVERT_LANG_EXCEPTION()
+    AMQ_IOSTREAM_CATCHALL_THROW()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -247,9 +248,9 @@ void PrimitiveTypesMarshaller::marshalPrimitiveList(
             marshalPrimitive(dataOut, list.get(ix));
         }
     }
-    AMQ_CATCH_RETHROW(io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, io::IOException)
-    AMQ_CATCHALL_THROW(io::IOException)
+    AMQ_IOSTREAM_CATCH_RETHROW()
+    AMQ_IOSTREAM_CATCH_CONVERT_LANG_EXCEPTION()
+    AMQ_IOSTREAM_CATCHALL_THROW()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -349,14 +350,15 @@ void PrimitiveTypesMarshaller::marshalPrimitive(
         }
         else
         {
-            throw IOException(__FILE__,
-                              __LINE__,
-                              "Object is not a primitive: ");
+            throw activemq::exceptions::IOException(
+                __FILE__,
+                __LINE__,
+                "Object is not a primitive: ");
         }
     }
-    AMQ_CATCH_RETHROW(io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, io::IOException)
-    AMQ_CATCHALL_THROW(io::IOException)
+    AMQ_IOSTREAM_CATCH_RETHROW()
+    AMQ_IOSTREAM_CATCH_CONVERT_LANG_EXCEPTION()
+    AMQ_IOSTREAM_CATCHALL_THROW()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -377,9 +379,9 @@ void PrimitiveTypesMarshaller::unmarshalPrimitiveMap(
             }
         }
     }
-    AMQ_CATCH_RETHROW(io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, io::IOException)
-    AMQ_CATCHALL_THROW(io::IOException)
+    AMQ_IOSTREAM_CATCH_RETHROW()
+    AMQ_IOSTREAM_CATCH_CONVERT_LANG_EXCEPTION()
+    AMQ_IOSTREAM_CATCHALL_THROW()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -395,9 +397,9 @@ void PrimitiveTypesMarshaller::unmarshalPrimitiveList(
             list.add(unmarshalPrimitive(dataIn));
         }
     }
-    AMQ_CATCH_RETHROW(io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, io::IOException)
-    AMQ_CATCHALL_THROW(io::IOException)
+    AMQ_IOSTREAM_CATCH_RETHROW()
+    AMQ_IOSTREAM_CATCH_CONVERT_LANG_EXCEPTION()
+    AMQ_IOSTREAM_CATCHALL_THROW()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -492,7 +494,7 @@ PrimitiveValueNode PrimitiveTypesMarshaller::unmarshalPrimitive(
                 break;
             }
             default:
-                throw IOException(
+                throw activemq::exceptions::IOException(
                     __FILE__,
                     __LINE__,
                     "PrimitiveTypesMarshaller::unmarshalPrimitive - "
@@ -501,7 +503,7 @@ PrimitiveValueNode PrimitiveTypesMarshaller::unmarshalPrimitive(
 
         return value;
     }
-    AMQ_CATCH_RETHROW(io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, io::IOException)
-    AMQ_CATCHALL_THROW(io::IOException)
+    AMQ_IOSTREAM_CATCH_RETHROW()
+    AMQ_IOSTREAM_CATCH_CONVERT_LANG_EXCEPTION()
+    AMQ_IOSTREAM_CATCHALL_THROW()
 }

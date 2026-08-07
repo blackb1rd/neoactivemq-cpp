@@ -17,6 +17,7 @@
 
 #include "StreamHandler.h"
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/io/OutputStream.h>
 #include <decaf/io/OutputStreamWriter.h>
 #include <decaf/io/Writer.h>
@@ -24,10 +25,11 @@
 #include <decaf/util/logging/Filter.h>
 #include <decaf/util/logging/Formatter.h>
 #include <decaf/util/logging/Level.h>
+#include <stdexcept>
+#include <string>
 
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::io;
 using namespace decaf::util;
 using namespace decaf::util::logging;
@@ -50,16 +52,18 @@ StreamHandler::StreamHandler(OutputStream* stream, Formatter* formatter)
 {
     if (stream == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "OutputStream cannot be NULL.");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "OutputStream cannot be NULL.");
     }
 
     if (formatter == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "Formatter cannot be NULL.");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "Formatter cannot be NULL.");
     }
 
     setFormatter(formatter);
@@ -158,9 +162,10 @@ void StreamHandler::setOuputStream(decaf::io::OutputStream* stream)
 {
     if (stream == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "OutputStream cannot be set to NULL.");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "OutputStream cannot be set to NULL.");
     }
 
     this->close(true);

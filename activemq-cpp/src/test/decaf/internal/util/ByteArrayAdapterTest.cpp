@@ -17,6 +17,8 @@
 
 #include <gtest/gtest.h>
 
+#include <stdexcept>
+
 #include <decaf/internal/util/ByteArrayAdapter.h>
 #include <decaf/lang/Double.h>
 #include <decaf/lang/Float.h>
@@ -27,7 +29,7 @@ using namespace decaf::internal;
 using namespace decaf::internal::util;
 using namespace decaf::nio;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
+using activemq::exceptions::BufferUnderflowException;
 
 class ByteArrayAdapterTest : public ::testing::Test
 {
@@ -263,8 +265,8 @@ TEST_F(ByteArrayAdapterTest, testReadExceptions)
 
     ByteArrayAdapter array(data, 256, true);
 
-    ASSERT_THROW(array.read(NULL, 1, 0, 500), NullPointerException)
-        << ("Should Throw NullPointerException");
+    ASSERT_THROW(array.read(NULL, 1, 0, 500), std::logic_error)
+        << ("Should Throw std::logic_error");
 
     unsigned char    result[5000];
     ByteArrayAdapter array2(256);
@@ -283,8 +285,8 @@ TEST_F(ByteArrayAdapterTest, testWriteExceptions)
     }
 
     ByteArrayAdapter array(data, 256, true);
-    ASSERT_THROW(array.write(NULL, 1, 0, 500), NullPointerException)
-        << ("Should Throw NullPointerException");
+    ASSERT_THROW(array.write(NULL, 1, 0, 500), std::logic_error)
+        << ("Should Throw std::logic_error");
 
     unsigned char    result[5000];
     ByteArrayAdapter array2(256);
@@ -303,8 +305,8 @@ TEST_F(ByteArrayAdapterTest, testOperatorsExceptions)
     }
 
     ByteArrayAdapter array(data, 256, true);
-    ASSERT_THROW(array[9999], IndexOutOfBoundsException)
-        << ("Should Throw IndexOutOfBoundsException");
+    ASSERT_THROW(array[9999], std::out_of_range)
+        << ("Should Throw std::out_of_range");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -320,8 +322,8 @@ TEST_F(ByteArrayAdapterTest, testPut)
         ASSERT_TRUE(testBuffer1.get(i) == (unsigned char)(i + 99));
     }
 
-    ASSERT_THROW(testBuffer1.put(i, 3), IndexOutOfBoundsException)
-        << ("Should throw a IndexOutOfBoundsException");
+    ASSERT_THROW(testBuffer1.put(i, 3), std::out_of_range)
+        << ("Should throw a std::out_of_range");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -337,8 +339,8 @@ TEST_F(ByteArrayAdapterTest, testPutChar)
         ASSERT_TRUE(testBuffer1.getChar(i) == (char)(i + 99));
     }
 
-    ASSERT_THROW(testBuffer1.putChar(i, 3), IndexOutOfBoundsException)
-        << ("Should throw a IndexOutOfBoundsException");
+    ASSERT_THROW(testBuffer1.putChar(i, 3), std::out_of_range)
+        << ("Should throw a std::out_of_range");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -353,8 +355,8 @@ TEST_F(ByteArrayAdapterTest, testPutLong)
         ASSERT_TRUE(testBuffer1.getLong(i) == (long long)(i + 99));
     }
 
-    ASSERT_THROW(testBuffer1.putLong(i, 3), IndexOutOfBoundsException)
-        << ("Should throw a IndexOutOfBoundsException");
+    ASSERT_THROW(testBuffer1.putLong(i, 3), std::out_of_range)
+        << ("Should throw a std::out_of_range");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -369,8 +371,8 @@ TEST_F(ByteArrayAdapterTest, testPutInt)
         ASSERT_TRUE(testBuffer1.getInt(i) == (int)(i + 99));
     }
 
-    ASSERT_THROW(testBuffer1.putInt(i, 3), IndexOutOfBoundsException)
-        << ("Should throw a IndexOutOfBoundsException");
+    ASSERT_THROW(testBuffer1.putInt(i, 3), std::out_of_range)
+        << ("Should throw a std::out_of_range");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -385,8 +387,8 @@ TEST_F(ByteArrayAdapterTest, testPutShort)
         ASSERT_TRUE(testBuffer1.getShort(i) == (short)(i + 99));
     }
 
-    ASSERT_THROW(testBuffer1.putShort(i, 3), IndexOutOfBoundsException)
-        << ("Should throw a IndexOutOfBoundsException");
+    ASSERT_THROW(testBuffer1.putShort(i, 3), std::out_of_range)
+        << ("Should throw a std::out_of_range");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -402,8 +404,8 @@ TEST_F(ByteArrayAdapterTest, testPutDouble)
                     Double::doubleToLongBits((double)(i + 99.025)));
     }
 
-    ASSERT_THROW(testBuffer1.putDouble(i, 3), IndexOutOfBoundsException)
-        << ("Should throw a IndexOutOfBoundsException");
+    ASSERT_THROW(testBuffer1.putDouble(i, 3), std::out_of_range)
+        << ("Should throw a std::out_of_range");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -419,8 +421,8 @@ TEST_F(ByteArrayAdapterTest, testPutFloat)
                     Float::floatToIntBits((float)(i + 99.025)));
     }
 
-    ASSERT_THROW(testBuffer1.putFloat(i, 3), IndexOutOfBoundsException)
-        << ("Should throw a IndexOutOfBoundsException");
+    ASSERT_THROW(testBuffer1.putFloat(i, 3), std::out_of_range)
+        << ("Should throw a std::out_of_range");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -443,8 +445,8 @@ TEST_F(ByteArrayAdapterTest, testGet)
         ASSERT_TRUE(testBuffer1.get(i) == values[j]);
     }
 
-    ASSERT_THROW(testBuffer1.get(i), IndexOutOfBoundsException)
-        << ("Should throw a IndexOutOfBoundsException");
+    ASSERT_THROW(testBuffer1.get(i), std::out_of_range)
+        << ("Should throw a std::out_of_range");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -467,8 +469,8 @@ TEST_F(ByteArrayAdapterTest, testGetChar)
         ASSERT_TRUE(testBuffer1.getChar(i) == values[j]);
     }
 
-    ASSERT_THROW(testBuffer1.getChar(i), IndexOutOfBoundsException)
-        << ("Should throw a IndexOutOfBoundsException");
+    ASSERT_THROW(testBuffer1.getChar(i), std::out_of_range)
+        << ("Should throw a std::out_of_range");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -491,8 +493,8 @@ TEST_F(ByteArrayAdapterTest, testGetShort)
         ASSERT_TRUE(testBuffer1.getShort(i) == values[j]);
     }
 
-    ASSERT_THROW(testBuffer1.getShort(i), IndexOutOfBoundsException)
-        << ("Should throw a IndexOutOfBoundsException");
+    ASSERT_THROW(testBuffer1.getShort(i), std::out_of_range)
+        << ("Should throw a std::out_of_range");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -515,8 +517,8 @@ TEST_F(ByteArrayAdapterTest, testGetInt)
         ASSERT_TRUE(testBuffer1.getInt(i) == values[j]);
     }
 
-    ASSERT_THROW(testBuffer1.getInt(i), IndexOutOfBoundsException)
-        << ("Should throw a IndexOutOfBoundsException");
+    ASSERT_THROW(testBuffer1.getInt(i), std::out_of_range)
+        << ("Should throw a std::out_of_range");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -539,8 +541,8 @@ TEST_F(ByteArrayAdapterTest, testGetLong)
         ASSERT_TRUE(testBuffer1.getLong(i) == values[j]);
     }
 
-    ASSERT_THROW(testBuffer1.getLong(i), IndexOutOfBoundsException)
-        << ("Should throw a IndexOutOfBoundsException");
+    ASSERT_THROW(testBuffer1.getLong(i), std::out_of_range)
+        << ("Should throw a std::out_of_range");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -564,8 +566,8 @@ TEST_F(ByteArrayAdapterTest, testGetFloat)
                     Float::floatToIntBits(values[j]));
     }
 
-    ASSERT_THROW(testBuffer1.getFloat(i), IndexOutOfBoundsException)
-        << ("Should throw a IndexOutOfBoundsException");
+    ASSERT_THROW(testBuffer1.getFloat(i), std::out_of_range)
+        << ("Should throw a std::out_of_range");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -589,6 +591,6 @@ TEST_F(ByteArrayAdapterTest, testGetDouble)
                     Double::doubleToLongBits(values[j]));
     }
 
-    ASSERT_THROW(testBuffer1.getDouble(i), IndexOutOfBoundsException)
-        << ("Should throw a IndexOutOfBoundsException");
+    ASSERT_THROW(testBuffer1.getDouble(i), std::out_of_range)
+        << ("Should throw a std::out_of_range");
 }

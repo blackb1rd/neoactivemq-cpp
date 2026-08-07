@@ -17,17 +17,17 @@
 
 #include "SecureRandomImpl.h"
 
-#include <decaf/lang/Exception.h>
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
-#include <decaf/lang/exceptions/RuntimeException.h>
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <cstdio>
 
 #include <bcrypt.h>
+#include <decaf/lang/Exception.h>
 #include <windows.h>
+#include <stdexcept>
+#include <string>
 
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::security;
 using namespace decaf::internal;
 using namespace decaf::internal::security;
@@ -55,18 +55,18 @@ void SecureRandomImpl::providerNextBytes(unsigned char* bytes, int numBytes)
 {
     if (bytes == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "Byte Buffer passed cannot be NULL.");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "Byte Buffer passed cannot be NULL.");
     }
 
     if (numBytes < 0)
     {
-        throw IllegalArgumentException(
-            __FILE__,
-            __LINE__,
-            "Number of bytes to read was negative: %d",
-            numBytes);
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Number of bytes to read was negative: " +
+            std::to_string(numBytes));
     }
 
     if (numBytes == 0)
@@ -81,10 +81,14 @@ void SecureRandomImpl::providerNextBytes(unsigned char* bytes, int numBytes)
 
     if (!BCRYPT_SUCCESS(status))
     {
-        throw RuntimeException(__FILE__,
-                               __LINE__,
-                               "BCryptGenRandom failed with NTSTATUS: 0x%08X",
-                               (unsigned int)status);
+        char message[96];
+        std::snprintf(message,
+                      sizeof(message),
+                      "BCryptGenRandom failed with NTSTATUS: 0x%08X",
+                      (unsigned int)status);
+        throw activemq::exceptions::RuntimeException(__FILE__,
+                                                     __LINE__,
+                                                     message);
     }
 }
 

@@ -19,9 +19,9 @@
 
 #include <string>
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/lang/Pointer.h>
 #include <decaf/lang/Runnable.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/util/ArrayList.h>
 #include <decaf/util/concurrent/AbstractExecutorService.h>
 #include <decaf/util/concurrent/ExecutorsTestSupport.h>
@@ -29,11 +29,11 @@
 #include <decaf/util/concurrent/LinkedBlockingQueue.h>
 #include <decaf/util/concurrent/ThreadPoolExecutor.h>
 #include <decaf/util/concurrent/TimeUnit.h>
+#include <stdexcept>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 
@@ -77,7 +77,10 @@ public:
     {
         if (r == NULL)
         {
-            throw NullPointerException(__FILE__, __LINE__, "Runnable was NULL");
+            throw activemq::exceptions::IllegalStateException(
+                __FILE__,
+                __LINE__,
+                "Runnable was NULL");
         }
 
         try
@@ -158,7 +161,7 @@ TEST_F(AbstractExecutorServiceTest, testExecuteRunnable)
     {
         unexpectedException();
     }
-    catch (InterruptedException& ex)
+    catch (std::runtime_error& ex)
     {
         unexpectedException();
     }
@@ -179,7 +182,7 @@ TEST_F(AbstractExecutorServiceTest, testSubmitCallable)
     {
         unexpectedException();
     }
-    catch (InterruptedException& ex)
+    catch (std::runtime_error& ex)
     {
         unexpectedException();
     }
@@ -200,7 +203,7 @@ TEST_F(AbstractExecutorServiceTest, testSubmitRunnable)
     {
         unexpectedException();
     }
-    catch (InterruptedException& ex)
+    catch (std::runtime_error& ex)
     {
         unexpectedException();
     }
@@ -221,7 +224,7 @@ TEST_F(AbstractExecutorServiceTest, testSubmitRunnable2)
     {
         unexpectedException();
     }
-    catch (InterruptedException& ex)
+    catch (std::runtime_error& ex)
     {
         unexpectedException();
     }
@@ -237,7 +240,7 @@ TEST_F(AbstractExecutorServiceTest, testExecuteNullRunnable)
         e.submit<int>(task);
         shouldThrow();
     }
-    catch (NullPointerException& success)
+    catch (std::logic_error& success)
     {
     }
     catch (Exception& ex)
@@ -256,7 +259,7 @@ TEST_F(AbstractExecutorServiceTest, testSubmitNullCallable)
         e.submit(t);
         shouldThrow();
     }
-    catch (NullPointerException& success)
+    catch (std::logic_error& success)
     {
     }
     catch (Exception& ex)
@@ -348,7 +351,7 @@ public:
             Thread::sleep(AbstractExecutorServiceTest::LONG_DELAY_MS);
             parent->threadShouldThrow();
         }
-        catch (InterruptedException& e)
+        catch (activemq::exceptions::InterruptedException& e)
         {
         }
 
@@ -388,7 +391,7 @@ public:
                 new TestInterruptedSubmitCallable<int>(parent)));
             future->get();
         }
-        catch (InterruptedException& success)
+        catch (activemq::exceptions::InterruptedException& success)
         {
         }
         catch (Exception& e)
@@ -494,7 +497,7 @@ public:
                 ->get();
             parent->threadShouldThrow();
         }
-        catch (InterruptedException& e)
+        catch (activemq::exceptions::InterruptedException& e)
         {
         }
         catch (RejectedExecutionException& e2)
@@ -530,7 +533,7 @@ TEST_F(AbstractExecutorServiceTest, testSubmitIE)
         t.interrupt();
         t.join();
     }
-    catch (InterruptedException& e)
+    catch (activemq::exceptions::InterruptedException& e)
     {
         unexpectedException();
     }
@@ -551,8 +554,8 @@ public:
 
     virtual int call()
     {
-        throw NumberFormatException(__FILE__,
-                                    __LINE__,
+        throw std::invalid_argument(std::string(__FILE__) + ":" +
+                                    std::to_string(__LINE__) + ": " +
                                     "Throwing a common exception");
         return 1;
     }

@@ -24,7 +24,7 @@
 #include <activemq/util/URISupport.h>
 #include <activemq/wireformat/openwire/OpenWireResponseBuilder.h>
 
-#include <decaf/io/IOException.h>
+#include <activemq/exceptions/IoExceptions.h>
 #include <decaf/lang/Boolean.h>
 
 using namespace activemq;
@@ -37,7 +37,6 @@ using namespace activemq::transport::logging;
 using namespace activemq::exceptions;
 using namespace decaf;
 using namespace decaf::util;
-using namespace decaf::io;
 using namespace decaf::lang;
 
 ////////////////////////////////////////////////////////////////////////////////

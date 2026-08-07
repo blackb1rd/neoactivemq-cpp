@@ -17,19 +17,18 @@
 
 #include "SSLContext.h"
 
-#include <decaf/lang/exceptions/IllegalStateException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
-
 #include <decaf/net/SocketFactory.h>
 #include <decaf/net/ssl/SSLParameters.h>
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/internal/net/ssl/DefaultSSLContext.h>
+#include <stdexcept>
+#include <string>
 
 using namespace decaf;
 using namespace decaf::net;
 using namespace decaf::net::ssl;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::internal;
 using namespace decaf::internal::net;
 using namespace decaf::internal::net::ssl;
@@ -43,9 +42,10 @@ SSLContext::SSLContext(SSLContextSpi* contextImpl)
 {
     if (contextImpl == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "SSLContextSpi cannot be NULL");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "SSLContextSpi cannot be NULL");
     }
 }
 
@@ -72,9 +72,32 @@ SSLContext* SSLContext::getDefault()
 
         return DefaultSSLContext::getContext();
     }
-    DECAF_CATCH_RETHROW(IllegalStateException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IllegalStateException)
-    DECAF_CATCHALL_THROW(IllegalStateException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (activemq::exceptions::NullPointerException&)
+    {
+        throw;
+    }
+    catch (activemq::exceptions::UnsupportedOperationException&)
+    {
+        throw;
+    }
+    catch (activemq::exceptions::IllegalStateException&)
+    {
+        throw;
+    }
+    catch (Exception& ex)
+    {
+        throw activemq::exceptions::IllegalStateException(ex.getMessage());
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::IllegalStateException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -82,9 +105,10 @@ void SSLContext::setDefault(SSLContext* context)
 {
     if (context == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "SSLContextSpi cannot be NULL");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "SSLContextSpi cannot be NULL");
     }
 
     SSLContext::defaultSSLContext = context;
@@ -97,9 +121,32 @@ SocketFactory* SSLContext::getSocketFactory()
     {
         return this->contextImpl->providerGetSocketFactory();
     }
-    DECAF_CATCH_RETHROW(IllegalStateException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IllegalStateException)
-    DECAF_CATCHALL_THROW(IllegalStateException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (activemq::exceptions::NullPointerException&)
+    {
+        throw;
+    }
+    catch (activemq::exceptions::UnsupportedOperationException&)
+    {
+        throw;
+    }
+    catch (activemq::exceptions::IllegalStateException&)
+    {
+        throw;
+    }
+    catch (Exception& ex)
+    {
+        throw activemq::exceptions::IllegalStateException(ex.getMessage());
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::IllegalStateException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -109,9 +156,32 @@ ServerSocketFactory* SSLContext::getServerSocketFactory()
     {
         return this->contextImpl->providerGetServerSocketFactory();
     }
-    DECAF_CATCH_RETHROW(IllegalStateException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IllegalStateException)
-    DECAF_CATCHALL_THROW(IllegalStateException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (activemq::exceptions::NullPointerException&)
+    {
+        throw;
+    }
+    catch (activemq::exceptions::UnsupportedOperationException&)
+    {
+        throw;
+    }
+    catch (activemq::exceptions::IllegalStateException&)
+    {
+        throw;
+    }
+    catch (Exception& ex)
+    {
+        throw activemq::exceptions::IllegalStateException(ex.getMessage());
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::IllegalStateException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -121,9 +191,32 @@ SSLParameters* SSLContext::getDefaultSSLParameters()
     {
         return this->contextImpl->providerGetDefaultSSLParameters();
     }
-    DECAF_CATCH_RETHROW(IllegalStateException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IllegalStateException)
-    DECAF_CATCHALL_THROW(IllegalStateException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (activemq::exceptions::NullPointerException&)
+    {
+        throw;
+    }
+    catch (activemq::exceptions::UnsupportedOperationException&)
+    {
+        throw;
+    }
+    catch (activemq::exceptions::IllegalStateException&)
+    {
+        throw;
+    }
+    catch (Exception& ex)
+    {
+        throw activemq::exceptions::IllegalStateException(ex.getMessage());
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::IllegalStateException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -133,7 +226,30 @@ SSLParameters* SSLContext::getSupportedSSLParameters()
     {
         return this->contextImpl->providerGetSupportedSSLParameters();
     }
-    DECAF_CATCH_RETHROW(IllegalStateException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IllegalStateException)
-    DECAF_CATCHALL_THROW(IllegalStateException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (activemq::exceptions::NullPointerException&)
+    {
+        throw;
+    }
+    catch (activemq::exceptions::UnsupportedOperationException&)
+    {
+        throw;
+    }
+    catch (activemq::exceptions::IllegalStateException&)
+    {
+        throw;
+    }
+    catch (Exception& ex)
+    {
+        throw activemq::exceptions::IllegalStateException(ex.getMessage());
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::IllegalStateException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }

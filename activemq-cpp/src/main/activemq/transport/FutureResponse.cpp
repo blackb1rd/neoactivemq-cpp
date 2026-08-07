@@ -19,8 +19,9 @@
 
 #include <activemq/exceptions/ActiveMQException.h>
 #include <activemq/util/Config.h>
-#include <decaf/lang/exceptions/UnsupportedOperationException.h>
 #include <decaf/util/concurrent/Concurrent.h>
+#include <stdexcept>
+#include <string>
 #include <typeinfo>
 
 using namespace activemq;
@@ -28,9 +29,7 @@ using namespace activemq::transport;
 using namespace activemq::exceptions;
 using namespace activemq::commands;
 using namespace decaf;
-using namespace decaf::io;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util::concurrent;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -63,13 +62,13 @@ std::shared_ptr<Response> FutureResponse::getResponse() const
         this->responseLatch.await();
         return response;
     }
-    catch (decaf::lang::exceptions::InterruptedException& ex)
+    catch (InterruptedException&)
     {
         decaf::lang::Thread::currentThread()->interrupt();
-        throw decaf::io::InterruptedIOException(
+        throw InterruptedIOException(
             __FILE__,
             __LINE__,
-            "Interrupted while awaiting a response");
+            std::string("Interrupted while awaiting a response"));
     }
 }
 
@@ -81,13 +80,13 @@ std::shared_ptr<Response> FutureResponse::getResponse()
         this->responseLatch.await();
         return response;
     }
-    catch (decaf::lang::exceptions::InterruptedException& ex)
+    catch (InterruptedException&)
     {
         decaf::lang::Thread::currentThread()->interrupt();
-        throw decaf::io::InterruptedIOException(
+        throw InterruptedIOException(
             __FILE__,
             __LINE__,
-            "Interrupted while awaiting a response");
+            std::string("Interrupted while awaiting a response"));
     }
 }
 
@@ -99,12 +98,12 @@ std::shared_ptr<Response> FutureResponse::getResponse(unsigned int timeout) cons
         this->responseLatch.await(timeout);
         return response;
     }
-    catch (decaf::lang::exceptions::InterruptedException& ex)
+    catch (InterruptedException&)
     {
-        throw decaf::io::InterruptedIOException(
+        throw InterruptedIOException(
             __FILE__,
             __LINE__,
-            "Interrupted while awaiting a response");
+            std::string("Interrupted while awaiting a response"));
     }
 }
 
@@ -116,12 +115,12 @@ std::shared_ptr<Response> FutureResponse::getResponse(unsigned int timeout)
         this->responseLatch.await(timeout);
         return response;
     }
-    catch (decaf::lang::exceptions::InterruptedException& ex)
+    catch (InterruptedException&)
     {
-        throw decaf::io::InterruptedIOException(
+        throw InterruptedIOException(
             __FILE__,
             __LINE__,
-            "Interrupted while awaiting a response");
+            std::string("Interrupted while awaiting a response"));
     }
 }
 

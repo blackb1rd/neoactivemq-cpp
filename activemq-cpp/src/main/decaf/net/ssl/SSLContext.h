@@ -21,6 +21,7 @@
 #include <decaf/util/Config.h>
 
 #include <decaf/net/ssl/SSLContextSpi.h>
+#include <stdexcept>
 
 namespace decaf
 {
@@ -69,7 +70,7 @@ namespace net
              * caller is responsible for deleting this object before the Library
              * shutdown methods are called.
              *
-             * @throws NullPointerException if the context passed is NULL.
+             * @throws std::logic_error if the context passed is NULL.
              */
             static void setDefault(SSLContext* context);
 
@@ -86,7 +87,7 @@ namespace net
              * @return a pointer to this SSLContext's SocketFactory for creating
              * SSLSocket objects.
              *
-             * @throws IllegalStateException if the SSLContextSpi requires
+             * @throws std::logic_error if the SSLContextSpi requires
              * initialization but it has not yet been initialized.
              */
             SocketFactory* getSocketFactory();
@@ -99,7 +100,7 @@ namespace net
              * @return a pointer to this SSLContext's ServerSocketFactory for
              * creating SSLServerSocket objects.
              *
-             * @throws IllegalStateException if the SSLContextSpi requires
+             * @throws std::logic_error if the SSLContextSpi requires
              * initialization but it has not yet been initialized.
              */
             ServerSocketFactory* getServerSocketFactory();
@@ -108,7 +109,7 @@ namespace net
              * @return a new instance of an SSLParameters object containing the
              * default set of settings for this SSLContext.
              *
-             * @throws UnsupportedOperationException if the parameters cannot be
+             * @throws std::logic_error if the parameters cannot be
              * retrieved.
              */
             SSLParameters* getDefaultSSLParameters();
@@ -117,7 +118,7 @@ namespace net
              * @return a new instance of an SSLParameters object containing the
              * complete set of settings for this SSLContext.
              *
-             * @throws UnsupportedOperationException if the parameters cannot be
+             * @throws std::logic_error if the parameters cannot be
              * retrieved.
              */
             SSLParameters* getSupportedSSLParameters();

@@ -17,20 +17,21 @@
 
 #include "Properties.h"
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/io/BufferedInputStream.h>
 #include <decaf/lang/Character.h>
 #include <decaf/lang/Integer.h>
-#include <decaf/lang/exceptions/UnsupportedOperationException.h>
 #include <decaf/util/Date.h>
 #include <decaf/util/Map.h>
 #include <decaf/util/StlMap.h>
 #include <map>
 #include <sstream>
+#include <stdexcept>
+#include <string>
 
 using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::io;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -397,9 +398,10 @@ void Properties::load(decaf::io::InputStream* stream)
     {
         if (stream == NULL)
         {
-            throw NullPointerException(__FILE__,
-                                       __LINE__,
-                                       "The Stream instance passed was Null");
+            throw activemq::exceptions::NullPointerException(
+                __FILE__,
+                __LINE__,
+                "The Stream instance passed was Null");
         }
 
         int                 mode = PARSE_MODE_NONE;
@@ -573,8 +575,6 @@ void Properties::load(decaf::io::InputStream* stream)
         }
     }
     DECAF_CATCH_RETHROW(IOException)
-    DECAF_CATCH_RETHROW(IllegalArgumentException)
-    DECAF_CATCH_RETHROW(NullPointerException)
     DECAF_CATCH_EXCEPTION_CONVERT(Exception, IOException)
     DECAF_CATCHALL_THROW(IOException)
 }
@@ -586,18 +586,18 @@ void Properties::load(decaf::io::Reader* reader)
     {
         if (reader == NULL)
         {
-            throw NullPointerException(__FILE__,
-                                       __LINE__,
-                                       "The Reader instance passed was Null");
+            throw activemq::exceptions::NullPointerException(
+                __FILE__,
+                __LINE__,
+                "The Reader instance passed was Null");
         }
 
-        throw UnsupportedOperationException(__FILE__,
-                                            __LINE__,
-                                            "Not yet Implemented.");
+        throw activemq::exceptions::UnsupportedOperationException(
+            __FILE__,
+            __LINE__,
+            "Not yet Implemented.");
     }
     DECAF_CATCH_RETHROW(IOException)
-    DECAF_CATCH_RETHROW(IllegalArgumentException)
-    DECAF_CATCH_RETHROW(NullPointerException)
     DECAF_CATCH_EXCEPTION_CONVERT(Exception, IOException)
     DECAF_CATCHALL_THROW(IOException)
 }
@@ -610,7 +610,7 @@ void Properties::store(decaf::io::OutputStream*    out,
     {
         if (out == NULL)
         {
-            throw NullPointerException(
+            throw activemq::exceptions::NullPointerException(
                 __FILE__,
                 __LINE__,
                 "The OutputStream instance passed was Null");
@@ -654,7 +654,6 @@ void Properties::store(decaf::io::OutputStream*    out,
         out->flush();
     }
     DECAF_CATCH_RETHROW(IOException)
-    DECAF_CATCH_RETHROW(NullPointerException)
     DECAF_CATCH_EXCEPTION_CONVERT(Exception, IOException)
     DECAF_CATCHALL_THROW(IOException)
 }
@@ -667,17 +666,18 @@ void Properties::store(decaf::io::Writer*          writer,
     {
         if (writer == NULL)
         {
-            throw NullPointerException(__FILE__,
-                                       __LINE__,
-                                       "The Writer instance passed was Null");
+            throw activemq::exceptions::NullPointerException(
+                __FILE__,
+                __LINE__,
+                "The Writer instance passed was Null");
         }
 
-        throw UnsupportedOperationException(__FILE__,
-                                            __LINE__,
-                                            "Not yet Implemented.");
+        throw activemq::exceptions::UnsupportedOperationException(
+            __FILE__,
+            __LINE__,
+            "Not yet Implemented.");
     }
     DECAF_CATCH_RETHROW(IOException)
-    DECAF_CATCH_RETHROW(NullPointerException)
     DECAF_CATCH_EXCEPTION_CONVERT(Exception, IOException)
     DECAF_CATCHALL_THROW(IOException)
 }

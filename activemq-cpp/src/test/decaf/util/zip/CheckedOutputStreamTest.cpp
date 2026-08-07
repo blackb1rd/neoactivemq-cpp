@@ -26,7 +26,6 @@ using namespace std;
 using namespace decaf;
 using namespace decaf::io;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::zip;
 
@@ -115,6 +114,6 @@ TEST_F(CheckedOutputStreamTest, testWriteBIII)
         << ("the checkSum value is zero, no bytes are written to the output "
             "file");
 
-    ASSERT_THROW(chkOut.write(byteArray, SIZE, 4, 6), IndexOutOfBoundsException)
-        << ("Should have thrown an IndexOutOfBoundsException");
+    ASSERT_THROW(chkOut.write(byteArray, SIZE, 4, 6), std::out_of_range)
+        << ("Should have thrown an std::out_of_range");
 }

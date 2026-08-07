@@ -20,6 +20,7 @@
 
 #include <activemq/commands/Command.h>
 #include <activemq/commands/Response.h>
+#include <activemq/exceptions/IoExceptions.h>
 #include <activemq/transport/Transport.h>
 #include <activemq/transport/TransportListener.h>
 #include <activemq/util/Config.h>
@@ -31,6 +32,7 @@
 #include <decaf/lang/Thread.h>
 #include <decaf/util/logging/LoggerDefines.h>
 #include <memory>
+#include <stdexcept>
 
 namespace activemq
 {
@@ -147,7 +149,7 @@ namespace transport
         /**
          * {@inheritDoc}
          *
-         * This method always thrown an UnsupportedOperationException.
+         * This method always thrown std::logic_error.
          */
         virtual std::shared_ptr<FutureResponse> asyncRequest(
             const std::shared_ptr<Command>          command,
@@ -156,7 +158,7 @@ namespace transport
         /**
          * {@inheritDoc}
          *
-         * This method always thrown an UnsupportedOperationException.
+         * This method always thrown std::logic_error.
          */
         virtual std::shared_ptr<Response> request(
             const std::shared_ptr<Command> command);
@@ -164,7 +166,7 @@ namespace transport
         /**
          * {@inheritDoc}
          *
-         * This method always thrown an UnsupportedOperationException.
+         * This method always thrown std::logic_error.
          */
         virtual std::shared_ptr<Response> request(
             const std::shared_ptr<Command> command,
@@ -223,7 +225,9 @@ namespace transport
                                 const decaf::util::List<decaf::net::URI>& uris
                                     AMQCPP_UNUSED)
         {
-            throw decaf::io::IOException();
+            throw activemq::exceptions::IOException(__FILE__,
+                                                    __LINE__,
+                                                    "updateURIs not supported");
         }
 
         /**

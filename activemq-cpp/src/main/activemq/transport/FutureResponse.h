@@ -24,12 +24,12 @@
 #include <activemq/exceptions/ActiveMQException.h>
 #include <activemq/transport/ResponseCallback.h>
 
-#include <decaf/io/InterruptedIOException.h>
+#include <activemq/exceptions/IoExceptions.h>
 #include <decaf/lang/Thread.h>
-#include <decaf/lang/exceptions/InterruptedException.h>
 #include <decaf/util/concurrent/CountDownLatch.h>
 #include <decaf/util/concurrent/Mutex.h>
 #include <memory>
+#include <stdexcept>
 
 namespace activemq
 {

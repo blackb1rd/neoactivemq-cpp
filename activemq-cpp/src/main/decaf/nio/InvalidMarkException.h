@@ -18,92 +18,32 @@
 #ifndef _DECAF_NIO_INVALIDMARKEXCEPTION_H_
 #define _DECAF_NIO_INVALIDMARKEXCEPTION_H_
 
-#include <decaf/lang/exceptions/IllegalStateException.h>
 #include <decaf/util/Config.h>
+
+#include <stdexcept>
+#include <string>
 
 namespace decaf
 {
 namespace nio
 {
 
-    class DECAF_API InvalidMarkException
-        : public lang::exceptions::IllegalStateException
+    /**
+     * Thrown when a buffer mark is invalid or unset (idiomatically a
+     * logic_error).
+     *
+     * @since 1.0
+     */
+    class DECAF_API InvalidMarkException : public std::logic_error
     {
     public:
-        /**
-         * Default Constructor
-         */
         InvalidMarkException();
 
-        /**
-         * Conversion Constructor from some other Exception
-         *
-         * @param ex
-         *      The Exception whose state data is to be copied into this
-         * Exception.
-         */
-        InvalidMarkException(const lang::Exception& ex);
+        explicit InvalidMarkException(const std::string& message);
 
-        /**
-         * Copy Constructor
-         *
-         * @param ex
-         *      The Exception whose state data is to be copied into this
-         * Exception.
-         */
-        InvalidMarkException(const InvalidMarkException& ex);
-
-        /**
-         * Constructor - Initializes the file name and line number where
-         * this message occurred.  Sets the message to report, using an
-         * optional list of arguments to parse into the message
-         *
-         * @param file The file name where exception occurs
-         * @param lineNumber The line number where the exception occurred.
-         * @param cause The exception that was the cause for this one to be
-         * thrown.
-         * @param msg The message to report
-         * @param ... list of primitives that are formatted into the message
-         */
-        InvalidMarkException(const char*           file,
-                             const int             lineNumber,
-                             const std::exception* cause,
-                             const char*           msg,
-                             ...);
-
-        /**
-         * Constructor
-         * @param cause Pointer to the exception that caused this one to
-         * be thrown, the object is cloned caller retains ownership.
-         */
-        InvalidMarkException(const std::exception* cause);
-
-        /**
-         * Constructor - Initializes the file name and line number where
-         * this message occurred.  Sets the message to report, using an
-         * optional list of arguments to parse into the message
-         *
-         * @param file The file name where exception occurs
-         * @param lineNumber The line number where the exception occurred.
-         * @param msg The message to report
-         * @param ... list of primitives that are formatted into the message
-         */
         InvalidMarkException(const char* file,
-                             const int   lineNumber,
-                             const char* msg,
-                             ...);
-
-        /**
-         * Clones this exception.  This is useful for cases where you need
-         * to preserve the type of the original exception as well as the
-         * message. All subclasses should override.
-         *
-         * @return A new Exception instance that is a copy of this Exception.
-         */
-        virtual InvalidMarkException* clone() const
-        {
-            return new InvalidMarkException(*this);
-        }
+                             int         lineNumber,
+                             const char* message);
 
         virtual ~InvalidMarkException() throw();
     };

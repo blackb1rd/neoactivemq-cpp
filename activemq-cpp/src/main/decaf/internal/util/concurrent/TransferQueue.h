@@ -20,10 +20,10 @@
 
 #include <decaf/internal/util/concurrent/Transferer.h>
 
-#include <decaf/lang/exceptions/InterruptedException.h>
 #include <decaf/util/concurrent/TimeoutException.h>
 #include <decaf/util/concurrent/atomic/AtomicReference.h>
 #include <decaf/util/concurrent/locks/LockSupport.h>
+#include <stdexcept>
 
 #include <decaf/lang/Thread.h>
 

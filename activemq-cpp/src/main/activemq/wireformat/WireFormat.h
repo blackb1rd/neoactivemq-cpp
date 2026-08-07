@@ -20,16 +20,16 @@
 
 #include <activemq/wireformat/WireFormatNegotiator.h>
 
+#include <activemq/exceptions/IoExceptions.h>
 #include <decaf/io/DataInputStream.h>
 #include <decaf/io/DataOutputStream.h>
-#include <decaf/io/IOException.h>
 
 #include <activemq/commands/Command.h>
 #include <activemq/transport/Transport.h>
 #include <activemq/util/Config.h>
 
-#include <decaf/lang/exceptions/UnsupportedOperationException.h>
 #include <memory>
+#include <stdexcept>
 
 namespace activemq
 {
@@ -124,7 +124,7 @@ namespace wireformat
          * @return new instance of a WireFormatNegotiator as a
          * Pointer<Transport>.
          *
-         * @throws UnsupportedOperationException if the WireFormat doesn't have
+         * @throws std::logic_error if the WireFormat doesn't have
          * a Negotiator.
          */
         virtual std::shared_ptr<transport::Transport> createNegotiator(

@@ -63,7 +63,7 @@ namespace transport
              * @param next
              *      the next transport in the chain
              *
-             * @throws NullPointerException if next if NULL.
+             * @throws std::logic_error if next if NULL.
              */
             ResponseCorrelator(std::shared_ptr<Transport> next);
 

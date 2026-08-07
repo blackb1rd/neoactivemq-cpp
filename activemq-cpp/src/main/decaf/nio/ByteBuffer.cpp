@@ -22,13 +22,16 @@
 #include "decaf/lang/Integer.h"
 #include "decaf/lang/Long.h"
 #include "decaf/lang/Short.h"
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <stdexcept>
+#include <string>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::nio;
 using namespace decaf::internal::nio;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
+using activemq::exceptions::BufferUnderflowException;
 
 ////////////////////////////////////////////////////////////////////////////////
 ByteBuffer::ByteBuffer(int capacity)
@@ -43,8 +46,16 @@ ByteBuffer* ByteBuffer::allocate(int capacity)
     {
         return BufferFactory::createByteBuffer(capacity);
     }
-    DECAF_CATCH_RETHROW(IllegalArgumentException)
-    DECAF_CATCHALL_THROW(IllegalArgumentException)
+    catch (std::invalid_argument&)
+    {
+        throw;
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -57,7 +68,7 @@ ByteBuffer* ByteBuffer::wrap(unsigned char* buffer,
     {
         if (buffer == NULL)
         {
-            throw NullPointerException(
+            throw activemq::exceptions::NullPointerException(
                 __FILE__,
                 __LINE__,
                 "ByteBuffer::wrap - Passed Buffer is Null.");
@@ -65,18 +76,38 @@ ByteBuffer* ByteBuffer::wrap(unsigned char* buffer,
 
         if (size < 0 || offset < 0 || length < 0 || offset + length > size)
         {
-            throw IndexOutOfBoundsException(
-                __FILE__,
-                __LINE__,
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
                 "Invalid array access parameters passed.");
         }
 
         return BufferFactory::createByteBuffer(buffer, size, offset, length);
     }
-    DECAF_CATCH_RETHROW(NullPointerException)
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception, NullPointerException)
-    DECAF_CATCHALL_THROW(NullPointerException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (std::invalid_argument&)
+    {
+        throw;
+    }
+    catch (activemq::exceptions::NullPointerException&)
+    {
+        throw;
+    }
+    catch (Exception& ex)
+    {
+        throw activemq::exceptions::NullPointerException(__FILE__,
+                                                         __LINE__,
+                                                         ex.what());
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -86,7 +117,7 @@ ByteBuffer* ByteBuffer::wrap(std::vector<unsigned char>& buffer)
     {
         if (buffer.empty())
         {
-            throw NullPointerException(
+            throw activemq::exceptions::NullPointerException(
                 __FILE__,
                 __LINE__,
                 "ByteBuffer::wrap - Passed Buffer is Empty.");
@@ -97,9 +128,31 @@ ByteBuffer* ByteBuffer::wrap(std::vector<unsigned char>& buffer)
                                                0,
                                                (int)buffer.size());
     }
-    DECAF_CATCH_RETHROW(NullPointerException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception, NullPointerException)
-    DECAF_CATCHALL_THROW(NullPointerException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (std::invalid_argument&)
+    {
+        throw;
+    }
+    catch (activemq::exceptions::NullPointerException&)
+    {
+        throw;
+    }
+    catch (Exception& ex)
+    {
+        throw activemq::exceptions::NullPointerException(__FILE__,
+                                                         __LINE__,
+                                                         ex.what());
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -134,7 +187,7 @@ ByteBuffer& ByteBuffer::get(unsigned char* buffer,
 
         if (buffer == NULL)
         {
-            throw NullPointerException(
+            throw activemq::exceptions::NullPointerException(
                 __FILE__,
                 __LINE__,
                 "ByteBuffer::get - Passed Buffer is Null.");
@@ -142,9 +195,9 @@ ByteBuffer& ByteBuffer::get(unsigned char* buffer,
 
         if (size < 0 || offset < 0 || length < 0 || offset + length > size)
         {
-            throw IndexOutOfBoundsException(__FILE__,
-                                            __LINE__,
-                                            "Arguments violate array bounds.");
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+                "Arguments violate array bounds.");
         }
 
         if (length > this->remaining())
@@ -164,8 +217,6 @@ ByteBuffer& ByteBuffer::get(unsigned char* buffer,
         return *this;
     }
     DECAF_CATCH_RETHROW(BufferUnderflowException)
-    DECAF_CATCH_RETHROW(NullPointerException)
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
     DECAF_CATCH_EXCEPTION_CONVERT(Exception, BufferUnderflowException)
     DECAF_CATCHALL_THROW(BufferUnderflowException)
 }
@@ -177,9 +228,9 @@ ByteBuffer& ByteBuffer::put(ByteBuffer& src)
     {
         if (this == &src)
         {
-            throw IllegalArgumentException(__FILE__,
-                                           __LINE__,
-                                           "ByteBuffer::put - Can't put Self");
+            throw activemq::exceptions::InvalidArgumentException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+                "ByteBuffer::put - Can't put Self");
         }
 
         if (this->isReadOnly())
@@ -206,8 +257,10 @@ ByteBuffer& ByteBuffer::put(ByteBuffer& src)
         return *this;
     }
     DECAF_CATCH_RETHROW(BufferOverflowException)
-    DECAF_CATCH_RETHROW(ReadOnlyBufferException)
-    DECAF_CATCH_RETHROW(IllegalArgumentException)
+    catch (ReadOnlyBufferException&)
+    {
+        throw;
+    }
     DECAF_CATCH_EXCEPTION_CONVERT(Exception, BufferOverflowException)
     DECAF_CATCHALL_THROW(BufferOverflowException)
 }
@@ -235,7 +288,7 @@ ByteBuffer& ByteBuffer::put(const unsigned char* buffer,
 
         if (buffer == NULL)
         {
-            throw NullPointerException(
+            throw activemq::exceptions::NullPointerException(
                 __FILE__,
                 __LINE__,
                 "ByteBuffer::put - Passed Buffer is Null.");
@@ -243,9 +296,9 @@ ByteBuffer& ByteBuffer::put(const unsigned char* buffer,
 
         if (size < 0 || offset < 0 || length < 0 || offset + length > size)
         {
-            throw IndexOutOfBoundsException(__FILE__,
-                                            __LINE__,
-                                            "Arguments violate array bounds.");
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+                "Arguments violate array bounds.");
         }
 
         if (length > this->remaining())
@@ -265,8 +318,10 @@ ByteBuffer& ByteBuffer::put(const unsigned char* buffer,
         return *this;
     }
     DECAF_CATCH_RETHROW(BufferOverflowException)
-    DECAF_CATCH_RETHROW(ReadOnlyBufferException)
-    DECAF_CATCH_RETHROW(NullPointerException)
+    catch (ReadOnlyBufferException&)
+    {
+        throw;
+    }
     DECAF_CATCH_EXCEPTION_CONVERT(Exception, BufferOverflowException)
     DECAF_CATCHALL_THROW(BufferOverflowException)
 }
@@ -284,7 +339,10 @@ ByteBuffer& ByteBuffer::put(std::vector<unsigned char>& buffer)
         return *this;
     }
     DECAF_CATCH_RETHROW(BufferOverflowException)
-    DECAF_CATCH_RETHROW(ReadOnlyBufferException)
+    catch (ReadOnlyBufferException&)
+    {
+        throw;
+    }
     DECAF_CATCH_EXCEPTION_CONVERT(Exception, BufferOverflowException)
     DECAF_CATCHALL_THROW(BufferOverflowException)
 }

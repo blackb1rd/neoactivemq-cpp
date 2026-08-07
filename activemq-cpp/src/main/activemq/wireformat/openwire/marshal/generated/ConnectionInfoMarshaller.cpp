@@ -19,6 +19,7 @@
 
 #include <activemq/commands/ConnectionInfo.h>
 #include <activemq/exceptions/ActiveMQException.h>
+#include <activemq/wireformat/openwire/marshal/OpenWireMarshalCatchMacros.h>
 #include <memory>
 
 //
@@ -110,10 +111,10 @@ void ConnectionInfoMarshaller::tightUnmarshal(OpenWireFormat*  wireFormat,
             info->setClientIp(tightUnmarshalString(dataIn, bs));
         }
     }
-    AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
-                                decaf::io::IOException)
-    AMQ_CATCHALL_THROW(decaf::io::IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(activemq::exceptions::ActiveMQException,
+                                activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -158,10 +159,10 @@ int ConnectionInfoMarshaller::tightMarshal1(OpenWireFormat* wireFormat,
 
         return rc + 0;
     }
-    AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
-                                decaf::io::IOException)
-    AMQ_CATCHALL_THROW(decaf::io::IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(activemq::exceptions::ActiveMQException,
+                                activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -208,10 +209,10 @@ void ConnectionInfoMarshaller::tightMarshal2(OpenWireFormat*   wireFormat,
             tightMarshalString2(info->getClientIp(), dataOut, bs);
         }
     }
-    AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
-                                decaf::io::IOException)
-    AMQ_CATCHALL_THROW(decaf::io::IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(activemq::exceptions::ActiveMQException,
+                                activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -269,10 +270,10 @@ void ConnectionInfoMarshaller::looseUnmarshal(OpenWireFormat*  wireFormat,
             info->setClientIp(looseUnmarshalString(dataIn));
         }
     }
-    AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
-                                decaf::io::IOException)
-    AMQ_CATCHALL_THROW(decaf::io::IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(activemq::exceptions::ActiveMQException,
+                                activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -313,8 +314,8 @@ void ConnectionInfoMarshaller::looseMarshal(OpenWireFormat*   wireFormat,
             looseMarshalString(info->getClientIp(), dataOut);
         }
     }
-    AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
-                                decaf::io::IOException)
-    AMQ_CATCHALL_THROW(decaf::io::IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(activemq::exceptions::ActiveMQException,
+                                activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }

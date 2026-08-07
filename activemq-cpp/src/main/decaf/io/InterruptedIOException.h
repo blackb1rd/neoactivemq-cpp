@@ -17,6 +17,8 @@
 #ifndef _DECAF_IO_INTERRUPTEDIOEXCEPTION_H_
 #define _DECAF_IO_INTERRUPTEDIOEXCEPTION_H_
 
+#include <cstdarg>
+
 #include <decaf/io/IOException.h>
 #include <decaf/lang/Exception.h>
 
@@ -101,6 +103,65 @@ namespace io
 
         virtual ~InterruptedIOException() throw();
     };
+
+    inline InterruptedIOException::InterruptedIOException()
+        : io::IOException()
+    {
+    }
+
+    inline InterruptedIOException::~InterruptedIOException() throw()
+    {
+    }
+
+    inline InterruptedIOException::InterruptedIOException(
+        const lang::Exception& ex)
+        : io::IOException()
+    {
+        *(lang::Exception*)this = ex;
+    }
+
+    inline InterruptedIOException::InterruptedIOException(
+        const InterruptedIOException& ex)
+        : io::IOException()
+    {
+        *(lang::Exception*)this = ex;
+    }
+
+    inline InterruptedIOException::InterruptedIOException(
+        const char*           file,
+        const int             lineNumber,
+        const std::exception* cause,
+        const char*           msg,
+        ...)
+        : io::IOException(cause)
+    {
+        va_list vargs;
+        va_start(vargs, msg);
+        buildMessage(msg, vargs);
+        va_end(vargs);
+
+        setMark(file, lineNumber);
+    }
+
+    inline InterruptedIOException::InterruptedIOException(
+        const std::exception* cause)
+        : io::IOException(cause)
+    {
+    }
+
+    inline InterruptedIOException::InterruptedIOException(const char* file,
+                                                          const int lineNumber,
+                                                          const char* msg,
+                                                          ...)
+        : io::IOException()
+    {
+        va_list vargs;
+        va_start(vargs, msg);
+        buildMessage(msg, vargs);
+        va_end(vargs);
+
+        setMark(file, lineNumber);
+    }
 
 }  // namespace io
 }  // namespace decaf

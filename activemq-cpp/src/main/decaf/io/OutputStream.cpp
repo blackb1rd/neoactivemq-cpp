@@ -19,13 +19,12 @@
 
 #include <typeinfo>
 
-#include <decaf/lang/exceptions/IndexOutOfBoundsException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <stdexcept>
 
 using namespace decaf;
 using namespace decaf::io;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 OutputStream::OutputStream()
@@ -73,8 +72,6 @@ void OutputStream::write(const unsigned char* buffer, int size)
         this->doWriteArray(buffer, size);
     }
     DECAF_CATCH_RETHROW(IOException)
-    DECAF_CATCH_RETHROW(NullPointerException)
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
     DECAF_CATCHALL_THROW(IOException)
 }
 
@@ -89,8 +86,6 @@ void OutputStream::write(const unsigned char* buffer,
         this->doWriteArrayBounded(buffer, size, offset, length);
     }
     DECAF_CATCH_RETHROW(IOException)
-    DECAF_CATCH_RETHROW(NullPointerException)
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
     DECAF_CATCHALL_THROW(IOException)
 }
 
@@ -113,33 +108,30 @@ void OutputStream::doWriteArrayBounded(const unsigned char* buffer,
 {
     if (buffer == NULL)
     {
-        throw IndexOutOfBoundsException(__FILE__,
-                                        __LINE__,
-                                        "Buffer pointer passed was NULL.");
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Buffer pointer passed was NULL.");
     }
 
     if (size < 0)
     {
-        throw IndexOutOfBoundsException(__FILE__,
-                                        __LINE__,
-                                        "size parameter out of Bounds: %d.",
-                                        size);
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "size parameter out of Bounds: " + std::to_string(size) + ".");
     }
 
     if (offset > size || offset < 0)
     {
-        throw IndexOutOfBoundsException(__FILE__,
-                                        __LINE__,
-                                        "offset parameter out of Bounds: %d.",
-                                        offset);
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "offset parameter out of Bounds: " + std::to_string(offset) + ".");
     }
 
     if (length < 0 || length > size - offset)
     {
-        throw IndexOutOfBoundsException(__FILE__,
-                                        __LINE__,
-                                        "length parameter out of Bounds: %d.",
-                                        length);
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "length parameter out of Bounds: " + std::to_string(length) + ".");
     }
 
     try
@@ -150,7 +142,5 @@ void OutputStream::doWriteArrayBounded(const unsigned char* buffer,
         }
     }
     DECAF_CATCH_RETHROW(IOException)
-    DECAF_CATCH_RETHROW(NullPointerException)
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
     DECAF_CATCHALL_THROW(IOException)
 }

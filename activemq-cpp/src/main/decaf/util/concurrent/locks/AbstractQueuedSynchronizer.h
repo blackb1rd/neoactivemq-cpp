@@ -24,6 +24,7 @@
 #include <decaf/util/Collection.h>
 #include <decaf/util/concurrent/locks/AbstractOwnableSynchronizer.h>
 #include <decaf/util/concurrent/locks/Condition.h>
+#include <stdexcept>
 
 namespace decaf
 {
@@ -153,7 +154,7 @@ namespace util
                  *      Argument passed to tryAcquire, value is not interpreted
                  * by this class.
                  *
-                 * @throws InterruptedException if the calling Thread is
+                 * @throws std::runtime_error if the calling Thread is
                  * interrupted.
                  */
                 void acquireInterruptibly(int arg);
@@ -169,7 +170,7 @@ namespace util
                  *      Argument passed to tryAcquireShared, value is not
                  * interpreted by this class.
                  *
-                 * @throws InterruptedException if the calling Thread is
+                 * @throws std::runtime_error if the calling Thread is
                  * interrupted.
                  */
                 void acquireSharedInterruptibly(int arg);
@@ -234,11 +235,11 @@ namespace util
                  * @return a Collection pointer that contains waiting threads on
                  * given ConditionObject. The caller owns the returned pointer.
                  *
-                 * @throws NullPointerException if the ConditionObject pointer
+                 * @throws std::logic_error if the ConditionObject pointer
                  * is NULL.
-                 * @throws IllegalArgumentException if the ConditionObject is
+                 * @throws std::invalid_argument if the ConditionObject is
                  * not associated with this Synchronizer.
-                 * @throws IllegalMonitorStateException if the caller does not
+                 * @throws std::logic_error if the caller does not
                  * hold exclusive synchronization.
                  */
                 Collection<decaf::lang::Thread*>* getWaitingThreads(
@@ -255,11 +256,11 @@ namespace util
                  *
                  * @return an estimate of the number of waiting threads.
                  *
-                 * @throws NullPointerException if the ConditionObject pointer
+                 * @throws std::logic_error if the ConditionObject pointer
                  * is NULL.
-                 * @throws IllegalArgumentException if the ConditionObject is
+                 * @throws std::invalid_argument if the ConditionObject is
                  * not associated with this Synchronizer.
-                 * @throws IllegalMonitorStateException if the caller does not
+                 * @throws std::logic_error if the caller does not
                  * hold exclusive synchronization.
                  */
                 int getWaitQueueLength(
@@ -285,11 +286,11 @@ namespace util
                  *
                  * @return true if the condition object has waiting threads.
                  *
-                 * @throws NullPointerException if the ConditionObject pointer
+                 * @throws std::logic_error if the ConditionObject pointer
                  * is NULL.
-                 * @throws IllegalArgumentException if the ConditionObject is
+                 * @throws std::invalid_argument if the ConditionObject is
                  * not associated with this Synchronizer.
-                 * @throws IllegalMonitorStateException if the caller does not
+                 * @throws std::logic_error if the caller does not
                  * hold exclusive synchronization.
                  */
                 bool hasWaiters(
@@ -302,7 +303,7 @@ namespace util
                  *
                  * @return true if the given thread is in the wait Queue.
                  *
-                 * @throws NullPointerException if the thread pointer is NULL.
+                 * @throws std::logic_error if the thread pointer is NULL.
                  */
                 bool isQueued(decaf::lang::Thread* thread) const;
 
@@ -313,7 +314,7 @@ namespace util
                  * @return true if the ConditionObject uses this Synchronizer as
                  * its lock.
                  *
-                 * @throws NullPointerException if the condition pointer is
+                 * @throws std::logic_error if the condition pointer is
                  * NULL.
                  */
                 bool owns(const AbstractQueuedSynchronizer::ConditionObject*
@@ -376,7 +377,7 @@ namespace util
                  *
                  * @return true if the acquire succeeded, false otherwise.
                  *
-                 * @throws InterruptedException if the calling thread is
+                 * @throws std::runtime_error if the calling thread is
                  * interrupted.
                  */
                 bool tryAcquireNanos(int arg, long long nanos);
@@ -397,7 +398,7 @@ namespace util
                  *
                  * @return true if the acquire succeeded, false otherwise.
                  *
-                 * @throws InterruptedException if the calling thread is
+                 * @throws std::runtime_error if the calling thread is
                  * interrupted.
                  */
                 bool tryAcquireSharedNanos(int arg, long long nanos);
@@ -444,7 +445,7 @@ namespace util
                  * @return true if this synchronization is held exclusively by
                  * the current thread.
                  *
-                 * @throws UnsupportedOperationException if Condition objects
+                 * @throws std::logic_error if Condition objects
                  * are not supported.
                  */
                 virtual bool isHeldExclusively() const;
@@ -468,9 +469,9 @@ namespace util
                  *
                  * @return true if the acquire succeeded, false otherwise.
                  *
-                 * @throws IllegalMonitorStateException if the acquire places
+                 * @throws std::logic_error if the acquire places
                  * the object in an invalid state.
-                 * @throws UnsupportedOperationException if exclusive mode is
+                 * @throws std::logic_error if exclusive mode is
                  * not supported.
                  */
                 virtual bool tryAcquire(int arg);
@@ -496,9 +497,9 @@ namespace util
                  * did succeed but no additional shared mode acquires can, or a
                  * positive number if success and future calls amy also succeed.
                  *
-                 * @throws IllegalMonitorStateException if the acquire places
+                 * @throws std::logic_error if the acquire places
                  * the object in an invalid state.
-                 * @throws UnsupportedOperationException if shared mode is not
+                 * @throws std::logic_error if shared mode is not
                  * supported.
                  */
                 virtual int tryAcquireShared(int arg);
@@ -518,9 +519,9 @@ namespace util
                  * such that waiting threads can now attempt to acquire it,
                  * false if not fully released.
                  *
-                 * @throws IllegalMonitorStateException if the release places
+                 * @throws std::logic_error if the release places
                  * the object in an invalid state.
-                 * @throws UnsupportedOperationException if exclusive mode is
+                 * @throws std::logic_error if exclusive mode is
                  * not supported.
                  */
                 virtual bool tryRelease(int arg);
@@ -540,9 +541,9 @@ namespace util
                  * such that waiting threads can now attempt to acquire it,
                  * false if not fully released.
                  *
-                 * @throws IllegalMonitorStateException if the release places
+                 * @throws std::logic_error if the release places
                  * the object in an invalid state.
-                 * @throws UnsupportedOperationException if shared mode is not
+                 * @throws std::logic_error if shared mode is not
                  * supported.
                  */
                 virtual bool tryReleaseShared(int arg);

@@ -15,17 +15,18 @@
  * limitations under the License.
  */
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #ifndef _DECAF_UTIL_CONCURRENT_COPYONWRITEARRAYLIST_H_
 #define _DECAF_UTIL_CONCURRENT_COPYONWRITEARRAYLIST_H_
 
 #include <decaf/lang/Math.h>
 #include <decaf/lang/Pointer.h>
 #include <decaf/lang/System.h>
-#include <decaf/lang/exceptions/IndexOutOfBoundsException.h>
 #include <decaf/util/List.h>
-#include <decaf/util/NoSuchElementException.h>
 #include <decaf/util/concurrent/Synchronizable.h>
 #include <decaf/util/concurrent/locks/ReentrantReadWriteLock.h>
+#include <stdexcept>
+#include <string>
 
 namespace decaf
 {
@@ -137,9 +138,9 @@ namespace util
                 {
                     if (position < 0 || position > array->size)
                     {
-                        throw decaf::lang::exceptions::IndexOutOfBoundsException(
-                            __FILE__,
-                            __LINE__,
+                        throw activemq::exceptions::OutOfRangeException(
+                            std::string(__FILE__) + ":" +
+                            std::to_string(__LINE__) + ": " +
                             "Iterator created with invalid index.");
                     }
                 }
@@ -153,7 +154,7 @@ namespace util
                 {
                     if (position >= array->size)
                     {
-                        throw NoSuchElementException();
+                        throw activemq::exceptions::NoSuchElementException();
                     }
 
                     return this->array->elements[position++];
@@ -166,7 +167,7 @@ namespace util
 
                 virtual void remove()
                 {
-                    throw decaf::lang::exceptions::UnsupportedOperationException(
+                    throw activemq::exceptions::UnsupportedOperationException(
                         __FILE__,
                         __LINE__,
                         "CopyOnWriteArrayList Iterator cannot remove "
@@ -175,18 +176,20 @@ namespace util
 
                 virtual void add(const E& e DECAF_UNUSED)
                 {
-                    throw decaf::lang::exceptions::UnsupportedOperationException(
+                    throw activemq::exceptions::UnsupportedOperationException(
                         __FILE__,
                         __LINE__,
-                        "CopyOnWriteArrayList Iterator cannot add elements.");
+                        "CopyOnWriteArrayList Iterator cannot add "
+                        "elements.");
                 }
 
                 virtual void set(const E& e DECAF_UNUSED)
                 {
-                    throw decaf::lang::exceptions::UnsupportedOperationException(
+                    throw activemq::exceptions::UnsupportedOperationException(
                         __FILE__,
                         __LINE__,
-                        "CopyOnWriteArrayList Iterator cannot add elements.");
+                        "CopyOnWriteArrayList Iterator cannot add "
+                        "elements.");
                 }
 
                 virtual bool hasPrevious() const
@@ -198,7 +201,7 @@ namespace util
                 {
                     if (position <= 0)
                     {
-                        throw NoSuchElementException();
+                        throw activemq::exceptions::NoSuchElementException();
                     }
 
                     return this->array->elements[position--];
@@ -281,6 +284,11 @@ namespace util
                     this->writeLock.unlock();
                     throw;
                 }
+                catch (std::exception&)
+                {
+                    this->writeLock.unlock();
+                    throw;
+                }
 
                 this->arrayLock.writeLock().unlock();
                 return *this;
@@ -295,6 +303,11 @@ namespace util
                     this->doCopyCollection(list);
                 }
                 catch (decaf::lang::Exception& ex)
+                {
+                    this->writeLock.unlock();
+                    throw;
+                }
+                catch (std::exception&)
                 {
                     this->writeLock.unlock();
                     throw;
@@ -399,6 +412,11 @@ namespace util
                     this->arrayLock.readLock().unlock();
                     throw;
                 }
+                catch (std::exception&)
+                {
+                    this->arrayLock.readLock().unlock();
+                    throw;
+                }
 
                 for (int i = 0; i < current->size; ++i)
                 {
@@ -482,6 +500,11 @@ namespace util
                     this->arrayLock.readLock().unlock();
                 }
                 catch (decaf::lang::Exception& ex)
+                {
+                    this->arrayLock.readLock().unlock();
+                    throw;
+                }
+                catch (std::exception&)
                 {
                     this->arrayLock.readLock().unlock();
                     throw;
@@ -631,6 +654,11 @@ namespace util
                     this->arrayLock.readLock().unlock();
                     throw;
                 }
+                catch (std::exception&)
+                {
+                    this->arrayLock.readLock().unlock();
+                    throw;
+                }
 
                 return current->size;
             }
@@ -645,6 +673,11 @@ namespace util
                     this->arrayLock.readLock().unlock();
                 }
                 catch (decaf::lang::Exception& ex)
+                {
+                    this->arrayLock.readLock().unlock();
+                    throw;
+                }
+                catch (std::exception&)
                 {
                     this->arrayLock.readLock().unlock();
                     throw;
@@ -673,6 +706,11 @@ namespace util
                     this->arrayLock.readLock().unlock();
                     throw;
                 }
+                catch (std::exception&)
+                {
+                    this->arrayLock.readLock().unlock();
+                    throw;
+                }
 
                 return new ArrayListIterator(current, 0);
             }
@@ -687,6 +725,11 @@ namespace util
                     this->arrayLock.readLock().unlock();
                 }
                 catch (decaf::lang::Exception& ex)
+                {
+                    this->arrayLock.readLock().unlock();
+                    throw;
+                }
+                catch (std::exception&)
                 {
                     this->arrayLock.readLock().unlock();
                     throw;
@@ -710,6 +753,11 @@ namespace util
                     this->arrayLock.readLock().unlock();
                     throw;
                 }
+                catch (std::exception&)
+                {
+                    this->arrayLock.readLock().unlock();
+                    throw;
+                }
 
                 return new ArrayListIterator(current, 0);
             }
@@ -724,6 +772,11 @@ namespace util
                     this->arrayLock.readLock().unlock();
                 }
                 catch (decaf::lang::Exception& ex)
+                {
+                    this->arrayLock.readLock().unlock();
+                    throw;
+                }
+                catch (std::exception&)
                 {
                     this->arrayLock.readLock().unlock();
                     throw;
@@ -746,6 +799,11 @@ namespace util
                     this->arrayLock.readLock().unlock();
                     throw;
                 }
+                catch (std::exception&)
+                {
+                    this->arrayLock.readLock().unlock();
+                    throw;
+                }
 
                 return new ArrayListIterator(current, index);
             }
@@ -764,6 +822,11 @@ namespace util
                     this->arrayLock.readLock().unlock();
                     throw;
                 }
+                catch (std::exception&)
+                {
+                    this->arrayLock.readLock().unlock();
+                    throw;
+                }
 
                 return new ArrayListIterator(this->array, index);
             }
@@ -778,6 +841,11 @@ namespace util
                     this->arrayLock.readLock().unlock();
                 }
                 catch (decaf::lang::Exception& ex)
+                {
+                    this->arrayLock.readLock().unlock();
+                    throw;
+                }
+                catch (std::exception&)
                 {
                     this->arrayLock.readLock().unlock();
                     throw;
@@ -808,6 +876,11 @@ namespace util
                     this->arrayLock.readLock().unlock();
                     throw;
                 }
+                catch (std::exception&)
+                {
+                    this->arrayLock.readLock().unlock();
+                    throw;
+                }
 
                 for (int i = current->size - 1; i >= 0; --i)
                 {
@@ -830,6 +903,11 @@ namespace util
                     this->arrayLock.readLock().unlock();
                 }
                 catch (decaf::lang::Exception& ex)
+                {
+                    this->arrayLock.readLock().unlock();
+                    throw;
+                }
+                catch (std::exception&)
                 {
                     this->arrayLock.readLock().unlock();
                     throw;
@@ -1015,6 +1093,11 @@ namespace util
                     this->arrayLock.readLock().unlock();
                     throw;
                 }
+                catch (std::exception&)
+                {
+                    this->arrayLock.readLock().unlock();
+                    throw;
+                }
 
                 std::string result;
                 return result;
@@ -1133,7 +1216,7 @@ namespace util
              * @return the index in the list that matches the value given, or -1
              * if not found.
              *
-             * @throws IndexOutOfBoundsException if the given index is greater
+             * @throws std::out_of_range if the given index is greater
              * than or equal to the List size.
              */
             int lastIndexOf(const E& value, int index)
@@ -1150,15 +1233,18 @@ namespace util
                     this->arrayLock.readLock().unlock();
                     throw;
                 }
+                catch (std::exception&)
+                {
+                    this->arrayLock.readLock().unlock();
+                    throw;
+                }
 
                 if (index >= current->size)
                 {
-                    throw decaf::lang::exceptions::IndexOutOfBoundsException(
-                        __FILE__,
-                        __LINE__,
-                        "Index given %d, actual size %d",
-                        index,
-                        current->size);
+                    throw activemq::exceptions::OutOfRangeException(
+                        std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+                        ": " + "Index given " + std::to_string(index) +
+                        ", actual size " + std::to_string(current->size));
                 }
 
                 for (int i = index - 1; i >= 0; --i)
@@ -1185,7 +1271,7 @@ namespace util
              * @return the index in the List that matches the given element or
              * -1 if not found.
              *
-             * @throws IndexOutOfBoundsException if the given index is negative.
+             * @throws std::out_of_range if the given index is negative.
              */
             int indexOf(const E& value, int index) const
             {
@@ -1201,15 +1287,18 @@ namespace util
                     this->arrayLock.readLock().unlock();
                     throw;
                 }
+                catch (std::exception&)
+                {
+                    this->arrayLock.readLock().unlock();
+                    throw;
+                }
 
                 if (index < 0)
                 {
-                    throw decaf::lang::exceptions::IndexOutOfBoundsException(
-                        __FILE__,
-                        __LINE__,
-                        "Index given %d, actual size %d",
-                        index,
-                        current->size);
+                    throw activemq::exceptions::OutOfRangeException(
+                        std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+                        ": " + "Index given " + std::to_string(index) +
+                        ", actual size " + std::to_string(current->size));
                 }
 
                 for (int i = index; i < current->size; ++i)
@@ -1302,18 +1391,21 @@ namespace util
                     this->arrayLock.writeLock().unlock();
                     throw;
                 }
+                catch (std::exception&)
+                {
+                    this->arrayLock.writeLock().unlock();
+                    throw;
+                }
             }
 
             static void checkIndexInclusive(int index, int size)
             {
                 if (index < 0 || index > size)
                 {
-                    throw decaf::lang::exceptions::IndexOutOfBoundsException(
-                        __FILE__,
-                        __LINE__,
-                        "Index is %d, size is %d",
-                        index,
-                        size);
+                    throw activemq::exceptions::OutOfRangeException(
+                        std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+                        ": " + "Index is " + std::to_string(index) +
+                        ", size is " + std::to_string(size));
                 }
             }
 
@@ -1321,12 +1413,10 @@ namespace util
             {
                 if (index < 0 || index >= size)
                 {
-                    throw decaf::lang::exceptions::IndexOutOfBoundsException(
-                        __FILE__,
-                        __LINE__,
-                        "Index is %d, size is %d",
-                        index,
-                        size);
+                    throw activemq::exceptions::OutOfRangeException(
+                        std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+                        ": " + "Index is " + std::to_string(index) +
+                        ", size is " + std::to_string(size));
                 }
             }
         };

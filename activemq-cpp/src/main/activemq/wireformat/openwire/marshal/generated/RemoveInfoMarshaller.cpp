@@ -19,6 +19,7 @@
 
 #include <activemq/commands/RemoveInfo.h>
 #include <activemq/exceptions/ActiveMQException.h>
+#include <activemq/wireformat/openwire/marshal/OpenWireMarshalCatchMacros.h>
 #include <memory>
 
 //
@@ -78,10 +79,10 @@ void RemoveInfoMarshaller::tightUnmarshal(OpenWireFormat*  wireFormat,
                 tightUnmarshalLong(wireFormat, dataIn, bs));
         }
     }
-    AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
-                                decaf::io::IOException)
-    AMQ_CATCHALL_THROW(decaf::io::IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(activemq::exceptions::ActiveMQException,
+                                activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -110,10 +111,10 @@ int RemoveInfoMarshaller::tightMarshal1(OpenWireFormat* wireFormat,
 
         return rc + 0;
     }
-    AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
-                                decaf::io::IOException)
-    AMQ_CATCHALL_THROW(decaf::io::IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(activemq::exceptions::ActiveMQException,
+                                activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -145,10 +146,10 @@ void RemoveInfoMarshaller::tightMarshal2(OpenWireFormat*   wireFormat,
                               bs);
         }
     }
-    AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
-                                decaf::io::IOException)
-    AMQ_CATCHALL_THROW(decaf::io::IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(activemq::exceptions::ActiveMQException,
+                                activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -174,10 +175,10 @@ void RemoveInfoMarshaller::looseUnmarshal(OpenWireFormat*  wireFormat,
                 looseUnmarshalLong(wireFormat, dataIn));
         }
     }
-    AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
-                                decaf::io::IOException)
-    AMQ_CATCHALL_THROW(decaf::io::IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(activemq::exceptions::ActiveMQException,
+                                activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -202,8 +203,8 @@ void RemoveInfoMarshaller::looseMarshal(OpenWireFormat*   wireFormat,
                              dataOut);
         }
     }
-    AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
-                                decaf::io::IOException)
-    AMQ_CATCHALL_THROW(decaf::io::IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(activemq::exceptions::ActiveMQException,
+                                activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }

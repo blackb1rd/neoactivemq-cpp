@@ -15,22 +15,22 @@
  * limitations under the License.
  */
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #ifndef _DECAF_UTIL_LINKEDLIST_H_
 #define _DECAF_UTIL_LINKEDLIST_H_
 
 #include <decaf/lang/Integer.h>
 #include <decaf/lang/System.h>
-#include <decaf/lang/exceptions/IndexOutOfBoundsException.h>
-#include <decaf/lang/exceptions/UnsupportedOperationException.h>
 #include <decaf/util/AbstractSequentialList.h>
 #include <decaf/util/ArrayList.h>
 #include <decaf/util/Config.h>
 #include <decaf/util/Deque.h>
 #include <decaf/util/Iterator.h>
 #include <decaf/util/ListIterator.h>
-#include <decaf/util/NoSuchElementException.h>
 #include <list>
 #include <memory>
+#include <stdexcept>
+#include <string>
 
 namespace decaf
 {
@@ -176,11 +176,10 @@ namespace util
         {
             if (index < 0 || index >= this->listSize)
             {
-                throw decaf::lang::exceptions::IndexOutOfBoundsException(
-                    __FILE__,
-                    __LINE__,
-                    "Index given is outside bounds of this list {%d}",
-                    index);
+                throw activemq::exceptions::OutOfRangeException(
+                    std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+                    ": " + "Index given is outside bounds of this list {" +
+                    std::to_string(index) + "}");
             }
 
             const ListNode<E>* location = NULL;
@@ -209,11 +208,10 @@ namespace util
         {
             if (index < 0 || index >= this->listSize)
             {
-                throw decaf::lang::exceptions::IndexOutOfBoundsException(
-                    __FILE__,
-                    __LINE__,
-                    "Index given is outside bounds of this list {%d}",
-                    index);
+                throw activemq::exceptions::OutOfRangeException(
+                    std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+                    ": " + "Index given is outside bounds of this list {" +
+                    std::to_string(index) + "}");
             }
 
             ListNode<E>* location = NULL;
@@ -251,11 +249,10 @@ namespace util
         {
             if (index < 0 || index > this->listSize)
             {
-                throw decaf::lang::exceptions::IndexOutOfBoundsException(
-                    __FILE__,
-                    __LINE__,
-                    "Index given is outside bounds of this list {%d}",
-                    index);
+                throw activemq::exceptions::OutOfRangeException(
+                    std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+                    ": " + "Index given is outside bounds of this list {" +
+                    std::to_string(index) + "}");
             }
 
             this->addAtLocation(index, value);
@@ -403,9 +400,10 @@ namespace util
         {
             if (this->listSize == 0)
             {
-                throw decaf::util::NoSuchElementException(__FILE__,
-                                                          __LINE__,
-                                                          "The list is Empty");
+                throw activemq::exceptions::NoSuchElementException(
+                    __FILE__,
+                    __LINE__,
+                    "The list is Empty");
             }
 
             return this->head.next->value;
@@ -425,9 +423,10 @@ namespace util
         {
             if (this->listSize == 0)
             {
-                throw decaf::util::NoSuchElementException(__FILE__,
-                                                          __LINE__,
-                                                          "The list is Empty");
+                throw activemq::exceptions::NoSuchElementException(
+                    __FILE__,
+                    __LINE__,
+                    "The list is Empty");
             }
 
             return this->head.next->value;
@@ -437,9 +436,10 @@ namespace util
         {
             if (this->listSize == 0)
             {
-                throw decaf::util::NoSuchElementException(__FILE__,
-                                                          __LINE__,
-                                                          "The list is Empty");
+                throw activemq::exceptions::NoSuchElementException(
+                    __FILE__,
+                    __LINE__,
+                    "The list is Empty");
             }
 
             return this->head.next->value;
@@ -449,9 +449,10 @@ namespace util
         {
             if (this->listSize == 0)
             {
-                throw decaf::util::NoSuchElementException(__FILE__,
-                                                          __LINE__,
-                                                          "The list is Empty");
+                throw activemq::exceptions::NoSuchElementException(
+                    __FILE__,
+                    __LINE__,
+                    "The list is Empty");
             }
 
             return this->tail.prev->value;
@@ -461,9 +462,10 @@ namespace util
         {
             if (this->listSize == 0)
             {
-                throw decaf::util::NoSuchElementException(__FILE__,
-                                                          __LINE__,
-                                                          "The list is Empty");
+                throw activemq::exceptions::NoSuchElementException(
+                    __FILE__,
+                    __LINE__,
+                    "The list is Empty");
             }
 
             return this->tail.prev->value;
@@ -602,19 +604,16 @@ namespace util
             {
                 if (list == NULL)
                 {
-                    throw decaf::lang::exceptions::NullPointerException(
-                        __FILE__,
-                        __LINE__,
+                    throw activemq::exceptions::NullPointerException(
                         "Parent LinkedList pointer was Null.");
                 }
 
                 if (index < 0 || index > list->listSize)
                 {
-                    throw decaf::lang::exceptions::IndexOutOfBoundsException(
-                        __FILE__,
-                        __LINE__,
-                        "Given index {%d} is out of range.",
-                        index);
+                    throw activemq::exceptions::OutOfRangeException(
+                        std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+                        ": " + "Given index {" + std::to_string(index) +
+                        "} is out of range.");
                 }
 
                 this->expectedModCount = list->modCount;
@@ -653,7 +652,7 @@ namespace util
             {
                 if (this->expectedModCount != this->list->modCount)
                 {
-                    throw ConcurrentModificationException(
+                    throw activemq::exceptions::ConcurrentModificationException(
                         __FILE__,
                         __LINE__,
                         "List modified outside of this Iterator.");
@@ -661,7 +660,7 @@ namespace util
 
                 if (this->current->next == &(this->list->tail))
                 {
-                    throw NoSuchElementException(
+                    throw activemq::exceptions::NoSuchElementException(
                         __FILE__,
                         __LINE__,
                         "No more elements to return from next()");
@@ -683,7 +682,7 @@ namespace util
             {
                 if (this->expectedModCount != this->list->modCount)
                 {
-                    throw ConcurrentModificationException(
+                    throw activemq::exceptions::ConcurrentModificationException(
                         __FILE__,
                         __LINE__,
                         "List modified outside of this Iterator.");
@@ -691,10 +690,11 @@ namespace util
 
                 if (this->current == &(this->list->head))
                 {
-                    throw decaf::lang::exceptions::IllegalStateException(
+                    throw activemq::exceptions::IllegalStateException(
                         __FILE__,
                         __LINE__,
-                        "No previous element, must call next() before calling "
+                        "No previous element, must call "
+                        "next() before calling "
                         "previous().");
                 }
 
@@ -714,7 +714,7 @@ namespace util
             {
                 if (this->expectedModCount != this->list->modCount)
                 {
-                    throw ConcurrentModificationException(
+                    throw activemq::exceptions::ConcurrentModificationException(
                         __FILE__,
                         __LINE__,
                         "List modified outside of this Iterator.");
@@ -722,10 +722,11 @@ namespace util
 
                 if (this->lastReturned == NULL)
                 {
-                    throw lang::exceptions::IllegalStateException(
+                    throw activemq::exceptions::IllegalStateException(
                         __FILE__,
                         __LINE__,
-                        "Invalid State to call remove, must call next() before "
+                        "Invalid State to call remove, must "
+                        "call next() before "
                         "remove()");
                 }
 
@@ -755,7 +756,7 @@ namespace util
             {
                 if (this->expectedModCount != this->list->modCount)
                 {
-                    throw ConcurrentModificationException(
+                    throw activemq::exceptions::ConcurrentModificationException(
                         __FILE__,
                         __LINE__,
                         "List modified outside of this Iterator.");
@@ -780,7 +781,7 @@ namespace util
             {
                 if (this->expectedModCount != this->list->modCount)
                 {
-                    throw ConcurrentModificationException(
+                    throw activemq::exceptions::ConcurrentModificationException(
                         __FILE__,
                         __LINE__,
                         "List modified outside of this Iterator.");
@@ -792,10 +793,9 @@ namespace util
                 }
                 else
                 {
-                    throw decaf::lang::exceptions::IllegalStateException(
-                        __FILE__,
-                        __LINE__,
-                        "Iterator next has not been called.");
+                    throw activemq::exceptions::IllegalStateException(
+                        std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+                        ": " + "Iterator next has not been called.");
                 }
             }
 
@@ -832,19 +832,16 @@ namespace util
             {
                 if (list == NULL)
                 {
-                    throw decaf::lang::exceptions::NullPointerException(
-                        __FILE__,
-                        __LINE__,
+                    throw activemq::exceptions::NullPointerException(
                         "Parent LinkedList pointer was Null.");
                 }
 
                 if (index < 0 || index > list->listSize)
                 {
-                    throw decaf::lang::exceptions::IndexOutOfBoundsException(
-                        __FILE__,
-                        __LINE__,
-                        "Given index {%d} is out of range.",
-                        index);
+                    throw activemq::exceptions::OutOfRangeException(
+                        std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+                        ": " + "Given index {" + std::to_string(index) +
+                        "} is out of range.");
                 }
 
                 // index starts at -1 to indicate that we are before begin or
@@ -881,7 +878,7 @@ namespace util
             {
                 if (this->current->next == &(this->list->tail))
                 {
-                    throw NoSuchElementException(
+                    throw activemq::exceptions::NoSuchElementException(
                         __FILE__,
                         __LINE__,
                         "No more elements to return from this ListIterator");
@@ -903,10 +900,11 @@ namespace util
             {
                 if (this->current == &(this->list->head))
                 {
-                    throw decaf::lang::exceptions::IllegalStateException(
+                    throw activemq::exceptions::IllegalStateException(
                         __FILE__,
                         __LINE__,
-                        "No previous element, must call next() before calling "
+                        "No previous element, must call "
+                        "next() before calling "
                         "previous().");
                 }
 
@@ -924,7 +922,7 @@ namespace util
 
             virtual void remove()
             {
-                throw lang::exceptions::UnsupportedOperationException(
+                throw activemq::exceptions::UnsupportedOperationException(
                     __FILE__,
                     __LINE__,
                     "Cannot write to a const ListIterator.");
@@ -932,7 +930,7 @@ namespace util
 
             virtual void add(const E& e DECAF_UNUSED)
             {
-                throw lang::exceptions::UnsupportedOperationException(
+                throw activemq::exceptions::UnsupportedOperationException(
                     __FILE__,
                     __LINE__,
                     "Cannot write to a const ListIterator.");
@@ -940,7 +938,7 @@ namespace util
 
             virtual void set(const E& e DECAF_UNUSED)
             {
-                throw lang::exceptions::UnsupportedOperationException(
+                throw activemq::exceptions::UnsupportedOperationException(
                     __FILE__,
                     __LINE__,
                     "Cannot write to a const ListIterator.");
@@ -979,9 +977,7 @@ namespace util
             {
                 if (list == NULL)
                 {
-                    throw decaf::lang::exceptions::NullPointerException(
-                        __FILE__,
-                        __LINE__,
+                    throw activemq::exceptions::NullPointerException(
                         "Parent LinkedList pointer was Null.");
                 }
 
@@ -1002,7 +998,7 @@ namespace util
             {
                 if (this->expectedModCount != this->list->modCount)
                 {
-                    throw ConcurrentModificationException(
+                    throw activemq::exceptions::ConcurrentModificationException(
                         __FILE__,
                         __LINE__,
                         "List modified outside of this Iterator.");
@@ -1010,7 +1006,7 @@ namespace util
 
                 if (this->current->prev == &(this->list->head))
                 {
-                    throw NoSuchElementException(
+                    throw activemq::exceptions::NoSuchElementException(
                         __FILE__,
                         __LINE__,
                         "No more elements to return from next()");
@@ -1026,7 +1022,7 @@ namespace util
             {
                 if (this->expectedModCount != this->list->modCount)
                 {
-                    throw ConcurrentModificationException(
+                    throw activemq::exceptions::ConcurrentModificationException(
                         __FILE__,
                         __LINE__,
                         "List modified outside of this Iterator.");
@@ -1034,10 +1030,11 @@ namespace util
 
                 if (!this->canRemove)
                 {
-                    throw lang::exceptions::IllegalStateException(
+                    throw activemq::exceptions::IllegalStateException(
                         __FILE__,
                         __LINE__,
-                        "Invalid State to call remove, must call next() before "
+                        "Invalid State to call remove, must "
+                        "call next() before "
                         "remove()");
                 }
 
@@ -1076,9 +1073,7 @@ namespace util
             {
                 if (list == NULL)
                 {
-                    throw decaf::lang::exceptions::NullPointerException(
-                        __FILE__,
-                        __LINE__,
+                    throw activemq::exceptions::NullPointerException(
                         "Parent LinkedList pointer was Null.");
                 }
 
@@ -1098,7 +1093,7 @@ namespace util
             {
                 if (this->current->prev == &(this->list->head))
                 {
-                    throw NoSuchElementException(
+                    throw activemq::exceptions::NoSuchElementException(
                         __FILE__,
                         __LINE__,
                         "No more elements to return from next()");
@@ -1111,7 +1106,7 @@ namespace util
 
             virtual void remove()
             {
-                throw lang::exceptions::UnsupportedOperationException(
+                throw activemq::exceptions::UnsupportedOperationException(
                     __FILE__,
                     __LINE__,
                     "Cannot write to a const Iterator.");
@@ -1146,9 +1141,10 @@ namespace util
         {
             if (this->head.next == &this->tail)
             {
-                throw NoSuchElementException(__FILE__,
-                                             __LINE__,
-                                             "The Collection is empty.");
+                throw activemq::exceptions::NoSuchElementException(
+                    __FILE__,
+                    __LINE__,
+                    "The Collection is empty.");
             }
 
             ListNode<E>* oldNode = this->head.next;
@@ -1169,9 +1165,10 @@ namespace util
         {
             if (this->head.next == &this->tail)
             {
-                throw NoSuchElementException(__FILE__,
-                                             __LINE__,
-                                             "The Collection is empty.");
+                throw activemq::exceptions::NoSuchElementException(
+                    __FILE__,
+                    __LINE__,
+                    "The Collection is empty.");
             }
 
             ListNode<E>* oldNode = this->tail.prev;
@@ -1247,9 +1244,9 @@ namespace util
         {
             if (index < 0 || index > this->listSize)
             {
-                throw decaf::lang::exceptions::IndexOutOfBoundsException(
-                    __FILE__,
-                    __LINE__,
+                throw activemq::exceptions::OutOfRangeException(
+                    std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+                    ": " +
                     "Index for add is outside bounds of this LinkedList.");
             }
 

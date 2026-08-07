@@ -20,13 +20,14 @@
 
 #include <decaf/util/Config.h>
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/lang/Runnable.h>
-#include <decaf/lang/exceptions/InterruptedException.h>
 #include <decaf/util/ArrayList.h>
 #include <decaf/util/concurrent/Executor.h>
 #include <decaf/util/concurrent/Future.h>
 #include <decaf/util/concurrent/FutureTask.h>
 #include <decaf/util/concurrent/TimeUnit.h>
+#include <stdexcept>
 
 namespace decaf
 {
@@ -89,7 +90,7 @@ namespace util
              * @return true if the executor terminated or false if the timeout
              * expired.
              *
-             * @throws InterruptedException if this call is interrupted while
+             * @throws std::runtime_error if this call is interrupted while
              * awaiting termination.
              */
             virtual bool awaitTermination(long long       timeout,
@@ -156,7 +157,8 @@ namespace util
              *
              * @throws RejectedExecutionException if the task cannot be
              * scheduled for execution
-             * @throws NullPointerException if the task is null
+             * @throws activemq::exceptions::NullPointerException if the
+             * task is null
              */
             template <typename E>
             Future<E>* submit(Callable<E>* task, bool takeOwnership = true)
@@ -191,8 +193,6 @@ namespace util
                     ex.setMark(__FILE__, __LINE__);
                     throw;
                 }
-                DECAF_CATCH_RETHROW(
-                    decaf::lang::exceptions::NullPointerException)
                 DECAF_CATCHALL_THROW(decaf::lang::Exception)
             }
 
@@ -218,7 +218,8 @@ namespace util
              *
              * @throws RejectedExecutionException if the task cannot be
              * scheduled for execution
-             * @throws NullPointerException if the task is null
+             * @throws activemq::exceptions::NullPointerException if the
+             * task is null
              */
             template <typename E>
             Future<E>* submit(decaf::lang::Runnable* task,
@@ -255,8 +256,6 @@ namespace util
                     ex.setMark(__FILE__, __LINE__);
                     throw;
                 }
-                DECAF_CATCH_RETHROW(
-                    decaf::lang::exceptions::NullPointerException)
                 DECAF_CATCHALL_THROW(decaf::lang::Exception)
             }
 
@@ -280,8 +279,8 @@ namespace util
              *
              * @throws RejectedExecutionException if the task cannot be
              * scheduled for execution
-             * @throws NullPointerException if the Runnable pointer passed is
-             * NULL.
+             * @throws activemq::exceptions::NullPointerException if the
+             * Runnable pointer passed is NULL.
              */
             template <typename E>
             Future<E>* submit(decaf::lang::Runnable* task,
@@ -317,8 +316,6 @@ namespace util
                     ex.setMark(__FILE__, __LINE__);
                     throw;
                 }
-                DECAF_CATCH_RETHROW(
-                    decaf::lang::exceptions::NullPointerException)
                 DECAF_CATCHALL_THROW(decaf::lang::Exception)
             }
 

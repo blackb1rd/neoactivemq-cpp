@@ -20,8 +20,10 @@
 
 #include <decaf/util/Config.h>
 
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/util/LinkedHashMap.h>
+#include <stdexcept>
+#include <string>
 
 namespace decaf
 {
@@ -69,10 +71,9 @@ namespace util
         {
             if (maximumCacheSize <= 0)
             {
-                throw decaf::lang::exceptions::IllegalArgumentException(
-                    __FILE__,
-                    __LINE__,
-                    "Cache size must be greater than zero.");
+                throw activemq::exceptions::InvalidArgumentException(
+                    std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+                    ": " + "Cache size must be greater than zero.");
             }
         }
 
@@ -90,7 +91,7 @@ namespace util
          *      The ordering mode - true for access-order, false for
          * insertion-order.
          *
-         * @throws IllegalArgumentException if the initial capacity is negative
+         * @throws std::invalid_argument if the initial capacity is negative
          * or the load factor is non-positive.
          */
         LRUCache(int   initialCapacity,
@@ -104,10 +105,9 @@ namespace util
         {
             if (maximumCacheSize <= 0)
             {
-                throw decaf::lang::exceptions::IllegalArgumentException(
-                    __FILE__,
-                    __LINE__,
-                    "Cache size must be greater than zero.");
+                throw activemq::exceptions::InvalidArgumentException(
+                    std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+                    ": " + "Cache size must be greater than zero.");
             }
         }
 
@@ -131,17 +131,16 @@ namespace util
          * @param size
          * 		The new maximum cache size setting.
          *
-         * @throws IllegalArgumentException is size is less than or equal to
+         * @throws std::invalid_argument is size is less than or equal to
          * zero.
          */
         void setMaxCacheSize(int size)
         {
             if (size <= 0)
             {
-                throw decaf::lang::exceptions::IllegalArgumentException(
-                    __FILE__,
-                    __LINE__,
-                    "Cache size must be greater than zero.");
+                throw activemq::exceptions::InvalidArgumentException(
+                    std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+                    ": " + "Cache size must be greater than zero.");
             }
 
             this->maxCacheSize = size;

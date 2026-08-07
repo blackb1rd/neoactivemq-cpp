@@ -144,9 +144,10 @@ namespace mock
                                   });
             if (error && !serverStarted)
             {
-                throw IOException(__FILE__,
-                                  __LINE__,
-                                  "Mock broker failed to start");
+                throw activemq::exceptions::IOException(
+                    __FILE__,
+                    __LINE__,
+                    "Mock broker failed to start");
             }
         }
 
@@ -228,7 +229,7 @@ namespace mock
                         server->bind("0.0.0.0", configuredPort);
                         bindSucceeded = true;
                     }
-                    catch (IOException& e)
+                    catch (activemq::exceptions::IOException& e)
                     {
                         // Bind failed - could be TIME_WAIT or port in use
                         server.reset();
@@ -338,9 +339,11 @@ namespace mock
                     // Don't set SO_LINGER to avoid RST on close
                     clientSocket->setTcpNoDelay(
                         true);  // Disable Nagle's algorithm for immediate sends
-                    // Set socket timeout to allow thread to check done flag
-                    // periodically
-                    clientSocket->setSoTimeout(1000);  // 1 second timeout
+                    // Allow slow handshakes on loaded CI; the command loop
+                    // still wakes periodically to observe `done` (keep this
+                    // bounded so broker stop() does not stall tests for too
+                    // long).
+                    clientSocket->setSoTimeout(10000);  // 10 second timeout
 
                     std::shared_ptr<WireFormatInfo> preferred =
                         wireFormat->getPreferedWireFormatInfo();
@@ -391,7 +394,7 @@ namespace mock
                                     // Timeout allows us to check done flag
                                     continue;
                                 }
-                                catch (IOException& ioe)
+                                catch (activemq::exceptions::IOException& ioe)
                                 {
                                     // Socket closed or connection error
                                     break;
@@ -401,7 +404,7 @@ namespace mock
                             // destroyed here, before the socket is closed
                         }
                     }
-                    catch (IOException& ioe)
+                    catch (activemq::exceptions::IOException& ioe)
                     {
                         // Failed during handshake or stream operations
                         // Clean up and wait for next connection
@@ -428,7 +431,7 @@ namespace mock
                     }
                 }
             }
-            catch (IOException& ex)
+            catch (activemq::exceptions::IOException& ex)
             {
                 error.store(true, std::memory_order_release);
             }

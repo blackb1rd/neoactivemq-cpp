@@ -22,8 +22,6 @@
 
 #include <decaf/io/IOException.h>
 #include <decaf/io/InputStream.h>
-#include <decaf/lang/exceptions/IndexOutOfBoundsException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
 
 namespace decaf
 {

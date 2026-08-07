@@ -32,6 +32,8 @@
 #include <activemq/core/SimplePriorityMessageDispatchChannel.h>
 #include <activemq/core/kernels/ActiveMQSessionKernel.h>
 #include <activemq/exceptions/ActiveMQException.h>
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <activemq/exceptions/IoExceptions.h>
 #include <activemq/threads/Scheduler.h>
 #include <activemq/util/AMQLog.h>
 #include <activemq/util/ActiveMQMessageTransformation.h>
@@ -40,19 +42,20 @@
 #include <activemq/util/Config.h>
 #include <cms/ExceptionListener.h>
 #include <cms/MessageTransformer.h>
+#include <decaf/io/IOException.h>
 #include <decaf/lang/Boolean.h>
+#include <decaf/lang/Exception.h>
 #include <decaf/lang/Math.h>
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
-#include <decaf/lang/exceptions/InvalidStateException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/util/Collections.h>
 #include <decaf/util/HashMap.h>
 #include <decaf/util/concurrent/ExecutorService.h>
 #include <decaf/util/concurrent/Executors.h>
 #include <atomic>
 #include <chrono>
+#include <exception>
 #include <memory>
 #include <stdexcept>
+#include <string>
 
 using namespace std;
 using namespace activemq;
@@ -63,7 +66,6 @@ using namespace activemq::commands;
 using namespace activemq::exceptions;
 using namespace activemq::threads;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 
@@ -413,7 +415,7 @@ namespace core
                                     500LL,
                                     failoverRedeliveryWaitPeriod / 4));
                             }
-                            catch (InterruptedException& ex)
+                            catch (activemq::exceptions::InterruptedException&)
                             {
                                 break;
                             }
@@ -555,11 +557,16 @@ namespace core
                                      << ", exceeded=" << exceeded);
                     return exceeded;
                 }
-                catch (Exception& ignored)
+                catch (const std::exception& ignored)
                 {
                     // Property access failed (likely corrupted) - redelivery IS
                     // exceeded Send POISON_ACK immediately for corrupted
                     // messages
+                    const decaf::lang::Exception* dex =
+                        dynamic_cast<const decaf::lang::Exception*>(&ignored);
+                    std::string msg = dex != nullptr
+                                          ? dex->getMessage()
+                                          : std::string(ignored.what());
                     AMQ_LOG_ERROR(
                         "ActiveMQConsumerKernel",
                         "redeliveryExceeded(): Property access failed for "
@@ -567,7 +574,7 @@ namespace core
                             << dispatch->getMessage()->getMessageId()->toString()
                             << ", redeliveryCount="
                             << dispatch->getRedeliveryCounter()
-                            << ", exception=" << ignored.getMessage()
+                            << ", exception=" << msg
                             << " - treating as exceeded, will send POISON_ACK");
                     return true;
                 }
@@ -644,9 +651,7 @@ public:
     {
         if (consumer == nullptr)
         {
-            throw NullPointerException(
-                __FILE__,
-                __LINE__,
+            throw activemq::exceptions::NullPointerException(
                 "Synchronization Created with NULL Consumer.");
         }
     }
@@ -708,9 +713,7 @@ public:
     {
         if (consumer == nullptr)
         {
-            throw NullPointerException(
-                __FILE__,
-                __LINE__,
+            throw activemq::exceptions::NullPointerException(
                 "Synchronization Created with NULL Consumer.");
         }
     }
@@ -773,7 +776,7 @@ public:
     {
         if (session == nullptr)
         {
-            throw NullPointerException(
+            throw activemq::exceptions::NullPointerException(
                 __FILE__,
                 __LINE__,
                 "Ack Handler Created with NULL Session.");
@@ -811,7 +814,7 @@ public:
     {
         if (consumer == nullptr)
         {
-            throw NullPointerException(
+            throw activemq::exceptions::NullPointerException(
                 __FILE__,
                 __LINE__,
                 "Ack Handler Created with NULL consumer.");
@@ -855,9 +858,7 @@ public:
     {
         if (consumer == nullptr)
         {
-            throw NullPointerException(
-                __FILE__,
-                __LINE__,
+            throw activemq::exceptions::NullPointerException(
                 "Synchronization Created with NULL Consumer.");
         }
     }
@@ -918,11 +919,7 @@ public:
             this->session->sendAck(ack, true);
             this->impl->deliveringAcks.store(false);
         }
-        catch (Exception& ex)
-        {
-            this->impl->deliveringAcks.store(false);
-        }
-        catch (cms::CMSException& ex)
+        catch (const std::exception&)
         {
             this->impl->deliveringAcks.store(false);
         }
@@ -967,9 +964,14 @@ public:
                 this->consumer->deliverAcks();
             }
         }
-        catch (Exception& ex)
+        catch (const std::exception& ex)
         {
-            impl->session->getConnection()->onAsyncException(ex);
+            const decaf::lang::Exception* dex =
+                dynamic_cast<const decaf::lang::Exception*>(&ex);
+            if (dex != nullptr)
+            {
+                impl->session->getConnection()->onAsyncException(*dex);
+            }
         }
     }
 };
@@ -1024,9 +1026,14 @@ public:
                 }
             }
         }
-        catch (Exception& e)
+        catch (const std::exception& e)
         {
-            session->getConnection()->onAsyncException(e);
+            const decaf::lang::Exception* dex =
+                dynamic_cast<const decaf::lang::Exception*>(&e);
+            if (dex != nullptr)
+            {
+                session->getConnection()->onAsyncException(*dex);
+            }
         }
 
         this->consumer.reset();
@@ -1053,9 +1060,9 @@ ActiveMQConsumerKernel::ActiveMQConsumerKernel(
 {
     if (session == nullptr)
     {
-        throw IllegalArgumentException(__FILE__,
-                                       __LINE__,
-                                       "Consumer created with NULL Session");
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Consumer created with NULL Session");
     }
 
     if (destination == nullptr)
@@ -1173,9 +1180,8 @@ ActiveMQConsumerKernel::ActiveMQConsumerKernel(
     if (this->consumerInfo->getPrefetchSize() < 0)
     {
         delete this->internal;
-        throw IllegalArgumentException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
             "Cannot create a consumer with a negative prefetch");
     }
 
@@ -1275,8 +1281,8 @@ void ActiveMQConsumerKernel::doClose()
     try
     {
         // Store interrupted state and clear so that Transport operations don't
-        // throw InterruptedException and we ensure that resources are clened
-        // up.
+        // throw activemq::exceptions::InterruptedException and we ensure
+        // that resources are clened up.
         bool interrupted = Thread::interrupted();
 
         dispose();
@@ -1408,7 +1414,7 @@ void ActiveMQConsumerKernel::dispose()
             {
                 this->session->removeConsumer(consumer);
             }
-            catch (Exception& e)
+            catch (const std::exception&)
             {
                 throw;
             }
@@ -1551,7 +1557,7 @@ std::shared_ptr<MessageDispatch> ActiveMQConsumerKernel::dequeue(
 
         return std::shared_ptr<MessageDispatch>();
     }
-    catch (InterruptedException& ex)
+    catch (activemq::exceptions::InterruptedException& ex)
     {
         Thread::currentThread()->interrupt();
         throw CMSExceptionSupport::create(ex);
@@ -1886,9 +1892,10 @@ void ActiveMQConsumerKernel::afterMessageIsConsumed(
         }
         else
         {
-            throw IllegalStateException(__FILE__,
-                                        __LINE__,
-                                        "Invalid Session State");
+            throw activemq::exceptions::IllegalStateException(
+                __FILE__,
+                __LINE__,
+                "Invalid Session State");
         }
     }
     AMQ_CATCH_RETHROW(ActiveMQException)
@@ -2337,11 +2344,13 @@ void ActiveMQConsumerKernel::dispatch(
 {
     if (dispatch == nullptr)
     {
-        throw std::invalid_argument("dispatch was NULL");
+        throw activemq::exceptions::InvalidArgumentException(
+            "dispatch was NULL");
     }
     if (dispatch->getMessage() == nullptr)
     {
-        throw std::invalid_argument("dispatch message was NULL");
+        throw activemq::exceptions::InvalidArgumentException(
+            "dispatch message was NULL");
     }
 
     try
@@ -2448,7 +2457,7 @@ void ActiveMQConsumerKernel::dispatch(
                                 }
                                 afterMessageIsConsumed(dispatch, expired);
                             }
-                            catch (decaf::io::IOException& e)
+                            catch (activemq::exceptions::IOException& e)
                             {
                                 // Lazy property unmarshaling failed (corrupted
                                 // properties) - C# client behavior Property
@@ -2466,7 +2475,13 @@ void ActiveMQConsumerKernel::dispatch(
                                         << ", exception=" << e.getMessage()
                                         << ", redeliveryCount="
                                         << dispatch->getRedeliveryCounter());
-                                dispatch->setRollbackCause(e);
+                                ActiveMQException rollbackCause(
+                                    __FILE__,
+                                    __LINE__,
+                                    "%s",
+                                    e.getMessage().c_str());
+                                rollbackCause.setMark(__FILE__, __LINE__);
+                                dispatch->setRollbackCause(rollbackCause);
                                 if (isAutoAcknowledgeBatch() ||
                                     isAutoAcknowledgeEach() ||
                                     session->isIndividualAcknowledge())
@@ -2482,7 +2497,33 @@ void ActiveMQConsumerKernel::dispatch(
                                     afterMessageIsConsumed(dispatch, false);
                                 }
                             }
-                            catch (RuntimeException& e)
+                            catch (decaf::io::IOException& e)
+                            {
+                                AMQ_LOG_ERROR(
+                                    "ActiveMQConsumerKernel",
+                                    "dispatch(): Property unmarshal failed "
+                                    "(corrupted) for message id="
+                                        << dispatch->getMessage()
+                                               ->getMessageId()
+                                               ->toString()
+                                        << ", exception=" << e.getMessage()
+                                        << ", redeliveryCount="
+                                        << dispatch->getRedeliveryCounter());
+                                ActiveMQException rollbackCause(e);
+                                rollbackCause.setMark(__FILE__, __LINE__);
+                                dispatch->setRollbackCause(rollbackCause);
+                                if (isAutoAcknowledgeBatch() ||
+                                    isAutoAcknowledgeEach() ||
+                                    session->isIndividualAcknowledge())
+                                {
+                                    rollback();
+                                }
+                                else
+                                {
+                                    afterMessageIsConsumed(dispatch, false);
+                                }
+                            }
+                            catch (activemq::exceptions::ActiveMQException& e)
                             {
                                 AMQ_LOG_ERROR("ActiveMQConsumerKernel",
                                               "dispatch(): Exception in "
@@ -2505,6 +2546,32 @@ void ActiveMQConsumerKernel::dispatch(
                                 {
                                     // Transacted or Client ack: Deliver the
                                     // next message.
+                                    afterMessageIsConsumed(dispatch, false);
+                                }
+                            }
+                            catch (std::exception& e)
+                            {
+                                decaf::lang::Exception dex(__FILE__,
+                                                           __LINE__,
+                                                           "%s",
+                                                           e.what());
+                                AMQ_LOG_ERROR("ActiveMQConsumerKernel",
+                                              "dispatch(): Exception in "
+                                              "message listener for message id="
+                                                  << dispatch->getMessage()
+                                                         ->getMessageId()
+                                                         ->toString()
+                                                  << ", exception="
+                                                  << e.what());
+                                dispatch->setRollbackCause(dex);
+                                if (isAutoAcknowledgeBatch() ||
+                                    isAutoAcknowledgeEach() ||
+                                    session->isIndividualAcknowledge())
+                                {
+                                    rollback();
+                                }
+                                else
+                                {
                                     afterMessageIsConsumed(dispatch, false);
                                 }
                             }
@@ -2607,9 +2674,7 @@ std::unique_ptr<cms::Message> ActiveMQConsumerKernel::createCMSMessage(
             {
                 if (transformed == nullptr)
                 {
-                    throw NullPointerException(
-                        __FILE__,
-                        __LINE__,
+                    throw activemq::exceptions::NullPointerException(
                         "Client MessageTransformer returned a NULL message");
                 }
 
@@ -2707,7 +2772,8 @@ void ActiveMQConsumerKernel::checkClosed() const
 {
     if (this->isClosed())
     {
-        throw cms::IllegalStateException("Consumer Already Closed");
+        throw activemq::exceptions::IllegalStateException(
+            "Consumer Already Closed");
     }
 }
 
@@ -2716,7 +2782,7 @@ void ActiveMQConsumerKernel::checkMessageListener() const
 {
     if (this->internal->listener != nullptr)
     {
-        throw cms::IllegalStateException(
+        throw activemq::exceptions::IllegalStateException(
             "Cannot synchronously receive a message when a MessageListener is "
             "set");
     }
@@ -3073,7 +3139,7 @@ void ActiveMQConsumerKernel::setOptimizedAckScheduledAckInterval(long long value
                 this->internal->optimizedAckTask);
             this->internal->optimizedAckTask = nullptr;
         }
-        catch (Exception& e)
+        catch (const std::exception& e)
         {
             this->internal->optimizedAckTask = nullptr;
             throw CMSExceptionSupport::create(e);
@@ -3096,7 +3162,7 @@ void ActiveMQConsumerKernel::setOptimizedAckScheduledAckInterval(long long value
                 this->internal->optimizedAckTask,
                 this->internal->optimizedAckScheduledAckInterval);
         }
-        catch (Exception& e)
+        catch (const std::exception& e)
         {
             throw CMSExceptionSupport::create(e);
         }

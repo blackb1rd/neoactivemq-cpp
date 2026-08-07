@@ -23,11 +23,10 @@
 #include <activemq/util/Config.h>
 #include <activemq/wireformat/WireFormat.h>
 #include <activemq/wireformat/openwire/utils/BooleanStream.h>
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
-#include <decaf/lang/exceptions/IllegalStateException.h>
 #include <decaf/util/Properties.h>
 #include <atomic>
 #include <memory>
+#include <stdexcept>
 
 namespace activemq
 {
@@ -197,7 +196,7 @@ namespace wireformat
              * @param info
              *      The new Wireformat Info settings.
              *
-             * @throws IllegalStateException is wire format can't be negotiated.
+             * @throws std::logic_error is wire format can't be negotiated.
              */
             void renegotiateWireFormat(const commands::WireFormatInfo& info);
 
@@ -207,7 +206,7 @@ namespace wireformat
              * @param info
              *      A WireFormatInfo object, takes ownership.
              *
-             * @throws IllegalStateException if the WireFormat object has not
+             * @throws std::logic_error if the WireFormat object has not
              * been initialized.
              */
             void setPreferedWireFormatInfo(
@@ -274,7 +273,7 @@ namespace wireformat
              * @param version
              *      An int that identifies the version
              *
-             * @throws IllegalArgumentException if the version given is not
+             * @throws std::invalid_argument if the version given is not
              * supported.
              */
             void setVersion(int version);

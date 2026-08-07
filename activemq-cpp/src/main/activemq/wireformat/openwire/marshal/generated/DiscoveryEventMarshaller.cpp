@@ -19,6 +19,7 @@
 
 #include <activemq/commands/DiscoveryEvent.h>
 #include <activemq/exceptions/ActiveMQException.h>
+#include <activemq/wireformat/openwire/marshal/OpenWireMarshalCatchMacros.h>
 #include <memory>
 
 //
@@ -69,10 +70,10 @@ void DiscoveryEventMarshaller::tightUnmarshal(OpenWireFormat*  wireFormat,
         info->setServiceName(tightUnmarshalString(dataIn, bs));
         info->setBrokerName(tightUnmarshalString(dataIn, bs));
     }
-    AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
-                                decaf::io::IOException)
-    AMQ_CATCHALL_THROW(decaf::io::IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(activemq::exceptions::ActiveMQException,
+                                activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -92,10 +93,10 @@ int DiscoveryEventMarshaller::tightMarshal1(OpenWireFormat* wireFormat,
 
         return rc + 0;
     }
-    AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
-                                decaf::io::IOException)
-    AMQ_CATCHALL_THROW(decaf::io::IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(activemq::exceptions::ActiveMQException,
+                                activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -115,10 +116,10 @@ void DiscoveryEventMarshaller::tightMarshal2(OpenWireFormat*   wireFormat,
         tightMarshalString2(info->getServiceName(), dataOut, bs);
         tightMarshalString2(info->getBrokerName(), dataOut, bs);
     }
-    AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
-                                decaf::io::IOException)
-    AMQ_CATCHALL_THROW(decaf::io::IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(activemq::exceptions::ActiveMQException,
+                                activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -135,10 +136,10 @@ void DiscoveryEventMarshaller::looseUnmarshal(OpenWireFormat*  wireFormat,
         info->setServiceName(looseUnmarshalString(dataIn));
         info->setBrokerName(looseUnmarshalString(dataIn));
     }
-    AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
-                                decaf::io::IOException)
-    AMQ_CATCHALL_THROW(decaf::io::IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(activemq::exceptions::ActiveMQException,
+                                activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -155,8 +156,8 @@ void DiscoveryEventMarshaller::looseMarshal(OpenWireFormat*   wireFormat,
         looseMarshalString(info->getServiceName(), dataOut);
         looseMarshalString(info->getBrokerName(), dataOut);
     }
-    AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
-                                decaf::io::IOException)
-    AMQ_CATCHALL_THROW(decaf::io::IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(activemq::exceptions::ActiveMQException,
+                                activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }

@@ -19,11 +19,11 @@
 
 #include <decaf/internal/util/concurrent/Threading.h>
 
-#include <decaf/lang/exceptions/RuntimeException.h>
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <decaf/lang/Exception.h>
 
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::internal;
 using namespace decaf::internal::util;
 using namespace decaf::internal::util::concurrent;
@@ -36,9 +36,10 @@ ThreadLocalImpl::ThreadLocalImpl()
 
     if (tlsKey < 0)
     {
-        throw RuntimeException(__FILE__,
-                               __LINE__,
-                               "Thread Local storage limit reached.");
+        throw activemq::exceptions::RuntimeException(
+            __FILE__,
+            __LINE__,
+            "Thread Local storage limit reached.");
     }
 }
 

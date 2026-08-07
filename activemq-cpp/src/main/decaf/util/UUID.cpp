@@ -21,21 +21,22 @@
 #include <string.h>
 #endif
 #include <decaf/internal/util/StringUtils.h>
+#include <decaf/lang/Exception.h>
 #include <decaf/lang/Long.h>
 #include <decaf/lang/Pointer.h>
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
-#include <decaf/lang/exceptions/RuntimeException.h>
-#include <decaf/lang/exceptions/UnsupportedOperationException.h>
 #include <decaf/security/MessageDigest.h>
 #include <decaf/security/NoSuchAlgorithmException.h>
 #include <decaf/security/SecureRandom.h>
+
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <stdexcept>
+#include <string>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::internal::util;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::security;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -250,7 +251,7 @@ long long UUID::node()
 {
     if (this->version() != 1)
     {
-        throw exceptions::UnsupportedOperationException(
+        throw activemq::exceptions::UnsupportedOperationException(
             __FILE__,
             __LINE__,
             "UUID::node - Only a Version 1 UUID supports this operation.");
@@ -264,7 +265,7 @@ long long UUID::timestamp()
 {
     if (this->version() != 1)
     {
-        throw exceptions::UnsupportedOperationException(
+        throw activemq::exceptions::UnsupportedOperationException(
             __FILE__,
             __LINE__,
             "UUID::node - Only a Version 1 UUID supports this operation.");
@@ -283,7 +284,7 @@ int UUID::clockSequence()
 {
     if (this->version() != 1)
     {
-        throw exceptions::UnsupportedOperationException(
+        throw activemq::exceptions::UnsupportedOperationException(
             __FILE__,
             __LINE__,
             "UUID::node - Only a Version 1 UUID supports this operation.");
@@ -368,9 +369,10 @@ UUID UUID::nameUUIDFromBytes(const char* name, int size)
 {
     if (name == NULL && size > 0)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "UUID name buffer was NULL");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "UUID name buffer was NULL");
     }
 
     std::vector<unsigned char> hash;
@@ -382,7 +384,7 @@ UUID UUID::nameUUIDFromBytes(const char* name, int size)
     }
     catch (NoSuchAlgorithmException& ex)
     {
-        throw exceptions::RuntimeException(
+        throw activemq::exceptions::RuntimeException(
             __FILE__,
             __LINE__,
             "UUID::nameUUIDFromBytes - Failed to run MD5 encoder.");
@@ -434,39 +436,34 @@ UUID UUID::fromString(const std::string& uuid)
     // should have and only can have four "-" in UUID
     if (i != POS_SIZE || lastPosition != -1)
     {
-        throw IllegalArgumentException(__FILE__,
-                                       __LINE__,
-                                       "Invalid UUID string %s",
-                                       uuid.c_str());
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": Invalid UUID string " + uuid);
     }
 
     if (position[0] == 0)
     {
-        throw IllegalArgumentException(__FILE__,
-                                       __LINE__,
-                                       "Invalid UUID string %s",
-                                       uuid.c_str());
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": Invalid UUID string " + uuid);
     }
     else if (((position[1] - position[0]) - 1) <= 0)
     {
-        throw IllegalArgumentException(__FILE__,
-                                       __LINE__,
-                                       "Invalid UUID string %s",
-                                       uuid.c_str());
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": Invalid UUID string " + uuid);
     }
     else if (((position[2] - position[1]) - 1) <= 0)
     {
-        throw IllegalArgumentException(__FILE__,
-                                       __LINE__,
-                                       "Invalid UUID string %s",
-                                       uuid.c_str());
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": Invalid UUID string " + uuid);
     }
     else if ((position[3] + 1) >= (int)uuid.length())
     {
-        throw IllegalArgumentException(__FILE__,
-                                       __LINE__,
-                                       "Invalid UUID string %s",
-                                       uuid.c_str());
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": Invalid UUID string " + uuid);
     }
 
     long long m1 = Long::parseLong(uuid.substr(0, position[0]), 16);

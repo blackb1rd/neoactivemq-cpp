@@ -19,13 +19,14 @@
 
 #include <memory>
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/lang/CharSequence.h>
+#include <stdexcept>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::io;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 Writer::Writer()
@@ -67,7 +68,6 @@ void Writer::write(const char* buffer, int size)
         this->doWriteArray(buffer, size);
     }
     DECAF_CATCH_RETHROW(IOException)
-    DECAF_CATCH_RETHROW(NullPointerException)
     DECAF_CATCHALL_THROW(IOException)
 }
 
@@ -79,8 +79,6 @@ void Writer::write(const char* buffer, int size, int offset, int length)
         this->doWriteArrayBounded(buffer, size, offset, length);
     }
     DECAF_CATCH_RETHROW(IOException)
-    DECAF_CATCH_RETHROW(NullPointerException)
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
     DECAF_CATCHALL_THROW(IOException)
 }
 
@@ -102,16 +100,14 @@ void Writer::write(const std::string& str, int offset, int length)
     {
         if ((offset + length) > (int)str.length())
         {
-            throw IndexOutOfBoundsException(
-                __FILE__,
-                __LINE__,
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
                 "Given Offset + Length value greater than the String length.");
         }
 
         this->doWriteStringBounded(str.c_str(), offset, length);
     }
     DECAF_CATCH_RETHROW(IOException)
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
     DECAF_CATCHALL_THROW(IOException)
 }
 
@@ -147,7 +143,6 @@ Appendable& Writer::append(const decaf::lang::CharSequence* csq,
         return this->doAppendCharSequenceStartEnd(csq, start, end);
     }
     DECAF_CATCH_RETHROW(IOException)
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
     DECAF_CATCHALL_THROW(IOException)
 }
 
@@ -184,7 +179,6 @@ void Writer::doWriteArray(const char* buffer, int size)
         this->doWriteArrayBounded(buffer, size, 0, size);
     }
     DECAF_CATCH_RETHROW(IOException)
-    DECAF_CATCH_RETHROW(NullPointerException)
     DECAF_CATCHALL_THROW(IOException)
 }
 
@@ -215,7 +209,6 @@ void Writer::doWriteStringBounded(const std::string& str,
                                   length);
     }
     DECAF_CATCH_RETHROW(IOException)
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
     DECAF_CATCHALL_THROW(IOException)
 }
 
@@ -273,6 +266,5 @@ decaf::lang::Appendable& Writer::doAppendCharSequenceStartEnd(
         return *this;
     }
     DECAF_CATCH_RETHROW(IOException)
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
     DECAF_CATCHALL_THROW(IOException)
 }

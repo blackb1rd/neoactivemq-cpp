@@ -23,6 +23,7 @@
 #include <decaf/lang/Thread.h>
 #include <decaf/util/Collection.h>
 #include <decaf/util/concurrent/locks/ReadWriteLock.h>
+#include <stdexcept>
 
 namespace decaf
 {
@@ -147,11 +148,11 @@ namespace util
                  *
                  * @return true if there are any waiting threads
                  *
-                 * @throws NullPointerException if the ConditionObject pointer
+                 * @throws std::logic_error if the ConditionObject pointer
                  * is NULL.
-                 * @throws IllegalArgumentException if the ConditionObject is
+                 * @throws std::invalid_argument if the ConditionObject is
                  * not associated with this Lock.
-                 * @throws IllegalMonitorStateException if the caller does not
+                 * @throws std::logic_error if the caller does not
                  * hold exclusive synchronization.
                  */
                 bool hasWaiters(Condition* condition) const;
@@ -166,11 +167,11 @@ namespace util
                  *
                  * @return an estimate of the number of waiting threads.
                  *
-                 * @throws NullPointerException if the ConditionObject pointer
+                 * @throws std::logic_error if the ConditionObject pointer
                  * is NULL.
-                 * @throws IllegalArgumentException if the ConditionObject is
+                 * @throws std::invalid_argument if the ConditionObject is
                  * not associated with this Synchronizer.
-                 * @throws IllegalMonitorStateException if the caller does not
+                 * @throws std::logic_error if the caller does not
                  * hold exclusive synchronization.
                  */
                 int getWaitQueueLength(Condition* condition) const;
@@ -212,7 +213,7 @@ namespace util
                  * @return true if the given thread is queued waiting for this
                  * lock
                  *
-                 * @throws NullPointerException if the thread is NULL.
+                 * @throws std::logic_error if the thread is NULL.
                  */
                 bool hasQueuedThread(decaf::lang::Thread* thread) const;
 
@@ -237,11 +238,11 @@ namespace util
                  * @return a Collection pointer that contains waiting threads on
                  * given Condition object. The caller owns the returned pointer.
                  *
-                 * @throws NullPointerException if the ConditionObject pointer
+                 * @throws std::logic_error if the ConditionObject pointer
                  * is NULL.
-                 * @throws IllegalArgumentException if the ConditionObject is
+                 * @throws std::invalid_argument if the ConditionObject is
                  * not associated with this Synchronizer.
-                 * @throws IllegalMonitorStateException if the caller does not
+                 * @throws std::logic_error if the caller does not
                  * hold exclusive synchronization.
                  */
                 decaf::util::Collection<decaf::lang::Thread*>*

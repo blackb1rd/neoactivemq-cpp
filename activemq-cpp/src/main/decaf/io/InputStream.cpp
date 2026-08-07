@@ -17,14 +17,13 @@
 
 #include "InputStream.h"
 
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <string>
 #include <typeinfo>
-
-#include <decaf/lang/exceptions/NullPointerException.h>
 
 using namespace decaf;
 using namespace decaf::io;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 InputStream::InputStream()
@@ -80,7 +79,6 @@ int InputStream::read(unsigned char* buffer, int size)
         return this->doReadArray(buffer, size);
     }
     DECAF_CATCH_RETHROW(IOException)
-    DECAF_CATCH_RETHROW(NullPointerException)
     DECAF_CATCHALL_THROW(IOException)
 }
 
@@ -92,8 +90,6 @@ int InputStream::read(unsigned char* buffer, int size, int offset, int length)
         return this->doReadArrayBounded(buffer, size, offset, length);
     }
     DECAF_CATCH_RETHROW(IOException)
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCH_RETHROW(NullPointerException)
     DECAF_CATCHALL_THROW(IOException)
 }
 
@@ -140,7 +136,6 @@ long long InputStream::skip(long long num)
         return skipped;
     }
     DECAF_CATCH_RETHROW(IOException)
-    DECAF_CATCH_RETHROW(UnsupportedOperationException)
     DECAF_CATCHALL_THROW(IOException)
 }
 
@@ -152,7 +147,6 @@ int InputStream::doReadArray(unsigned char* buffer, int size)
         return this->doReadArrayBounded(buffer, size, 0, size);
     }
     DECAF_CATCH_RETHROW(IOException)
-    DECAF_CATCH_RETHROW(NullPointerException)
     DECAF_CATCHALL_THROW(IOException)
 }
 
@@ -171,16 +165,16 @@ int InputStream::doReadArrayBounded(unsigned char* buffer,
 
         if (buffer == NULL)
         {
-            throw NullPointerException(__FILE__,
-                                       __LINE__,
-                                       "Buffer passed was NULL");
+            throw activemq::exceptions::NullPointerException(
+                __FILE__,
+                __LINE__,
+                "Buffer passed was NULL");
         }
 
         if (length > (size - offset))
         {
-            throw IndexOutOfBoundsException(
-                __FILE__,
-                __LINE__,
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
                 "Offset + Length given exceeds Buffer size.");
         }
 
@@ -208,7 +202,5 @@ int InputStream::doReadArrayBounded(unsigned char* buffer,
         return (int)length;
     }
     DECAF_CATCH_RETHROW(IOException)
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCH_RETHROW(NullPointerException)
     DECAF_CATCHALL_THROW(IOException)
 }

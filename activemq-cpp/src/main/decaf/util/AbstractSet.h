@@ -19,13 +19,11 @@
 #define _DECAF_UTIL_ABSTRACTSET_H_
 
 #include <decaf/lang/Iterable.h>
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
-#include <decaf/lang/exceptions/UnsupportedOperationException.h>
 #include <decaf/util/Config.h>
 #include <decaf/util/Iterator.h>
 #include <decaf/util/Set.h>
 #include <memory>
+#include <stdexcept>
 
 namespace decaf
 {
@@ -74,7 +72,7 @@ namespace util
          * remove method.
          *
          * Note that this implementation will throw an
-         * UnsupportedOperationException if the iterator returned by the
+         * std::logic_error if the iterator returned by the
          * iterator method does not implement the remove method.
          */
         virtual bool removeAll(const Collection<E>& collection)

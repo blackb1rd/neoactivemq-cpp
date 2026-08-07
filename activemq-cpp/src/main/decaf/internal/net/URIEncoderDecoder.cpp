@@ -18,11 +18,13 @@
 #include "URIEncoderDecoder.h"
 
 #include <decaf/lang/Character.h>
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
+
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <stdexcept>
+#include <string>
 
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::internal;
 using namespace decaf::internal::net;
 using namespace decaf::net;
@@ -172,11 +174,9 @@ std::string URIEncoderDecoder::decode(const std::string& s)
             {
                 if (i + 2 >= s.length())
                 {
-                    throw IllegalArgumentException(
-                        __FILE__,
-                        __LINE__,
-                        "String has invalid encoding: %s",
-                        s.c_str());
+                    throw activemq::exceptions::InvalidArgumentException(
+                        std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+                        ": String has invalid encoding: " + s);
                 }
 
                 int d1 = Character::digit(s.at(i + 1), 16);
@@ -184,11 +184,10 @@ std::string URIEncoderDecoder::decode(const std::string& s)
 
                 if (d1 == -1 || d2 == -1)
                 {
-                    throw IllegalArgumentException(
-                        __FILE__,
-                        __LINE__,
-                        "URIEncoderDecoder::decode - Bad hex encoding in: ",
-                        s.c_str());
+                    throw activemq::exceptions::InvalidArgumentException(
+                        std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+                        ": URIEncoderDecoder::decode - Bad hex encoding in: " +
+                        s);
                 }
 
                 result += (unsigned char)((d1 << 4) + d2);

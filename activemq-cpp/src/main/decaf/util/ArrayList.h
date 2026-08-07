@@ -18,17 +18,17 @@
 #ifndef _DECAF_UTIL_ARRAYLIST_H_
 #define _DECAF_UTIL_ARRAYLIST_H_
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/lang/Integer.h>
 #include <decaf/lang/System.h>
-#include <decaf/lang/exceptions/IndexOutOfBoundsException.h>
-#include <decaf/lang/exceptions/UnsupportedOperationException.h>
 #include <decaf/util/AbstractList.h>
 #include <decaf/util/Config.h>
 #include <decaf/util/Iterator.h>
 #include <decaf/util/List.h>
 #include <decaf/util/ListIterator.h>
-#include <decaf/util/NoSuchElementException.h>
 #include <memory>
+#include <stdexcept>
+#include <string>
 
 namespace decaf
 {
@@ -102,10 +102,9 @@ namespace util
         {
             if (initialCapacity < 0)
             {
-                throw decaf::lang::exceptions::IllegalArgumentException(
-                    __FILE__,
-                    __LINE__,
-                    "Initial Capacity argument cannot be negative.");
+                throw activemq::exceptions::InvalidArgumentException(
+                    std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+                    ": " + "Initial Capacity argument cannot be negative.");
             }
 
             this->elements = new E[this->capacity];
@@ -240,10 +239,9 @@ namespace util
         {
             if (index < 0 || index >= this->curSize)
             {
-                throw decaf::lang::exceptions::IndexOutOfBoundsException(
-                    __FILE__,
-                    __LINE__,
-                    "Index greater than size() or negative");
+                throw activemq::exceptions::OutOfRangeException(
+                    std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+                    ": " + "Index greater than size() or negative");
             }
 
             E oldValue            = this->elements[index];
@@ -256,10 +254,9 @@ namespace util
         {
             if (index < 0 || index >= this->curSize)
             {
-                throw decaf::lang::exceptions::IndexOutOfBoundsException(
-                    __FILE__,
-                    __LINE__,
-                    "Index greater than size() or negative");
+                throw activemq::exceptions::OutOfRangeException(
+                    std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+                    ": " + "Index greater than size() or negative");
             }
 
             return this->elements[index];
@@ -278,10 +275,9 @@ namespace util
         {
             if (index < 0 || index > this->curSize)
             {
-                throw decaf::lang::exceptions::IndexOutOfBoundsException(
-                    __FILE__,
-                    __LINE__,
-                    "Index was negative or greater than size()");
+                throw activemq::exceptions::OutOfRangeException(
+                    std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+                    ": " + "Index was negative or greater than size()");
             }
 
             if (index == 0)
@@ -328,10 +324,9 @@ namespace util
         {
             if (index < 0 || index > this->curSize)
             {
-                throw decaf::lang::exceptions::IndexOutOfBoundsException(
-                    __FILE__,
-                    __LINE__,
-                    "Index greater than size()");
+                throw activemq::exceptions::OutOfRangeException(
+                    std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+                    ": " + "Index greater than size()");
             }
 
             int csize = collection.size();
@@ -381,10 +376,9 @@ namespace util
         {
             if (index < 0 || index >= this->curSize)
             {
-                throw decaf::lang::exceptions::IndexOutOfBoundsException(
-                    __FILE__,
-                    __LINE__,
-                    "Index greater than size() or negative");
+                throw activemq::exceptions::OutOfRangeException(
+                    std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+                    ": " + "Index greater than size() or negative");
             }
 
             E old = this->elements[index];

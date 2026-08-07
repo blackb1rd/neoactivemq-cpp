@@ -24,8 +24,8 @@
 
 using namespace activemq;
 using namespace activemq::util;
+using activemq::exceptions::UTFDataFormatException;
 using namespace decaf;
-using namespace decaf::io;
 using namespace decaf::lang;
 using namespace std;
 
@@ -56,9 +56,9 @@ void MarshallingSupport::writeString(decaf::io::DataOutputStream& dataOut,
             MarshallingSupport::writeString32(dataOut, value);
         }
     }
-    AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, decaf::io::IOException)
-    AMQ_CATCHALL_THROW(decaf::io::IOException)
+    AMQ_IOSTREAM_CATCH_RETHROW()
+    AMQ_IOSTREAM_CATCH_CONVERT_LANG_EXCEPTION()
+    AMQ_IOSTREAM_CATCHALL_THROW()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -71,10 +71,11 @@ void MarshallingSupport::writeString16(decaf::io::DataOutputStream& dataOut,
 
         if (strSize > Short::MAX_VALUE)
         {
-            throw IOException(__FILE__,
-                              __LINE__,
-                              "String size exceeds Short::MAX_VALUE and cannot "
-                              "be sent via Openwire.");
+            throw activemq::exceptions::IOException(
+                __FILE__,
+                __LINE__,
+                "String size exceeds Short::MAX_VALUE and cannot "
+                "be sent via Openwire.");
         }
 
         dataOut.writeShort((short)strSize);
@@ -83,9 +84,9 @@ void MarshallingSupport::writeString16(decaf::io::DataOutputStream& dataOut,
             dataOut.write((unsigned char*)value.c_str(), strSize, 0, strSize);
         }
     }
-    AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, decaf::io::IOException)
-    AMQ_CATCHALL_THROW(decaf::io::IOException)
+    AMQ_IOSTREAM_CATCH_RETHROW()
+    AMQ_IOSTREAM_CATCH_CONVERT_LANG_EXCEPTION()
+    AMQ_IOSTREAM_CATCHALL_THROW()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -98,10 +99,11 @@ void MarshallingSupport::writeString32(decaf::io::DataOutputStream& dataOut,
 
         if (strSize > Integer::MAX_VALUE)
         {
-            throw IOException(__FILE__,
-                              __LINE__,
-                              "String size exceeds Integer::MAX_VALUE and "
-                              "cannot be sent via Openwire.");
+            throw activemq::exceptions::IOException(
+                __FILE__,
+                __LINE__,
+                "String size exceeds Integer::MAX_VALUE and "
+                "cannot be sent via Openwire.");
         }
 
         dataOut.writeInt(strSize);
@@ -110,9 +112,9 @@ void MarshallingSupport::writeString32(decaf::io::DataOutputStream& dataOut,
             dataOut.write((unsigned char*)value.c_str(), strSize, 0, strSize);
         }
     }
-    AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, decaf::io::IOException)
-    AMQ_CATCHALL_THROW(decaf::io::IOException)
+    AMQ_IOSTREAM_CATCH_RETHROW()
+    AMQ_IOSTREAM_CATCH_CONVERT_LANG_EXCEPTION()
+    AMQ_IOSTREAM_CATCHALL_THROW()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -129,9 +131,9 @@ std::string MarshallingSupport::readString16(decaf::io::DataInputStream& dataIn)
         }
         return "";
     }
-    AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, decaf::io::IOException)
-    AMQ_CATCHALL_THROW(decaf::io::IOException)
+    AMQ_IOSTREAM_CATCH_RETHROW()
+    AMQ_IOSTREAM_CATCH_CONVERT_LANG_EXCEPTION()
+    AMQ_IOSTREAM_CATCHALL_THROW()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -148,9 +150,9 @@ std::string MarshallingSupport::readString32(decaf::io::DataInputStream& dataIn)
         }
         return "";
     }
-    AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, decaf::io::IOException)
-    AMQ_CATCHALL_THROW(decaf::io::IOException)
+    AMQ_IOSTREAM_CATCH_RETHROW()
+    AMQ_IOSTREAM_CATCH_CONVERT_LANG_EXCEPTION()
+    AMQ_IOSTREAM_CATCHALL_THROW()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -235,9 +237,10 @@ std::string MarshallingSupport::asciiToModifiedUtf8(
             return "";
         }
     }
-    AMQ_CATCH_RETHROW(decaf::io::UTFDataFormatException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, decaf::io::UTFDataFormatException)
-    AMQ_CATCHALL_THROW(decaf::io::UTFDataFormatException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::UTFDataFormatException)
+    AMQ_CATCH_EXCEPTION_CONVERT(decaf::lang::Exception,
+                                activemq::exceptions::UTFDataFormatException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::UTFDataFormatException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -348,7 +351,8 @@ std::string MarshallingSupport::modifiedUtf8ToAscii(
 
         return std::string((char*)(&result[0]), index);
     }
-    AMQ_CATCH_RETHROW(decaf::io::UTFDataFormatException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, decaf::io::UTFDataFormatException)
-    AMQ_CATCHALL_THROW(decaf::io::UTFDataFormatException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::UTFDataFormatException)
+    AMQ_CATCH_EXCEPTION_CONVERT(decaf::lang::Exception,
+                                activemq::exceptions::UTFDataFormatException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::UTFDataFormatException)
 }

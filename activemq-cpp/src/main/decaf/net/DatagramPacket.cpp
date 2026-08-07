@@ -16,11 +16,13 @@
  */
 
 #include "DatagramPacket.h"
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <stdexcept>
+#include <string>
 
 using namespace decaf;
 using namespace decaf::net;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util::concurrent;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -183,10 +185,9 @@ void DatagramPacket::setPort(int port)
 {
     if (port < 0 || port > 65535)
     {
-        throw IllegalArgumentException(__FILE__,
-                                       __LINE__,
-                                       "Given port value is out of range, %d",
-                                       port);
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Given port value is out of range, " + std::to_string(port));
     }
 
     synchronized(&mutex)
@@ -214,10 +215,9 @@ void DatagramPacket::setOffset(int offset)
     {
         if (offset < 0 || offset > size)
         {
-            throw IllegalArgumentException(__FILE__,
-                                           __LINE__,
-                                           "Offset value is invalid: %d",
-                                           offset);
+            throw activemq::exceptions::InvalidArgumentException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+                "Offset value is invalid: " + std::to_string(offset));
         }
 
         this->offset = offset;
@@ -243,10 +243,9 @@ void DatagramPacket::setLength(int length)
     {
         if (length < 0 || (size - offset) > length)
         {
-            throw IllegalArgumentException(__FILE__,
-                                           __LINE__,
-                                           "Length value is invalid: %d",
-                                           length);
+            throw activemq::exceptions::InvalidArgumentException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+                "Length value is invalid: " + std::to_string(length));
         }
 
         this->length = length;
@@ -282,17 +281,17 @@ void DatagramPacket::setData(unsigned char* buffer, int size)
 {
     if (buffer == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "Provided Buffer pointer was NULL.");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "Provided Buffer pointer was NULL.");
     }
 
     if (size <= 0)
     {
-        throw IllegalArgumentException(__FILE__,
-                                       __LINE__,
-                                       "Size value is invalid: %d",
-                                       size);
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Size value is invalid: " + std::to_string(size));
     }
 
     synchronized(&mutex)
@@ -312,33 +311,31 @@ void DatagramPacket::setData(unsigned char* buffer,
 {
     if (buffer == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "Provided Buffer pointer was NULL.");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "Provided Buffer pointer was NULL.");
     }
 
     if (size <= 0)
     {
-        throw IllegalArgumentException(__FILE__,
-                                       __LINE__,
-                                       "Size value is invalid: %d",
-                                       size);
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Size value is invalid: " + std::to_string(size));
     }
 
     if (offset < 0 || offset > size)
     {
-        throw IllegalArgumentException(__FILE__,
-                                       __LINE__,
-                                       "Offset value is invalid: %d",
-                                       offset);
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Offset value is invalid: " + std::to_string(offset));
     }
 
     if (length < 0 || (size - offset) > length)
     {
-        throw IllegalArgumentException(__FILE__,
-                                       __LINE__,
-                                       "Length value is invalid: %d",
-                                       length);
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Length value is invalid: " + std::to_string(length));
     }
 
     synchronized(&mutex)

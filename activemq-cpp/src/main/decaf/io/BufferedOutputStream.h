@@ -19,7 +19,7 @@
 #define _DECAF_IO_BUFFEREDOUTPUTSTREAM_H_
 
 #include <decaf/io/FilterOutputStream.h>
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
+#include <stdexcept>
 
 namespace decaf
 {
@@ -78,7 +78,7 @@ namespace io
          * @param own
          *      Indicates if this class owns the stream pointer.
          *
-         * @throws IllegalArgumentException if the bufferSize given is negative.
+         * @throws std::invalid_argument if the bufferSize given is negative.
          */
         BufferedOutputStream(OutputStream* stream,
                              int           bufferSize,

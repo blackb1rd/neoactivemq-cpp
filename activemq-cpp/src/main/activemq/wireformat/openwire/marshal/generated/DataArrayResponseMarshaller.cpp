@@ -19,6 +19,7 @@
 
 #include <activemq/commands/DataArrayResponse.h>
 #include <activemq/exceptions/ActiveMQException.h>
+#include <activemq/wireformat/openwire/marshal/OpenWireMarshalCatchMacros.h>
 #include <memory>
 
 //
@@ -84,10 +85,10 @@ void DataArrayResponseMarshaller::tightUnmarshal(OpenWireFormat*  wireFormat,
             info->getData().clear();
         }
     }
-    AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
-                                decaf::io::IOException)
-    AMQ_CATCHALL_THROW(decaf::io::IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(activemq::exceptions::ActiveMQException,
+                                activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -106,10 +107,10 @@ int DataArrayResponseMarshaller::tightMarshal1(OpenWireFormat* wireFormat,
 
         return rc + 0;
     }
-    AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
-                                decaf::io::IOException)
-    AMQ_CATCHALL_THROW(decaf::io::IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(activemq::exceptions::ActiveMQException,
+                                activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -129,10 +130,10 @@ void DataArrayResponseMarshaller::tightMarshal2(OpenWireFormat*   wireFormat,
             dynamic_cast<DataArrayResponse*>(dataStructure);
         tightMarshalObjectArray2(wireFormat, info->getData(), dataOut, bs);
     }
-    AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
-                                decaf::io::IOException)
-    AMQ_CATCHALL_THROW(decaf::io::IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(activemq::exceptions::ActiveMQException,
+                                activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -162,10 +163,10 @@ void DataArrayResponseMarshaller::looseUnmarshal(OpenWireFormat*  wireFormat,
             info->getData().clear();
         }
     }
-    AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
-                                decaf::io::IOException)
-    AMQ_CATCHALL_THROW(decaf::io::IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(activemq::exceptions::ActiveMQException,
+                                activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -180,8 +181,8 @@ void DataArrayResponseMarshaller::looseMarshal(OpenWireFormat*   wireFormat,
         ResponseMarshaller::looseMarshal(wireFormat, dataStructure, dataOut);
         looseMarshalObjectArray(wireFormat, info->getData(), dataOut);
     }
-    AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
-                                decaf::io::IOException)
-    AMQ_CATCHALL_THROW(decaf::io::IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(activemq::exceptions::ActiveMQException,
+                                activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }

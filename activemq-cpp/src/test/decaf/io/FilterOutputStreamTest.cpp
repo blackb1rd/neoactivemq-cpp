@@ -20,11 +20,11 @@
 #include <decaf/io/FilterOutputStream.h>
 #include <decaf/lang/Exception.h>
 #include <gtest/gtest.h>
+#include <stdexcept>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::io;
 using namespace decaf::util;
 
@@ -54,10 +54,9 @@ public:
             "RandomAccessFile\nTest_decaf_io_SyncFailedException\nTest_decaf_"
             "lang_AbstractMethodError\nTest_decaf_lang_"
             "ArithmeticException\nTest_decaf_lang_"
-            "ArrayIndexOutOfBoundsException\nTest_decaf_lang_"
             "ArrayStoreException\nTest_decaf_lang_Boolean\nTest_decaf_lang_"
             "Byte\nTest_decaf_lang_Character\nTest_decaf_lang_Class\nTest_"
-            "decaf_lang_ClassCastException\nTest_decaf_lang_"
+            "decaf_lang_"
             "ClassCircularityError\nTest_decaf_lang_ClassFormatError\nTest_"
             "decaf_lang_ClassLoader\nTest_decaf_lang_"
             "ClassNotFoundException\nTest_decaf_lang_"
@@ -67,19 +66,19 @@ public:
             "lang_IllegalAccessError\nTest_decaf_lang_"
             "IllegalAccessException\nTest_decaf_lang_"
             "IllegalArgumentException\nTest_decaf_lang_"
-            "IllegalMonitorStateException\nTest_decaf_lang_"
+            ""
             "IllegalThreadStateException\nTest_decaf_lang_"
             "IncompatibleClassChangeError\nTest_decaf_lang_"
-            "IndexOutOfBoundsException\nTest_decaf_lang_"
+            "std::out_of_range\nTest_decaf_lang_"
             "InstantiationError\nTest_decaf_lang_InstantiationException\nTest_"
             "decaf_lang_Integer\nTest_decaf_lang_InternalError\nTest_decaf_"
-            "lang_InterruptedException\nTest_decaf_lang_LinkageError\nTest_"
+            "lang_RuntimeError\nTest_decaf_lang_LinkageError\nTest_"
             "decaf_lang_Long\nTest_decaf_lang_Math\nTest_decaf_lang_"
-            "NegativeArraySizeException\nTest_decaf_lang_"
+            "std::runtime_error\nTest_decaf_lang_"
             "NoClassDefFoundError\nTest_decaf_lang_NoSuchFieldError\nTest_"
             "decaf_lang_NoSuchMethodError\nTest_decaf_lang_"
             "NullPointerException\nTest_decaf_lang_Number\nTest_decaf_lang_"
-            "NumberFormatException\nTest_decaf_lang_Object\nTest_decaf_lang_"
+            "Object\nTest_decaf_lang_"
             "OutOfMemoryError\nTest_decaf_lang_RuntimeException\nTest_decaf_"
             "lang_SecurityManager\nTest_decaf_lang_Short\nTest_decaf_lang_"
             "StackOverflowError\nTest_decaf_lang_String\nTest_decaf_lang_"
@@ -216,19 +215,19 @@ TEST_F(FilterOutputStreamTest, testWriteBIIIExceptions)
     ByteArrayOutputStream baos;
     FilterOutputStream    os(&baos);
 
-    ASSERT_THROW(os.write(NULL, 1000, 0, 1001), NullPointerException)
-        << ("Should have thrown an NullPointerException");
+    ASSERT_THROW(os.write(NULL, 1000, 0, 1001), std::logic_error)
+        << ("Should have thrown an std::logic_error");
 
     unsigned char buffer[1000];
 
-    ASSERT_THROW(os.write(buffer, 1000, 0, 1001), IndexOutOfBoundsException)
-        << ("Should have thrown an IndexOutOfBoundsException");
+    ASSERT_THROW(os.write(buffer, 1000, 0, 1001), std::out_of_range)
+        << ("Should have thrown an std::out_of_range");
 
-    ASSERT_THROW(os.write(buffer, 1000, 1001, 0), IndexOutOfBoundsException)
-        << ("Should have thrown an IndexOutOfBoundsException");
+    ASSERT_THROW(os.write(buffer, 1000, 1001, 0), std::out_of_range)
+        << ("Should have thrown an std::out_of_range");
 
-    ASSERT_THROW(os.write(buffer, 1000, 500, 501), IndexOutOfBoundsException)
-        << ("Should have thrown an IndexOutOfBoundsException");
+    ASSERT_THROW(os.write(buffer, 1000, 500, 501), std::out_of_range)
+        << ("Should have thrown an std::out_of_range");
 
     os.close();
 

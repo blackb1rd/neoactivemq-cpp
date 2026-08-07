@@ -20,23 +20,26 @@
 #include <memory>
 
 #include <activemq/exceptions/ActiveMQException.h>
+#include <activemq/exceptions/IoExceptions.h>
 #include <activemq/util/Suspendable.h>
 #include <activemq/util/URISupport.h>
 
-#include <decaf/lang/exceptions/NullPointerException.h>
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <decaf/lang/Exception.h>
 #include <decaf/net/URISyntaxException.h>
 #include <decaf/util/HashMap.h>
 #include <decaf/util/Properties.h>
 #include <decaf/util/StlMap.h>
 #include <decaf/util/concurrent/Mutex.h>
+#include <exception>
+#include <stdexcept>
+#include <string>
 
 using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
-using namespace decaf::io;
 using namespace decaf::net;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace activemq;
 using namespace activemq::commands;
 using namespace activemq::exceptions;
@@ -110,9 +113,10 @@ void DiscoveryTransport::start()
 {
     if (!this->impl->agent)
     {
-        throw IllegalStateException(__FILE__,
-                                    __LINE__,
-                                    "discoveryAgent not configured");
+        throw activemq::exceptions::IllegalStateException(
+            __FILE__,
+            __LINE__,
+            "discoveryAgent not configured");
     }
 
     // lets pass into the agent the broker name and connection details
@@ -127,16 +131,31 @@ void DiscoveryTransport::stop()
 {
     try
     {
-        IOException error;
-        bool        hasException = false;
+        activemq::exceptions::IOException error;
+        bool                              hasException = false;
 
         try
         {
             this->impl->agent->stop();
         }
-        catch (IOException& ex)
+        catch (activemq::exceptions::IOException& ex)
         {
             error = ex;
+            error.setMark(__FILE__, __LINE__);
+            hasException = true;
+        }
+        catch (activemq::exceptions::ActiveMQException& ex)
+        {
+            error = activemq::exceptions::IOException(
+                static_cast<const decaf::lang::Exception&>(ex));
+            error.setMark(__FILE__, __LINE__);
+            hasException = true;
+        }
+        catch (std::exception& ex)
+        {
+            decaf::lang::Exception dex(__FILE__, __LINE__, "%s", ex.what());
+            dex.setMark(__FILE__, __LINE__);
+            error = activemq::exceptions::IOException(dex);
             error.setMark(__FILE__, __LINE__);
             hasException = true;
         }
@@ -145,11 +164,32 @@ void DiscoveryTransport::stop()
         {
             TransportFilter::stop();
         }
-        catch (IOException& ex)
+        catch (activemq::exceptions::IOException& ex)
         {
             if (!hasException)
             {
                 error = ex;
+                error.setMark(__FILE__, __LINE__);
+                hasException = true;
+            }
+        }
+        catch (activemq::exceptions::ActiveMQException& ex)
+        {
+            if (!hasException)
+            {
+                error = activemq::exceptions::IOException(
+                    static_cast<const decaf::lang::Exception&>(ex));
+                error.setMark(__FILE__, __LINE__);
+                hasException = true;
+            }
+        }
+        catch (std::exception& ex)
+        {
+            if (!hasException)
+            {
+                decaf::lang::Exception dex(__FILE__, __LINE__, "%s", ex.what());
+                dex.setMark(__FILE__, __LINE__);
+                error = activemq::exceptions::IOException(dex);
                 error.setMark(__FILE__, __LINE__);
                 hasException = true;
             }
@@ -160,9 +200,9 @@ void DiscoveryTransport::stop()
             throw error;
         }
     }
-    AMQ_CATCH_RETHROW(IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, IOException)
-    AMQ_CATCHALL_THROW(IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(Exception, activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -172,9 +212,9 @@ void DiscoveryTransport::doClose()
     {
         this->impl->next.reset();
     }
-    AMQ_CATCH_RETHROW(IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, IOException)
-    AMQ_CATCHALL_THROW(IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(Exception, activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -182,9 +222,10 @@ void DiscoveryTransport::setDiscoveryAgent(std::shared_ptr<DiscoveryAgent> agent
 {
     if (!agent)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "DiscoveryAgent required to be non-null");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "DiscoveryAgent required to be non-null");
     }
 
     this->impl->agent = agent;
@@ -248,7 +289,7 @@ void DiscoveryTransport::onServiceRemove(const DiscoveryEvent* event)
         uris.add(uri);
         this->impl->next->removeURI(false, uris);
     }
-    catch (NoSuchElementException& e)
+    catch (activemq::exceptions::InterruptedException& e)
     {
     }
 }
@@ -264,7 +305,7 @@ void DiscoveryTransport::transportInterrupted()
         {
             suspendable->resume();
         }
-        catch (Exception& e)
+        catch (const std::exception&)
         {
             // Failed to Resume
         }
@@ -284,7 +325,7 @@ void DiscoveryTransport::transportResumed()
         {
             suspendable->suspend();
         }
-        catch (Exception& e)
+        catch (const std::exception&)
         {
             // Failed to Suspend
         }

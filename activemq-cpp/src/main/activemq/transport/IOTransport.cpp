@@ -23,13 +23,19 @@
 #include <activemq/commands/MessageDispatch.h>
 #include <activemq/commands/MessageId.h>
 #include <activemq/exceptions/ActiveMQException.h>
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <activemq/exceptions/IoExceptions.h>
 #include <activemq/util/AMQLog.h>
 #include <activemq/util/Config.h>
 #include <activemq/wireformat/WireFormat.h>
 #include <activemq/wireformat/openwire/OpenWireFormat.h>
-#include <decaf/lang/exceptions/UnsupportedOperationException.h>
+#include <decaf/io/EOFException.h>
+#include <decaf/io/IOException.h>
+#include <decaf/lang/Exception.h>
 #include <decaf/util/concurrent/Concurrent.h>
 #include <atomic>
+#include <stdexcept>
+#include <string>
 #include <typeinfo>
 
 using namespace activemq;
@@ -40,9 +46,7 @@ using namespace activemq::wireformat;
 using namespace activemq::wireformat::openwire;
 using activemq::util::AMQLogger;
 using namespace decaf;
-using namespace decaf::io;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 
@@ -219,15 +223,16 @@ void IOTransport::oneway(const std::shared_ptr<Command> command)
     {
         if (impl->closed.load())
         {
-            throw IOException(__FILE__,
-                              __LINE__,
-                              "IOTransport::oneway() - transport is closed!");
+            throw activemq::exceptions::IOException(
+                __FILE__,
+                __LINE__,
+                "IOTransport::oneway() - transport is closed!");
         }
 
         // Make sure the thread has been started.
         if (!impl->thread)
         {
-            throw IOException(
+            throw activemq::exceptions::IOException(
                 __FILE__,
                 __LINE__,
                 "IOTransport::oneway() - transport is not started");
@@ -236,7 +241,7 @@ void IOTransport::oneway(const std::shared_ptr<Command> command)
         // Make sure the command object is valid.
         if (!command)
         {
-            throw IOException(
+            throw activemq::exceptions::IOException(
                 __FILE__,
                 __LINE__,
                 "IOTransport::oneway() - attempting to write NULL command");
@@ -245,9 +250,10 @@ void IOTransport::oneway(const std::shared_ptr<Command> command)
         // Make sure we have an output stream to write to.
         if (impl->outputStream == NULL)
         {
-            throw IOException(__FILE__,
-                              __LINE__,
-                              "IOTransport::oneway() - invalid output stream");
+            throw activemq::exceptions::IOException(
+                __FILE__,
+                __LINE__,
+                "IOTransport::oneway() - invalid output stream");
         }
 
         AMQ_LOG_DEBUG(
@@ -268,9 +274,9 @@ void IOTransport::oneway(const std::shared_ptr<Command> command)
         AMQ_LOG_DEBUG("IOTransport",
                       "oneway() sent cmdId=" << command->getCommandId());
     }
-    AMQ_CATCH_RETHROW(IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, IOException)
-    AMQ_CATCHALL_THROW(IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(Exception, activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -283,21 +289,23 @@ void IOTransport::start()
         {
             if (impl->closed.load())
             {
-                throw IOException(__FILE__,
-                                  __LINE__,
-                                  "IOTransport::start() - transport is already "
-                                  "closed - cannot restart");
+                throw activemq::exceptions::IOException(
+                    __FILE__,
+                    __LINE__,
+                    "IOTransport::start() - transport is already "
+                    "closed - cannot restart");
             }
 
             // Make sure all variables that we need have been set.
             if (impl->inputStream == NULL || impl->outputStream == NULL ||
                 !impl->wireFormat)
             {
-                throw IOException(__FILE__,
-                                  __LINE__,
-                                  "IOTransport::start() - "
-                                  "IO streams and wireFormat instances must be "
-                                  "set before calling start");
+                throw activemq::exceptions::IOException(
+                    __FILE__,
+                    __LINE__,
+                    "IOTransport::start() - "
+                    "IO streams and wireFormat instances must be "
+                    "set before calling start");
             }
 
             // Start the polling thread.
@@ -305,9 +313,9 @@ void IOTransport::start()
             impl->thread->start();
         }
     }
-    AMQ_CATCH_RETHROW(IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, IOException)
-    AMQ_CATCHALL_THROW(IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(Exception, activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -317,9 +325,9 @@ void IOTransport::stop()
     {
         this->impl->started.store(false);
     }
-    AMQ_CATCH_RETHROW(IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, IOException)
-    AMQ_CATCHALL_THROW(IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(Exception, activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -361,8 +369,8 @@ void IOTransport::close()
             // No need to fire anymore async events now.
             this->impl->listener = NULL;
 
-            IOException error;
-            bool        hasException = false;
+            activemq::exceptions::IOException error;
+            bool                              hasException = false;
 
             // We have to close the input stream before we stop the thread. this
             // will force us to wake up the thread if it's stuck in a read
@@ -375,9 +383,10 @@ void IOTransport::close()
                     impl->inputStream->close();
                 }
             }
-            catch (IOException& ex)
+            catch (std::exception& ex)
             {
-                error = ex;
+                decaf::lang::Exception dex(__FILE__, __LINE__, "%s", ex.what());
+                error = activemq::exceptions::IOException(dex);
                 error.setMark(__FILE__, __LINE__);
                 hasException = true;
             }
@@ -390,11 +399,15 @@ void IOTransport::close()
                     impl->outputStream->close();
                 }
             }
-            catch (IOException& ex)
+            catch (std::exception& ex)
             {
                 if (!hasException)
                 {
-                    error = ex;
+                    decaf::lang::Exception dex(__FILE__,
+                                               __LINE__,
+                                               "%s",
+                                               ex.what());
+                    error = activemq::exceptions::IOException(dex);
                     error.setMark(__FILE__, __LINE__);
                     hasException = true;
                 }
@@ -406,9 +419,9 @@ void IOTransport::close()
             }
         }
     }
-    AMQ_CATCH_RETHROW(IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, IOException)
-    AMQ_CATCHALL_THROW(IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(Exception, activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -434,14 +447,43 @@ void IOTransport::run()
                 // Notify the listener.
                 fire(command);
             }
+            catch (activemq::exceptions::EOFException& ex)
+            {
+                AMQ_LOG_ERROR("IOTransport",
+                              "run() caught EOFException (connection closed): "
+                                  << ex.getMessage());
+                ActiveMQException wrapped(ex);
+                wrapped.setMark(__FILE__, __LINE__);
+                fire(wrapped);
+                break;
+            }
+            catch (activemq::exceptions::IOException& ex)
+            {
+                AMQ_LOG_ERROR("IOTransport",
+                              "run() caught IOException: " << ex.getMessage());
+                std::string errorMsg = ex.getMessage();
+                if (errorMsg.find("OpenSSL") != std::string::npos ||
+                    errorMsg.find("SSL") != std::string::npos ||
+                    errorMsg.find("TLS") != std::string::npos)
+                {
+                    AMQ_LOG_ERROR("IOTransport",
+                                  "run() SSL/TLS error detected - fatal, "
+                                  "propagating to FailoverTransport");
+                }
+                ActiveMQException wrapped(ex);
+                wrapped.setMark(__FILE__, __LINE__);
+                fire(wrapped);
+                break;
+            }
             catch (decaf::io::EOFException& ex)
             {
                 // EOF means connection closed - this is fatal, propagate up
                 AMQ_LOG_ERROR("IOTransport",
                               "run() caught EOFException (connection closed): "
                                   << ex.getMessage());
-                ex.setMark(__FILE__, __LINE__);
-                fire(ex);
+                ActiveMQException wrapped(ex);
+                wrapped.setMark(__FILE__, __LINE__);
+                fire(wrapped);
                 break;  // Exit the loop, connection is dead
             }
             catch (decaf::io::IOException& ex)
@@ -463,8 +505,9 @@ void IOTransport::run()
                                   "propagating to FailoverTransport");
                 }
 
-                ex.setMark(__FILE__, __LINE__);
-                fire(ex);
+                ActiveMQException wrapped(ex);
+                wrapped.setMark(__FILE__, __LINE__);
+                fire(wrapped);
                 break;  // All IO errors require connection reestablishment
             }
             catch (exceptions::ActiveMQException& ex)
@@ -477,15 +520,12 @@ void IOTransport::run()
                 fire(ex);
                 break;  // Fatal error, exit
             }
-            catch (decaf::lang::Exception& ex)
+            catch (std::exception& ex)
             {
-                // Other decaf exceptions indicate connection or protocol
-                // problems
                 AMQ_LOG_ERROR("IOTransport",
-                              "run() caught Exception: " << ex.getMessage());
+                              "run() caught Exception: " << ex.what());
 
-                // Check if this is an SSL/TLS error - these are always fatal
-                std::string errorMsg = ex.getMessage();
+                std::string errorMsg(ex.what());
                 if (errorMsg.find("OpenSSL") != std::string::npos ||
                     errorMsg.find("SSL") != std::string::npos ||
                     errorMsg.find("TLS") != std::string::npos)
@@ -495,9 +535,24 @@ void IOTransport::run()
                                   "propagating to FailoverTransport");
                 }
 
-                ex.setMark(__FILE__, __LINE__);
-                fire(ex);
-                break;  // Propagate to FailoverTransport for reconnection
+                const decaf::lang::Exception* dex =
+                    dynamic_cast<const decaf::lang::Exception*>(&ex);
+                if (dex != nullptr)
+                {
+                    decaf::lang::Exception copy(*dex);
+                    copy.setMark(__FILE__, __LINE__);
+                    fire(copy);
+                }
+                else
+                {
+                    decaf::lang::Exception wrapped(__FILE__,
+                                                   __LINE__,
+                                                   "%s",
+                                                   errorMsg.c_str());
+                    wrapped.setMark(__FILE__, __LINE__);
+                    fire(wrapped);
+                }
+                break;
             }
             catch (...)
             {
@@ -525,12 +580,24 @@ void IOTransport::run()
         ex.setMark(__FILE__, __LINE__);
         fire(ex);
     }
-    catch (decaf::lang::Exception& ex)
+    catch (std::exception& ex)
     {
-        AMQ_LOG_ERROR("IOTransport", "run() outer catch: " << ex.getMessage());
-        exceptions::ActiveMQException exl(ex);
-        exl.setMark(__FILE__, __LINE__);
-        fire(exl);
+        AMQ_LOG_ERROR("IOTransport", "run() outer catch: " << ex.what());
+        const decaf::lang::Exception* dex =
+            dynamic_cast<const decaf::lang::Exception*>(&ex);
+        if (dex != nullptr)
+        {
+            exceptions::ActiveMQException exl(*dex);
+            exl.setMark(__FILE__, __LINE__);
+            fire(exl);
+        }
+        else
+        {
+            decaf::lang::Exception cause(__FILE__, __LINE__, "%s", ex.what());
+            exceptions::ActiveMQException exl(cause);
+            exl.setMark(__FILE__, __LINE__);
+            fire(exl);
+        }
     }
     catch (...)
     {
@@ -553,7 +620,7 @@ std::shared_ptr<FutureResponse> IOTransport::asyncRequest(
     const std::shared_ptr<Command> command                   AMQCPP_UNUSED,
     const std::shared_ptr<ResponseCallback> responseCallback AMQCPP_UNUSED)
 {
-    throw UnsupportedOperationException(
+    throw activemq::exceptions::UnsupportedOperationException(
         __FILE__,
         __LINE__,
         "IOTransport::asyncRequest() - unsupported operation");
@@ -563,7 +630,7 @@ std::shared_ptr<FutureResponse> IOTransport::asyncRequest(
 std::shared_ptr<Response> IOTransport::request(
     const std::shared_ptr<Command> command AMQCPP_UNUSED)
 {
-    throw UnsupportedOperationException(
+    throw activemq::exceptions::UnsupportedOperationException(
         __FILE__,
         __LINE__,
         "IOTransport::request() - unsupported operation");
@@ -574,7 +641,7 @@ std::shared_ptr<Response> IOTransport::request(
     const std::shared_ptr<Command> command AMQCPP_UNUSED,
     unsigned int timeout                   AMQCPP_UNUSED)
 {
-    throw UnsupportedOperationException(
+    throw activemq::exceptions::UnsupportedOperationException(
         __FILE__,
         __LINE__,
         "IOTransport::request() - unsupported operation");

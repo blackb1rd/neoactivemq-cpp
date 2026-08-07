@@ -245,7 +245,7 @@ TEST_F(MarshallingSupportTest, testModifiedUtf8ToAscii)
             (int)sizeof(input) / (int)sizeof(unsigned char));
 
         ASSERT_THROW(MarshallingSupport::modifiedUtf8ToAscii(inputString),
-                     UTFDataFormatException)
+                     activemq::exceptions::UTFDataFormatException)
             << ("Should throw a UTFDataFormatException");
     }
 
@@ -269,7 +269,7 @@ TEST_F(MarshallingSupportTest, testModifiedUtf8ToAscii)
             (int)sizeof(input) / (int)sizeof(unsigned char));
 
         ASSERT_THROW(MarshallingSupport::modifiedUtf8ToAscii(inputString),
-                     UTFDataFormatException)
+                     activemq::exceptions::UTFDataFormatException)
             << ("Should throw a UTFDataFormatException");
     }
 
@@ -281,7 +281,7 @@ TEST_F(MarshallingSupportTest, testModifiedUtf8ToAscii)
             (int)sizeof(input) / (int)sizeof(unsigned char));
 
         ASSERT_THROW(MarshallingSupport::modifiedUtf8ToAscii(inputString),
-                     UTFDataFormatException)
+                     activemq::exceptions::UTFDataFormatException)
             << ("Should throw a UTFDataFormatException");
     }
 
@@ -293,7 +293,7 @@ TEST_F(MarshallingSupportTest, testModifiedUtf8ToAscii)
             (int)sizeof(input) / (int)sizeof(unsigned char));
 
         ASSERT_THROW(MarshallingSupport::modifiedUtf8ToAscii(inputString),
-                     UTFDataFormatException)
+                     activemq::exceptions::UTFDataFormatException)
             << ("Should throw a UTFDataFormatException");
     }
 
@@ -305,7 +305,7 @@ TEST_F(MarshallingSupportTest, testModifiedUtf8ToAscii)
             (int)sizeof(input) / (int)sizeof(unsigned char));
 
         ASSERT_THROW(MarshallingSupport::modifiedUtf8ToAscii(inputString),
-                     UTFDataFormatException)
+                     activemq::exceptions::UTFDataFormatException)
             << ("Should throw a UTFDataFormatException");
     }
 }

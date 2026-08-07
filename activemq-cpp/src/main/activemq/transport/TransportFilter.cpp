@@ -16,19 +16,19 @@
  */
 
 #include "TransportFilter.h"
-#include <decaf/io/IOException.h>
 
 #include <atomic>
 
+#include <activemq/exceptions/IoExceptions.h>
 #include <activemq/util/AMQLog.h>
 #include <activemq/wireformat/WireFormat.h>
 
 using namespace activemq;
+using namespace activemq::exceptions;
 using namespace activemq::transport;
 using namespace decaf::lang;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
-using namespace decaf::io;
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace activemq
@@ -184,18 +184,11 @@ void TransportFilter::start()
         return;
     }
 
-    if (this->listener == NULL)
-    {
-        throw decaf::io::IOException(__FILE__,
-                                     __LINE__,
-                                     "exceptionListener is invalid");
-    }
-
     if (this->next == NULL)
     {
-        throw decaf::io::IOException(__FILE__,
-                                     __LINE__,
-                                     "Transport chain is invalid");
+        throw activemq::exceptions::IOException(__FILE__,
+                                                __LINE__,
+                                                "Transport chain is invalid");
     }
 
     try
@@ -203,14 +196,33 @@ void TransportFilter::start()
         bool _e_start = false;
         if (this->impl->started.compare_exchange_strong(_e_start, true))
         {
-            beforeNextIsStarted();
-            next->start();
-            afterNextIsStarted();
+            try
+            {
+                beforeNextIsStarted();
+                next->start();
+                afterNextIsStarted();
+            }
+            catch (...)
+            {
+                // started was set true before the nested chain ran; if any
+                // stage throws we must run the normal stop teardown (socket,
+                // reader thread, etc.). Otherwise close()->stop() may see a
+                // stuck or inconsistent chain and rapid connect tests can crash
+                // (e.g. SEGV on Linux under load).
+                try
+                {
+                    this->stop();
+                }
+                catch (...)
+                {
+                }
+                throw;
+            }
         }
     }
-    AMQ_CATCH_RETHROW(IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, IOException)
-    AMQ_CATCHALL_THROW(IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(Exception, activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -228,19 +240,20 @@ void TransportFilter::stop()
         {
             if (!this->next)
             {
-                throw decaf::io::IOException(__FILE__,
-                                             __LINE__,
-                                             "Transport chain is invalid");
+                throw activemq::exceptions::IOException(
+                    __FILE__,
+                    __LINE__,
+                    "Transport chain is invalid");
             }
 
-            IOException error;
-            bool        hasException = false;
+            activemq::exceptions::IOException error;
+            bool                              hasException = false;
 
             try
             {
                 beforeNextIsStopped();
             }
-            catch (IOException& ex)
+            catch (activemq::exceptions::IOException& ex)
             {
                 error = ex;
                 error.setMark(__FILE__, __LINE__);
@@ -251,7 +264,7 @@ void TransportFilter::stop()
             {
                 next->stop();
             }
-            catch (IOException& ex)
+            catch (activemq::exceptions::IOException& ex)
             {
                 error = ex;
                 error.setMark(__FILE__, __LINE__);
@@ -262,7 +275,7 @@ void TransportFilter::stop()
             {
                 afterNextIsStopped();
             }
-            catch (IOException& ex)
+            catch (activemq::exceptions::IOException& ex)
             {
                 error = ex;
                 error.setMark(__FILE__, __LINE__);
@@ -275,9 +288,9 @@ void TransportFilter::stop()
             }
         }
     }
-    AMQ_CATCH_RETHROW(IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, IOException)
-    AMQ_CATCHALL_THROW(IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(Exception, activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -290,14 +303,14 @@ void TransportFilter::close()
 
     try
     {
-        IOException error;
-        bool        hasException = false;
+        activemq::exceptions::IOException error;
+        bool                              hasException = false;
 
         try
         {
             stop();
         }
-        catch (IOException& ex)
+        catch (activemq::exceptions::IOException& ex)
         {
             error = ex;
             error.setMark(__FILE__, __LINE__);
@@ -309,9 +322,10 @@ void TransportFilter::close()
         {
             if (!this->next)
             {
-                throw decaf::io::IOException(__FILE__,
-                                             __LINE__,
-                                             "Transport chain is invalid");
+                throw activemq::exceptions::IOException(
+                    __FILE__,
+                    __LINE__,
+                    "Transport chain is invalid");
             }
 
             next->setTransportListener(NULL);
@@ -320,7 +334,7 @@ void TransportFilter::close()
             {
                 next->close();
             }
-            catch (IOException& ex)
+            catch (activemq::exceptions::IOException& ex)
             {
                 error = ex;
                 error.setMark(__FILE__, __LINE__);
@@ -331,7 +345,7 @@ void TransportFilter::close()
             {
                 doClose();
             }
-            catch (IOException& ex)
+            catch (activemq::exceptions::IOException& ex)
             {
                 error = ex;
                 error.setMark(__FILE__, __LINE__);
@@ -344,9 +358,9 @@ void TransportFilter::close()
             throw error;
         }
     }
-    AMQ_CATCH_RETHROW(IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, IOException)
-    AMQ_CATCHALL_THROW(IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(Exception, activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -373,9 +387,9 @@ void TransportFilter::reconnect(const decaf::net::URI& uri)
     {
         next->reconnect(uri);
     }
-    AMQ_CATCH_RETHROW(IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, IOException)
-    AMQ_CATCHALL_THROW(IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(Exception, activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -404,6 +418,8 @@ void TransportFilter::checkClosed() const
 {
     if (this->impl->closed.load())
     {
-        throw IOException(__FILE__, __LINE__, "Transport is closed");
+        throw activemq::exceptions::IOException(__FILE__,
+                                                __LINE__,
+                                                "Transport is closed");
     }
 }

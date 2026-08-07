@@ -18,6 +18,8 @@
 #ifndef _DECAF_IO_UTFDATAFORMATEXCEPTION_H_
 #define _DECAF_IO_UTFDATAFORMATEXCEPTION_H_
 
+#include <cstdarg>
+
 #include <decaf/io/IOException.h>
 
 namespace decaf
@@ -107,6 +109,65 @@ namespace io
 
         virtual ~UTFDataFormatException() throw();
     };
+
+    inline UTFDataFormatException::UTFDataFormatException()
+        : io::IOException()
+    {
+    }
+
+    inline UTFDataFormatException::~UTFDataFormatException() throw()
+    {
+    }
+
+    inline UTFDataFormatException::UTFDataFormatException(
+        const lang::Exception& ex)
+        : io::IOException()
+    {
+        *(lang::Exception*)this = ex;
+    }
+
+    inline UTFDataFormatException::UTFDataFormatException(
+        const UTFDataFormatException& ex)
+        : io::IOException()
+    {
+        *(lang::Exception*)this = ex;
+    }
+
+    inline UTFDataFormatException::UTFDataFormatException(
+        const char*           file,
+        const int             lineNumber,
+        const std::exception* cause,
+        const char*           msg,
+        ...)
+        : io::IOException(cause)
+    {
+        va_list vargs;
+        va_start(vargs, msg);
+        buildMessage(msg, vargs);
+        va_end(vargs);
+
+        setMark(file, lineNumber);
+    }
+
+    inline UTFDataFormatException::UTFDataFormatException(
+        const std::exception* cause)
+        : io::IOException(cause)
+    {
+    }
+
+    inline UTFDataFormatException::UTFDataFormatException(const char* file,
+                                                          const int lineNumber,
+                                                          const char* msg,
+                                                          ...)
+        : io::IOException()
+    {
+        va_list vargs;
+        va_start(vargs, msg);
+        buildMessage(msg, vargs);
+        va_end(vargs);
+
+        setMark(file, lineNumber);
+    }
 
 }  // namespace io
 }  // namespace decaf

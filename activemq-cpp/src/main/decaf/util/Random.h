@@ -18,9 +18,9 @@
 #ifndef _DECAF_UTIL_RANDOM_H_
 #define _DECAF_UTIL_RANDOM_H_
 
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
 #include <decaf/util/Config.h>
 #include <cmath>
+#include <stdexcept>
 #include <vector>
 
 namespace decaf
@@ -145,7 +145,7 @@ namespace util
          *
          * @return the next pseudo random int value.
          *
-         * @throws IllegalArgumentException if n is less than or equal to zero.
+         * @throws std::invalid_argument if n is less than or equal to zero.
          */
         int nextInt(int n);
 

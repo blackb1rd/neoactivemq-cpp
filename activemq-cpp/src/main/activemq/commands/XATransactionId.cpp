@@ -17,18 +17,18 @@
 
 #include <activemq/commands/XATransactionId.h>
 #include <activemq/exceptions/ActiveMQException.h>
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <activemq/state/CommandVisitor.h>
 #include <cms/XAException.h>
 #include <decaf/internal/util/StringUtils.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/util/HashCode.h>
+#include <stdexcept>
 
 using namespace std;
 using namespace activemq;
 using namespace activemq::exceptions;
 using namespace activemq::commands;
 
-using namespace decaf::lang::exceptions;
 using namespace decaf::internal::util;
 
 /*
@@ -135,7 +135,7 @@ void XATransactionId::copyDataStructure(const DataStructure* src)
 
     if (srcPtr == NULL || src == NULL)
     {
-        throw decaf::lang::exceptions::NullPointerException(
+        throw activemq::exceptions::NullPointerException(
             __FILE__,
             __LINE__,
             "XATransactionId::copyDataStructure - src is NULL or invalid");

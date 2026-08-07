@@ -18,16 +18,15 @@
 #include <gtest/gtest.h>
 
 #include <decaf/io/Reader.h>
-#include <decaf/lang/exceptions/IndexOutOfBoundsException.h>
 
 #include <decaf/io/ByteArrayInputStream.h>
 #include <decaf/io/InputStreamReader.h>
+#include <stdexcept>
 #include <vector>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::io;
-using namespace decaf::lang::exceptions;
 
 class InputStreamReaderTest : public ::testing::Test
 {
@@ -101,8 +100,8 @@ TEST_F(InputStreamReaderTest, testClose)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(InputStreamReaderTest, testConstructorInputStream)
 {
-    ASSERT_THROW(InputStreamReader(NULL), NullPointerException)
-        << ("Should throw an NullPointerException");
+    ASSERT_THROW(InputStreamReader(NULL), std::logic_error)
+        << ("Should throw an std::logic_error");
 
     InputStreamReader* reader2 = new InputStreamReader(this->buffer1);
     reader2->close();

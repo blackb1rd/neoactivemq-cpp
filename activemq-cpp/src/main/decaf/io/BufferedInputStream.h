@@ -19,8 +19,8 @@
 #define _DECAF_IO_BUFFEREDINPUTSTREAM_H_
 
 #include <decaf/io/FilterInputStream.h>
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
 #include <decaf/util/Config.h>
+#include <stdexcept>
 
 namespace decaf
 {
@@ -72,7 +72,7 @@ namespace io
          * @param own
          *      Indicates if we own the stream object, defaults to false.
          *
-         * @throws IllegalArgumentException is the size is zero or negative.
+         * @throws std::invalid_argument is the size is zero or negative.
          */
         BufferedInputStream(InputStream* stream,
                             int          bufferSize,

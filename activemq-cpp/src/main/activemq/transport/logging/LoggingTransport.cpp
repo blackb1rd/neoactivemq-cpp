@@ -16,6 +16,8 @@
  */
 
 #include "LoggingTransport.h"
+#include <activemq/exceptions/StdExceptionCatchMacros.h>
+#include <stdexcept>
 
 using namespace std;
 using namespace activemq;
@@ -24,7 +26,6 @@ using namespace activemq::transport;
 using namespace activemq::transport::logging;
 using namespace decaf::io;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 LoggingTransport::LoggingTransport(const std::shared_ptr<Transport> next)
@@ -51,10 +52,10 @@ void LoggingTransport::oneway(const std::shared_ptr<Command> command)
         // Delegate to the base class.
         TransportFilter::oneway(command);
     }
-    AMQ_CATCH_RETHROW(IOException)
-    AMQ_CATCH_RETHROW(UnsupportedOperationException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, IOException)
-    AMQ_CATCHALL_THROW(IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCHALL_RETHROW_STL_BACKED_EXCEPTIONS()
+    AMQ_CATCH_EXCEPTION_CONVERT(Exception, activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -70,10 +71,10 @@ std::shared_ptr<Response> LoggingTransport::request(
 
         return response;
     }
-    AMQ_CATCH_RETHROW(IOException)
-    AMQ_CATCH_RETHROW(UnsupportedOperationException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, IOException)
-    AMQ_CATCHALL_THROW(IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCHALL_RETHROW_STL_BACKED_EXCEPTIONS()
+    AMQ_CATCH_EXCEPTION_CONVERT(Exception, activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -91,8 +92,8 @@ std::shared_ptr<Response> LoggingTransport::request(
 
         return response;
     }
-    AMQ_CATCH_RETHROW(IOException)
-    AMQ_CATCH_RETHROW(UnsupportedOperationException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, IOException)
-    AMQ_CATCHALL_THROW(IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCHALL_RETHROW_STL_BACKED_EXCEPTIONS()
+    AMQ_CATCH_EXCEPTION_CONVERT(Exception, activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }

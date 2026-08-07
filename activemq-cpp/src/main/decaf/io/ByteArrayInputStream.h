@@ -126,7 +126,7 @@ namespace io
          *      Indicates if this object should take ownership of the array,
          * default is false.
          *
-         * @throws NullPointerException if the buffer is Null.
+         * @throws std::logic_error if the buffer is Null.
          * @throws IllegalArguementException if the bufferSize is negative.
          */
         ByteArrayInputStream(const unsigned char* buffer,
@@ -149,7 +149,7 @@ namespace io
          *      Indicates if this object should take ownership of the array,
          * default is false.
          *
-         * @throws NullPointerException if the buffer is Null.
+         * @throws std::logic_error if the buffer is Null.
          * @throws IllegalArguementException if the bufferSize is negative.
          */
         ByteArrayInputStream(const unsigned char* buffer,
@@ -182,7 +182,7 @@ namespace io
          * @param bufferSize
          *      The size of the buffer.
          *
-         * @throws NullPointerException if the buffer is Null.
+         * @throws std::logic_error if the buffer is Null.
          * @throws IllegalArguementException if the bufferSize is negative.
          */
         virtual void setByteArray(const unsigned char* buffer, int bufferSize);
@@ -200,7 +200,7 @@ namespace io
          * @param length
          *      The number of bytes to read past the offset.
          *
-         * @throws NullPointerException if the buffer is Null.
+         * @throws std::logic_error if the buffer is Null.
          * @throws IllegalArguementException if the bufferSize is negative.
          */
         virtual void setByteArray(const unsigned char* buffer,

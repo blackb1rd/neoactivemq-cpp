@@ -21,7 +21,6 @@
 #include <decaf/internal/net/ssl/openssl/OpenSSLSocketException.h>
 #include <decaf/internal/net/ssl/openssl/OpenSSLSocketFactory.h>
 #include <decaf/lang/Pointer.h>
-#include <decaf/lang/exceptions/IllegalStateException.h>
 #include <decaf/net/SocketFactory.h>
 #include <decaf/net/ssl/SSLParameters.h>
 #include <decaf/security/KeyManagementException.h>
@@ -34,15 +33,17 @@
 #include <openssl/ssl.h>
 #include <openssl/x509.h>
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #ifdef _WIN32
 #include <wincrypt.h>
 #include <windows.h>
+#include <stdexcept>
+#include <string>
 #pragma comment(lib, "crypt32.lib")
 #endif
 
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::net;
 using namespace decaf::net::ssl;
 using namespace decaf::util;
@@ -158,9 +159,10 @@ void OpenSSLContextSpi::providerInit(SecureRandom* random)
 {
     if (random == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "SecureRandom instance passed was NULL.");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "SecureRandom instance passed was NULL.");
     }
 
     try
@@ -267,7 +269,6 @@ void OpenSSLContextSpi::providerInit(SecureRandom* random)
         random->nextBytes(seed);
         RAND_seed((void*)(&seed[0]), (int)seed.size());
     }
-    DECAF_CATCH_RETHROW(NullPointerException)
     DECAF_CATCH_RETHROW(KeyManagementException)
     DECAF_CATCH_EXCEPTION_CONVERT(Exception, KeyManagementException)
     DECAF_CATCHALL_THROW(KeyManagementException)
@@ -289,7 +290,6 @@ SocketFactory* OpenSSLContextSpi::providerGetSocketFactory()
 
         return this->data->clientSocketFactory.get();
     }
-    DECAF_CATCH_RETHROW(IllegalStateException)
     DECAF_CATCH_RETHROW(Exception)
     DECAF_CATCHALL_THROW(Exception)
 }
@@ -310,7 +310,6 @@ ServerSocketFactory* OpenSSLContextSpi::providerGetServerSocketFactory()
 
         return this->data->serverSocketFactory.get();
     }
-    DECAF_CATCH_RETHROW(IllegalStateException)
     DECAF_CATCH_RETHROW(Exception)
     DECAF_CATCHALL_THROW(Exception)
 }

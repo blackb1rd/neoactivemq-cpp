@@ -17,6 +17,7 @@
 
 #include <activemq/transport/discovery/AbstractDiscoveryAgent.h>
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <activemq/transport/discovery/DiscoveredBrokerData.h>
 #include <activemq/transport/discovery/DiscoveryListener.h>
 
@@ -30,14 +31,15 @@
 #include <atomic>
 #include <chrono>
 #include <memory>
+#include <stdexcept>
 
 using namespace activemq;
+using namespace activemq::exceptions;
 using namespace activemq::commands;
 using namespace activemq::transport;
 using namespace activemq::transport::discovery;
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::net;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
@@ -401,7 +403,7 @@ void AbstractDiscoveryAgent::run()
         {
             doDiscovery();
         }
-        catch (InterruptedException& ex)
+        catch (InterruptedException&)
         {
             return;
         }
@@ -445,7 +447,7 @@ void AbstractDiscoveryAgent::serviceFailed(
         {
             service = impl->discoveredServices.get(event.getServiceName());
         }
-        catch (NoSuchElementException& ex)
+        catch (NoSuchElementException&)
         {
         }
     }
@@ -616,7 +618,7 @@ void AbstractDiscoveryAgent::processLiveService(const std::string& brokerName,
             {
                 remoteBroker = impl->discoveredServices.get(service);
             }
-            catch (NoSuchElementException& ignored)
+            catch (NoSuchElementException&)
             {
             }
         }
@@ -651,7 +653,7 @@ void AbstractDiscoveryAgent::processDeadService(const std::string& service)
             {
                 remoteBroker = impl->discoveredServices.get(service);
             }
-            catch (NoSuchElementException& ignored)
+            catch (NoSuchElementException&)
             {
             }
         }

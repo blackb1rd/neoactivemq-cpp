@@ -32,7 +32,6 @@ using namespace activemq::exceptions;
 
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 
@@ -105,7 +104,7 @@ void ConnectionAudit::removeDispatcher(Dispatcher* dispatcher)
         {
             this->impl->dispatchers.remove(dispatcher);
         }
-        catch (NoSuchElementException& ex)
+        catch (NoSuchElementException&)
         {
         }
     }
@@ -130,7 +129,7 @@ bool ConnectionAudit::isDuplicate(Dispatcher*                        dispatcher,
                     {
                         audit = this->impl->destinations.get(destination);
                     }
-                    catch (NoSuchElementException& ex)
+                    catch (NoSuchElementException&)
                     {
                         audit.reset(new ActiveMQMessageAudit(
                             auditDepth,
@@ -145,7 +144,7 @@ bool ConnectionAudit::isDuplicate(Dispatcher*                        dispatcher,
                 {
                     audit = this->impl->dispatchers.get(dispatcher);
                 }
-                catch (NoSuchElementException& ex)
+                catch (NoSuchElementException&)
                 {
                     audit.reset(
                         new ActiveMQMessageAudit(auditDepth,
@@ -181,7 +180,7 @@ void ConnectionAudit::rollbackDuplicate(
                             this->impl->destinations.get(destination);
                         audit->rollback(message->getMessageId());
                     }
-                    catch (NoSuchElementException& ex)
+                    catch (NoSuchElementException&)
                     {
                     }
                 }
@@ -193,7 +192,7 @@ void ConnectionAudit::rollbackDuplicate(
                             this->impl->dispatchers.get(dispatcher);
                         audit->rollback(message->getMessageId());
                     }
-                    catch (NoSuchElementException& ex)
+                    catch (NoSuchElementException&)
                     {
                     }
                 }

@@ -19,17 +19,16 @@
 
 #include <activemq/transport/inactivity/InactivityMonitor.h>
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <chrono>
-
-#include <decaf/lang/exceptions/NullPointerException.h>
+#include <stdexcept>
+#include <string>
 
 using namespace activemq;
 using namespace activemq::transport;
 using namespace activemq::transport::inactivity;
 using namespace decaf;
 using namespace decaf::util;
-using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 WriteChecker::WriteChecker(InactivityMonitor* parent)
@@ -39,9 +38,10 @@ WriteChecker::WriteChecker(InactivityMonitor* parent)
 {
     if (this->parent == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "WriteChecker created with NULL parent.");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "WriteChecker created with NULL parent.");
     }
 }
 

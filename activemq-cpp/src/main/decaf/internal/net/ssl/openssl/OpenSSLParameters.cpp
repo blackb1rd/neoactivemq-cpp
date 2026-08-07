@@ -15,17 +15,18 @@
  * limitations under the License.
  */
 
+#include <decaf/lang/Exception.h>
+#include <decaf/lang/exceptions/ExceptionDefines.h>
+
 #include "OpenSSLParameters.h"
 
-#include <decaf/lang/exceptions/NullPointerException.h>
-
-#include <openssl/ssl.h>
-
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <memory>
+#include <stdexcept>
+#include <string>
 
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::internal;
 using namespace decaf::internal::net;
 using namespace decaf::internal::net::ssl;
@@ -45,7 +46,10 @@ OpenSSLParameters::OpenSSLParameters(SSL_CTX* context)
 {
     if (context == NULL)
     {
-        throw NullPointerException(__FILE__, __LINE__, "SSL Context was NULL");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "SSL Context was NULL");
     }
 
     // Create a new SSL instance for this Parameters object, each one needs its
@@ -60,7 +64,7 @@ OpenSSLParameters::~OpenSSLParameters()
     {
         SSL_free(this->ssl);
     }
-    DECAF_CATCH_NOTHROW(Exception)
+    DECAF_CATCH_NOTHROW(decaf::lang::Exception)
     DECAF_CATCHALL_NOTHROW()
 }
 

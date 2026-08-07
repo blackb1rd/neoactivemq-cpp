@@ -32,7 +32,6 @@ using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::net;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 class DiscoveryTransportFactoryTest : public ::testing::Test
 {

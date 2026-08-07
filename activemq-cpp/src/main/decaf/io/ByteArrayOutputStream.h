@@ -21,8 +21,8 @@
 #include <decaf/util/Config.h>
 
 #include <decaf/io/OutputStream.h>
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
 
+#include <stdexcept>
 #include <utility>
 
 namespace decaf
@@ -66,7 +66,7 @@ namespace io
          * @param bufferSize
          *      The size to use for the internal buffer.
          *
-         * @throw IllegalArgumentException if the size is less than or equal to
+         * @throws std::invalid_argument if the size is less than or equal to
          * zero.
          */
         ByteArrayOutputStream(int bufferSize);

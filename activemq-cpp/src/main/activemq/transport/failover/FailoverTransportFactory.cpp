@@ -96,15 +96,17 @@ std::shared_ptr<Transport> FailoverTransportFactory::doCreateComposite(
             topLvlProperties.getProperty("maxReconnectAttempts", "20"));
         transport->setMaxReconnectAttempts(maxReconnectAttempts);
 
-        // Default startupMaxReconnectAttempts to 0 (try once on initial
-        // connect, no retry). After the first successful connection,
-        // maxReconnectAttempts governs reconnection.
+        // When startupMaxReconnectAttempts is omitted, use -1 so
+        // calculateReconnectAttemptLimit() applies maxReconnectAttempts during
+        // the first-connection phase (matches Java client and unit tests).
+        // Explicit startupMaxReconnectAttempts=0 still means fail-fast on
+        // startup.
         std::string startupMaxStr =
             topLvlProperties.getProperty("startupMaxReconnectAttempts", "");
         int startupMaxReconnectAttempts;
         if (startupMaxStr.empty())
         {
-            startupMaxReconnectAttempts = 0;
+            startupMaxReconnectAttempts = -1;
         }
         else
         {

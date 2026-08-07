@@ -21,12 +21,11 @@
 #include <activemq/transport/TransportFactory.h>
 #include <activemq/util/AMQLog.h>
 
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/net/SocketFactory.h>
 #include <atomic>
 #include <memory>
 #include <mutex>
+#include <stdexcept>
 
 using namespace std;
 using namespace activemq;
@@ -40,7 +39,6 @@ using namespace decaf::util;
 using namespace decaf::util::concurrent;
 using namespace decaf::io;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 namespace activemq
 {
@@ -129,9 +127,9 @@ void TcpTransport::beforeNextIsStarted()
     {
         connect();
     }
-    AMQ_CATCH_RETHROW(IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, IOException)
-    AMQ_CATCHALL_THROW(IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(Exception, activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -146,9 +144,9 @@ void TcpTransport::afterNextIsStopped()
             impl->socket->close();
         }
     }
-    AMQ_CATCH_RETHROW(IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, IOException)
-    AMQ_CATCHALL_THROW(IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(Exception, activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -168,9 +166,9 @@ void TcpTransport::doClose()
             AMQ_LOG_DEBUG("TcpTransport", "Socket closed");
         }
     }
-    AMQ_CATCH_RETHROW(IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, IOException)
-    AMQ_CATCHALL_THROW(IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(Exception, activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -286,9 +284,9 @@ Socket* TcpTransport::createSocket()
         SocketFactory* factory = SocketFactory::getDefault();
         return factory->createSocket();
     }
-    DECAF_CATCH_RETHROW(IOException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IOException)
-    DECAF_CATCHALL_THROW(IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(Exception, activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -319,8 +317,6 @@ void TcpTransport::configureSocket(Socket* socket)
             socket->setSendBufferSize(soSendBufferSize);
         }
     }
-    DECAF_CATCH_RETHROW(NullPointerException)
-    DECAF_CATCH_RETHROW(IllegalArgumentException)
     DECAF_CATCH_RETHROW(SocketException)
     DECAF_CATCH_EXCEPTION_CONVERT(Exception, SocketException)
     DECAF_CATCHALL_THROW(SocketException)

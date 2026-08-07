@@ -18,8 +18,8 @@
 #include <activemq/util/CMSExceptionSupport.h>
 #include <activemq/wireformat/openwire/marshal/PrimitiveTypesMarshaller.h>
 
-#include <decaf/lang/exceptions/UnsupportedOperationException.h>
-
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <activemq/wireformat/openwire/marshal/OpenWireMarshalCatchMacros.h>
 #include <decaf/io/BufferedInputStream.h>
 #include <decaf/io/ByteArrayInputStream.h>
 #include <decaf/io/ByteArrayOutputStream.h>
@@ -27,13 +27,13 @@
 #include <decaf/io/DataOutputStream.h>
 #include <decaf/util/zip/DeflaterOutputStream.h>
 #include <decaf/util/zip/InflaterInputStream.h>
+#include <stdexcept>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::io;
 
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::zip;
 using namespace activemq;
@@ -155,73 +155,56 @@ void ActiveMQMapMessage::beforeMarshal(WireFormat* wireFormat)
             clearBody();
         }
     }
-    AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, decaf::io::IOException)
-    AMQ_CATCHALL_THROW(decaf::io::IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(decaf::lang::Exception,
+                                activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 PrimitiveMap& ActiveMQMapMessage::getMap()
 {
-    try
-    {
-        this->checkMapIsUnmarshalled();
-        return *map;
-    }
-    AMQ_CATCH_RETHROW(NullPointerException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, NullPointerException)
-    AMQ_CATCHALL_THROW(NullPointerException)
+    this->checkMapIsUnmarshalled();
+    return *map;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 const PrimitiveMap& ActiveMQMapMessage::getMap() const
 {
-    try
-    {
-        this->checkMapIsUnmarshalled();
-        return *map;
-    }
-    AMQ_CATCH_RETHROW(NullPointerException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, NullPointerException)
-    AMQ_CATCHALL_THROW(NullPointerException)
+    this->checkMapIsUnmarshalled();
+    return *map;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 void ActiveMQMapMessage::checkMapIsUnmarshalled() const
 {
-    try
+    if (map.get() == NULL && !getContent().empty())
     {
-        if (map.get() == NULL && !getContent().empty())
+        InputStream* is = new ByteArrayInputStream(getContent());
+
+        if (isCompressed())
         {
-            InputStream* is = new ByteArrayInputStream(getContent());
-
-            if (isCompressed())
-            {
-                is = new InflaterInputStream(is, true);
-                is = new BufferedInputStream(is, true);
-            }
-
-            DataInputStream dataIn(is, true);
-
-            map.reset(PrimitiveTypesMarshaller::unmarshalMap(dataIn));
-
-            if (map.get() == NULL)
-            {
-                throw NullPointerException(
-                    __FILE__,
-                    __LINE__,
-                    "ActiveMQMapMessage::getMap() - All attempts to create a "
-                    "map have failed.");
-            }
+            is = new InflaterInputStream(is, true);
+            is = new BufferedInputStream(is, true);
         }
-        else if (map.get() == NULL)
+
+        DataInputStream dataIn(is, true);
+
+        map.reset(PrimitiveTypesMarshaller::unmarshalMap(dataIn));
+
+        if (map.get() == NULL)
         {
-            map.reset(new PrimitiveMap());
+            throw activemq::exceptions::NullPointerException(
+                __FILE__,
+                __LINE__,
+                "ActiveMQMapMessage::getMap() - All attempts to create a "
+                "map have failed.");
         }
     }
-    AMQ_CATCH_RETHROW(NullPointerException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, NullPointerException)
-    AMQ_CATCHALL_THROW(NullPointerException)
+    else if (map.get() == NULL)
+    {
+        map.reset(new PrimitiveMap());
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -304,10 +287,7 @@ bool ActiveMQMapMessage::getBoolean(const std::string& name) const
     {
         return getMap().getBool(name);
     }
-    catch (UnsupportedOperationException& ex)
-    {
-        throw CMSExceptionSupport::createMessageFormatException(ex);
-    }
+    AMQ_CATCH_PROPERTY_LAYER_AS_MESSAGE_FORMAT()
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
 }
 
@@ -329,10 +309,7 @@ unsigned char ActiveMQMapMessage::getByte(const std::string& name) const
     {
         return getMap().getByte(name);
     }
-    catch (UnsupportedOperationException& ex)
-    {
-        throw CMSExceptionSupport::createMessageFormatException(ex);
-    }
+    AMQ_CATCH_PROPERTY_LAYER_AS_MESSAGE_FORMAT()
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
 }
 
@@ -355,10 +332,7 @@ std::vector<unsigned char> ActiveMQMapMessage::getBytes(
     {
         return getMap().getByteArray(name);
     }
-    catch (UnsupportedOperationException& ex)
-    {
-        throw CMSExceptionSupport::createMessageFormatException(ex);
-    }
+    AMQ_CATCH_PROPERTY_LAYER_AS_MESSAGE_FORMAT()
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
 }
 
@@ -381,10 +355,7 @@ char ActiveMQMapMessage::getChar(const std::string& name) const
     {
         return getMap().getChar(name);
     }
-    catch (UnsupportedOperationException& ex)
-    {
-        throw CMSExceptionSupport::createMessageFormatException(ex);
-    }
+    AMQ_CATCH_PROPERTY_LAYER_AS_MESSAGE_FORMAT()
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
 }
 
@@ -406,10 +377,7 @@ double ActiveMQMapMessage::getDouble(const std::string& name) const
     {
         return getMap().getDouble(name);
     }
-    catch (UnsupportedOperationException& ex)
-    {
-        throw CMSExceptionSupport::createMessageFormatException(ex);
-    }
+    AMQ_CATCH_PROPERTY_LAYER_AS_MESSAGE_FORMAT()
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
 }
 
@@ -431,10 +399,7 @@ float ActiveMQMapMessage::getFloat(const std::string& name) const
     {
         return getMap().getFloat(name);
     }
-    catch (UnsupportedOperationException& ex)
-    {
-        throw CMSExceptionSupport::createMessageFormatException(ex);
-    }
+    AMQ_CATCH_PROPERTY_LAYER_AS_MESSAGE_FORMAT()
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
 }
 
@@ -456,10 +421,7 @@ int ActiveMQMapMessage::getInt(const std::string& name) const
     {
         return getMap().getInt(name);
     }
-    catch (UnsupportedOperationException& ex)
-    {
-        throw CMSExceptionSupport::createMessageFormatException(ex);
-    }
+    AMQ_CATCH_PROPERTY_LAYER_AS_MESSAGE_FORMAT()
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
 }
 
@@ -481,10 +443,7 @@ long long ActiveMQMapMessage::getLong(const std::string& name) const
     {
         return getMap().getLong(name);
     }
-    catch (UnsupportedOperationException& ex)
-    {
-        throw CMSExceptionSupport::createMessageFormatException(ex);
-    }
+    AMQ_CATCH_PROPERTY_LAYER_AS_MESSAGE_FORMAT()
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
 }
 
@@ -506,10 +465,7 @@ short ActiveMQMapMessage::getShort(const std::string& name) const
     {
         return getMap().getShort(name);
     }
-    catch (UnsupportedOperationException& ex)
-    {
-        throw CMSExceptionSupport::createMessageFormatException(ex);
-    }
+    AMQ_CATCH_PROPERTY_LAYER_AS_MESSAGE_FORMAT()
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
 }
 
@@ -531,10 +487,7 @@ std::string ActiveMQMapMessage::getString(const std::string& name) const
     {
         return getMap().getString(name);
     }
-    catch (UnsupportedOperationException& ex)
-    {
-        throw CMSExceptionSupport::createMessageFormatException(ex);
-    }
+    AMQ_CATCH_PROPERTY_LAYER_AS_MESSAGE_FORMAT()
     AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
 }
 

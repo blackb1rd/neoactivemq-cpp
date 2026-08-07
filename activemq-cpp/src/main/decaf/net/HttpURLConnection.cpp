@@ -18,12 +18,14 @@
 #include <decaf/net/HttpURLConnection.h>
 
 #include <decaf/lang/Integer.h>
-#include <decaf/lang/exceptions/IllegalStateException.h>
 #include <decaf/net/ProtocolException.h>
+
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <stdexcept>
+#include <string>
 
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::net;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -156,21 +158,24 @@ void HttpURLConnection::setFixedLengthStreamingMode(int contentLength)
 {
     if (connected)
     {
-        throw IllegalStateException(__FILE__, __LINE__, "Already connected");
+        throw activemq::exceptions::IllegalStateException(__FILE__,
+                                                          __LINE__,
+                                                          "Already connected");
     }
 
     if (0 < chunkLength)
     {
-        throw IllegalStateException(__FILE__,
-                                    __LINE__,
-                                    "different mode already set");
+        throw activemq::exceptions::IllegalStateException(
+            __FILE__,
+            __LINE__,
+            "different mode already set");
     }
 
     if (0 > contentLength)
     {
-        throw IllegalArgumentException(__FILE__,
-                                       __LINE__,
-                                       "scale value < than zero");
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "scale value < than zero");
     }
 
     fixedContentLength = contentLength;
@@ -181,14 +186,17 @@ void HttpURLConnection::setChunkedStreamingMode(int chunklen)
 {
     if (connected)
     {
-        throw IllegalStateException(__FILE__, __LINE__, "Already connected");
+        throw activemq::exceptions::IllegalStateException(__FILE__,
+                                                          __LINE__,
+                                                          "Already connected");
     }
 
     if (0 <= fixedContentLength)
     {
-        throw IllegalStateException(__FILE__,
-                                    __LINE__,
-                                    "different mode already set");
+        throw activemq::exceptions::IllegalStateException(
+            __FILE__,
+            __LINE__,
+            "different mode already set");
     }
 
     if (0 >= chunklen)

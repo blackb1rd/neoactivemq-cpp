@@ -24,14 +24,14 @@
 #include <decaf/net/ServerSocket.h>
 #include <decaf/util/concurrent/Mutex.h>
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/internal/util/StringUtils.h>
-#include <decaf/lang/exceptions/RuntimeException.h>
+#include <decaf/lang/Exception.h>
 
 using namespace activemq;
 using namespace activemq::util;
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::net;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
@@ -122,9 +122,10 @@ std::string IdGenerator::generateId() const
 
     if (IdGenerator::kernel == NULL)
     {
-        throw RuntimeException(__FILE__,
-                               __LINE__,
-                               "Library is not initialized.");
+        throw activemq::exceptions::RuntimeException(
+            __FILE__,
+            __LINE__,
+            "Library is not initialized.");
     }
 
     synchronized(&(IdGenerator::kernel->mutex))

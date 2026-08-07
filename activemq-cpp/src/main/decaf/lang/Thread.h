@@ -19,11 +19,8 @@
 
 #include <decaf/lang/Exception.h>
 #include <decaf/lang/Runnable.h>
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
-#include <decaf/lang/exceptions/IllegalThreadStateException.h>
-#include <decaf/lang/exceptions/InterruptedException.h>
-#include <decaf/lang/exceptions/RuntimeException.h>
 #include <decaf/util/Config.h>
+#include <stdexcept>
 #include <thread>
 
 namespace decaf
@@ -202,7 +199,7 @@ namespace lang
          *
          * The stack size option is platform independent and may have no effect
          * on the newly created thread on some systems.  If the value given is
-         * invalid on the system a RuntimeException is thrown, the stack size
+         * invalid on the system a Exception is thrown, the stack size
          * can be invalid if it is outside the allowed range or doesn't match
          * the size of the system page size on some system.
          *
@@ -223,9 +220,9 @@ namespace lang
          * creation, the run() method of either this object or the provided
          * Runnable object will be invoked in the context of this thread.
          *
-         * @throws IllegalThreadStateException if the thread has already been
+         * @throws std::logic_error if the thread has already been
          * started.
-         * @throws RuntimeException if the Thread cannot be created for some
+         * @throws Exception if the Thread cannot be created for some
          * reason.
          */
         virtual void start();
@@ -233,7 +230,7 @@ namespace lang
         /**
          * Forces the Current Thread to wait until the thread exits.
          *
-         * @throws InterruptedException if any thread has interrupted the
+         * @throws std::runtime_error if any thread has interrupted the
          * current thread. The interrupted status of the current thread is
          * cleared when this exception is thrown.
          */
@@ -244,9 +241,9 @@ namespace lang
          *
          * @param millisecs the time in Milliseconds before the thread resumes
          *
-         * @throws IllegalArgumentException if the milliseconds parameter is
+         * @throws std::invalid_argument if the milliseconds parameter is
          * negative.
-         * @throws InterruptedException if any thread has interrupted the
+         * @throws std::runtime_error if any thread has interrupted the
          * current thread. The interrupted status of the current thread is
          * cleared when this exception is thrown.
          */
@@ -258,9 +255,9 @@ namespace lang
          * @param millisecs the time in Milliseconds before the thread resumes
          * @param nanos 0-999999 extra nanoseconds to sleep.
          *
-         * @throws IllegalArgumentException if the nanoseconds parameter is out
+         * @throws std::invalid_argument if the nanoseconds parameter is out
          * of range or the milliseconds paramter is negative.
-         * @throws InterruptedException if any thread has interrupted the
+         * @throws std::runtime_error if any thread has interrupted the
          * current thread. The interrupted status of the current thread is
          * cleared when this exception is thrown.
          */
@@ -308,7 +305,7 @@ namespace lang
          *
          * @param value the new priority value to assign to this Thread.
          *
-         * @throws IllegalArgumentException if the value is out of range.
+         * @throws std::invalid_argument if the value is out of range.
          */
         void setPriority(int value);
 
@@ -356,10 +353,10 @@ namespace lang
          *
          * When the thread is in one of its own join or sleep methods or blocked
          * by a call to a monitor or mutex wait call it will clear its
-         * interrupted flag and and an InterruptedException will be thrown.
+         * interrupted flag and and an std::runtime_error will be thrown.
          *
          * In other cases the thread's interrupted status will be set and an
-         * instance of an InterruptedException may be thrown.
+         * instance of an std::runtime_error may be thrown.
          *
          * If the thread is not alive when this method is called there is no
          * affect.
@@ -385,9 +382,9 @@ namespace lang
          *
          * @param millisecs time in milliseconds to halt execution.
          *
-         * @throws IllegalArgumentException if the milliseconds parameter is
+         * @throws std::invalid_argument if the milliseconds parameter is
          * negative.
-         * @throws InterruptedException if the Thread was interrupted while
+         * @throws std::runtime_error if the Thread was interrupted while
          * sleeping.
          */
         static void sleep(long long millisecs);
@@ -404,9 +401,9 @@ namespace lang
          * @param millisecs time in milliseconds to halt execution.
          * @param nanos 0-999999 extra nanoseconds to sleep.
          *
-         * @throws IllegalArgumentException if the nanoseconds parameter is out
+         * @throws std::invalid_argument if the nanoseconds parameter is out
          * of range or the milliseconds paramter is negative.
-         * @throws InterruptedException if the Thread was interrupted while
+         * @throws std::runtime_error if the Thread was interrupted while
          * sleeping.
          */
         static void sleep(long long millisecs, int nanos);

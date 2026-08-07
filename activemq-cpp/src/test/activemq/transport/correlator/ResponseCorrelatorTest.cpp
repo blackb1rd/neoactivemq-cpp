@@ -23,10 +23,11 @@
 #include <activemq/util/Config.h>
 #include <activemq/wireformat/WireFormat.h>
 #include <decaf/lang/Thread.h>
-#include <decaf/lang/exceptions/UnsupportedOperationException.h>
 #include <decaf/util/concurrent/Concurrent.h>
 #include <memory>
 #include <queue>
+#include <stdexcept>
+#include <string>
 #include <vector>
 
 using namespace activemq;
@@ -122,26 +123,23 @@ public:
         const std::shared_ptr<Command>          command,
         const std::shared_ptr<ResponseCallback> responseCallback)
     {
-        throw decaf::lang::exceptions::UnsupportedOperationException(__FILE__,
-                                                                     __LINE__,
-                                                                     "stuff");
+        throw std::logic_error(std::string(__FILE__) + ":" +
+                               std::to_string(__LINE__) + ": " + "stuff");
     }
 
     virtual std::shared_ptr<Response> request(
         const std::shared_ptr<Command> command AMQCPP_UNUSED)
     {
-        throw decaf::lang::exceptions::UnsupportedOperationException(__FILE__,
-                                                                     __LINE__,
-                                                                     "stuff");
+        throw std::logic_error(std::string(__FILE__) + ":" +
+                               std::to_string(__LINE__) + ": " + "stuff");
     }
 
     virtual std::shared_ptr<Response> request(
         const std::shared_ptr<Command> command AMQCPP_UNUSED,
         unsigned int timeout                   AMQCPP_UNUSED)
     {
-        throw decaf::lang::exceptions::UnsupportedOperationException(__FILE__,
-                                                                     __LINE__,
-                                                                     "stuff");
+        throw std::logic_error(std::string(__FILE__) + ":" +
+                               std::to_string(__LINE__) + ": " + "stuff");
     }
 
     virtual std::shared_ptr<wireformat::WireFormat> getWireFormat() const
@@ -526,7 +524,7 @@ TEST_F(ResponseCorrelatorTest, testTransportException)
     {
         correlator->request(cmd, 1000);
     }
-    catch (IOException& ex)
+    catch (activemq::exceptions::IOException& ex)
     {
         ASSERT_TRUE(false);
     }

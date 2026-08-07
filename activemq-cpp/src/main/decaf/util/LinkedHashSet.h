@@ -20,10 +20,9 @@
 
 #include <decaf/util/Config.h>
 
-#include <decaf/lang/exceptions/UnsupportedOperationException.h>
-#include <decaf/util/ConcurrentModificationException.h>
 #include <decaf/util/HashSet.h>
 #include <decaf/util/LinkedHashMap.h>
+#include <stdexcept>
 
 namespace decaf
 {
@@ -86,7 +85,7 @@ namespace util
      * The iterators returned by this class's iterator method are fail-fast: if
      * the set is modified at any time after the iterator is created, in any way
      * except through the iterator's own remove method, the iterator will throw
-     * a ConcurrentModificationException. Thus, in the face of concurrent
+     * a std::runtime_error. Thus, in the face of concurrent
      * modification, the iterator fails quickly and cleanly, rather than risking
      * arbitrary, non-deterministic behavior at an undetermined time in the
      * future.
@@ -94,7 +93,7 @@ namespace util
      * Note that the fail-fast behavior of an iterator cannot be guaranteed as
      * it is, generally speaking, impossible to make any hard guarantees in the
      * presence of unsynchronized concurrent modification. Fail-fast iterators
-     * throw ConcurrentModificationException on a best-effort basis. Therefore,
+     * throw std::runtime_error on a best-effort basis. Therefore,
      * it would be wrong to write a program that depended on this exception for
      * its correctness: the fail-fast behavior of iterators should be used only
      * to detect bugs.

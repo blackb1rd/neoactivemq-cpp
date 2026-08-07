@@ -26,14 +26,13 @@
 #include <cms/Destination.h>
 
 #include <decaf/lang/Pointer.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
+#include <stdexcept>
 
 using namespace activemq;
 using namespace activemq::util;
 using namespace activemq::commands;
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 class ActiveMQMessageTransformationTest : public ::testing::Test
 {
@@ -102,18 +101,18 @@ TEST_F(ActiveMQMessageTransformationTest, testTransformDestination)
 
     ASSERT_THROW(
         ActiveMQMessageTransformation::transformDestination(&customTopic, NULL),
-        NullPointerException)
-        << ("Should throw an NullPointerException");
+        std::logic_error)
+        << ("Should throw std::logic_error");
 
     ASSERT_THROW(
         ActiveMQMessageTransformation::transformDestination(NULL, NULL),
-        NullPointerException)
-        << ("Should throw an NullPointerException");
+        std::logic_error)
+        << ("Should throw std::logic_error");
 
     ASSERT_THROW(
         ActiveMQMessageTransformation::transformDestination(NULL, &transformed),
-        NullPointerException)
-        << ("Should throw an NullPointerException");
+        std::logic_error)
+        << ("Should throw std::logic_error");
 
     ASSERT_TRUE(
         ActiveMQMessageTransformation::transformDestination(&customTopic,

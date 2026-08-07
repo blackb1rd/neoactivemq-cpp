@@ -18,9 +18,11 @@
 #include "AdvisoryConsumer.h"
 
 #include <activemq/core/ActiveMQConstants.h>
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <activemq/util/AdvisorySupport.h>
-#include <decaf/lang/exceptions/ClassCastException.h>
 #include <atomic>
+#include <stdexcept>
+#include <string>
 
 using namespace activemq;
 using namespace activemq::core;
@@ -30,7 +32,6 @@ using namespace activemq::exceptions;
 
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 
@@ -70,9 +71,10 @@ AdvisoryConsumer::AdvisoryConsumer(
 {
     if (connection == nullptr)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "Parent Connection pointer was NULL");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "Parent Connection pointer was NULL");
     }
 
     this->config->info.reset(new ConsumerInfo());
@@ -160,17 +162,11 @@ void AdvisoryConsumer::dispatch(const std::shared_ptr<MessageDispatch>& message)
         message->getMessage()->getDataStructure();
     if (object != nullptr)
     {
-        try
+        std::shared_ptr<DestinationInfo> info =
+            std::dynamic_pointer_cast<DestinationInfo>(object);
+        if (info != nullptr)
         {
-            std::shared_ptr<DestinationInfo> info =
-                std::dynamic_pointer_cast<DestinationInfo>(object);
-            if (info != nullptr)
-            {
-                processDestinationInfo(info);
-            }
-        }
-        catch (ClassCastException& ex)
-        {
+            processDestinationInfo(info);
         }
     }
 }

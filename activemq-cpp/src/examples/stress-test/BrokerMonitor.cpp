@@ -34,7 +34,6 @@ extern bool VERBOSE;
 using namespace cms;
 using namespace cms::stress;
 using namespace activemq::cmsutil;
-using namespace decaf::lang::exceptions;
 using namespace decaf::lang;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;

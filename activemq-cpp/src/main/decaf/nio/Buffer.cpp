@@ -16,13 +16,12 @@
  */
 
 #include "Buffer.h"
-
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <stdexcept>
+#include <string>
 
 using namespace decaf;
 using namespace decaf::nio;
-using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 Buffer::Buffer(int capacity)
@@ -49,9 +48,8 @@ Buffer& Buffer::position(int newPosition)
 {
     if (newPosition < 0 || newPosition > this->_limit)
     {
-        throw IllegalArgumentException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
             "Buffer::position - New Position is greater than set limit");
     }
 
@@ -70,9 +68,8 @@ Buffer& Buffer::limit(int newLimit)
 {
     if (newLimit < 0 || newLimit > this->capacity())
     {
-        throw IllegalArgumentException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
             "Buffer::limit - new limit is larger than the capacity.");
     }
 

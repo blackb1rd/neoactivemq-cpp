@@ -25,16 +25,15 @@
 #include <decaf/lang/Long.h>
 #include <decaf/lang/Short.h>
 #include <decaf/lang/System.h>
-#include <decaf/lang/exceptions/IndexOutOfBoundsException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
-#include <decaf/lang/exceptions/StringIndexOutOfBoundsException.h>
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/internal/util/StringUtils.h>
+#include <stdexcept>
+#include <string>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::internal;
 using namespace decaf::internal::util;
 
@@ -118,11 +117,9 @@ String::String(const char value, int count)
 {
     if (count < 0)
     {
-        throw StringIndexOutOfBoundsException(
-            __FILE__,
-            __LINE__,
-            "count parameter out of Bounds: %d.",
-            count);
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "count parameter out of Bounds: " + std::to_string(count) + ".");
     }
 
     contents = new Contents(count);
@@ -156,9 +153,10 @@ String::String(const char* array)
 {
     if (array == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "Buffer pointer passed was NULL.");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "Buffer pointer passed was NULL.");
     }
 
     int size = StringUtils::stringLength(array);
@@ -180,18 +178,17 @@ String::String(const char* array, int size)
 {
     if (size < 0)
     {
-        throw StringIndexOutOfBoundsException(
-            __FILE__,
-            __LINE__,
-            "size parameter out of Bounds: %d.",
-            size);
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "size parameter out of Bounds: " + std::to_string(size) + ".");
     }
 
     if (array == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "Buffer pointer passed was NULL.");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "Buffer pointer passed was NULL.");
     }
 
     if (size > 0)
@@ -209,31 +206,28 @@ String::String(const char* array, int size)
 String::String(const char* array, int offset, int length)
     : contents()
 {
+    if (array == NULL)
+    {
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "Buffer pointer passed was NULL.");
+    }
+
     int size = StringUtils::stringLength(array);
 
     if (offset > size || offset < 0)
     {
-        throw StringIndexOutOfBoundsException(
-            __FILE__,
-            __LINE__,
-            "offset parameter out of Bounds: %d.",
-            offset);
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "offset parameter out of Bounds: " + std::to_string(offset) + ".");
     }
 
     if (length < 0 || length > size - offset)
     {
-        throw StringIndexOutOfBoundsException(
-            __FILE__,
-            __LINE__,
-            "length parameter out of Bounds: %d.",
-            length);
-    }
-
-    if (array == NULL)
-    {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "Buffer pointer passed was NULL.");
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "length parameter out of Bounds: " + std::to_string(length) + ".");
     }
 
     if (size > 0 && length > 0)
@@ -253,35 +247,31 @@ String::String(const char* array, int size, int offset, int length)
 {
     if (size < 0)
     {
-        throw IndexOutOfBoundsException(__FILE__,
-                                        __LINE__,
-                                        "size parameter out of Bounds: %d.",
-                                        size);
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "size parameter out of Bounds: " + std::to_string(size) + ".");
     }
 
     if (offset > size || offset < 0)
     {
-        throw StringIndexOutOfBoundsException(
-            __FILE__,
-            __LINE__,
-            "offset parameter out of Bounds: %d.",
-            offset);
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "offset parameter out of Bounds: " + std::to_string(offset) + ".");
     }
 
     if (length < 0 || length > size - offset)
     {
-        throw StringIndexOutOfBoundsException(
-            __FILE__,
-            __LINE__,
-            "length parameter out of Bounds: %d.",
-            length);
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "length parameter out of Bounds: " + std::to_string(length) + ".");
     }
 
     if (array == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "Buffer pointer passed was NULL.");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "Buffer pointer passed was NULL.");
     }
 
     if (size > 0 && length > 0)
@@ -341,9 +331,10 @@ String& String::operator=(const char* other)
 {
     if (other == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "Assignment from NULL not supported.");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "Assignment from NULL not supported.");
     }
 
     int length = StringUtils::stringLength(other);
@@ -522,17 +513,23 @@ char String::charAt(int index) const
     {
         if (index < 0 || index >= this->length())
         {
-            throw StringIndexOutOfBoundsException(
-                __FILE__,
-                __LINE__,
-                "Index given is out of bounds: %d.",
-                index);
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+                "Index given is out of bounds: " + std::to_string(index) + ".");
         }
 
         return this->contents->value[this->contents->offset + index];
     }
-    DECAF_CATCH_RETHROW(StringIndexOutOfBoundsException)
-    DECAF_CATCHALL_THROW(StringIndexOutOfBoundsException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -605,9 +602,10 @@ int String::compareTo(const char* string) const
 {
     if (string == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "Comparison C String cannot be NULL");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "Comparison C String cannot be NULL");
     }
 
     int length = StringUtils::stringLength(string);
@@ -693,9 +691,10 @@ int String::compareToIgnoreCase(const char* string) const
 {
     if (string == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "Comparison C String cannot be NULL");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "Comparison C String cannot be NULL");
     }
 
     int length = StringUtils::stringLength(string);
@@ -730,9 +729,10 @@ String String::copyValueOf(const char* data)
 {
     if (data == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "C String to be copied cannot be NULL");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "C String to be copied cannot be NULL");
     }
 
     return String(data, 0, StringUtils::stringLength(data));
@@ -743,9 +743,10 @@ String String::copyValueOf(char* data, int start, int length)
 {
     if (data == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "C String to be copied cannot be NULL");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "C String to be copied cannot be NULL");
     }
 
     return String(data, start, length);
@@ -1124,30 +1125,27 @@ void String::getChars(int   srcBegin,
 {
     if (srcBegin < 0 || srcBegin > srcEnd || srcEnd > contents->length)
     {
-        throw StringIndexOutOfBoundsException(
-            __FILE__,
-            __LINE__,
-            "Invalid start or end parameters: %d, %d",
-            srcBegin,
-            srcEnd);
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Invalid start or end parameters: " + std::to_string(srcBegin) +
+            ", " + std::to_string(srcEnd));
     }
 
     if (destSize < 0 || destBegin < 0 ||
         (destBegin + (srcEnd - srcBegin)) > destSize)
     {
-        throw StringIndexOutOfBoundsException(
-            __FILE__,
-            __LINE__,
-            "Invalid destination size or offset parameters: %d, %d",
-            destSize,
-            destBegin);
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Invalid destination size or offset parameters: " +
+            std::to_string(destSize) + ", " + std::to_string(destBegin));
     }
 
     if (dest == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "Destination pointer was Null");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "Destination pointer was Null");
     }
 
     // Note: last character not copied!
@@ -1724,7 +1722,9 @@ String String::substring(int start) const
                       contents->value);
     }
 
-    throw StringIndexOutOfBoundsException(__FILE__, __LINE__, start);
+    throw activemq::exceptions::OutOfRangeException(
+        std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+        "Invalid start index: " + std::to_string(start));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1737,15 +1737,21 @@ String String::substring(int start, int end) const
 
     if (start < 0)
     {
-        throw StringIndexOutOfBoundsException(__FILE__, __LINE__, start);
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Invalid start index: " + std::to_string(start));
     }
     else if (start > end)
     {
-        throw StringIndexOutOfBoundsException(__FILE__, __LINE__, end - start);
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Invalid length: " + std::to_string(end - start));
     }
     else if (end > contents->length)
     {
-        throw StringIndexOutOfBoundsException(__FILE__, __LINE__, end);
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Invalid end index: " + std::to_string(end));
     }
 
     // NOTE last character not copied!
@@ -1760,24 +1766,30 @@ CharSequence* String::subSequence(int start DECAF_UNUSED,
     {
         if (start > end)
         {
-            throw StringIndexOutOfBoundsException(
-                __FILE__,
-                __LINE__,
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
                 "Start index is greater than end index.");
         }
 
         if (end - start > this->length())
         {
-            throw StringIndexOutOfBoundsException(
-                __FILE__,
-                __LINE__,
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
                 "Requested Range is greater than the String length.");
         }
 
         return NULL;
     }
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCHALL_THROW(IndexOutOfBoundsException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////

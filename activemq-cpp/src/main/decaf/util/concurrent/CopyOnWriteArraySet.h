@@ -20,13 +20,12 @@
 
 #include <decaf/lang/ArrayPointer.h>
 #include <decaf/lang/Pointer.h>
-#include <decaf/lang/exceptions/IndexOutOfBoundsException.h>
 #include <decaf/util/AbstractSet.h>
 #include <decaf/util/Arrays.h>
-#include <decaf/util/NoSuchElementException.h>
 #include <decaf/util/Set.h>
 #include <decaf/util/concurrent/CopyOnWriteArrayList.h>
 #include <decaf/util/concurrent/Synchronizable.h>
+#include <stdexcept>
 
 namespace decaf
 {

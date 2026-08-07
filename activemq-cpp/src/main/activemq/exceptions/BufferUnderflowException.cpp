@@ -15,15 +15,16 @@
  * limitations under the License.
  */
 
-#include "BufferUnderflowException.h"
+#include <activemq/exceptions/BufferUnderflowException.h>
 
-using namespace decaf;
-using namespace decaf::nio;
-using namespace decaf::lang;
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <string>
+
+using namespace activemq::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 BufferUnderflowException::BufferUnderflowException()
-    : lang::Exception()
+    : std::out_of_range("")
 {
 }
 
@@ -33,53 +34,68 @@ BufferUnderflowException::~BufferUnderflowException() throw()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-BufferUnderflowException::BufferUnderflowException(const lang::Exception& ex)
-    : lang::Exception()
+BufferUnderflowException::BufferUnderflowException(
+    const BufferUnderflowException& ex)
+    : std::out_of_range(ex)
 {
-    *(lang::Exception*)this = ex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-BufferUnderflowException::BufferUnderflowException(
+BufferUnderflowException& BufferUnderflowException::operator=(
     const BufferUnderflowException& ex)
-    : lang::Exception()
 {
-    *(lang::Exception*)this = ex;
+    std::out_of_range::operator=(ex);
+    return *this;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+BufferUnderflowException::BufferUnderflowException(const std::string& message)
+    : std::out_of_range(message)
+{
+}
+
+////////////////////////////////////////////////////////////////////////////////
+BufferUnderflowException::BufferUnderflowException(const std::exception& ex)
+    : std::out_of_range(std::string(ex.what()))
+{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 BufferUnderflowException::BufferUnderflowException(const char* file,
                                                    const int   lineNumber,
-                                                   const std::exception* cause,
-                                                   const char*           msg,
-                                                   ...)
-    : lang::Exception(cause)
+                                                   const char* plainMessage)
+    : std::out_of_range(buildSourceMessage(file, lineNumber, plainMessage))
 {
-    va_list vargs;
-    va_start(vargs, msg);
-    buildMessage(msg, vargs);
+}
 
-    // Set the first mark for this exception.
-    setMark(file, lineNumber);
+////////////////////////////////////////////////////////////////////////////////
+std::string BufferUnderflowException::messageFromOwnedCause(
+    const std::exception* cause)
+{
+    if (cause == NULL)
+    {
+        return "";
+    }
+    std::string msg;
+    try
+    {
+        msg = std::string(cause->what());
+    }
+    catch (...)
+    {
+        msg = "<unknown>";
+    }
+    delete cause;
+    return msg;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 BufferUnderflowException::BufferUnderflowException(const std::exception* cause)
-    : lang::Exception(cause)
+    : std::out_of_range(messageFromOwnedCause(cause))
 {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-BufferUnderflowException::BufferUnderflowException(const char* file,
-                                                   const int   lineNumber,
-                                                   const char* msg,
-                                                   ...)
-    : lang::Exception()
+void BufferUnderflowException::setMark(const char*, int) noexcept
 {
-    va_list vargs;
-    va_start(vargs, msg);
-    buildMessage(msg, vargs);
-
-    // Set the first mark for this exception.
-    setMark(file, lineNumber);
 }

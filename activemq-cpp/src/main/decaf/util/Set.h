@@ -20,9 +20,9 @@
 
 #include <decaf/util/AbstractCollection.h>
 #include <decaf/util/Iterator.h>
-#include <decaf/util/NoSuchElementException.h>
 #include <decaf/util/concurrent/Mutex.h>
 #include <decaf/util/concurrent/Synchronizable.h>
+#include <stdexcept>
 
 namespace decaf
 {

@@ -22,6 +22,7 @@
 
 #include <decaf/io/FilterInputStream.h>
 #include <decaf/io/InputStream.h>
+#include <stdexcept>
 
 namespace decaf
 {
@@ -79,7 +80,7 @@ namespace io
          *      Boolean value indicating if this FilterInputStream owns the
          * wrapped stream.
          *
-         * @throws IllegalArgumentException if the bufSize argument is < zero.
+         * @throws std::invalid_argument if the bufSize argument is < zero.
          */
         PushbackInputStream(InputStream* stream, int bufSize, bool own = false);
 
@@ -109,8 +110,8 @@ namespace io
          * @param size
          *      The size of the array to be copied.
          *
-         * @throws NullPointerException if the buffer passed is NULL.
-         * @throws IndexOutOfBoundsException if the size value given is
+         * @throws std::logic_error if the buffer passed is NULL.
+         * @throws std::out_of_range if the size value given is
          * negative.
          * @throws IOException if there is not enough space in the pushback
          * buffer or this stream has already been closed.
@@ -131,8 +132,8 @@ namespace io
          * @param length
          *      The number of bytes to push back from the passed buffer.
          *
-         * @throws NullPointerException if the buffer passed is NULL.
-         * @throws IndexOutOfBoundsException if the offset + length is greater
+         * @throws std::logic_error if the buffer passed is NULL.
+         * @throws std::out_of_range if the offset + length is greater
          * than the buffer size.
          * @throws IOException if there is not enough space in the pushback
          * buffer or this stream has already been closed.

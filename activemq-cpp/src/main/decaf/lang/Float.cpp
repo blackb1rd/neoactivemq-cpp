@@ -16,15 +16,17 @@
  */
 
 #include "Float.h"
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/lang/ArrayPointer.h>
 #include <decaf/lang/Integer.h>
 #include <string.h>
 #include <limits>
+#include <stdexcept>
+#include <string>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 DECAF_API const int   Float::SIZE      = 32;
@@ -183,10 +185,8 @@ float Float::parseFloat(const String& value)
     // Not everything got read, meaning there wasn't just a number here.
     if (!stream.eof())
     {
-        throw exceptions::NumberFormatException(
-            __FILE__,
-            __LINE__,
-            "Failed to parse a valid float from input string: %s",
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string("Failed to parse a valid float from input string: ") +
             value.c_str());
     }
 

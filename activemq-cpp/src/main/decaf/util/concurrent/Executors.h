@@ -24,7 +24,8 @@
 #include <decaf/lang/Thread.h>
 #include <decaf/util/concurrent/Callable.h>
 
-#include <decaf/lang/exceptions/NullPointerException.h>
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <stdexcept>
 
 namespace decaf
 {
@@ -131,7 +132,7 @@ namespace util
              * @return pointer to a new ExecutorService that is owned by the
              * caller.
              *
-             * @throws IllegalArgumentException if nThreads is less than or
+             * @throws std::invalid_argument if nThreads is less than or
              * equal to zero.
              */
             static ExecutorService* newFixedThreadPool(int nThreads);
@@ -158,8 +159,8 @@ namespace util
              * @return pointer to a new ExecutorService that is owned by the
              * caller.
              *
-             * @throws NullPointerException if threadFactory is NULL.
-             * @throws IllegalArgumentException if nThreads is less than or
+             * @throws std::logic_error if threadFactory is NULL.
+             * @throws std::invalid_argument if nThreads is less than or
              * equal to zero.
              */
             static ExecutorService* newFixedThreadPool(
@@ -199,7 +200,7 @@ namespace util
              *
              * @return a new Executor pointer that is owned by the caller.
              *
-             * @throws NullPointerException if threadFactory is NULL.
+             * @throws std::logic_error if threadFactory is NULL.
              */
             static ExecutorService* newSingleThreadExecutor(
                 ThreadFactory* threadFactory);
@@ -219,7 +220,7 @@ namespace util
              * @return a new ExecutorService pointer that is owned by the
              * caller.
              *
-             * @throws NullPointerException if ExecutorService is NULL.
+             * @throws std::logic_error if ExecutorService is NULL.
              */
             static ExecutorService* unconfigurableExecutorService(
                 ExecutorService* executor);
@@ -237,7 +238,7 @@ namespace util
              *
              * @return a new Callable<E> pointer that is owned by the caller.
              *
-             * @throws NullPointerException if the Runnable task is NULL
+             * @throws std::logic_error if the Runnable task is NULL
              */
             template <typename E>
             static Callable<E>* callable(decaf::lang::Runnable* task,
@@ -245,7 +246,7 @@ namespace util
             {
                 if (task == NULL)
                 {
-                    throw decaf::lang::exceptions::NullPointerException(
+                    throw activemq::exceptions::NullPointerException(
                         __FILE__,
                         __LINE__,
                         "The Runnable task argument cannot be NULL");
@@ -269,7 +270,7 @@ namespace util
              *
              * @return a new Callable<E> pointer that is owned by the caller.
              *
-             * @throws NullPointerException if the Runnable task is NULL
+             * @throws std::logic_error if the Runnable task is NULL
              */
             template <typename E>
             static Callable<E>* callable(decaf::lang::Runnable* task,
@@ -278,7 +279,7 @@ namespace util
             {
                 if (task == NULL)
                 {
-                    throw decaf::lang::exceptions::NullPointerException(
+                    throw activemq::exceptions::NullPointerException(
                         __FILE__,
                         __LINE__,
                         "The Runnable task argument cannot be NULL");

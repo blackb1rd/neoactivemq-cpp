@@ -18,10 +18,12 @@
 #include "Byte.h"
 #include <decaf/lang/Integer.h>
 
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <stdexcept>
+
 using namespace std;
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 const unsigned char Byte::MIN_VALUE = 0x7F;
@@ -60,9 +62,7 @@ unsigned char Byte::parseByte(const String& s, int radix)
     unsigned char result   = (unsigned char)intValue;
     if (result != intValue)
     {
-        throw NumberFormatException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::NumberFormatException(
             "Byte::parseByte - Not a valid unsigned char encoded string.");
     }
 
@@ -82,9 +82,7 @@ Byte Byte::decode(const String& value)
     unsigned char result   = (unsigned char)intValue;
     if (result != intValue)
     {
-        throw NumberFormatException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::NumberFormatException(
             "Byte::decode - Not a valid unsigned char encoded string.");
     }
 

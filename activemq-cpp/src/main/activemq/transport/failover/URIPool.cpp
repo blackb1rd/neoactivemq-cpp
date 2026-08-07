@@ -20,7 +20,9 @@
 #include <chrono>
 #include <memory>
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/util/Random.h>
+#include <string>
 
 using namespace activemq;
 using namespace activemq::transport;
@@ -29,7 +31,6 @@ using namespace decaf;
 using namespace decaf::net;
 using namespace decaf::util;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 URIPool::URIPool()
@@ -115,9 +116,10 @@ URI URIPool::getURI()
         }
     }
 
-    throw NoSuchElementException(__FILE__,
-                                 __LINE__,
-                                 "URI Pool is currently empty.");
+    throw activemq::exceptions::NoSuchElementException(
+        __FILE__,
+        __LINE__,
+        "URI Pool is currently empty.");
 }
 
 ////////////////////////////////////////////////////////////////////////////////

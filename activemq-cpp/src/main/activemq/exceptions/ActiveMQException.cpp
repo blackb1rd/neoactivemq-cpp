@@ -16,6 +16,8 @@
  */
 
 #include "ActiveMQException.h"
+
+#include <activemq/exceptions/IoExceptions.h>
 #include <decaf/util/logging/LoggerDefines.h>
 #include <stdio.h>
 
@@ -44,6 +46,12 @@ ActiveMQException::ActiveMQException(const ActiveMQException& ex)
 ////////////////////////////////////////////////////////////////////////////////
 ActiveMQException::ActiveMQException(const Exception& ex)
     : decaf::lang::Exception(ex.clone())
+{
+}
+
+////////////////////////////////////////////////////////////////////////////////
+ActiveMQException::ActiveMQException(const activemq::exceptions::IOException& ex)
+    : decaf::lang::Exception(__FILE__, __LINE__, "%s", ex.getMessage().c_str())
 {
 }
 

@@ -21,14 +21,15 @@
 #include <activemq/commands/Message.h>
 #include <activemq/core/ActiveMQAckHandler.h>
 #include <activemq/core/ActiveMQConnection.h>
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <activemq/util/CMSExceptionSupport.h>
 #include <activemq/util/Config.h>
 #include <activemq/wireformat/openwire/marshal/BaseDataStreamMarshaller.h>
 #include <activemq/wireformat/openwire/utils/MessagePropertyInterceptor.h>
 #include <cms/DeliveryMode.h>
 
-#include <decaf/lang/exceptions/UnsupportedOperationException.h>
 #include <memory>
+#include <stdexcept>
 
 #include <cms/IllegalStateException.h>
 #include <cms/MessageFormatException.h>
@@ -203,11 +204,7 @@ namespace commands
                 this->ensurePropertiesUnmarshaled();
                 return this->propertiesInterceptor->getBooleanProperty(name);
             }
-            catch (decaf::lang::exceptions::UnsupportedOperationException& ex)
-            {
-                throw activemq::util::CMSExceptionSupport::
-                    createMessageFormatException(ex);
-            }
+            AMQ_CATCH_PROPERTY_LAYER_AS_MESSAGE_FORMAT()
             AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
         }
 
@@ -220,11 +217,7 @@ namespace commands
                 this->ensurePropertiesUnmarshaled();
                 return this->propertiesInterceptor->getByteProperty(name);
             }
-            catch (decaf::lang::exceptions::UnsupportedOperationException& ex)
-            {
-                throw activemq::util::CMSExceptionSupport::
-                    createMessageFormatException(ex);
-            }
+            AMQ_CATCH_PROPERTY_LAYER_AS_MESSAGE_FORMAT()
             AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
         }
 
@@ -237,11 +230,7 @@ namespace commands
                 this->ensurePropertiesUnmarshaled();
                 return this->propertiesInterceptor->getDoubleProperty(name);
             }
-            catch (decaf::lang::exceptions::UnsupportedOperationException& ex)
-            {
-                throw activemq::util::CMSExceptionSupport::
-                    createMessageFormatException(ex);
-            }
+            AMQ_CATCH_PROPERTY_LAYER_AS_MESSAGE_FORMAT()
             AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
         }
 
@@ -254,11 +243,7 @@ namespace commands
                 this->ensurePropertiesUnmarshaled();
                 return this->propertiesInterceptor->getFloatProperty(name);
             }
-            catch (decaf::lang::exceptions::UnsupportedOperationException& ex)
-            {
-                throw activemq::util::CMSExceptionSupport::
-                    createMessageFormatException(ex);
-            }
+            AMQ_CATCH_PROPERTY_LAYER_AS_MESSAGE_FORMAT()
             AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
         }
 
@@ -271,11 +256,7 @@ namespace commands
                 this->ensurePropertiesUnmarshaled();
                 return this->propertiesInterceptor->getIntProperty(name);
             }
-            catch (decaf::lang::exceptions::UnsupportedOperationException& ex)
-            {
-                throw activemq::util::CMSExceptionSupport::
-                    createMessageFormatException(ex);
-            }
+            AMQ_CATCH_PROPERTY_LAYER_AS_MESSAGE_FORMAT()
             AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
         }
 
@@ -288,11 +269,7 @@ namespace commands
                 this->ensurePropertiesUnmarshaled();
                 return this->propertiesInterceptor->getLongProperty(name);
             }
-            catch (decaf::lang::exceptions::UnsupportedOperationException& ex)
-            {
-                throw activemq::util::CMSExceptionSupport::
-                    createMessageFormatException(ex);
-            }
+            AMQ_CATCH_PROPERTY_LAYER_AS_MESSAGE_FORMAT()
             AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
         }
 
@@ -305,11 +282,7 @@ namespace commands
                 this->ensurePropertiesUnmarshaled();
                 return this->propertiesInterceptor->getShortProperty(name);
             }
-            catch (decaf::lang::exceptions::UnsupportedOperationException& ex)
-            {
-                throw activemq::util::CMSExceptionSupport::
-                    createMessageFormatException(ex);
-            }
+            AMQ_CATCH_PROPERTY_LAYER_AS_MESSAGE_FORMAT()
             AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
         }
 
@@ -322,11 +295,7 @@ namespace commands
                 this->ensurePropertiesUnmarshaled();
                 return this->propertiesInterceptor->getStringProperty(name);
             }
-            catch (decaf::lang::exceptions::UnsupportedOperationException& ex)
-            {
-                throw activemq::util::CMSExceptionSupport::
-                    createMessageFormatException(ex);
-            }
+            AMQ_CATCH_PROPERTY_LAYER_AS_MESSAGE_FORMAT()
             AMQ_CATCH_ALL_THROW_CMSEXCEPTION()
         }
 
@@ -556,10 +525,16 @@ namespace commands
                 std::shared_ptr<MessageId> id(new MessageId(value));
                 this->setMessageId(id);
             }
-            catch (decaf::lang::exceptions::NumberFormatException& e)
+            catch (const std::invalid_argument&)
             {
                 // we must be some foreign JMS provider or strange user-supplied
                 // String so lets set the IDs to be 1
+                std::shared_ptr<MessageId> id(new MessageId);
+                id->setTextView(value);
+                this->setMessageId(id);
+            }
+            catch (const ::activemq::exceptions::OutOfRangeException&)
+            {
                 std::shared_ptr<MessageId> id(new MessageId);
                 id->setTextView(value);
                 this->setMessageId(id);

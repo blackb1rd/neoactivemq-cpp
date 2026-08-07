@@ -28,17 +28,19 @@
 #include <decaf/io/ByteArrayOutputStream.h>
 #include <decaf/lang/Exception.h>
 #include <decaf/lang/Thread.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/util/Random.h>
 #include <decaf/util/concurrent/Concurrent.h>
 #include <decaf/util/concurrent/CountDownLatch.h>
 #include <decaf/util/concurrent/Mutex.h>
 
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <stdexcept>
+#include <string>
+
 using namespace activemq;
 using namespace activemq::transport;
 using namespace activemq::exceptions;
 using namespace decaf::io;
-using namespace decaf::lang::exceptions;
 
 class IOTransportTest : public ::testing::Test
 {
@@ -134,14 +136,15 @@ public:
         {
             if (throwException)
             {
-                throw IOException();
+                throw activemq::exceptions::IOException();
             }
 
             if (inputStream == NULL)
             {
-                throw NullPointerException(__FILE__,
-                                           __LINE__,
-                                           "InputStream passed is Null");
+                throw activemq::exceptions::IllegalStateException(
+                    __FILE__,
+                    __LINE__,
+                    "InputStream passed is Null");
             }
 
             decaf::util::Random randGen;
@@ -160,11 +163,13 @@ public:
                 catch (decaf::lang::Exception& ex)
                 {
                     ex.setMark(__FILE__, __LINE__);
-                    throw IOException();
+                    throw activemq::exceptions::IOException();
                 }
                 catch (...)
                 {
-                    throw IOException(__FILE__, __LINE__, "Catch all");
+                    throw activemq::exceptions::IOException(__FILE__,
+                                                            __LINE__,
+                                                            "Catch all");
                 }
 
                 return command;
@@ -172,13 +177,13 @@ public:
         }
         catch (decaf::lang::Exception& ex)
         {
-            IOException cx;
+            activemq::exceptions::IOException cx;
             cx.setMark(__FILE__, __LINE__);
             throw cx;
         }
         catch (...)
         {
-            IOException cx;
+            activemq::exceptions::IOException cx;
             cx.setMark(__FILE__, __LINE__);
             throw cx;
         }
@@ -203,11 +208,13 @@ public:
         catch (decaf::lang::Exception& ex)
         {
             ex.setMark(__FILE__, __LINE__);
-            throw IOException(ex);
+            throw activemq::exceptions::IOException(ex);
         }
         catch (...)
         {
-            throw IOException(__FILE__, __LINE__, "writeCommand");
+            throw activemq::exceptions::IOException(__FILE__,
+                                                    __LINE__,
+                                                    "writeCommand");
         }
     }
 };

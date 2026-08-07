@@ -16,7 +16,6 @@
  */
 
 #include <decaf/lang/System.h>
-#include <decaf/lang/exceptions/UnsupportedOperationException.h>
 #include <decaf/util/Config.h>
 #include <decaf/util/Date.h>
 
@@ -36,7 +35,6 @@ using namespace std;
 using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 Date::Date()

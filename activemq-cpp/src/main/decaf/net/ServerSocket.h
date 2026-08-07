@@ -24,11 +24,10 @@
 #include <decaf/net/SocketImplFactory.h>
 
 #include <decaf/io/IOException.h>
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/net/SocketTimeoutException.h>
 #include <decaf/net/UnknownHostException.h>
 
+#include <stdexcept>
 #include <string>
 
 namespace decaf
@@ -93,7 +92,7 @@ namespace net
          *
          * @throws IOException if there is an I/O error while performing this
          * operation.
-         * @throws IllegalArgumentException if the port value is negative or
+         * @throws std::invalid_argument if the port value is negative or
          * greater than 65535.
          */
         ServerSocket(int port);
@@ -119,7 +118,7 @@ namespace net
          *
          * @throws IOException if there is an I/O error while performing this
          * operation.
-         * @throws IllegalArgumentException if the port value is negative or
+         * @throws std::invalid_argument if the port value is negative or
          * greater than 65535.
          */
         ServerSocket(int port, int backlog);
@@ -148,7 +147,7 @@ namespace net
          *
          * @throws IOException if there is an I/O error while performing this
          * operation.
-         * @throws IllegalArgumentException if the port value is negative or
+         * @throws std::invalid_argument if the port value is negative or
          * greater than 65535.
          */
         ServerSocket(int port, int backlog, const InetAddress* address);
@@ -168,7 +167,7 @@ namespace net
          * @param impl
          *      The SocketImpl instance to wrap.
          *
-         * @throws NullPointerException if the passed SocketImpl is Null.
+         * @throws std::logic_error if the passed SocketImpl is Null.
          */
         ServerSocket(SocketImpl* impl);
 
@@ -184,7 +183,7 @@ namespace net
          *      The TCP port between 1..655535.
          *
          * @throws IOException if an I/O error occurs while binding the socket.
-         * @throws IllegalArgumentException if the parameters are not valid.
+         * @throws std::invalid_argument if the parameters are not valid.
          */
         virtual void bind(const std::string& host, int port);
 
@@ -205,7 +204,7 @@ namespace net
          *      The size of listen backlog.
          *
          * @throws IOException if an I/O error occurs while binding the socket.
-         * @throws IllegalArgumentException if the parameters are not valid.
+         * @throws std::invalid_argument if the parameters are not valid.
          */
         virtual void bind(const std::string& host, int port, int backlog);
 
@@ -263,7 +262,7 @@ namespace net
          *      Number of bytes to set the receive buffer to.
          *
          * @throws SocketException if the operation fails.
-         * @throws IllegalArgumentException if the value is zero or negative.
+         * @throws std::invalid_argument if the value is zero or negative.
          */
         virtual void setReceiveBufferSize(int size);
 
@@ -303,7 +302,7 @@ namespace net
          *      The timeout in milliseconds for socket operations.
          *
          * @throws SocketException Thrown if unable to set the information.
-         * @throws IllegalArgumentException if the timeout value is negative.
+         * @throws std::invalid_argument if the timeout value is negative.
          */
         virtual void setSoTimeout(int timeout);
 

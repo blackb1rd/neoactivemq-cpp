@@ -20,9 +20,10 @@
 
 #include <decaf/util/Config.h>
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/lang/Pointer.h>
 #include <decaf/lang/Thread.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
+#include <stdexcept>
 
 #include <decaf/util/concurrent/Callable.h>
 #include <decaf/util/concurrent/CancellationException.h>
@@ -433,14 +434,14 @@ namespace util
              *      Boolean value indicating if the Executor now owns the
              * pointer to the task.
              *
-             * @throws NullPointerException if callable pointer is NULL
+             * @throws std::logic_error if callable pointer is NULL
              */
             FutureTask(Callable<T>* callable, bool takeOwnership = true)
                 : sync(NULL)
             {
                 if (callable == NULL)
                 {
-                    throw decaf::lang::exceptions::NullPointerException(
+                    throw activemq::exceptions::NullPointerException(
                         __FILE__,
                         __LINE__,
                         "The Callable pointer passed to the constructor was "
@@ -465,7 +466,7 @@ namespace util
              *      Boolean value indicating if the Executor now owns the
              * pointer to the task.
              *
-             * @throws NullPointerException if runnable is NULL.
+             * @throws std::logic_error if runnable is NULL.
              */
             FutureTask(decaf::lang::Runnable* runnable,
                        const T&               result,
@@ -474,7 +475,7 @@ namespace util
             {
                 if (runnable == NULL)
                 {
-                    throw decaf::lang::exceptions::NullPointerException(
+                    throw activemq::exceptions::NullPointerException(
                         __FILE__,
                         __LINE__,
                         "The Runnable pointer passed to the constructor was "

@@ -19,18 +19,16 @@
 
 #include <decaf/lang/Boolean.h>
 #include <decaf/lang/Integer.h>
-#include <decaf/lang/exceptions/SecurityException.h>
-#include <decaf/lang/exceptions/StringIndexOutOfBoundsException.h>
 #include <decaf/net/URI.h>
 #include <decaf/net/URL.h>
 #include <decaf/net/URLStreamHandler.h>
 #include <decaf/net/URLStreamHandlerFactory.h>
+#include <stdexcept>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::net;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 class URLTest : public ::testing::Test
 {
@@ -580,45 +578,44 @@ TEST_F(URLTest, testURLStreamHandlerParseURL)
     MyURLStreamHandler handler;
 
     ASSERT_THROW(handler.parse(url, "//", 0, Integer::MIN_VALUE),
-                 StringIndexOutOfBoundsException)
-        << ("Should have thrown an StringIndexOutOfBoundsException");
+                 std::out_of_range)
+        << ("Should have thrown std::out_of_range");
 
     ASSERT_THROW(handler.parse(url, "1234//", 4, Integer::MIN_VALUE),
-                 StringIndexOutOfBoundsException)
-        << ("Should have thrown an StringIndexOutOfBoundsException");
+                 std::out_of_range)
+        << ("Should have thrown std::out_of_range");
 
-    ASSERT_THROW(handler.parse(url, "1", -1, 0), StringIndexOutOfBoundsException)
-        << ("Should have thrown an StringIndexOutOfBoundsException");
+    ASSERT_THROW(handler.parse(url, "1", -1, 0), std::out_of_range)
+        << ("Should have thrown std::out_of_range");
 
-    ASSERT_THROW(handler.parse(url, "1", 3, 2), SecurityException)
+    ASSERT_THROW(handler.parse(url, "1", 3, 2), std::logic_error)
         << ("Should have thrown an SecurityException");
 
     ASSERT_THROW(handler.parse(url, "11", 1, Integer::MIN_VALUE),
-                 SecurityException)
+                 std::logic_error)
         << ("Should have thrown an SecurityException");
 
     ASSERT_THROW(handler.parse(url, "any", 10, Integer::MIN_VALUE),
-                 StringIndexOutOfBoundsException)
-        << ("Should have thrown an StringIndexOutOfBoundsException");
+                 std::out_of_range)
+        << ("Should have thrown std::out_of_range");
 
     ASSERT_THROW(handler.parse(url, "any", 10, Integer::MIN_VALUE + 1),
-                 StringIndexOutOfBoundsException)
-        << ("Should have thrown an StringIndexOutOfBoundsException");
+                 std::out_of_range)
+        << ("Should have thrown std::out_of_range");
 
     ASSERT_THROW(
         handler.parse(url, "any", Integer::MIN_VALUE, Integer::MIN_VALUE),
-        StringIndexOutOfBoundsException)
-        << ("Should have thrown an StringIndexOutOfBoundsException");
+        std::out_of_range)
+        << ("Should have thrown std::out_of_range");
 
     ASSERT_THROW(handler.parse(url, "any", Integer::MIN_VALUE, 2),
-                 StringIndexOutOfBoundsException)
-        << ("Should have thrown an StringIndexOutOfBoundsException");
+                 std::out_of_range)
+        << ("Should have thrown std::out_of_range");
 
-    ASSERT_THROW(handler.parse(url, "any", -1, 2),
-                 StringIndexOutOfBoundsException)
-        << ("Should have thrown an StringIndexOutOfBoundsException");
+    ASSERT_THROW(handler.parse(url, "any", -1, 2), std::out_of_range)
+        << ("Should have thrown std::out_of_range");
 
-    ASSERT_THROW(handler.parse(url, "any", -1, -1), SecurityException)
+    ASSERT_THROW(handler.parse(url, "any", -1, -1), std::logic_error)
         << ("Should have thrown an SecurityException");
 }
 

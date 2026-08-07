@@ -23,9 +23,11 @@
 #include <decaf/util/zip/DeflaterOutputStream.h>
 #include <decaf/util/zip/InflaterInputStream.h>
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <activemq/util/CMSExceptionSupport.h>
 #include <activemq/util/MarshallingSupport.h>
 #include <cms/CMSException.h>
+#include <stdexcept>
 
 using namespace std;
 using namespace activemq;
@@ -92,7 +94,7 @@ void ActiveMQTextMessage::copyDataStructure(const DataStructure* src)
 
     if (srcPtr == NULL || src == NULL)
     {
-        throw decaf::lang::exceptions::NullPointerException(
+        throw activemq::exceptions::NullPointerException(
             __FILE__,
             __LINE__,
             "ActiveMQTextMessage::copyDataStructure - src is NULL or invalid");
@@ -232,7 +234,7 @@ std::string ActiveMQTextMessage::getText() const
 
                 dataIn.close();
             }
-            catch (IOException& ioe)
+            catch (activemq::exceptions::IOException& ioe)
             {
                 throw CMSExceptionSupport::create(ioe);
             }

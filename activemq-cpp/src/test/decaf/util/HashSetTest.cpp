@@ -18,19 +18,18 @@
 #include <gtest/gtest.h>
 
 #include <decaf/lang/Integer.h>
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
 #include <decaf/util/ArrayList.h>
 #include <decaf/util/HashMap.h>
 #include <decaf/util/HashSet.h>
 #include <decaf/util/Iterator.h>
 #include <decaf/util/LinkedList.h>
 #include <decaf/util/StlMap.h>
+#include <stdexcept>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 class HashSetTest : public ::testing::Test
 {
@@ -121,7 +120,7 @@ void HashSetTest::testConstructorI()
     {
         HashSet<int> set(-1);
     }
-    catch (IllegalArgumentException& e)
+    catch (std::invalid_argument& e)
     {
         return;
     }
@@ -139,7 +138,7 @@ void HashSetTest::testConstructorIF()
     {
         HashSet<int> set(0, 0);
     }
-    catch (IllegalArgumentException& e)
+    catch (std::invalid_argument& e)
     {
         return;
     }

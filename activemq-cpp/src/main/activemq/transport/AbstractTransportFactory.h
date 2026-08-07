@@ -22,9 +22,9 @@
 #include <activemq/transport/TransportFactory.h>
 #include <activemq/util/Config.h>
 #include <activemq/wireformat/WireFormat.h>
-#include <decaf/util/NoSuchElementException.h>
 #include <decaf/util/Properties.h>
 #include <memory>
+#include <stdexcept>
 
 namespace activemq
 {
@@ -53,7 +53,7 @@ namespace transport
          *
          * @return a pointer to a WireFormat instance that the caller then owns.
          *
-         * @throws NoSuchElementException if the configured WireFormat is not
+         * @throws std::runtime_error if the configured WireFormat is not
          * found.
          */
         virtual std::shared_ptr<wireformat::WireFormat> createWireFormat(

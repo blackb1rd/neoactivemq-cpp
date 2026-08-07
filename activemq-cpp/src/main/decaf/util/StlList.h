@@ -18,17 +18,17 @@
 #ifndef _DECAF_UTIL_STLLIST_H_
 #define _DECAF_UTIL_STLLIST_H_
 
-#include <decaf/lang/exceptions/IndexOutOfBoundsException.h>
-#include <decaf/lang/exceptions/UnsupportedOperationException.h>
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/util/AbstractList.h>
 #include <decaf/util/Config.h>
 #include <decaf/util/Iterator.h>
 #include <decaf/util/List.h>
 #include <decaf/util/ListIterator.h>
-#include <decaf/util/NoSuchElementException.h>
 #include <algorithm>
 #include <list>
 #include <memory>
+#include <stdexcept>
+#include <string>
 
 namespace decaf
 {
@@ -81,9 +81,7 @@ namespace util
             {
                 if (this->current == list->end())
                 {
-                    throw NoSuchElementException(
-                        __FILE__,
-                        __LINE__,
+                    throw activemq::exceptions::NoSuchElementException(
                         "List::Iterator::next - No more elements to return");
                 }
 
@@ -100,7 +98,7 @@ namespace util
             {
                 if (this->prev == list->end())
                 {
-                    throw lang::exceptions::IllegalStateException(
+                    throw activemq::exceptions::IllegalStateException(
                         __FILE__,
                         __LINE__,
                         "List::Iterator::remove - Invalid State to call "
@@ -137,9 +135,7 @@ namespace util
             {
                 if (this->current == this->list->begin())
                 {
-                    throw NoSuchElementException(
-                        __FILE__,
-                        __LINE__,
+                    throw activemq::exceptions::NoSuchElementException(
                         "List::ListIterator::previous - No Previous element.");
                 }
 
@@ -205,9 +201,7 @@ namespace util
             {
                 if (this->current == list->end())
                 {
-                    throw NoSuchElementException(
-                        __FILE__,
-                        __LINE__,
+                    throw activemq::exceptions::NoSuchElementException(
                         "List::Iterator::next - No more elements to return");
                 }
 
@@ -222,7 +216,7 @@ namespace util
 
             virtual void remove()
             {
-                throw lang::exceptions::UnsupportedOperationException(
+                throw activemq::exceptions::UnsupportedOperationException(
                     __FILE__,
                     __LINE__,
                     "List::ListIterator::remove - Const Iterator.");
@@ -230,7 +224,7 @@ namespace util
 
             virtual void add(const E& e DECAF_UNUSED)
             {
-                throw lang::exceptions::UnsupportedOperationException(
+                throw activemq::exceptions::UnsupportedOperationException(
                     __FILE__,
                     __LINE__,
                     "List::ListIterator::add - Const Iterator.");
@@ -238,7 +232,7 @@ namespace util
 
             virtual void set(const E& e DECAF_UNUSED)
             {
-                throw lang::exceptions::UnsupportedOperationException(
+                throw activemq::exceptions::UnsupportedOperationException(
                     __FILE__,
                     __LINE__,
                     "List::ListIterator::set - Const Iterator.");
@@ -253,9 +247,7 @@ namespace util
             {
                 if (this->current == this->list->begin())
                 {
-                    throw NoSuchElementException(
-                        __FILE__,
-                        __LINE__,
+                    throw activemq::exceptions::NoSuchElementException(
                         "List::ListIterator::previous - No Previous element.");
                 }
 
@@ -388,9 +380,9 @@ namespace util
         {
             if (index < 0 || index > this->size())
             {
-                throw decaf::lang::exceptions::IndexOutOfBoundsException(
-                    __FILE__,
-                    __LINE__,
+                throw activemq::exceptions::OutOfRangeException(
+                    std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+                    ": " +
                     "List::listIterator - Index greater than size() or "
                     "negative");
             }
@@ -402,9 +394,9 @@ namespace util
         {
             if (index < 0 || index > this->size())
             {
-                throw decaf::lang::exceptions::IndexOutOfBoundsException(
-                    __FILE__,
-                    __LINE__,
+                throw activemq::exceptions::OutOfRangeException(
+                    std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+                    ": " +
                     "List::listIterator - Index greater than size() or "
                     "negative");
             }
@@ -443,10 +435,9 @@ namespace util
         {
             if (index < 0 || index >= this->size())
             {
-                throw decaf::lang::exceptions::IndexOutOfBoundsException(
-                    __FILE__,
-                    __LINE__,
-                    "List::get - Index greater than size() or negative");
+                throw activemq::exceptions::OutOfRangeException(
+                    std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+                    ": " + "List::get - Index greater than size() or negative");
             }
 
             // Advance from begin and return the value at that location.
@@ -462,10 +453,9 @@ namespace util
         {
             if (index < 0 || index >= this->size())
             {
-                throw decaf::lang::exceptions::IndexOutOfBoundsException(
-                    __FILE__,
-                    __LINE__,
-                    "List::get - Index greater than size() or negative");
+                throw activemq::exceptions::OutOfRangeException(
+                    std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+                    ": " + "List::get - Index greater than size() or negative");
             }
 
             // Advance from begin and return the value at that location
@@ -482,10 +472,9 @@ namespace util
         {
             if (index < 0 || index > this->size())
             {
-                throw decaf::lang::exceptions::IndexOutOfBoundsException(
-                    __FILE__,
-                    __LINE__,
-                    "List::add - Index greater than size()");
+                throw activemq::exceptions::OutOfRangeException(
+                    std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+                    ": " + "List::add - Index greater than size()");
             }
 
             // Advance from begin and insert the value at that location
@@ -525,10 +514,9 @@ namespace util
         {
             if (index < 0 || index > this->size())
             {
-                throw decaf::lang::exceptions::IndexOutOfBoundsException(
-                    __FILE__,
-                    __LINE__,
-                    "List::addAll - Index greater than size()");
+                throw activemq::exceptions::OutOfRangeException(
+                    std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+                    ": " + "List::addAll - Index greater than size()");
             }
 
             if (collection.isEmpty())
@@ -560,9 +548,9 @@ namespace util
         {
             if (index < 0 || index >= this->size())
             {
-                throw decaf::lang::exceptions::IndexOutOfBoundsException(
-                    __FILE__,
-                    __LINE__,
+                throw activemq::exceptions::OutOfRangeException(
+                    std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+                    ": " +
                     "List::removeAt - Index greater than size() or negative");
             }
 

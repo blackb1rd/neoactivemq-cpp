@@ -23,11 +23,11 @@
 #include <cms/MessageListener.h>
 #include <cms/Session.h>
 
-#include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/util/HashSet.h>
 #include <decaf/util/concurrent/Mutex.h>
 #include <atomic>
 #include <memory>
+#include <stdexcept>
 
 #include <activemq/commands/ActiveMQDestination.h>
 #include <activemq/commands/ActiveMQQueue.h>
@@ -37,7 +37,9 @@
 #include <activemq/commands/DestinationInfo.h>
 #include <activemq/core/ActiveMQConnection.h>
 #include <activemq/core/ActiveMQDestinationEvent.h>
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <activemq/util/AdvisorySupport.h>
+#include <string>
 
 using namespace cms;
 using namespace activemq;
@@ -46,7 +48,6 @@ using namespace activemq::core;
 using namespace activemq::commands;
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 
@@ -170,20 +171,14 @@ namespace core
             {
                 std::shared_ptr<DataStructure> payload =
                     amqMessage->getDataStructure();
-                try
+                std::shared_ptr<DestinationInfo> destinationInfo =
+                    std::dynamic_pointer_cast<DestinationInfo>(payload);
+                if (!destinationInfo)
                 {
-                    std::shared_ptr<DestinationInfo> destinationInfo =
-                        std::dynamic_pointer_cast<DestinationInfo>(payload);
-                    if (!destinationInfo)
-                    {
-                        return;
-                    }
-                    ActiveMQDestinationEvent event(destinationInfo);
-                    handleDestinationEvent(event);
+                    return;
                 }
-                catch (ClassCastException& ex)
-                {
-                }
+                ActiveMQDestinationEvent event(destinationInfo);
+                handleDestinationEvent(event);
             }
         }
 
@@ -352,9 +347,10 @@ ActiveMQDestinationSource::ActiveMQDestinationSource(
 {
     if (connection == nullptr)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "Connection passed was NULL");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "Connection passed was NULL");
     }
 
     this->impl->connection = connection;

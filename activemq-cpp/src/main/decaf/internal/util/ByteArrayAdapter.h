@@ -18,12 +18,9 @@
 #ifndef _DECAF_INTERNAL_UTIL_BYTEARRAYADAPTER_H_
 #define _DECAF_INTERNAL_UTIL_BYTEARRAYADAPTER_H_
 
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
-#include <decaf/lang/exceptions/IndexOutOfBoundsException.h>
-#include <decaf/lang/exceptions/InvalidStateException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
+#include <activemq/exceptions/BufferUnderflowException.h>
 #include <decaf/nio/BufferOverflowException.h>
-#include <decaf/nio/BufferUnderflowException.h>
+#include <stdexcept>
 
 namespace decaf
 {
@@ -79,7 +76,7 @@ namespace internal
              *      The size of the array, this is the limit we read and write
              * to.
              *
-             * @throws IllegalArgumentException if size is negative.
+             * @throws std::invalid_argument if size is negative.
              */
             ByteArrayAdapter(int size);
 
@@ -96,8 +93,8 @@ namespace internal
              * @param own
              *      Indicates if this class is now the owner of the pointer.
              *
-             * @throws NullPointerException if buffer is NULL
-             * @throws IndexOutOfBoundsException if the size is negative.
+             * @throws std::logic_error if buffer is NULL
+             * @throws std::out_of_range if the size is negative.
              */
             ByteArrayAdapter(unsigned char* array, int size, bool own = false);
 
@@ -114,8 +111,8 @@ namespace internal
              * @param own
              *      Indicates if this class is now the owner of the pointer.
              *
-             * @throws NullPointerException if buffer is NULL
-             * @throws IndexOutOfBoundsException if the size is negative.
+             * @throws std::logic_error if buffer is NULL
+             * @throws std::out_of_range if the size is negative.
              */
             ByteArrayAdapter(char* array, int size, bool own = false);
 
@@ -132,8 +129,8 @@ namespace internal
              * @param own
              *      Indicates if this class is now the owner of the pointer.
              *
-             * @throws NullPointerException if buffer is NULL
-             * @throws IndexOutOfBoundsException if the size is negative.
+             * @throws std::logic_error if buffer is NULL
+             * @throws std::out_of_range if the size is negative.
              */
             ByteArrayAdapter(double* array, int size, bool own = false);
 
@@ -150,8 +147,8 @@ namespace internal
              * @param own
              *      Indicates if this class is now the owner of the pointer.
              *
-             * @throws NullPointerException if buffer is NULL
-             * @throws IndexOutOfBoundsException if the size is negative.
+             * @throws std::logic_error if buffer is NULL
+             * @throws std::out_of_range if the size is negative.
              */
             ByteArrayAdapter(float* array, int size, bool own = false);
 
@@ -168,8 +165,8 @@ namespace internal
              * @param own
              *      Indicates if this class is now the owner of the pointer.
              *
-             * @throws NullPointerException if buffer is NULL
-             * @throws IndexOutOfBoundsException if the size is negative.
+             * @throws std::logic_error if buffer is NULL
+             * @throws std::out_of_range if the size is negative.
              */
             ByteArrayAdapter(long long* array, int size, bool own = false);
 
@@ -186,8 +183,8 @@ namespace internal
              * @param own
              *      Indicates if this class is now the owner of the pointer.
              *
-             * @throws NullPointerException if buffer is NULL
-             * @throws IndexOutOfBoundsException if the size is negative.
+             * @throws std::logic_error if buffer is NULL
+             * @throws std::out_of_range if the size is negative.
              */
             ByteArrayAdapter(int* array, int size, bool own = false);
 
@@ -204,8 +201,8 @@ namespace internal
              * @param own
              *      Indicates if this class is now the owner of the pointer.
              *
-             * @throws NullPointerException if buffer is NULL
-             * @throws IndexOutOfBoundsException if the size is negative.
+             * @throws std::logic_error if buffer is NULL
+             * @throws std::out_of_range if the size is negative.
              */
             ByteArrayAdapter(short* array, int size, bool own = false);
 
@@ -366,9 +363,9 @@ namespace internal
              * @param length
              *      The amount of data to read from this array.
              *
-             * @throws IndexOutOfBoundsException if the offset + length exceeds
+             * @throws std::out_of_range if the offset + length exceeds
              * the size.
-             * @throws NullPointerException if buffer is null
+             * @throws std::logic_error if buffer is null
              * @throws BufferUnderflowException if there is not enough data to
              * read because the offset or the length is greater than the size of
              * this array.
@@ -393,9 +390,9 @@ namespace internal
              * @param length
              *      The amount of data to read from this array.
              *
-             * @throws IndexOutOfBoundsException if the offset + length exceeds
+             * @throws std::out_of_range if the offset + length exceeds
              * the size.
-             * @throws NullPointerException if buffer is null
+             * @throws std::logic_error if buffer is null
              * @throws BufferOverflowException if the amount of data to be
              * written to this array or the offset given are larger than this
              * array's size.
@@ -412,15 +409,15 @@ namespace internal
              * will fit into the new array is preserved.
              *
              * A ByteArrayAdapter can only be resized when it owns the
-             * underlying array, if it does not then it will throw an
-             * InvalidStateException.
+             * underlying array, if it does not then it will throw
+             * std::logic_error.
              *
              * @param size
              *      The new size of the array.
              *
-             * @throws IllegalArgumentException if the size parameter is
+             * @throws std::invalid_argument if the size parameter is
              * negative.
-             * @throws InvalidStateException if this object does not own the
+             * @throws std::logic_error if this object does not own the
              * buffer.
              */
             virtual void resize(int size);
@@ -439,9 +436,9 @@ namespace internal
              * @param index
              *      The position in the array to access, if the value is
              * negative or greater than the size of the underlying array an
-             * IndexOutOfBoundsException is thrown.
+             * std::out_of_range is thrown.
              *
-             * @throws IndexOutOfBoundsException if the preconditions of index
+             * @throws std::out_of_range if the preconditions of index
              * are not met.
              */
             unsigned char&       operator[](int index);
@@ -455,7 +452,7 @@ namespace internal
              *
              * @return the byte that is located at the given index.
              *
-             * @throws IndexOutOfBoundsException If index is not smaller than
+             * @throws std::out_of_range If index is not smaller than
              * the buffer's limit or is negative.
              */
             virtual unsigned char get(int index) const;
@@ -468,7 +465,7 @@ namespace internal
              *
              * @return the byte that is located at the given index.
              *
-             * @throws IndexOutOfBoundsException If index is not smaller than
+             * @throws std::out_of_range If index is not smaller than
              * the buffer's limit or is negative.
              */
             virtual char getChar(int index) const;
@@ -484,7 +481,7 @@ namespace internal
              *
              * @return the value at the given index in the buffer.
              *
-             * @throws IndexOutOfBoundsException if there are not enough bytes
+             * @throws std::out_of_range if there are not enough bytes
              * remaining to fill the requested Data Type, or index is negative.
              */
             virtual double getDouble(int index) const;
@@ -497,7 +494,7 @@ namespace internal
              *
              * @return the value at the given index in the buffer.
              *
-             * @throws IndexOutOfBoundsException if there are not enough bytes
+             * @throws std::out_of_range if there are not enough bytes
              * remaining to fill the requested Data Type, or index is negative.
              */
             virtual double getDoubleAt(int index) const;
@@ -513,7 +510,7 @@ namespace internal
              *
              * @return the value at the given index in the buffer.
              *
-             * @throws IndexOutOfBoundsException if there are not enough bytes
+             * @throws std::out_of_range if there are not enough bytes
              * remaining to fill the requested Data Type, or index is negative.
              */
             virtual float getFloat(int index) const;
@@ -526,7 +523,7 @@ namespace internal
              *
              * @return the value at the given index in the buffer.
              *
-             * @throws IndexOutOfBoundsException if there are not enough bytes
+             * @throws std::out_of_range if there are not enough bytes
              * remaining to fill the requested Data Type, or index is negative.
              */
             virtual float getFloatAt(int index) const;
@@ -542,7 +539,7 @@ namespace internal
              *
              * @return the value at the given index in the buffer.
              *
-             * @throws IndexOutOfBoundsException if there are not enough bytes
+             * @throws std::out_of_range if there are not enough bytes
              * remaining to fill the requested Data Type, or index is negative.
              */
             virtual long long getLong(int index) const;
@@ -555,7 +552,7 @@ namespace internal
              *
              * @return the value at the given index in the buffer.
              *
-             * @throws IndexOutOfBoundsException if there are not enough bytes
+             * @throws std::out_of_range if there are not enough bytes
              * remaining to fill the requested Data Type, or index is negative.
              */
             virtual long long getLongAt(int index) const;
@@ -571,7 +568,7 @@ namespace internal
              *
              * @return the value at the given index in the buffer.
              *
-             * @throws IndexOutOfBoundsException if there are not enough bytes
+             * @throws std::out_of_range if there are not enough bytes
              * remaining to fill the requested Data Type, or index is negative.
              */
             virtual int getInt(int index) const;
@@ -584,7 +581,7 @@ namespace internal
              *
              * @return the value at the given index in the buffer.
              *
-             * @throws IndexOutOfBoundsException if there are not enough bytes
+             * @throws std::out_of_range if there are not enough bytes
              * remaining to fill the requested Data Type, or index is negative.
              */
             virtual int getIntAt(int index) const;
@@ -600,7 +597,7 @@ namespace internal
              *
              * @return the value at the given index in the buffer.
              *
-             * @throws IndexOutOfBoundsException if there are not enough bytes
+             * @throws std::out_of_range if there are not enough bytes
              * remaining to fill the requested Data Type, or index is negative.
              */
             virtual short getShort(int index) const;
@@ -613,7 +610,7 @@ namespace internal
              *
              * @return the value at the given index in the buffer.
              *
-             * @throws IndexOutOfBoundsException if there are not enough bytes
+             * @throws std::out_of_range if there are not enough bytes
              * remaining to fill the requested Data Type, or index is negative.
              */
             virtual short getShortAt(int index) const;
@@ -631,7 +628,7 @@ namespace internal
              *
              * @return a reference to this buffer.
              *
-             * @throw IndexOutOfBoundsException if index greater than the
+             * @throw std::out_of_range if index greater than the
              * buffer's limit minus the size of the type being written, or index
              * is negative.
              */
@@ -651,7 +648,7 @@ namespace internal
              *
              * @return a reference to this buffer.
              *
-             * @throw IndexOutOfBoundsException if index greater than the
+             * @throw std::out_of_range if index greater than the
              * buffer's limit minus the size of the type being written, or index
              * is negative.
              */
@@ -671,7 +668,7 @@ namespace internal
              *
              * @return a reference to this buffer.
              *
-             * @throw IndexOutOfBoundsException if index greater than the
+             * @throw std::out_of_range if index greater than the
              * buffer's limit minus the size of the type being written, or index
              * is negative.
              */
@@ -688,7 +685,7 @@ namespace internal
              *
              * @return a reference to this buffer.
              *
-             * @throw IndexOutOfBoundsException if index greater than the
+             * @throw std::out_of_range if index greater than the
              * buffer's limit minus the size of the type being written, or index
              * is negative.
              */
@@ -708,7 +705,7 @@ namespace internal
              *
              * @return a reference to this buffer.
              *
-             * @throw IndexOutOfBoundsException if index greater than the
+             * @throw std::out_of_range if index greater than the
              * buffer's limit minus the size of the type being written, or index
              * is negative.
              */
@@ -725,7 +722,7 @@ namespace internal
              *
              * @return a reference to this buffer.
              *
-             * @throw IndexOutOfBoundsException if index greater than the
+             * @throw std::out_of_range if index greater than the
              * buffer's limit minus the size of the type being written, or index
              * is negative.
              */
@@ -745,7 +742,7 @@ namespace internal
              *
              * @return a reference to this buffer.
              *
-             * @throw IndexOutOfBoundsException if index greater than the
+             * @throw std::out_of_range if index greater than the
              * buffer's limit minus the size of the type being written, or index
              * is negative.
              */
@@ -762,7 +759,7 @@ namespace internal
              *
              * @return a reference to this buffer.
              *
-             * @throw IndexOutOfBoundsException if index greater than the
+             * @throw std::out_of_range if index greater than the
              * buffer's limit minus the size of the type being written, or index
              * is negative.
              */
@@ -782,7 +779,7 @@ namespace internal
              *
              * @return a reference to this buffer.
              *
-             * @throw IndexOutOfBoundsException if index greater than the
+             * @throw std::out_of_range if index greater than the
              * buffer's limit minus the size of the type being written, or index
              * is negative.
              */
@@ -799,7 +796,7 @@ namespace internal
              *
              * @return a reference to this buffer.
              *
-             * @throw IndexOutOfBoundsException if index greater than the
+             * @throw std::out_of_range if index greater than the
              * buffer's limit minus the size of the type being written, or index
              * is negative.
              */
@@ -819,7 +816,7 @@ namespace internal
              *
              * @return a reference to this buffer.
              *
-             * @throw IndexOutOfBoundsException if index greater than the
+             * @throw std::out_of_range if index greater than the
              * buffer's limit minus the size of the type being written, or index
              * is negative.
              */
@@ -836,7 +833,7 @@ namespace internal
              *
              * @return a reference to this buffer.
              *
-             * @throw IndexOutOfBoundsException if index greater than the
+             * @throw std::out_of_range if index greater than the
              * buffer's limit minus the size of the type being written, or index
              * is negative.
              */

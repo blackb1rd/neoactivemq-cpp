@@ -17,10 +17,10 @@
 
 #include <decaf/internal/net/URLStreamHandlerManager.h>
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/internal/net/Network.h>
 #include <decaf/lang/Exception.h>
 #include <decaf/lang/Runnable.h>
-#include <decaf/lang/exceptions/RuntimeException.h>
 #include <decaf/net/URLStreamHandler.h>
 #include <decaf/net/URLStreamHandlerFactory.h>
 
@@ -36,7 +36,6 @@ using namespace decaf::internal::net::https;
 using namespace decaf::internal::net::file;
 using namespace decaf::net;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 URLStreamHandlerManager* URLStreamHandlerManager::instance;
@@ -155,7 +154,7 @@ void URLStreamHandlerManager::setURLStreamHandlerFactory(
     {
         if (impl->factory != NULL)
         {
-            throw RuntimeException(
+            throw activemq::exceptions::RuntimeException(
                 __FILE__,
                 __LINE__,
                 "Application already set a URLStreamHandlerFactory");

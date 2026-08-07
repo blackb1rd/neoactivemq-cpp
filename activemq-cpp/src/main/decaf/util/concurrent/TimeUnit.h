@@ -19,11 +19,9 @@
 #define _DECAF_UTIL_CONCURRENT_TIMEUNIT_H_
 
 #include <decaf/lang/Comparable.h>
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
-#include <decaf/lang/exceptions/InterruptedException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/util/Config.h>
 #include <decaf/util/concurrent/Synchronizable.h>
+#include <stdexcept>
 #include <string>
 
 namespace decaf
@@ -229,8 +227,8 @@ namespace util
              * @param obj the object to wait on
              * @param timeout the maximum time to wait.
              *
-             * @throws InterruptedException if interrupted while waiting.
-             * @throws NullPointerException if the Synchronizable object is
+             * @throws std::runtime_error if interrupted while waiting.
+             * @throws std::logic_error if the Synchronizable object is
              * null.
              *
              * @see Synchronizable#wait( long long, long long )
@@ -245,8 +243,8 @@ namespace util
              * @param thread the thread to wait for
              * @param timeout the maximum time to wait
              *
-             * @throws InterruptedException if interrupted while waiting.
-             * @throws NullPointerException if the thread object is null.
+             * @throws std::runtime_error if interrupted while waiting.
+             * @throws std::logic_error if the thread object is null.
              *
              * @see Thread#join( long long, long long )
              */
@@ -279,7 +277,7 @@ namespace util
              * @return
              *          A constant reference to the TimeUnit Constant with the
              * given name.
-             * @throws IllegalArgumentException
+             * @throws std::invalid_argument
              *          if this enum type has no constant with the specified
              * name
              */

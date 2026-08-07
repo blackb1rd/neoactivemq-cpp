@@ -21,6 +21,7 @@
 #include <decaf/util/Config.h>
 
 #include <decaf/security/SecureRandom.h>
+#include <stdexcept>
 
 namespace decaf
 {
@@ -52,7 +53,7 @@ namespace net
              * @param random
              *      Pointer to an instance of a secure random number generator.
              *
-             * @throw NullPointerException if the SecureRandom instance is NULL.
+             * @throw std::logic_error if the SecureRandom instance is NULL.
              * @throw KeyManagementException if an error occurs while
              * initializing the context.
              */
@@ -67,7 +68,7 @@ namespace net
              *
              * @return new SSLParameters instance with the SSLContext defaults.
              *
-             * @throws UnsupportedOperationException if the defaults cannot be
+             * @throws std::logic_error if the defaults cannot be
              * obtained.
              */
             virtual SSLParameters* providerGetDefaultSSLParameters();
@@ -82,7 +83,7 @@ namespace net
              * @return a new SSLParameters instance with the full set of
              * settings that are supported.
              *
-             * @throws UnsupportedOperationException if the supported parameters
+             * @throws std::logic_error if the supported parameters
              * cannot be obtained.
              */
             virtual SSLParameters* providerGetSupportedSSLParameters();
@@ -97,7 +98,7 @@ namespace net
              * @return SocketFactory instance that can be used to create new
              * SSLSockets.
              *
-             * @throws IllegalStateException if the SSLContextSpi object
+             * @throws std::logic_error if the SSLContextSpi object
              * requires initialization but has not been initialized yet.
              */
             virtual SocketFactory* providerGetSocketFactory() = 0;
@@ -112,7 +113,7 @@ namespace net
              * @return SocketFactory instance that can be used to create new
              * SSLServerSockets.
              *
-             * @throws IllegalStateException if the SSLContextSpi object
+             * @throws std::logic_error if the SSLContextSpi object
              * requires initialization but has not been initialized yet.
              */
             virtual ServerSocketFactory* providerGetServerSocketFactory() = 0;

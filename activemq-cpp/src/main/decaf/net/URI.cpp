@@ -17,12 +17,15 @@
 
 #include "URI.h"
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/internal/net/URIEncoderDecoder.h>
 #include <decaf/internal/net/URIHelper.h>
 #include <decaf/internal/util/StringUtils.h>
 #include <decaf/lang/Character.h>
 #include <decaf/lang/Integer.h>
 #include <decaf/net/URL.h>
+#include <stdexcept>
+#include <string>
 
 using namespace std;
 using namespace decaf;
@@ -31,7 +34,6 @@ using namespace decaf::internal;
 using namespace decaf::internal::net;
 using namespace decaf::internal::util;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 const std::string URI::unreserved = "_-!.~\'()*";
@@ -614,7 +616,7 @@ URI URI::create(const std::string uri)
     }
     catch (URISyntaxException& e)
     {
-        throw IllegalArgumentException(e);
+        throw activemq::exceptions::InvalidArgumentException(e.getMessage());
     }
 }
 
@@ -1107,9 +1109,8 @@ URL URI::toURL() const
 {
     if (!this->isAbsolute())
     {
-        throw IllegalArgumentException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
             "URI is not absolute, cannot convert to an URL.");
     }
 

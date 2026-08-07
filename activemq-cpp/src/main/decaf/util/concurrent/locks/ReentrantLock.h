@@ -22,6 +22,7 @@
 
 #include <decaf/util/Collection.h>
 #include <decaf/util/concurrent/locks/Lock.h>
+#include <stdexcept>
 
 namespace decaf
 {
@@ -136,7 +137,7 @@ namespace util
                  * dormant until the lock has been acquired, at which time the
                  * lock hold count is set to one.
                  *
-                 * @throws RuntimeException if an error occurs while acquiring
+                 * @throws Exception if an error occurs while acquiring
                  * the lock.
                  */
                 virtual void lock();
@@ -167,16 +168,16 @@ namespace util
                  * or
                  *     * is interrupted while acquiring the lock,
                  *
-                 * then InterruptedException is thrown and the current thread's
+                 * then std::runtime_error is thrown and the current thread's
                  * interrupted status is cleared.
                  *
                  * In this implementation, as this method is an explicit
                  * interruption point, preference is given to responding to the
                  * interrupt over normal or reentrant acquisition of the lock.
                  *
-                 * @throws RuntimeException if an error occurs while acquiring
+                 * @throws Exception if an error occurs while acquiring
                  * the lock.
-                 * @throws InterruptedException
+                 * @throws std::runtime_error
                  *         if the current thread is interrupted while acquiring
                  * the lock (and interruption of lock acquisition is supported).
                  */
@@ -205,7 +206,7 @@ namespace util
                  *
                  * @return true if the lock was acquired and false otherwise
                  *
-                 * @throws RuntimeException if an error occurs while acquiring
+                 * @throws Exception if an error occurs while acquiring
                  * the lock.
                  */
                 virtual bool tryLock();
@@ -247,7 +248,7 @@ namespace util
                  * or
                  *     * is interrupted while acquiring the lock,
                  *
-                 * then InterruptedException is thrown and the current thread's
+                 * then std::runtime_error is thrown and the current thread's
                  * interrupted status is cleared.
                  *
                  * If the specified waiting time elapses then the value false is
@@ -267,9 +268,9 @@ namespace util
                  * @return true if the lock was acquired and false if the
                  * waiting time elapsed before the lock was acquired
                  *
-                 * @throws RuntimeException if an error occurs while acquiring
+                 * @throws Exception if an error occurs while acquiring
                  * the lock.
-                 * @throws InterruptedException
+                 * @throws std::runtime_error
                  *         if the current thread is interrupted while acquiring
                  * the lock (and interruption of lock acquisition is supported)
                  */
@@ -281,9 +282,9 @@ namespace util
                  * If the current thread is the holder of this lock then the
                  * hold count is decremented. If the hold count is now zero then
                  * the lock is released. If the current thread is not the holder
-                 * of this lock then IllegalMonitorStateException is thrown.
+                 * of this lock then std::logic_error is thrown.
                  *
-                 * @throws RuntimeException if an error occurs while acquiring
+                 * @throws Exception if an error occurs while acquiring
                  * the lock.
                  */
                 virtual void unlock();
@@ -296,13 +297,13 @@ namespace util
                  *
                  *   * If this lock is not held when any of the Condition
                  * waiting or signalling methods are called, then an
-                 * IllegalMonitorStateException is thrown.
+                 * std::logic_error is thrown.
                  *   * When the condition waiting methods are called the lock is
                  * released and, before they return, the lock is reacquired and
                  * the lock hold count restored to what it was when the method
                  * was called.
                  *   * If a thread is interrupted while waiting then the wait
-                 * will terminate, an InterruptedException will be thrown, and
+                 * will terminate, an std::runtime_error will be thrown, and
                  * the thread's interrupted status will be cleared.
                  *   * Waiting threads are signaled in FIFO order.
                  *   * The ordering of lock reacquisition for threads returning
@@ -311,9 +312,9 @@ namespace util
                  *     specified, but for fair locks favors those threads that
                  * have been waiting the longest.
                  *
-                 * @throws RuntimeException if an error occurs while creating
+                 * @throws Exception if an error occurs while creating
                  * the Condition.
-                 * @throws UnsupportedOperationException
+                 * @throws std::logic_error
                  *         if this Lock implementation does not support
                  * conditions
                  */
@@ -449,11 +450,11 @@ namespace util
                  *
                  * @return an estimate of the number of waiting threads.
                  *
-                 * @throws NullPointerException if the ConditionObject pointer
+                 * @throws std::logic_error if the ConditionObject pointer
                  * is NULL.
-                 * @throws IllegalArgumentException if the ConditionObject is
+                 * @throws std::invalid_argument if the ConditionObject is
                  * not associated with this Synchronizer.
-                 * @throws IllegalMonitorStateException if the caller does not
+                 * @throws std::logic_error if the caller does not
                  * hold exclusive synchronization.
                  */
                 int getWaitQueueLength(Condition* condition) const;
@@ -465,11 +466,11 @@ namespace util
                  *
                  * @return true if the condition object has waiting threads.
                  *
-                 * @throws NullPointerException if the ConditionObject pointer
+                 * @throws std::logic_error if the ConditionObject pointer
                  * is NULL.
-                 * @throws IllegalArgumentException if the ConditionObject is
+                 * @throws std::invalid_argument if the ConditionObject is
                  * not associated with this Lock.
-                 * @throws IllegalMonitorStateException if the caller does not
+                 * @throws std::logic_error if the caller does not
                  * hold exclusive synchronization.
                  */
                 bool hasWaiters(Condition* condition) const;
@@ -485,7 +486,7 @@ namespace util
                  * Lock object.  Because of cancellations this method can return
                  * true but the given Thread is not in the Queue afterwards.
                  *
-                 * @throws NullPointerException if the given thread is NULL.
+                 * @throws std::logic_error if the given thread is NULL.
                  */
                 bool hasQueuedThread(decaf::lang::Thread* thread) const;
 
@@ -498,11 +499,11 @@ namespace util
                  * @return a Collection pointer that contains waiting threads on
                  * given Condition object. The caller owns the returned pointer.
                  *
-                 * @throws NullPointerException if the ConditionObject pointer
+                 * @throws std::logic_error if the ConditionObject pointer
                  * is NULL.
-                 * @throws IllegalArgumentException if the ConditionObject is
+                 * @throws std::invalid_argument if the ConditionObject is
                  * not associated with this Synchronizer.
-                 * @throws IllegalMonitorStateException if the caller does not
+                 * @throws std::logic_error if the caller does not
                  * hold exclusive synchronization.
                  */
                 decaf::util::Collection<decaf::lang::Thread*>*

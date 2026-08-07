@@ -23,6 +23,7 @@
 #include <decaf/io/InputStream.h>
 #include <decaf/io/OutputStream.h>
 #include <decaf/net/URLConnection.h>
+#include <stdexcept>
 
 namespace decaf
 {
@@ -370,9 +371,9 @@ namespace net
          * @param contentLength
          *      the fixed length of the HTTP request body.
          *
-         * @throws IllegalStateException if already connected or an other mode
+         * @throws std::logic_error if already connected or an other mode
          * already set.
-         * @throws IllegalArgumentException if contentLength is less than zero.
+         * @throws std::invalid_argument if contentLength is less than zero.
          */
         void setFixedLengthStreamingMode(int contentLength);
 
@@ -385,7 +386,7 @@ namespace net
          * @param chunklen
          *      the length of a chunk.
          *
-         * @throws IllegalStateException if already connected or an other mode
+         * @throws std::logic_error if already connected or an other mode
          * already set.
          */
         void setChunkedStreamingMode(int chunklen);

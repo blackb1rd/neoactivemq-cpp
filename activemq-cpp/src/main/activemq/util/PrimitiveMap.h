@@ -22,8 +22,8 @@
 #include <activemq/util/PrimitiveValueConverter.h>
 #include <activemq/util/PrimitiveValueNode.h>
 #include <decaf/util/Config.h>
-#include <decaf/util/NoSuchElementException.h>
 #include <decaf/util/StlMap.h>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -77,7 +77,7 @@ namespace util
 
         /**
          * @return the numeric type value for the given key if it exists.
-         * @throws NoSuchElementException if the key is not present in the map.
+         * @throws std::runtime_error if the key is not present in the map.
          */
         virtual PrimitiveValueNode::PrimitiveType getValueType(
             const std::string& key) const;
@@ -85,11 +85,11 @@ namespace util
         /**
          * Gets the Boolean value at the given key, if the key is not
          * in the map or cannot be returned as the requested value then
-         * an exception of type NoSuchElementException is thrown.
+         * an exception of type std::runtime_error is thrown.
          *
          * @param key - the location to return the value from.
          * @return the value at key in the type requested.
-         * @throw NoSuchElementException if key is not in the map.
+         * @throw std::runtime_error if key is not in the map.
          * @throw UnSupportedOperationException if the value cannot be converted
          *                                      to the type this method returns
          */
@@ -106,11 +106,11 @@ namespace util
         /**
          * Gets the Byte value at the given key, if the key is not
          * in the map or cannot be returned as the requested value then
-         * an exception of type NoSuchElementException is thrown.
+         * an exception of type std::runtime_error is thrown.
          *
          * @param key - the location to return the value from.
          * @return the value at key in the type requested.
-         * @throw NoSuchElementException if key is not in the map.
+         * @throw std::runtime_error if key is not in the map.
          * @throw UnSupportedOperationException if the value cannot be converted
          *                                      to the type this method returns
          */
@@ -127,11 +127,11 @@ namespace util
         /**
          * Gets the Character value at the given key, if the key is not
          * in the map or cannot be returned as the requested value then
-         * an exception of type NoSuchElementException is thrown.
+         * an exception of type std::runtime_error is thrown.
          *
          * @param key - the location to return the value from.
          * @return the value at key in the type requested.
-         * @throw NoSuchElementException if key is not in the map.
+         * @throw std::runtime_error if key is not in the map.
          * @throw UnSupportedOperationException if the value cannot be converted
          *                                      to the type this method returns
          */
@@ -148,11 +148,11 @@ namespace util
         /**
          * Gets the Short value at the given key, if the key is not
          * in the map or cannot be returned as the requested value then
-         * an exception of type NoSuchElementException is thrown.
+         * an exception of type std::runtime_error is thrown.
          *
          * @param key - the location to return the value from.
          * @return the value at key in the type requested.
-         * @throw NoSuchElementException if key is not in the map.
+         * @throw std::runtime_error if key is not in the map.
          * @throw UnSupportedOperationException if the value cannot be converted
          *                                      to the type this method returns
          */
@@ -169,11 +169,11 @@ namespace util
         /**
          * Gets the Integer value at the given key, if the key is not
          * in the map or cannot be returned as the requested value then
-         * an exception of type NoSuchElementException is thrown.
+         * an exception of type std::runtime_error is thrown.
          *
          * @param key - the location to return the value from.
          * @return the value at key in the type requested.
-         * @throw NoSuchElementException if key is not in the map.
+         * @throw std::runtime_error if key is not in the map.
          * @throw UnSupportedOperationException if the value cannot be converted
          *                                      to the type this method returns
          */
@@ -190,11 +190,11 @@ namespace util
         /**
          * Gets the Long value at the given key, if the key is not
          * in the map or cannot be returned as the requested value then
-         * an exception of type NoSuchElementException is thrown.
+         * an exception of type std::runtime_error is thrown.
          *
          * @param key - the location to return the value from.
          * @return the value at key in the type requested.
-         * @throw NoSuchElementException if key is not in the map.
+         * @throw std::runtime_error if key is not in the map.
          * @throw UnSupportedOperationException if the value cannot be converted
          *                                      to the type this method returns
          */
@@ -211,11 +211,11 @@ namespace util
         /**
          * Gets the Float value at the given key, if the key is not
          * in the map or cannot be returned as the requested value then
-         * an exception of type NoSuchElementException is thrown.
+         * an exception of type std::runtime_error is thrown.
          *
          * @param key - the location to return the value from.
          * @return the value at key in the type requested.
-         * @throw NoSuchElementException if key is not in the map.
+         * @throw std::runtime_error if key is not in the map.
          * @throw UnSupportedOperationException if the value cannot be converted
          *                                      to the type this method returns
          */
@@ -232,11 +232,11 @@ namespace util
         /**
          * Gets the Double value at the given key, if the key is not
          * in the map or cannot be returned as the requested value then
-         * an exception of type NoSuchElementException is thrown.
+         * an exception of type std::runtime_error is thrown.
          *
          * @param key - the location to return the value from.
          * @return the value at key in the type requested.
-         * @throw NoSuchElementException if key is not in the map.
+         * @throw std::runtime_error if key is not in the map.
          * @throw UnSupportedOperationException if the value cannot be converted
          *                                      to the type this method returns
          */
@@ -253,11 +253,11 @@ namespace util
         /**
          * Gets the String value at the given key, if the key is not
          * in the map or cannot be returned as the requested value then
-         * an exception of type NoSuchElementException is thrown.
+         * an exception of type std::runtime_error is thrown.
          *
          * @param key - the location to return the value from.
          * @return the value at key in the type requested.
-         * @throw NoSuchElementException if key is not in the map.
+         * @throw std::runtime_error if key is not in the map.
          * @throw UnSupportedOperationException if the value cannot be converted
          *                                      to the type this method returns
          */
@@ -275,11 +275,11 @@ namespace util
         /**
          * Gets the Byte Array value at the given key, if the key is not
          * in the map or cannot be returned as the requested value then
-         * an exception of type NoSuchElementException is thrown.
+         * an exception of type std::runtime_error is thrown.
          *
          * @param key - the location to return the value from.
          * @return the value at key in the type requested.
-         * @throw NoSuchElementException if key is not in the map.
+         * @throw std::runtime_error if key is not in the map.
          * @throw UnSupportedOperationException if the value cannot be converted
          *                                      to the type this method returns
          */

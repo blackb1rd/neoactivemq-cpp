@@ -31,7 +31,6 @@ using namespace activemq::core;
 using namespace activemq::core::kernels;
 using namespace activemq::exceptions;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 

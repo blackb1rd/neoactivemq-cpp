@@ -17,23 +17,24 @@
 
 #include "Executors.h"
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/lang/Exception.h>
 #include <decaf/lang/Integer.h>
 #include <decaf/lang/Pointer.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/util/concurrent/AbstractExecutorService.h>
 #include <decaf/util/concurrent/LinkedBlockingQueue.h>
 #include <decaf/util/concurrent/ThreadFactory.h>
 #include <decaf/util/concurrent/ThreadPoolExecutor.h>
 #include <decaf/util/concurrent/TimeUnit.h>
 #include <decaf/util/concurrent/atomic/AtomicInteger.h>
+#include <stdexcept>
+#include <string>
 
 using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 using namespace decaf::util::concurrent::atomic;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace
@@ -61,7 +62,8 @@ public:
     {
         if (DefaultThreadFactory::poolNumber == NULL)
         {
-            throw NullPointerException();
+            throw activemq::exceptions::NullPointerException(
+                "Executors thread pool counter was not initialized");
         }
 
         namePrefix = std::string("pool-") +
@@ -196,15 +198,13 @@ ExecutorService* Executors::newFixedThreadPool(int nThreads)
 
         return service;
     }
-    catch (NullPointerException& ex)
+    catch (activemq::exceptions::NullPointerException&)
     {
-        ex.setMark(__FILE__, __LINE__);
-        throw ex;
+        throw;
     }
-    catch (IllegalArgumentException& ex)
+    catch (std::invalid_argument&)
     {
-        ex.setMark(__FILE__, __LINE__);
-        throw ex;
+        throw;
     }
     catch (Exception& ex)
     {
@@ -213,7 +213,7 @@ ExecutorService* Executors::newFixedThreadPool(int nThreads)
     }
     catch (...)
     {
-        throw Exception();
+        throw activemq::exceptions::RuntimeException();
     }
 }
 
@@ -238,15 +238,13 @@ ExecutorService* Executors::newFixedThreadPool(int            nThreads,
 
         return service;
     }
-    catch (NullPointerException& ex)
+    catch (activemq::exceptions::NullPointerException&)
     {
-        ex.setMark(__FILE__, __LINE__);
-        throw ex;
+        throw;
     }
-    catch (IllegalArgumentException& ex)
+    catch (std::invalid_argument&)
     {
-        ex.setMark(__FILE__, __LINE__);
-        throw ex;
+        throw;
     }
     catch (Exception& ex)
     {
@@ -255,7 +253,7 @@ ExecutorService* Executors::newFixedThreadPool(int            nThreads,
     }
     catch (...)
     {
-        throw Exception();
+        throw activemq::exceptions::RuntimeException();
     }
 }
 
@@ -281,15 +279,13 @@ ExecutorService* Executors::newSingleThreadExecutor()
 
         return result;
     }
-    catch (NullPointerException& ex)
+    catch (activemq::exceptions::NullPointerException&)
     {
-        ex.setMark(__FILE__, __LINE__);
-        throw ex;
+        throw;
     }
-    catch (IllegalArgumentException& ex)
+    catch (std::invalid_argument&)
     {
-        ex.setMark(__FILE__, __LINE__);
-        throw ex;
+        throw;
     }
     catch (Exception& ex)
     {
@@ -298,7 +294,7 @@ ExecutorService* Executors::newSingleThreadExecutor()
     }
     catch (...)
     {
-        throw Exception();
+        throw activemq::exceptions::RuntimeException();
     }
 }
 
@@ -325,15 +321,13 @@ ExecutorService* Executors::newSingleThreadExecutor(ThreadFactory* threadFactory
 
         return result;
     }
-    catch (NullPointerException& ex)
+    catch (activemq::exceptions::NullPointerException&)
     {
-        ex.setMark(__FILE__, __LINE__);
-        throw ex;
+        throw;
     }
-    catch (IllegalArgumentException& ex)
+    catch (std::invalid_argument&)
     {
-        ex.setMark(__FILE__, __LINE__);
-        throw ex;
+        throw;
     }
     catch (Exception& ex)
     {
@@ -342,7 +336,7 @@ ExecutorService* Executors::newSingleThreadExecutor(ThreadFactory* threadFactory
     }
     catch (...)
     {
-        throw Exception();
+        throw activemq::exceptions::RuntimeException();
     }
 }
 
@@ -354,9 +348,10 @@ ExecutorService* Executors::unconfigurableExecutorService(
     {
         if (executor == NULL)
         {
-            throw NullPointerException(__FILE__,
-                                       __LINE__,
-                                       "The wrapped service cannot be NULL");
+            throw activemq::exceptions::NullPointerException(
+                __FILE__,
+                __LINE__,
+                "The wrapped service cannot be NULL");
         }
 
         NonConfigurableExecutorService* result =
@@ -364,15 +359,13 @@ ExecutorService* Executors::unconfigurableExecutorService(
 
         return result;
     }
-    catch (NullPointerException& ex)
+    catch (activemq::exceptions::NullPointerException&)
     {
-        ex.setMark(__FILE__, __LINE__);
-        throw ex;
+        throw;
     }
-    catch (IllegalArgumentException& ex)
+    catch (std::invalid_argument&)
     {
-        ex.setMark(__FILE__, __LINE__);
-        throw ex;
+        throw;
     }
     catch (Exception& ex)
     {
@@ -381,6 +374,6 @@ ExecutorService* Executors::unconfigurableExecutorService(
     }
     catch (...)
     {
-        throw Exception();
+        throw activemq::exceptions::RuntimeException();
     }
 }

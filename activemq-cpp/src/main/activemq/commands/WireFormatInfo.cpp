@@ -17,14 +17,15 @@
 
 #include <activemq/commands/WireFormatInfo.h>
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <activemq/state/CommandVisitor.h>
+#include <activemq/wireformat/openwire/marshal/OpenWireMarshalCatchMacros.h>
 #include <activemq/wireformat/openwire/marshal/PrimitiveTypesMarshaller.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
+#include <stdexcept>
 
 using namespace std;
 using namespace decaf;
 
-using namespace decaf::lang::exceptions;
 using namespace activemq;
 using namespace activemq::exceptions;
 using namespace activemq::wireformat;
@@ -77,7 +78,7 @@ void WireFormatInfo::copyDataStructure(const DataStructure* src)
 
     if (srcPtr == NULL || src == NULL)
     {
-        throw NullPointerException(
+        throw activemq::exceptions::NullPointerException(
             __FILE__,
             __LINE__,
             "WireFormatInfo::copyDataStructure - src is NULL or invalid");
@@ -359,10 +360,10 @@ void WireFormatInfo::beforeMarshal(WireFormat* wireFormat AMQCPP_UNUSED)
                                                        marshalledProperties);
         }
     }
-    AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
-                                decaf::io::IOException)
-    AMQ_CATCHALL_THROW(decaf::io::IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(activemq::exceptions::ActiveMQException,
+                                activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -373,10 +374,10 @@ void WireFormatInfo::afterUnmarshal(WireFormat* wireFormat AMQCPP_UNUSED)
         marshal::PrimitiveTypesMarshaller::unmarshal(&properties,
                                                      marshalledProperties);
     }
-    AMQ_CATCH_RETHROW(decaf::io::IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
-                                decaf::io::IOException)
-    AMQ_CATCHALL_THROW(decaf::io::IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(activemq::exceptions::ActiveMQException,
+                                activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////

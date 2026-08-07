@@ -17,16 +17,17 @@
 
 #include <gtest/gtest.h>
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <activemq/wireformat/WireFormatRegistry.h>
 
 #include <activemq/wireformat/openwire/OpenWireFormatFactory.h>
+#include <stdexcept>
 
 using namespace activemq;
+using namespace activemq::exceptions;
 using namespace activemq::wireformat;
 using namespace decaf;
 using namespace decaf::util;
-using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 class WireFormatRegistryTest : public ::testing::Test
 {
@@ -44,12 +45,11 @@ TEST_F(WireFormatRegistryTest, test)
     ASSERT_NO_THROW(registry.findFactory("openwire"));
 
     ASSERT_THROW(registry.findFactory(""), NoSuchElementException)
-        << ("Should have thrown an NoSuchElementException");
+        << ("Should have thrown NoSuchElementException");
 
-    ASSERT_THROW(registry.registerFactory("test", NULL), NullPointerException)
-        << ("Should have thrown an NullPointerException");
+    ASSERT_THROW(registry.registerFactory("test", NULL), std::logic_error)
+        << ("Should have thrown std::logic_error");
 
-    ASSERT_THROW(registry.registerFactory("", &factory),
-                 IllegalArgumentException)
-        << ("Should have thrown an IllegalArgumentException");
+    ASSERT_THROW(registry.registerFactory("", &factory), std::invalid_argument)
+        << ("Should have thrown an std::invalid_argument");
 }

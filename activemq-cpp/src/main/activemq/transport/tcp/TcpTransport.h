@@ -31,6 +31,7 @@
 #include <decaf/net/Socket.h>
 #include <decaf/net/URI.h>
 #include <decaf/util/Properties.h>
+#include <stdexcept>
 
 namespace activemq
 {
@@ -143,8 +144,8 @@ namespace transport
              *      The Socket instance to configure using options from the
              * given Properties.
              *
-             * @throw NullPointerException if the Socket instance is null.
-             * @throw IllegalArgumentException if the socket instance is not
+             * @throw std::logic_error if the Socket instance is null.
+             * @throws std::invalid_argument if the socket instance is not
              * handled by the class.
              * @throw SocketException if there is an error while setting one of
              * the Socket options.

@@ -17,9 +17,12 @@
 
 #include "Handler.h"
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/util/logging/ErrorManager.h>
 #include <decaf/util/logging/Filter.h>
 #include <decaf/util/logging/Level.h>
+#include <stdexcept>
+#include <string>
 
 using namespace std;
 using namespace decaf;
@@ -48,7 +51,7 @@ void Handler::setFormatter(Formatter* formatter)
 {
     if (formatter == NULL)
     {
-        throw decaf::lang::exceptions::NullPointerException(
+        throw activemq::exceptions::NullPointerException(
             __FILE__,
             __LINE__,
             "The Formatter cannot be set to NULL.");
@@ -62,7 +65,7 @@ void Handler::setErrorManager(ErrorManager* errorManager)
 {
     if (errorManager == NULL)
     {
-        throw decaf::lang::exceptions::NullPointerException(
+        throw activemq::exceptions::NullPointerException(
             __FILE__,
             __LINE__,
             "Error Manager cannot be set to NULL.");

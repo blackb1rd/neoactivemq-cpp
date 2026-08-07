@@ -25,9 +25,6 @@
 #include <decaf/util/concurrent/Mutex.h>
 #include <decaf/util/concurrent/Synchronizable.h>
 
-#include <decaf/lang/exceptions/IndexOutOfBoundsException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
-
 namespace decaf
 {
 namespace io
@@ -100,8 +97,8 @@ namespace io
          *      The size of the buffer passed.
          *
          * @throws IOException if an I/O error occurs.
-         * @throws NullPointerException thrown if buffer is Null.
-         * @throws IndexOutOfBoundsException if size value is negative.
+         * @throws std::logic_error thrown if buffer is Null.
+         * @throws std::out_of_range if size value is negative.
          */
         virtual void write(const unsigned char* buffer, int size);
 
@@ -126,8 +123,8 @@ namespace io
          *      The number of bytes from the buffer to be written.
          *
          * @throws IOException if an I/O error occurs.
-         * @throws NullPointerException thrown if buffer is Null.
-         * @throws IndexOutOfBoundsException if the offset + length > size. or
+         * @throws std::logic_error thrown if buffer is Null.
+         * @throws std::out_of_range if the offset + length > size. or
          * one of the parameters is negative.
          */
         virtual void write(const unsigned char* buffer,

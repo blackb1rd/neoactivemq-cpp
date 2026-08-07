@@ -22,6 +22,7 @@
 
 #include <decaf/net/Socket.h>
 #include <decaf/net/ssl/SSLParameters.h>
+#include <stdexcept>
 
 namespace decaf
 {
@@ -54,8 +55,8 @@ namespace net
              * @throws UnknownHostException if the host cannot be resolved.
              * @throws IOException if an I/O error occurs while connecting the
              * Socket.
-             * @throws NullPointerException if the InetAddress instance in NULL.
-             * @throws IllegalArgumentException if the port if not in range
+             * @throws std::logic_error if the InetAddress instance in NULL.
+             * @throws std::invalid_argument if the port if not in range
              * [0...65535]
              */
             SSLSocket(const InetAddress* address, int port);
@@ -77,8 +78,8 @@ namespace net
              * @throws UnknownHostException if the host cannot be resolved.
              * @throws IOException if an I/O error occurs while connecting the
              * Socket.
-             * @throws NullPointerException if the InetAddress instance in NULL.
-             * @throws IllegalArgumentException if the port if not in range
+             * @throws std::logic_error if the InetAddress instance in NULL.
+             * @throws std::invalid_argument if the port if not in range
              * [0...65535]
              */
             SSLSocket(const InetAddress* address,
@@ -102,7 +103,7 @@ namespace net
              * @throws UnknownHostException if the host cannot be resolved.
              * @throws IOException if an I/O error occurs while connecting the
              * Socket.
-             * @throws IllegalArgumentException if the port if not in range
+             * @throws std::invalid_argument if the port if not in range
              * [0...65535]
              */
             SSLSocket(const std::string& host, int port);
@@ -127,7 +128,7 @@ namespace net
              * @throws UnknownHostException if the host cannot be resolved.
              * @throws IOException if an I/O error occurs while connecting the
              * Socket.
-             * @throws IllegalArgumentException if the port if not in range
+             * @throws std::invalid_argument if the port if not in range
              * [0...65535]
              */
             SSLSocket(const std::string& host,
@@ -176,7 +177,7 @@ namespace net
              *      An Vector of names for all the Cipher Suites that are to be
              * enabled.
              *
-             * @throws IllegalArgumentException if the vector is empty or one of
+             * @throws std::invalid_argument if the vector is empty or one of
              * the names is invalid.
              */
             virtual void setEnabledCipherSuites(
@@ -200,7 +201,7 @@ namespace net
              *      An Vector of names for all the Protocols that are to be
              * enabled.
              *
-             * @throws IllegalArgumentException if the vector is empty or one of
+             * @throws std::invalid_argument if the vector is empty or one of
              * the names is invalid.
              */
             virtual void setEnabledProtocols(
@@ -234,7 +235,7 @@ namespace net
              *      The SSLParameters instance that is used to update this
              * SSLSocket's settings.
              *
-             * @throws IllegalArgumentException if an error occurs while calling
+             * @throws std::invalid_argument if an error occurs while calling
              * setEnabledCipherSuites or setEnabledProtocols.
              */
             virtual void setSSLParameters(const SSLParameters& value);

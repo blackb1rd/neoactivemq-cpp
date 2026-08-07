@@ -18,12 +18,9 @@
 #ifndef _DECAF_INTERNAL_NIO_BYTEBUFFER_H_
 #define _DECAF_INTERNAL_NIO_BYTEBUFFER_H_
 
+#include <activemq/exceptions/BufferUnderflowException.h>
 #include <decaf/internal/util/ByteArrayAdapter.h>
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
-#include <decaf/lang/exceptions/IndexOutOfBoundsException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/nio/BufferOverflowException.h>
-#include <decaf/nio/BufferUnderflowException.h>
 #include <decaf/nio/ByteBuffer.h>
 #include <decaf/nio/ReadOnlyBufferException.h>
 
@@ -159,8 +156,8 @@ namespace internal
              * @param readOnly
              *      Should this buffer be read-only, default as false.
              *
-             * @throws NullPointerException if buffer is NULL
-             * @throws IndexOutOfBoundsException if the preconditions of size,
+             * @throws std::logic_error if buffer is NULL
+             * @throws std::out_of_range if the preconditions of size,
              * offset and length are violated.
              */
             ByteArrayBuffer(unsigned char* array,
@@ -184,8 +181,8 @@ namespace internal
              * @param readOnly
              *      Boolean indicating if this a readOnly buffer.
              *
-             * @throws NullPointerException if array is NULL
-             * @throws IndexOutOfBoundsException if offset is greater than array
+             * @throws std::logic_error if array is NULL
+             * @throws std::out_of_range if offset is greater than array
              * capacity.
              */
             ByteArrayBuffer(const decaf::lang::Pointer<ByteArrayAdapter>& array,

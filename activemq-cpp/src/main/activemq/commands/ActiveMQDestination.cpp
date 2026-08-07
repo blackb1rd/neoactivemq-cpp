@@ -24,19 +24,18 @@
 #include <activemq/commands/ActiveMQTempTopic.h>
 #include <activemq/commands/ActiveMQTopic.h>
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/internal/util/StringUtils.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/util/HashCode.h>
 #include <decaf/util/StlSet.h>
 #include <decaf/util/StringTokenizer.h>
+#include <stdexcept>
 
 using namespace activemq;
 using namespace activemq::util;
 using namespace activemq::commands;
 using namespace decaf::internal::util;
 using namespace decaf::util;
-
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 const std::string ActiveMQDestination::DEFAULT_ORDERED_TARGET = "coordinator";
@@ -138,9 +137,7 @@ void ActiveMQDestination::copyDataStructure(const DataStructure* src)
 
     if (srcPtr == NULL || src == NULL)
     {
-        throw decaf::lang::exceptions::NullPointerException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::NullPointerException(
             "BrokerId::copyDataStructure - src is NULL or invalid");
     }
 
@@ -262,11 +259,9 @@ std::shared_ptr<ActiveMQDestination> ActiveMQDestination::createDestination(
             result.reset(new ActiveMQTempTopic(name));
             return result;
         default:
-            throw IllegalArgumentException(
-                __FILE__,
-                __LINE__,
-                "Invalid default destination type: %d",
-                type);
+            throw activemq::exceptions::InvalidArgumentException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+                "Invalid default destination type: " + std::to_string(type));
     }
 }
 
@@ -284,10 +279,10 @@ std::string ActiveMQDestination::getDestinationTypeAsString() const
         case cms::Destination::TEMPORARY_TOPIC:
             return "TempTopic";
         default:
-            throw new IllegalArgumentException(__FILE__,
-                                               __LINE__,
-                                               "Invalid destination type: %d",
-                                               (int)getDestinationType());
+            throw activemq::exceptions::InvalidArgumentException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+                "Invalid destination type: " +
+                std::to_string((int)getDestinationType()));
     }
 }
 

@@ -22,7 +22,6 @@ using namespace std;
 using namespace activemq;
 using namespace activemq::wireformat;
 using namespace activemq::wireformat::stomp;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 // Stomp Command Ids

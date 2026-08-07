@@ -21,7 +21,6 @@
 #include <decaf/lang/Comparable.h>
 #include <decaf/lang/Number.h>
 #include <decaf/lang/String.h>
-#include <decaf/lang/exceptions/NumberFormatException.h>
 #include <decaf/util/Config.h>
 #include <string>
 
@@ -58,13 +57,13 @@ namespace lang
         /**
          * Constructs a new Integer and attempts to convert the given string to
          * an int value, assigning it to the new object is successful or
-         * throwing a NumberFormatException if the string is not a properly
+         * throwing a std::invalid_argument if the string is not a properly
          * formatted int.
          *
          * @param value
          *      The string to convert to a primitive type to wrap.
          *
-         * @throws NumberFormatException if the string is not a a valid integer.
+         * @throws std::invalid_argument if the string is not a a valid integer.
          */
         Integer(const std::string& value);
 
@@ -220,7 +219,7 @@ namespace lang
          * and/or radix specifier ("0x", "0X", "#", or leading zero) is parsed
          * as by the Integer.parseInteger method with the indicated radix (10,
          * 16, or 8). This sequence of characters must represent a positive
-         * value or a NumberFormatException will be thrown. The result is
+         * value or a std::invalid_argument will be thrown. The result is
          * negated if first character of the specified String is the minus sign.
          * No whitespace characters are permitted in the string.
          * @param value - The string to decode
@@ -254,7 +253,7 @@ namespace lang
          * the first character may be an ASCII minus sign '-' to indicate a
          * negative value. The resulting byte value is returned.
          *
-         * An exception of type NumberFormatException is thrown if any of the
+         * An exception of type std::invalid_argument is thrown if any of the
          * following situations occurs:
          *  * The first argument is null or is a string of length zero.
          *  * The radix is either smaller than Character.MIN_RADIX or larger
@@ -268,7 +267,7 @@ namespace lang
          * @param radix - the radix to be used while parsing s
          * @return the int represented by the string argument in the specified
          * radix.
-         * @throws NumberFormatException - If String does not contain a parsable
+         * @throws std::invalid_argument - If String does not contain a parsable
          * int.
          */
         static int parseInt(const String& s, int radix);
@@ -285,7 +284,7 @@ namespace lang
          *      String to convert to a int
          *
          * @return the converted int value
-         * @throws NumberFormatException if the string is not a int.
+         * @throws std::invalid_argument if the string is not a int.
          */
         static int parseInt(const String& s);
 
@@ -310,7 +309,7 @@ namespace lang
          * represents the int value specified by the string.
          * @param value - std::string to parse as base 10
          * @return new Integer Object wrapping the primitive
-         * @throws NumberFormatException if the string is not a decimal int.
+         * @throws std::invalid_argument if the string is not a decimal int.
          */
         static Integer valueOf(const String& value);
 
@@ -325,7 +324,7 @@ namespace lang
          * @param value - std::string to parse as base ( radix )
          * @param radix - base of the string to parse.
          * @return new Integer Object wrapping the primitive
-         * @throws NumberFormatException if the string is not a valid int.
+         * @throws std::invalid_argument if the string is not a valid int.
          */
         static Integer valueOf(const String& value, int radix);
 

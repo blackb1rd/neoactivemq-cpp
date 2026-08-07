@@ -17,11 +17,12 @@
 
 #include "MessageDigestSpi.h"
 
-#include <decaf/lang/exceptions/CloneNotSupportedException.h>
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <stdexcept>
+#include <string>
 
 using namespace decaf;
 using namespace decaf::security;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 MessageDigestSpi::MessageDigestSpi()
@@ -43,8 +44,8 @@ bool MessageDigestSpi::isCloneable() const
 ////////////////////////////////////////////////////////////////////////////////
 MessageDigestSpi* MessageDigestSpi::clone()
 {
-    throw CloneNotSupportedException(
+    throw activemq::exceptions::CloneNotSupportedException(
         __FILE__,
         __LINE__,
-        "This MessageDisgestSpi cannot be cloned.");
+        "This MessageDigestSpi cannot be cloned.");
 }

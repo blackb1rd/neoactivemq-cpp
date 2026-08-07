@@ -33,7 +33,6 @@ using namespace cms;
 using namespace cms::stress;
 using namespace activemq::library;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util::concurrent;
 using namespace decaf::util::concurrent::atomic;
 

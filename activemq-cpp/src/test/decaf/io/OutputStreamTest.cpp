@@ -22,7 +22,6 @@
 using namespace std;
 using namespace decaf;
 using namespace decaf::io;
-using namespace decaf::lang::exceptions;
 
 class OutputStreamTest : public ::testing::Test
 {

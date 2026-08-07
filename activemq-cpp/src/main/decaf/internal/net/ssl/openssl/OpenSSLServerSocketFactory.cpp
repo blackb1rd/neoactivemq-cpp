@@ -17,20 +17,19 @@
 
 #include "OpenSSLServerSocketFactory.h"
 
-#include <decaf/lang/exceptions/NullPointerException.h>
-#include <decaf/lang/exceptions/UnsupportedOperationException.h>
-
 #include <decaf/internal/net/ssl/openssl/OpenSSLContextSpi.h>
 #include <decaf/internal/net/ssl/openssl/OpenSSLParameters.h>
 #include <decaf/internal/net/ssl/openssl/OpenSSLSocket.h>
 
 #include <memory>
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <openssl/ssl.h>
+#include <stdexcept>
+#include <string>
 
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::io;
 using namespace decaf::net;
 using namespace decaf::net::ssl;
@@ -46,9 +45,10 @@ OpenSSLServerSocketFactory::OpenSSLServerSocketFactory(OpenSSLContextSpi* parent
 {
     if (parent == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "Parent Pointer was NULL.");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "Parent Pointer was NULL.");
     }
 }
 

@@ -18,8 +18,8 @@
 #ifndef _DECAF_NIO_BUFFER_H_
 #define _DECAF_NIO_BUFFER_H_
 
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
 #include <decaf/nio/InvalidMarkException.h>
+#include <stdexcept>
 
 namespace decaf
 {
@@ -57,7 +57,7 @@ namespace nio
      * no data is transferred.
      *   * Absolute operations take an explicit element index and do not affect
      * the position. Absolute get and put operations throw an
-     * IndexOutOfBoundsException if the index argument exceeds the limit.
+     * std::out_of_range if the index argument exceeds the limit.
      *
      *  Data may also, of course, be transferred in to or out of a buffer by the
      * I/O operations of an appropriate channel, which are always relative to
@@ -173,7 +173,7 @@ namespace nio
          *
          * @return a reference to This buffer.
          *
-         * @throws IllegalArgumentException if preconditions on the new pos
+         * @throws std::invalid_argument if preconditions on the new pos
          * don't hold.
          */
         virtual Buffer& position(int newPosition);
@@ -197,7 +197,7 @@ namespace nio
          *
          * @return A reference to This buffer
          *
-         * @throws IllegalArgumentException if preconditions on the new pos
+         * @throws std::invalid_argument if preconditions on the new pos
          * don't hold.
          */
         virtual Buffer& limit(int newLimit);

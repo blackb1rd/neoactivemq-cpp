@@ -27,7 +27,6 @@ using namespace std;
 using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 class ListTest : public ::testing::Test
 {
@@ -406,9 +405,8 @@ TEST_F(ListTest, testAdd2)
     ASSERT_TRUE(list.get(4) == "fred");
     ASSERT_TRUE(list.get(5) == "bob");
 
-    ASSERT_THROW(list.add(list.size() + 1, "bob"),
-                 decaf::lang::exceptions::IndexOutOfBoundsException)
-        << ("Should throw an IndexOutOfBoundsException");
+    ASSERT_THROW(list.add(list.size() + 1, "bob"), std::out_of_range)
+        << ("Should throw an std::out_of_range");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -440,11 +438,11 @@ TEST_F(ListTest, testAdd3)
     ASSERT_EQ(array.get(1), oldItem)
         << ("Should have returned the old item from slot 0");
 
-    ASSERT_THROW(array.add(-1, 0), IndexOutOfBoundsException)
-        << ("Should throw an IndexOutOfBoundsException");
+    ASSERT_THROW(array.add(-1, 0), std::out_of_range)
+        << ("Should throw an std::out_of_range");
 
-    ASSERT_THROW(array.add(array.size() + 1, 0), IndexOutOfBoundsException)
-        << ("Should throw an IndexOutOfBoundsException");
+    ASSERT_THROW(array.add(array.size() + 1, 0), std::out_of_range)
+        << ("Should throw an std::out_of_range");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -482,9 +480,8 @@ TEST_F(ListTest, testAddAll1)
 TEST_F(ListTest, testAddAll2)
 {
     StlList<int> emptyCollection;
-    ASSERT_THROW(StlList<int>().addAll(-1, emptyCollection),
-                 IndexOutOfBoundsException)
-        << ("Should throw an IndexOutOfBoundsException");
+    ASSERT_THROW(StlList<int>().addAll(-1, emptyCollection), std::out_of_range)
+        << ("Should throw an std::out_of_range");
 
     {
         std::string          data[] = {"1", "2", "3", "4", "5", "6", "7", "8"};
@@ -557,11 +554,11 @@ TEST_F(ListTest, testAddAll3)
     list.addAll(0, list);
     list.addAll(list.size(), list);
 
-    ASSERT_THROW(list.addAll(-1, list), IndexOutOfBoundsException)
-        << ("Should throw an IndexOutOfBoundsException");
+    ASSERT_THROW(list.addAll(-1, list), std::out_of_range)
+        << ("Should throw an std::out_of_range");
 
-    ASSERT_THROW(list.addAll(list.size() + 1, list), IndexOutOfBoundsException)
-        << ("Should throw an IndexOutOfBoundsException");
+    ASSERT_THROW(list.addAll(list.size() + 1, list), std::out_of_range)
+        << ("Should throw an std::out_of_range");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -747,9 +744,8 @@ TEST_F(ListTest, testRemove2)
     ASSERT_TRUE(list.removeAt(2) == "mike");
     ASSERT_TRUE(list.get(2) == "larry");
 
-    ASSERT_THROW(list.removeAt(list.size() + 1),
-                 decaf::lang::exceptions::IndexOutOfBoundsException)
-        << ("Should throw an IndexOutOfBoundsException");
+    ASSERT_THROW(list.removeAt(list.size() + 1), std::out_of_range)
+        << ("Should throw an std::out_of_range");
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -788,8 +784,8 @@ TEST_F(ListTest, testRemoveAt)
     array.removeAt(10);
     ASSERT_EQ(-1, array.indexOf(10)) << ("Failed to remove element");
 
-    ASSERT_THROW(array.removeAt(9999), IndexOutOfBoundsException)
-        << ("Should throw an IndexOutOfBoundsException");
+    ASSERT_THROW(array.removeAt(9999), std::out_of_range)
+        << ("Should throw an std::out_of_range");
 
     StlList<int> myArray(array);
     array.add(25, 9999);
@@ -814,11 +810,11 @@ TEST_F(ListTest, testRemoveAt)
     l.removeAt(0);
     l.removeAt(0);
 
-    ASSERT_THROW(l.removeAt(-1), IndexOutOfBoundsException)
-        << ("Should throw an IndexOutOfBoundsException");
+    ASSERT_THROW(l.removeAt(-1), std::out_of_range)
+        << ("Should throw an std::out_of_range");
 
-    ASSERT_THROW(l.removeAt(0), IndexOutOfBoundsException)
-        << ("Should throw an IndexOutOfBoundsException");
+    ASSERT_THROW(l.removeAt(0), std::out_of_range)
+        << ("Should throw an std::out_of_range");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -878,8 +874,8 @@ TEST_F(ListTest, testListIterator1IndexOutOfBoundsException)
     StlList<int> list;
 
     ASSERT_THROW(std::unique_ptr<ListIterator<int>> it(list.listIterator(-1)),
-                 IndexOutOfBoundsException)
-        << ("Should throw an IndexOutOfBoundsException");
+                 std::out_of_range)
+        << ("Should throw an std::out_of_range");
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -890,6 +886,6 @@ TEST_F(ListTest, testListIterator2IndexOutOfBoundsException)
     list.add(2);
 
     ASSERT_THROW(std::unique_ptr<ListIterator<int>> it(list.listIterator(100)),
-                 IndexOutOfBoundsException)
-        << ("Should throw an IndexOutOfBoundsException");
+                 std::out_of_range)
+        << ("Should throw an std::out_of_range");
 }

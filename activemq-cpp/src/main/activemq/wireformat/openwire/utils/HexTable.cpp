@@ -18,6 +18,8 @@
 #include "HexTable.h"
 
 #include <activemq/exceptions/ActiveMQException.h>
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <stdexcept>
 #include <string>
 
 using namespace std;
@@ -26,8 +28,6 @@ using namespace activemq::exceptions;
 using namespace activemq::wireformat;
 using namespace activemq::wireformat::openwire;
 using namespace activemq::wireformat::openwire::utils;
-using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 HexTable::HexTable()
@@ -65,45 +65,27 @@ HexTable::HexTable()
 ////////////////////////////////////////////////////////////////////////////////
 const std::string& HexTable::operator[](std::size_t index)
 {
-    try
+    if (size() < index)
     {
-        if (size() < index)
-        {
-            throw IndexOutOfBoundsException(
-                __FILE__,
-                __LINE__,
-                (string("HexTable::operator[] - Index passed is out of "
-                        "Bounds") +
-                 std::to_string((int)index))
-                    .c_str());
-        }
-
-        return table[index];
+        throw activemq::exceptions::IndexOutOfBoundsException(
+            "HexTable::operator[] - Index passed is out of "
+            "Bounds" +
+            std::to_string((int)index));
     }
-    AMQ_CATCH_RETHROW(IndexOutOfBoundsException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, IndexOutOfBoundsException)
-    AMQ_CATCHALL_THROW(IndexOutOfBoundsException)
+
+    return table[index];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 const std::string& HexTable::operator[](std::size_t index) const
 {
-    try
+    if (size() < index)
     {
-        if (size() < index)
-        {
-            throw IndexOutOfBoundsException(
-                __FILE__,
-                __LINE__,
-                (string("HexTable::operator[] - Index passed is out of "
-                        "Bounds") +
-                 std::to_string((int)index))
-                    .c_str());
-        }
-
-        return table[index];
+        throw activemq::exceptions::IndexOutOfBoundsException(
+            "HexTable::operator[] - Index passed is out of "
+            "Bounds" +
+            std::to_string((int)index));
     }
-    AMQ_CATCH_RETHROW(IndexOutOfBoundsException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, IndexOutOfBoundsException)
-    AMQ_CATCHALL_THROW(IndexOutOfBoundsException)
+
+    return table[index];
 }

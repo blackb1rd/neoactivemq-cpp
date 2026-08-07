@@ -22,9 +22,11 @@
 #include <activemq/util/ServiceStopper.h>
 
 #include <decaf/lang/Runnable.h>
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
-#include <decaf/lang/exceptions/IllegalStateException.h>
 #include <decaf/util/Timer.h>
+
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <stdexcept>
+#include <string>
 
 using namespace activemq;
 using namespace activemq::threads;
@@ -34,7 +36,6 @@ using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 Scheduler::Scheduler(const std::string& name)
@@ -45,9 +46,9 @@ Scheduler::Scheduler(const std::string& name)
 {
     if (name.empty())
     {
-        throw IllegalArgumentException(__FILE__,
-                                       __LINE__,
-                                       "Scheduler name must not be empty.");
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Scheduler name must not be empty.");
     }
 }
 
@@ -75,9 +76,10 @@ void Scheduler::executePeriodically(Runnable* task,
 {
     if (!isStarted())
     {
-        throw IllegalStateException(__FILE__,
-                                    __LINE__,
-                                    "Scheduler is not started.");
+        throw activemq::exceptions::IllegalStateException(
+            __FILE__,
+            __LINE__,
+            "Scheduler is not started.");
     }
 
     synchronized(&mutex)
@@ -95,9 +97,10 @@ void Scheduler::schedualPeriodically(Runnable* task,
 {
     if (!isStarted())
     {
-        throw IllegalStateException(__FILE__,
-                                    __LINE__,
-                                    "Scheduler is not started.");
+        throw activemq::exceptions::IllegalStateException(
+            __FILE__,
+            __LINE__,
+            "Scheduler is not started.");
     }
 
     synchronized(&mutex)
@@ -113,9 +116,10 @@ void Scheduler::cancel(Runnable* task)
 {
     if (!isStarted())
     {
-        throw IllegalStateException(__FILE__,
-                                    __LINE__,
-                                    "Scheduler is not started.");
+        throw activemq::exceptions::IllegalStateException(
+            __FILE__,
+            __LINE__,
+            "Scheduler is not started.");
     }
 
     synchronized(&mutex)
@@ -136,9 +140,10 @@ void Scheduler::executeAfterDelay(Runnable* task,
 {
     if (!isStarted())
     {
-        throw IllegalStateException(__FILE__,
-                                    __LINE__,
-                                    "Scheduler is not started.");
+        throw activemq::exceptions::IllegalStateException(
+            __FILE__,
+            __LINE__,
+            "Scheduler is not started.");
     }
 
     synchronized(&mutex)

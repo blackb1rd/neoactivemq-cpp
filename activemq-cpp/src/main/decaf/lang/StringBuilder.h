@@ -24,6 +24,7 @@
 #include <decaf/lang/Pointer.h>
 #include <decaf/lang/String.h>
 #include <decaf/util/Config.h>
+#include <stdexcept>
 
 namespace decaf
 {
@@ -67,7 +68,7 @@ namespace lang
          * @param capacity
          *      The initial capacity to give this new instance.
          *
-         * @throws NegativeArraySizeException if the given capacity is less than
+         * @throws std::runtime_error if the given capacity is less than
          * zero.
          */
         StringBuilder(int capacity);
@@ -92,7 +93,7 @@ namespace lang
          *      The CharSequence whose contents are to be copied into this
          * StringBuilder.
          *
-         * @throws NullPointerException if the CharSequence pointer is NULL.
+         * @throws std::logic_error if the CharSequence pointer is NULL.
          */
         StringBuilder(const CharSequence* source);
 
@@ -251,8 +252,8 @@ namespace lang
          * @param length
          *      The number of characters to copy from the given array.
          *
-         * @throws NullPointerException if the pointer is NULL.
-         * @throws IndexOutOfBoundsException if offset or length is negative or
+         * @throws std::logic_error if the pointer is NULL.
+         * @throws std::out_of_range if offset or length is negative or
          * the value of offset + length is greater than the strings length.
          */
         StringBuilder& append(const char* value, int offset, int length);
@@ -283,7 +284,7 @@ namespace lang
          * @param length
          *      The number of characters to copy from the given CharSequence.
          *
-         * @throws IndexOutOfBoundsException if offset or length is negative or
+         * @throws std::out_of_range if offset or length is negative or
          * the value of offset + length is greater than the strings length.
          */
         StringBuilder& append(const CharSequence* value,
@@ -327,7 +328,7 @@ namespace lang
          * @return a reference to this StringBuilder so that operations can be
          * chained.
          *
-         * @throws StringIndexOutOfBoundsException
+         * @throws std::out_of_range
          *      if start is negative, greater than length(), or greater than
          * end.
          */
@@ -344,7 +345,7 @@ namespace lang
          * @return a reference to this StringBuilder so that operations can be
          * chained.
          *
-         * @throws StringIndexOutOfBoundsException
+         * @throws std::out_of_range
          *      if the index is negative or greater than or equal to length().
          */
         StringBuilder& deleteCharAt(int index);
@@ -418,7 +419,7 @@ namespace lang
          * @return a reference to this StringBuilder so that operations can be
          * chained.
          *
-         * @throws IndexOutOfBoundsException
+         * @throws std::out_of_range
          *      if the index is negative or greater than or equal to length().
          */
         StringBuilder& insert(int index, char value);
@@ -436,7 +437,7 @@ namespace lang
          * @return a reference to this StringBuilder so that operations can be
          * chained.
          *
-         * @throws IndexOutOfBoundsException
+         * @throws std::out_of_range
          *      if the index is negative or greater than or equal to length().
          */
         StringBuilder& insert(int index, bool value);
@@ -454,7 +455,7 @@ namespace lang
          * @return a reference to this StringBuilder so that operations can be
          * chained.
          *
-         * @throws IndexOutOfBoundsException
+         * @throws std::out_of_range
          *      if the index is negative or greater than or equal to length().
          */
         StringBuilder& insert(int index, short value);
@@ -472,7 +473,7 @@ namespace lang
          * @return a reference to this StringBuilder so that operations can be
          * chained.
          *
-         * @throws IndexOutOfBoundsException
+         * @throws std::out_of_range
          *      if the index is negative or greater than or equal to length().
          */
         StringBuilder& insert(int index, int value);
@@ -490,7 +491,7 @@ namespace lang
          * @return a reference to this StringBuilder so that operations can be
          * chained.
          *
-         * @throws IndexOutOfBoundsException
+         * @throws std::out_of_range
          *      if the index is negative or greater than or equal to length().
          */
         StringBuilder& insert(int index, long long value);
@@ -508,7 +509,7 @@ namespace lang
          * @return a reference to this StringBuilder so that operations can be
          * chained.
          *
-         * @throws IndexOutOfBoundsException
+         * @throws std::out_of_range
          *      if the index is negative or greater than or equal to length().
          */
         StringBuilder& insert(int index, float value);
@@ -526,7 +527,7 @@ namespace lang
          * @return a reference to this StringBuilder so that operations can be
          * chained.
          *
-         * @throws IndexOutOfBoundsException
+         * @throws std::out_of_range
          *      if the index is negative or greater than or equal to length().
          */
         StringBuilder& insert(int index, double value);
@@ -543,8 +544,8 @@ namespace lang
          * @return a reference to this StringBuilder so that operations can be
          * chained.
          *
-         * @throws NullPointerException if the target C string pointer is NULL.
-         * @throws IndexOutOfBoundsException
+         * @throws std::logic_error if the target C string pointer is NULL.
+         * @throws std::out_of_range
          *      if the index is negative or greater than or equal to length().
          */
         StringBuilder& insert(int index, const char* value);
@@ -561,8 +562,8 @@ namespace lang
          * @return a reference to this StringBuilder so that operations can be
          * chained.
          *
-         * @throws NullPointerException if the target C string pointer is NULL.
-         * @throws IndexOutOfBoundsException
+         * @throws std::logic_error if the target C string pointer is NULL.
+         * @throws std::out_of_range
          *      if the index is negative or greater than or equal to length().
          */
         StringBuilder& insert(int index, const String& value);
@@ -579,9 +580,9 @@ namespace lang
          * @return a reference to this StringBuilder so that operations can be
          * chained.
          *
-         * @throws NullPointerException if the target std::string pointer is
+         * @throws std::logic_error if the target std::string pointer is
          * NULL.
-         * @throws IndexOutOfBoundsException
+         * @throws std::out_of_range
          *      if the index is negative or greater than or equal to length().
          */
         StringBuilder& insert(int index, const std::string& value);
@@ -603,8 +604,8 @@ namespace lang
          * @return a reference to this StringBuilder so that operations can be
          * chained.
          *
-         * @throws NullPointerException if the target C string pointer is NULL.
-         * @throws IndexOutOfBoundsException
+         * @throws std::logic_error if the target C string pointer is NULL.
+         * @throws std::out_of_range
          *      if the index is negative or greater than or equal to length().
          *      If offset or length is negative or offset > the string length +
          * length.
@@ -629,7 +630,7 @@ namespace lang
          * @return a reference to this StringBuilder so that operations can be
          * chained.
          *
-         * @throws IndexOutOfBoundsException
+         * @throws std::out_of_range
          *      if the index is negative or greater than or equal to length().
          */
         StringBuilder& insert(int index, const CharSequence* value);
@@ -653,7 +654,7 @@ namespace lang
          * @return a reference to this StringBuilder so that operations can be
          * chained.
          *
-         * @throws IndexOutOfBoundsException
+         * @throws std::out_of_range
          *      if the index is negative or greater than or equal to length().
          *      If offset or length is negative or offset > the string length +
          * length.
@@ -681,7 +682,7 @@ namespace lang
          * @return a reference to this StringBuilder so that operations can be
          * chained.
          *
-         * @throws IndexOutOfBoundsException if start is negative, greater than
+         * @throws std::out_of_range if start is negative, greater than
          * end or greater than length().
          */
         StringBuilder& replace(int start, int end, const String& value);

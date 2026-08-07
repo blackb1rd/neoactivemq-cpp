@@ -31,15 +31,13 @@
 #include <activemq/transport/TransportListener.h>
 #include <activemq/util/Config.h>
 #include <cms/EnhancedConnection.h>
-#include <decaf/lang/exceptions/IllegalStateException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
-#include <decaf/lang/exceptions/UnsupportedOperationException.h>
 #include <decaf/util/ArrayList.h>
 #include <decaf/util/Properties.h>
 #include <decaf/util/concurrent/ExecutorService.h>
 
 #include <atomic>
 #include <memory>
+#include <stdexcept>
 #include <string>
 
 namespace activemq
@@ -230,11 +228,11 @@ namespace core
          * @param destination
          *        The Destination the Broker will be requested to remove.
          *
-         * @throws NullPointerException
+         * @throws std::logic_error
          *         If the passed Destination is Null
-         * @throws IllegalStateException
+         * @throws std::logic_error
          *         If the connection is closed.
-         * @throws UnsupportedOperationException
+         * @throws std::logic_error
          *         If the wire format in use does not support this operation.
          * @throws ActiveMQException
          *         If any other error occurs during the attempt to destroy the
@@ -253,11 +251,11 @@ namespace core
          * @param destination
          *        The CMS Destination the Broker will be requested to remove.
          *
-         * @throws NullPointerException
+         * @throws std::logic_error
          *         If the passed Destination is Null
-         * @throws IllegalStateException
+         * @throws std::logic_error
          *         If the connection is closed.
-         * @throws UnsupportedOperationException
+         * @throws std::logic_error
          *         If the wire format in use does not support this operation.
          * @throws ActiveMQException
          *         If any other error occurs during the attempt to destroy the

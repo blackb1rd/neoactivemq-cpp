@@ -22,15 +22,15 @@
 #include <activemq/exceptions/ActiveMQException.h>
 #include <activemq/util/ActiveMQMessageTransformation.h>
 
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/util/ArrayList.h>
+#include <stdexcept>
+#include <string>
 
 using namespace activemq;
 using namespace activemq::util;
 using namespace activemq::commands;
 using namespace decaf::util;
-using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 const std::string AdvisorySupport::ADVISORY_TOPIC_PREFIX = "ActiveMQ.Advisory.";
@@ -222,7 +222,7 @@ ActiveMQDestination* AdvisorySupport::getConsumerAdvisoryTopic(
 {
     if (destination == NULL)
     {
-        throw NullPointerException(
+        throw activemq::exceptions::NullPointerException(
             __FILE__,
             __LINE__,
             "The passed ActiveMQDestination cannot be NULL");
@@ -265,7 +265,7 @@ ActiveMQDestination* AdvisorySupport::getProducerAdvisoryTopic(
 {
     if (destination == NULL)
     {
-        throw NullPointerException(
+        throw activemq::exceptions::NullPointerException(
             __FILE__,
             __LINE__,
             "The passed ActiveMQDestination cannot be NULL");
@@ -308,7 +308,7 @@ ActiveMQDestination* AdvisorySupport::getExpiredMessageTopic(
 {
     if (destination == NULL)
     {
-        throw NullPointerException(
+        throw activemq::exceptions::NullPointerException(
             __FILE__,
             __LINE__,
             "The passed ActiveMQDestination cannot be NULL");
@@ -348,7 +348,7 @@ ActiveMQDestination* AdvisorySupport::getExpiredTopicMessageAdvisoryTopic(
 {
     if (destination == NULL)
     {
-        throw NullPointerException(
+        throw activemq::exceptions::NullPointerException(
             __FILE__,
             __LINE__,
             "The passed ActiveMQDestination cannot be NULL");
@@ -384,7 +384,7 @@ ActiveMQDestination* AdvisorySupport::getExpiredQueueMessageAdvisoryTopic(
 {
     if (destination == NULL)
     {
-        throw NullPointerException(
+        throw activemq::exceptions::NullPointerException(
             __FILE__,
             __LINE__,
             "The passed ActiveMQDestination cannot be NULL");
@@ -420,7 +420,7 @@ ActiveMQDestination* AdvisorySupport::getNoConsumersAdvisoryTopic(
 {
     if (destination == NULL)
     {
-        throw NullPointerException(
+        throw activemq::exceptions::NullPointerException(
             __FILE__,
             __LINE__,
             "The passed ActiveMQDestination cannot be NULL");
@@ -459,7 +459,7 @@ ActiveMQDestination* AdvisorySupport::getNoTopicConsumersAdvisoryTopic(
 {
     if (destination == NULL)
     {
-        throw NullPointerException(
+        throw activemq::exceptions::NullPointerException(
             __FILE__,
             __LINE__,
             "The passed ActiveMQDestination cannot be NULL");
@@ -495,7 +495,7 @@ ActiveMQDestination* AdvisorySupport::getNoQueueConsumersAdvisoryTopic(
 {
     if (destination == NULL)
     {
-        throw NullPointerException(
+        throw activemq::exceptions::NullPointerException(
             __FILE__,
             __LINE__,
             "The passed ActiveMQDestination cannot be NULL");
@@ -531,7 +531,7 @@ ActiveMQDestination* AdvisorySupport::getSlowConsumerAdvisoryTopic(
 {
     if (destination == NULL)
     {
-        throw NullPointerException(
+        throw activemq::exceptions::NullPointerException(
             __FILE__,
             __LINE__,
             "The passed ActiveMQDestination cannot be NULL");
@@ -569,7 +569,7 @@ ActiveMQDestination* AdvisorySupport::getFastProducerAdvisoryTopic(
 {
     if (destination == NULL)
     {
-        throw NullPointerException(
+        throw activemq::exceptions::NullPointerException(
             __FILE__,
             __LINE__,
             "The passed ActiveMQDestination cannot be NULL");
@@ -607,7 +607,7 @@ ActiveMQDestination* AdvisorySupport::getMessageDiscardedAdvisoryTopic(
 {
     if (destination == NULL)
     {
-        throw NullPointerException(
+        throw activemq::exceptions::NullPointerException(
             __FILE__,
             __LINE__,
             "The passed ActiveMQDestination cannot be NULL");
@@ -645,7 +645,7 @@ ActiveMQDestination* AdvisorySupport::getMessageDeliveredAdvisoryTopic(
 {
     if (destination == NULL)
     {
-        throw NullPointerException(
+        throw activemq::exceptions::NullPointerException(
             __FILE__,
             __LINE__,
             "The passed ActiveMQDestination cannot be NULL");
@@ -683,7 +683,7 @@ ActiveMQDestination* AdvisorySupport::getMessageConsumedAdvisoryTopic(
 {
     if (destination == NULL)
     {
-        throw NullPointerException(
+        throw activemq::exceptions::NullPointerException(
             __FILE__,
             __LINE__,
             "The passed ActiveMQDestination cannot be NULL");
@@ -721,7 +721,7 @@ ActiveMQDestination* AdvisorySupport::getMessageDLQdAdvisoryTopic(
 {
     if (destination == NULL)
     {
-        throw NullPointerException(
+        throw activemq::exceptions::NullPointerException(
             __FILE__,
             __LINE__,
             "The passed ActiveMQDestination cannot be NULL");
@@ -770,7 +770,7 @@ ActiveMQDestination* AdvisorySupport::getFullAdvisoryTopic(
 {
     if (destination == NULL)
     {
-        throw NullPointerException(
+        throw activemq::exceptions::NullPointerException(
             __FILE__,
             __LINE__,
             "The passed ActiveMQDestination cannot be NULL");
@@ -808,7 +808,7 @@ ActiveMQDestination* AdvisorySupport::getDestinationAdvisoryTopic(
 {
     if (destination == NULL)
     {
-        throw NullPointerException(
+        throw activemq::exceptions::NullPointerException(
             __FILE__,
             __LINE__,
             "The passed ActiveMQDestination cannot be NULL");
@@ -825,11 +825,10 @@ ActiveMQDestination* AdvisorySupport::getDestinationAdvisoryTopic(
         case cms::Destination::TEMPORARY_TOPIC:
             return getTempTopicAdvisoryTopic();
         default:
-            throw new IllegalArgumentException(
-                __FILE__,
-                __LINE__,
-                "Unknown destination type: %d",
-                (int)destination->getDestinationType());
+            throw activemq::exceptions::InvalidArgumentException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+                "Unknown destination type: " +
+                std::to_string((int)destination->getDestinationType()));
     }
 }
 
@@ -858,7 +857,7 @@ bool AdvisorySupport::isDestinationAdvisoryTopic(
 {
     if (destination == NULL)
     {
-        throw NullPointerException(
+        throw activemq::exceptions::NullPointerException(
             __FILE__,
             __LINE__,
             "The passed ActiveMQDestination cannot be NULL");
@@ -912,7 +911,7 @@ bool AdvisorySupport::isTempDestinationAdvisoryTopic(
 {
     if (destination == NULL)
     {
-        throw NullPointerException(
+        throw activemq::exceptions::NullPointerException(
             __FILE__,
             __LINE__,
             "The passed ActiveMQDestination cannot be NULL");
@@ -963,7 +962,7 @@ bool AdvisorySupport::isAdvisoryTopic(const ActiveMQDestination* destination)
 {
     if (destination == NULL)
     {
-        throw NullPointerException(
+        throw activemq::exceptions::NullPointerException(
             __FILE__,
             __LINE__,
             "The passed ActiveMQDestination cannot be NULL");
@@ -1016,7 +1015,7 @@ bool AdvisorySupport::isConnectionAdvisoryTopic(
 {
     if (destination == NULL)
     {
-        throw NullPointerException(
+        throw activemq::exceptions::NullPointerException(
             __FILE__,
             __LINE__,
             "The passed ActiveMQDestination cannot be NULL");
@@ -1067,7 +1066,7 @@ bool AdvisorySupport::isProducerAdvisoryTopic(
 {
     if (destination == NULL)
     {
-        throw NullPointerException(
+        throw activemq::exceptions::NullPointerException(
             __FILE__,
             __LINE__,
             "The passed ActiveMQDestination cannot be NULL");
@@ -1119,7 +1118,7 @@ bool AdvisorySupport::isConsumerAdvisoryTopic(
 {
     if (destination == NULL)
     {
-        throw NullPointerException(
+        throw activemq::exceptions::NullPointerException(
             __FILE__,
             __LINE__,
             "The passed ActiveMQDestination cannot be NULL");
@@ -1171,7 +1170,7 @@ bool AdvisorySupport::isSlowConsumerAdvisoryTopic(
 {
     if (destination == NULL)
     {
-        throw NullPointerException(
+        throw activemq::exceptions::NullPointerException(
             __FILE__,
             __LINE__,
             "The passed ActiveMQDestination cannot be NULL");
@@ -1222,7 +1221,7 @@ bool AdvisorySupport::isFastProducerAdvisoryTopic(
 {
     if (destination == NULL)
     {
-        throw NullPointerException(
+        throw activemq::exceptions::NullPointerException(
             __FILE__,
             __LINE__,
             "The passed ActiveMQDestination cannot be NULL");
@@ -1273,7 +1272,7 @@ bool AdvisorySupport::isMessageConsumedAdvisoryTopic(
 {
     if (destination == NULL)
     {
-        throw NullPointerException(
+        throw activemq::exceptions::NullPointerException(
             __FILE__,
             __LINE__,
             "The passed ActiveMQDestination cannot be NULL");
@@ -1326,7 +1325,7 @@ bool AdvisorySupport::isMasterBrokerAdvisoryTopic(
 {
     if (destination == NULL)
     {
-        throw NullPointerException(
+        throw activemq::exceptions::NullPointerException(
             __FILE__,
             __LINE__,
             "The passed ActiveMQDestination cannot be NULL");
@@ -1377,7 +1376,7 @@ bool AdvisorySupport::isMessageDeliveredAdvisoryTopic(
 {
     if (destination == NULL)
     {
-        throw NullPointerException(
+        throw activemq::exceptions::NullPointerException(
             __FILE__,
             __LINE__,
             "The passed ActiveMQDestination cannot be NULL");
@@ -1430,7 +1429,7 @@ bool AdvisorySupport::isMessageDiscardedAdvisoryTopic(
 {
     if (destination == NULL)
     {
-        throw NullPointerException(
+        throw activemq::exceptions::NullPointerException(
             __FILE__,
             __LINE__,
             "The passed ActiveMQDestination cannot be NULL");
@@ -1483,7 +1482,7 @@ bool AdvisorySupport::isMessageDLQdAdvisoryTopic(
 {
     if (destination == NULL)
     {
-        throw NullPointerException(
+        throw activemq::exceptions::NullPointerException(
             __FILE__,
             __LINE__,
             "The passed ActiveMQDestination cannot be NULL");
@@ -1532,7 +1531,7 @@ bool AdvisorySupport::isFullAdvisoryTopic(const ActiveMQDestination* destination
 {
     if (destination == NULL)
     {
-        throw NullPointerException(
+        throw activemq::exceptions::NullPointerException(
             __FILE__,
             __LINE__,
             "The passed ActiveMQDestination cannot be NULL");
@@ -1583,7 +1582,7 @@ bool AdvisorySupport::isNetworkBridgeAdvisoryTopic(
 {
     if (destination == NULL)
     {
-        throw NullPointerException(
+        throw activemq::exceptions::NullPointerException(
             __FILE__,
             __LINE__,
             "The passed ActiveMQDestination cannot be NULL");

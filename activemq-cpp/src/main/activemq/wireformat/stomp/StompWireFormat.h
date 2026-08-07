@@ -18,12 +18,13 @@
 #ifndef _ACTIVEMQ_WIREFORMAT_STOMP_STOMPWIREFORMAT_H_
 #define _ACTIVEMQ_WIREFORMAT_STOMP_STOMPWIREFORMAT_H_
 
+#include <activemq/exceptions/IoExceptions.h>
 #include <activemq/util/Config.h>
 #include <activemq/wireformat/WireFormat.h>
 #include <activemq/wireformat/stomp/StompFrame.h>
-#include <decaf/io/IOException.h>
 #include <atomic>
 #include <memory>
+#include <stdexcept>
 
 namespace activemq
 {
@@ -201,7 +202,7 @@ namespace wireformat
              * If the Transport Provides a Negotiator this method will create
              * and return a news instance of the Negotiator.
              * @return new instance of a WireFormatNegotiator.
-             * @throws UnsupportedOperationException if the WireFormat doesn't
+             * @throws std::logic_error if the WireFormat doesn't
              * have a Negotiator.
              */
             virtual std::shared_ptr<transport::Transport> createNegotiator(

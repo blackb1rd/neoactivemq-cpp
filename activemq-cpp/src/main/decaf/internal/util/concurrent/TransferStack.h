@@ -20,8 +20,8 @@
 
 #include <decaf/internal/util/concurrent/Transferer.h>
 
-#include <decaf/lang/exceptions/InterruptedException.h>
 #include <decaf/util/concurrent/TimeoutException.h>
+#include <stdexcept>
 
 namespace decaf
 {

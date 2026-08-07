@@ -21,12 +21,12 @@
 #include <decaf/lang/Character.h>
 #include <decaf/lang/Exception.h>
 #include <decaf/lang/Integer.h>
-#include <decaf/lang/exceptions/NumberFormatException.h>
 #include <decaf/util/StringTokenizer.h>
+
+#include <stdexcept>
 
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::net;
 using namespace decaf::internal;
@@ -390,7 +390,7 @@ URIType URIHelper::parseAuthority(bool               forceServer,
                         return result;
                     }
                 }
-                catch (NumberFormatException& e)
+                catch (std::exception&)
                 {
                     if (forceServer)
                     {
@@ -617,7 +617,7 @@ bool URIHelper::isValidIPv4Address(const std::string& host)
             return false;
         }
     }
-    catch (Exception& e)
+    catch (std::exception&)
     {
         return false;
     }

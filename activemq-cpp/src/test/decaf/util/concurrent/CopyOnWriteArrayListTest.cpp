@@ -23,12 +23,12 @@
 #include <decaf/util/concurrent/CopyOnWriteArrayList.h>
 #include <decaf/util/concurrent/LinkedBlockingQueue.h>
 #include <decaf/util/concurrent/ThreadPoolExecutor.h>
+#include <stdexcept>
 
 using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 class CopyOnWriteArrayListTest : public ::testing::Test
 {
@@ -204,8 +204,8 @@ TEST_F(CopyOnWriteArrayListTest, testAddAll2)
 {
     StlList<int> emptyCollection;
     ASSERT_THROW(CopyOnWriteArrayList<int>().addAll(-1, emptyCollection),
-                 IndexOutOfBoundsException)
-        << ("Should throw an IndexOutOfBoundsException");
+                 std::out_of_range)
+        << ("Should throw an std::out_of_range");
 
     {
         std::string data[] = {"1", "2", "3", "4", "5", "6", "7", "8"};
@@ -278,11 +278,11 @@ TEST_F(CopyOnWriteArrayListTest, testAddAll3)
     list.addAll(0, list);
     list.addAll(list.size(), list);
 
-    ASSERT_THROW(list.addAll(-1, list), IndexOutOfBoundsException)
-        << ("Should throw an IndexOutOfBoundsException");
+    ASSERT_THROW(list.addAll(-1, list), std::out_of_range)
+        << ("Should throw an std::out_of_range");
 
-    ASSERT_THROW(list.addAll(list.size() + 1, list), IndexOutOfBoundsException)
-        << ("Should throw an IndexOutOfBoundsException");
+    ASSERT_THROW(list.addAll(list.size() + 1, list), std::out_of_range)
+        << ("Should throw an std::out_of_range");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -695,7 +695,7 @@ TEST_F(CopyOnWriteArrayListTest, testIteratorRemove)
 
     it->next();
 
-    ASSERT_THROW(it->remove(), UnsupportedOperationException)
+    ASSERT_THROW(it->remove(), std::logic_error)
         << ("Should throw an UnsupportedOperationException");
 }
 
@@ -758,8 +758,8 @@ TEST_F(CopyOnWriteArrayListTest, testAddAll1IndexOutOfBoundsException)
     CopyOnWriteArrayList<int> list;
     StlList<int>              collection;
 
-    ASSERT_THROW(list.addAll(-1, collection), IndexOutOfBoundsException)
-        << ("Should throw an IndexOutOfBoundsException");
+    ASSERT_THROW(list.addAll(-1, collection), std::out_of_range)
+        << ("Should throw an std::out_of_range");
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -771,8 +771,8 @@ TEST_F(CopyOnWriteArrayListTest, testAddAll2IndexOutOfBoundsException)
 
     StlList<int> collection;
 
-    ASSERT_THROW(list.addAll(100, collection), IndexOutOfBoundsException)
-        << ("Should throw an IndexOutOfBoundsException");
+    ASSERT_THROW(list.addAll(100, collection), std::out_of_range)
+        << ("Should throw an std::out_of_range");
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -781,8 +781,8 @@ TEST_F(CopyOnWriteArrayListTest, testListIterator1IndexOutOfBoundsException)
     CopyOnWriteArrayList<int> list;
 
     ASSERT_THROW(std::unique_ptr<ListIterator<int>> it(list.listIterator(-1)),
-                 IndexOutOfBoundsException)
-        << ("Should throw an IndexOutOfBoundsException");
+                 std::out_of_range)
+        << ("Should throw an std::out_of_range");
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -793,8 +793,8 @@ TEST_F(CopyOnWriteArrayListTest, testListIterator2IndexOutOfBoundsException)
     list.add(2);
 
     ASSERT_THROW(std::unique_ptr<ListIterator<int>> it(list.listIterator(100)),
-                 IndexOutOfBoundsException)
-        << ("Should throw an IndexOutOfBoundsException");
+                 std::out_of_range)
+        << ("Should throw an std::out_of_range");
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -802,8 +802,8 @@ TEST_F(CopyOnWriteArrayListTest, testAdd1IndexOutOfBoundsException)
 {
     CopyOnWriteArrayList<int> list;
 
-    ASSERT_THROW(list.add(-1, 42), IndexOutOfBoundsException)
-        << ("Should throw an IndexOutOfBoundsException");
+    ASSERT_THROW(list.add(-1, 42), std::out_of_range)
+        << ("Should throw an std::out_of_range");
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -813,8 +813,8 @@ TEST_F(CopyOnWriteArrayListTest, testAdd2IndexOutOfBoundsException)
     list.add(1);
     list.add(2);
 
-    ASSERT_THROW(list.add(100, 42), IndexOutOfBoundsException)
-        << ("Should throw an IndexOutOfBoundsException");
+    ASSERT_THROW(list.add(100, 42), std::out_of_range)
+        << ("Should throw an std::out_of_range");
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -822,8 +822,8 @@ TEST_F(CopyOnWriteArrayListTest, testRemoveAt1IndexOutOfBounds)
 {
     CopyOnWriteArrayList<int> list;
 
-    ASSERT_THROW(list.removeAt(-1), IndexOutOfBoundsException)
-        << ("Should throw an IndexOutOfBoundsException");
+    ASSERT_THROW(list.removeAt(-1), std::out_of_range)
+        << ("Should throw an std::out_of_range");
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -833,8 +833,8 @@ TEST_F(CopyOnWriteArrayListTest, testRemoveAt2IndexOutOfBounds)
     list.add(1);
     list.add(2);
 
-    ASSERT_THROW(list.removeAt(100), IndexOutOfBoundsException)
-        << ("Should throw an IndexOutOfBoundsException");
+    ASSERT_THROW(list.removeAt(100), std::out_of_range)
+        << ("Should throw an std::out_of_range");
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -842,8 +842,8 @@ TEST_F(CopyOnWriteArrayListTest, testGet1IndexOutOfBoundsException)
 {
     CopyOnWriteArrayList<int> list;
 
-    ASSERT_THROW(list.get(-1), IndexOutOfBoundsException)
-        << ("Should throw an IndexOutOfBoundsException");
+    ASSERT_THROW(list.get(-1), std::out_of_range)
+        << ("Should throw an std::out_of_range");
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -853,8 +853,8 @@ TEST_F(CopyOnWriteArrayListTest, testGet2IndexOutOfBoundsException)
     list.add(1);
     list.add(2);
 
-    ASSERT_THROW(list.get(100), IndexOutOfBoundsException)
-        << ("Should throw an IndexOutOfBoundsException");
+    ASSERT_THROW(list.get(100), std::out_of_range)
+        << ("Should throw an std::out_of_range");
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -862,8 +862,8 @@ TEST_F(CopyOnWriteArrayListTest, testSet1IndexOutOfBoundsException)
 {
     CopyOnWriteArrayList<int> list;
 
-    ASSERT_THROW(list.set(-1, 42), IndexOutOfBoundsException)
-        << ("Should throw an IndexOutOfBoundsException");
+    ASSERT_THROW(list.set(-1, 42), std::out_of_range)
+        << ("Should throw an std::out_of_range");
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -873,8 +873,8 @@ TEST_F(CopyOnWriteArrayListTest, testSet2IndexOutOfBoundsException)
     list.add(1);
     list.add(2);
 
-    ASSERT_THROW(list.set(100, 42), IndexOutOfBoundsException)
-        << ("Should throw an IndexOutOfBoundsException");
+    ASSERT_THROW(list.set(100, 42), std::out_of_range)
+        << ("Should throw an std::out_of_range");
 }
 
 //////////////////////////////////////////////////////////////////////////////

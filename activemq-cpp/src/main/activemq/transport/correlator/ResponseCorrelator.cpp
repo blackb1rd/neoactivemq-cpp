@@ -18,6 +18,7 @@
 #include "ResponseCorrelator.h"
 #include <algorithm>
 
+#include <activemq/exceptions/ActiveMQException.h>
 #include <decaf/util/ArrayList.h>
 #include <decaf/util/HashMap.h>
 #include <decaf/util/concurrent/Mutex.h>
@@ -26,8 +27,13 @@
 
 #include <activemq/commands/ExceptionResponse.h>
 #include <activemq/commands/Response.h>
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <activemq/exceptions/IoExceptions.h>
+#include <activemq/exceptions/StdExceptionCatchMacros.h>
 #include <activemq/transport/FutureResponse.h>
 #include <activemq/util/AMQLog.h>
+#include <exception>
+#include <stdexcept>
 
 using namespace std;
 using namespace activemq;
@@ -36,9 +42,7 @@ using namespace activemq::transport::correlator;
 using namespace activemq::exceptions;
 using activemq::util::AMQLogger;
 using namespace decaf;
-using namespace decaf::io;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 
@@ -73,7 +77,7 @@ public:
         synchronized(mutex)
         {
             // Only remove if the key still exists to avoid
-            // NoSuchElementException
+            // std::runtime_error
             if (map->containsKey(commandId))
             {
                 try
@@ -157,11 +161,12 @@ void ResponseCorrelator::oneway(const std::shared_ptr<Command> command)
 
         next->oneway(command);
     }
-    AMQ_CATCH_RETHROW(UnsupportedOperationException)
-    AMQ_CATCH_RETHROW(IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(ActiveMQException, IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, IOException)
-    AMQ_CATCHALL_THROW(IOException)
+    AMQ_CATCHALL_RETHROW_STL_BACKED_EXCEPTIONS()
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(ActiveMQException,
+                                activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(Exception, activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -202,9 +207,10 @@ std::shared_ptr<FutureResponse> ResponseCorrelator::asyncRequest(
 
             futureResponse->setResponse(response);
 
-            throw IOException(__FILE__,
-                              __LINE__,
-                              this->impl->priorError->getMessage().c_str());
+            throw activemq::exceptions::IOException(
+                __FILE__,
+                __LINE__,
+                this->impl->priorError->getMessage().c_str());
         }
 
         // Send the request.
@@ -212,7 +218,7 @@ std::shared_ptr<FutureResponse> ResponseCorrelator::asyncRequest(
         {
             next->oneway(command);
         }
-        catch (Exception& ex)
+        catch (const std::exception&)
         {
             // We have to ensure this gets cleaned out otherwise we can consume
             // memory over time.
@@ -234,11 +240,12 @@ std::shared_ptr<FutureResponse> ResponseCorrelator::asyncRequest(
 
         return futureResponse;
     }
-    AMQ_CATCH_RETHROW(UnsupportedOperationException)
-    AMQ_CATCH_RETHROW(IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(ActiveMQException, IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, IOException)
-    AMQ_CATCHALL_THROW(IOException)
+    AMQ_CATCHALL_RETHROW_STL_BACKED_EXCEPTIONS()
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(ActiveMQException,
+                                activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(Exception, activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 std::shared_ptr<Response> ResponseCorrelator::request(
@@ -285,9 +292,10 @@ std::shared_ptr<Response> ResponseCorrelator::request(
 
         if (priorError)
         {
-            throw IOException(__FILE__,
-                              __LINE__,
-                              this->impl->priorError->getMessage().c_str());
+            throw activemq::exceptions::IOException(
+                __FILE__,
+                __LINE__,
+                this->impl->priorError->getMessage().c_str());
         }
 
         // The finalizer will cleanup the map even if an exception is thrown.
@@ -306,7 +314,7 @@ std::shared_ptr<Response> ResponseCorrelator::request(
 
         if (!response)
         {
-            throw IOException(
+            throw activemq::exceptions::IOException(
                 __FILE__,
                 __LINE__,
                 "No valid response received for command: %s, check broker.",
@@ -315,11 +323,12 @@ std::shared_ptr<Response> ResponseCorrelator::request(
 
         return response;
     }
-    AMQ_CATCH_RETHROW(UnsupportedOperationException)
-    AMQ_CATCH_RETHROW(IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(ActiveMQException, IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, IOException)
-    AMQ_CATCHALL_THROW(IOException)
+    AMQ_CATCHALL_RETHROW_STL_BACKED_EXCEPTIONS()
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(ActiveMQException,
+                                activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(Exception, activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 std::shared_ptr<Response> ResponseCorrelator::request(
@@ -350,9 +359,10 @@ std::shared_ptr<Response> ResponseCorrelator::request(
 
         if (priorError)
         {
-            throw IOException(__FILE__,
-                              __LINE__,
-                              this->impl->priorError->getMessage().c_str());
+            throw activemq::exceptions::IOException(
+                __FILE__,
+                __LINE__,
+                this->impl->priorError->getMessage().c_str());
         }
 
         // The finalizer will cleanup the map even if an exception is thrown.
@@ -371,7 +381,7 @@ std::shared_ptr<Response> ResponseCorrelator::request(
 
         if (!response)
         {
-            throw IOException(
+            throw activemq::exceptions::IOException(
                 __FILE__,
                 __LINE__,
                 "No valid response received for command: %s, check broker.",
@@ -380,11 +390,12 @@ std::shared_ptr<Response> ResponseCorrelator::request(
 
         return response;
     }
-    AMQ_CATCH_RETHROW(UnsupportedOperationException)
-    AMQ_CATCH_RETHROW(IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(ActiveMQException, IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, IOException)
-    AMQ_CATCHALL_THROW(IOException)
+    AMQ_CATCHALL_RETHROW_STL_BACKED_EXCEPTIONS()
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(ActiveMQException,
+                                activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(Exception, activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -426,7 +437,7 @@ void ResponseCorrelator::onCommand(const std::shared_ptr<Command> command)
                               << response->getCorrelationId()
                               << " mapSize=" << this->impl->requestMap.size());
         }
-        catch (NoSuchElementException& ex)
+        catch (NoSuchElementException&)
         {
             AMQ_LOG_DEBUG("ResponseCorrelator",
                           "NOT FOUND in map correlationId="
@@ -454,7 +465,7 @@ void ResponseCorrelator::onCommand(const std::shared_ptr<Command> command)
                     // during reconnection
                     if (!this->impl->priorError)
                     {
-                        this->impl->priorError.reset(new IOException(
+                        this->impl->priorError.reset(new ActiveMQException(
                             __FILE__,
                             __LINE__,
                             exResponse->getException()->getMessage().c_str()));
@@ -479,11 +490,11 @@ void ResponseCorrelator::doClose()
     try
     {
         dispose(std::shared_ptr<Exception>(
-            new IOException(__FILE__, __LINE__, "Transport Stopped")));
+            new ActiveMQException(__FILE__, __LINE__, "Transport Stopped")));
     }
-    AMQ_CATCH_RETHROW(IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, IOException)
-    AMQ_CATCHALL_THROW(IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(Exception, activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////

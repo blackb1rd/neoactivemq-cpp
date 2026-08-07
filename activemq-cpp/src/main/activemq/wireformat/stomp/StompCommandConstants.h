@@ -19,7 +19,6 @@
 
 #include <activemq/util/Config.h>
 #include <cms/Destination.h>
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
 
 #include <map>
 #include <string>

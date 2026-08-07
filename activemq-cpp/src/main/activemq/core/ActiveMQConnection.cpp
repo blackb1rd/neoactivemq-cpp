@@ -56,6 +56,9 @@
 #include <decaf/util/concurrent/TimeUnit.h>
 #include <decaf/util/concurrent/locks/ReentrantReadWriteLock.h>
 #include <atomic>
+#include <exception>
+
+#include <stdexcept>
 
 #include <activemq/commands/ActiveMQMessage.h>
 #include <activemq/commands/BrokerError.h>
@@ -74,6 +77,80 @@
 #include <activemq/commands/SessionInfo.h>
 #include <activemq/commands/ShutdownInfo.h>
 #include <activemq/commands/WireFormatInfo.h>
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <activemq/exceptions/StdExceptionCatchMacros.h>
+#include <string>
+
+namespace
+{
+template <typename E>
+[[noreturn]] void throwWrappedActiveMQExceptionFromStl(const E& ex)
+{
+    activemq::exceptions::ActiveMQException amqEx(__FILE__,
+                                                  __LINE__,
+                                                  ex.what());
+    amqEx.setMark(__FILE__, __LINE__);
+    throw amqEx;
+}
+}  // namespace
+
+#define AMQ_CATCH_STL_BACKED_WRAP_TO_ACTIVEMQ_EXCEPTION()                \
+    catch (::activemq::exceptions::IllegalStateException & ex)           \
+    {                                                                    \
+        throwWrappedActiveMQExceptionFromStl(ex);                        \
+    }                                                                    \
+    catch (::activemq::exceptions::InvalidStateException & ex)           \
+    {                                                                    \
+        throwWrappedActiveMQExceptionFromStl(ex);                        \
+    }                                                                    \
+    catch (::activemq::exceptions::CloneNotSupportedException & ex)      \
+    {                                                                    \
+        throwWrappedActiveMQExceptionFromStl(ex);                        \
+    }                                                                    \
+    catch (::activemq::exceptions::NullPointerException & ex)            \
+    {                                                                    \
+        throwWrappedActiveMQExceptionFromStl(ex);                        \
+    }                                                                    \
+    catch (::activemq::exceptions::UnsupportedOperationException & ex)   \
+    {                                                                    \
+        throwWrappedActiveMQExceptionFromStl(ex);                        \
+    }                                                                    \
+    catch (::activemq::exceptions::IllegalMonitorStateException & ex)    \
+    {                                                                    \
+        throwWrappedActiveMQExceptionFromStl(ex);                        \
+    }                                                                    \
+    catch (::activemq::exceptions::TypeMismatchException & ex)           \
+    {                                                                    \
+        throwWrappedActiveMQExceptionFromStl(ex);                        \
+    }                                                                    \
+    catch (::activemq::exceptions::OutOfRangeException & ex)             \
+    {                                                                    \
+        throwWrappedActiveMQExceptionFromStl(ex);                        \
+    }                                                                    \
+    catch (::activemq::exceptions::InvalidArgumentException & ex)        \
+    {                                                                    \
+        throwWrappedActiveMQExceptionFromStl(ex);                        \
+    }                                                                    \
+    catch (::activemq::exceptions::InterruptedException & ex)            \
+    {                                                                    \
+        throwWrappedActiveMQExceptionFromStl(ex);                        \
+    }                                                                    \
+    catch (::activemq::exceptions::RuntimeException & ex)                \
+    {                                                                    \
+        throwWrappedActiveMQExceptionFromStl(ex);                        \
+    }                                                                    \
+    catch (::activemq::exceptions::ConcurrentModificationException & ex) \
+    {                                                                    \
+        throwWrappedActiveMQExceptionFromStl(ex);                        \
+    }                                                                    \
+    catch (::activemq::exceptions::NoSuchElementException & ex)          \
+    {                                                                    \
+        throwWrappedActiveMQExceptionFromStl(ex);                        \
+    }                                                                    \
+    catch (::activemq::exceptions::OutOfMemoryError & ex)                \
+    {                                                                    \
+        throwWrappedActiveMQExceptionFromStl(ex);                        \
+    }
 
 using namespace std;
 using namespace cms;
@@ -93,7 +170,6 @@ using namespace decaf::io;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace activemq
@@ -112,9 +188,10 @@ namespace core
         {
             if (connectionId.empty())
             {
-                throw NullPointerException(__FILE__,
-                                           __LINE__,
-                                           "Connection Id must be set.");
+                throw activemq::exceptions::NullPointerException(
+                    __FILE__,
+                    __LINE__,
+                    "Connection Id must be set.");
             }
         }
 
@@ -391,7 +468,7 @@ namespace core
                         error->getException()->createExceptionObject());
                 }
             }
-            catch (Exception& ex)
+            catch (const std::exception&)
             {
             }
         }
@@ -440,9 +517,6 @@ namespace core
                         listener->onException(amqEx.convertToCMSException());
                     }
                 }
-            }
-            catch (Exception& ex)
-            {
             }
             catch (const std::exception&)
             {
@@ -527,7 +601,7 @@ namespace core
                     }
                 }
             }
-            catch (Exception& ex)
+            catch (const std::exception&)
             {
             }
         }
@@ -729,7 +803,7 @@ void ActiveMQConnection::addSession(
             this->config->activeSessions.add(session);
             this->config->sessionsLock.writeLock().unlock();
         }
-        catch (Exception& ex)
+        catch (const std::exception&)
         {
             this->config->sessionsLock.writeLock().unlock();
             throw;
@@ -751,7 +825,7 @@ void ActiveMQConnection::removeSession(
             this->config->connectionAudit.removeDispatcher(session.get());
             this->config->sessionsLock.writeLock().unlock();
         }
-        catch (Exception& ex)
+        catch (const std::exception&)
         {
             this->config->sessionsLock.writeLock().unlock();
             throw;
@@ -890,11 +964,23 @@ void ActiveMQConnection::close()
             {
                 this->config->scheduler->stop();
             }
-            catch (Exception& error)
+            catch (const std::exception& error)
             {
                 if (!hasException)
                 {
-                    ex = error;
+                    const Exception* dex =
+                        dynamic_cast<const Exception*>(&error);
+                    if (dex != nullptr)
+                    {
+                        ex = *dex;
+                    }
+                    else
+                    {
+                        ex = ActiveMQException(__FILE__,
+                                               __LINE__,
+                                               "%s",
+                                               error.what());
+                    }
                     ex.setMark(__FILE__, __LINE__);
                     hasException = true;
                 }
@@ -955,12 +1041,23 @@ void ActiveMQConnection::close()
             this->config->activeSessions.clear();
             this->config->sessionsLock.writeLock().unlock();
         }
-        catch (Exception& error)
+        catch (const std::exception& error)
         {
             this->config->sessionsLock.writeLock().unlock();
             if (!hasException)
             {
-                ex = error;
+                const Exception* dex = dynamic_cast<const Exception*>(&error);
+                if (dex != nullptr)
+                {
+                    ex = *dex;
+                }
+                else
+                {
+                    ex = ActiveMQException(__FILE__,
+                                           __LINE__,
+                                           "%s",
+                                           error.what());
+                }
                 ex.setMark(__FILE__, __LINE__);
                 hasException = true;
             }
@@ -1047,11 +1144,22 @@ void ActiveMQConnection::close()
                 this->config->executor->shutdown();
             }
         }
-        catch (Exception& error)
+        catch (const std::exception& error)
         {
             if (!hasException)
             {
-                ex = error;
+                const Exception* dex = dynamic_cast<const Exception*>(&error);
+                if (dex != nullptr)
+                {
+                    ex = *dex;
+                }
+                else
+                {
+                    ex = ActiveMQException(__FILE__,
+                                           __LINE__,
+                                           "%s",
+                                           error.what());
+                }
                 ex.setMark(__FILE__, __LINE__);
                 hasException = true;
             }
@@ -1062,11 +1170,22 @@ void ActiveMQConnection::close()
         {
             this->disconnect(lastDeliveredSequenceId);
         }
-        catch (Exception& error)
+        catch (const std::exception& error)
         {
             if (!hasException)
             {
-                ex = error;
+                const Exception* dex = dynamic_cast<const Exception*>(&error);
+                if (dex != nullptr)
+                {
+                    ex = *dex;
+                }
+                else
+                {
+                    ex = ActiveMQException(__FILE__,
+                                           __LINE__,
+                                           "%s",
+                                           error.what());
+                }
                 ex.setMark(__FILE__, __LINE__);
                 hasException = true;
             }
@@ -1118,7 +1237,7 @@ void ActiveMQConnection::cleanup()
             this->config->activeSessions.clear();
             this->config->sessionsLock.writeLock().unlock();
         }
-        catch (Exception& ex)
+        catch (const std::exception&)
         {
             this->config->sessionsLock.writeLock().unlock();
             throw;
@@ -1179,7 +1298,7 @@ void ActiveMQConnection::start()
                 this->config->sessionsLock.readLock().unlock();
             }
         }
-        catch (Exception& ex)
+        catch (const std::exception&)
         {
             this->config->sessionsLock.readLock().unlock();
             throw;
@@ -1217,7 +1336,7 @@ void ActiveMQConnection::stop()
                 this->config->sessionsLock.readLock().unlock();
             }
         }
-        catch (Exception& ex)
+        catch (const std::exception&)
         {
             this->config->sessionsLock.readLock().unlock();
             throw;
@@ -1335,9 +1454,10 @@ void ActiveMQConnection::destroyDestination(
     {
         if (destination == nullptr)
         {
-            throw NullPointerException(__FILE__,
-                                       __LINE__,
-                                       "Destination passed was NULL");
+            throw activemq::exceptions::NullPointerException(
+                __FILE__,
+                __LINE__,
+                "Destination passed was NULL");
         }
 
         checkClosedOrFailed();
@@ -1355,8 +1475,7 @@ void ActiveMQConnection::destroyDestination(
         // Send the message to the broker.
         syncRequest(command);
     }
-    AMQ_CATCH_RETHROW(NullPointerException)
-    AMQ_CATCH_RETHROW(decaf::lang::exceptions::IllegalStateException)
+    AMQ_CATCHALL_RETHROW_STL_BACKED_EXCEPTIONS()
     AMQ_CATCH_RETHROW(ActiveMQException)
     AMQ_CATCH_EXCEPTION_CONVERT(Exception, ActiveMQException)
     AMQ_CATCHALL_THROW(ActiveMQException)
@@ -1369,9 +1488,10 @@ void ActiveMQConnection::destroyDestination(const cms::Destination* destination)
     {
         if (destination == nullptr)
         {
-            throw NullPointerException(__FILE__,
-                                       __LINE__,
-                                       "Destination passed was NULL");
+            throw activemq::exceptions::NullPointerException(
+                __FILE__,
+                __LINE__,
+                "Destination passed was NULL");
         }
 
         checkClosedOrFailed();
@@ -1382,8 +1502,7 @@ void ActiveMQConnection::destroyDestination(const cms::Destination* destination)
 
         this->destroyDestination(amqDestination);
     }
-    AMQ_CATCH_RETHROW(NullPointerException)
-    AMQ_CATCH_RETHROW(decaf::lang::exceptions::IllegalStateException)
+    AMQ_CATCHALL_RETHROW_STL_BACKED_EXCEPTIONS()
     AMQ_CATCH_RETHROW(ActiveMQException)
     AMQ_CATCH_EXCEPTION_CONVERT(Exception, ActiveMQException)
     AMQ_CATCHALL_THROW(ActiveMQException)
@@ -1551,7 +1670,7 @@ void ActiveMQConnection::onConsumerControl(
         }
         this->config->sessionsLock.readLock().unlock();
     }
-    catch (Exception& ex)
+    catch (const std::exception&)
     {
         this->config->sessionsLock.readLock().unlock();
         throw;
@@ -1627,7 +1746,7 @@ void ActiveMQConnection::transportInterrupted()
         }
         this->config->sessionsLock.readLock().unlock();
     }
-    catch (Exception& ex)
+    catch (const std::exception&)
     {
         this->config->sessionsLock.readLock().unlock();
         throw;
@@ -1683,10 +1802,9 @@ void ActiveMQConnection::oneway(std::shared_ptr<Command> command)
         checkClosedOrFailed();
         this->config->transport->oneway(command);
     }
-    AMQ_CATCH_EXCEPTION_CONVERT(IOException, ActiveMQException)
-    AMQ_CATCH_EXCEPTION_CONVERT(
-        decaf::lang::exceptions::UnsupportedOperationException,
-        ActiveMQException)
+    AMQ_CATCH_EXCEPTION_CONVERT(activemq::exceptions::IOException,
+                                ActiveMQException)
+    AMQ_CATCH_STL_BACKED_WRAP_TO_ACTIVEMQ_EXCEPTION()
     AMQ_CATCH_EXCEPTION_CONVERT(Exception, ActiveMQException)
     AMQ_CATCHALL_THROW(ActiveMQException)
 }
@@ -1723,7 +1841,7 @@ std::shared_ptr<Response> ActiveMQConnection::syncRequest(
                               << AMQLogger::commandTypeName(
                                      response->getDataStructureType()));
         }
-        catch (IOException& ex)
+        catch (activemq::exceptions::IOException& ex)
         {
             AMQ_LOG_ERROR("ActiveMQConnection",
                           "syncRequest() IOException: " << ex.getMessage());
@@ -1752,10 +1870,9 @@ std::shared_ptr<Response> ActiveMQConnection::syncRequest(
         return response;
     }
     AMQ_CATCH_RETHROW(ActiveMQException)
-    AMQ_CATCH_EXCEPTION_CONVERT(IOException, ActiveMQException)
-    AMQ_CATCH_EXCEPTION_CONVERT(
-        decaf::lang::exceptions::UnsupportedOperationException,
-        ActiveMQException)
+    AMQ_CATCH_EXCEPTION_CONVERT(activemq::exceptions::IOException,
+                                ActiveMQException)
+    AMQ_CATCH_STL_BACKED_WRAP_TO_ACTIVEMQ_EXCEPTION()
     AMQ_CATCH_EXCEPTION_CONVERT(Exception, ActiveMQException)
     AMQ_CATCHALL_THROW(ActiveMQException)
 }
@@ -1779,10 +1896,9 @@ void ActiveMQConnection::asyncRequest(std::shared_ptr<Command> command,
         this->config->transport->asyncRequest(command, callback);
     }
     AMQ_CATCH_RETHROW(ActiveMQException)
-    AMQ_CATCH_EXCEPTION_CONVERT(IOException, ActiveMQException)
-    AMQ_CATCH_EXCEPTION_CONVERT(
-        decaf::lang::exceptions::UnsupportedOperationException,
-        ActiveMQException)
+    AMQ_CATCH_EXCEPTION_CONVERT(activemq::exceptions::IOException,
+                                ActiveMQException)
+    AMQ_CATCH_STL_BACKED_WRAP_TO_ACTIVEMQ_EXCEPTION()
     AMQ_CATCH_EXCEPTION_CONVERT(Exception, ActiveMQException)
     AMQ_CATCHALL_THROW(ActiveMQException)
 }
@@ -2297,7 +2413,7 @@ ActiveMQConnection::getSessions() const
         result.addAll(this->config->activeSessions);
         this->config->sessionsLock.readLock().unlock();
     }
-    catch (Exception& ex)
+    catch (const std::exception&)
     {
         this->config->sessionsLock.readLock().unlock();
         throw;
@@ -2488,9 +2604,10 @@ void ActiveMQConnection::deleteTempDestination(
     {
         if (destination == nullptr)
         {
-            throw NullPointerException(__FILE__,
-                                       __LINE__,
-                                       "Destination passed was NULL");
+            throw activemq::exceptions::NullPointerException(
+                __FILE__,
+                __LINE__,
+                "Destination passed was NULL");
         }
 
         checkClosedOrFailed();
@@ -2516,7 +2633,7 @@ void ActiveMQConnection::deleteTempDestination(
             }
             this->config->sessionsLock.readLock().unlock();
         }
-        catch (Exception& ex)
+        catch (const std::exception&)
         {
             this->config->sessionsLock.readLock().unlock();
             throw;
@@ -2536,8 +2653,7 @@ void ActiveMQConnection::deleteTempDestination(
         // Send the message to the broker.
         syncRequest(command);
     }
-    AMQ_CATCH_RETHROW(NullPointerException)
-    AMQ_CATCH_RETHROW(decaf::lang::exceptions::IllegalStateException)
+    AMQ_CATCHALL_RETHROW_STL_BACKED_EXCEPTIONS()
     AMQ_CATCH_RETHROW(ActiveMQException)
     AMQ_CATCH_EXCEPTION_CONVERT(Exception, ActiveMQException)
     AMQ_CATCHALL_THROW(ActiveMQException)
@@ -2574,7 +2690,7 @@ void ActiveMQConnection::cleanUpTempDestinations()
                 this->deleteTempDestination(dest);
             }
         }
-        catch (Exception& ex)
+        catch (const std::exception&)
         {
         }
     }

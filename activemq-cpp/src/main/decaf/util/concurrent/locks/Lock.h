@@ -20,9 +20,8 @@
 
 #include <decaf/util/Config.h>
 
-#include <decaf/lang/exceptions/InterruptedException.h>
-#include <decaf/lang/exceptions/UnsupportedOperationException.h>
 #include <decaf/util/concurrent/locks/Condition.h>
+#include <stdexcept>
 
 namespace decaf
 {
@@ -131,7 +130,7 @@ namespace util
                  * circumstances and the exception type must be documented by
                  * that Lock implementation.
                  *
-                 * @throws RuntimeException if an error occurs while acquiring
+                 * @throws Exception if an error occurs while acquiring
                  * the lock.
                  */
                 virtual void lock() = 0;
@@ -155,7 +154,7 @@ namespace util
                  *  * is interrupted while acquiring the lock, and interruption
                  * of lock acquisition is supported,
                  *
-                 * then InterruptedException is thrown and the current thread's
+                 * then std::runtime_error is thrown and the current thread's
                  * interrupted status is cleared.
                  *
                  * Implementation Considerations
@@ -175,9 +174,9 @@ namespace util
                  * circumstances and the exception type must be documented by
                  * that Lock implementation.
                  *
-                 * @throws RuntimeException if an error occurs while acquiring
+                 * @throws Exception if an error occurs while acquiring
                  * the lock.
-                 * @throws InterruptedException
+                 * @throws std::runtime_error
                  *         if the current thread is interrupted while acquiring
                  * the lock (and interruption of lock acquisition is supported).
                  */
@@ -209,7 +208,7 @@ namespace util
                  *
                  * @return true if the lock was acquired and false otherwise
                  *
-                 * @throws RuntimeException if an error occurs while acquiring
+                 * @throws Exception if an error occurs while acquiring
                  * the lock.
                  */
                 virtual bool tryLock() = 0;
@@ -236,7 +235,7 @@ namespace util
                  *   * is interrupted while acquiring the lock, and interruption
                  * of lock acquisition is supported,
                  *
-                 * then InterruptedException is thrown and the current thread's
+                 * then std::runtime_error is thrown and the current thread's
                  * interrupted status is cleared.
                  *
                  * If the specified waiting time elapses then the value false is
@@ -268,9 +267,9 @@ namespace util
                  * @return true if the lock was acquired and false if the
                  * waiting time elapsed before the lock was acquired
                  *
-                 * @throws RuntimeException if an error occurs while acquiring
+                 * @throws Exception if an error occurs while acquiring
                  * the lock.
-                 * @throws InterruptedException
+                 * @throws std::runtime_error
                  *         if the current thread is interrupted while acquiring
                  * the lock (and interruption of lock acquisition is supported)
                  */
@@ -287,9 +286,9 @@ namespace util
                  * restriction is violated. Any restrictions and the exception
                  * type must be documented by that Lock implementation.
                  *
-                 * @throws RuntimeException if an error occurs while acquiring
+                 * @throws Exception if an error occurs while acquiring
                  * the lock.
-                 * @throws IllegalMonitorStateException if the current thread is
+                 * @throws std::logic_error if the current thread is
                  * not the owner of the lock.
                  */
                 virtual void unlock() = 0;
@@ -310,9 +309,9 @@ namespace util
                  * caller must delete the returned Condition object when done
                  * with it.
                  *
-                 * @throws RuntimeException if an error occurs while creating
+                 * @throws Exception if an error occurs while creating
                  * the Condition.
-                 * @throws UnsupportedOperationException
+                 * @throws std::logic_error
                  *         if this Lock implementation does not support
                  * conditions
                  */

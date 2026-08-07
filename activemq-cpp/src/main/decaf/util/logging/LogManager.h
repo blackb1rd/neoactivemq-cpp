@@ -28,8 +28,7 @@
 #include <decaf/util/concurrent/Mutex.h>
 
 #include <decaf/io/IOException.h>
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
+#include <stdexcept>
 
 namespace decaf
 {
@@ -176,8 +175,8 @@ namespace util
              * @param logger
              *      The new Logger instance to add to this LogManager.
              *
-             * @throws NullPointerException if logger is NULL.
-             * @throws IllegalArgumentException if the logger has no name.
+             * @throws std::logic_error if logger is NULL.
+             * @throws std::invalid_argument if the logger has no name.
              */
             bool addLogger(Logger* logger);
 
@@ -277,7 +276,7 @@ namespace util
              * @param stream
              *      The InputStream to read the Properties from.
              *
-             * @throws NullPointerException if stream is NULL.
+             * @throws std::logic_error if stream is NULL.
              * @throws IOException if an I/O error occurs.
              */
             void readConfiguration(decaf::io::InputStream* stream);

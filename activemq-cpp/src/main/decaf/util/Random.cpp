@@ -19,13 +19,13 @@
 
 #include <decaf/lang/System.h>
 
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <stdexcept>
+#include <string>
 
 using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 unsigned long long Random::multiplier = 0x5deece66dLL;
 
@@ -70,8 +70,6 @@ void Random::nextBytes(std::vector<unsigned char>& buf)
 
         this->nextBytes(&buf[0], (int)buf.size());
     }
-    DECAF_CATCH_RETHROW(NullPointerException)
-    DECAF_CATCH_RETHROW(IllegalArgumentException)
     DECAF_CATCHALL_THROW(Exception)
 }
 
@@ -80,16 +78,17 @@ void Random::nextBytes(unsigned char* buf, int size)
 {
     if (buf == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "Buffer passed cannot be NULL.");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "Buffer passed cannot be NULL.");
     }
 
     if (size < 0)
     {
-        throw IllegalArgumentException(__FILE__,
-                                       __LINE__,
-                                       "Specified buffer size was negative.");
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Specified buffer size was negative.");
     }
 
     int rand  = 0;
@@ -181,9 +180,8 @@ int Random::nextInt(int n)
         return val;
     }
 
-    throw exceptions::IllegalArgumentException(
-        __FILE__,
-        __LINE__,
+    throw activemq::exceptions::InvalidArgumentException(
+        std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
         "Value passed cannot be less than or equal to zero.");
 }
 

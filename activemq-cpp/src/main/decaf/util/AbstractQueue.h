@@ -18,15 +18,14 @@
 #ifndef ABSTRACTQUEUE_H_
 #define ABSTRACTQUEUE_H_
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/lang/Iterable.h>
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
-#include <decaf/lang/exceptions/IllegalStateException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
-#include <decaf/lang/exceptions/UnsupportedOperationException.h>
 #include <decaf/util/Config.h>
 #include <decaf/util/Iterator.h>
 #include <decaf/util/Queue.h>
 #include <memory>
+#include <stdexcept>
+#include <string>
 
 namespace decaf
 {
@@ -65,7 +64,7 @@ namespace util
          * {@inheritDoc}
          *
          * This implementation returns true if offer succeeds, else throws an
-         * IllegalStateException.
+         * std::logic_error.
          */
         virtual bool add(const E& value)
         {
@@ -74,7 +73,7 @@ namespace util
                 return true;
             }
 
-            throw decaf::lang::exceptions::IllegalStateException(
+            throw activemq::exceptions::IllegalStateException(
                 __FILE__,
                 __LINE__,
                 "Unable to add specified element to the Queue.");
@@ -84,17 +83,16 @@ namespace util
          * {@inheritDoc}
          *
          * This implementation checks to see if the Queue is being added to
-         * itself and throws an IllegalArgumentException if so, otherwise it
+         * itself and throws an std::invalid_argument if so, otherwise it
          * delegates the add to the AbstractCollection's addAll implementation.
          */
         virtual bool addAll(const Collection<E>& collection)
         {
             if (this == &collection)
             {
-                throw decaf::lang::exceptions::IllegalArgumentException(
-                    __FILE__,
-                    __LINE__,
-                    "A Queue cannot be added to itself.");
+                throw activemq::exceptions::InvalidArgumentException(
+                    std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+                    ": " + "A Queue cannot be added to itself.");
             }
 
             return AbstractCollection<E>::addAll(collection);
@@ -116,7 +114,7 @@ namespace util
                 return result;
             }
 
-            throw decaf::util::NoSuchElementException(
+            throw activemq::exceptions::NoSuchElementException(
                 __FILE__,
                 __LINE__,
                 "Unable to remove specified element from the Queue.");
@@ -126,7 +124,7 @@ namespace util
          * {@inheritDoc}
          *
          * This implementation returns the result of peek unless the queue is
-         * empty otherwise it throws a NoSuchElementException.
+         * empty otherwise it throws a std::runtime_error.
          */
         virtual E element() const
         {
@@ -136,7 +134,7 @@ namespace util
                 return result;
             }
 
-            throw decaf::util::NoSuchElementException(
+            throw activemq::exceptions::NoSuchElementException(
                 __FILE__,
                 __LINE__,
                 "Unable to remove specified element from the Queue.");

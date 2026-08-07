@@ -26,7 +26,6 @@
 using namespace std;
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::zip;
 
@@ -179,11 +178,9 @@ TEST_F(CRC32Test, testUpdateArrayIndexed)
         << ("update(unsigned char[],int,int) failed to update the checksum to "
             "the correct value ");
 
-    ASSERT_THROW(crc.update(byteArray, SIZE, off, lenError),
-                 IndexOutOfBoundsException)
-        << ("Should have thrown an IndexOutOfBoundsException for lenError");
+    ASSERT_THROW(crc.update(byteArray, SIZE, off, lenError), std::out_of_range)
+        << ("Should have thrown an std::out_of_range for lenError");
 
-    ASSERT_THROW(crc.update(byteArray, SIZE, offError, len),
-                 IndexOutOfBoundsException)
-        << ("Should have thrown an IndexOutOfBoundsException for offError");
+    ASSERT_THROW(crc.update(byteArray, SIZE, offError, len), std::out_of_range)
+        << ("Should have thrown an std::out_of_range for offError");
 }

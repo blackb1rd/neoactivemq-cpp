@@ -26,12 +26,12 @@
 #include <activemq/wireformat/openwire/marshal/BaseDataStreamMarshaller.h>
 
 #include <activemq/commands/DataStructure.h>
+#include <activemq/exceptions/IoExceptions.h>
 #include <activemq/util/Config.h>
 #include <activemq/wireformat/openwire/OpenWireFormat.h>
 #include <activemq/wireformat/openwire/utils/BooleanStream.h>
 #include <decaf/io/DataInputStream.h>
 #include <decaf/io/DataOutputStream.h>
-#include <decaf/io/IOException.h>
 
 namespace activemq
 {

@@ -17,10 +17,13 @@
 #ifndef _DECAF_UTIL_STLQUEUE_H_
 #define _DECAF_UTIL_STLQUEUE_H_
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/lang/Exception.h>
 #include <decaf/util/Iterator.h>
 #include <decaf/util/concurrent/Mutex.h>
 #include <list>
+#include <stdexcept>
+#include <string>
 #include <vector>
 
 namespace decaf
@@ -92,7 +95,7 @@ namespace util
             {
                 if (this->current == queue->end())
                 {
-                    throw NoSuchElementException(
+                    throw activemq::exceptions::NoSuchElementException(
                         __FILE__,
                         __LINE__,
                         "Queue::Iterator::next - No more elements to return");
@@ -111,7 +114,7 @@ namespace util
             {
                 if (this->previous == queue->end())
                 {
-                    throw lang::exceptions::IllegalStateException(
+                    throw activemq::exceptions::IllegalStateException(
                         __FILE__,
                         __LINE__,
                         "Queue::Iterator::remove - Invalid State to call "

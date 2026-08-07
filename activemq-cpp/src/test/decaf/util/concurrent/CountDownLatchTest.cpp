@@ -19,10 +19,10 @@
 #include <decaf/util/concurrent/CountDownLatch.h>
 #include <decaf/util/concurrent/ExecutorsTestSupport.h>
 #include <gtest/gtest.h>
+#include <stdexcept>
 
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 
@@ -110,7 +110,7 @@ TEST_F(CountDownLatchTest, testConstructor)
         CountDownLatch l(-1);
         shouldThrow();
     }
-    catch (IllegalArgumentException& success)
+    catch (std::invalid_argument& success)
     {
     }
 }
@@ -169,7 +169,7 @@ public:
             latch->await();
             parent->threadAssertTrue(latch->getCount() == 0);
         }
-        catch (InterruptedException& e)
+        catch (std::runtime_error& e)
         {
             parent->threadUnexpectedException();
         }
@@ -195,7 +195,7 @@ TEST_F(CountDownLatchTest, testAwait)
         ASSERT_EQ(l.getCount(), 0);
         t.join();
     }
-    catch (InterruptedException& e)
+    catch (std::runtime_error& e)
     {
         unexpectedException();
     }
@@ -236,7 +236,7 @@ public:
                 latch->await(CountDownLatchTest::SMALL_DELAY_MS,
                              TimeUnit::MILLISECONDS));
         }
-        catch (InterruptedException& e)
+        catch (std::runtime_error& e)
         {
             parent->threadUnexpectedException();
         }
@@ -262,7 +262,7 @@ TEST_F(CountDownLatchTest, testTimedAwait)
         ASSERT_EQ(l.getCount(), 0);
         t.join();
     }
-    catch (InterruptedException& e)
+    catch (std::runtime_error& e)
     {
         unexpectedException();
     }
@@ -272,28 +272,27 @@ TEST_F(CountDownLatchTest, testTimedAwait)
 namespace
 {
 
-class TestAwaitInterruptedExceptionRunnable : public Runnable
+class TestAwaitRuntimeErrorRunnable : public Runnable
 {
 private:
     CountDownLatch*     latch;
     CountDownLatchTest* parent;
 
 private:
-    TestAwaitInterruptedExceptionRunnable(
-        const TestAwaitInterruptedExceptionRunnable&);
-    TestAwaitInterruptedExceptionRunnable operator=(
-        const TestAwaitInterruptedExceptionRunnable&);
+    TestAwaitRuntimeErrorRunnable(const TestAwaitRuntimeErrorRunnable&);
+    TestAwaitRuntimeErrorRunnable operator=(
+        const TestAwaitRuntimeErrorRunnable&);
 
 public:
-    TestAwaitInterruptedExceptionRunnable(CountDownLatch*     latch,
-                                          CountDownLatchTest* parent)
+    TestAwaitRuntimeErrorRunnable(CountDownLatch*     latch,
+                                  CountDownLatchTest* parent)
         : Runnable(),
           latch(latch),
           parent(parent)
     {
     }
 
-    virtual ~TestAwaitInterruptedExceptionRunnable()
+    virtual ~TestAwaitRuntimeErrorRunnable()
     {
     }
 
@@ -305,7 +304,7 @@ public:
             latch->await();
             parent->threadShouldThrow();
         }
-        catch (InterruptedException& success)
+        catch (std::runtime_error& success)
         {
         }
     }
@@ -313,11 +312,11 @@ public:
 }  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(CountDownLatchTest, testAwaitInterruptedException)
+TEST_F(CountDownLatchTest, testAwaitRuntimeError)
 {
-    CountDownLatch                        l(1);
-    TestAwaitInterruptedExceptionRunnable runnable(&l, this);
-    Thread                                t(&runnable);
+    CountDownLatch                l(1);
+    TestAwaitRuntimeErrorRunnable runnable(&l, this);
+    Thread                        t(&runnable);
 
     t.start();
     try
@@ -326,7 +325,7 @@ TEST_F(CountDownLatchTest, testAwaitInterruptedException)
         t.interrupt();
         t.join();
     }
-    catch (InterruptedException& e)
+    catch (std::runtime_error& e)
     {
         unexpectedException();
     }
@@ -336,28 +335,28 @@ TEST_F(CountDownLatchTest, testAwaitInterruptedException)
 namespace
 {
 
-class TestTimedAwaitInterruptedExceptionRunnable : public Runnable
+class TestTimedAwaitRuntimeErrorRunnable : public Runnable
 {
 private:
     CountDownLatch*     latch;
     CountDownLatchTest* parent;
 
 private:
-    TestTimedAwaitInterruptedExceptionRunnable(
-        const TestTimedAwaitInterruptedExceptionRunnable&);
-    TestTimedAwaitInterruptedExceptionRunnable operator=(
-        const TestTimedAwaitInterruptedExceptionRunnable&);
+    TestTimedAwaitRuntimeErrorRunnable(
+        const TestTimedAwaitRuntimeErrorRunnable&);
+    TestTimedAwaitRuntimeErrorRunnable operator=(
+        const TestTimedAwaitRuntimeErrorRunnable&);
 
 public:
-    TestTimedAwaitInterruptedExceptionRunnable(CountDownLatch*     latch,
-                                               CountDownLatchTest* parent)
+    TestTimedAwaitRuntimeErrorRunnable(CountDownLatch*     latch,
+                                       CountDownLatchTest* parent)
         : Runnable(),
           latch(latch),
           parent(parent)
     {
     }
 
-    virtual ~TestTimedAwaitInterruptedExceptionRunnable()
+    virtual ~TestTimedAwaitRuntimeErrorRunnable()
     {
     }
 
@@ -370,7 +369,7 @@ public:
                          TimeUnit::MILLISECONDS);
             parent->threadShouldThrow();
         }
-        catch (InterruptedException& success)
+        catch (std::runtime_error& success)
         {
         }
     }
@@ -378,11 +377,11 @@ public:
 }  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(CountDownLatchTest, testTimedAwaitInterruptedException)
+TEST_F(CountDownLatchTest, testTimedAwaitRuntimeError)
 {
-    CountDownLatch                             l(1);
-    TestTimedAwaitInterruptedExceptionRunnable runnable(&l, this);
-    Thread                                     t(&runnable);
+    CountDownLatch                     l(1);
+    TestTimedAwaitRuntimeErrorRunnable runnable(&l, this);
+    Thread                             t(&runnable);
 
     t.start();
     try
@@ -392,7 +391,7 @@ TEST_F(CountDownLatchTest, testTimedAwaitInterruptedException)
         t.interrupt();
         t.join();
     }
-    catch (InterruptedException& e)
+    catch (std::runtime_error& e)
     {
         unexpectedException();
     }
@@ -434,7 +433,7 @@ public:
                              TimeUnit::MILLISECONDS));
             parent->threadAssertTrue(latch->getCount() > 0);
         }
-        catch (InterruptedException& ie)
+        catch (std::runtime_error& ie)
         {
             parent->threadUnexpectedException();
         }
@@ -455,7 +454,7 @@ TEST_F(CountDownLatchTest, testAwaitTimeout)
         ASSERT_EQ(l.getCount(), 1);
         t.join();
     }
-    catch (InterruptedException& e)
+    catch (std::runtime_error& e)
     {
         unexpectedException();
     }

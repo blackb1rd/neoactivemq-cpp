@@ -24,7 +24,6 @@
 using namespace decaf;
 using namespace decaf::io;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 class PushbackInputStreamTest : public ::testing::Test
 {
@@ -52,11 +51,11 @@ std::string PushbackInputStreamTest::testString =
     "RandomAccessFile\n"
     "Test_java_io_SyncFailedException\nTest_java_lang_"
     "AbstractMethodError\nTest_java_lang_ArithmeticException\n"
-    "Test_java_lang_ArrayIndexOutOfBoundsException\nTest_java_lang_"
+    "Test_java_lang_"
     "ArrayStoreException\nTest_java_lang_Boolean\n"
     "Test_java_lang_Byte\nTest_java_lang_Character\nTest_java_lang_Class\nTest_"
-    "java_lang_ClassCastException\n"
-    "Test_java_lang_ClassCircularityError\nTest_java_lang_"
+    "java_lang_"
+    "ClassCircularityError\nTest_java_lang_"
     "ClassFormatError\nTest_java_lang_ClassLoader\n"
     "Test_java_lang_ClassNotFoundException\nTest_java_lang_"
     "CloneNotSupportedException\nTest_java_lang_Double\n"
@@ -65,21 +64,20 @@ std::string PushbackInputStreamTest::testString =
     "Test_java_lang_Float\nTest_java_lang_IllegalAccessError\nTest_java_lang_"
     "IllegalAccessException\n"
     "Test_java_lang_IllegalArgumentException\nTest_java_lang_"
-    "IllegalMonitorStateException\n"
+    ""
     "Test_java_lang_IllegalThreadStateException\nTest_java_lang_"
     "IncompatibleClassChangeError\n"
     "Test_java_lang_IndexOutOfBoundsException\nTest_java_lang_"
     "InstantiationError\n"
     "Test_java_lang_InstantiationException\nTest_java_lang_Integer\nTest_java_"
     "lang_InternalError\n"
-    "Test_java_lang_InterruptedException\nTest_java_lang_LinkageError\nTest_"
+    "Test_java_lang_RuntimeError\nTest_java_lang_LinkageError\nTest_"
     "java_lang_Long\n"
     "Test_java_lang_Math\nTest_java_lang_NegativeArraySizeException\nTest_java_"
     "lang_NoClassDefFoundError\n"
     "Test_java_lang_NoSuchFieldError\nTest_java_lang_NoSuchMethodError\nTest_"
     "java_lang_NullPointerException\n"
-    "Test_java_lang_Number\nTest_java_lang_NumberFormatException\nTest_java_"
-    "lang_Object\n"
+    "Test_java_lang_Number\nTest_java_lang_Object\n"
     "Test_java_lang_OutOfMemoryError\nTest_java_lang_RuntimeException\nTest_"
     "java_lang_SecurityManager\n"
     "Test_java_lang_Short\nTest_java_lang_StackOverflowError\nTest_java_lang_"

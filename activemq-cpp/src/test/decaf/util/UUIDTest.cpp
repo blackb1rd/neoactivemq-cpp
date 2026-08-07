@@ -18,16 +18,13 @@
 #include <gtest/gtest.h>
 
 #include <decaf/lang/Long.h>
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
-#include <decaf/lang/exceptions/NumberFormatException.h>
-#include <decaf/lang/exceptions/UnsupportedOperationException.h>
 #include <decaf/util/UUID.h>
+
+#include <stdexcept>
 
 using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 class UUIDTest : public ::testing::Test
 {
@@ -133,11 +130,11 @@ TEST_F(UUIDTest, testTimestamp)
     ASSERT_EQ(0x333555577777777LL, uuid.timestamp());
 
     uuid = UUID(0x0000000000000000LL, 0x8000000000000000LL);
-    ASSERT_THROW(uuid.timestamp(), UnsupportedOperationException)
+    ASSERT_THROW(uuid.timestamp(), std::logic_error)
         << ("Should throw an UnsupportedOperationException exception");
 
     uuid = UUID(0x0000000000002000LL, 0x8000000000000000LL);
-    ASSERT_THROW(uuid.timestamp(), UnsupportedOperationException)
+    ASSERT_THROW(uuid.timestamp(), std::logic_error)
         << ("Should throw an UnsupportedOperationException exception");
 }
 
@@ -154,11 +151,11 @@ TEST_F(UUIDTest, testClockSequence)
     ASSERT_EQ(0x3FFF, uuid.clockSequence());
 
     uuid = UUID(0x0000000000000000LL, 0x8000000000000000LL);
-    ASSERT_THROW(uuid.clockSequence(), UnsupportedOperationException)
+    ASSERT_THROW(uuid.clockSequence(), std::logic_error)
         << ("Should throw an UnsupportedOperationException exception");
 
     uuid = UUID(0x0000000000002000LL, 0x8000000000000000LL);
-    ASSERT_THROW(uuid.clockSequence(), UnsupportedOperationException)
+    ASSERT_THROW(uuid.clockSequence(), std::logic_error)
         << ("Should throw an UnsupportedOperationException exception");
 }
 
@@ -172,11 +169,11 @@ TEST_F(UUIDTest, testNode)
     ASSERT_EQ(0xFFFFFFFFFFFFLL, uuid.node());
 
     uuid = UUID(0x0000000000000000LL, 0x8000000000000000LL);
-    ASSERT_THROW(uuid.node(), UnsupportedOperationException)
+    ASSERT_THROW(uuid.node(), std::logic_error)
         << ("Should throw an UnsupportedOperationException exception");
 
     uuid = UUID(0x0000000000002000LL, 0x8000000000000000LL);
-    ASSERT_THROW(uuid.node(), UnsupportedOperationException)
+    ASSERT_THROW(uuid.node(), std::logic_error)
         << ("Should throw an UnsupportedOperationException exception");
 }
 
@@ -282,8 +279,8 @@ TEST_F(UUIDTest, testNameUUIDFromBytes)
     ASSERT_EQ(0xd41d8cd98f003204ULL,
               (unsigned long long)uuid.getMostSignificantBits());
 
-    ASSERT_THROW(UUID::nameUUIDFromBytes(NULL, 1), NullPointerException)
-        << ("Should throw an NullPointerException exception");
+    ASSERT_THROW(UUID::nameUUIDFromBytes(NULL, 1), std::logic_error)
+        << ("Should throw std::logic_error");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -309,23 +306,23 @@ TEST_F(UUIDTest, testFromString)
     ASSERT_EQ(0, actual.clockSequence());
     ASSERT_EQ(0LL, actual.node());
 
-    ASSERT_THROW(UUID::fromString(""), IllegalArgumentException)
+    ASSERT_THROW(UUID::fromString(""), std::invalid_argument)
         << ("Should throw an IllegalArgumentException exception");
 
     ASSERT_THROW(UUID::fromString("f81d4fae_7dec-11d0-a765-00a0c91e6bf6"),
-                 IllegalArgumentException)
+                 std::invalid_argument)
         << ("Should throw an IllegalArgumentException exception");
 
     ASSERT_THROW(UUID::fromString("f81d4fae-7dec_11d0-a765-00a0c91e6bf6"),
-                 IllegalArgumentException)
+                 std::invalid_argument)
         << ("Should throw an IllegalArgumentException exception");
 
     ASSERT_THROW(UUID::fromString("f81d4fae-7dec-11d0_a765-00a0c91e6bf6"),
-                 IllegalArgumentException)
+                 std::invalid_argument)
         << ("Should throw an IllegalArgumentException exception");
 
     ASSERT_THROW(UUID::fromString("f81d4fae-7dec-11d0-a765_00a0c91e6bf6"),
-                 IllegalArgumentException)
+                 std::invalid_argument)
         << ("Should throw an IllegalArgumentException exception");
 }
 
@@ -334,31 +331,31 @@ TEST_F(UUIDTest, testFromStringStringException)
 {
     UUID uuid = UUID::fromString("0-0-0-0-0");
 
-    ASSERT_THROW(UUID::fromString("0-0-0-0-"), IllegalArgumentException)
+    ASSERT_THROW(UUID::fromString("0-0-0-0-"), std::invalid_argument)
         << ("Should throw an IllegalArgumentException exception");
 
-    ASSERT_THROW(UUID::fromString("00000"), IllegalArgumentException)
+    ASSERT_THROW(UUID::fromString("00000"), std::invalid_argument)
         << ("Should throw an IllegalArgumentException exception");
 
-    ASSERT_THROW(UUID::fromString("----"), IllegalArgumentException)
+    ASSERT_THROW(UUID::fromString("----"), std::invalid_argument)
         << ("Should throw an IllegalArgumentException exception");
 
-    ASSERT_THROW(UUID::fromString("-0-0-0-0-0"), IllegalArgumentException)
+    ASSERT_THROW(UUID::fromString("-0-0-0-0-0"), std::invalid_argument)
         << ("Should throw an IllegalArgumentException exception");
 
-    ASSERT_THROW(UUID::fromString("-0-0-0-0"), IllegalArgumentException)
+    ASSERT_THROW(UUID::fromString("-0-0-0-0"), std::invalid_argument)
         << ("Should throw an IllegalArgumentException exception");
 
-    ASSERT_THROW(UUID::fromString("-0-0-0-"), IllegalArgumentException)
+    ASSERT_THROW(UUID::fromString("-0-0-0-"), std::invalid_argument)
         << ("Should throw an IllegalArgumentException exception");
 
-    ASSERT_THROW(UUID::fromString("0--0-0-0"), IllegalArgumentException)
+    ASSERT_THROW(UUID::fromString("0--0-0-0"), std::invalid_argument)
         << ("Should throw an IllegalArgumentException exception");
 
-    ASSERT_THROW(UUID::fromString("0-0-0-0-"), IllegalArgumentException)
+    ASSERT_THROW(UUID::fromString("0-0-0-0-"), std::invalid_argument)
         << ("Should throw an IllegalArgumentException exception");
 
-    ASSERT_THROW(UUID::fromString("-1-0-0-0-0"), IllegalArgumentException)
+    ASSERT_THROW(UUID::fromString("-1-0-0-0-0"), std::invalid_argument)
         << ("Should throw an IllegalArgumentException exception");
 
     uuid = UUID::fromString("123456789-0-0-0-0");
@@ -375,8 +372,8 @@ TEST_F(UUIDTest, testFromStringStringException)
     ASSERT_EQ(0x0LL, uuid.getLeastSignificantBits());
 
     ASSERT_THROW(UUID::fromString("8000000000000000-0-0-0-0"),
-                 NumberFormatException)
-        << ("Should throw an IllegalArgumentException exception");
+                 std::invalid_argument)
+        << ("Should throw std::invalid_argument");
 
     uuid = UUID::fromString(
         "7fffffffffffffff-7fffffffffffffff-7fffffffffffffff-0-0");
@@ -390,10 +387,10 @@ TEST_F(UUIDTest, testFromStringStringException)
               (unsigned long long)uuid.getLeastSignificantBits());
 
     ASSERT_THROW(UUID::fromString("0-0-0-8000000000000000-0"),
-                 NumberFormatException)
-        << ("Should throw an IllegalArgumentException exception");
+                 std::invalid_argument)
+        << ("Should throw std::invalid_argument");
 
     ASSERT_THROW(UUID::fromString("0-0-0-0-8000000000000000"),
-                 NumberFormatException)
-        << ("Should throw an IllegalArgumentException exception");
+                 std::invalid_argument)
+        << ("Should throw std::invalid_argument");
 }

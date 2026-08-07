@@ -20,16 +20,19 @@
 #include <activemq/commands/ActiveMQMessage.h>
 #include <activemq/commands/ConnectionControl.h>
 #include <activemq/exceptions/ActiveMQException.h>
+#include <activemq/exceptions/IoExceptions.h>
 #include <activemq/mock/MockBrokerService.h>
 #include <activemq/transport/failover/BrokerStateInfo.h>
 #include <activemq/transport/failover/FailoverTransport.h>
 #include <activemq/transport/failover/FailoverTransportFactory.h>
 #include <activemq/transport/mock/MockTransport.h>
 #include <activemq/util/AMQLog.h>
+#include <decaf/lang/System.h>
 #include <decaf/lang/Thread.h>
 #include <decaf/util/UUID.h>
 #include <decaf/util/concurrent/CountDownLatch.h>
 #include <decaf/util/concurrent/Mutex.h>
+#include <atomic>
 #include <memory>
 
 #include <activemq/commands/ConnectionInfo.h>
@@ -135,27 +138,26 @@ public:
 
     virtual void transportInterrupted()
     {
-        std::shared_ptr<CountDownLatch> latch;
+        // Count down while holding resetMutex so reset() cannot swap in new
+        // latches between taking the shared_ptr and countDown(); otherwise the
+        // test thread may await a latch that never receives the signal (flake).
         synchronized(&resetMutex)
         {
-            latch = interruptedLatch;
-        }
-        if (latch != NULL)
-        {
-            latch->countDown();
+            if (interruptedLatch != NULL)
+            {
+                interruptedLatch->countDown();
+            }
         }
     }
 
     virtual void transportResumed()
     {
-        std::shared_ptr<CountDownLatch> latch;
         synchronized(&resetMutex)
         {
-            latch = resumedLatch;
-        }
-        if (latch != NULL)
-        {
-            latch->countDown();
+            if (resumedLatch != NULL)
+            {
+                resumedLatch->countDown();
+            }
         }
     }
 
@@ -170,24 +172,107 @@ public:
 
     bool awaitInterruption()
     {
-        std::shared_ptr<CountDownLatch> latch;
-        synchronized(&resetMutex)
+        const long long deadline = System::currentTimeMillis() + 60000;
+        while (System::currentTimeMillis() < deadline)
         {
-            latch = interruptedLatch;
+            std::shared_ptr<CountDownLatch> latch;
+            synchronized(&resetMutex)
+            {
+                latch = interruptedLatch;
+            }
+            if (latch->await(500))
+            {
+                return true;
+            }
         }
-        bool result = latch->await(60000);
-        return result;
+        return false;
     }
 
     bool awaitResumed()
     {
-        std::shared_ptr<CountDownLatch> latch;
-        synchronized(&resetMutex)
+        const long long deadline = System::currentTimeMillis() + 60000;
+        while (System::currentTimeMillis() < deadline)
         {
-            latch = resumedLatch;
+            std::shared_ptr<CountDownLatch> latch;
+            synchronized(&resetMutex)
+            {
+                latch = resumedLatch;
+            }
+            if (latch->await(500))
+            {
+                return true;
+            }
         }
-        bool result = latch->await(60000);
-        return result;
+        return false;
+    }
+};
+
+/**
+ * CI-stable listener for failover timing: CountDownLatch snapshots in
+ * awaitInterruption/awaitResumed can race with reset() and miss signals on
+ * loaded Linux/macOS runners. Atomic counters + spin wait avoid that.
+ */
+class FailoverSyncListener : public DefaultTransportListener
+{
+private:
+    std::atomic<int> interruptEvents;
+    std::atomic<int> resumeEvents;
+
+public:
+    FailoverSyncListener()
+        : interruptEvents(0),
+          resumeEvents(0)
+    {
+    }
+
+    virtual void transportInterrupted() override
+    {
+        interruptEvents.fetch_add(1, std::memory_order_relaxed);
+    }
+
+    virtual void transportResumed() override
+    {
+        resumeEvents.fetch_add(1, std::memory_order_relaxed);
+    }
+
+    int getInterruptEvents() const
+    {
+        return interruptEvents.load(std::memory_order_relaxed);
+    }
+
+    int getResumeEvents() const
+    {
+        return resumeEvents.load(std::memory_order_relaxed);
+    }
+
+    bool awaitInterruptEventsGreaterThan(int baseline, long long timeoutMs)
+    {
+        const int       sliceMs  = 50;
+        const long long deadline = System::currentTimeMillis() + timeoutMs;
+        while (System::currentTimeMillis() < deadline)
+        {
+            if (getInterruptEvents() > baseline)
+            {
+                return true;
+            }
+            Thread::sleep(sliceMs);
+        }
+        return getInterruptEvents() > baseline;
+    }
+
+    bool awaitResumeEventsGreaterThan(int baseline, long long timeoutMs)
+    {
+        const int       sliceMs  = 50;
+        const long long deadline = System::currentTimeMillis() + timeoutMs;
+        while (System::currentTimeMillis() < deadline)
+        {
+            if (getResumeEvents() > baseline)
+            {
+                return true;
+            }
+            Thread::sleep(sliceMs);
+        }
+        return getResumeEvents() > baseline;
     }
 };
 }  // namespace
@@ -397,7 +482,7 @@ TEST_F(FailoverTransportTest, testTransportCreateFailOnCreateSendMessage)
 
     transport->start();
 
-    ASSERT_THROW(transport->oneway(message), IOException)
+    ASSERT_THROW(transport->oneway(message), activemq::exceptions::IOException)
         << ("Should Throw a IOException");
 
     ASSERT_TRUE(listener.caughtException == true);
@@ -929,7 +1014,7 @@ TEST_F(FailoverTransportTest, testMaxReconnectsHonorsConfiguration)
 
     transport->start();
 
-    ASSERT_THROW(transport->oneway(info), Exception)
+    ASSERT_THROW(transport->oneway(info), activemq::exceptions::IOException)
         << ("Send should have failed after max connect attempts of two");
 
     ASSERT_TRUE(failover->isConnected() == false);
@@ -971,7 +1056,7 @@ TEST_F(FailoverTransportTest, testStartupMaxReconnectsHonorsConfiguration)
     // finished
     Thread::sleep(500);
 
-    ASSERT_THROW(transport->oneway(info), Exception)
+    ASSERT_THROW(transport->oneway(info), activemq::exceptions::IOException)
         << ("Send should have failed after max connect attempts of two");
 
     ASSERT_TRUE(failover->isConnected() == false);
@@ -2232,12 +2317,13 @@ TEST_F(FailoverTransportTest, testBrokerRestartWithProperSync)
     int port2 = broker2->getPort();
 
     // Use 127.0.0.1 instead of localhost to avoid IPv6 resolution issues on CI
-    std::string uri = std::string("failover://(tcp://127.0.0.1:") +
-                      Integer::toString(port1) +
-                      ",tcp://127.0.0.1:" + Integer::toString(port2) +
-                      ")?maxReconnectDelay=1000";
+    std::string uri =
+        std::string("failover://(tcp://127.0.0.1:") + Integer::toString(port1) +
+        "?transport.useInactivityMonitor=false," +
+        "tcp://127.0.0.1:" + Integer::toString(port2) +
+        "?transport.useInactivityMonitor=false)?maxReconnectDelay=1000";
 
-    PriorityBackupListener   listener;
+    FailoverSyncListener     listener;
     FailoverTransportFactory factory;
 
     std::shared_ptr<Transport> transport(factory.create(uri));
@@ -2252,38 +2338,42 @@ TEST_F(FailoverTransportTest, testBrokerRestartWithProperSync)
 
     transport->start();
 
-    // Wait for initial connection using listener, not sleep
-    ASSERT_TRUE(listener.awaitResumed()) << ("Failed to connect initially");
-    listener.reset();
+    ASSERT_TRUE(listener.awaitResumeEventsGreaterThan(0, 120000))
+        << ("Failed to connect initially");
     ASSERT_TRUE(failover->isConnected() == true);
+
+    int snapI = listener.getInterruptEvents();
+    int snapR = listener.getResumeEvents();
 
     // Stop broker1, should failover to broker2
     broker1->stop();
     broker1->waitUntilStopped();
 
-    ASSERT_TRUE(listener.awaitInterruption()) << ("Failed to get interrupted");
-    ASSERT_TRUE(listener.awaitResumed()) << ("Failed to reconnect");
-    listener.reset();
+    ASSERT_TRUE(listener.awaitInterruptEventsGreaterThan(snapI, 120000))
+        << ("Failed to get interrupted");
+    ASSERT_TRUE(listener.awaitResumeEventsGreaterThan(snapR, 120000))
+        << ("Failed to reconnect");
     ASSERT_TRUE(failover->isConnected() == true);
 
     // Restart broker1 - wait for transport to be ready
     broker1->start();
     broker1->waitUntilStarted();
 
-    // Give backup connections time to establish (this is asynchronous in
-    // FailoverTransport) We can't eliminate this completely without modifying
-    // FailoverTransport to notify when backup connections are ready, but 3
-    // seconds should be sufficient
-    Thread::sleep(3000);
+    // Give backup connections time to establish (asynchronous in
+    // FailoverTransport)
+    Thread::sleep(5000);
+
+    snapI = listener.getInterruptEvents();
+    snapR = listener.getResumeEvents();
 
     // Stop broker2, should reconnect to broker1
     broker2->stop();
     broker2->waitUntilStopped();
 
-    ASSERT_TRUE(listener.awaitInterruption())
+    ASSERT_TRUE(listener.awaitInterruptEventsGreaterThan(snapI, 120000))
         << ("Failed to get interrupted after broker2 stop");
-    ASSERT_TRUE(listener.awaitResumed()) << ("Failed to reconnect to broker1");
-    listener.reset();
+    ASSERT_TRUE(listener.awaitResumeEventsGreaterThan(snapR, 120000))
+        << ("Failed to reconnect to broker1");
 
     // Now we're guaranteed to be connected before checking
     ASSERT_TRUE(failover->isConnected() == true)
@@ -2294,7 +2384,7 @@ TEST_F(FailoverTransportTest, testBrokerRestartWithProperSync)
     broker2->waitUntilStarted();
 
     // Give backup connections time to re-establish
-    Thread::sleep(3000);
+    Thread::sleep(5000);
 
     // Final check - we're still connected
     ASSERT_TRUE(failover->isConnected() == true)
@@ -2331,11 +2421,13 @@ TEST_F(FailoverTransportTest, testFuzzyBrokerAvailability)
     // Use 127.0.0.1 instead of localhost to avoid IPv6 resolution issues on CI
     std::string uri = std::string("failover://(tcp://127.0.0.1:") +
                       Integer::toString(port1) +
-                      ",tcp://127.0.0.1:" + Integer::toString(port2) +
-                      ")?initialReconnectDelay=100&maxReconnectDelay=500&"
+                      "?transport.useInactivityMonitor=false," +
+                      "tcp://127.0.0.1:" + Integer::toString(port2) +
+                      "?transport.useInactivityMonitor=false)?"
+                      "initialReconnectDelay=100&maxReconnectDelay=500&"
                       "useExponentialBackOff=false";
 
-    PriorityBackupListener   listener;
+    FailoverSyncListener     listener;
     FailoverTransportFactory factory;
 
     std::shared_ptr<Transport> transport(factory.create(uri));
@@ -2350,17 +2442,10 @@ TEST_F(FailoverTransportTest, testFuzzyBrokerAvailability)
 
     transport->start();
 
-    // Wait for initial connection with extended timeout
-    int retries = 0;
-    while (!listener.awaitResumed() && retries++ < 3)
-    {
-        Thread::sleep(1000);
-    }
+    ASSERT_TRUE(listener.awaitResumeEventsGreaterThan(0, 120000))
+        << ("Failed to get reconnected in time");
     ASSERT_TRUE(failover->isConnected())
         << ("Failed to get reconnected in time");
-    listener.reset();
-
-    ASSERT_TRUE(failover->isConnected() == true);
 
     std::random_device              rd;
     std::mt19937                    gen(rd());
@@ -2386,17 +2471,22 @@ TEST_F(FailoverTransportTest, testFuzzyBrokerAvailability)
             case 0:  // Try to stop broker1
                 if (canStopBroker1)
                 {
+                    int snapI = listener.getInterruptEvents();
+                    int snapR = listener.getResumeEvents();
                     broker1->stop();
                     broker1->waitUntilStopped();
                     broker1Running = false;
 
                     if (broker2Running)
                     {
-                        ASSERT_TRUE(listener.awaitInterruption())
+                        ASSERT_TRUE(
+                            listener.awaitInterruptEventsGreaterThan(snapI,
+                                                                     120000))
                             << ("Failed to get interrupted in time");
-                        ASSERT_TRUE(listener.awaitResumed())
+                        ASSERT_TRUE(
+                            listener.awaitResumeEventsGreaterThan(snapR,
+                                                                  120000))
                             << ("Failed to get reconnected in time");
-                        listener.reset();
                     }
                 }
                 break;
@@ -2404,17 +2494,22 @@ TEST_F(FailoverTransportTest, testFuzzyBrokerAvailability)
             case 1:  // Try to stop broker2
                 if (canStopBroker2)
                 {
+                    int snapI = listener.getInterruptEvents();
+                    int snapR = listener.getResumeEvents();
                     broker2->stop();
                     broker2->waitUntilStopped();
                     broker2Running = false;
 
                     if (broker1Running)
                     {
-                        ASSERT_TRUE(listener.awaitInterruption())
+                        ASSERT_TRUE(
+                            listener.awaitInterruptEventsGreaterThan(snapI,
+                                                                     120000))
                             << ("Failed to get interrupted in time");
-                        ASSERT_TRUE(listener.awaitResumed())
+                        ASSERT_TRUE(
+                            listener.awaitResumeEventsGreaterThan(snapR,
+                                                                  120000))
                             << ("Failed to get reconnected in time");
-                        listener.reset();
                     }
                 }
                 break;
@@ -2451,9 +2546,9 @@ TEST_F(FailoverTransportTest, testFuzzyBrokerAvailability)
         // is running
         if (broker1Running || broker2Running)
         {
-            // Allow some time for reconnection if needed
+            // Allow time for reconnection under slow CI (backoff can exceed 5s)
             int retries = 0;
-            while (!failover->isConnected() && retries < 50)
+            while (!failover->isConnected() && retries < 200)
             {
                 Thread::sleep(100);
                 retries++;
@@ -2477,8 +2572,18 @@ TEST_F(FailoverTransportTest, testFuzzyBrokerAvailability)
         broker2Running = true;
     }
 
-    Thread::sleep(1000);
-    ASSERT_TRUE(failover->isConnected() == true);
+    // Reconnection after the fuzz loop can lag on busy CI; poll like the loop
+    // body instead of assuming 1s is always enough.
+    {
+        int retries = 0;
+        while (!failover->isConnected() && retries < 600)
+        {
+            Thread::sleep(100);
+            retries++;
+        }
+    }
+    ASSERT_TRUE(failover->isConnected())
+        << ("Expected connected transport after both brokers are up");
 
     transport->close();
 

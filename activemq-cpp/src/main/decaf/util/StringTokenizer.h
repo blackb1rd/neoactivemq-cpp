@@ -18,7 +18,7 @@
 #define _DECAF_UTIL_STRINGTOKENIZER_H_
 
 #include <decaf/util/Config.h>
-#include <decaf/util/NoSuchElementException.h>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -92,7 +92,7 @@ namespace util
          *
          * @return string value of next token
          *
-         * @throws NoSuchElementException if there are no more tokens in this
+         * @throws std::runtime_error if there are no more tokens in this
          * string.
          */
         virtual std::string nextToken();
@@ -111,7 +111,7 @@ namespace util
          *
          * @return next string in the token list
          *
-         * @throws NoSuchElementException if there are no more tokens in this
+         * @throws std::runtime_error if there are no more tokens in this
          * string.
          */
         virtual std::string nextToken(const std::string& delim);

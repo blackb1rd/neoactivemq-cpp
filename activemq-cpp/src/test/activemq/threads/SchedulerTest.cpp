@@ -20,12 +20,11 @@
 #include <activemq/threads/Scheduler.h>
 #include <decaf/lang/Runnable.h>
 #include <decaf/lang/Thread.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
+#include <stdexcept>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace activemq;
 using namespace activemq::threads;
@@ -92,12 +91,12 @@ TEST_F(SchedulerTest, testScheduleNullRunnableThrows)
     Scheduler scheduler("testSchedualPeriodically");
     scheduler.start();
 
-    ASSERT_THROW(scheduler.schedualPeriodically(NULL, 400), NullPointerException)
-        << ("Should have thrown a NullPointerException");
-    ASSERT_THROW(scheduler.executePeriodically(NULL, 400), NullPointerException)
-        << ("Should have thrown a NullPointerException");
-    ASSERT_THROW(scheduler.executeAfterDelay(NULL, 400), NullPointerException)
-        << ("Should have thrown a NullPointerException");
+    ASSERT_THROW(scheduler.schedualPeriodically(NULL, 400), std::logic_error)
+        << ("Should have thrown std::logic_error");
+    ASSERT_THROW(scheduler.executePeriodically(NULL, 400), std::logic_error)
+        << ("Should have thrown std::logic_error");
+    ASSERT_THROW(scheduler.executeAfterDelay(NULL, 400), std::logic_error)
+        << ("Should have thrown std::logic_error");
 }
 
 ////////////////////////////////////////////////////////////////////////////////

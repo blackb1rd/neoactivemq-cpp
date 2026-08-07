@@ -41,7 +41,6 @@ using namespace decaf;
 using namespace decaf::net;
 using namespace decaf::io;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 class InactivityMonitorTest : public ::testing::Test
 {

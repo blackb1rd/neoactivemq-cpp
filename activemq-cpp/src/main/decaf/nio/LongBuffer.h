@@ -18,13 +18,12 @@
 #ifndef _DECAF_NIO_LONGBUFFER_H_
 #define _DECAF_NIO_LONGBUFFER_H_
 
+#include <activemq/exceptions/BufferUnderflowException.h>
 #include <decaf/lang/Comparable.h>
-#include <decaf/lang/exceptions/IndexOutOfBoundsException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/nio/Buffer.h>
 #include <decaf/nio/BufferOverflowException.h>
-#include <decaf/nio/BufferUnderflowException.h>
 #include <decaf/nio/ReadOnlyBufferException.h>
+#include <stdexcept>
 
 namespace decaf
 {
@@ -90,7 +89,7 @@ namespace nio
          * @return the array that backs this Buffer.
          *
          * @throws ReadOnlyBufferException if this Buffer is read only.
-         * @throws UnsupportedOperationException if the underlying store has no
+         * @throws std::logic_error if the underlying store has no
          * array.
          */
         virtual long long* array() = 0;
@@ -106,7 +105,7 @@ namespace nio
          * starts.
          *
          * @throws ReadOnlyBufferException if this Buffer is read only.
-         * @throws UnsupportedOperationException if the underlying store has no
+         * @throws std::logic_error if the underlying store has no
          * array.
          */
         virtual int arrayOffset() = 0;
@@ -187,7 +186,7 @@ namespace nio
          *
          * @return the long long that is located at the given index.
          *
-         * @throws IndexOutOfBoundsException if index is not smaller than the
+         * @throws std::out_of_range if index is not smaller than the
          *         buffer's limit, or index is negative.
          */
         virtual long long get(int index) const = 0;
@@ -237,7 +236,7 @@ namespace nio
          * @throws BufferUnderflowException if there are fewer than length long
          * longs remaining in this buffer
          * @throws NullPolong longerException if the passed buffer is null.
-         * @throws IndexOutOfBoundsException if the preconditions of size,
+         * @throws std::out_of_range if the preconditions of size,
          * offset, or length are not met.
          */
         LongBuffer& get(long long* buffer, int size, int offset, int length);
@@ -273,7 +272,7 @@ namespace nio
          *
          * @throws BufferOverflowException if there is insufficient space in
          * this buffer for the remaining long longs in the source buffer
-         * @throws IllegalArgumentException if the source buffer is this buffer
+         * @throws std::invalid_argument if the source buffer is this buffer
          * @throws ReadOnlyBufferException if this buffer is read-only
          */
         LongBuffer& put(LongBuffer& src);
@@ -305,7 +304,7 @@ namespace nio
          * this buffer
          * @throws ReadOnlyBufferException if this buffer is read-only
          * @throws NullPolong longerException if the passed buffer is null.
-         * @throws IndexOutOfBoundsException if the preconditions of size,
+         * @throws std::out_of_range if the preconditions of size,
          * offset, or length are not met.
          */
         LongBuffer& put(const long long* buffer,
@@ -355,7 +354,7 @@ namespace nio
          *
          * @return a reference to this buffer.
          *
-         * @throws IndexOutOfBoundsException if index greater than the buffer's
+         * @throws std::out_of_range if index greater than the buffer's
          * limit minus the size of the type being written.
          * @throws ReadOnlyBufferException if this buffer is read-only
          */
@@ -434,8 +433,8 @@ namespace nio
          *
          * @return a new LongBuffer that is backed by buffer, caller owns.
          *
-         * @throws NullPointerException if the array pointer is NULL.
-         * @throws IndexOutOfBoundsException if the preconditions of size,
+         * @throws std::logic_error if the array pointer is NULL.
+         * @throws std::out_of_range if the preconditions of size,
          * offset, or length are not met.
          */
         static LongBuffer* wrap(long long* array,

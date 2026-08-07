@@ -22,6 +22,9 @@
 
 #include <decaf/util/concurrent/BlockingQueue.h>
 
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <stdexcept>
+#include <string>
 #include <vector>
 
 namespace decaf
@@ -73,9 +76,7 @@ namespace util
             public:
                 virtual E next()
                 {
-                    throw NoSuchElementException(
-                        __FILE__,
-                        __LINE__,
+                    throw activemq::exceptions::ConcurrentModificationException(
                         "Cannot traverse a Synchronous Queue.");
                 }
 
@@ -86,10 +87,11 @@ namespace util
 
                 virtual void remove()
                 {
-                    throw lang::exceptions::IllegalStateException(
-                        __FILE__,
-                        __LINE__,
-                        "No Elements to remove from a Synchronous Queue.");
+                    throw activemq::exceptions::TypeMismatchException(
+                        std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+                        ": " +
+                        "No Elements to remove from a "
+                        "Synchronous Queue.");
                 }
             };
 
@@ -113,17 +115,25 @@ namespace util
              *
              * @param value the element to add to the Queue.
              *
-             * @throws InterruptedException {@inheritDoc}
-             * @throws NullPointerException {@inheritDoc}
-             * @throws IllegalArgumentException {@inheritDoc}
+             * @throws std::runtime_error {@inheritDoc}
+             * @throws std::logic_error {@inheritDoc}
+             * @throws std::invalid_argument {@inheritDoc}
              */
             virtual void put(const E& value DECAF_UNUSED)
             {
-                // if (o == null) throw new NullPointerException();
+                // if (o == null) throw std::logic_error(/*null elem*/);
                 // if (transferer.transfer(o, false, 0) == null) {
                 //     Thread.interrupted();
-                //     throw new InterruptedException();
+                //     throw new std::runtime_error();
                 // }
+            }
+
+            virtual bool offer(const E& value DECAF_UNUSED)
+            {
+                // if (e == null) throw std::logic_error(/*null elem*/);
+                // return transferer.transfer(e, true, 0) != null;
+
+                return false;
             }
 
             /**
@@ -134,43 +144,21 @@ namespace util
              * @return <tt>true</tt> if successful, or <tt>false</tt> if the
              *         specified waiting time elapses before a consumer appears.
              *
-             * @throws InterruptedException {@inheritDoc}
-             * @throws NullPointerException {@inheritDoc}
-             * @throws IllegalArgumentException {@inheritDoc}
+             * @throws std::runtime_error {@inheritDoc}
+             * @throws std::logic_error {@inheritDoc}
+             * @throws std::invalid_argument {@inheritDoc}
              */
             virtual bool offer(const E& e           DECAF_UNUSED,
                                long long timeout    DECAF_UNUSED,
                                const TimeUnit& unit DECAF_UNUSED)
             {
-                // if (o == null) throw new NullPointerException();
+                // if (o == null) throw std::logic_error(/*null elem*/);
                 // if (transferer.transfer(o, true, unit.toNanos(timeout)) !=
                 // null)
                 //     return true;
                 // if (!Thread.interrupted())
                 //     return false;
-                // throw new InterruptedException();
-
-                throw false;
-            }
-
-            /**
-             * Inserts the specified element into this queue, if another thread
-             * is waiting to receive it.
-             *
-             * @param value the element to add to the Queue
-             *
-             * @return <tt>true</tt> if the element was added to this queue,
-             * else <tt>false</tt>
-             *
-             * @throws NullPointerException if the Queue implementation does not
-             * allow Null values to be inserted into the Queue.
-             * @throws IllegalArgumentException if some property of the
-             * specified element prevents it from being added to this queue
-             */
-            virtual bool offer(const E& value DECAF_UNUSED)
-            {
-                // if (e == null) throw new NullPointerException();
-                // return transferer.transfer(e, true, 0) != null;
+                // throw new std::runtime_error();
 
                 return false;
             }
@@ -180,7 +168,7 @@ namespace util
              * necessary for another thread to insert it.
              *
              * @return the head of this queue
-             * @throws InterruptedException {@inheritDoc}
+             * @throws std::runtime_error {@inheritDoc}
              */
             virtual E take()
             {
@@ -188,7 +176,7 @@ namespace util
                 // if (e != null)
                 //     return (E)e;
                 // Thread.interrupted();
-                // throw new InterruptedException();
+                // throw new std::runtime_error();
 
                 return E();
             }
@@ -215,7 +203,7 @@ namespace util
                 // unit.toNanos(timeout)); if (e != null ||
                 // !Thread.interrupted())
                 //     return (E)e;
-                // throw new InterruptedException();
+                // throw new std::runtime_error();
 
                 return false;
             }
@@ -313,10 +301,9 @@ namespace util
             {
                 if ((void*)&c == this)
                 {
-                    throw decaf::lang::exceptions::IllegalArgumentException(
-                        __FILE__,
-                        __LINE__,
-                        "Cannot drain a Collection to Itself.");
+                    throw activemq::exceptions::InvalidArgumentException(
+                        std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+                        ": " + "Cannot drain a Collection to Itself.");
                 }
 
                 int count = 0;
@@ -335,10 +322,9 @@ namespace util
             {
                 if ((void*)&c == this)
                 {
-                    throw decaf::lang::exceptions::IllegalArgumentException(
-                        __FILE__,
-                        __LINE__,
-                        "Cannot drain a Collection to Itself.");
+                    throw activemq::exceptions::InvalidArgumentException(
+                        std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+                        ": " + "Cannot drain a Collection to Itself.");
                 }
 
                 int count = 0;

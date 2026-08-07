@@ -23,6 +23,7 @@
 #include <decaf/internal/util/GenericResource.h>
 #include <decaf/internal/util/Resource.h>
 #include <decaf/util/concurrent/Mutex.h>
+#include <stdexcept>
 
 namespace decaf
 {
@@ -77,7 +78,7 @@ namespace internal
              * @param value
              *      The Resource to add to the Network Runtime.
              *
-             * @throw NullPointerException if the Resource value passed is null.
+             * @throw std::logic_error if the Resource value passed is null.
              */
             void addNetworkResource(decaf::internal::util::Resource* value);
 
@@ -114,7 +115,7 @@ namespace internal
             /**
              * Gets the one and only instance of the Network class, if this is
              * called before the Network layer has been initialized or after it
-             * has been shutdown then an IllegalStateException is thrown.
+             * has been shutdown then std::logic_error is thrown.
              *
              * @return pointer to the Network runtime for the Decaf library.
              */

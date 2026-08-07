@@ -21,7 +21,7 @@
 #include <decaf/util/Config.h>
 
 #include <decaf/lang/Comparable.h>
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
+#include <stdexcept>
 
 namespace decaf
 {
@@ -235,7 +235,7 @@ namespace util
              * result in a new Level that has been initialized with that int
              * value and name as the string form of the int.
              *
-             * @throws IllegalArgumentException if the value is not valid,
+             * @throws std::invalid_argument if the value is not valid,
              * validity means that the string is either a valid int (between
              * Integer::MIN_VALUE and Integer::MAX_VALUE or is one of the known
              * level names.

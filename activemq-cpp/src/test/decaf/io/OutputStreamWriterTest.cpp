@@ -22,12 +22,11 @@
 #include <decaf/io/InputStreamReader.h>
 #include <decaf/io/OutputStreamWriter.h>
 #include <decaf/io/Writer.h>
-#include <decaf/lang/exceptions/IndexOutOfBoundsException.h>
+#include <stdexcept>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::io;
-using namespace decaf::lang::exceptions;
 
 class OutputStreamWriterTest : public ::testing::Test
 {
@@ -118,8 +117,8 @@ TEST_F(OutputStreamWriterTest, testFlush)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(OutputStreamWriterTest, testWriteCharArrayIntIntInt)
 {
-    ASSERT_THROW(this->writer1->write(NULL, 0, 1, 1), NullPointerException)
-        << ("Should throw an NullPointerException");
+    ASSERT_THROW(this->writer1->write(NULL, 0, 1, 1), std::logic_error)
+        << ("Should throw an std::logic_error");
 
     this->writer1->write(TEST_STRING.c_str(), 1, 2);
     this->writer1->flush();
@@ -163,13 +162,11 @@ TEST_F(OutputStreamWriterTest, testWriteChar)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(OutputStreamWriterTest, testWriteStringIntInt)
 {
-    ASSERT_THROW(this->writer1->write(string(""), 0, 1),
-                 IndexOutOfBoundsException)
-        << ("Should throw an IndexOutOfBoundsException");
+    ASSERT_THROW(this->writer1->write(string(""), 0, 1), std::out_of_range)
+        << ("Should throw an std::out_of_range");
 
-    ASSERT_THROW(this->writer1->write(string("abc"), 1, 3),
-                 IndexOutOfBoundsException)
-        << ("Should throw an IndexOutOfBoundsException");
+    ASSERT_THROW(this->writer1->write(string("abc"), 1, 3), std::out_of_range)
+        << ("Should throw an std::out_of_range");
 
     this->writer1->write("abc", 1, 2);
     this->writer1->flush();
@@ -189,8 +186,8 @@ TEST_F(OutputStreamWriterTest, testWriteStringIntInt)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(OutputStreamWriterTest, testOutputStreamWriterOutputStream)
 {
-    ASSERT_THROW(OutputStreamWriter(NULL), NullPointerException)
-        << ("Should throw an NullPointerException");
+    ASSERT_THROW(OutputStreamWriter(NULL), std::logic_error)
+        << ("Should throw an std::logic_error");
 
     OutputStreamWriter* writer2 = new OutputStreamWriter(this->buffer1);
     writer2->close();

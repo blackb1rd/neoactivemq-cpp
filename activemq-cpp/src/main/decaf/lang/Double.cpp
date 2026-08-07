@@ -16,16 +16,18 @@
  */
 
 #include "Double.h"
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/lang/ArrayPointer.h>
 #include <decaf/lang/Long.h>
 #include <string.h>
 #include <limits>
 #include <sstream>
+#include <stdexcept>
+#include <string>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 DECAF_API const int    Double::SIZE      = 64;
@@ -179,10 +181,8 @@ double Double::parseDouble(const String& value)
     // Not everything got read, meaning there wasn't just a number here.
     if (!stream.eof())
     {
-        throw exceptions::NumberFormatException(
-            __FILE__,
-            __LINE__,
-            "Failed to parse a valid float from input string: %s",
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string("Failed to parse a valid double from input string: ") +
             value.c_str());
     }
 

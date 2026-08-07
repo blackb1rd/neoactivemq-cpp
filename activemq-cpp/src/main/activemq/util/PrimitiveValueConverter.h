@@ -20,8 +20,9 @@
 
 #include <activemq/util/Config.h>
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <activemq/util/PrimitiveValueNode.h>
-#include <decaf/lang/exceptions/UnsupportedOperationException.h>
+#include <stdexcept>
 #include <string>
 
 namespace activemq
@@ -31,9 +32,9 @@ namespace util
 
     /**
      * Class controls the conversion of data contained in a PrimitiveValueNode
-     * from one type to another.  If the conversion is supported then calling
-     * the convert method will throw an UnsupportedOperationException to
-     * indicate that its not possible to perform the conversion.
+     * from one type to another.  If the conversion is not supported then
+     * calling the convert method will throw std::logic_error to indicate that
+     * its not possible to perform the conversion.
      *
      * This class is used to implement the rules of conversion on CMS Message
      * properties, the following conversion table must be implemented.  A value
@@ -67,7 +68,7 @@ namespace util
         template <typename TO>
         TO convert(const PrimitiveValueNode& value DECAF_UNUSED) const
         {
-            throw decaf::lang::exceptions::UnsupportedOperationException(
+            throw activemq::exceptions::UnsupportedOperationException(
                 __FILE__,
                 __LINE__,
                 "Invalid Conversion");

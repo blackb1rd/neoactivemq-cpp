@@ -27,13 +27,13 @@
 #include <decaf/lang/Integer.h>
 #include <decaf/lang/Long.h>
 #include <decaf/lang/Math.h>
-#include <decaf/lang/exceptions/IllegalThreadStateException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
-#include <decaf/lang/exceptions/RuntimeException.h>
 #include <decaf/util/concurrent/Executors.h>
 #include <decaf/util/concurrent/Mutex.h>
 #include <decaf/util/concurrent/TimeUnit.h>
 
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <stdexcept>
+#include <string>
 #include <vector>
 
 using namespace decaf;
@@ -41,7 +41,6 @@ using namespace decaf::internal;
 using namespace decaf::internal::util;
 using namespace decaf::internal::util::concurrent;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 
@@ -193,7 +192,7 @@ void Thread::start()
         }
         else if (currentState > Thread::NEW)
         {
-            throw IllegalThreadStateException(
+            throw activemq::exceptions::IllegalStateException(
                 __FILE__,
                 __LINE__,
                 "Thread::start - Thread already started");
@@ -201,10 +200,8 @@ void Thread::start()
 
         Threading::start(this->properties->handle);
     }
-    DECAF_CATCH_RETHROW(IllegalThreadStateException)
-    DECAF_CATCH_RETHROW(RuntimeException)
-    DECAF_CATCH_EXCEPTION_CONVERT(NullPointerException, RuntimeException)
-    DECAF_CATCHALL_THROW(RuntimeException)
+    DECAF_CATCH_RETHROW(Exception)
+    DECAF_CATCHALL_THROW(Exception)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -230,11 +227,10 @@ void Thread::join(long long millisecs)
 {
     if (millisecs < 0)
     {
-        throw IllegalArgumentException(
-            __FILE__,
-            __LINE__,
-            "Thread::join( millisecs ) - Value given {%d} is less than 0",
-            millisecs);
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Thread::join( millisecs ) - Value given {" +
+            std::to_string(millisecs) + "} is less than 0");
     }
 
     Threading::join(this->properties->handle, millisecs, 0);
@@ -245,18 +241,17 @@ void Thread::join(long long millisecs, int nanos)
 {
     if (millisecs < 0)
     {
-        throw IllegalArgumentException(__FILE__,
-                                       __LINE__,
-                                       "Thread::join( millisecs, nanos ) - "
-                                       "Value given {%d} is less than 0",
-                                       millisecs);
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Thread::join( millisecs, nanos ) - "
+            "Value given {" +
+            std::to_string(millisecs) + "} is less than 0");
     }
 
     if (nanos < 0 || nanos > 999999)
     {
-        throw IllegalArgumentException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
             "Thread::join( millisecs, nanos ) - Nanoseconds must be in range "
             "[0...999999]");
     }
@@ -275,18 +270,17 @@ void Thread::sleep(long long millisecs, int nanos)
 {
     if (millisecs < 0)
     {
-        throw IllegalArgumentException(__FILE__,
-                                       __LINE__,
-                                       "Thread::sleep( millisecs, nanos ) - "
-                                       "Value given {%d} is less than 0",
-                                       millisecs);
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Thread::sleep( millisecs, nanos ) - "
+            "Value given {" +
+            std::to_string(millisecs) + "} is less than 0");
     }
 
     if (nanos < 0 || nanos > 999999)
     {
-        throw IllegalArgumentException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
             "Thread::sleep( millisecs, nanos ) - Nanoseconds must be in range "
             "[0...999999]");
     }
@@ -323,11 +317,10 @@ void Thread::setPriority(int value)
 {
     if (value < Thread::MIN_PRIORITY || value > Thread::MAX_PRIORITY)
     {
-        throw IllegalArgumentException(
-            __FILE__,
-            __LINE__,
-            "Thread::setPriority - Specified value {%d} is out of range",
-            value);
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Thread::setPriority - Specified value {" + std::to_string(value) +
+            "} is out of range");
     }
 
     Threading::setThreadPriority(this->properties->handle, value);

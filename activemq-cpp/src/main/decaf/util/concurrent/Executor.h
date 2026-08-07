@@ -21,7 +21,6 @@
 #include <decaf/util/Config.h>
 
 #include <decaf/lang/Runnable.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/util/concurrent/RejectedExecutionException.h>
 
 namespace decaf
@@ -105,7 +104,7 @@ namespace util
              * @throws RejectedExecutionException if this task cannot be
              *         accepted for execution.
              *
-             * @throws NullPointerException if command is null
+             * @throws std::logic_error if command is null
              */
             virtual void execute(decaf::lang::Runnable* command) = 0;
 
@@ -124,7 +123,7 @@ namespace util
              * @throws RejectedExecutionException if this task cannot be
              *         accepted for execution.
              *
-             * @throws NullPointerException if command is null
+             * @throws std::logic_error if command is null
              */
             virtual void execute(decaf::lang::Runnable* command,
                                  bool                   takeOwnership) = 0;

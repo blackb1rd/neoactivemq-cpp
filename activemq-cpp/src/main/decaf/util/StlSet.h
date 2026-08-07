@@ -18,13 +18,15 @@
 #ifndef _DECAF_UTIL_STLSET_H_
 #define _DECAF_UTIL_STLSET_H_
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/util/AbstractSet.h>
 #include <decaf/util/Iterator.h>
-#include <decaf/util/NoSuchElementException.h>
 #include <decaf/util/concurrent/Mutex.h>
 #include <decaf/util/concurrent/Synchronizable.h>
 #include <memory>
 #include <set>
+#include <stdexcept>
+#include <string>
 #include <vector>
 
 namespace decaf
@@ -72,7 +74,7 @@ namespace util
             {
                 if (this->current == set->end())
                 {
-                    throw NoSuchElementException(
+                    throw activemq::exceptions::NoSuchElementException(
                         __FILE__,
                         __LINE__,
                         "Set::Iterator::next - No more elements to return");
@@ -91,7 +93,7 @@ namespace util
             {
                 if (this->previous == set->end())
                 {
-                    throw lang::exceptions::IllegalStateException(
+                    throw activemq::exceptions::IllegalStateException(
                         __FILE__,
                         __LINE__,
                         "Set::Iterator::remove - Invalid State to call remove");
@@ -130,7 +132,7 @@ namespace util
             {
                 if (this->current == set->end())
                 {
-                    throw NoSuchElementException(
+                    throw activemq::exceptions::NoSuchElementException(
                         __FILE__,
                         __LINE__,
                         "Set::Iterator::next - No more elements to return");
@@ -147,7 +149,7 @@ namespace util
 
             virtual void remove()
             {
-                throw lang::exceptions::UnsupportedOperationException(
+                throw activemq::exceptions::UnsupportedOperationException(
                     __FILE__,
                     __LINE__,
                     "Set::Iterator::remove - Not Valid on a Const Iterator");

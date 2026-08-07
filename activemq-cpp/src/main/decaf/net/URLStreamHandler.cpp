@@ -17,19 +17,18 @@
 
 #include <decaf/net/URLStreamHandler.h>
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/internal/net/URLUtils.h>
 #include <decaf/internal/util/StringUtils.h>
 #include <decaf/lang/Integer.h>
-#include <decaf/lang/exceptions/SecurityException.h>
-#include <decaf/lang/exceptions/StringIndexOutOfBoundsException.h>
-#include <decaf/lang/exceptions/UnsupportedOperationException.h>
 #include <decaf/net/UnknownHostException.h>
 #include <decaf/util/HashCode.h>
+#include <stdexcept>
+#include <string>
 
 using namespace decaf;
 using namespace decaf::net;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::internal;
 using namespace decaf::internal::util;
 using namespace decaf::internal::net;
@@ -65,9 +64,10 @@ String relativePath(const String& base, const String& path)
 URLConnection* URLStreamHandler::openConnection(const URL& url     DECAF_UNUSED,
                                                 const Proxy* proxy DECAF_UNUSED)
 {
-    throw UnsupportedOperationException(__FILE__,
-                                        __LINE__,
-                                        "method has not been implemented yet");
+    throw activemq::exceptions::UnsupportedOperationException(
+        __FILE__,
+        __LINE__,
+        "method has not been implemented yet");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -227,13 +227,16 @@ void URLStreamHandler::parseURL(URL&          url,
             (spec.startsWith("//", start) &&
              spec.indexOf('/', start + 2) == -1))
         {
-            throw StringIndexOutOfBoundsException(__FILE__, __LINE__, limit);
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+                "Invalid limit: " + std::to_string(limit));
         }
         if (this != url.getURLStreamHandler())
         {
-            throw SecurityException(__FILE__,
-                                    __LINE__,
-                                    "Only the URL's stream handler can modify");
+            throw activemq::exceptions::IllegalStateException(
+                __FILE__,
+                __LINE__,
+                "Only the URL's stream handler can modify");
         }
         return;
     }
@@ -279,12 +282,10 @@ void URLStreamHandler::parseURL(URL&          url,
         {
             if (URLUtils::findFirstOf(spec, ":", hostStart, ipv6End) == ipv6End)
             {
-                throw IllegalArgumentException(
-                    __FILE__,
-                    __LINE__,
-                    (std::string("Expected an IPv6 address: ") +
-                     spec.substring(hostStart, ipv6End + 1).toString())
-                        .c_str());
+                throw activemq::exceptions::InvalidArgumentException(
+                    std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+                    ": Expected an IPv6 address: " +
+                    spec.substring(hostStart, ipv6End + 1).toString());
             }
             colonSearchFrom = ipv6End;
         }
@@ -298,10 +299,9 @@ void URLStreamHandler::parseURL(URL&          url,
                 spec.substring(portStart, fileStart).toString());
             if (port < 0)
             {
-                throw IllegalArgumentException(__FILE__,
-                                               __LINE__,
-                                               "port < 0: %d",
-                                               port);
+                throw activemq::exceptions::InvalidArgumentException(
+                    std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+                    ": port < 0: " + std::to_string(port));
             }
         }
         path  = "";
@@ -378,9 +378,10 @@ void URLStreamHandler::setURL(URL&          url,
 {
     if (this != url.getURLStreamHandler())
     {
-        throw SecurityException(__FILE__,
-                                __LINE__,
-                                "Stream handler is not the URLs intance.");
+        throw activemq::exceptions::IllegalStateException(
+            __FILE__,
+            __LINE__,
+            "Stream handler is not the URLs instance.");
     }
 
     url.set(protocol, host, port, authority, userInfo, path, query, ref);

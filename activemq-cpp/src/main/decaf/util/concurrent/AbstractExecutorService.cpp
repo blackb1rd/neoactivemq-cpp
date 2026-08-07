@@ -17,13 +17,14 @@
 
 #include "AbstractExecutorService.h"
 
-#include <decaf/lang/exceptions/NullPointerException.h>
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <stdexcept>
+#include <string>
 
 using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 AbstractExecutorService::AbstractExecutorService()
@@ -45,15 +46,18 @@ void AbstractExecutorService::doSubmit(FutureType* future)
         Runnable* task = dynamic_cast<Runnable*>(future);
         if (task == NULL)
         {
-            throw NullPointerException(
+            throw activemq::exceptions::NullPointerException(
                 __FILE__,
                 __LINE__,
-                "Could not cast FutureType to a Runnabke");
+                "Could not cast FutureType to a Runnable");
         }
 
         // Ensure that we tell the subclass it owns the Future.
         this->execute(task, true);
     }
-    DECAF_CATCH_RETHROW(NullPointerException)
+    catch (activemq::exceptions::NullPointerException&)
+    {
+        throw;
+    }
     DECAF_CATCH_RETHROW(RejectedExecutionException)
 }

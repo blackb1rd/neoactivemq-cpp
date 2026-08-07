@@ -19,12 +19,13 @@
 
 #include <memory>
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/lang/Boolean.h>
 #include <decaf/lang/Integer.h>
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/net/ssl/SSLSocket.h>
 #include <decaf/net/ssl/SSLSocketFactory.h>
+#include <stdexcept>
+#include <string>
 
 using namespace activemq;
 using namespace activemq::io;
@@ -37,7 +38,6 @@ using namespace decaf::net::ssl;
 using namespace decaf::util;
 using namespace decaf::io;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 SslTransport::SslTransport(const std::shared_ptr<Transport> next,
@@ -72,9 +72,9 @@ Socket* SslTransport::createSocket()
         SocketFactory* factory = SSLSocketFactory::getDefault();
         return factory->createSocket();
     }
-    DECAF_CATCH_RETHROW(IOException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IOException)
-    DECAF_CATCHALL_THROW(IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(Exception, activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -84,17 +84,17 @@ void SslTransport::configureSocket(Socket* socket)
     {
         if (socket == NULL)
         {
-            throw NullPointerException(__FILE__,
-                                       __LINE__,
-                                       "Socket instance passed was NULL");
+            throw activemq::exceptions::NullPointerException(
+                __FILE__,
+                __LINE__,
+                "Socket instance passed was NULL");
         }
 
         SSLSocket* sslSocket = dynamic_cast<SSLSocket*>(socket);
         if (sslSocket == NULL)
         {
-            throw IllegalArgumentException(
-                __FILE__,
-                __LINE__,
+            throw activemq::exceptions::InvalidArgumentException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
                 "Socket passed was not an SSLSocket instance.");
         }
 
@@ -120,8 +120,6 @@ void SslTransport::configureSocket(Socket* socket)
 
         TcpTransport::configureSocket(socket);
     }
-    DECAF_CATCH_RETHROW(NullPointerException)
-    DECAF_CATCH_RETHROW(IllegalArgumentException)
     DECAF_CATCH_RETHROW(SocketException)
     DECAF_CATCH_EXCEPTION_CONVERT(Exception, SocketException)
     DECAF_CATCHALL_THROW(SocketException)
@@ -144,7 +142,7 @@ void SslTransport::beforeNextIsStarted()
             this->sslSocket->startHandshake();
         }
     }
-    DECAF_CATCH_RETHROW(IOException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IOException)
-    DECAF_CATCHALL_THROW(IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(Exception, activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }

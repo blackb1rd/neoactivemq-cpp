@@ -20,13 +20,9 @@
 
 #include <decaf/util/Config.h>
 
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
-#include <decaf/lang/exceptions/IllegalStateException.h>
-#include <decaf/lang/exceptions/IndexOutOfBoundsException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
-
 #include <decaf/util/zip/DataFormatException.h>
 
+#include <stdexcept>
 #include <vector>
 
 namespace decaf
@@ -97,10 +93,12 @@ namespace util
              * @param length
              *      The number of bytes to read from the input buffer.
              *
-             * @throws NullPointerException if buffer is NULL.
-             * @throws IndexOutOfBoundsException if the offset + length > size
+             * @throws activemq::exceptions::IllegalStateException if
+             * buffer is NULL.
+             * @throws std::out_of_range if the offset + length > size
              * of the buffer.
-             * @throws IllegalStateException if in the end state.
+             * @throws activemq::exceptions::IllegalStateException if in
+             * the end state.
              */
             void setInput(const unsigned char* buffer,
                           int                  size,
@@ -119,9 +117,10 @@ namespace util
              * @param length
              *      The number of bytes to read from the input buffer.
              *
-             * @throws IndexOutOfBoundsException if the offset + length > size
+             * @throws std::out_of_range if the offset + length > size
              * of the buffer.
-             * @throws IllegalStateException if in the end state.
+             * @throws activemq::exceptions::IllegalStateException if in
+             * the end state.
              */
             void setInput(const std::vector<unsigned char>& buffer,
                           int                               offset,
@@ -135,7 +134,8 @@ namespace util
              * @param buffer
              *      The Buffer to read in for decompression.
              *
-             * @throws IllegalStateException if in the end state.
+             * @throws activemq::exceptions::IllegalStateException if in
+             * the end state.
              */
             void setInput(const std::vector<unsigned char>& buffer);
 
@@ -164,11 +164,13 @@ namespace util
              * @param length
              *      The number of bytes to read from the input buffer.
              *
-             * @throws NullPointerException if buffer is NULL.
-             * @throws IndexOutOfBoundsException if the offset + length > size
+             * @throws activemq::exceptions::IllegalStateException if
+             * buffer is NULL.
+             * @throws std::out_of_range if the offset + length > size
              * of the buffer.
-             * @throws IllegalStateException if in the end state.
-             * @throws IllegalArgumentException if the given dictionary doesn't
+             * @throws activemq::exceptions::IllegalStateException if in
+             * the end state.
+             * @throws std::invalid_argument if the given dictionary doesn't
              * match thre required dictionaries checksum value.
              */
             void setDictionary(const unsigned char* buffer,
@@ -190,10 +192,11 @@ namespace util
              * @param length
              *      The number of bytes to read from the input buffer.
              *
-             * @throws IndexOutOfBoundsException if the offset + length > size
+             * @throws std::out_of_range if the offset + length > size
              * of the buffer.
-             * @throws IllegalStateException if in the end state.
-             * @throws IllegalArgumentException if the given dictionary doesn't
+             * @throws activemq::exceptions::IllegalStateException if in
+             * the end state.
+             * @throws std::invalid_argument if the given dictionary doesn't
              * match thre required dictionaries checksum value.
              */
             void setDictionary(const std::vector<unsigned char>& buffer,
@@ -210,8 +213,9 @@ namespace util
              * @param buffer
              *      The Buffer to read in for decompression.
              *
-             * @throws IllegalStateException if in the end state.
-             * @throws IllegalArgumentException if the given dictionary doesn't
+             * @throws activemq::exceptions::IllegalStateException if in
+             * the end state.
+             * @throws std::invalid_argument if the given dictionary doesn't
              * match the required dictionaries checksum value.
              */
             void setDictionary(const std::vector<unsigned char>& buffer);
@@ -256,9 +260,11 @@ namespace util
              * @param length
              *      The maximum number of byte of data to write.
              *
-             * @throws NullPointerException if buffer is NULL.
-             * @throws IllegalStateException if in the end state.
-             * @throws IndexOutOfBoundsException if the offset + length > size
+             * @throws activemq::exceptions::IllegalStateException if
+             * buffer is NULL.
+             * @throws activemq::exceptions::IllegalStateException if in
+             * the end state.
+             * @throws std::out_of_range if the offset + length > size
              * of the buffer.
              * @throws DataFormatException if the compressed data format is
              * invalid.
@@ -280,8 +286,9 @@ namespace util
              * @param length
              *      The maximum number of byte of data to write.
              *
-             * @throws IllegalStateException if in the end state.
-             * @throws IndexOutOfBoundsException if the offset + length > size
+             * @throws activemq::exceptions::IllegalStateException if in
+             * the end state.
+             * @throws std::out_of_range if the offset + length > size
              * of the buffer.
              * @throws DataFormatException if the compressed data format is
              * invalid.
@@ -301,7 +308,8 @@ namespace util
              * @param buffer
              *      The Buffer to write the compressed data to.
              *
-             * @throws IllegalStateException if in the end state.
+             * @throws activemq::exceptions::IllegalStateException if in
+             * the end state.
              * @throws DataFormatException if the compressed data format is
              * invalid.
              */
@@ -310,21 +318,24 @@ namespace util
             /**
              * @return the ADLER-32 value of the uncompressed data.
              *
-             * @throws IllegalStateException if in the end state.
+             * @throws activemq::exceptions::IllegalStateException if in
+             * the end state.
              */
             long long getAdler() const;
 
             /**
              * @return the total number of compressed bytes input so far.
              *
-             * @throws IllegalStateException if in the end state.
+             * @throws activemq::exceptions::IllegalStateException if in
+             * the end state.
              */
             long long getBytesRead() const;
 
             /**
              * @return the total number of decompressed bytes output so far.
              *
-             * @throws IllegalStateException if in the end state.
+             * @throws activemq::exceptions::IllegalStateException if in
+             * the end state.
              */
             long long getBytesWritten() const;
 
@@ -332,7 +343,8 @@ namespace util
              * Resets deflater so that a new set of input data can be processed.
              * Keeps current decompression level and strategy settings.
              *
-             * @throws IllegalStateException if in the end state.
+             * @throws activemq::exceptions::IllegalStateException if in
+             * the end state.
              */
             void reset();
 

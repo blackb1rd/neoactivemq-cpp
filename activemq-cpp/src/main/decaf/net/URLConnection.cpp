@@ -19,15 +19,14 @@
 
 #include <decaf/io/IOException.h>
 #include <decaf/lang/Integer.h>
-#include <decaf/lang/exceptions/IllegalStateException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
-#include <decaf/lang/exceptions/NumberFormatException.h>
-#include <decaf/lang/exceptions/UnsupportedOperationException.h>
+
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <stdexcept>
+#include <string>
 
 using namespace decaf;
 using namespace decaf::net;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 bool URLConnection::defaultAllowUserInteraction;
@@ -110,9 +109,10 @@ long long URLConnection::getHeaderFieldDate(const std::string& field,
         return defaultValue;
     }
 
-    throw UnsupportedOperationException(__FILE__,
-                                        __LINE__,
-                                        "Not yet implemented");
+    throw activemq::exceptions::UnsupportedOperationException(
+        __FILE__,
+        __LINE__,
+        "Not yet implemented");
 
     try
     {
@@ -133,7 +133,7 @@ int URLConnection::getHeaderFieldInt(const std::string& field,
     {
         return Integer::parseInt(getHeaderField(field));
     }
-    catch (NumberFormatException& e)
+    catch (std::invalid_argument&)
     {
         return defaultValue;
     }
@@ -144,9 +144,10 @@ void URLConnection::setAllowUserInteraction(bool newValue)
 {
     if (connected)
     {
-        throw IllegalStateException(__FILE__,
-                                    __LINE__,
-                                    "Connection already established");
+        throw activemq::exceptions::IllegalStateException(
+            __FILE__,
+            __LINE__,
+            "Connection already established");
     }
 
     allowUserInteraction = newValue;
@@ -157,9 +158,10 @@ void URLConnection::setDefaultUseCaches(bool newValue)
 {
     if (connected)
     {
-        throw IllegalStateException(__FILE__,
-                                    __LINE__,
-                                    "Connection already established");
+        throw activemq::exceptions::IllegalStateException(
+            __FILE__,
+            __LINE__,
+            "Connection already established");
     }
     defaultUseCaches = newValue;
 }
@@ -169,9 +171,10 @@ void URLConnection::setDoInput(bool newValue)
 {
     if (connected)
     {
-        throw IllegalStateException(__FILE__,
-                                    __LINE__,
-                                    "Connection already established");
+        throw activemq::exceptions::IllegalStateException(
+            __FILE__,
+            __LINE__,
+            "Connection already established");
     }
     doInput = newValue;
 }
@@ -181,9 +184,10 @@ void URLConnection::setDoOutput(bool newValue)
 {
     if (connected)
     {
-        throw IllegalStateException(__FILE__,
-                                    __LINE__,
-                                    "Connection already established");
+        throw activemq::exceptions::IllegalStateException(
+            __FILE__,
+            __LINE__,
+            "Connection already established");
     }
     doOutput = newValue;
 }
@@ -193,9 +197,10 @@ void URLConnection::setUseCaches(bool newValue)
 {
     if (connected)
     {
-        throw IllegalStateException(__FILE__,
-                                    __LINE__,
-                                    "Connection already established");
+        throw activemq::exceptions::IllegalStateException(
+            __FILE__,
+            __LINE__,
+            "Connection already established");
     }
     useCaches = newValue;
 }
@@ -205,9 +210,10 @@ void URLConnection::setConnectTimeout(int timeout)
 {
     if (0 > timeout)
     {
-        throw IllegalStateException(__FILE__,
-                                    __LINE__,
-                                    "Invalid negative timeout");
+        throw activemq::exceptions::IllegalStateException(
+            __FILE__,
+            __LINE__,
+            "Invalid negative timeout");
     }
     impl->connectTimeout = timeout;
 }
@@ -217,9 +223,10 @@ void URLConnection::setReadTimeout(int timeout)
 {
     if (0 > timeout)
     {
-        throw IllegalStateException(__FILE__,
-                                    __LINE__,
-                                    "Invalid negative timeout");
+        throw activemq::exceptions::IllegalStateException(
+            __FILE__,
+            __LINE__,
+            "Invalid negative timeout");
     }
     impl->readTimeout = timeout;
 }
@@ -240,9 +247,10 @@ void URLConnection::setIfModifiedSince(long long newValue)
 {
     if (connected)
     {
-        throw IllegalStateException(__FILE__,
-                                    __LINE__,
-                                    "Connection already established");
+        throw activemq::exceptions::IllegalStateException(
+            __FILE__,
+            __LINE__,
+            "Connection already established");
     }
     ifModifiedSince = newValue;
 }

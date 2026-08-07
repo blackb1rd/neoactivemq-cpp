@@ -17,6 +17,7 @@
 
 #include "BufferFactory.h"
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/internal/nio/ByteArrayBuffer.h>
 #include <decaf/internal/nio/CharArrayBuffer.h>
 #include <decaf/internal/nio/DoubleArrayBuffer.h>
@@ -24,13 +25,14 @@
 #include <decaf/internal/nio/IntArrayBuffer.h>
 #include <decaf/internal/nio/LongArrayBuffer.h>
 #include <decaf/internal/nio/ShortArrayBuffer.h>
+#include <stdexcept>
+#include <string>
 
 using namespace decaf;
 using namespace decaf::internal;
 using namespace decaf::internal::nio;
 using namespace decaf::nio;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 ByteBuffer* BufferFactory::createByteBuffer(int capacity)
@@ -39,8 +41,16 @@ ByteBuffer* BufferFactory::createByteBuffer(int capacity)
     {
         return new ByteArrayBuffer(capacity);
     }
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCHALL_THROW(IndexOutOfBoundsException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -53,10 +63,27 @@ ByteBuffer* BufferFactory::createByteBuffer(unsigned char* buffer,
     {
         return new ByteArrayBuffer(buffer, size, offset, length, false);
     }
-    DECAF_CATCH_RETHROW(NullPointerException)
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception, NullPointerException)
-    DECAF_CATCHALL_THROW(NullPointerException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (activemq::exceptions::NullPointerException&)
+    {
+        throw;
+    }
+    catch (Exception& ex)
+    {
+        throw activemq::exceptions::NullPointerException(__FILE__,
+                                                         __LINE__,
+                                                         ex.what());
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -70,8 +97,16 @@ ByteBuffer* BufferFactory::createByteBuffer(std::vector<unsigned char>& buffer)
                                    (int)buffer.size(),
                                    false);
     }
-    DECAF_CATCH_RETHROW(Exception)
-    DECAF_CATCHALL_THROW(Exception)
+    catch (Exception& ex)
+    {
+        ex.setMark(__FILE__, __LINE__);
+        throw;
+    }
+    catch (...)
+    {
+        Exception ex(__FILE__, __LINE__, "caught unknown exception");
+        throw ex;
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -81,8 +116,16 @@ CharBuffer* BufferFactory::createCharBuffer(int capacity)
     {
         return new CharArrayBuffer(capacity);
     }
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCHALL_THROW(IndexOutOfBoundsException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -95,10 +138,27 @@ CharBuffer* BufferFactory::createCharBuffer(char* buffer,
     {
         return new CharArrayBuffer(buffer, size, offset, length, false);
     }
-    DECAF_CATCH_RETHROW(NullPointerException)
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception, NullPointerException)
-    DECAF_CATCHALL_THROW(NullPointerException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (activemq::exceptions::NullPointerException&)
+    {
+        throw;
+    }
+    catch (Exception& ex)
+    {
+        throw activemq::exceptions::NullPointerException(__FILE__,
+                                                         __LINE__,
+                                                         ex.what());
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -112,8 +172,16 @@ CharBuffer* BufferFactory::createCharBuffer(std::vector<char>& buffer)
                                    (int)buffer.size(),
                                    false);
     }
-    DECAF_CATCH_RETHROW(Exception)
-    DECAF_CATCHALL_THROW(Exception)
+    catch (Exception& ex)
+    {
+        ex.setMark(__FILE__, __LINE__);
+        throw;
+    }
+    catch (...)
+    {
+        Exception ex(__FILE__, __LINE__, "caught unknown exception");
+        throw ex;
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -123,8 +191,16 @@ DoubleBuffer* BufferFactory::createDoubleBuffer(int capacity)
     {
         return new DoubleArrayBuffer(capacity);
     }
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCHALL_THROW(IndexOutOfBoundsException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -137,10 +213,27 @@ DoubleBuffer* BufferFactory::createDoubleBuffer(double* buffer,
     {
         return new DoubleArrayBuffer(buffer, size, offset, length, false);
     }
-    DECAF_CATCH_RETHROW(NullPointerException)
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception, NullPointerException)
-    DECAF_CATCHALL_THROW(NullPointerException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (activemq::exceptions::NullPointerException&)
+    {
+        throw;
+    }
+    catch (Exception& ex)
+    {
+        throw activemq::exceptions::NullPointerException(__FILE__,
+                                                         __LINE__,
+                                                         ex.what());
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -154,8 +247,16 @@ DoubleBuffer* BufferFactory::createDoubleBuffer(std::vector<double>& buffer)
                                      (int)buffer.size(),
                                      false);
     }
-    DECAF_CATCH_RETHROW(Exception)
-    DECAF_CATCHALL_THROW(Exception)
+    catch (Exception& ex)
+    {
+        ex.setMark(__FILE__, __LINE__);
+        throw;
+    }
+    catch (...)
+    {
+        Exception ex(__FILE__, __LINE__, "caught unknown exception");
+        throw ex;
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -165,8 +266,16 @@ FloatBuffer* BufferFactory::createFloatBuffer(int capacity)
     {
         return new FloatArrayBuffer(capacity);
     }
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCHALL_THROW(IndexOutOfBoundsException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -179,10 +288,27 @@ FloatBuffer* BufferFactory::createFloatBuffer(float* buffer,
     {
         return new FloatArrayBuffer(buffer, size, offset, length, false);
     }
-    DECAF_CATCH_RETHROW(NullPointerException)
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception, NullPointerException)
-    DECAF_CATCHALL_THROW(NullPointerException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (activemq::exceptions::NullPointerException&)
+    {
+        throw;
+    }
+    catch (Exception& ex)
+    {
+        throw activemq::exceptions::NullPointerException(__FILE__,
+                                                         __LINE__,
+                                                         ex.what());
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -196,8 +322,16 @@ FloatBuffer* BufferFactory::createFloatBuffer(std::vector<float>& buffer)
                                     (int)buffer.size(),
                                     false);
     }
-    DECAF_CATCH_RETHROW(Exception)
-    DECAF_CATCHALL_THROW(Exception)
+    catch (Exception& ex)
+    {
+        ex.setMark(__FILE__, __LINE__);
+        throw;
+    }
+    catch (...)
+    {
+        Exception ex(__FILE__, __LINE__, "caught unknown exception");
+        throw ex;
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -207,8 +341,16 @@ LongBuffer* BufferFactory::createLongBuffer(int capacity)
     {
         return new LongArrayBuffer(capacity);
     }
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCHALL_THROW(IndexOutOfBoundsException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -221,10 +363,27 @@ LongBuffer* BufferFactory::createLongBuffer(long long* buffer,
     {
         return new LongArrayBuffer(buffer, size, offset, length, false);
     }
-    DECAF_CATCH_RETHROW(NullPointerException)
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception, NullPointerException)
-    DECAF_CATCHALL_THROW(NullPointerException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (activemq::exceptions::NullPointerException&)
+    {
+        throw;
+    }
+    catch (Exception& ex)
+    {
+        throw activemq::exceptions::NullPointerException(__FILE__,
+                                                         __LINE__,
+                                                         ex.what());
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -238,8 +397,16 @@ LongBuffer* BufferFactory::createLongBuffer(std::vector<long long>& buffer)
                                    (int)buffer.size(),
                                    false);
     }
-    DECAF_CATCH_RETHROW(Exception)
-    DECAF_CATCHALL_THROW(Exception)
+    catch (Exception& ex)
+    {
+        ex.setMark(__FILE__, __LINE__);
+        throw;
+    }
+    catch (...)
+    {
+        Exception ex(__FILE__, __LINE__, "caught unknown exception");
+        throw ex;
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -249,8 +416,16 @@ IntBuffer* BufferFactory::createIntBuffer(int capacity)
     {
         return new IntArrayBuffer(capacity);
     }
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCHALL_THROW(IndexOutOfBoundsException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -263,10 +438,27 @@ IntBuffer* BufferFactory::createIntBuffer(int* buffer,
     {
         return new IntArrayBuffer(buffer, size, offset, length, false);
     }
-    DECAF_CATCH_RETHROW(NullPointerException)
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception, NullPointerException)
-    DECAF_CATCHALL_THROW(NullPointerException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (activemq::exceptions::NullPointerException&)
+    {
+        throw;
+    }
+    catch (Exception& ex)
+    {
+        throw activemq::exceptions::NullPointerException(__FILE__,
+                                                         __LINE__,
+                                                         ex.what());
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -280,8 +472,16 @@ IntBuffer* BufferFactory::createIntBuffer(std::vector<int>& buffer)
                                   (int)buffer.size(),
                                   false);
     }
-    DECAF_CATCH_RETHROW(Exception)
-    DECAF_CATCHALL_THROW(Exception)
+    catch (Exception& ex)
+    {
+        ex.setMark(__FILE__, __LINE__);
+        throw;
+    }
+    catch (...)
+    {
+        Exception ex(__FILE__, __LINE__, "caught unknown exception");
+        throw ex;
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -291,8 +491,16 @@ ShortBuffer* BufferFactory::createShortBuffer(int capacity)
     {
         return new ShortArrayBuffer(capacity);
     }
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCHALL_THROW(IndexOutOfBoundsException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::OutOfRangeException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -305,10 +513,27 @@ ShortBuffer* BufferFactory::createShortBuffer(short* buffer,
     {
         return new ShortArrayBuffer(buffer, size, offset, length, false);
     }
-    DECAF_CATCH_RETHROW(NullPointerException)
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception, NullPointerException)
-    DECAF_CATCHALL_THROW(NullPointerException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (activemq::exceptions::NullPointerException&)
+    {
+        throw;
+    }
+    catch (Exception& ex)
+    {
+        throw activemq::exceptions::NullPointerException(__FILE__,
+                                                         __LINE__,
+                                                         ex.what());
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -322,6 +547,14 @@ ShortBuffer* BufferFactory::createShortBuffer(std::vector<short>& buffer)
                                     (int)buffer.size(),
                                     false);
     }
-    DECAF_CATCH_RETHROW(Exception)
-    DECAF_CATCHALL_THROW(Exception)
+    catch (Exception& ex)
+    {
+        ex.setMark(__FILE__, __LINE__);
+        throw;
+    }
+    catch (...)
+    {
+        Exception ex(__FILE__, __LINE__, "caught unknown exception");
+        throw ex;
+    }
 }

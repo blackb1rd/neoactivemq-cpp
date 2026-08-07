@@ -21,7 +21,6 @@
 #include <decaf/lang/Comparable.h>
 #include <decaf/lang/Number.h>
 #include <decaf/lang/String.h>
-#include <decaf/lang/exceptions/NumberFormatException.h>
 #include <string>
 
 namespace decaf
@@ -56,13 +55,13 @@ namespace lang
         /**
          * Constructs a new Long and attempts to convert the given string to an
          * long long value, assigning it to the new object is successful or
-         * throwing a NumberFormatException if the string is not a properly
+         * throwing a std::invalid_argument if the string is not a properly
          * formatted long long.
          *
          * @param value
          *      The string to convert to a primitive type to wrap.
          *
-         * @throws NumberFormatException if the string is not a a valid 64bit
+         * @throws std::invalid_argument if the string is not a a valid 64bit
          * long.
          */
         Long(const String& value);
@@ -227,7 +226,7 @@ namespace lang
          * and/or radix specifier ("0x", "0X", "#", or leading zero) is parsed
          * as by the Integer.parseInteger method with the indicated radix (10,
          * 16, or 8). This sequence of characters must represent a positive
-         * value or a NumberFormatException will be thrown. The result is
+         * value or a std::invalid_argument will be thrown. The result is
          * negated if first character of the specified String is the minus sign.
          * No whitespace characters are permitted in the string.
          * @param value - The string to decode
@@ -309,7 +308,7 @@ namespace lang
          * end of this string as would normally be permitted in a C++ program.
          * @param value - String to parse
          * @return long long value
-         * @throws NumberFormatException on invalid string value
+         * @throws std::invalid_argument on invalid string value
          */
         static long long parseLong(const String& value);
 
@@ -324,7 +323,7 @@ namespace lang
          * @param value - String to parse
          * @param radix - the base encoding of the string
          * @return long long value
-         * @throws NumberFormatException on invalid string value
+         * @throws std::invalid_argument on invalid string value
          */
         static long long parseLong(const String& value, int radix);
 
@@ -508,7 +507,7 @@ namespace lang
          *      String to parse as base 10
          *
          * @return new Long Object wrapping the primitive
-         * @throws NumberFormatException if the string is not a decimal long
+         * @throws std::invalid_argument if the string is not a decimal long
          * long.
          */
         static Long valueOf(const String& value);
@@ -528,7 +527,7 @@ namespace lang
          *      base of the string to parse.
          *
          * @return new Long Object wrapping the primitive
-         * @throws NumberFormatException if the string is not a valid long long.
+         * @throws std::invalid_argument if the string is not a valid long long.
          */
         static Long valueOf(const String& value, int radix);
 

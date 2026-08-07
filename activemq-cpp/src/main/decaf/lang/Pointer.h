@@ -15,17 +15,18 @@
  * limitations under the License.
  */
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #ifndef _DECAF_LANG_POINTER_H_
 #define _DECAF_LANG_POINTER_H_
 
-#include <decaf/lang/exceptions/ClassCastException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/util/Comparator.h>
 #include <decaf/util/Config.h>
 #include <decaf/util/concurrent/atomic/AtomicRefCounter.h>
 #include <algorithm>
 #include <functional>
 #include <memory>
+#include <stdexcept>
+#include <string>
 #include <typeinfo>
 
 namespace decaf
@@ -154,13 +155,13 @@ namespace lang
          * Dynamic Cast constructor. Copies the value contained in the pointer
          * to the new instance and increments the reference counter performing a
          * dynamic cast on the value contained in the source Pointer object.  If
-         * the cast fails and return NULL then this method throws a
-         * ClassCastException.
+         * the cast fails and return NULL then this method throws
+         * std::bad_cast.
          *
          * @param value
          *      Pointer instance to cast to this type using a dynamic_cast.
          *
-         * @throw ClassCastException if the dynamic cast returns NULL
+         * @throw std::bad_cast if the dynamic cast returns NULL
          */
         template <typename T1, typename R1>
         Pointer(const Pointer<T1, R1>& value, const DYNAMIC_CAST_TOKEN&)
@@ -174,13 +175,7 @@ namespace lang
                 // since we didn't actually create one as the dynamic cast
                 // failed.
                 REFCOUNTER::release();
-                throw decaf::lang::exceptions::ClassCastException(
-                    __FILE__,
-                    __LINE__,
-                    "Failed to cast source pointer of type %s to this type: "
-                    "%s.",
-                    typeid(T1).name(),
-                    typeid(T).name());
+                throw std::bad_cast();
             }
         }
 
@@ -282,17 +277,19 @@ namespace lang
 
         /**
          * Dereference Operator, returns a reference to the Contained value.
-         * This method throws an NullPointerException if the contained value is
-         * NULL.
+         * This method throws
+         * activemq::exceptions::IllegalStateException if the contained
+         * value is NULL.
          *
          * @return reference to the contained pointer.
-         * @throws NullPointerException if the contained value is Null
+         * @throws activemq::exceptions::IllegalStateException if the
+         * contained value is Null
          */
         ReferenceType operator*()
         {
             if (this->value == NULL)
             {
-                throw decaf::lang::exceptions::NullPointerException(
+                throw activemq::exceptions::NullPointerException(
                     __FILE__,
                     __LINE__,
                     "Pointer operator& - Pointee is NULL.");
@@ -305,7 +302,7 @@ namespace lang
         {
             if (this->value == NULL)
             {
-                throw decaf::lang::exceptions::NullPointerException(
+                throw activemq::exceptions::NullPointerException(
                     __FILE__,
                     __LINE__,
                     "Pointer operator& - Pointee is NULL.");
@@ -316,16 +313,18 @@ namespace lang
 
         /**
          * Indirection Operator, returns a pointer to the Contained value.  This
-         * method throws an NullPointerException if the contained value is NULL.
+         * method throws activemq::exceptions::IllegalStateException if
+         * the contained value is NULL.
          *
          * @return reference to the contained pointer.
-         * @throws NullPointerException if the contained value is Null
+         * @throws activemq::exceptions::IllegalStateException if the
+         * contained value is Null
          */
         PointerType operator->()
         {
             if (this->value == NULL)
             {
-                throw decaf::lang::exceptions::NullPointerException(
+                throw activemq::exceptions::NullPointerException(
                     __FILE__,
                     __LINE__,
                     "Pointer operator-> - Pointee is NULL.");
@@ -337,7 +336,7 @@ namespace lang
         {
             if (this->value == NULL)
             {
-                throw decaf::lang::exceptions::NullPointerException(
+                throw activemq::exceptions::NullPointerException(
                     __FILE__,
                     __LINE__,
                     "Pointer operator-> - Pointee is NULL.");

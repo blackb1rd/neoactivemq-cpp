@@ -22,6 +22,10 @@
 #include <decaf/lang/Boolean.h>
 #include <decaf/lang/Integer.h>
 
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <stdexcept>
+#include <string>
+
 using namespace std;
 using namespace activemq;
 using namespace activemq::util;
@@ -31,7 +35,6 @@ using namespace activemq::wireformat::openwire;
 using namespace activemq::wireformat::openwire::utils;
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 MessagePropertyInterceptor::MessagePropertyInterceptor(
@@ -42,16 +45,18 @@ MessagePropertyInterceptor::MessagePropertyInterceptor(
 {
     if (message == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "Message passed was NULL");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "Message passed was NULL");
     }
 
     if (properties == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "PrimitiveMap passed was NULL");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "PrimitiveMap passed was NULL");
     }
 }
 
@@ -365,11 +370,31 @@ void MessagePropertyInterceptor::setStringProperty(const std::string& name,
     }
     else if (name == "JMSXDeliveryCount")
     {
-        this->message->setRedeliveryCounter(Integer::parseInt(value));
+        try
+        {
+            this->message->setRedeliveryCounter(Integer::parseInt(value));
+        }
+        catch (std::exception&)
+        {
+            throw ActiveMQException(
+                __FILE__,
+                __LINE__,
+                "Cannot Convert Reserved Property to this Type.");
+        }
     }
     else if (name == "JMSXGroupSeq")
     {
-        this->message->setGroupSequence(Integer::parseInt(value));
+        try
+        {
+            this->message->setGroupSequence(Integer::parseInt(value));
+        }
+        catch (std::exception&)
+        {
+            throw ActiveMQException(
+                __FILE__,
+                __LINE__,
+                "Cannot Convert Reserved Property to this Type.");
+        }
     }
     else if (name == "JMSXGroupFirstForConsumer")
     {

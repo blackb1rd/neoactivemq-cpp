@@ -21,14 +21,16 @@
 #include <activemq/commands/ConnectionInfo.h>
 #include <activemq/commands/Message.h>
 #include <activemq/commands/SessionInfo.h>
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <activemq/state/ConnectionStateTracker.h>
 #include <activemq/state/ConsumerState.h>
 #include <activemq/state/SessionState.h>
 #include <activemq/transport/Transport.h>
 #include <activemq/wireformat/WireFormat.h>
-#include <decaf/lang/exceptions/UnsupportedOperationException.h>
 #include <decaf/util/LinkedList.h>
 #include <memory>
+#include <stdexcept>
+#include <string>
 
 using namespace std;
 using namespace activemq;
@@ -38,7 +40,6 @@ using namespace activemq::transport;
 using namespace activemq::wireformat;
 using namespace decaf::util;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 class ConnectionStateTrackerTest : public ::testing::Test
 {
@@ -107,20 +108,29 @@ public:
         const std::shared_ptr<Command>          command,
         const std::shared_ptr<ResponseCallback> responseCallback)
     {
-        throw UnsupportedOperationException();
+        throw activemq::exceptions::IllegalStateException(
+            __FILE__,
+            __LINE__,
+            "UnsupportedOperationException");
     }
 
     virtual std::shared_ptr<Response> request(
         const std::shared_ptr<Command> command)
     {
-        throw UnsupportedOperationException();
+        throw activemq::exceptions::IllegalStateException(
+            __FILE__,
+            __LINE__,
+            "UnsupportedOperationException");
     }
 
     virtual std::shared_ptr<Response> request(
         const std::shared_ptr<Command> command,
         unsigned int                   timeout)
     {
-        throw UnsupportedOperationException();
+        throw activemq::exceptions::IllegalStateException(
+            __FILE__,
+            __LINE__,
+            "UnsupportedOperationException");
     }
 
     virtual std::shared_ptr<wireformat::WireFormat> getWireFormat() const

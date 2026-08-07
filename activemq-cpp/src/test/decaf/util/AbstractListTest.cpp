@@ -17,15 +17,16 @@
 
 #include <gtest/gtest.h>
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/lang/Integer.h>
 #include <decaf/util/AbstractList.h>
+#include <stdexcept>
 #include <vector>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 class AbstractListTest : public ::testing::Test
 {
@@ -62,7 +63,10 @@ public:
     {
         if (index < 0 || index >= (int)array.size())
         {
-            throw IndexOutOfBoundsException();
+            throw ::activemq::exceptions::OutOfRangeException(
+                __FILE__,
+                __LINE__,
+                "unit test simulated out of range");
         }
 
         return this->array[index];
@@ -72,7 +76,10 @@ public:
     {
         if (i < 0 || i > (int)array.size())
         {
-            throw IndexOutOfBoundsException();
+            throw ::activemq::exceptions::OutOfRangeException(
+                __FILE__,
+                __LINE__,
+                "unit test simulated out of range");
         }
 
         this->array.insert(this->array.begin() + i, value);
@@ -82,7 +89,10 @@ public:
     {
         if (i < 0 || i >= (int)array.size())
         {
-            throw IndexOutOfBoundsException();
+            throw ::activemq::exceptions::OutOfRangeException(
+                __FILE__,
+                __LINE__,
+                "unit test simulated out of range");
         }
 
         E oldValue = this->array[i];
@@ -120,7 +130,10 @@ public:
     {
         if (index < 0 || index >= (int)array.size())
         {
-            throw IndexOutOfBoundsException();
+            throw ::activemq::exceptions::OutOfRangeException(
+                __FILE__,
+                __LINE__,
+                "unit test simulated out of range");
         }
 
         return this->array[index];
@@ -130,7 +143,10 @@ public:
     {
         if (i < 0 || i > (int)array.size())
         {
-            throw IndexOutOfBoundsException();
+            throw ::activemq::exceptions::OutOfRangeException(
+                __FILE__,
+                __LINE__,
+                "unit test simulated out of range");
         }
 
         this->modCount += 10;
@@ -141,7 +157,10 @@ public:
     {
         if (i < 0 || i >= (int)array.size())
         {
-            throw IndexOutOfBoundsException();
+            throw ::activemq::exceptions::OutOfRangeException(
+                __FILE__,
+                __LINE__,
+                "unit test simulated out of range");
         }
 
         this->modCount++;
@@ -210,7 +229,10 @@ public:
     {
         if (index < 0 || index >= (int)array.size())
         {
-            throw IndexOutOfBoundsException();
+            throw ::activemq::exceptions::OutOfRangeException(
+                __FILE__,
+                __LINE__,
+                "unit test simulated out of range");
         }
 
         return array[index];
@@ -299,9 +321,9 @@ TEST_F(AbstractListTest, testIteratorNext)
     try
     {
         it->next();
-        FAIL() << ("Should throw NoSuchElementException");
+        FAIL() << ("Should throw std::runtime_error");
     }
-    catch (NoSuchElementException& cme)
+    catch (std::runtime_error& cme)
     {
         // expected
     }
@@ -310,9 +332,9 @@ TEST_F(AbstractListTest, testIteratorNext)
     try
     {
         it->remove();
-        FAIL() << ("Should throw ConcurrentModificationException");
+        FAIL() << ("Should throw std::runtime_error");
     }
-    catch (ConcurrentModificationException& cme)
+    catch (std::runtime_error& cme)
     {
         // expected
     }
@@ -321,9 +343,9 @@ TEST_F(AbstractListTest, testIteratorNext)
     try
     {
         it->remove();
-        FAIL() << ("Should throw IllegalStateException");
+        FAIL() << ("Should throw std::logic_error");
     }
-    catch (IllegalStateException& ise)
+    catch (std::logic_error& ise)
     {
         // expected
     }
@@ -345,14 +367,14 @@ TEST_F(AbstractListTest, testRemove)
     {
         iter->remove();
     }
-    catch (ConcurrentModificationException& e)
+    catch (std::runtime_error& e)
     {
-        FAIL() << ("Excepted to catch IllegalStateException not "
-                   "ConcurrentModificationException");
+        FAIL() << ("Excepted to catch std::logic_error not "
+                   "std::runtime_error");
     }
-    catch (IllegalStateException& e)
+    catch (std::logic_error& e)
     {
-        // Excepted to catch IllegalStateException here
+        // Excepted to catch std::logic_error here
     }
 }
 
@@ -409,7 +431,7 @@ TEST_F(AbstractListTest, testRemoveAt)
         list.removeAt(0);
         FAIL() << ("should throw UnsupportedOperationException");
     }
-    catch (UnsupportedOperationException& e)
+    catch (std::logic_error& e)
     {
         // expected
     }
@@ -419,7 +441,7 @@ TEST_F(AbstractListTest, testRemoveAt)
         list.set(0, 1);
         FAIL() << ("should throw UnsupportedOperationException");
     }
-    catch (UnsupportedOperationException& e)
+    catch (std::logic_error& e)
     {
         // expected
     }

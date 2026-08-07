@@ -16,16 +16,17 @@
  */
 
 #include <activemq/exceptions/ActiveMQException.h>
+#include <activemq/exceptions/IoExceptions.h>
+#include <activemq/exceptions/StdExceptionCatchMacros.h>
 #include <activemq/transport/mock/MockTransport.h>
+#include <stdexcept>
 
 using namespace activemq;
 using namespace activemq::transport;
 using namespace activemq::transport::mock;
 using namespace activemq::exceptions;
 using namespace activemq::wireformat;
-using namespace decaf::io;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 MockTransport* MockTransport::instance = NULL;
@@ -100,11 +101,12 @@ void MockTransport::oneway(const std::shared_ptr<Command> command)
             return;
         }
     }
-    AMQ_CATCH_RETHROW(IOException)
-    AMQ_CATCH_RETHROW(UnsupportedOperationException)
-    AMQ_CATCH_EXCEPTION_CONVERT(ActiveMQException, IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, IOException)
-    AMQ_CATCHALL_THROW(IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCHALL_RETHROW_STL_BACKED_EXCEPTIONS()
+    AMQ_CATCH_EXCEPTION_CONVERT(ActiveMQException,
+                                activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(Exception, activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -152,11 +154,12 @@ std::shared_ptr<FutureResponse> MockTransport::asyncRequest(
             __LINE__,
             "MockTransport::request - no response builder available");
     }
-    AMQ_CATCH_RETHROW(IOException)
-    AMQ_CATCH_RETHROW(UnsupportedOperationException)
-    AMQ_CATCH_EXCEPTION_CONVERT(ActiveMQException, IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, IOException)
-    AMQ_CATCHALL_THROW(IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCHALL_RETHROW_STL_BACKED_EXCEPTIONS()
+    AMQ_CATCH_EXCEPTION_CONVERT(ActiveMQException,
+                                activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(Exception, activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -195,11 +198,12 @@ std::shared_ptr<Response> MockTransport::request(
             __LINE__,
             "MockTransport::request - no response builder available");
     }
-    AMQ_CATCH_RETHROW(IOException)
-    AMQ_CATCH_RETHROW(UnsupportedOperationException)
-    AMQ_CATCH_EXCEPTION_CONVERT(ActiveMQException, IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, IOException)
-    AMQ_CATCHALL_THROW(IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCHALL_RETHROW_STL_BACKED_EXCEPTIONS()
+    AMQ_CATCH_EXCEPTION_CONVERT(ActiveMQException,
+                                activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(Exception, activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -211,11 +215,12 @@ std::shared_ptr<Response> MockTransport::request(
     {
         return this->request(command);
     }
-    AMQ_CATCH_RETHROW(IOException)
-    AMQ_CATCH_RETHROW(UnsupportedOperationException)
-    AMQ_CATCH_EXCEPTION_CONVERT(ActiveMQException, IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, IOException)
-    AMQ_CATCHALL_THROW(IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCHALL_RETHROW_STL_BACKED_EXCEPTIONS()
+    AMQ_CATCH_EXCEPTION_CONVERT(ActiveMQException,
+                                activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(Exception, activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////

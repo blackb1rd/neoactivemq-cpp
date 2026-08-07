@@ -21,7 +21,6 @@
 #include <decaf/lang/Comparable.h>
 #include <decaf/lang/Number.h>
 #include <decaf/lang/String.h>
-#include <decaf/lang/exceptions/NumberFormatException.h>
 #include <decaf/util/Config.h>
 #include <string>
 
@@ -59,7 +58,7 @@ namespace lang
          * @param value
          *      The string to convert to an unsigned char
          *
-         * @throws NumberFormatException if the string is not a valid byte.
+         * @throws std::invalid_argument if the string is not a valid byte.
          */
         Byte(const String& value);
 
@@ -224,7 +223,7 @@ namespace lang
          * and/or radix specifier ("0x", "0X", "#", or leading zero) is parsed
          * as by the Byte::parseByte method with the indicated radix (10, 16, or
          * 8). This sequence of characters must represent a positive value or a
-         * NumberFormatException will be thrown. The result is negated if first
+         * std::invalid_argument will be thrown. The result is negated if first
          * character of the specified String is the minus sign. No whitespace
          * characters are permitted in the string.
          *
@@ -246,7 +245,7 @@ namespace lang
          * the first character may be an ASCII minus sign '-' to indicate a
          * negative value. The resulting byte value is returned.
          *
-         * An exception of type NumberFormatException is thrown if any of the
+         * An exception of type std::invalid_argument is thrown if any of the
          * following situations occurs:
          *  * The first argument is null or is a string of length zero.
          *  * The radix is either smaller than Character.MIN_RADIX or larger
@@ -264,7 +263,7 @@ namespace lang
          *
          * @return the unsigned char represented by the string argument in the
          * 	       specified radix.
-         * @throws NumberFormatException - If String does not contain a parsable
+         * @throws std::invalid_argument - If String does not contain a parsable
          *         unsigned char.
          */
         static unsigned char parseByte(const String& s, int radix);
@@ -282,7 +281,7 @@ namespace lang
          *
          * @return the converted unsigned char value
          *
-         * @throws NumberFormatException if the string is not a unsigned char.
+         * @throws std::invalid_argument if the string is not a unsigned char.
          */
         static unsigned char parseByte(const String& s);
 
@@ -310,7 +309,7 @@ namespace lang
          *      String to parse as base 10
          *
          * @return new Byte Object wrapping the primitive
-         * @throws NumberFormatException if the string is not a decimal unsigned
+         * @throws std::invalid_argument if the string is not a decimal unsigned
          * char.
          */
         static Byte valueOf(const String& value);
@@ -330,7 +329,7 @@ namespace lang
          *
          * @return new Byte Object wrapping the primitive
          *
-         * @throws NumberFormatException if the string is not a valid unsigned
+         * @throws std::invalid_argument if the string is not a valid unsigned
          * char.
          */
         static Byte valueOf(const String& value, int radix);

@@ -18,85 +18,32 @@
 #ifndef _DECAF_NIO_READONLYBUFFEREXCEPTION_H_
 #define _DECAF_NIO_READONLYBUFFEREXCEPTION_H_
 
-#include <decaf/lang/exceptions/UnsupportedOperationException.h>
 #include <decaf/util/Config.h>
+
+#include <stdexcept>
+#include <string>
 
 namespace decaf
 {
 namespace nio
 {
 
-    class DECAF_API ReadOnlyBufferException
-        : public lang::exceptions::UnsupportedOperationException
+    /**
+     * Thrown when a buffer mutation is attempted on a read-only buffer
+     * (idiomatically std::logic_error).
+     *
+     * @since 1.0
+     */
+    class DECAF_API ReadOnlyBufferException : public std::logic_error
     {
     public:
-        /**
-         * Default Constructor
-         */
         ReadOnlyBufferException();
 
-        /**
-         * Copy Constructor
-         *
-         * @param ex the exception to copy
-         */
-        ReadOnlyBufferException(const lang::Exception& ex);
+        explicit ReadOnlyBufferException(const std::string& message);
 
-        /**
-         * Copy Constructor
-         *
-         * @param ex the exception to copy, which is an instance of this type
-         */
-        ReadOnlyBufferException(const ReadOnlyBufferException& ex);
-
-        /**
-         * Constructor - Initializes the file name and line number where
-         * this message occurred.  Sets the message to report, using an
-         * optional list of arguments to parse into the message
-         *
-         * @param file The file name where exception occurs
-         * @param lineNumber The line number where the exception occurred.
-         * @param cause The exception that was the cause for this one to be
-         * thrown.
-         * @param msg The message to report
-         * @param ... list of primitives that are formatted into the message
-         */
-        ReadOnlyBufferException(const char*           file,
-                                const int             lineNumber,
-                                const std::exception* cause,
-                                const char*           msg,
-                                ...);
-
-        /**
-         * Constructor
-         *
-         * @param cause Pointer to the exception that caused this one to
-         * be thrown, the object is cloned caller retains ownership.
-         */
-        ReadOnlyBufferException(const std::exception* cause);
-
-        /**
-         * Constructor
-         *
-         * @param file The file name where exception occurs
-         * @param lineNumber The line number where the exception occurred.
-         * @param msg The message to report
-         * @param ... list of primitives that are formatted into the message
-         */
         ReadOnlyBufferException(const char* file,
-                                const int   lineNumber,
-                                const char* msg,
-                                ...);
-
-        /**
-         * Clones this exception.  This is useful for cases where you need
-         * to preserve the type of the original exception as well as the
-         * message. All subclasses should override.
-         */
-        virtual ReadOnlyBufferException* clone() const
-        {
-            return new ReadOnlyBufferException(*this);
-        }
+                                int         lineNumber,
+                                const char* message);
 
         virtual ~ReadOnlyBufferException() throw();
     };

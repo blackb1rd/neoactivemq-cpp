@@ -19,8 +19,9 @@
 
 #include <activemq/commands/ActiveMQDestination.h>
 #include <activemq/core/ActiveMQConstants.h>
-
-#include <decaf/lang/exceptions/NullPointerException.h>
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <stdexcept>
+#include <string>
 
 using namespace cms;
 using namespace activemq;
@@ -28,7 +29,6 @@ using namespace activemq::core;
 using namespace activemq::commands;
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 ActiveMQDestinationEvent::ActiveMQDestinationEvent(
@@ -38,9 +38,10 @@ ActiveMQDestinationEvent::ActiveMQDestinationEvent(
 {
     if (destination == nullptr)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "Events cannot have null destinations");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "Events cannot have null destinations");
     }
 }
 

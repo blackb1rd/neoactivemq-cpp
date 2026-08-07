@@ -15,20 +15,18 @@
  * limitations under the License.
  */
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #ifndef _DECAF_UTIL_ABSTRACTLIST_H_
 #define _DECAF_UTIL_ABSTRACTLIST_H_
 
 #include <decaf/lang/Iterable.h>
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
-#include <decaf/lang/exceptions/UnsupportedOperationException.h>
 #include <decaf/util/AbstractCollection.h>
-#include <decaf/util/ConcurrentModificationException.h>
 #include <decaf/util/Config.h>
 #include <decaf/util/Iterator.h>
 #include <decaf/util/List.h>
-#include <decaf/util/NoSuchElementException.h>
 #include <memory>
+#include <stdexcept>
+#include <string>
 
 namespace decaf
 {
@@ -97,17 +95,15 @@ namespace util
             {
                 if (parent == NULL)
                 {
-                    throw decaf::lang::exceptions::NullPointerException(
-                        __FILE__,
-                        __LINE__,
+                    throw activemq::exceptions::NullPointerException(
                         "List Iterator constructed with NULL parent");
                 }
 
                 if (start < 0 || start > parent->size())
                 {
-                    throw decaf::lang::exceptions::IndexOutOfBoundsException(
-                        __FILE__,
-                        __LINE__,
+                    throw activemq::exceptions::IndexOutOfBoundsException(
+                        std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+                        ": " +
                         "start index passed was negative or greater than "
                         "size()");
                 }
@@ -130,7 +126,7 @@ namespace util
             {
                 if (this->expectedModCount != this->parent->modCount)
                 {
-                    throw ConcurrentModificationException(
+                    throw activemq::exceptions::ConcurrentModificationException(
                         __FILE__,
                         __LINE__,
                         "Concurrent Modification of Parent List detected.");
@@ -145,9 +141,9 @@ namespace util
 
                     return result;
                 }
-                catch (decaf::lang::exceptions::IndexOutOfBoundsException& e)
+                catch (::activemq::exceptions::OutOfRangeException&)
                 {
-                    throw decaf::util::NoSuchElementException(
+                    throw activemq::exceptions::NoSuchElementException(
                         __FILE__,
                         __LINE__,
                         "Next called without a next element to process.");
@@ -158,15 +154,16 @@ namespace util
             {
                 if (this->lastPosition == -1)
                 {
-                    throw decaf::lang::exceptions::IllegalStateException(
+                    throw activemq::exceptions::IllegalStateException(
                         __FILE__,
                         __LINE__,
-                        "Remove called before next() was called.");
+                        "Remove called before next() was "
+                        "called.");
                 }
 
                 if (this->expectedModCount != this->parent->modCount)
                 {
-                    throw ConcurrentModificationException(
+                    throw activemq::exceptions::ConcurrentModificationException(
                         __FILE__,
                         __LINE__,
                         "Concurrent Modification of Parent List detected.");
@@ -183,9 +180,9 @@ namespace util
 
                     this->parent->removeAt(lastPosition);
                 }
-                catch (decaf::lang::exceptions::IndexOutOfBoundsException& e)
+                catch (::activemq::exceptions::OutOfRangeException&)
                 {
-                    throw ConcurrentModificationException(
+                    throw activemq::exceptions::ConcurrentModificationException(
                         __FILE__,
                         __LINE__,
                         "Concurrent Modification detected.");
@@ -199,7 +196,7 @@ namespace util
             {
                 if (this->expectedModCount != this->parent->modCount)
                 {
-                    throw ConcurrentModificationException(
+                    throw activemq::exceptions::ConcurrentModificationException(
                         __FILE__,
                         __LINE__,
                         "Concurrent Modification of Parent List detected.");
@@ -212,9 +209,9 @@ namespace util
                     this->expectedModCount = this->parent->modCount;
                     this->lastPosition     = -1;
                 }
-                catch (decaf::lang::exceptions::IndexOutOfBoundsException& e)
+                catch (::activemq::exceptions::OutOfRangeException&)
                 {
-                    throw decaf::util::NoSuchElementException(
+                    throw activemq::exceptions::NoSuchElementException(
                         __FILE__,
                         __LINE__,
                         "Add called without a next element to process.");
@@ -235,7 +232,7 @@ namespace util
             {
                 if (this->expectedModCount != this->parent->modCount)
                 {
-                    throw ConcurrentModificationException(
+                    throw activemq::exceptions::ConcurrentModificationException(
                         __FILE__,
                         __LINE__,
                         "Concurrent Modification detected.");
@@ -250,9 +247,9 @@ namespace util
 
                     return result;
                 }
-                catch (decaf::lang::exceptions::IndexOutOfBoundsException& e)
+                catch (::activemq::exceptions::OutOfRangeException&)
                 {
-                    throw decaf::util::NoSuchElementException(
+                    throw activemq::exceptions::NoSuchElementException(
                         __FILE__,
                         __LINE__,
                         "No previous element exists.");
@@ -268,7 +265,7 @@ namespace util
             {
                 if (this->expectedModCount != this->parent->modCount)
                 {
-                    throw ConcurrentModificationException(
+                    throw activemq::exceptions::ConcurrentModificationException(
                         __FILE__,
                         __LINE__,
                         "Concurrent Modification detected.");
@@ -278,9 +275,10 @@ namespace util
                 {
                     this->parent->set(this->lastPosition, value);
                 }
-                catch (decaf::lang::exceptions::IndexOutOfBoundsException& e)
+                catch (::activemq::exceptions::OutOfRangeException&)
                 {
-                    throw decaf::lang::exceptions::IllegalStateException();
+                    throw activemq::exceptions::IllegalStateException(
+                        "Set called without a valid iterator position.");
                 }
             }
         };
@@ -307,17 +305,15 @@ namespace util
             {
                 if (parent == NULL)
                 {
-                    throw decaf::lang::exceptions::NullPointerException(
-                        __FILE__,
-                        __LINE__,
+                    throw activemq::exceptions::NullPointerException(
                         "List Iterator constructed with NULL parent");
                 }
 
                 if (start < 0 || start > parent->size())
                 {
-                    throw decaf::lang::exceptions::IndexOutOfBoundsException(
-                        __FILE__,
-                        __LINE__,
+                    throw activemq::exceptions::IndexOutOfBoundsException(
+                        std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+                        ": " +
                         "start index passed was negative or greater than "
                         "size()");
                 }
@@ -340,7 +336,7 @@ namespace util
             {
                 if (this->expectedModCount != this->parent->modCount)
                 {
-                    throw ConcurrentModificationException(
+                    throw activemq::exceptions::ConcurrentModificationException(
                         __FILE__,
                         __LINE__,
                         "Concurrent Modification of Parent List detected.");
@@ -355,9 +351,9 @@ namespace util
 
                     return result;
                 }
-                catch (decaf::lang::exceptions::IndexOutOfBoundsException& e)
+                catch (::activemq::exceptions::OutOfRangeException&)
                 {
-                    throw decaf::util::NoSuchElementException(
+                    throw activemq::exceptions::NoSuchElementException(
                         __FILE__,
                         __LINE__,
                         "Next called without a next element to process.");
@@ -366,7 +362,7 @@ namespace util
 
             virtual void remove()
             {
-                throw lang::exceptions::UnsupportedOperationException(
+                throw activemq::exceptions::UnsupportedOperationException(
                     __FILE__,
                     __LINE__,
                     "AbstractList::Iterator::remove - Const Iterator.");
@@ -374,7 +370,7 @@ namespace util
 
             virtual void add(const E& value DECAF_UNUSED)
             {
-                throw lang::exceptions::UnsupportedOperationException(
+                throw activemq::exceptions::UnsupportedOperationException(
                     __FILE__,
                     __LINE__,
                     "AbstractList::ListIterator::radd - Const Iterator.");
@@ -394,7 +390,7 @@ namespace util
             {
                 if (this->expectedModCount != this->parent->modCount)
                 {
-                    throw ConcurrentModificationException(
+                    throw activemq::exceptions::ConcurrentModificationException(
                         __FILE__,
                         __LINE__,
                         "Concurrent Modification detected.");
@@ -409,9 +405,9 @@ namespace util
 
                     return result;
                 }
-                catch (decaf::lang::exceptions::IndexOutOfBoundsException& e)
+                catch (::activemq::exceptions::OutOfRangeException&)
                 {
-                    throw decaf::util::NoSuchElementException(
+                    throw activemq::exceptions::NoSuchElementException(
                         __FILE__,
                         __LINE__,
                         "No previous element exists.");
@@ -425,7 +421,7 @@ namespace util
 
             virtual void set(const E& value DECAF_UNUSED)
             {
-                throw lang::exceptions::UnsupportedOperationException(
+                throw activemq::exceptions::UnsupportedOperationException(
                     __FILE__,
                     __LINE__,
                     "AbstractList::ListIterator::set - Const Iterator.");
@@ -485,7 +481,7 @@ namespace util
 
         virtual void add(int index DECAF_UNUSED, const E& element DECAF_UNUSED)
         {
-            throw decaf::lang::exceptions::UnsupportedOperationException(
+            throw activemq::exceptions::UnsupportedOperationException(
                 __FILE__,
                 __LINE__,
                 "Abstract list does not implement the add method.");
@@ -508,7 +504,7 @@ namespace util
 
         virtual E removeAt(int index DECAF_UNUSED)
         {
-            throw decaf::lang::exceptions::UnsupportedOperationException(
+            throw activemq::exceptions::UnsupportedOperationException(
                 __FILE__,
                 __LINE__,
                 "Abstract list does not implement the removeAt method.");
@@ -516,7 +512,7 @@ namespace util
 
         virtual E set(int index DECAF_UNUSED, const E& element DECAF_UNUSED)
         {
-            throw decaf::lang::exceptions::UnsupportedOperationException(
+            throw activemq::exceptions::UnsupportedOperationException(
                 __FILE__,
                 __LINE__,
                 "Abstract list does not implement the set method.");

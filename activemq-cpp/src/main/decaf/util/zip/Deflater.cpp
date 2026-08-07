@@ -20,12 +20,15 @@
 #include <assert.h>
 #include <stdio.h>
 
-#include <decaf/lang/exceptions/RuntimeException.h>
+#include <decaf/lang/Exception.h>
 #include <zlib.h>
+
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <stdexcept>
+#include <string>
 
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::zip;
 
@@ -72,9 +75,7 @@ namespace util
             {
                 if (handle == NULL)
                 {
-                    throw NullPointerException(
-                        __FILE__,
-                        __LINE__,
+                    throw activemq::exceptions::NullPointerException(
                         "Error While initializing the Compression Library.");
                 }
 
@@ -112,7 +113,7 @@ namespace util
 
                 if (result != Z_OK)
                 {
-                    throw RuntimeException(
+                    throw activemq::exceptions::NullPointerException(
                         __FILE__,
                         __LINE__,
                         "Error While initializing the Compression Library.");
@@ -123,9 +124,7 @@ namespace util
             {
                 if (handle == NULL)
                 {
-                    throw NullPointerException(
-                        __FILE__,
-                        __LINE__,
+                    throw activemq::exceptions::NullPointerException(
                         "Error While initializing the Compression Library.");
                 }
 
@@ -144,9 +143,7 @@ namespace util
             {
                 if (handle == NULL)
                 {
-                    throw NullPointerException(
-                        __FILE__,
-                        __LINE__,
+                    throw activemq::exceptions::NullPointerException(
                         "Error While initializing the Compression Library.");
                 }
 
@@ -188,11 +185,9 @@ Deflater::Deflater(int level, bool nowrap)
 {
     if (level < DEFAULT_COMPRESSION || level > BEST_COMPRESSION)
     {
-        throw IllegalArgumentException(
-            __FILE__,
-            __LINE__,
-            "Compression level passed was Invalid: %d",
-            level);
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Compression level passed was Invalid: " + std::to_string(level));
     }
 
     // Initialize all the ZLib structures.
@@ -229,23 +224,24 @@ void Deflater::setInput(const unsigned char* buffer,
     {
         if (buffer == NULL)
         {
-            throw NullPointerException(__FILE__,
-                                       __LINE__,
-                                       "Buffer passed cannot be NULL.");
+            throw activemq::exceptions::NullPointerException(
+                __FILE__,
+                __LINE__,
+                "Buffer passed cannot be NULL.");
         }
 
         if (this->data->stream == NULL)
         {
-            throw IllegalStateException(__FILE__,
-                                        __LINE__,
-                                        "The Deflator has already been ended.");
+            throw activemq::exceptions::IllegalStateException(
+                __FILE__,
+                __LINE__,
+                "The Deflator has already been ended.");
         }
 
         if (offset + length > size)
         {
-            throw IndexOutOfBoundsException(
-                __FILE__,
-                __LINE__,
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
                 "Given offset + length greater than the size of the buffer.");
         }
 
@@ -261,10 +257,28 @@ void Deflater::setInput(const unsigned char* buffer,
         this->data->stream->avail_in = (uInt)length;
         this->data->stream->next_in  = (Bytef*)(buffer + offset);
     }
-    DECAF_CATCH_RETHROW(NullPointerException)
-    DECAF_CATCH_RETHROW(IllegalStateException)
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCHALL_THROW(IllegalStateException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (std::invalid_argument&)
+    {
+        throw;
+    }
+    catch (activemq::exceptions::NullPointerException&)
+    {
+        throw;
+    }
+    catch (activemq::exceptions::IllegalStateException&)
+    {
+        throw;
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::IllegalStateException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -296,23 +310,24 @@ void Deflater::setDictionary(const unsigned char* buffer,
     {
         if (buffer == NULL)
         {
-            throw NullPointerException(__FILE__,
-                                       __LINE__,
-                                       "Buffer passed cannot be NULL.");
+            throw activemq::exceptions::NullPointerException(
+                __FILE__,
+                __LINE__,
+                "Buffer passed cannot be NULL.");
         }
 
         if (this->data->stream == NULL)
         {
-            throw IllegalStateException(__FILE__,
-                                        __LINE__,
-                                        "The Deflator has already been ended.");
+            throw activemq::exceptions::IllegalStateException(
+                __FILE__,
+                __LINE__,
+                "The Deflator has already been ended.");
         }
 
         if (offset + length > size)
         {
-            throw IndexOutOfBoundsException(
-                __FILE__,
-                __LINE__,
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
                 "Given offset + length greater than the size of the buffer.");
         }
 
@@ -326,16 +341,34 @@ void Deflater::setDictionary(const unsigned char* buffer,
                                  buffer + offset,
                                  (uInt)length) != Z_OK)
         {
-            throw IllegalStateException(
+            throw activemq::exceptions::IllegalStateException(
                 __FILE__,
                 __LINE__,
                 "Deflator could not accept the dictionary.");
         }
     }
-    DECAF_CATCH_RETHROW(NullPointerException)
-    DECAF_CATCH_RETHROW(IllegalStateException)
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCHALL_THROW(IllegalStateException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (std::invalid_argument&)
+    {
+        throw;
+    }
+    catch (activemq::exceptions::NullPointerException&)
+    {
+        throw;
+    }
+    catch (activemq::exceptions::IllegalStateException&)
+    {
+        throw;
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::IllegalStateException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -362,17 +395,17 @@ void Deflater::setStrategy(int strategy)
 {
     if (strategy < DEFAULT_STRATEGY || strategy > HUFFMAN_ONLY)
     {
-        throw IllegalArgumentException(__FILE__,
-                                       __LINE__,
-                                       "Strategy value {%d} is not valid.",
-                                       strategy);
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Strategy value {" + std::to_string(strategy) + "} is not valid.");
     }
 
     if (this->data->stream == NULL && !this->data->ended)
     {
-        throw IllegalStateException(__FILE__,
-                                    __LINE__,
-                                    "The Deflator is in an invalid state.");
+        throw activemq::exceptions::IllegalStateException(
+            __FILE__,
+            __LINE__,
+            "The Deflator is in an invalid state.");
     }
 
     this->data->strategy = strategy;
@@ -383,17 +416,17 @@ void Deflater::setLevel(int level)
 {
     if (level < DEFAULT_COMPRESSION || level > BEST_COMPRESSION)
     {
-        throw IllegalArgumentException(__FILE__,
-                                       __LINE__,
-                                       "Strategy value {%d} is not valid.",
-                                       level);
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Compression level passed was Invalid: " + std::to_string(level));
     }
 
     if (this->data->stream == NULL && !this->data->ended)
     {
-        throw IllegalStateException(__FILE__,
-                                    __LINE__,
-                                    "The Deflator is in an invalid state.");
+        throw activemq::exceptions::IllegalStateException(
+            __FILE__,
+            __LINE__,
+            "The Deflator is in an invalid state.");
     }
 
     this->data->level = level;
@@ -429,42 +462,41 @@ int Deflater::deflate(unsigned char* buffer, int size, int offset, int length)
     {
         if (buffer == NULL)
         {
-            throw NullPointerException(__FILE__,
-                                       __LINE__,
-                                       "Buffer passed cannot be NULL.");
+            throw activemq::exceptions::NullPointerException(
+                __FILE__,
+                __LINE__,
+                "Buffer passed cannot be NULL.");
         }
 
         if (this->data->stream == NULL)
         {
-            throw IllegalStateException(__FILE__,
-                                        __LINE__,
-                                        "The Deflator has already been ended.");
+            throw activemq::exceptions::IllegalStateException(
+                __FILE__,
+                __LINE__,
+                "The Deflator has already been ended.");
         }
 
         if (size < 0)
         {
-            throw IndexOutOfBoundsException(__FILE__,
-                                            __LINE__,
-                                            "size parameter out of Bounds: %d.",
-                                            size);
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+                "size parameter out of Bounds: " + std::to_string(size) + ".");
         }
 
         if (offset > size || offset < 0)
         {
-            throw IndexOutOfBoundsException(
-                __FILE__,
-                __LINE__,
-                "offset parameter out of Bounds: %d.",
-                offset);
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+                "offset parameter out of Bounds: " + std::to_string(offset) +
+                ".");
         }
 
         if (length < 0 || length > size - offset)
         {
-            throw IndexOutOfBoundsException(
-                __FILE__,
-                __LINE__,
-                "length parameter out of Bounds: %d.",
-                length);
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+                "length parameter out of Bounds: " + std::to_string(length) +
+                ".");
         }
 
         unsigned long outStart = this->data->stream->total_out;
@@ -483,10 +515,28 @@ int Deflater::deflate(unsigned char* buffer, int size, int offset, int length)
 
         return (int)(this->data->stream->total_out - outStart);
     }
-    DECAF_CATCH_RETHROW(NullPointerException)
-    DECAF_CATCH_RETHROW(IllegalStateException)
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
-    DECAF_CATCHALL_THROW(IllegalStateException)
+    catch (::activemq::exceptions::OutOfRangeException&)
+    {
+        throw;
+    }
+    catch (std::invalid_argument&)
+    {
+        throw;
+    }
+    catch (activemq::exceptions::NullPointerException&)
+    {
+        throw;
+    }
+    catch (activemq::exceptions::IllegalStateException&)
+    {
+        throw;
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::IllegalStateException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -508,9 +558,10 @@ long long Deflater::getAdler() const
 {
     if (this->data->stream == NULL)
     {
-        throw IllegalStateException(__FILE__,
-                                    __LINE__,
-                                    "The Deflator has already been ended.");
+        throw activemq::exceptions::IllegalStateException(
+            __FILE__,
+            __LINE__,
+            "The Deflator has already been ended.");
     }
 
     return this->data->stream->adler;
@@ -521,9 +572,10 @@ long long Deflater::getBytesRead() const
 {
     if (this->data->stream == NULL)
     {
-        throw IllegalStateException(__FILE__,
-                                    __LINE__,
-                                    "The Deflator has already been ended.");
+        throw activemq::exceptions::IllegalStateException(
+            __FILE__,
+            __LINE__,
+            "The Deflator has already been ended.");
     }
 
     return this->data->stream->total_in;
@@ -534,9 +586,10 @@ long long Deflater::getBytesWritten() const
 {
     if (this->data->stream == NULL)
     {
-        throw IllegalStateException(__FILE__,
-                                    __LINE__,
-                                    "The Deflator has already been ended.");
+        throw activemq::exceptions::IllegalStateException(
+            __FILE__,
+            __LINE__,
+            "The Deflator has already been ended.");
     }
 
     return this->data->stream->total_out;
@@ -547,9 +600,10 @@ void Deflater::reset()
 {
     if (this->data->stream == NULL)
     {
-        throw IllegalStateException(__FILE__,
-                                    __LINE__,
-                                    "The Deflator has already been ended.");
+        throw activemq::exceptions::IllegalStateException(
+            __FILE__,
+            __LINE__,
+            "The Deflator has already been ended.");
     }
 
     DeflaterData::resetZlibStream(this->data);

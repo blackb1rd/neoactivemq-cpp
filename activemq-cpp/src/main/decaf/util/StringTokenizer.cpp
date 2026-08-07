@@ -16,13 +16,12 @@
  */
 #include "StringTokenizer.h"
 
-#include <decaf/util/NoSuchElementException.h>
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <stdexcept>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::util;
-using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 StringTokenizer::StringTokenizer(const std::string& str,
@@ -86,9 +85,7 @@ std::string StringTokenizer::nextToken()
 {
     if (pos == string::npos)
     {
-        throw NoSuchElementException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::NoSuchElementException(
             "StringTokenizer::nextToken - No more Tokens available");
     }
 
@@ -118,9 +115,7 @@ std::string StringTokenizer::nextToken()
     }
     else
     {
-        throw NoSuchElementException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::NoSuchElementException(
             "StringTokenizer::nextToken - No more Tokens available");
     }
 }

@@ -19,10 +19,10 @@
 #define _DECAF_CONCURRENT_COUNTDOWNLATCH_H_
 
 #include <decaf/lang/Exception.h>
-#include <decaf/lang/exceptions/InterruptedException.h>
 #include <decaf/util/Config.h>
 #include <decaf/util/concurrent/Mutex.h>
 #include <decaf/util/concurrent/TimeUnit.h>
+#include <stdexcept>
 
 namespace decaf
 {
@@ -71,10 +71,10 @@ namespace util
              *   * has its interrupted status set on entry to this method; or
              *   * is interrupted while waiting,
              *
-             * then InterruptedException is thrown and the current thread's
+             * then std::runtime_error is thrown and the current thread's
              * interrupted status is cleared.
              *
-             * @throws InterruptedException - if the current thread is
+             * @throws std::runtime_error - if the current thread is
              * interrupted while waiting.
              * @throws Exception - if any other error occurs.
              */
@@ -105,7 +105,7 @@ namespace util
              *   * has its interrupted status set on entry to this method; or
              *   * is interrupted while waiting,
              *
-             * then InterruptedException is thrown and the current thread's
+             * then std::runtime_error is thrown and the current thread's
              * interrupted status is cleared.
              *
              * If the specified waiting time elapses then the value false is
@@ -115,7 +115,7 @@ namespace util
              * @param timeout - Time in milliseconds to wait for the count to
              * reach zero.
              *
-             * @throws InterruptedException - if the current thread is
+             * @throws std::runtime_error - if the current thread is
              * interrupted while waiting.
              * @throws Exception - if any other error occurs.
              */
@@ -146,7 +146,7 @@ namespace util
              *   * has its interrupted status set on entry to this method; or
              *   * is interrupted while waiting,
              *
-             * then InterruptedException is thrown and the current thread's
+             * then std::runtime_error is thrown and the current thread's
              * interrupted status is cleared.
              *
              * If the specified waiting time elapses then the value false is
@@ -156,7 +156,7 @@ namespace util
              * @param timeout - Time to wait for the count to reach zero.
              * @param unit - The units that the timeout specifies.
              *
-             * @throws InterruptedException - if the current thread is
+             * @throws std::runtime_error - if the current thread is
              * interrupted while waiting.
              * @throws Exception - if any other error occurs.
              */

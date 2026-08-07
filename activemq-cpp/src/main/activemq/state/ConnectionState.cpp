@@ -17,10 +17,12 @@
 
 #include "ConnectionState.h"
 
-#include <decaf/lang/exceptions/IllegalStateException.h>
-
 #include <activemq/commands/SessionId.h>
 #include <activemq/commands/SessionInfo.h>
+
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <stdexcept>
+#include <string>
 
 using namespace activemq;
 using namespace activemq::state;
@@ -94,7 +96,7 @@ void ConnectionState::checkShutdown() const
 {
     if (this->disposed.load())
     {
-        throw decaf::lang::exceptions::IllegalStateException(
+        throw activemq::exceptions::IllegalStateException(
             __FILE__,
             __LINE__,
             "Connection already Disposed");

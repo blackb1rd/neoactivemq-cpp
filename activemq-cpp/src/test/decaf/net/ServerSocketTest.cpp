@@ -26,7 +26,6 @@ using namespace decaf;
 using namespace decaf::net;
 using namespace decaf::io;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 class ServerSocketTest : public ::testing::Test
 {
@@ -71,7 +70,7 @@ public:
             this->clientS.reset(new Socket("127.0.0.1", port));
             Thread::sleep(1000);
         }
-        catch (InterruptedException& ex)
+        catch (std::runtime_error& ex)
         {
         }
         catch (Exception& ex)
@@ -137,7 +136,7 @@ TEST_F(ServerSocketTest, testConstructor)
         this->ssconn = s.accept();
         this->ssconn->close();
     }
-    catch (InterruptedException& ex)
+    catch (std::runtime_error& ex)
     {
     }
     catch (Exception& ex)
@@ -247,7 +246,7 @@ TEST_F(ServerSocketTest, testAccept)
     //            do {
     //                Thread::sleep( 500 );
     //            } while( !thread.isAlive() );
-    //        } catch( InterruptedException& e ) {
+    //        } catch( std::runtime_error& e ) {
     //        }
     //
     //        ss.close();
@@ -256,7 +255,7 @@ TEST_F(ServerSocketTest, testAccept)
     //        do {
     //            try {
     //                Thread::sleep( 500 );
-    //            } catch( InterruptedException& e ) {
+    //            } catch( std::runtime_error& e ) {
     //            }
     //
     //            if( interrupted ) {
@@ -370,9 +369,8 @@ void ServerSocketTest::startClient(int port)
     {
         Thread::sleep(1000);
     }
-    catch (InterruptedException& e)
+    catch (std::runtime_error& e)
     {
-        FAIL() << (std::string("Exception during startClinet()") +
-                   e.getMessage());
+        FAIL() << (std::string("Exception during startClinet()") + e.what());
     }
 }

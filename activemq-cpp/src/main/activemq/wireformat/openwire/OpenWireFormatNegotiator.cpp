@@ -19,8 +19,11 @@
 
 #include <activemq/commands/DataStructure.h>
 #include <activemq/commands/WireFormatInfo.h>
+#include <activemq/exceptions/ActiveMQException.h>
+#include <activemq/exceptions/StdExceptionCatchMacros.h>
 #include <activemq/transport/IOTransport.h>
 #include <activemq/util/AMQLog.h>
+#include <stdexcept>
 
 using namespace std;
 using namespace activemq;
@@ -34,7 +37,6 @@ using activemq::util::AMQLogger;
 using namespace decaf::util::concurrent;
 using namespace decaf::io;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 const int OpenWireFormatNegotiator::negotiationTimeout = 15000;
@@ -76,11 +78,12 @@ void OpenWireFormatNegotiator::oneway(const std::shared_ptr<Command> command)
 
         if (!readyCountDownLatch.await(negotiationTimeout))
         {
-            throw IOException(__FILE__,
-                              __LINE__,
-                              "OpenWireFormatNegotiator::oneway"
-                              "Wire format negotiation timeout: peer did not "
-                              "send his wire format.");
+            throw activemq::exceptions::IOException(
+                __FILE__,
+                __LINE__,
+                "OpenWireFormatNegotiator::oneway"
+                "Wire format negotiation timeout: peer did not "
+                "send his wire format.");
         }
 
         AMQ_LOG_DEBUG(
@@ -91,10 +94,11 @@ void OpenWireFormatNegotiator::oneway(const std::shared_ptr<Command> command)
 
         next->oneway(command);
     }
-    AMQ_CATCH_RETHROW(UnsupportedOperationException)
-    AMQ_CATCH_RETHROW(IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException, IOException)
-    AMQ_CATCHALL_THROW(IOException)
+    AMQ_CATCHALL_RETHROW_STL_BACKED_EXCEPTIONS()
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
+                                activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -107,19 +111,21 @@ std::shared_ptr<Response> OpenWireFormatNegotiator::request(
 
         if (!readyCountDownLatch.await(negotiationTimeout))
         {
-            throw IOException(__FILE__,
-                              __LINE__,
-                              "OpenWireFormatNegotiator::request"
-                              "Wire format negotiation timeout: peer did not "
-                              "send his wire format.");
+            throw activemq::exceptions::IOException(
+                __FILE__,
+                __LINE__,
+                "OpenWireFormatNegotiator::request"
+                "Wire format negotiation timeout: peer did not "
+                "send his wire format.");
         }
 
         return next->request(command);
     }
-    AMQ_CATCH_RETHROW(UnsupportedOperationException)
-    AMQ_CATCH_RETHROW(IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException, IOException)
-    AMQ_CATCHALL_THROW(IOException)
+    AMQ_CATCHALL_RETHROW_STL_BACKED_EXCEPTIONS()
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
+                                activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -133,19 +139,21 @@ std::shared_ptr<Response> OpenWireFormatNegotiator::request(
 
         if (!readyCountDownLatch.await(negotiationTimeout))
         {
-            throw IOException(__FILE__,
-                              __LINE__,
-                              "OpenWireFormatNegotiator::request"
-                              "Wire format negotiation timeout: peer did not "
-                              "send his wire format.");
+            throw activemq::exceptions::IOException(
+                __FILE__,
+                __LINE__,
+                "OpenWireFormatNegotiator::request"
+                "Wire format negotiation timeout: peer did not "
+                "send his wire format.");
         }
 
         return next->request(command, timeout);
     }
-    AMQ_CATCH_RETHROW(UnsupportedOperationException)
-    AMQ_CATCH_RETHROW(IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException, IOException)
-    AMQ_CATCHALL_THROW(IOException)
+    AMQ_CATCHALL_RETHROW_STL_BACKED_EXCEPTIONS()
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(exceptions::ActiveMQException,
+                                activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -159,10 +167,11 @@ void OpenWireFormatNegotiator::onCommand(const std::shared_ptr<Command> command)
         {
             if (!info->isValid())
             {
-                throw IOException(__FILE__,
-                                  __LINE__,
-                                  "OpenWireFormatNegotiator::onCommand"
-                                  "Remote wire format magic is invalid");
+                throw activemq::exceptions::IOException(
+                    __FILE__,
+                    __LINE__,
+                    "OpenWireFormatNegotiator::onCommand"
+                    "Remote wire format magic is invalid");
             }
 
             AMQ_LOG_DEBUG("OpenWireFormatNegotiator",
@@ -220,11 +229,16 @@ void OpenWireFormatNegotiator::afterNextIsStarted()
             // Mark the latch
             wireInfoSentDownLatch.countDown();
         }
-        catch (decaf::lang::Exception& ex)
+        catch (activemq::exceptions::ActiveMQException& ex)
         {
             // Mark the latch
             wireInfoSentDownLatch.countDown();
             ex.setMark(__FILE__, __LINE__);
+            throw;
+        }
+        catch (std::exception&)
+        {
+            wireInfoSentDownLatch.countDown();
             throw;
         }
     }

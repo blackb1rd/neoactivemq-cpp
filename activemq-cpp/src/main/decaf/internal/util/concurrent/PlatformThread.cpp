@@ -18,22 +18,23 @@
 #include <decaf/internal/util/concurrent/CustomReentrantLock.h>
 #include <decaf/internal/util/concurrent/PlatformThread.h>
 
+#include <decaf/lang/Exception.h>
 #include <decaf/lang/Thread.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
-#include <decaf/lang/exceptions/RuntimeException.h>
 #include <decaf/util/concurrent/TimeUnit.h>
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <atomic>
 #include <chrono>
 #include <map>
 #include <memory>
 #include <mutex>
 #include <shared_mutex>
+#include <stdexcept>
+#include <string>
 #include <thread>
 
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 using namespace decaf::internal;
@@ -553,9 +554,10 @@ void PlatformThread::createTlsKey(decaf_tls_key* tlsKey)
 {
     if (tlsKey == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "TLS Key pointer must not be NULL.");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "TLS Key pointer must not be NULL.");
     }
 
     *tlsKey = ++getTlsKeyCounter();

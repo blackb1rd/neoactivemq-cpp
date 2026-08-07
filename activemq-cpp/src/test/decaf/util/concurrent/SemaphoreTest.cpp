@@ -30,7 +30,6 @@
 using namespace std;
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 using namespace decaf::util::concurrent::locks;
@@ -97,7 +96,7 @@ public:
         {
             lock->acquire();
         }
-        catch (InterruptedException& success)
+        catch (std::runtime_error& success)
         {
         }
     }
@@ -132,7 +131,7 @@ public:
             lock->acquire();
             parent->threadShouldThrow();
         }
-        catch (InterruptedException& success)
+        catch (std::runtime_error& success)
         {
         }
     }
@@ -206,7 +205,7 @@ TEST_F(SemaphoreTest, testAcquireReleaseInSameThread)
         s.release();
         ASSERT_EQ(1, s.availablePermits());
     }
-    catch (InterruptedException& e)
+    catch (std::runtime_error& e)
     {
         unexpectedException();
     }
@@ -253,7 +252,7 @@ TEST_F(SemaphoreTest, testTimedAcquireReleaseInSameThread)
         s.release();
         ASSERT_EQ(1, s.availablePermits());
     }
-    catch (InterruptedException& e)
+    catch (std::runtime_error& e)
     {
         unexpectedException();
     }
@@ -297,7 +296,7 @@ public:
             sem->release();
             sem->acquire();
         }
-        catch (InterruptedException& ie)
+        catch (std::runtime_error& ie)
         {
             parent->threadUnexpectedException();
         }
@@ -323,7 +322,7 @@ TEST_F(SemaphoreTest, testAcquireReleaseInDifferentThreads)
         s.release();
         t.join();
     }
-    catch (InterruptedException& e)
+    catch (std::runtime_error& e)
     {
         unexpectedException();
     }
@@ -389,7 +388,7 @@ TEST_F(SemaphoreTest, testUninterruptibleAcquireReleaseInDifferentThreads)
         s.release();
         t.join();
     }
-    catch (InterruptedException& e)
+    catch (std::runtime_error& e)
     {
         unexpectedException();
     }
@@ -437,7 +436,7 @@ public:
                 sem->tryAcquire(SemaphoreTest::SHORT_DELAY_MS,
                                 TimeUnit::MILLISECONDS));
         }
-        catch (InterruptedException& ie)
+        catch (std::runtime_error& ie)
         {
             parent->threadUnexpectedException();
         }
@@ -462,7 +461,7 @@ TEST_F(SemaphoreTest, testTimedAcquireReleaseInDifferentThreads)
         s.release();
         t.join();
     }
-    catch (InterruptedException& e)
+    catch (std::runtime_error& e)
     {
         unexpectedException();
     }
@@ -472,28 +471,26 @@ TEST_F(SemaphoreTest, testTimedAcquireReleaseInDifferentThreads)
 namespace
 {
 
-class TestAcquireInterruptedExceptionRunnable : public Runnable
+class TestAcquireRuntimeErrorRunnable : public Runnable
 {
 private:
     Semaphore*     sem;
     SemaphoreTest* parent;
 
 private:
-    TestAcquireInterruptedExceptionRunnable(
-        const TestAcquireInterruptedExceptionRunnable&);
-    TestAcquireInterruptedExceptionRunnable operator=(
-        const TestAcquireInterruptedExceptionRunnable&);
+    TestAcquireRuntimeErrorRunnable(const TestAcquireRuntimeErrorRunnable&);
+    TestAcquireRuntimeErrorRunnable operator=(
+        const TestAcquireRuntimeErrorRunnable&);
 
 public:
-    TestAcquireInterruptedExceptionRunnable(Semaphore*     sem,
-                                            SemaphoreTest* parent)
+    TestAcquireRuntimeErrorRunnable(Semaphore* sem, SemaphoreTest* parent)
         : Runnable(),
           sem(sem),
           parent(parent)
     {
     }
 
-    virtual ~TestAcquireInterruptedExceptionRunnable()
+    virtual ~TestAcquireRuntimeErrorRunnable()
     {
     }
 
@@ -504,7 +501,7 @@ public:
             sem->acquire();
             parent->threadShouldThrow();
         }
-        catch (InterruptedException& success)
+        catch (std::runtime_error& success)
         {
         }
     }
@@ -512,11 +509,11 @@ public:
 }  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(SemaphoreTest, testAcquireInterruptedException)
+TEST_F(SemaphoreTest, testAcquireRuntimeError)
 {
-    Semaphore                               s(0, false);
-    TestAcquireInterruptedExceptionRunnable runnable(&s, this);
-    Thread                                  t(&runnable);
+    Semaphore                       s(0, false);
+    TestAcquireRuntimeErrorRunnable runnable(&s, this);
+    Thread                          t(&runnable);
 
     t.start();
     try
@@ -525,7 +522,7 @@ TEST_F(SemaphoreTest, testAcquireInterruptedException)
         t.interrupt();
         t.join();
     }
-    catch (InterruptedException& e)
+    catch (std::runtime_error& e)
     {
         unexpectedException();
     }
@@ -535,28 +532,27 @@ TEST_F(SemaphoreTest, testAcquireInterruptedException)
 namespace
 {
 
-class TestTryAcquireInterruptedExceptionRunnable : public Runnable
+class TestTryAcquireRuntimeErrorRunnable : public Runnable
 {
 private:
     Semaphore*     sem;
     SemaphoreTest* parent;
 
 private:
-    TestTryAcquireInterruptedExceptionRunnable(
-        const TestTryAcquireInterruptedExceptionRunnable&);
-    TestTryAcquireInterruptedExceptionRunnable operator=(
-        const TestTryAcquireInterruptedExceptionRunnable&);
+    TestTryAcquireRuntimeErrorRunnable(
+        const TestTryAcquireRuntimeErrorRunnable&);
+    TestTryAcquireRuntimeErrorRunnable operator=(
+        const TestTryAcquireRuntimeErrorRunnable&);
 
 public:
-    TestTryAcquireInterruptedExceptionRunnable(Semaphore*     sem,
-                                               SemaphoreTest* parent)
+    TestTryAcquireRuntimeErrorRunnable(Semaphore* sem, SemaphoreTest* parent)
         : Runnable(),
           sem(sem),
           parent(parent)
     {
     }
 
-    virtual ~TestTryAcquireInterruptedExceptionRunnable()
+    virtual ~TestTryAcquireRuntimeErrorRunnable()
     {
     }
 
@@ -568,7 +564,7 @@ public:
                             TimeUnit::MILLISECONDS);
             parent->threadShouldThrow();
         }
-        catch (InterruptedException& success)
+        catch (std::runtime_error& success)
         {
         }
     }
@@ -576,11 +572,11 @@ public:
 }  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(SemaphoreTest, testTryAcquireInterruptedException)
+TEST_F(SemaphoreTest, testTryAcquireRuntimeError)
 {
-    Semaphore                               s(0, false);
-    TestAcquireInterruptedExceptionRunnable runnable(&s, this);
-    Thread                                  t(&runnable);
+    Semaphore                       s(0, false);
+    TestAcquireRuntimeErrorRunnable runnable(&s, this);
+    Thread                          t(&runnable);
 
     t.start();
     try
@@ -589,7 +585,7 @@ TEST_F(SemaphoreTest, testTryAcquireInterruptedException)
         t.interrupt();
         t.join();
     }
-    catch (InterruptedException& e)
+    catch (std::runtime_error& e)
     {
         unexpectedException();
     }
@@ -792,7 +788,7 @@ TEST_F(SemaphoreTest, testAcquireReleaseInSameThreadFair)
         s.release();
         ASSERT_EQ(1, s.availablePermits());
     }
-    catch (InterruptedException& e)
+    catch (std::runtime_error& e)
     {
         unexpectedException();
     }
@@ -816,7 +812,7 @@ TEST_F(SemaphoreTest, testAcquireReleaseNInSameThreadFair)
         s.acquire(5);
         ASSERT_EQ(1, s.availablePermits());
     }
-    catch (InterruptedException& e)
+    catch (std::runtime_error& e)
     {
         unexpectedException();
     }
@@ -863,7 +859,7 @@ TEST_F(SemaphoreTest, testTimedAcquireReleaseNInSameThreadFair)
         ASSERT_TRUE(s.tryAcquire(5, SHORT_DELAY_MS, TimeUnit::MILLISECONDS));
         ASSERT_EQ(1, s.availablePermits());
     }
-    catch (InterruptedException& e)
+    catch (std::runtime_error& e)
     {
         unexpectedException();
     }
@@ -887,7 +883,7 @@ TEST_F(SemaphoreTest, testTimedAcquireReleaseInSameThreadFair)
         s.release();
         ASSERT_EQ(1, s.availablePermits());
     }
-    catch (InterruptedException& e)
+    catch (std::runtime_error& e)
     {
         unexpectedException();
     }
@@ -931,7 +927,7 @@ public:
             sem->acquire();
             sem->acquire();
         }
-        catch (InterruptedException& ie)
+        catch (std::runtime_error& ie)
         {
             parent->threadUnexpectedException();
         }
@@ -959,7 +955,7 @@ TEST_F(SemaphoreTest, testAcquireReleaseInDifferentThreadsFair)
         t.join();
         ASSERT_EQ(2, s.availablePermits());
     }
-    catch (InterruptedException& e)
+    catch (std::runtime_error& e)
     {
         unexpectedException();
     }
@@ -1002,7 +998,7 @@ public:
             sem->release(2);
             sem->acquire();
         }
-        catch (InterruptedException& ie)
+        catch (std::runtime_error& ie)
         {
             parent->threadUnexpectedException();
         }
@@ -1026,7 +1022,7 @@ TEST_F(SemaphoreTest, testAcquireReleaseNInDifferentThreadsFair)
         s.release(1);
         t.join();
     }
-    catch (InterruptedException& e)
+    catch (std::runtime_error& e)
     {
         unexpectedException();
     }
@@ -1069,7 +1065,7 @@ public:
             sem->acquire(2);
             sem->release(4);
         }
-        catch (InterruptedException& ie)
+        catch (std::runtime_error& ie)
         {
             parent->threadUnexpectedException();
         }
@@ -1094,7 +1090,7 @@ TEST_F(SemaphoreTest, testAcquireReleaseNInDifferentThreadsFair2)
         s.release(2);
         t.join();
     }
-    catch (InterruptedException& e)
+    catch (std::runtime_error& e)
     {
         unexpectedException();
     }
@@ -1149,7 +1145,7 @@ public:
                 sem->tryAcquire(SemaphoreTest::SHORT_DELAY_MS,
                                 TimeUnit::MILLISECONDS));
         }
-        catch (InterruptedException& ie)
+        catch (std::runtime_error& ie)
         {
             parent->threadUnexpectedException();
         }
@@ -1174,7 +1170,7 @@ TEST_F(SemaphoreTest, testTimedAcquireReleaseInDifferentThreadsFair)
         s.release();
         t.join();
     }
-    catch (InterruptedException& e)
+    catch (std::runtime_error& e)
     {
         unexpectedException();
     }
@@ -1224,7 +1220,7 @@ public:
                                 TimeUnit::MILLISECONDS));
             sem->release(2);
         }
-        catch (InterruptedException& ie)
+        catch (std::runtime_error& ie)
         {
             parent->threadUnexpectedException();
         }
@@ -1248,7 +1244,7 @@ TEST_F(SemaphoreTest, testTimedAcquireReleaseNInDifferentThreadsFair)
         s.release(2);
         t.join();
     }
-    catch (InterruptedException& e)
+    catch (std::runtime_error& e)
     {
         unexpectedException();
     }
@@ -1258,28 +1254,27 @@ TEST_F(SemaphoreTest, testTimedAcquireReleaseNInDifferentThreadsFair)
 namespace
 {
 
-class TestAcquireInterruptedExceptionFairRunnable : public Runnable
+class TestAcquireRuntimeErrorFairRunnable : public Runnable
 {
 private:
     Semaphore*     sem;
     SemaphoreTest* parent;
 
 private:
-    TestAcquireInterruptedExceptionFairRunnable(
-        const TestAcquireInterruptedExceptionFairRunnable&);
-    TestAcquireInterruptedExceptionFairRunnable operator=(
-        const TestAcquireInterruptedExceptionFairRunnable&);
+    TestAcquireRuntimeErrorFairRunnable(
+        const TestAcquireRuntimeErrorFairRunnable&);
+    TestAcquireRuntimeErrorFairRunnable operator=(
+        const TestAcquireRuntimeErrorFairRunnable&);
 
 public:
-    TestAcquireInterruptedExceptionFairRunnable(Semaphore*     sem,
-                                                SemaphoreTest* parent)
+    TestAcquireRuntimeErrorFairRunnable(Semaphore* sem, SemaphoreTest* parent)
         : Runnable(),
           sem(sem),
           parent(parent)
     {
     }
 
-    virtual ~TestAcquireInterruptedExceptionFairRunnable()
+    virtual ~TestAcquireRuntimeErrorFairRunnable()
     {
     }
 
@@ -1290,7 +1285,7 @@ public:
             sem->acquire();
             parent->threadShouldThrow();
         }
-        catch (InterruptedException& success)
+        catch (std::runtime_error& success)
         {
         }
     }
@@ -1298,11 +1293,11 @@ public:
 }  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(SemaphoreTest, testAcquireInterruptedExceptionFair)
+TEST_F(SemaphoreTest, testAcquireRuntimeErrorFair)
 {
-    Semaphore                                   s(0, true);
-    TestAcquireInterruptedExceptionFairRunnable runnable(&s, this);
-    Thread                                      t(&runnable);
+    Semaphore                           s(0, true);
+    TestAcquireRuntimeErrorFairRunnable runnable(&s, this);
+    Thread                              t(&runnable);
 
     t.start();
     try
@@ -1311,7 +1306,7 @@ TEST_F(SemaphoreTest, testAcquireInterruptedExceptionFair)
         t.interrupt();
         t.join();
     }
-    catch (InterruptedException& e)
+    catch (std::runtime_error& e)
     {
         unexpectedException();
     }
@@ -1321,28 +1316,27 @@ TEST_F(SemaphoreTest, testAcquireInterruptedExceptionFair)
 namespace
 {
 
-class TestAcquireNInterruptedExceptionFairRunnable : public Runnable
+class TestAcquireNRuntimeErrorFairRunnable : public Runnable
 {
 private:
     Semaphore*     sem;
     SemaphoreTest* parent;
 
 private:
-    TestAcquireNInterruptedExceptionFairRunnable(
-        const TestAcquireNInterruptedExceptionFairRunnable&);
-    TestAcquireNInterruptedExceptionFairRunnable operator=(
-        const TestAcquireNInterruptedExceptionFairRunnable&);
+    TestAcquireNRuntimeErrorFairRunnable(
+        const TestAcquireNRuntimeErrorFairRunnable&);
+    TestAcquireNRuntimeErrorFairRunnable operator=(
+        const TestAcquireNRuntimeErrorFairRunnable&);
 
 public:
-    TestAcquireNInterruptedExceptionFairRunnable(Semaphore*     sem,
-                                                 SemaphoreTest* parent)
+    TestAcquireNRuntimeErrorFairRunnable(Semaphore* sem, SemaphoreTest* parent)
         : Runnable(),
           sem(sem),
           parent(parent)
     {
     }
 
-    virtual ~TestAcquireNInterruptedExceptionFairRunnable()
+    virtual ~TestAcquireNRuntimeErrorFairRunnable()
     {
     }
 
@@ -1353,7 +1347,7 @@ public:
             sem->acquire(3);
             parent->threadShouldThrow();
         }
-        catch (InterruptedException& success)
+        catch (std::runtime_error& success)
         {
         }
     }
@@ -1361,11 +1355,11 @@ public:
 }  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(SemaphoreTest, testAcquireNInterruptedExceptionFair)
+TEST_F(SemaphoreTest, testAcquireNRuntimeErrorFair)
 {
-    Semaphore                                    s(2, true);
-    TestAcquireNInterruptedExceptionFairRunnable runnable(&s, this);
-    Thread                                       t(&runnable);
+    Semaphore                            s(2, true);
+    TestAcquireNRuntimeErrorFairRunnable runnable(&s, this);
+    Thread                               t(&runnable);
 
     t.start();
     try
@@ -1374,7 +1368,7 @@ TEST_F(SemaphoreTest, testAcquireNInterruptedExceptionFair)
         t.interrupt();
         t.join();
     }
-    catch (InterruptedException& e)
+    catch (std::runtime_error& e)
     {
         unexpectedException();
     }
@@ -1384,28 +1378,28 @@ TEST_F(SemaphoreTest, testAcquireNInterruptedExceptionFair)
 namespace
 {
 
-class TestTryAcquireInterruptedExceptionFairRunnable : public Runnable
+class TestTryAcquireRuntimeErrorFairRunnable : public Runnable
 {
 private:
     Semaphore*     sem;
     SemaphoreTest* parent;
 
 private:
-    TestTryAcquireInterruptedExceptionFairRunnable(
-        const TestTryAcquireInterruptedExceptionFairRunnable&);
-    TestTryAcquireInterruptedExceptionFairRunnable operator=(
-        const TestTryAcquireInterruptedExceptionFairRunnable&);
+    TestTryAcquireRuntimeErrorFairRunnable(
+        const TestTryAcquireRuntimeErrorFairRunnable&);
+    TestTryAcquireRuntimeErrorFairRunnable operator=(
+        const TestTryAcquireRuntimeErrorFairRunnable&);
 
 public:
-    TestTryAcquireInterruptedExceptionFairRunnable(Semaphore*     sem,
-                                                   SemaphoreTest* parent)
+    TestTryAcquireRuntimeErrorFairRunnable(Semaphore*     sem,
+                                           SemaphoreTest* parent)
         : Runnable(),
           sem(sem),
           parent(parent)
     {
     }
 
-    virtual ~TestTryAcquireInterruptedExceptionFairRunnable()
+    virtual ~TestTryAcquireRuntimeErrorFairRunnable()
     {
     }
 
@@ -1417,7 +1411,7 @@ public:
                             TimeUnit::MILLISECONDS);
             parent->threadShouldThrow();
         }
-        catch (InterruptedException& success)
+        catch (std::runtime_error& success)
         {
         }
     }
@@ -1425,11 +1419,11 @@ public:
 }  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(SemaphoreTest, testTryAcquireInterruptedExceptionFair)
+TEST_F(SemaphoreTest, testTryAcquireRuntimeErrorFair)
 {
-    Semaphore                                      s(0, true);
-    TestTryAcquireInterruptedExceptionFairRunnable runnable(&s, this);
-    Thread                                         t(&runnable);
+    Semaphore                              s(0, true);
+    TestTryAcquireRuntimeErrorFairRunnable runnable(&s, this);
+    Thread                                 t(&runnable);
 
     t.start();
     try
@@ -1438,7 +1432,7 @@ TEST_F(SemaphoreTest, testTryAcquireInterruptedExceptionFair)
         t.interrupt();
         t.join();
     }
-    catch (InterruptedException& e)
+    catch (std::runtime_error& e)
     {
         unexpectedException();
     }
@@ -1448,28 +1442,28 @@ TEST_F(SemaphoreTest, testTryAcquireInterruptedExceptionFair)
 namespace
 {
 
-class TestTryAcquireNInterruptedExceptionFairRunnable : public Runnable
+class TestTryAcquireNRuntimeErrorFairRunnable : public Runnable
 {
 private:
     Semaphore*     sem;
     SemaphoreTest* parent;
 
 private:
-    TestTryAcquireNInterruptedExceptionFairRunnable(
-        const TestTryAcquireNInterruptedExceptionFairRunnable&);
-    TestTryAcquireNInterruptedExceptionFairRunnable operator=(
-        const TestTryAcquireNInterruptedExceptionFairRunnable&);
+    TestTryAcquireNRuntimeErrorFairRunnable(
+        const TestTryAcquireNRuntimeErrorFairRunnable&);
+    TestTryAcquireNRuntimeErrorFairRunnable operator=(
+        const TestTryAcquireNRuntimeErrorFairRunnable&);
 
 public:
-    TestTryAcquireNInterruptedExceptionFairRunnable(Semaphore*     sem,
-                                                    SemaphoreTest* parent)
+    TestTryAcquireNRuntimeErrorFairRunnable(Semaphore*     sem,
+                                            SemaphoreTest* parent)
         : Runnable(),
           sem(sem),
           parent(parent)
     {
     }
 
-    virtual ~TestTryAcquireNInterruptedExceptionFairRunnable()
+    virtual ~TestTryAcquireNRuntimeErrorFairRunnable()
     {
     }
 
@@ -1482,7 +1476,7 @@ public:
                             TimeUnit::MILLISECONDS);
             parent->threadShouldThrow();
         }
-        catch (InterruptedException& success)
+        catch (std::runtime_error& success)
         {
         }
     }
@@ -1490,11 +1484,11 @@ public:
 }  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(SemaphoreTest, testTryAcquireNInterruptedExceptionFair)
+TEST_F(SemaphoreTest, testTryAcquireNRuntimeErrorFair)
 {
-    Semaphore                                       s(1, true);
-    TestTryAcquireNInterruptedExceptionFairRunnable runnable(&s, this);
-    Thread                                          t(&runnable);
+    Semaphore                               s(1, true);
+    TestTryAcquireNRuntimeErrorFairRunnable runnable(&s, this);
+    Thread                                  t(&runnable);
 
     t.start();
     try
@@ -1503,7 +1497,7 @@ TEST_F(SemaphoreTest, testTryAcquireNInterruptedExceptionFair)
         t.interrupt();
         t.join();
     }
-    catch (InterruptedException& e)
+    catch (std::runtime_error& e)
     {
         unexpectedException();
     }

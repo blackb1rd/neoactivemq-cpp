@@ -238,7 +238,7 @@ out.println("");
 out.println("");
 out.println("#include <decaf/io/DataInputStream.h>");
 out.println("#include <decaf/io/DataOutputStream.h>");
-out.println("#include <decaf/io/IOException.h>");
+out.println("#include <activemq/exceptions/IoCatchMacros.h>");
 out.println("#include <activemq/util/Config.h>");
 out.println("#include <activemq/commands/DataStructure.h>");
 out.println("#include <activemq/wireformat/openwire/OpenWireFormat.h>");

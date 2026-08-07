@@ -21,7 +21,6 @@
 #include <decaf/lang/Comparable.h>
 #include <decaf/lang/Number.h>
 #include <decaf/lang/String.h>
-#include <decaf/lang/exceptions/NumberFormatException.h>
 #include <decaf/util/Config.h>
 #include <string>
 
@@ -337,7 +336,7 @@ namespace lang
          *
          * @return a float parsed from the string
          *
-         * @throw NumberFormatException if an error occurs parsing the String.
+         * @throw std::invalid_argument if an error occurs parsing the String.
          */
         static float parseFloat(const String& value);
 
@@ -426,7 +425,7 @@ namespace lang
          *
          * @param value - the string to parse
          * @return a new Float instance wrapping the float parsed from value
-         * @throws NumberFormatException on error.
+         * @throws std::invalid_argument on error.
          */
         static Float valueOf(const String& value);
 

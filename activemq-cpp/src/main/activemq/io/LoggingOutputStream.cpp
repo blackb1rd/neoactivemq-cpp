@@ -16,15 +16,15 @@
  */
 
 #include "LoggingOutputStream.h"
-#include <activemq/exceptions/ExceptionDefines.h>
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <iomanip>
 #include <sstream>
+#include <stdexcept>
 
 using namespace std;
 using namespace activemq;
 using namespace activemq::io;
 using namespace decaf::io;
-using namespace decaf::lang::exceptions;
 
 LOGDECAF_INITIALIZE(logger,
                     LoggingOutputStream,
@@ -44,13 +44,8 @@ LoggingOutputStream::~LoggingOutputStream()
 ////////////////////////////////////////////////////////////////////////////////
 void LoggingOutputStream::doWriteByte(const unsigned char c)
 {
-    try
-    {
-        log(&c, 1);
-        FilterOutputStream::doWriteByte(c);
-    }
-    AMQ_CATCH_RETHROW(IOException)
-    AMQ_CATCHALL_THROW(IOException)
+    log(&c, 1);
+    FilterOutputStream::doWriteByte(c);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -59,38 +54,27 @@ void LoggingOutputStream::doWriteArrayBounded(const unsigned char* buffer,
                                               int                  offset,
                                               int                  length)
 {
-    try
+    if (length == 0)
     {
-        if (length == 0)
-        {
-            return;
-        }
-
-        if (buffer == NULL)
-        {
-            throw NullPointerException(
-                __FILE__,
-                __LINE__,
-                "LoggingOutputStream::write - Passed Buffer is Null");
-        }
-
-        if ((offset + length) > size)
-        {
-            throw decaf::lang::exceptions::IndexOutOfBoundsException(
-                __FILE__,
-                __LINE__,
-                "DataOutputStream::write - given offset + length is greater "
-                "than buffer size.");
-        }
-
-        log(buffer + offset, length);
-
-        FilterOutputStream::doWriteArrayBounded(buffer, size, offset, length);
+        return;
     }
-    AMQ_CATCH_RETHROW(IOException)
-    AMQ_CATCH_RETHROW(NullPointerException)
-    AMQ_CATCH_RETHROW(IndexOutOfBoundsException)
-    AMQ_CATCHALL_THROW(IOException)
+
+    if (buffer == NULL)
+    {
+        throw activemq::exceptions::NullPointerException(
+            "LoggingOutputStream::write - Passed Buffer is Null");
+    }
+
+    if ((offset + length) > size)
+    {
+        throw activemq::exceptions::IndexOutOfBoundsException(
+            "DataOutputStream::write - given offset + length is greater "
+            "than buffer size.");
+    }
+
+    log(buffer + offset, length);
+
+    FilterOutputStream::doWriteArrayBounded(buffer, size, offset, length);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

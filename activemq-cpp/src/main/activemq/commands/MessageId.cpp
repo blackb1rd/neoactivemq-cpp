@@ -17,10 +17,9 @@
 
 #include <activemq/commands/MessageId.h>
 #include <activemq/exceptions/ActiveMQException.h>
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <activemq/state/CommandVisitor.h>
 #include <decaf/internal/util/StringUtils.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
-#include <decaf/lang/exceptions/NumberFormatException.h>
 #include <decaf/util/HashCode.h>
 #include <sstream>
 #include <stdexcept>
@@ -30,7 +29,6 @@ using namespace std;
 using namespace activemq;
 using namespace activemq::exceptions;
 using namespace activemq::commands;
-using namespace decaf::lang::exceptions;
 using namespace decaf::internal::util;
 
 /*
@@ -149,9 +147,7 @@ void MessageId::copyDataStructure(const DataStructure* src)
 
     if (srcPtr == NULL || src == NULL)
     {
-        throw decaf::lang::exceptions::NullPointerException(
-            __FILE__,
-            __LINE__,
+        throw activemq::exceptions::TypeMismatchException(
             "MessageId::copyDataStructure - src is NULL or invalid");
     }
 
@@ -377,33 +373,25 @@ int MessageId::getHashCode() const
 ////////////////////////////////////////////////////////////////////////////////
 void MessageId::setValue(const std::string& key)
 {
-    std::string messageKey = key;
-
-    // Parse off the sequenceId
-    std::size_t p = messageKey.rfind(':');
-
-    if (p != std::string::npos)
+    try
     {
-        try
+        std::string messageKey = key;
+
+        // Parse off the sequenceId
+        std::size_t p = messageKey.rfind(':');
+
+        if (p != std::string::npos)
         {
             producerSequenceId =
                 std::stoll(messageKey.substr(p + 1, std::string::npos));
+            messageKey = messageKey.substr(0, p);
         }
-        catch (const std::invalid_argument& e)
-        {
-            throw decaf::lang::exceptions::NumberFormatException(__FILE__,
-                                                                 __LINE__,
-                                                                 e.what());
-        }
-        catch (const std::out_of_range& e)
-        {
-            throw decaf::lang::exceptions::NumberFormatException(__FILE__,
-                                                                 __LINE__,
-                                                                 e.what());
-        }
-        messageKey = messageKey.substr(0, p);
-    }
 
-    this->producerId.reset(new ProducerId(messageKey));
-    this->key = messageKey;
+        this->producerId.reset(new ProducerId(messageKey));
+        this->key = messageKey;
+    }
+    catch (const std::out_of_range& ex)
+    {
+        throw OutOfRangeException(__FILE__, __LINE__, ex.what());
+    }
 }

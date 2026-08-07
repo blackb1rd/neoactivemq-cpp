@@ -118,6 +118,15 @@ namespace lang
         virtual std::string getStackTraceString() const = 0;
     };
 
+    inline Throwable::Throwable()
+        : std::exception()
+    {
+    }
+
+    inline Throwable::~Throwable() throw()
+    {
+    }
+
 }  // namespace lang
 }  // namespace decaf
 

@@ -18,6 +18,9 @@
 #ifndef _DECAF_LANG_EXCEPTIONS_EXCEPTIONDEFINES_H_
 #define _DECAF_LANG_EXCEPTIONS_EXCEPTIONDEFINES_H_
 
+#include <activemq/exceptions/StdExceptionCatchMacros.h>
+#include <stdexcept>
+
 /**
  * Macro for catching and rethrowing an exception of
  * a given type.
@@ -47,9 +50,15 @@
 
 /**
  * A catch-all that throws a known exception.
- * @param type the type of exception to be thrown.
+ *
+ * AMQ thin STL-backed exceptions (see StdExceptionCatchMacros.h) are
+ * rethrown unchanged before \p type is thrown for unknown failures.
+ *
+ * @param type the type of exception to be thrown for failures outside the
+ * standard logic_error / runtime_error hierarchies.
  */
 #define DECAF_CATCHALL_THROW(type)                               \
+    AMQ_CATCHALL_RETHROW_STL_BACKED_EXCEPTIONS()                 \
     catch (...)                                                  \
     {                                                            \
         type ex(__FILE__, __LINE__, "caught unknown exception"); \
@@ -57,11 +66,29 @@
     }
 
 /**
+ * Like DECAF_CATCHALL_THROW but skips OutOfRangeException in the AMQ rethrow
+ * list (use after a catch that maps or rethrows OutOfRangeException so it is
+ * not shadowed).
+ */
+#define DECAF_CATCHALL_THROW_AFTER_STL_OUT_OF_RANGE_MAP(type)           \
+    AMQ_CATCHALL_RETHROW_STL_BACKED_EXCEPTIONS_AFTER_OUT_OF_RANGE_MAP() \
+    catch (...)                                                         \
+    {                                                                   \
+        type ex(__FILE__, __LINE__, "caught unknown exception");        \
+        throw ex;                                                       \
+    }
+
+/**
  * A catch-all that does not throw an exception, one use would
  * be to catch any exception in a destructor and mark it, but not
  * throw so that cleanup would continue as normal.
+ *
+ * AMQ thin STL-backed exceptions are swallowed explicitly first so behavior
+ * matches a single catch (...) that would otherwise absorb them; non-standard
+ * exceptions still construct a marked Exception for diagnostics.
  */
 #define DECAF_CATCHALL_NOTHROW()                                        \
+    AMQ_CATCHALL_SWALLOW_STL_BACKED_EXCEPTIONS()                        \
     catch (...)                                                         \
     {                                                                   \
         lang::Exception ex(__FILE__,                                    \

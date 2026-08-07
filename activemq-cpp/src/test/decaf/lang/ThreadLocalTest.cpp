@@ -17,18 +17,17 @@
 
 #include <gtest/gtest.h>
 
+#include <decaf/lang/Exception.h>
 #include <decaf/lang/System.h>
 #include <decaf/lang/ThreadLocal.h>
-#include <decaf/lang/exceptions/InterruptedException.h>
-#include <decaf/lang/exceptions/RuntimeException.h>
 #include <decaf/util/concurrent/Mutex.h>
+#include <stdexcept>
 
 #include <memory>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 
@@ -153,7 +152,7 @@ TEST_F(ThreadLocalTest, testGet)
     {
         t.join();
     }
-    catch (InterruptedException& ie)
+    catch (std::runtime_error& ie)
     {
         FAIL() << ("Interrupted!!");
     }
@@ -213,7 +212,7 @@ TEST_F(ThreadLocalTest, testSet)
     {
         t.join();
     }
-    catch (InterruptedException& ie)
+    catch (std::runtime_error& ie)
     {
         FAIL() << ("Interrupted!!");
     }

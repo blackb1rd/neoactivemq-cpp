@@ -17,13 +17,14 @@
 
 #include "InputStreamReader.h"
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/io/InputStream.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
+#include <stdexcept>
+#include <string>
 
 using namespace decaf;
 using namespace decaf::io;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 InputStreamReader::InputStreamReader(InputStream* stream, bool own)
@@ -34,9 +35,10 @@ InputStreamReader::InputStreamReader(InputStream* stream, bool own)
 {
     if (stream == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "The passed InputStream cannot be NULL.");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "The passed InputStream cannot be NULL.");
     }
 }
 
@@ -113,8 +115,6 @@ int InputStreamReader::doReadArrayBounded(char* buffer,
         return this->stream->read((unsigned char*)buffer, size, offset, length);
     }
     DECAF_CATCH_RETHROW(IOException)
-    DECAF_CATCH_RETHROW(NullPointerException)
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
     DECAF_CATCHALL_THROW(IOException)
 }
 

@@ -15,14 +15,15 @@
  * limitations under the License.
  */
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #ifndef _DECAF_LANG_SYSTEM_H_
 #define _DECAF_LANG_SYSTEM_H_
 
 #include <decaf/lang/Exception.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/util/Config.h>
 #include <decaf/util/Map.h>
 #include <decaf/util/Properties.h>
+#include <stdexcept>
 #include <string>
 
 namespace decaf
@@ -70,7 +71,8 @@ namespace lang
          * @param length
          *      The number of elements to copy from src to dest.
          *
-         * @throws NullPointerException if src or dest are NULL.
+         * @throws activemq::exceptions::IllegalStateException if src or
+         * dest are NULL.
          */
         static void arraycopy(const char* src,
                               std::size_t srcPos,
@@ -94,7 +96,8 @@ namespace lang
          * @param length
          *      The number of elements to copy from src to dest.
          *
-         * @throws NullPointerException if src or dest are NULL.
+         * @throws activemq::exceptions::IllegalStateException if src or
+         * dest are NULL.
          */
         static void arraycopy(const unsigned char* src,
                               std::size_t          srcPos,
@@ -118,7 +121,8 @@ namespace lang
          * @param length
          *      The number of elements to copy from src to dest.
          *
-         * @throws NullPointerException if src or dest are NULL.
+         * @throws activemq::exceptions::IllegalStateException if src or
+         * dest are NULL.
          */
         static void arraycopy(const short* src,
                               std::size_t  srcPos,
@@ -142,7 +146,8 @@ namespace lang
          * @param length
          *      The number of elements to copy from src to dest.
          *
-         * @throws NullPointerException if src or dest are NULL.
+         * @throws activemq::exceptions::IllegalStateException if src or
+         * dest are NULL.
          */
         static void arraycopy(const int*  src,
                               std::size_t srcPos,
@@ -166,7 +171,8 @@ namespace lang
          * @param length
          *      The number of elements to copy from src to dest.
          *
-         * @throws NullPointerException if src or dest are NULL.
+         * @throws activemq::exceptions::IllegalStateException if src or
+         * dest are NULL.
          */
         static void arraycopy(const long long* src,
                               std::size_t      srcPos,
@@ -190,7 +196,8 @@ namespace lang
          * @param length
          *      The number of elements to copy from src to dest.
          *
-         * @throws NullPointerException if src or dest are NULL.
+         * @throws activemq::exceptions::IllegalStateException if src or
+         * dest are NULL.
          */
         static void arraycopy(const float* src,
                               std::size_t  srcPos,
@@ -214,7 +221,8 @@ namespace lang
          * @param length
          *      The number of elements to copy from src to dest.
          *
-         * @throws NullPointerException if src or dest are NULL.
+         * @throws activemq::exceptions::IllegalStateException if src or
+         * dest are NULL.
          */
         static void arraycopy(const double* src,
                               std::size_t   srcPos,
@@ -238,7 +246,8 @@ namespace lang
          * @param length
          *      The number of elements to copy from src to dest.
          *
-         * @throws NullPointerException if src or dest are NULL.
+         * @throws activemq::exceptions::IllegalStateException if src or
+         * dest are NULL.
          */
         template <typename E>
         static void arraycopy(const E*    src,
@@ -249,15 +258,15 @@ namespace lang
         {
             if (src == NULL)
             {
-                throw decaf::lang::exceptions::NullPointerException(
+                throw activemq::exceptions::NullPointerException(
                     __FILE__,
                     __LINE__,
                     "Given Source Pointer was null.");
             }
 
-            if (src == NULL)
+            if (dest == NULL)
             {
-                throw decaf::lang::exceptions::NullPointerException(
+                throw activemq::exceptions::NullPointerException(
                     __FILE__,
                     __LINE__,
                     "Given Source Pointer was null.");
@@ -289,6 +298,8 @@ namespace lang
          *
          * @return a string with the value from the variables or ""
          *
+         * @throws activemq::exceptions::IllegalStateException if the
+         * named environment variable is not set.
          * @throws an Exception if an error occurs while reading the Env.
          */
         static std::string getenv(const std::string& name);
@@ -396,7 +407,7 @@ namespace lang
          * @return an empty string if the named property is not set, otherwise
          returns the value.
          *
-         * @throws IllegalArgumentException if key is an empty string.
+         * @throws std::invalid_argument if key is an empty string.
          */
         static std::string getProperty(const std::string& key);
 
@@ -416,7 +427,7 @@ namespace lang
          * @return the value of the named system property or the defaultValue if
          * the property isn't set..
          *
-         * @throws IllegalArgumentException if key is an empty string.
+         * @throws std::invalid_argument if key is an empty string.
          */
         static std::string getProperty(const std::string& key,
                                        const std::string& defaultValue);
@@ -432,7 +443,7 @@ namespace lang
          * @return the previous value of the property named by key if there was
          * one, otherwise returns an empty string.
          *
-         * @throws IllegalArgumentException if key is an empty string.
+         * @throws std::invalid_argument if key is an empty string.
          */
         static std::string setProperty(const std::string& key,
                                        const std::string& value);
@@ -446,7 +457,7 @@ namespace lang
          * @return the previous value of the property named by key if there was
          * one, otherwise returns an empty string.
          *
-         * @throws IllegalArgumentException if key is an empty string.
+         * @throws std::invalid_argument if key is an empty string.
          */
         static std::string clearProperty(const std::string& key);
 

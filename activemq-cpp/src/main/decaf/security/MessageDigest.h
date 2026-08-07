@@ -50,8 +50,8 @@ namespace security
      * initialized state.
      *
      * Implementations are free to implement the clone method.  Client
-     * applications can test cloneability by attempting cloning and catching the
-     * CloneNotSupportedException:
+     * applications can test cloneability by attempting cloning and catching
+     * std::logic_error:
      *
      *   MessageDigest* md = MessageDigest::getInstance("SHA");
      *
@@ -61,7 +61,7 @@ namespace security
      *       byte[] toChapter1Digest = tc1.digest();
      *       md.update(toChapter2);
      *       ...etc.
-     *   } catch (CloneNotSupportedException& ex) {
+     *   } catch (std::logic_error& ex) {
      *       throw DigestException("couldn't make digest of partial content");
      *   }
      *
@@ -188,8 +188,7 @@ namespace security
          *
          * @return a clone of this MessageDigest if possible.
          *
-         * @throws CloneNotSupportedException if the SPI in use cannot be
-         * cloned.
+         * @throws std::logic_error if the SPI in use cannot be cloned.
          */
         MessageDigest* clone();
 

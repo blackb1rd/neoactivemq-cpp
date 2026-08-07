@@ -16,14 +16,14 @@
  */
 
 #include "SSLSocket.h"
-
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <stdexcept>
+#include <string>
 
 using namespace decaf;
 using namespace decaf::net;
 using namespace decaf::net::ssl;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 SSLSocket::SSLSocket()
@@ -90,7 +90,14 @@ void SSLSocket::setSSLParameters(const SSLParameters& value)
             this->setEnabledProtocols(value.getProtocols());
         }
     }
-    DECAF_CATCH_RETHROW(IllegalArgumentException)
-    DECAF_CATCH_EXCEPTION_CONVERT(Exception, IllegalArgumentException)
-    DECAF_CATCHALL_THROW(IllegalArgumentException)
+    catch (Exception& ex)
+    {
+        throw activemq::exceptions::InvalidArgumentException(ex.getMessage());
+    }
+    catch (...)
+    {
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+            ": caught unknown exception");
+    }
 }

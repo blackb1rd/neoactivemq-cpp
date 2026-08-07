@@ -17,14 +17,15 @@
 
 #include "CountDownLatch.h"
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/lang/Integer.h>
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
 #include <decaf/util/concurrent/TimeUnit.h>
 #include <decaf/util/concurrent/locks/AbstractQueuedSynchronizer.h>
+#include <stdexcept>
+#include <string>
 
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 using namespace decaf::util::concurrent::locks;
@@ -94,9 +95,9 @@ CountDownLatch::CountDownLatch(int count)
 {
     if (count < 0)
     {
-        throw IllegalArgumentException(__FILE__,
-                                       __LINE__,
-                                       "Count must be non-negative.");
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "Count must be non-negative.");
     }
 
     this->sync = new LatchSync(count);
@@ -119,7 +120,6 @@ void CountDownLatch::await()
     {
         this->sync->acquireSharedInterruptibly(1);
     }
-    DECAF_CATCH_RETHROW(decaf::lang::exceptions::InterruptedException)
     DECAF_CATCH_RETHROW(decaf::lang::Exception)
     DECAF_CATCHALL_THROW(decaf::lang::Exception)
 }
@@ -133,7 +133,6 @@ bool CountDownLatch::await(long long timeOut)
             1,
             TimeUnit::MILLISECONDS.toNanos(timeOut));
     }
-    DECAF_CATCH_RETHROW(decaf::lang::exceptions::InterruptedException)
     DECAF_CATCH_RETHROW(decaf::lang::Exception)
     DECAF_CATCHALL_THROW(decaf::lang::Exception)
 }
@@ -145,7 +144,6 @@ bool CountDownLatch::await(long long timeout, const TimeUnit& unit)
     {
         return this->sync->tryAcquireSharedNanos(1, unit.toNanos(timeout));
     }
-    DECAF_CATCH_RETHROW(decaf::lang::exceptions::InterruptedException)
     DECAF_CATCH_RETHROW(decaf::lang::Exception)
     DECAF_CATCHALL_THROW(decaf::lang::Exception)
 }

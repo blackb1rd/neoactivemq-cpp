@@ -20,6 +20,8 @@
 #include <activemq/commands/ConnectionControl.h>
 #include <activemq/commands/RemoveInfo.h>
 #include <activemq/commands/ShutdownInfo.h>
+#include <activemq/exceptions/ExceptionTypes.h>
+#include <activemq/exceptions/IoExceptions.h>
 #include <activemq/threads/CompositeTaskRunner.h>
 #include <activemq/threads/DedicatedTaskRunner.h>
 #include <activemq/transport/DefaultTransportListener.h>
@@ -31,7 +33,7 @@
 #include <activemq/transport/failover/URIPool.h>
 #include <activemq/util/AMQLog.h>
 #include <activemq/util/URISupport.h>
-#include <decaf/lang/exceptions/IllegalThreadStateException.h>
+#include <decaf/lang/Exception.h>
 #include <decaf/util/LinkedList.h>
 #include <decaf/util/Random.h>
 #include <decaf/util/StlMap.h>
@@ -40,8 +42,11 @@
 #include <decaf/util/concurrent/TimeUnit.h>
 #include <atomic>
 #include <chrono>
+#include <exception>
 #include <memory>
 #include <sstream>
+#include <stdexcept>
+#include <string>
 #include <vector>
 
 using namespace std;
@@ -54,12 +59,10 @@ using namespace activemq::transport;
 using namespace activemq::transport::failover;
 using namespace activemq::util;
 using namespace decaf;
-using namespace decaf::io;
 using namespace decaf::net;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 namespace activemq
@@ -396,7 +399,7 @@ namespace transport
                         {
                             sleepMutex.wait(reconnectDelay);
                         }
-                        catch (InterruptedException& e)
+                        catch (InterruptedException&)
                         {
                             Thread::currentThread()->interrupt();
                         }
@@ -437,24 +440,7 @@ namespace transport
             {
                 if (this->transportListener != NULL)
                 {
-                    std::shared_ptr<IOException> ioException;
-                    try
-                    {
-                        ioException = std::dynamic_pointer_cast<IOException>(
-                            this->connectionFailure);
-                    }
-                    AMQ_CATCH_NOTHROW(ClassCastException)
-
-                    if (ioException)
-                    {
-                        transportListener->onException(
-                            *this->connectionFailure);
-                    }
-                    else
-                    {
-                        transportListener->onException(
-                            IOException(*this->connectionFailure));
-                    }
+                    transportListener->onException(*this->connectionFailure);
                 }
 
                 reconnectMutex.notifyAll();
@@ -615,9 +601,9 @@ void FailoverTransport::reconnect(const decaf::net::URI& uri)
             reconnect(true);
         }
     }
-    AMQ_CATCH_RETHROW(IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, IOException)
-    AMQ_CATCHALL_THROW(IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(Exception, activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -773,9 +759,10 @@ void FailoverTransport::oneway(const std::shared_ptr<Command> command)
                         // disposed.
                         if (this->impl->closed)
                         {
-                            error.reset(new IOException(__FILE__,
-                                                        __LINE__,
-                                                        "Transport disposed."));
+                            error.reset(new decaf::lang::Exception(
+                                __FILE__,
+                                __LINE__,
+                                "Transport disposed."));
                         }
                         else if (this->impl->connectionFailure)
                         {
@@ -783,7 +770,7 @@ void FailoverTransport::oneway(const std::shared_ptr<Command> command)
                         }
                         else if (timedout == true)
                         {
-                            error.reset(new IOException(
+                            error.reset(new decaf::lang::Exception(
                                 __FILE__,
                                 __LINE__,
                                 "Failover timeout of %d ms reached.",
@@ -791,16 +778,17 @@ void FailoverTransport::oneway(const std::shared_ptr<Command> command)
                         }
                         else if (!this->impl->willReconnect())
                         {
-                            error.reset(new IOException(
+                            error.reset(new decaf::lang::Exception(
                                 __FILE__,
                                 __LINE__,
                                 "Maximum reconnection attempts exceeded"));
                         }
                         else
                         {
-                            error.reset(new IOException(__FILE__,
-                                                        __LINE__,
-                                                        "Unexpected failure."));
+                            error.reset(new decaf::lang::Exception(
+                                __FILE__,
+                                __LINE__,
+                                "Unexpected failure."));
                         }
 
                         break;
@@ -846,7 +834,7 @@ void FailoverTransport::oneway(const std::shared_ptr<Command> command)
                             this->impl->shutdown = true;
                         }
                     }
-                    catch (IOException& e)
+                    catch (activemq::exceptions::IOException& e)
                     {
                         e.setMark(__FILE__, __LINE__);
                         AMQ_LOG_DEBUG("FailoverTransport",
@@ -885,7 +873,7 @@ void FailoverTransport::oneway(const std::shared_ptr<Command> command)
 
                     return;
                 }
-                catch (IOException& e)
+                catch (activemq::exceptions::IOException& e)
                 {
                     e.setMark(__FILE__, __LINE__);
                     handleTransportFailure(e);
@@ -893,12 +881,13 @@ void FailoverTransport::oneway(const std::shared_ptr<Command> command)
             }
         }
     }
-    catch (InterruptedException& ex)
+    catch (InterruptedException&)
     {
         Thread::currentThread()->interrupt();
-        throw InterruptedIOException(__FILE__,
-                                     __LINE__,
-                                     "FailoverTransport oneway() interrupted");
+        throw InterruptedIOException(
+            __FILE__,
+            __LINE__,
+            std::string("FailoverTransport oneway() interrupted"));
     }
     AMQ_CATCHALL_NOTHROW()
 
@@ -906,7 +895,7 @@ void FailoverTransport::oneway(const std::shared_ptr<Command> command)
     {
         if (error)
         {
-            throw IOException(*error);
+            throw activemq::exceptions::IOException(*error);
         }
     }
 }
@@ -916,7 +905,7 @@ std::shared_ptr<FutureResponse> FailoverTransport::asyncRequest(
     const std::shared_ptr<Command> command                   AMQCPP_UNUSED,
     const std::shared_ptr<ResponseCallback> responseCallback AMQCPP_UNUSED)
 {
-    throw decaf::lang::exceptions::UnsupportedOperationException(
+    throw activemq::exceptions::UnsupportedOperationException(
         __FILE__,
         __LINE__,
         "FailoverTransport::asyncRequest - Not Supported");
@@ -926,7 +915,7 @@ std::shared_ptr<FutureResponse> FailoverTransport::asyncRequest(
 std::shared_ptr<Response> FailoverTransport::request(
     const std::shared_ptr<Command> command AMQCPP_UNUSED)
 {
-    throw decaf::lang::exceptions::UnsupportedOperationException(
+    throw activemq::exceptions::UnsupportedOperationException(
         __FILE__,
         __LINE__,
         "FailoverTransport::request - Not Supported");
@@ -937,7 +926,7 @@ std::shared_ptr<Response> FailoverTransport::request(
     const std::shared_ptr<Command> command AMQCPP_UNUSED,
     unsigned int timeout                   AMQCPP_UNUSED)
 {
-    throw decaf::lang::exceptions::UnsupportedOperationException(
+    throw activemq::exceptions::UnsupportedOperationException(
         __FILE__,
         __LINE__,
         "FailoverTransport::request - Not Supported");
@@ -981,9 +970,9 @@ void FailoverTransport::start()
             }
         }
     }
-    AMQ_CATCH_RETHROW(IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, IOException)
-    AMQ_CATCHALL_THROW(IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(Exception, activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -998,9 +987,9 @@ void FailoverTransport::stop()
             this->impl->reconnectMutex.notifyAll();
         }
     }
-    AMQ_CATCH_RETHROW(IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, IOException)
-    AMQ_CATCHALL_THROW(IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(Exception, activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1065,9 +1054,9 @@ void FailoverTransport::close()
 
         this->impl->taskRunner->shutdown(TimeUnit::SECONDS.toMillis(30));
     }
-    AMQ_CATCH_RETHROW(IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, IOException)
-    AMQ_CATCHALL_THROW(IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(Exception, activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1088,7 +1077,7 @@ void FailoverTransport::reconnect(bool rebalance)
             {
                 this->impl->taskRunner->wakeup();
             }
-            catch (InterruptedException& ex)
+            catch (InterruptedException&)
             {
                 Thread::currentThread()->interrupt();
             }
@@ -1137,9 +1126,9 @@ void FailoverTransport::restoreTransport(
             transport->oneway(iter->next());
         }
     }
-    AMQ_CATCH_RETHROW(IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, IOException)
-    AMQ_CATCHALL_THROW(IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(Exception, activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1215,6 +1204,16 @@ void FailoverTransport::handleTransportFailure(
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+void FailoverTransport::handleTransportFailure(
+    const activemq::exceptions::IOException& error)
+{
+    decaf::lang::Exception wrapped(__FILE__,
+                                   __LINE__,
+                                   error.getMessage().c_str());
+    handleTransportFailure(wrapped);
+}
+
+////////////////////////////////////////////////////////////////////////////////
 void FailoverTransport::handleConnectionControl(
     const std::shared_ptr<Command> control)
 {
@@ -1239,7 +1238,7 @@ void FailoverTransport::handleConnectionControl(
                         reconnect(URI(reconnectStr));
                     }
                 }
-                catch (Exception& e)
+                catch (const std::exception&)
                 {
                 }
             }
@@ -1275,7 +1274,7 @@ void FailoverTransport::processNewTransports(bool        rebalance,
                     URI uri(str);
                     list.add(uri);
                 }
-                catch (Exception& e)
+                catch (const std::exception&)
                 {
                 }
             }
@@ -1286,7 +1285,7 @@ void FailoverTransport::processNewTransports(bool        rebalance,
                 {
                     updateURIs(rebalance, list);
                 }
-                catch (IOException& e)
+                catch (activemq::exceptions::IOException& e)
                 {
                 }
             }
@@ -1408,10 +1407,10 @@ bool FailoverTransport::iterate()
             {
                 AMQ_LOG_ERROR("FailoverTransport",
                               "No URIs available for reconnect");
-                failure.reset(
-                    new IOException(__FILE__,
-                                    __LINE__,
-                                    "No URIs available for reconnect."));
+                failure.reset(new decaf::lang::Exception(
+                    __FILE__,
+                    __LINE__,
+                    "No URIs available for reconnect."));
             }
             else
             {
@@ -1557,7 +1556,7 @@ bool FailoverTransport::iterate()
                         {
                             this->impl->sleepMutex.wait(sleepDelay);
                         }
-                        catch (InterruptedException& e)
+                        catch (InterruptedException&)
                         {
                             Thread::currentThread()->interrupt();
                         }
@@ -1605,7 +1604,7 @@ bool FailoverTransport::iterate()
                             {
                                 uri = connectList->getURI();
                             }
-                            catch (NoSuchElementException& ex)
+                            catch (NoSuchElementException&)
                             {
                                 break;
                             }
@@ -1757,6 +1756,60 @@ bool FailoverTransport::iterate()
                         }
 
                         return false;
+                    }
+                    catch (IOException& e)
+                    {
+                        // createTransport() converts many failures to
+                        // activemq::exceptions::IOException, which is not a
+                        // decaf::lang::Exception; treat like Exception& below.
+                        decaf::lang::Exception dex(__FILE__,
+                                                   __LINE__,
+                                                   "%s",
+                                                   e.getMessage().c_str());
+                        dex.setMark(__FILE__, __LINE__);
+                        AMQ_LOG_DEBUG("FailoverTransport",
+                                      "Connection attempt to "
+                                          << uri.toString()
+                                          << " failed: " << dex.getMessage());
+                        transportAlreadyStarted = false;
+                        if (transport)
+                        {
+                            if (this->impl->disposedListener != NULL)
+                            {
+                                transport->setTransportListener(
+                                    this->impl->disposedListener.get());
+                            }
+
+                            try
+                            {
+                                transport->stop();
+                            }
+                            catch (...)
+                            {
+                            }
+
+                            this->impl->connected.store(
+                                false,
+                                std::memory_order_release);
+                            this->impl->closeTask->add(transport);
+                            this->impl->taskRunner->wakeup();
+                            transport.reset();
+                            this->impl->connectingTransport.reset();
+                        }
+
+                        failures.add(uri);
+                        failure.reset(dex.clone());
+
+                        int reconnectAttemptsIo =
+                            this->impl->calculateReconnectAttemptLimit();
+                        this->impl->markBrokerFailed(uri,
+                                                     dex.getMessage(),
+                                                     reconnectAttemptsIo);
+                        int uriAttemptsIo = this->impl->getUriFailureCount(uri);
+                        AMQ_LOG_DEBUG("FailoverTransport",
+                                      "URI " << uri.toString()
+                                             << " failure count: "
+                                             << uriAttemptsIo);
                     }
                     catch (Exception& e)
                     {
@@ -1937,7 +1990,7 @@ std::shared_ptr<Transport> FailoverTransport::createTransport(
 
         if (factory == NULL)
         {
-            throw new IOException(
+            throw activemq::exceptions::IOException(
                 __FILE__,
                 __LINE__,
                 "Invalid URI specified, no valid Factory Found.");
@@ -1967,9 +2020,9 @@ std::shared_ptr<Transport> FailoverTransport::createTransport(
 
         return transport;
     }
-    AMQ_CATCH_RETHROW(IOException)
-    AMQ_CATCH_EXCEPTION_CONVERT(Exception, IOException)
-    AMQ_CATCHALL_THROW(IOException)
+    AMQ_CATCH_RETHROW(activemq::exceptions::IOException)
+    AMQ_CATCH_EXCEPTION_CONVERT(Exception, activemq::exceptions::IOException)
+    AMQ_CATCHALL_THROW(activemq::exceptions::IOException)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -2035,7 +2088,7 @@ void FailoverTransport::processResponse(const std::shared_ptr<Response> response
             object =
                 this->impl->requestMap.remove(response->getCorrelationId());
         }
-        catch (NoSuchElementException& ex)
+        catch (NoSuchElementException&)
         {
             // Not tracking this request in our map, not an error.
         }
@@ -2043,16 +2096,12 @@ void FailoverTransport::processResponse(const std::shared_ptr<Response> response
 
     if (object)
     {
-        try
+        std::shared_ptr<Tracked> tracked =
+            std::dynamic_pointer_cast<Tracked>(object);
+        if (tracked)
         {
-            std::shared_ptr<Tracked> tracked =
-                std::dynamic_pointer_cast<Tracked>(object);
-            if (tracked)
-            {
-                tracked->onResponse();
-            }
+            tracked->onResponse();
         }
-        AMQ_CATCH_NOTHROW(ClassCastException)
     }
 }
 
@@ -2316,7 +2365,7 @@ void FailoverTransport::setPriorityURIs(
         {
             this->impl->priorityUris->addURI(URI(str));
         }
-        catch (Exception& e)
+        catch (const std::exception&)
         {
         }
     }

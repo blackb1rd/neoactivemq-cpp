@@ -23,8 +23,6 @@
 #include <activemq/util/Config.h>
 #include <activemq/util/PrimitiveMap.h>
 
-#include <decaf/lang/exceptions/NullPointerException.h>
-
 namespace activemq
 {
 namespace wireformat
@@ -72,7 +70,7 @@ namespace wireformat
                  * @param properties - The PrimitiveMap to store the rest of the
                  * properties in.
                  *
-                 * @throws NullPointerException if either param is NULL
+                 * @throws std::logic_error if either param is NULL
                  */
                 MessagePropertyInterceptor(commands::Message*  message,
                                            util::PrimitiveMap* properties);

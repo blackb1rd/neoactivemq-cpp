@@ -17,6 +17,8 @@
 
 #include <gtest/gtest.h>
 
+#include <exception>
+
 #include <activemq/transport/tcp/TcpTransport.h>
 #include <activemq/transport/tcp/TcpTransportFactory.h>
 
@@ -195,7 +197,7 @@ public:
                     // flag
                     continue;
                 }
-                catch (IOException& io)
+                catch (activemq::exceptions::IOException& io)
                 {
                     // IOException during accept usually means socket was closed
                     // Check if we're shutting down
@@ -209,7 +211,7 @@ public:
                 }
             }
         }
-        catch (IOException& ex)
+        catch (activemq::exceptions::IOException& ex)
         {
             // Only set error if not shutting down
             if (!done)
@@ -261,31 +263,51 @@ void TcpTransportTest::TearDown()
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(TcpTransportTest, testTransportCreateWithRadomFailures)
 {
-    Properties          properties;
-    OpenWireFormat      wireFormat(properties);
     TcpTransportFactory factory;
 
     int port = server->getLocalPort();
-    URI connectUri("tcp://localhost:" + Integer::toString(port));
+    // Use IPv4 loopback: on Linux CI "localhost" often resolves to ::1 first,
+    // which can behave differently from IPv4 and amplify races with rapid
+    // connects; ServerSocket is bound to all interfaces on IPv4.
+    URI connectUri("tcp://127.0.0.1:" + Integer::toString(port));
 
-    std::shared_ptr<Transport> transport;
-
-    // Test rapid creation with random connect failures.
+    // Rapid creation with random connect failures on the server side.
+    // Each iteration must use its own transport: if create() throws, we must
+    // not call start()/close() on null or on a transport from a previous
+    // iteration.
     for (int i = 0; i < 1000; ++i)
     {
+        std::shared_ptr<Transport> transport;
         try
         {
             transport = factory.create(connectUri);
         }
-        catch (Exception& ex)
+        catch (Exception&)
         {
+        }
+        catch (std::exception&)
+        {
+        }
+        catch (...)
+        {
+        }
+
+        if (!transport)
+        {
+            continue;
         }
 
         try
         {
             transport->start();
         }
-        catch (Exception& ex)
+        catch (Exception&)
+        {
+        }
+        catch (std::exception&)
+        {
+        }
+        catch (...)
         {
         }
 
@@ -293,7 +315,13 @@ TEST_F(TcpTransportTest, testTransportCreateWithRadomFailures)
         {
             transport->close();
         }
-        catch (Exception& ex)
+        catch (Exception&)
+        {
+        }
+        catch (std::exception&)
+        {
+        }
+        catch (...)
         {
         }
     }

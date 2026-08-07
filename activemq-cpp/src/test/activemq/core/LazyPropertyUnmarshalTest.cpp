@@ -148,7 +148,7 @@ void LazyPropertyUnmarshalTest::testCorruptedPropertiesThrowIOException()
         message->getMessageProperties();
         FAIL() << ("Expected IOException for corrupted properties");
     }
-    catch (IOException& e)
+    catch (activemq::exceptions::IOException& e)
     {
         exceptionThrown = true;
         // Expected - corrupted properties should throw IOException
@@ -262,7 +262,7 @@ void LazyPropertyUnmarshalTest::testCorruptedMessageDoesNotCloseConnection()
         {
             message->getMessageProperties();
         }
-        catch (IOException& e)
+        catch (activemq::exceptions::IOException& e)
         {
             ioExceptionThrown = true;
         }

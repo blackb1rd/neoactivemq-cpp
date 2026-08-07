@@ -21,7 +21,6 @@
 #include <activemq/commands/WireFormatInfo.h>
 #include <activemq/util/Config.h>
 #include <activemq/wireformat/WireFormatFactory.h>
-#include <decaf/lang/exceptions/IllegalStateException.h>
 #include <decaf/util/Properties.h>
 #include <memory>
 

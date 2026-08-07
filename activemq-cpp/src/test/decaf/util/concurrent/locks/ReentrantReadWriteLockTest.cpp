@@ -17,6 +17,8 @@
 
 #include <gtest/gtest.h>
 
+#include <stdexcept>
+
 #include <decaf/lang/Runnable.h>
 #include <decaf/util/Date.h>
 #include <decaf/util/concurrent/ExecutorsTestSupport.h>
@@ -25,7 +27,6 @@
 
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 using namespace decaf::util::concurrent::locks;
@@ -73,7 +74,7 @@ public:
         {
             lock->writeLock().lockInterruptibly();
         }
-        catch (InterruptedException& success)
+        catch (std::runtime_error& success)
         {
         }
     }
@@ -108,7 +109,7 @@ public:
             lock->writeLock().lockInterruptibly();
             test->threadShouldThrow();
         }
-        catch (InterruptedException& success)
+        catch (std::runtime_error& success)
         {
         }
     }
@@ -227,7 +228,7 @@ TEST_F(ReentrantReadWriteLockTest, testUnlockIllegalMonitorStateException)
         rl.writeLock().unlock();
         shouldThrow();
     }
-    catch (IllegalMonitorStateException& success)
+    catch (std::logic_error& success)
     {
     }
 }
@@ -271,7 +272,7 @@ public:
             lock->writeLock().lockInterruptibly();
             lock->writeLock().unlock();
         }
-        catch (InterruptedException& success)
+        catch (std::runtime_error& success)
         {
         }
     }
@@ -336,7 +337,7 @@ public:
         {
             lock->writeLock().tryLock(1000, TimeUnit::MILLISECONDS);
         }
-        catch (InterruptedException& success)
+        catch (std::runtime_error& success)
         {
         }
     }
@@ -401,7 +402,7 @@ public:
         {
             lock->readLock().lockInterruptibly();
         }
-        catch (InterruptedException& success)
+        catch (std::runtime_error& success)
         {
         }
     }
@@ -468,7 +469,7 @@ public:
             lock->readLock().tryLock(1000, TimeUnit::MILLISECONDS);
             test->threadShouldThrow();
         }
-        catch (InterruptedException& success)
+        catch (std::runtime_error& success)
         {
         }
     }
@@ -1639,7 +1640,7 @@ public:
             lock->writeLock().lockInterruptibly();
             test->threadShouldThrow();
         }
-        catch (InterruptedException& success)
+        catch (std::runtime_error& success)
         {
         }
     }
@@ -1711,7 +1712,7 @@ public:
             lock->readLock().lockInterruptibly();
             test->threadShouldThrow();
         }
-        catch (InterruptedException& success)
+        catch (std::runtime_error& success)
         {
         }
     }
@@ -1758,7 +1759,7 @@ TEST_F(ReentrantReadWriteLockTest, testAwaitIllegalMonitor)
         c->await();
         shouldThrow();
     }
-    catch (IllegalMonitorStateException& success)
+    catch (std::logic_error& success)
     {
     }
     catch (Exception& ex)
@@ -1777,7 +1778,7 @@ TEST_F(ReentrantReadWriteLockTest, testSignalIllegalMonitor)
         c->signal();
         shouldThrow();
     }
-    catch (IllegalMonitorStateException& success)
+    catch (std::logic_error& success)
     {
     }
     catch (Exception& ex)
@@ -1878,7 +1879,7 @@ public:
             cond->await();
             lock->writeLock().unlock();
         }
-        catch (InterruptedException& e)
+        catch (std::runtime_error& e)
         {
             test->threadUnexpectedException();
         }
@@ -2042,7 +2043,7 @@ public:
             lock->writeLock().unlock();
             test->threadShouldThrow();
         }
-        catch (InterruptedException& success)
+        catch (std::runtime_error& success)
         {
         }
     }
@@ -2113,7 +2114,7 @@ public:
             lock->writeLock().unlock();
             test->threadShouldThrow();
         }
-        catch (InterruptedException& success)
+        catch (std::runtime_error& success)
         {
         }
     }
@@ -2183,7 +2184,7 @@ public:
             lock->writeLock().unlock();
             test->threadShouldThrow();
         }
-        catch (InterruptedException& success)
+        catch (std::runtime_error& success)
         {
         }
     }
@@ -2250,7 +2251,7 @@ public:
             cond->await();
             lock->writeLock().unlock();
         }
-        catch (InterruptedException& e)
+        catch (std::runtime_error& e)
         {
             test->threadUnexpectedException();
         }
@@ -2329,7 +2330,7 @@ TEST_F(ReentrantReadWriteLockTest, testHasQueuedThreadNPE)
         sync.hasQueuedThread(NULL);
         shouldThrow();
     }
-    catch (NullPointerException& success)
+    catch (std::logic_error& success)
     {
     }
 }
@@ -2461,7 +2462,7 @@ TEST_F(ReentrantReadWriteLockTest, testHasWaitersNPE)
         lock.hasWaiters(NULL);
         shouldThrow();
     }
-    catch (NullPointerException& success)
+    catch (std::logic_error& success)
     {
     }
     catch (Exception& ex)
@@ -2479,7 +2480,7 @@ TEST_F(ReentrantReadWriteLockTest, testGetWaitQueueLengthNPE)
         lock.getWaitQueueLength(NULL);
         shouldThrow();
     }
-    catch (NullPointerException& success)
+    catch (std::logic_error& success)
     {
     }
     catch (Exception& ex)
@@ -2497,7 +2498,7 @@ TEST_F(ReentrantReadWriteLockTest, testGetWaitingThreadsNPE)
         lock.getWaitingThreadsPublic(NULL);
         shouldThrow();
     }
-    catch (NullPointerException& success)
+    catch (std::logic_error& success)
     {
     }
     catch (Exception& ex)
@@ -2517,7 +2518,7 @@ TEST_F(ReentrantReadWriteLockTest, testHasWaitersIAE)
         lock2.hasWaiters(c.get());
         shouldThrow();
     }
-    catch (IllegalArgumentException& success)
+    catch (std::invalid_argument& success)
     {
     }
     catch (Exception& ex)
@@ -2536,7 +2537,7 @@ TEST_F(ReentrantReadWriteLockTest, testHasWaitersIMSE)
         lock.hasWaiters(c.get());
         shouldThrow();
     }
-    catch (IllegalMonitorStateException& success)
+    catch (std::logic_error& success)
     {
     }
     catch (Exception& ex)
@@ -2556,7 +2557,7 @@ TEST_F(ReentrantReadWriteLockTest, testGetWaitQueueLengthIAE)
         lock2.getWaitQueueLength(c.get());
         shouldThrow();
     }
-    catch (IllegalArgumentException& success)
+    catch (std::invalid_argument& success)
     {
     }
     catch (Exception& ex)
@@ -2575,7 +2576,7 @@ TEST_F(ReentrantReadWriteLockTest, testGetWaitQueueLengthIMSE)
         lock.getWaitQueueLength(c.get());
         shouldThrow();
     }
-    catch (IllegalMonitorStateException& success)
+    catch (std::logic_error& success)
     {
     }
     catch (Exception& ex)
@@ -2595,7 +2596,7 @@ TEST_F(ReentrantReadWriteLockTest, testGetWaitingThreadsIAE)
         lock2.getWaitingThreadsPublic(c.get());
         shouldThrow();
     }
-    catch (IllegalArgumentException& success)
+    catch (std::invalid_argument& success)
     {
     }
     catch (Exception& ex)
@@ -2614,7 +2615,7 @@ TEST_F(ReentrantReadWriteLockTest, testGetWaitingThreadsIMSE)
         lock.getWaitingThreadsPublic(c.get());
         shouldThrow();
     }
-    catch (IllegalMonitorStateException& success)
+    catch (std::logic_error& success)
     {
     }
     catch (Exception& ex)
@@ -2663,7 +2664,7 @@ public:
             cond->await();
             lock->writeLock().unlock();
         }
-        catch (InterruptedException& e)
+        catch (std::runtime_error& e)
         {
             test->threadUnexpectedException();
         }
@@ -2743,7 +2744,7 @@ public:
             cond->await();
             lock->writeLock().unlock();
         }
-        catch (InterruptedException& e)
+        catch (std::runtime_error& e)
         {
             test->threadUnexpectedException();
         }
@@ -2824,7 +2825,7 @@ public:
             cond->await();
             lock->writeLock().unlock();
         }
-        catch (InterruptedException& e)
+        catch (std::runtime_error& e)
         {
             test->threadUnexpectedException();
         }
@@ -2869,7 +2870,7 @@ public:
             cond->await();
             lock->writeLock().unlock();
         }
-        catch (InterruptedException& e)
+        catch (std::runtime_error& e)
         {
             test->threadUnexpectedException();
         }

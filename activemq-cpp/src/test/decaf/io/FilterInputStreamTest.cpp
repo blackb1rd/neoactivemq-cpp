@@ -15,15 +15,16 @@
  * limitations under the License.
  */
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/io/ByteArrayInputStream.h>
 #include <decaf/io/FilterInputStream.h>
 #include <decaf/lang/Exception.h>
 #include <gtest/gtest.h>
+#include <string>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::io;
 using namespace decaf::util;
 
@@ -124,14 +125,16 @@ protected:
 
         if (buffer == NULL)
         {
-            throw NullPointerException(__FILE__, __LINE__, "Buffer was Null.");
+            throw activemq::exceptions::IllegalStateException(
+                __FILE__,
+                __LINE__,
+                "Buffer was Null.");
         }
 
         if (offset > size || offset + length > size)
         {
-            throw IndexOutOfBoundsException(
-                __FILE__,
-                __LINE__,
+            throw activemq::exceptions::OutOfRangeException(
+                std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
                 "Offset + Length greater than the given buffer size.");
         }
 
@@ -278,19 +281,23 @@ TEST_F(FilterInputStreamTest, testReadBIIIExceptions)
     MyInputStream     myStream(testStr);
     FilterInputStream is(&myStream);
 
-    ASSERT_THROW(is.read(NULL, 1000, 0, 1001), NullPointerException)
-        << ("should throw NullPointerException");
+    ASSERT_THROW(is.read(NULL, 1000, 0, 1001),
+                 activemq::exceptions::IllegalStateException)
+        << ("should throw activemq::exceptions::IllegalStateException");
 
     unsigned char buf[1000];
 
-    ASSERT_THROW(is.read(buf, 1000, 0, 1001), IndexOutOfBoundsException)
-        << ("should throw IndexOutOfBoundsException");
+    ASSERT_THROW(is.read(buf, 1000, 0, 1001),
+                 activemq::exceptions::OutOfRangeException)
+        << ("should throw activemq::exceptions::OutOfRangeException");
 
-    ASSERT_THROW(is.read(buf, 1000, 1001, 0), IndexOutOfBoundsException)
-        << ("should throw IndexOutOfBoundsException");
+    ASSERT_THROW(is.read(buf, 1000, 1001, 0),
+                 activemq::exceptions::OutOfRangeException)
+        << ("should throw activemq::exceptions::OutOfRangeException");
 
-    ASSERT_THROW(is.read(buf, 1000, 500, 501), IndexOutOfBoundsException)
-        << ("should throw IndexOutOfBoundsException");
+    ASSERT_THROW(is.read(buf, 1000, 500, 501),
+                 activemq::exceptions::OutOfRangeException)
+        << ("should throw activemq::exceptions::OutOfRangeException");
 
     {
         MyInputStream     myStream(testStr);

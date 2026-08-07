@@ -15,13 +15,13 @@
  * limitations under the License.
  */
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/internal/net/https/HttpsHandler.h>
-
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
+#include <stdexcept>
+#include <string>
 
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::internal;
 using namespace decaf::internal::net;
 using namespace decaf::internal::net::https;
@@ -45,9 +45,9 @@ decaf::net::URLConnection* HttpsHandler::openConnection(
 {
     if (proxy == NULL)
     {
-        throw IllegalArgumentException(__FILE__,
-                                       __LINE__,
-                                       "proxy object cannot be NULL");
+        throw activemq::exceptions::InvalidArgumentException(
+            std::string(__FILE__) + ":" + std::to_string(__LINE__) + ": " +
+            "proxy object cannot be NULL");
     }
 
     return NULL;

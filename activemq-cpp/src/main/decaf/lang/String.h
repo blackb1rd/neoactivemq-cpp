@@ -25,6 +25,7 @@
 #include <decaf/lang/Comparable.h>
 
 #include <ostream>
+#include <stdexcept>
 #include <string>
 
 namespace decaf
@@ -79,7 +80,7 @@ namespace lang
          * @param count
          *      The number of copies of the character to fill.
          *
-         * @throws IndexOutOfBoundsException if the count parameter is negative.
+         * @throws std::out_of_range if the count parameter is negative.
          */
         String(const char value, int count);
 
@@ -108,7 +109,7 @@ namespace lang
          * @param array
          *      The character buffer to copy into this new String object.
          *
-         * @throws NullPointerException if the character array parameter is
+         * @throws std::logic_error if the character array parameter is
          * NULL.
          */
         String(const char* array);
@@ -126,9 +127,9 @@ namespace lang
          *      The size of the string buffer given, in case the string is not
          * NULL terminated.
          *
-         * @throws NullPointerException if the character array parameter is
+         * @throws std::logic_error if the character array parameter is
          * NULL.
-         * @throws IndexOutOfBoundsException if the size parameter is negative.
+         * @throws std::out_of_range if the size parameter is negative.
          */
         String(const char* array, int size);
 
@@ -146,9 +147,9 @@ namespace lang
          *      The number of bytes to copy from the given buffer starting from
          * the offset.
          *
-         * @throws NullPointerException if the character array parameter is
+         * @throws std::logic_error if the character array parameter is
          * NULL.
-         * @throws IndexOutOfBoundsException if the size, offset or length
+         * @throws std::out_of_range if the size, offset or length
          * parameter is negative or if the length to copy is greater than the
          * span of size - offset.
          */
@@ -172,9 +173,9 @@ namespace lang
          *      The number of bytes to copy from the given buffer starting from
          * the offset.
          *
-         * @throws NullPointerException if the character array parameter is
+         * @throws std::logic_error if the character array parameter is
          * NULL.
-         * @throws IndexOutOfBoundsException if the size, offset or length
+         * @throws std::out_of_range if the size, offset or length
          * parameter is negative or if the length to copy is greater than the
          * span of size - offset.
          */
@@ -411,7 +412,7 @@ namespace lang
          * is before the specified string, or a positive integer if this string
          *         is after the specified string.
          *
-         * @throws NullPointerException if the passed in C String value is NULL.
+         * @throws std::logic_error if the passed in C String value is NULL.
          */
         int compareTo(const char* string) const;
 
@@ -461,7 +462,7 @@ namespace lang
          * is before the specified string, or a positive integer if this string
          *         is after the specified string.
          *
-         * @throws NullPointerException if the passed in C String value is NULL.
+         * @throws std::logic_error if the passed in C String value is NULL.
          */
         int compareToIgnoreCase(const char* string) const;
 
@@ -696,7 +697,7 @@ namespace lang
          * @param destBegin
          *      The offset into the destination array to start copying to.
          *
-         * @throws IndexOutOfBoundsException if any of the following conditions
+         * @throws std::out_of_range if any of the following conditions
          * are met: srcBegin or srcEnd are negative. srcBegin is greater than
          * src end. srcEnd is greater than the length() destSize or destBegin
          * are negative. destBegin + (srcEnd - srcBegin) is greater than
@@ -1048,7 +1049,7 @@ namespace lang
          * @return a new string containing the characters from start to the end
          * of the string.
          *
-         * @throws IndexOutOfBoundsException if start < 0 or start > length().
+         * @throws std::out_of_range if start < 0 or start > length().
          */
         String substring(int start) const;
 
@@ -1064,7 +1065,7 @@ namespace lang
          *
          * @return a new string containing the characters from start to end - 1.
          *
-         * @throws IndexOutOfBoundsException if start < 0, start > end or end >
+         * @throws std::out_of_range if start < 0, start > end or end >
          * length().
          */
         String substring(int start, int end) const;
@@ -1142,7 +1143,7 @@ namespace lang
          *
          * @return the new string.
          *
-         * @throws NullPointerException if the C string pointer is NULL
+         * @throws std::logic_error if the C string pointer is NULL
          */
         static String copyValueOf(const char* data);
 
@@ -1160,8 +1161,8 @@ namespace lang
          *
          * @return the new string.
          *
-         * @throws NullPointerException if the C string is NULL
-         * @throws IndexOutOfBoundsException
+         * @throws std::logic_error if the C string is NULL
+         * @throws std::out_of_range
          *         if length < 0, start < 0 or start + length > the C string's
          * length.
          */

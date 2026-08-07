@@ -17,9 +17,10 @@
 
 #include <gtest/gtest.h>
 
+#include <stdexcept>
+
 #include <decaf/lang/Integer.h>
 #include <decaf/lang/Thread.h>
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
 #include <decaf/util/LinkedList.h>
 #include <decaf/util/concurrent/Callable.h>
 #include <decaf/util/concurrent/FutureTask.h>
@@ -30,7 +31,6 @@
 using namespace std;
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 
@@ -135,7 +135,7 @@ public:
             Thread::sleep(FutureTaskTest::MEDIUM_DELAY_MS);
             this->parent->threadShouldThrow();
         }
-        catch (InterruptedException& success)
+        catch (std::runtime_error& success)
         {
         }
 
@@ -157,16 +157,16 @@ FutureTaskTest::~FutureTaskTest()
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(FutureTaskTest, testConstructor1)
 {
-    ASSERT_THROW(new FutureTask<std::string>(NULL), NullPointerException)
-        << ("Should have thrown a NullPointerException");
+    ASSERT_THROW(new FutureTask<std::string>(NULL), std::logic_error)
+        << ("Should have thrown std::logic_error");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(FutureTaskTest, testConstructor2)
 {
     ASSERT_THROW(new FutureTask<std::string>(NULL, std::string("Test")),
-                 NullPointerException)
-        << ("Should have thrown a NullPointerException");
+                 std::logic_error)
+        << ("Should have thrown std::logic_error");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -240,8 +240,8 @@ TEST_F(FutureTaskTest, testSet)
 ////////////////////////////////////////////////////////////////////////////////
 TEST_F(FutureTaskTest, testSetException)
 {
-    NoSuchElementException nse;
-    PublicFutureTask       task(new NoOpCallable<std::string>());
+    Exception        nse(__FILE__, __LINE__, "planned exception");
+    PublicFutureTask task(new NoOpCallable<std::string>());
     task.setException(nse);
     try
     {
@@ -250,8 +250,7 @@ TEST_F(FutureTaskTest, testSetException)
     }
     catch (ExecutionException& ee)
     {
-        const NoSuchElementException* cause =
-            dynamic_cast<const NoSuchElementException*>(ee.getCause());
+        const Exception* cause = dynamic_cast<const Exception*>(ee.getCause());
         ASSERT_TRUE(cause != NULL);
     }
     catch (Exception& e)
@@ -305,7 +304,7 @@ TEST_F(FutureTaskTest, testCancelInterrupt)
         ASSERT_TRUE(task.isDone());
         ASSERT_TRUE(task.isCancelled());
     }
-    catch (InterruptedException& e)
+    catch (std::runtime_error& e)
     {
         unexpectedException();
     }
@@ -343,7 +342,7 @@ public:
         {
             Thread::sleep(FutureTaskTest::MEDIUM_DELAY_MS);
         }
-        catch (InterruptedException& success)
+        catch (std::runtime_error& success)
         {
             this->parent->threadFail("Should not interrupt");
         }
@@ -369,7 +368,7 @@ TEST_F(FutureTaskTest, testCancelNoInterrupt)
         ASSERT_TRUE(task.isDone());
         ASSERT_TRUE(task.isCancelled());
     }
-    catch (InterruptedException& e)
+    catch (std::runtime_error& e)
     {
         unexpectedException();
     }
@@ -436,7 +435,7 @@ TEST_F(FutureTaskTest, testGet1)
         ASSERT_TRUE(ft.isDone());
         ASSERT_TRUE(!ft.isCancelled());
     }
-    catch (InterruptedException& e)
+    catch (std::runtime_error& e)
     {
         unexpectedException();
     }
@@ -504,7 +503,7 @@ TEST_F(FutureTaskTest, testTimedGet1)
         ASSERT_TRUE(ft.isDone());
         ASSERT_TRUE(!ft.isCancelled());
     }
-    catch (InterruptedException& e)
+    catch (std::runtime_error& e)
     {
         unexpectedException();
     }
@@ -542,7 +541,7 @@ public:
             Thread::sleep(FutureTaskTest::MEDIUM_DELAY_MS);
             this->parent->threadShouldThrow();
         }
-        catch (InterruptedException& success)
+        catch (std::runtime_error& success)
         {
         }
 
@@ -610,7 +609,7 @@ TEST_F(FutureTaskTest, testTimedGetCancellation)
         t1.join();
         t2.join();
     }
-    catch (InterruptedException& ie)
+    catch (std::runtime_error& ie)
     {
         unexpectedException();
     }
@@ -679,7 +678,7 @@ TEST_F(FutureTaskTest, testGetCancellation)
         t1.join();
         t2.join();
     }
-    catch (InterruptedException& success)
+    catch (std::runtime_error& success)
     {
         unexpectedException();
     }
@@ -797,7 +796,7 @@ public:
             task->get();
             this->parent->threadShouldThrow();
         }
-        catch (InterruptedException& success)
+        catch (std::runtime_error& success)
         {
         }
         catch (Exception& e)
@@ -809,7 +808,7 @@ public:
 }  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(FutureTaskTest, testGetInterruptedException)
+TEST_F(FutureTaskTest, testGetRuntimeError)
 {
     FutureTask<std::string> ft(new NoOpCallable<std::string>());
     Thread                  t(&ft);
@@ -863,7 +862,7 @@ public:
             task->get(FutureTaskTest::LONG_DELAY_MS, TimeUnit::MILLISECONDS);
             this->parent->threadShouldThrow();
         }
-        catch (InterruptedException& success)
+        catch (std::runtime_error& success)
         {
         }
         catch (Exception& e)
@@ -875,7 +874,7 @@ public:
 }  // namespace
 
 ////////////////////////////////////////////////////////////////////////////////
-TEST_F(FutureTaskTest, testTimedGetInterruptedException2)
+TEST_F(FutureTaskTest, testTimedGetRuntimeError2)
 {
     FutureTask<std::string> ft(new NoOpCallable<std::string>());
     InterruptableFutureTaskLongTimeoutGetRunnable runner(this, &ft);

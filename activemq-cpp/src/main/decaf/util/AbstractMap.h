@@ -18,9 +18,6 @@
 #ifndef _DECAF_UTIL_ABSTRACTMAP_H_
 #define _DECAF_UTIL_ABSTRACTMAP_H_
 
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
-#include <decaf/lang/exceptions/UnsupportedOperationException.h>
 #include <decaf/util/Config.h>
 #include <decaf/util/Iterator.h>
 #include <decaf/util/Map.h>

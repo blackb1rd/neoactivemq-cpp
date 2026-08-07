@@ -20,10 +20,9 @@
 
 #include <activemq/util/PrimitiveValueConverter.h>
 #include <activemq/util/PrimitiveValueNode.h>
-#include <decaf/lang/exceptions/IndexOutOfBoundsException.h>
-#include <decaf/lang/exceptions/UnsupportedOperationException.h>
 #include <decaf/util/LinkedList.h>
 #include <stdio.h>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -71,8 +70,8 @@ namespace util
          * Gets the Boolean value at the specified index.
          * @param index - index to get value from
          * @return value contained at the given index
-         * @throw IndexOutOfBoundsException if index is > size()
-         * @throw UnsupportedOperationException if the type at index is not of
+         * @throw std::out_of_range if index is > size()
+         * @throws std::logic_error if the type at index is not of
          * the type that this method is to return or can convert to.
          */
         virtual bool getBool(int index) const;
@@ -84,7 +83,7 @@ namespace util
          * than the size of the list.
          * @param index - location to set in the list
          * @param value - the new value to assign to the element at index
-         * @throw IndexOutOfBoundsException if index > size().
+         * @throw std::out_of_range if index > size().
          */
         virtual void setBool(int index, bool value);
 
@@ -92,8 +91,8 @@ namespace util
          * Gets the Byte value at the specified index.
          * @param index - index to get value from
          * @return value contained at the given index
-         * @throw IndexOutOfBoundsException if index is > size()
-         * @throw UnsupportedOperationException if the type at index is not of
+         * @throw std::out_of_range if index is > size()
+         * @throws std::logic_error if the type at index is not of
          * the type that this method is to return or can convert to.
          */
         virtual unsigned char getByte(int index) const;
@@ -105,7 +104,7 @@ namespace util
          * than the size of the list.
          * @param index - location to set in the list
          * @param value - the new value to assign to the element at index
-         * @throw IndexOutOfBoundsException if index > size().
+         * @throw std::out_of_range if index > size().
          */
         virtual void setByte(int index, unsigned char value);
 
@@ -113,8 +112,8 @@ namespace util
          * Gets the Character value at the specified index.
          * @param index - index to get value from
          * @return value contained at the given index
-         * @throw IndexOutOfBoundsException if index is > size()
-         * @throw UnsupportedOperationException if the type at index is not of
+         * @throw std::out_of_range if index is > size()
+         * @throws std::logic_error if the type at index is not of
          * the type that this method is to return or can convert to.
          */
         virtual char getChar(int index) const;
@@ -126,7 +125,7 @@ namespace util
          * than the size of the list.
          * @param index - location to set in the list
          * @param value - the new value to assign to the element at index
-         * @throw IndexOutOfBoundsException if index > size().
+         * @throw std::out_of_range if index > size().
          */
         virtual void setChar(int index, char value);
 
@@ -134,8 +133,8 @@ namespace util
          * Gets the Short value at the specified index.
          * @param index - index to get value from
          * @return value contained at the given index
-         * @throw IndexOutOfBoundsException if index is > size()
-         * @throw UnsupportedOperationException if the type at index is not of
+         * @throw std::out_of_range if index is > size()
+         * @throws std::logic_error if the type at index is not of
          * the type that this method is to return or can convert to.
          */
         virtual short getShort(int index) const;
@@ -147,7 +146,7 @@ namespace util
          * than the size of the list.
          * @param index - location to set in the list
          * @param value - the new value to assign to the element at index
-         * @throw IndexOutOfBoundsException if index > size().
+         * @throw std::out_of_range if index > size().
          */
         virtual void setShort(int index, short value);
 
@@ -155,8 +154,8 @@ namespace util
          * Gets the Integer value at the specified index.
          * @param index - index to get value from
          * @return value contained at the given index
-         * @throw IndexOutOfBoundsException if index is > size()
-         * @throw UnsupportedOperationException if the type at index is not of
+         * @throw std::out_of_range if index is > size()
+         * @throws std::logic_error if the type at index is not of
          * the type that this method is to return or can convert to.
          */
         virtual int getInt(int index) const;
@@ -168,7 +167,7 @@ namespace util
          * than the size of the list.
          * @param index - location to set in the list
          * @param value - the new value to assign to the element at index
-         * @throw IndexOutOfBoundsException if index > size().
+         * @throw std::out_of_range if index > size().
          */
         virtual void setInt(int index, int value);
 
@@ -176,8 +175,8 @@ namespace util
          * Gets the Long value at the specified index.
          * @param index - index to get value from
          * @return value contained at the given index
-         * @throw IndexOutOfBoundsException if index is > size()
-         * @throw UnsupportedOperationException if the type at index is not of
+         * @throw std::out_of_range if index is > size()
+         * @throws std::logic_error if the type at index is not of
          * the type that this method is to return or can convert to.
          */
         virtual long long getLong(int index) const;
@@ -189,7 +188,7 @@ namespace util
          * than the size of the list.
          * @param index - location to set in the list
          * @param value - the new value to assign to the element at index
-         * @throw IndexOutOfBoundsException if index > size().
+         * @throw std::out_of_range if index > size().
          */
         virtual void setLong(int index, long long value);
 
@@ -197,8 +196,8 @@ namespace util
          * Gets the Float value at the specified index.
          * @param index - index to get value from
          * @return value contained at the given index
-         * @throw IndexOutOfBoundsException if index is > size()
-         * @throw UnsupportedOperationException if the type at index is not of
+         * @throw std::out_of_range if index is > size()
+         * @throws std::logic_error if the type at index is not of
          * the type that this method is to return or can convert to.
          */
         virtual float getFloat(int index) const;
@@ -210,7 +209,7 @@ namespace util
          * than the size of the list.
          * @param index - location to set in the list
          * @param value - the new value to assign to the element at index
-         * @throw IndexOutOfBoundsException if index > size().
+         * @throw std::out_of_range if index > size().
          */
         virtual void setFloat(int index, float value);
 
@@ -218,8 +217,8 @@ namespace util
          * Gets the Double value at the specified index.
          * @param index - index to get value from
          * @return value contained at the given index
-         * @throw IndexOutOfBoundsException if index is > size()
-         * @throw UnsupportedOperationException if the type at index is not of
+         * @throw std::out_of_range if index is > size()
+         * @throws std::logic_error if the type at index is not of
          * the type that this method is to return or can convert to.
          */
         virtual double getDouble(int index) const;
@@ -231,7 +230,7 @@ namespace util
          * than the size of the list.
          * @param index - location to set in the list
          * @param value - the new value to assign to the element at index
-         * @throw IndexOutOfBoundsException if index > size().
+         * @throw std::out_of_range if index > size().
          */
         virtual void setDouble(int index, double value);
 
@@ -239,8 +238,8 @@ namespace util
          * Gets the String value at the specified index.
          * @param index - index to get value from
          * @return value contained at the given index
-         * @throw IndexOutOfBoundsException if index is > size()
-         * @throw UnsupportedOperationException if the type at index is not of
+         * @throw std::out_of_range if index is > size()
+         * @throws std::logic_error if the type at index is not of
          * the type that this method is to return or can convert to.
          */
         virtual std::string getString(int index) const;
@@ -252,7 +251,7 @@ namespace util
          * than the size of the list.
          * @param index - location to set in the list
          * @param value - the new value to assign to the element at index
-         * @throw IndexOutOfBoundsException if index > size().
+         * @throw std::out_of_range if index > size().
          */
         virtual void setString(int index, const std::string& value);
 
@@ -260,8 +259,8 @@ namespace util
          * Gets the Byte Array value at the specified index.
          * @param index - index to get value from
          * @return value contained at the given index
-         * @throw IndexOutOfBoundsException if index is > size()
-         * @throw UnsupportedOperationException if the type at index is not of
+         * @throw std::out_of_range if index is > size()
+         * @throws std::logic_error if the type at index is not of
          * the type that this method is to return or can convert to.
          */
         virtual std::vector<unsigned char> getByteArray(int index) const;
@@ -273,7 +272,7 @@ namespace util
          * than the size of the list.
          * @param index - location to set in the list
          * @param value - the new value to assign to the element at index
-         * @throw IndexOutOfBoundsException if index > size().
+         * @throw std::out_of_range if index > size().
          */
         virtual void setByteArray(int                               index,
                                   const std::vector<unsigned char>& value);

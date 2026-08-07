@@ -30,7 +30,6 @@
 #include <decaf/lang/Integer.h>
 #include <decaf/lang/Long.h>
 #include <decaf/lang/Math.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/net/URI.h>
 #include <decaf/util/Properties.h>
 #include <decaf/util/concurrent/Mutex.h>
@@ -48,7 +47,6 @@ using namespace decaf::net;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 const std::string ActiveMQConnectionFactory::DEFAULT_URI =
@@ -494,15 +492,11 @@ cms::Connection* ActiveMQConnectionFactory::doCreateConnection(
         ex.setMark(__FILE__, __LINE__);
         throw ex.convertToCMSException();
     }
-    catch (decaf::lang::Exception& ex)
-    {
-        ex.setMark(__FILE__, __LINE__);
-        activemq::exceptions::ActiveMQException amqEx(ex);
-        throw amqEx.convertToCMSException();
-    }
     catch (std::exception& ex)
     {
-        throw cms::CMSException(ex.what(), nullptr);
+        ActiveMQException amqEx(__FILE__, __LINE__, "%s", ex.what());
+        amqEx.setMark(__FILE__, __LINE__);
+        throw amqEx.convertToCMSException();
     }
     catch (...)
     {

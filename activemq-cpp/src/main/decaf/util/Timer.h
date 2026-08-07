@@ -21,12 +21,10 @@
 #include <memory>
 
 #include <decaf/lang/Pointer.h>
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
-#include <decaf/lang/exceptions/IllegalStateException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/util/Config.h>
 #include <decaf/util/Date.h>
 #include <decaf/util/concurrent/TimeUnit.h>
+#include <stdexcept>
 
 namespace decaf
 {
@@ -110,7 +108,7 @@ namespace util
          *
          * @return true if the Timer terminated or false if the timeout expired.
          *
-         * @throws InterruptedException if this call is interrupted while
+         * @throws std::runtime_error if this call is interrupted while
          * awaiting termination.
          */
         bool awaitTermination(long long                                timeout,
@@ -153,10 +151,10 @@ namespace util
          * @param task - task to be scheduled.
          * @param delay - delay in milliseconds before task is to be executed.
          *
-         * @throw NullPointerException - if the TimerTask value is Null.
-         * @throw IllegalArgumentException - if delay is negative, or delay +
+         * @throw std::logic_error - if the TimerTask value is Null.
+         * @throws std::invalid_argument - if delay is negative, or delay +
          * System.currentTimeMillis() is negative.
-         * @throw IllegalStateException - if task was already scheduled or
+         * @throw std::logic_error - if task was already scheduled or
          * canceled, or timer was canceled.
          */
         void schedule(TimerTask* task, long long delay);
@@ -167,10 +165,10 @@ namespace util
          * @param task - task to be scheduled.
          * @param delay - delay in milliseconds before task is to be executed.
          *
-         * @throw NullPointerException - if the TimerTask value is Null.
-         * @throw IllegalArgumentException - if delay is negative, or delay +
+         * @throw std::logic_error - if the TimerTask value is Null.
+         * @throws std::invalid_argument - if delay is negative, or delay +
          * System.currentTimeMillis() is negative.
-         * @throw IllegalStateException - if task was already scheduled or
+         * @throw std::logic_error - if task was already scheduled or
          * canceled, or timer was canceled.
          */
         void schedule(const decaf::lang::Pointer<TimerTask>& task,
@@ -194,9 +192,9 @@ namespace util
          * @param task - task to be scheduled.
          * @param time - time at which task is to be executed.
          *
-         * @throw NullPointerException - if the TimerTask value is Null.
-         * @throw IllegalArgumentException - if time.getTime() is negative.
-         * @throw IllegalStateException - if task was already scheduled or
+         * @throw std::logic_error - if the TimerTask value is Null.
+         * @throws std::invalid_argument - if time.getTime() is negative.
+         * @throw std::logic_error - if task was already scheduled or
          * canceled, timer was canceled, or timer thread terminated.
          */
         void schedule(TimerTask* task, const Date& time);
@@ -209,9 +207,9 @@ namespace util
          * @param task - task to be scheduled.
          * @param time - time at which task is to be executed.
          *
-         * @throw NullPointerException - if the TimerTask value is Null.
-         * @throw IllegalArgumentException - if time.getTime() is negative.
-         * @throw IllegalStateException - if task was already scheduled or
+         * @throw std::logic_error - if the TimerTask value is Null.
+         * @throws std::invalid_argument - if time.getTime() is negative.
+         * @throw std::logic_error - if task was already scheduled or
          * canceled, timer was canceled, or timer thread terminated.
          */
         void schedule(const decaf::lang::Pointer<TimerTask>& task,
@@ -254,10 +252,10 @@ namespace util
          * @param period - time in milliseconds between successive task
          * executions.
          *
-         * @throw NullPointerException - if the TimerTask value is Null.
-         * @throw IllegalArgumentException - if delay is negative, or delay +
+         * @throw std::logic_error - if the TimerTask value is Null.
+         * @throws std::invalid_argument - if delay is negative, or delay +
          * System.currentTimeMillis() is negative.
-         * @throw IllegalStateException - if task was already scheduled or
+         * @throw std::logic_error - if task was already scheduled or
          * canceled, timer was canceled, or timer thread terminated.
          */
         void schedule(TimerTask* task, long long delay, long long period);
@@ -289,10 +287,10 @@ namespace util
          * @param period - time in milliseconds between successive task
          * executions.
          *
-         * @throw NullPointerException - if the TimerTask value is Null.
-         * @throw IllegalArgumentException - if delay is negative, or delay +
+         * @throw std::logic_error - if the TimerTask value is Null.
+         * @throws std::invalid_argument - if delay is negative, or delay +
          * System.currentTimeMillis() is negative.
-         * @throw IllegalStateException - if task was already scheduled or
+         * @throw std::logic_error - if task was already scheduled or
          * canceled, timer was canceled, or timer thread terminated.
          */
         void schedule(const decaf::lang::Pointer<TimerTask>& task,
@@ -336,9 +334,9 @@ namespace util
          * @param period - time in milliseconds between successive task
          * executions.
          *
-         * @throw NullPointerException - if the TimerTask value is Null.
-         * @throw IllegalArgumentException - if time.getTime() is negative.
-         * @throw IllegalStateException - if task was already scheduled or
+         * @throw std::logic_error - if the TimerTask value is Null.
+         * @throws std::invalid_argument - if time.getTime() is negative.
+         * @throw std::logic_error - if task was already scheduled or
          * canceled, timer was canceled, or timer thread terminated.
          */
         void schedule(TimerTask* task, const Date& firstTime, long long period);
@@ -370,9 +368,9 @@ namespace util
          * @param period - time in milliseconds between successive task
          * executions.
          *
-         * @throw NullPointerException - if the TimerTask value is Null.
-         * @throw IllegalArgumentException - if time.getTime() is negative.
-         * @throw IllegalStateException - if task was already scheduled or
+         * @throw std::logic_error - if the TimerTask value is Null.
+         * @throws std::invalid_argument - if time.getTime() is negative.
+         * @throw std::logic_error - if task was already scheduled or
          * canceled, timer was canceled, or timer thread terminated.
          */
         void schedule(const decaf::lang::Pointer<TimerTask>& task,
@@ -418,10 +416,10 @@ namespace util
          * @param period - time in milliseconds between successive task
          * executions.
          *
-         * @throw NullPointerException - if the TimerTask value is Null.
-         * @throw IllegalArgumentException - if delay is negative, or delay +
+         * @throw std::logic_error - if the TimerTask value is Null.
+         * @throws std::invalid_argument - if delay is negative, or delay +
          * System.currentTimeMillis() is negative.
-         * @throw IllegalStateException - if task was already scheduled or
+         * @throw std::logic_error - if task was already scheduled or
          * canceled, timer was canceled, or timer thread terminated.
          */
         void scheduleAtFixedRate(TimerTask* task,
@@ -457,10 +455,10 @@ namespace util
          * @param period - time in milliseconds between successive task
          * executions.
          *
-         * @throw NullPointerException - if the TimerTask value is Null.
-         * @throw IllegalArgumentException - if delay is negative, or delay +
+         * @throw std::logic_error - if the TimerTask value is Null.
+         * @throws std::invalid_argument - if delay is negative, or delay +
          * System.currentTimeMillis() is negative.
-         * @throw IllegalStateException - if task was already scheduled or
+         * @throw std::logic_error - if task was already scheduled or
          * canceled, timer was canceled, or timer thread terminated.
          */
         void scheduleAtFixedRate(const decaf::lang::Pointer<TimerTask>& task,
@@ -505,9 +503,9 @@ namespace util
          * @param period - time in milliseconds between successive task
          * executions.
          *
-         * @throw NullPointerException - if the TimerTask value is Null.
-         * @throw IllegalArgumentException - if time.getTime() is negative.
-         * @throw IllegalStateException - if task was already scheduled or
+         * @throw std::logic_error - if the TimerTask value is Null.
+         * @throws std::invalid_argument - if time.getTime() is negative.
+         * @throw std::logic_error - if task was already scheduled or
          * canceled, timer was canceled, or timer thread terminated.
          */
         void scheduleAtFixedRate(TimerTask*  task,
@@ -542,9 +540,9 @@ namespace util
          * @param period - time in milliseconds between successive task
          * executions.
          *
-         * @throw NullPointerException - if the TimerTask value is Null.
-         * @throw IllegalArgumentException - if time.getTime() is negative.
-         * @throw IllegalStateException - if task was already scheduled or
+         * @throw std::logic_error - if the TimerTask value is Null.
+         * @throws std::invalid_argument - if time.getTime() is negative.
+         * @throw std::logic_error - if task was already scheduled or
          * canceled, timer was canceled, or timer thread terminated.
          */
         void scheduleAtFixedRate(const decaf::lang::Pointer<TimerTask>& task,

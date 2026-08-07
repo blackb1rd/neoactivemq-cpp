@@ -18,16 +18,16 @@
 #ifndef _DECAF_LANG_ARRAYPOINTER_H_
 #define _DECAF_LANG_ARRAYPOINTER_H_
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/lang/System.h>
-#include <decaf/lang/exceptions/IllegalArgumentException.h>
-#include <decaf/lang/exceptions/IndexOutOfBoundsException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/util/Arrays.h>
 #include <decaf/util/Comparator.h>
 #include <decaf/util/Config.h>
 #include <decaf/util/concurrent/atomic/AtomicInteger.h>
 #include <algorithm>
 #include <memory>
+#include <stdexcept>
+#include <string>
 #include <type_traits>
 #include <typeinfo>
 
@@ -89,18 +89,17 @@ namespace lang
             {
                 if (value != NULL && length <= 0)
                 {
-                    throw decaf::lang::exceptions::IllegalArgumentException(
-                        __FILE__,
-                        __LINE__,
+                    throw activemq::exceptions::InvalidArgumentException(
+                        std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+                        ": " +
                         "Non-NULL array pointer cannot have a size <= zero");
                 }
 
                 if (value == NULL && length > 0)
                 {
-                    throw decaf::lang::exceptions::IllegalArgumentException(
-                        __FILE__,
-                        __LINE__,
-                        "NULL array pointer cannot have a size > zero");
+                    throw activemq::exceptions::InvalidArgumentException(
+                        std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+                        ": " + "NULL array pointer cannot have a size > zero");
                 }
             }
 
@@ -441,30 +440,30 @@ namespace lang
 
         /**
          * Dereference Operator, returns a reference to the Contained value.
-         * This method throws an NullPointerException if the contained value is
+         * This method throws std::logic_error if the contained value is
          * NULL.
          *
          * @return reference to the contained pointer.
          *
-         * @throws NullPointerException if the contained value is Null
+         * @throws std::logic_error if the contained value is Null
          */
         ReferenceType operator[](int index)
         {
             if (this->array->value == NULL)
             {
-                throw decaf::lang::exceptions::NullPointerException(
+                throw activemq::exceptions::NullPointerException(
                     __FILE__,
                     __LINE__,
-                    "ArrayPointer operator& - Pointee is NULL.");
+                    "ArrayPointer operator[] - Pointee is NULL.");
             }
 
             if (index < 0 || this->array->length <= index)
             {
-                throw decaf::lang::exceptions::IndexOutOfBoundsException(
-                    __FILE__,
-                    __LINE__,
-                    "Array Index %d is out of bounds for this array.",
-                    this->array->length);
+                throw activemq::exceptions::OutOfRangeException(
+                    std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+                    ": " + "Array Index " +
+                    std::to_string(this->array->length) +
+                    " is out of bounds for this array.");
             }
 
             return this->array->value[index];
@@ -474,19 +473,19 @@ namespace lang
         {
             if (this->array->value == NULL)
             {
-                throw decaf::lang::exceptions::NullPointerException(
+                throw activemq::exceptions::NullPointerException(
                     __FILE__,
                     __LINE__,
-                    "ArrayPointer operator& - Pointee is NULL.");
+                    "ArrayPointer operator[] - Pointee is NULL.");
             }
 
             if (index < 0 || this->array->length <= index)
             {
-                throw decaf::lang::exceptions::IndexOutOfBoundsException(
-                    __FILE__,
-                    __LINE__,
-                    "Array Index %d is out of bounds for this array.",
-                    this->array->length);
+                throw activemq::exceptions::OutOfRangeException(
+                    std::string(__FILE__) + ":" + std::to_string(__LINE__) +
+                    ": " + "Array Index " +
+                    std::to_string(this->array->length) +
+                    " is out of bounds for this array.");
             }
 
             return this->array->value[index];

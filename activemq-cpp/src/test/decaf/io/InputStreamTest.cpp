@@ -18,11 +18,11 @@
 #include <gtest/gtest.h>
 
 #include <decaf/io/InputStream.h>
+#include <stdexcept>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::io;
-using namespace decaf::lang::exceptions;
 
 class InputStreamTest : public ::testing::Test
 {
@@ -65,6 +65,6 @@ TEST_F(InputStreamTest, test)
 {
     MockInputStream stream;
 
-    ASSERT_THROW(stream.read(NULL, 0, 0, 1), NullPointerException)
-        << ("Should throw a NullPointerException");
+    ASSERT_THROW(stream.read(NULL, 0, 0, 1), std::logic_error)
+        << ("Should throw a std::logic_error");
 }

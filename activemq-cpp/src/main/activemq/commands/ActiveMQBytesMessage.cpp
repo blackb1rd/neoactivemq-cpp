@@ -19,10 +19,9 @@
 #include <activemq/util/CMSExceptionSupport.h>
 
 #include <decaf/io/ByteArrayInputStream.h>
-#include <decaf/io/EOFException.h>
 #include <decaf/io/FilterOutputStream.h>
-#include <decaf/io/IOException.h>
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/util/zip/DeflaterOutputStream.h>
 #include <decaf/util/zip/InflaterInputStream.h>
 
@@ -32,8 +31,6 @@ using namespace activemq::util;
 using namespace activemq::commands;
 using namespace activemq::exceptions;
 using namespace decaf::io;
-using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::zip;
 
@@ -129,12 +126,19 @@ void ActiveMQBytesMessage::copyDataStructure(const DataStructure* src)
     const ActiveMQBytesMessage* srcPtr =
         dynamic_cast<const ActiveMQBytesMessage*>(src);
 
-    if (srcPtr == NULL || src == NULL)
+    if (src == NULL)
     {
-        throw decaf::lang::exceptions::NullPointerException(
-            __FILE__,
-            __LINE__,
-            "ActiveMQBytesMessage::copyDataStructure - src is NULL or invalid");
+        throw NullPointerException(__FILE__,
+                                   __LINE__,
+                                   "ActiveMQBytesMessage::copyDataStructure - "
+                                   "src is NULL.");
+    }
+
+    if (srcPtr == NULL)
+    {
+        throw TypeMismatchException(
+            "ActiveMQBytesMessage::copyDataStructure - src is not an "
+            "ActiveMQBytesMessage.");
     }
 
     ActiveMQBytesMessage* nonConstSrc =
@@ -244,18 +248,7 @@ bool ActiveMQBytesMessage::readBoolean() const
     {
         return this->dataIn->readBoolean();
     }
-    catch (EOFException& ex)
-    {
-        throw CMSExceptionSupport::createMessageEOFException(ex);
-    }
-    catch (IOException& ex)
-    {
-        throw CMSExceptionSupport::createMessageFormatException(ex);
-    }
-    catch (Exception& ex)
-    {
-        throw CMSExceptionSupport::create(ex);
-    }
+    AMQ_CATCH_DECAF_IOSTREAM_TO_CMS_MESSAGE()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -266,14 +259,7 @@ void ActiveMQBytesMessage::writeBoolean(bool value)
     {
         this->dataOut->writeBoolean(value);
     }
-    catch (EOFException& ex)
-    {
-        throw CMSExceptionSupport::createMessageEOFException(ex);
-    }
-    catch (Exception& ex)
-    {
-        throw CMSExceptionSupport::create(ex);
-    }
+    AMQ_CATCH_DECAF_IOSTREAM_TO_CMS_MESSAGE()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -284,18 +270,7 @@ unsigned char ActiveMQBytesMessage::readByte() const
     {
         return (unsigned char)this->dataIn->readByte();
     }
-    catch (EOFException& ex)
-    {
-        throw CMSExceptionSupport::createMessageEOFException(ex);
-    }
-    catch (IOException& ex)
-    {
-        throw CMSExceptionSupport::createMessageFormatException(ex);
-    }
-    catch (Exception& ex)
-    {
-        throw CMSExceptionSupport::create(ex);
-    }
+    AMQ_CATCH_DECAF_IOSTREAM_TO_CMS_MESSAGE()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -306,14 +281,7 @@ void ActiveMQBytesMessage::writeByte(unsigned char value)
     {
         this->dataOut->writeByte(value);
     }
-    catch (EOFException& ex)
-    {
-        throw CMSExceptionSupport::createMessageEOFException(ex);
-    }
-    catch (Exception& ex)
-    {
-        throw CMSExceptionSupport::create(ex);
-    }
+    AMQ_CATCH_DECAF_IOSTREAM_TO_CMS_MESSAGE()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -330,14 +298,7 @@ void ActiveMQBytesMessage::writeBytes(const std::vector<unsigned char>& value)
     {
         this->dataOut->write(&value[0], (int)value.size());
     }
-    catch (EOFException& ex)
-    {
-        throw CMSExceptionSupport::createMessageEOFException(ex);
-    }
-    catch (Exception& ex)
-    {
-        throw CMSExceptionSupport::create(ex);
-    }
+    AMQ_CATCH_DECAF_IOSTREAM_TO_CMS_MESSAGE()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -375,18 +336,7 @@ int ActiveMQBytesMessage::readBytes(unsigned char* buffer, int length) const
 
         return n;
     }
-    catch (EOFException& ex)
-    {
-        throw CMSExceptionSupport::createMessageEOFException(ex);
-    }
-    catch (IOException& ex)
-    {
-        throw CMSExceptionSupport::createMessageFormatException(ex);
-    }
-    catch (Exception& ex)
-    {
-        throw CMSExceptionSupport::create(ex);
-    }
+    AMQ_CATCH_DECAF_IOSTREAM_TO_CMS_MESSAGE()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -399,14 +349,7 @@ void ActiveMQBytesMessage::writeBytes(const unsigned char* value,
     {
         this->dataOut->write(value, length, offset, length);
     }
-    catch (EOFException& ex)
-    {
-        throw CMSExceptionSupport::createMessageEOFException(ex);
-    }
-    catch (Exception& ex)
-    {
-        throw CMSExceptionSupport::create(ex);
-    }
+    AMQ_CATCH_DECAF_IOSTREAM_TO_CMS_MESSAGE()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -417,18 +360,7 @@ char ActiveMQBytesMessage::readChar() const
     {
         return this->dataIn->readChar();
     }
-    catch (EOFException& ex)
-    {
-        throw CMSExceptionSupport::createMessageEOFException(ex);
-    }
-    catch (IOException& ex)
-    {
-        throw CMSExceptionSupport::createMessageFormatException(ex);
-    }
-    catch (Exception& ex)
-    {
-        throw CMSExceptionSupport::create(ex);
-    }
+    AMQ_CATCH_DECAF_IOSTREAM_TO_CMS_MESSAGE()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -439,14 +371,7 @@ void ActiveMQBytesMessage::writeChar(char value)
     {
         this->dataOut->writeChar(value);
     }
-    catch (EOFException& ex)
-    {
-        throw CMSExceptionSupport::createMessageEOFException(ex);
-    }
-    catch (Exception& ex)
-    {
-        throw CMSExceptionSupport::create(ex);
-    }
+    AMQ_CATCH_DECAF_IOSTREAM_TO_CMS_MESSAGE()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -457,18 +382,7 @@ float ActiveMQBytesMessage::readFloat() const
     {
         return this->dataIn->readFloat();
     }
-    catch (EOFException& ex)
-    {
-        throw CMSExceptionSupport::createMessageEOFException(ex);
-    }
-    catch (IOException& ex)
-    {
-        throw CMSExceptionSupport::createMessageFormatException(ex);
-    }
-    catch (Exception& ex)
-    {
-        throw CMSExceptionSupport::create(ex);
-    }
+    AMQ_CATCH_DECAF_IOSTREAM_TO_CMS_MESSAGE()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -479,14 +393,7 @@ void ActiveMQBytesMessage::writeFloat(float value)
     {
         this->dataOut->writeFloat(value);
     }
-    catch (EOFException& ex)
-    {
-        throw CMSExceptionSupport::createMessageEOFException(ex);
-    }
-    catch (Exception& ex)
-    {
-        throw CMSExceptionSupport::create(ex);
-    }
+    AMQ_CATCH_DECAF_IOSTREAM_TO_CMS_MESSAGE()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -497,18 +404,7 @@ double ActiveMQBytesMessage::readDouble() const
     {
         return this->dataIn->readDouble();
     }
-    catch (EOFException& ex)
-    {
-        throw CMSExceptionSupport::createMessageEOFException(ex);
-    }
-    catch (IOException& ex)
-    {
-        throw CMSExceptionSupport::createMessageFormatException(ex);
-    }
-    catch (Exception& ex)
-    {
-        throw CMSExceptionSupport::create(ex);
-    }
+    AMQ_CATCH_DECAF_IOSTREAM_TO_CMS_MESSAGE()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -519,14 +415,7 @@ void ActiveMQBytesMessage::writeDouble(double value)
     {
         this->dataOut->writeDouble(value);
     }
-    catch (EOFException& ex)
-    {
-        throw CMSExceptionSupport::createMessageEOFException(ex);
-    }
-    catch (Exception& ex)
-    {
-        throw CMSExceptionSupport::create(ex);
-    }
+    AMQ_CATCH_DECAF_IOSTREAM_TO_CMS_MESSAGE()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -537,18 +426,7 @@ short ActiveMQBytesMessage::readShort() const
     {
         return this->dataIn->readShort();
     }
-    catch (EOFException& ex)
-    {
-        throw CMSExceptionSupport::createMessageEOFException(ex);
-    }
-    catch (IOException& ex)
-    {
-        throw CMSExceptionSupport::createMessageFormatException(ex);
-    }
-    catch (Exception& ex)
-    {
-        throw CMSExceptionSupport::create(ex);
-    }
+    AMQ_CATCH_DECAF_IOSTREAM_TO_CMS_MESSAGE()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -559,14 +437,7 @@ void ActiveMQBytesMessage::writeShort(short value)
     {
         this->dataOut->writeShort(value);
     }
-    catch (EOFException& ex)
-    {
-        throw CMSExceptionSupport::createMessageEOFException(ex);
-    }
-    catch (Exception& ex)
-    {
-        throw CMSExceptionSupport::create(ex);
-    }
+    AMQ_CATCH_DECAF_IOSTREAM_TO_CMS_MESSAGE()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -577,18 +448,7 @@ unsigned short ActiveMQBytesMessage::readUnsignedShort() const
     {
         return this->dataIn->readUnsignedShort();
     }
-    catch (EOFException& ex)
-    {
-        throw CMSExceptionSupport::createMessageEOFException(ex);
-    }
-    catch (IOException& ex)
-    {
-        throw CMSExceptionSupport::createMessageFormatException(ex);
-    }
-    catch (Exception& ex)
-    {
-        throw CMSExceptionSupport::create(ex);
-    }
+    AMQ_CATCH_DECAF_IOSTREAM_TO_CMS_MESSAGE()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -599,14 +459,7 @@ void ActiveMQBytesMessage::writeUnsignedShort(unsigned short value)
     {
         this->dataOut->writeUnsignedShort(value);
     }
-    catch (EOFException& ex)
-    {
-        throw CMSExceptionSupport::createMessageEOFException(ex);
-    }
-    catch (Exception& ex)
-    {
-        throw CMSExceptionSupport::create(ex);
-    }
+    AMQ_CATCH_DECAF_IOSTREAM_TO_CMS_MESSAGE()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -617,18 +470,7 @@ int ActiveMQBytesMessage::readInt() const
     {
         return this->dataIn->readInt();
     }
-    catch (EOFException& ex)
-    {
-        throw CMSExceptionSupport::createMessageEOFException(ex);
-    }
-    catch (IOException& ex)
-    {
-        throw CMSExceptionSupport::createMessageFormatException(ex);
-    }
-    catch (Exception& ex)
-    {
-        throw CMSExceptionSupport::create(ex);
-    }
+    AMQ_CATCH_DECAF_IOSTREAM_TO_CMS_MESSAGE()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -639,14 +481,7 @@ void ActiveMQBytesMessage::writeInt(int value)
     {
         this->dataOut->writeInt(value);
     }
-    catch (EOFException& ex)
-    {
-        throw CMSExceptionSupport::createMessageEOFException(ex);
-    }
-    catch (Exception& ex)
-    {
-        throw CMSExceptionSupport::create(ex);
-    }
+    AMQ_CATCH_DECAF_IOSTREAM_TO_CMS_MESSAGE()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -657,18 +492,7 @@ long long ActiveMQBytesMessage::readLong() const
     {
         return this->dataIn->readLong();
     }
-    catch (EOFException& ex)
-    {
-        throw CMSExceptionSupport::createMessageEOFException(ex);
-    }
-    catch (IOException& ex)
-    {
-        throw CMSExceptionSupport::createMessageFormatException(ex);
-    }
-    catch (Exception& ex)
-    {
-        throw CMSExceptionSupport::create(ex);
-    }
+    AMQ_CATCH_DECAF_IOSTREAM_TO_CMS_MESSAGE()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -679,14 +503,7 @@ void ActiveMQBytesMessage::writeLong(long long value)
     {
         this->dataOut->writeLong(value);
     }
-    catch (EOFException& ex)
-    {
-        throw CMSExceptionSupport::createMessageEOFException(ex);
-    }
-    catch (Exception& ex)
-    {
-        throw CMSExceptionSupport::create(ex);
-    }
+    AMQ_CATCH_DECAF_IOSTREAM_TO_CMS_MESSAGE()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -697,18 +514,7 @@ std::string ActiveMQBytesMessage::readString() const
     {
         return this->dataIn->readString();
     }
-    catch (EOFException& ex)
-    {
-        throw CMSExceptionSupport::createMessageEOFException(ex);
-    }
-    catch (IOException& ex)
-    {
-        throw CMSExceptionSupport::createMessageFormatException(ex);
-    }
-    catch (Exception& ex)
-    {
-        throw CMSExceptionSupport::create(ex);
-    }
+    AMQ_CATCH_DECAF_IOSTREAM_TO_CMS_MESSAGE()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -719,14 +525,7 @@ void ActiveMQBytesMessage::writeString(const std::string& value)
     {
         this->dataOut->writeChars(value);
     }
-    catch (EOFException& ex)
-    {
-        throw CMSExceptionSupport::createMessageEOFException(ex);
-    }
-    catch (Exception& ex)
-    {
-        throw CMSExceptionSupport::create(ex);
-    }
+    AMQ_CATCH_DECAF_IOSTREAM_TO_CMS_MESSAGE()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -737,18 +536,7 @@ std::string ActiveMQBytesMessage::readUTF() const
     {
         return this->dataIn->readUTF();
     }
-    catch (EOFException& ex)
-    {
-        throw CMSExceptionSupport::createMessageEOFException(ex);
-    }
-    catch (IOException& ex)
-    {
-        throw CMSExceptionSupport::createMessageFormatException(ex);
-    }
-    catch (Exception& ex)
-    {
-        throw CMSExceptionSupport::create(ex);
-    }
+    AMQ_CATCH_DECAF_IOSTREAM_TO_CMS_MESSAGE()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -759,14 +547,7 @@ void ActiveMQBytesMessage::writeUTF(const std::string& value)
     {
         this->dataOut->writeUTF(value);
     }
-    catch (EOFException& ex)
-    {
-        throw CMSExceptionSupport::createMessageEOFException(ex);
-    }
-    catch (Exception& ex)
-    {
-        throw CMSExceptionSupport::create(ex);
-    }
+    AMQ_CATCH_DECAF_IOSTREAM_TO_CMS_MESSAGE()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -831,10 +612,7 @@ void ActiveMQBytesMessage::initializeReading() const
                     DataInputStream dis(is);
                     this->length = dis.readInt();
                 }
-                catch (IOException& ex)
-                {
-                    throw CMSExceptionSupport::create(ex);
-                }
+                AMQ_CATCH_DECAF_IOSTREAM_IOEXCEPTION_TO_CMS()
 
                 is = new InflaterInputStream(is, true);
             }

@@ -20,12 +20,11 @@
 #include <decaf/io/IOException.h>
 #include <decaf/io/InputStream.h>
 #include <decaf/io/OutputStream.h>
-#include <decaf/lang/exceptions/IndexOutOfBoundsException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
 #include <decaf/net/SocketException.h>
 #include <decaf/net/SocketImpl.h>
 #include <decaf/net/SocketTimeoutException.h>
 #include <decaf/util/Config.h>
+#include <stdexcept>
 
 namespace decaf
 {
@@ -169,8 +168,8 @@ namespace internal
                  * @return the actual number of bytes read or -1 if at EOF.
                  *
                  * @throw IOException if an I/O error occurs during the read.
-                 * @throw NullPointerException if buffer is Null.
-                 * @throw IndexOutOfBoundsException if offset + length is
+                 * @throw std::logic_error if buffer is Null.
+                 * @throw std::out_of_range if offset + length is
                  * greater than buffer size.
                  */
                 int read(unsigned char* buffer,
@@ -193,8 +192,8 @@ namespace internal
                  *      The number of bytes past offset to write.
                  *
                  * @throw IOException if an I/O error occurs during the write.
-                 * @throw NullPointerException if buffer is Null.
-                 * @throw IndexOutOfBoundsException if offset + length is
+                 * @throw std::logic_error if buffer is Null.
+                 * @throw std::out_of_range if offset + length is
                  * greater than buffer size.
                  */
                 void write(const unsigned char* buffer,

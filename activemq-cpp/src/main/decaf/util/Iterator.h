@@ -18,9 +18,7 @@
 #ifndef _DECAF_UTIL_ITERATOR_H_
 #define _DECAF_UTIL_ITERATOR_H_
 
-#include <decaf/lang/exceptions/IllegalStateException.h>
-#include <decaf/lang/exceptions/UnsupportedOperationException.h>
-#include <decaf/util/NoSuchElementException.h>
+#include <stdexcept>
 
 namespace decaf
 {
@@ -47,13 +45,13 @@ namespace util
          *
          * @return the next element in the iteration of elements.
          *
-         * @throws NoSuchElementException if the iteration has no more elements.
+         * @throws std::runtime_error if the iteration has no more elements.
          */
         virtual E next() = 0;
 
         /**
          * Returns true if the iteration has more elements.  Returns false if
-         * the next call to next would result in an NoSuchElementException to
+         * the next call to next would result in an std::runtime_error to
          * be thrown.
          *
          * @return true if there are more elements available for iteration.
@@ -68,9 +66,9 @@ namespace util
          * iteration is in progress in any way other than by calling this
          * method.
          *
-         * @throws UnsupportedOperationException if the remove  operation is
+         * @throws std::logic_error if the remove  operation is
          *         not supported by this Iterator.
-         * @throws IllegalStateException if the next method has not yet been
+         * @throws std::logic_error if the next method has not yet been
          *         called, or the remove method has already been called after
          *         the last call to the next method.
          */

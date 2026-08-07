@@ -17,11 +17,13 @@
 
 #include "OpenSSLSocketOutputStream.h"
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/internal/net/ssl/openssl/OpenSSLSocket.h>
+#include <stdexcept>
+#include <string>
 
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::io;
 using namespace decaf::internal;
 using namespace decaf::internal::net;
@@ -36,9 +38,10 @@ OpenSSLSocketOutputStream::OpenSSLSocketOutputStream(OpenSSLSocket* socket)
 {
     if (socket == NULL)
     {
-        throw NullPointerException(__FILE__,
-                                   __LINE__,
-                                   "TcpSocket instance passed was NULL.");
+        throw activemq::exceptions::NullPointerException(
+            __FILE__,
+            __LINE__,
+            "TcpSocket instance passed was NULL.");
     }
 }
 
@@ -91,9 +94,10 @@ void OpenSSLSocketOutputStream::doWriteArrayBounded(const unsigned char* buffer,
 
         if (buffer == NULL)
         {
-            throw NullPointerException(__FILE__,
-                                       __LINE__,
-                                       "passed buffer is null");
+            throw activemq::exceptions::NullPointerException(
+                __FILE__,
+                __LINE__,
+                "passed buffer is null");
         }
 
         if (closed)
@@ -106,7 +110,5 @@ void OpenSSLSocketOutputStream::doWriteArrayBounded(const unsigned char* buffer,
         this->socket->write(buffer, size, offset, length);
     }
     DECAF_CATCH_RETHROW(IOException)
-    DECAF_CATCH_RETHROW(NullPointerException)
-    DECAF_CATCH_RETHROW(IndexOutOfBoundsException)
     DECAF_CATCHALL_THROW(IOException)
 }

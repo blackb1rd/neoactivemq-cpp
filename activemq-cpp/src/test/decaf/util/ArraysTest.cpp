@@ -18,14 +18,14 @@
 #include <gtest/gtest.h>
 
 #include <decaf/lang/Integer.h>
-#include <decaf/lang/exceptions/UnsupportedOperationException.h>
 #include <decaf/util/Arrays.h>
+
+#include <stdexcept>
 
 using namespace std;
 using namespace decaf;
 using namespace decaf::util;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 class ArraysTest : public ::testing::Test
 {
@@ -77,10 +77,10 @@ TEST_F(ArraysTest, testFill1)
         ASSERT_EQ(std::string("B"), stringArray[i]);
     }
 
-    ASSERT_THROW(Arrays::fill((bool*)NULL, -1, false), NullPointerException)
-        << ("Should throw a NullPointerException");
+    ASSERT_THROW(Arrays::fill((bool*)NULL, -1, false), std::logic_error)
+        << ("Should throw std::logic_error");
 
-    ASSERT_THROW(Arrays::fill(boolArray, -1, false), IllegalArgumentException)
+    ASSERT_THROW(Arrays::fill(boolArray, -1, false), std::invalid_argument)
         << ("Should throw a IllegalArgumentException");
 }
 
@@ -99,23 +99,21 @@ TEST_F(ArraysTest, testFill2)
         ASSERT_EQ(false, boolArray[i]);
     }
 
-    ASSERT_THROW(Arrays::fill((bool*)NULL, -1, 0, 1, false),
-                 NullPointerException)
-        << ("Should throw a NullPointerException");
+    ASSERT_THROW(Arrays::fill((bool*)NULL, -1, 0, 1, false), std::logic_error)
+        << ("Should throw std::logic_error");
 
-    ASSERT_THROW(Arrays::fill(boolArray, -1, 0, 1, false),
-                 IllegalArgumentException)
+    ASSERT_THROW(Arrays::fill(boolArray, -1, 0, 1, false), std::invalid_argument)
         << ("Should throw a IllegalArgumentException");
 
     ASSERT_THROW(Arrays::fill(boolArray, SIZE, SIZE + 1, SIZE, false),
-                 IllegalArgumentException)
+                 std::invalid_argument)
         << ("Should throw a IllegalArgumentException");
 
     ASSERT_THROW(Arrays::fill(boolArray, SIZE, -1, SIZE, false),
-                 IndexOutOfBoundsException)
-        << ("Should throw a IndexOutOfBoundsException");
+                 std::out_of_range)
+        << ("Should throw a std::out_of_range");
 
     ASSERT_THROW(Arrays::fill(boolArray, SIZE, 0, SIZE + 10, false),
-                 IndexOutOfBoundsException)
-        << ("Should throw a IndexOutOfBoundsException");
+                 std::out_of_range)
+        << ("Should throw a std::out_of_range");
 }

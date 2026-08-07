@@ -17,19 +17,16 @@
 
 #include <decaf/lang/StringBuilder.h>
 
-#include <decaf/lang/exceptions/NegativeArraySizeException.h>
-#include <decaf/lang/exceptions/NullPointerException.h>
-
 #include <decaf/lang/Double.h>
 #include <decaf/lang/Float.h>
 #include <decaf/lang/Integer.h>
 #include <decaf/lang/Long.h>
 #include <decaf/lang/Short.h>
 #include <decaf/lang/StringBuffer.h>
+#include <stdexcept>
 
 using namespace decaf;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 
 ////////////////////////////////////////////////////////////////////////////////
 StringBuilder::StringBuilder()

@@ -17,9 +17,11 @@
 
 #include "SecurityRuntime.h"
 
+#include <activemq/exceptions/ExceptionTypes.h>
 #include <decaf/internal/security/ServiceRegistry.h>
 #include <decaf/internal/security/provider/DefaultProvider.h>
-#include <decaf/lang/exceptions/IllegalStateException.h>
+#include <stdexcept>
+#include <string>
 
 using namespace decaf;
 using namespace decaf::security;
@@ -27,7 +29,6 @@ using namespace decaf::internal;
 using namespace decaf::internal::security;
 using namespace decaf::internal::security::provider;
 using namespace decaf::lang;
-using namespace decaf::lang::exceptions;
 using namespace decaf::util;
 using namespace decaf::util::concurrent;
 
@@ -93,7 +94,7 @@ SecurityRuntime* SecurityRuntime::getSecurityRuntime()
 {
     if (SecurityRuntime::securityRuntime == NULL)
     {
-        throw IllegalStateException(
+        throw activemq::exceptions::IllegalStateException(
             __FILE__,
             __LINE__,
             "SecurityRuntime Runtime is not Initialized.");

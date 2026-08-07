@@ -24,9 +24,6 @@
         "type": "equals",
         "lhs": "${hostSystemName}",
         "rhs": "Linux"
-      },
-      "environment": {
-        "VCPKG_FORCE_SYSTEM_BINARIES": "1"
       }
     },
     {
@@ -44,9 +41,6 @@
         "type": "equals",
         "lhs": "${hostSystemName}",
         "rhs": "Linux"
-      },
-      "environment": {
-        "VCPKG_FORCE_SYSTEM_BINARIES": "1"
       }
     },
     {

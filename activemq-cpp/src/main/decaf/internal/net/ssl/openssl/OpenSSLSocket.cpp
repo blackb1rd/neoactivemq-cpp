@@ -80,7 +80,7 @@ namespace internal
             {
             public:
                 asio::io_context&                      ioContext;
-                std::unique_ptr<asio::ip::tcp::socket> socket;
+                std::shared_ptr<asio::ip::tcp::socket> socket;
                 // Other members exist but we don't need them here
             };
         }  // namespace tcp
